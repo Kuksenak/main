@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { environment } from '@environments/environment';
 
 @Injectable({
@@ -11,6 +12,7 @@ export class AuthStore {
 
   private baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   token = computed(() => this.tokenSignal());
 
@@ -21,18 +23,19 @@ export class AuthStore {
   }
 
   signout(): void {
-    this.tokenSignal.set(null);
     localStorage.removeItem('token');
+    this.tokenSignal.set(null);
+    this.router.navigate(['/signin']);
   }
 
   getToken(state: string | null) {
     if (!state) {
       this.signout();
     } else {
-
-      this.http.get<{ token: string, user: any }>(`${this.baseUrl}/auth/state/${state}`).subscribe(data => {
-        localStorage.setItem('token', data.token);
-        this.tokenSignal.set(data.token);
+      this.http.get<string>(`${this.baseUrl}/auth/state/${state}`).subscribe(data => {
+        localStorage.setItem('token', data);
+        this.tokenSignal.set(data);
+        this.router.navigate(['']);
       });
     }
   }

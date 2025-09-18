@@ -11,9 +11,8 @@ export class AuthCallback {
     router = inject(Router);
 
     ngOnInit() {
-        const token = this.route.snapshot.queryParamMap.get('state');
-        console.log(token);
-        this.authStore.getToken(token);
+        const state = this.route.snapshot.queryParamMap.get('state');
+        this.authStore.getToken(state);
         this.router.navigate(['/']);
     }
 }
