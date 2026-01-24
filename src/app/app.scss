@@ -1,0 +1,27 @@
+// :host ::ng-deep .google-btn .mdc-button__label {
+//     display: inline-flex;
+//     align-items: center;
+//     gap: 8px;
+// }
+
+:host {
+    height: 100vh;
+    display: block;
+}
+
+.page {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.content {
+    flex: 1; // занимает всё свободное место
+    min-height: 0; // важно для скролла
+    overflow: auto; // если контент длинный
+    padding: 16px;
+}
+
+.spacer {
+    flex: 1;
+}

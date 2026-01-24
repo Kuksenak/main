@@ -1,0 +1,18 @@
+<div class="page">
+    <div class="content">
+        <router-outlet></router-outlet>
+    </div>
+
+    <mat-toolbar>
+        <button matIconButton routerLink="/home" matTooltip="Home">
+            <mat-icon>home_app_logo</mat-icon>
+        </button>
+        <button matIconButton routerLink="/mfa" matTooltip="MFA">
+            <mat-icon>lock_person</mat-icon>
+        </button>
+        <span class="spacer"></span>
+        <button matIconButton (click)="auth.signout()" matTooltip="Sign out">
+            <mat-icon>exit_to_app</mat-icon>
+        </button>
+    </mat-toolbar>
+</div>
