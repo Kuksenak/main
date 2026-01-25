@@ -19,6 +19,24 @@
     </div> -->
 </div>
 
+
+<div class="scanner-shell">
+  <zxing-scanner 
+    [enable]="scannerEnabled"
+    (scanSuccess)="onScanSuccess($event)"
+    [formats]=allowedFormats>
+  </zxing-scanner>
+
+  <div class="overlay">
+    <div class="target-box"></div>
+    <p>Наведите камеру на QR-код</p>
+  </div>
+</div>
+
+<button (click)="toggleScanner()">
+  {{ scannerEnabled ? 'Выключить' : 'Включить камеру' }}
+</button>
+
 <!-- <p></p>
 <mat-form-field appearance="outline">
     <mat-label>Filter</mat-label>

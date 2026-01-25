@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MfaStore } from '../mfa.store';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import {
   MatDialog,
   MAT_DIALOG_DATA,
@@ -15,16 +16,17 @@ import {
 import { MfaDetails } from '../mfa-details/mfa-details';
 
 import jsqr from 'jsqr';
+import { BarcodeFormat } from '@zxing/library';
 
 @Component({
   selector: 'app-mfa',
-  imports: [MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatListModule, FormsModule, MatButtonModule],
+  imports: [MatButtonModule, MatIconModule, MatFormFieldModule, MatInputModule, MatListModule, FormsModule, MatButtonModule, ZXingScannerModule],
   templateUrl: './mfa.html',
   styleUrl: './mfa.scss',
 
 })
 export class Mfa implements OnInit {
-
+  allowedFormats = [BarcodeFormat.QR_CODE];
   // store = inject(MfaStore);
   // mode = signal<string>('view');
   issuer: any;
@@ -100,11 +102,26 @@ export class Mfa implements OnInit {
     const url = new URL(uri.replace('otpauth://', 'http://')); // хак для парсинга через URL
     const secret = url.searchParams.get('secret');
     const issuer = url.searchParams.get('issuer') || url.pathname.split(':')[0].replace('//totp/', '');
-    
+
     console.log('Secret:', secret, 'Issuer:', issuer);
     alert(`secret ${secret}, issuer ${issuer}`);
   }
 
+  scannerEnabled = false;
+  toggleScanner() {
+    this.scannerEnabled = !this.scannerEnabled;
+  }
+
+  onScanSuccess(result: string) {
+    console.log('Считанный URI:', result);
+    this.scannerEnabled = false; // Выключаем камеру после успеха
+    this.parseOtp(result);
+  }
+
+  private parseOtp(uri: string) {
+    // Ваша логика парсинга otpauth://
+    alert("Найден секрет: " + uri);
+  }
 
 
   // secrets: string[] = [
