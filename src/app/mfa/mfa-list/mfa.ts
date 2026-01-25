@@ -31,8 +31,17 @@ export class Mfa implements OnInit {
   // mode = signal<string>('view');
   issuer: any;
   secret: any;
+  text1: any;
 
-  ngOnInit() { }
+  ngOnInit() {
+    if ('BarcodeDetector' in window) {
+      this.text1 = 'Barcode Detector поддерживается!';
+      console.log('Barcode Detector поддерживается!');
+    } else {
+       this.text1 = 'Barcode Detector не поддерживается вашим браузером.';
+      // console.log('');
+    }
+  }
 
   create() {
     // this.store.create(this.issuer, this.secret);
