@@ -2,12 +2,29 @@
     <mat-icon>add</mat-icon>
     Create
 </button>
+<!-- <button matButton="tonal" (click)="scanScreen()">QR</button> -->
+
+<button matIconButton matTooltip="Scan QR code" (click)="scanScreen()">
+    <mat-icon>qr_code_scanner</mat-icon>
+</button>
+<div class="scanner-container">
+
+@if(loading){
+    loading
+}
+<canvas #canvas hidden></canvas>
+
+    <!-- <div @if = "scanning" class="status">
+        Статус: Ищу QR-код... Выберите окно с кодом.
+    </div> -->
+</div>
+
 <!-- <p></p>
 <mat-form-field appearance="outline">
     <mat-label>Filter</mat-label>
     <input matInput placeholder="Filter">
 </mat-form-field> -->
-@if(store.loading() && store.items().length === 0){
+<!-- @if(store.loading() && store.items().length === 0){
 <p>Loading...</p>
 }
 <mat-list role="list">
@@ -15,8 +32,8 @@
     <mat-list-item role="listitem">{{ item.issuer }} — {{ item.code }}</mat-list-item>
     <mat-divider></mat-divider>
     }
-</mat-list>
+</mat-list> -->
 
-@if(store.error()){
+<!-- @if(store.error()){
 <p>{{ store.error() }}</p>
-}
+} -->
