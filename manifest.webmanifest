@@ -54,9 +54,7 @@
     }
   ],
   "display": "standalone",
-  "display_override": [
-    "window-controls-overlay"
-  ],
+
   "theme_color": "#38383d",
   "background_color": "#38383d",
   "orientation": "portrait"
