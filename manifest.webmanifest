@@ -57,7 +57,7 @@
   "display_override": [
     "window-controls-overlay"
   ],
-  "background_color": "#262627",
-  "theme_color": "#262627",
+  "background_color": "#383b43",
+  "theme_color": "#383b43",
   "orientation": "portrait"
 }
