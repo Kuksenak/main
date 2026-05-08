@@ -1,7 +1,6 @@
 {
   "name": "main",
   "short_name": "main",
-  "display": "standalone",
   "scope": "./",
   "start_url": "./",
   "icons": [
@@ -53,5 +52,12 @@
       "type": "image/png",
       "purpose": "maskable any"
     }
-  ]
+  ],
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay"
+  ],
+  "background_color": "#f3f3f3",
+  "theme_color": "#f3f3f3",
+  "orientation": "portrait"
 }

@@ -1,0 +1,47 @@
+<!-- <button matIconButton matTooltip="Scan QR code" (click)="scanScreen()" [disabled]="loading">
+    <mat-icon>qr_code_scanner</mat-icon>
+</button>
+<button matIconButton matTooltip="Scan QR code" (click)="startLiveScanner()" [disabled]="loading">
+    <mat-icon>qr_code_scanner</mat-icon>
+</button>
+<button matIconButton matTooltip="Scan QR code" (click)="store.load()">
+    <mat-icon>sync</mat-icon>
+</button>
+<mat-list role="list">
+    @for (item of store.items(); track item; let i = $index) {
+    <mat-list-item (click)="copyCode(item.code)" role="listitem" [cdkCopyToClipboard]="item.code"
+        style="cursor: pointer;">
+        <span style="font-weight: 500; color: #286ed8;"> {{ formatCode(item.code) }}</span>
+        <span style="color: #0000006b;"> {{ item.issuer }}</span>
+    </mat-list-item>
+    <mat-divider></mat-divider>
+    }
+</mat-list>
+@if(loading){
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+@if (isCameraOpen) {
+<div class="fullscreen-scanner">
+    <video #videoElement autoplay playsinline (playing)="videoReady = true">
+    </video>
+
+    @if (videoReady) {
+    <div class="scanner-overlay">
+        <div class="target-box">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+        </div>
+
+        <p class="instruction">Поместите QR-код в рамку</p>
+    </div>
+
+    <div class="footer-controls">
+        <button mat-fab color="warn" (click)="stopCamera()" matTooltip="Закрыть камеру">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    }
+</div>
+} -->

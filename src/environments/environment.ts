@@ -1,4 +1,7 @@
+import packageJson from '../../package.json';
+
 export const environment = {
     production: false,
-    apiUrl: 'https://localhost:5111'
+    apiUrl: '/api',
+    version: packageJson.version
 };

@@ -1,12 +1,13 @@
 {
   "name": "main",
-  "version": "0.0.0",
+  "version": "0.0.43",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "deploy": "npm version patch --no-git-tag-version && ng build --configuration production --base-href / && npx angular-cli-ghpages --dir=dist/main/browser"
   },
   "prettier": {
     "printWidth": 100,
@@ -22,15 +23,15 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/cdk": "^20.2.3",
+    "@angular/cdk": "^21.1.1",
     "@angular/common": "^21.1.1",
     "@angular/compiler": "^21.1.1",
     "@angular/core": "^21.1.1",
     "@angular/forms": "^21.1.1",
-    "@angular/material": "^20.2.3",
     "@angular/platform-browser": "^21.1.1",
     "@angular/router": "^21.1.1",
     "@angular/service-worker": "^21.1.1",
+    "@microsoft/signalr": "^10.0.0",
     "@otplib/preset-browser": "^12.0.1",
     "@zxing/library": "^0.21.3",
     "@zxing/ngx-scanner": "^21.0.0",
@@ -44,13 +45,17 @@
     "@angular/build": "^21.1.1",
     "@angular/cli": "^21.1.1",
     "@angular/compiler-cli": "^21.1.1",
+    "@tailwindcss/postcss": "^4.2.0",
     "@types/jasmine": "~5.1.0",
+    "autoprefixer": "^10.4.24",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "4.2",
     "typescript": "~5.9.3"
   }
 }

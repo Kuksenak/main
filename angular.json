@@ -23,14 +23,23 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src",
+                "src/styles"
+              ]
+            },
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
-              }
+                "input": "public",
+                "output": "/"
+              },
+              "src/assets",
+              "src/CNAME"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.css"
             ]
           },
           "configurations": {
@@ -54,7 +63,7 @@
                 }
               ],
               "outputHashing": "all",
-              "baseHref": "/main/",
+              "baseHref": "/",
               "serviceWorker": "ngsw-config.json"
             },
             "development": {
@@ -75,7 +84,10 @@
               "buildTarget": "main:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          }
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
@@ -93,10 +105,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/CNAME"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.css"
             ]
           }
         }

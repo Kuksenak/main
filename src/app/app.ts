@@ -1,19 +1,33 @@
-import { Component, inject, signal } from '@angular/core';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { RouterLink, RouterOutlet } from '@angular/router';
-import { AuthStore } from './auth/auth-store';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip'
+import { Component, inject, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { AuthStore } from './_todo-core/auth/auth-store';
+import { Navbar } from './core/ui/navbar/navbar';
+import { environment } from '@environments/environment';
+import { SignalRService } from './_todo-core/realtime/signalr';
+import { NotificationService } from './_todo-core/notifications/notification-service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, MatToolbarModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [RouterOutlet, Navbar],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  // styleUrl: './app.scss'
 })
-export class App {
-  protected readonly title = signal('main');
+export class App implements OnInit {
+  protected version = environment.version;
+  authStore = inject(AuthStore);
+  signalR = inject(SignalRService);
+  notificationService = inject(NotificationService);
 
-  auth = inject(AuthStore);
+  ngOnInit() {
+    this.signalR.startConnection();
+
+    this.signalR.onNotification((msg) => {
+      console.log('Notification:', msg);
+      this.authStore.initAuth().subscribe();
+      this.notificationService.show(msg);
+
+    });
+  }
 }
+
+

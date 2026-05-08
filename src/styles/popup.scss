@@ -1,0 +1,111 @@
+/* Основная обертка приложения */
+#app-main-wrapper {
+    background-color: var(--color-app-bg);
+    transform-origin: center top;
+    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+        border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+        background-color 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+    will-change: transform;
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+/* Эффект "карточки" при открытии шторки */
+.app-stacked {
+    /* Сжатие и скругление */
+    transform: translateY(calc(env(safe-area-inset-top, 20px) + 8px)) scale(0.93) !important;
+    border-radius: 16px !important;
+
+    /* Блокируем взаимодействие */
+    pointer-events: none;
+    user-select: none;
+
+    /* Высветление: подмешиваем белый к surface, чтобы в темной теме карточка "засветилась" */
+    background-color: color-mix(in srgb, var(--color-app-surface), white 20%) !important;
+
+    /* Оставляем высокую непрозрачность, чтобы текст был четким */
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+/* Мобильная шторка (Glassmorphism) */
+.mobile-sheet {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden;
+    width: 100%;
+
+    /* Стекло */
+    background-color: color-mix(in srgb, var(--color-app-surface), transparent 15%) !important;
+    backdrop-filter: blur(20px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+
+    /* Границы и тени */
+    border-top: 1px solid var(--color-app-border) !important;
+    border-left: 1px solid var(--color-app-border) !important;
+    border-right: 1px solid var(--color-app-border) !important;
+    border-radius: 20px 20px 0 0 !important;
+
+    height: calc(100dvh - env(safe-area-inset-top, 20px) - 24px) !important;
+    will-change: transform;
+
+    /* Тень и заполнение пустоты снизу при свайпе */
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.1),
+        0 100px 0 0 var(--color-app-surface);
+}
+
+/* Десктопная панель */
+.desktop-sheet {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden;
+    /* Нейтральный glass‑эффект, завязанный на тему */
+    background-color: color-mix(in srgb, var(--color-app-surface), transparent 28%) !important;
+    backdrop-filter: blur(22px) saturate(170%) !important;
+    -webkit-backdrop-filter: blur(22px) saturate(170%) !important;
+    border-radius: 22px !important;
+    border: 1px solid color-mix(in srgb, var(--color-app-border), white 22%) !important;
+    max-height: 90vh !important;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
+    animation: panel-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+
+    /* Область захвата (ручка) */
+    .sheet-handle-wrapper {
+        display: flex;
+        justify-content: center;
+        padding: 12px 0 16px 0;
+        cursor: grab;
+        touch-action: none;
+        background: transparent;
+        width: 100%;
+        flex-shrink: 0;
+    }
+
+    .sheet-handle {
+        width: 36px;
+        height: 5px !important;
+        background-color: var(--color-app-text);
+        opacity: 0.2;
+        border-radius: 10px;
+    }
+
+    /* Фон подложки (прозрачный, так как мы видим body) */
+    .sheet-backdrop {
+        background: transparent !important;
+    }
+
+    @keyframes panel-in {
+        from {
+            opacity: 0;
+            transform: scale(0.95) translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+}
