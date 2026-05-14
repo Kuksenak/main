@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  deployments: write
 
 concurrency:
   group: gh-pages
@@ -15,6 +16,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ vars.PAGES_URL != '' && vars.PAGES_URL || format('https://{0}/', vars.PAGES_CNAME) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
