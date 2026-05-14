@@ -80,7 +80,7 @@ Workflow: `.github/workflows/deploy-ghpages.yml`
 | `API_URL` | yes | `https://api.example.com` | Injected into `src/environments/environment.prod.ts` before building |
 | `PAGES_CNAME` | yes | `adnak.app` | Custom domain for Pages; used to generate `CNAME` |
 | `PAGES_URL` | no | `https://adnak.app/` | If set, shown as the environment URL in the Actions UI |
-| `PAGES_DEPLOY_BRANCH` | no | `main` or `master` | Which branch is allowed to run the **deploy** job (defaults to `main`) |
+| `PAGES_DEPLOY_BRANCH` | no | `main` or `master` | Which branch is allowed to run the **deploy** job (defaults to the repository default branch) |
 
 **GitHub settings required**
 
