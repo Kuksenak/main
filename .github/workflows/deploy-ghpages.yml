@@ -1,0 +1,67 @@
+name: Deploy to GitHub Pages (gh-pages)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate API_URL
+        env:
+          API_URL: ${{ vars.API_URL }}
+        run: |
+          if [ -z "$API_URL" ]; then
+            echo "ERROR: vars.API_URL is not set" >&2
+            exit 1
+          fi
+
+      - name: Validate custom domain (CNAME)
+        env:
+          PAGES_CNAME: ${{ vars.PAGES_CNAME }}
+        run: |
+          if [ -z "$PAGES_CNAME" ]; then
+            echo "ERROR: vars.PAGES_CNAME is not set (e.g. inky.one)" >&2
+            exit 1
+          fi
+
+      - name: Inject API_URL into environment.prod.ts
+        env:
+          API_URL: ${{ vars.API_URL }}
+        run: |
+          node -e "const fs=require('fs'); const p='src/environments/environment.prod.ts'; let s=fs.readFileSync(p,'utf8'); const next=s.replace(/apiUrl:\s*'[^']*'/, \`apiUrl: '\${process.env.API_URL}'\`); if (next===s) { console.error('ERROR: apiUrl field not found in '+p); process.exit(1); } fs.writeFileSync(p,next);"
+
+      - name: Build (production)
+        run: npm run build -- --configuration production
+
+      - name: Configure git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to gh-pages branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAGES_CNAME: ${{ vars.PAGES_CNAME }}
+        run: npx angular-cli-ghpages --dir=dist/main/browser --cname "$PAGES_CNAME" --no-silent

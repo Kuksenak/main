@@ -5,7 +5,7 @@ export type SnackType = 'info' | 'success' | 'error';
   selector: 'app-snack',
   imports: [],
   templateUrl: './snack.html',
-  // styleUrl: './snack.scss',
+  styleUrl: './snack.scss',
 })
 export class Snack {
   message = input.required<string>();

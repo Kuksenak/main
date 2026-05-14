@@ -1,13 +1,12 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable, signal } from "@angular/core";
-import { environment } from "@environments/environment";
 import { Mfa } from "app/_todo-features/mfa/mfa.model";
+import { environment } from "@environments/environment";
 
 @Injectable({ providedIn: 'root' })
 export class MfaStore {
-
-  private baseUrl = `${environment.apiUrl}/mfa`;
   private http = inject(HttpClient);
+  private baseUrl = `${environment.apiUrl}/mfa`;
 
   items = signal<Mfa[]>([]);
   loading = signal(false);

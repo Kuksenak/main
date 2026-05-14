@@ -1,23 +1,61 @@
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
 
+/* ═══════════════════════════════════════════════════
+   Apple Music Design System — Tokens
+   ═══════════════════════════════════════════════════ */
+
 :root {
-    --bg-main: #f3f3f3;
-    --color-app-bg: #f3f3f3;
+    /* Основные цвета (Apple Music Light) */
+    --bg-main: #f5f5f7;
+    --color-app-bg: #f5f5f7;
     --color-app-surface: #ffffff;
-    --color-app-border: rgba(0, 0, 0, 0.1);
-    --border-menu: rgba(0, 0, 0, 0.1);
-    --hover-menu: rgba(0, 0, 0, 0.05);
+    --color-app-border: rgba(0, 0, 0, 0.08);
+    --border-menu: rgba(0, 0, 0, 0.08);
+    --hover-menu: rgba(0, 0, 0, 0.04);
+
+    /* Glass-эффекты */
+    --glass-bg: rgba(245, 245, 247, 0.72);
+    --glass-blur: blur(20px) saturate(1.8);
+
+    /* Акценты */
+    --color-accent: #fa233b;
+    --color-accent-hover: #e01e34;
+
+    /* Тени */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.12);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+    /* Скругления */
+    --radius-xs: 6px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-pill: 100px;
 }
 
 html.dark {
-    --bg-main: #33373a;
-    --color-app-bg: #33373a;
-    --color-app-surface: #33373a;
-    --color-app-border: rgba(255, 255, 255, 0.08);
+    --bg-main: #1d1d1f;
+    --color-app-bg: #1d1d1f;
+    --color-app-surface: #2c2c2e;
+    --color-app-border: rgba(255, 255, 255, 0.1);
     --border-menu: rgba(255, 255, 255, 0.1);
-    --hover-menu: rgba(255, 255, 255, 0.1);
+    --hover-menu: rgba(255, 255, 255, 0.06);
+
+    --glass-bg: rgba(29, 29, 31, 0.72);
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
+
+/* ═══════════════════════════════════════════════════
+   Типографика — Apple System Font Stack
+   ═══════════════════════════════════════════════════ */
 
 @font-face {
     font-family: 'Inter';
@@ -29,21 +67,25 @@ html.dark {
 
 html,
 body {
-    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+        'Inter', 'Helvetica Neue', system-ui, sans-serif;
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     margin: 0;
     height: 100%;
     background-color: var(--bg-main);
-    color: #111827;
+    color: #1d1d1f;
     color-scheme: light;
+    letter-spacing: -0.01em;
 }
 
 @media (max-width: 768px) {
 
     html,
     body {
-        font-size: 18px;
+        font-size: 17px;
     }
 }
 
@@ -55,13 +97,16 @@ html.dark body {
 }
 
 body {
-    line-height: 1.45;
+    line-height: 1.47;
 }
 
-/* Красивые скроллбары в стиле macOS */
+/* ═══════════════════════════════════════════════════
+   Скроллбары в стиле Apple
+   ═══════════════════════════════════════════════════ */
+
 ::-webkit-scrollbar {
-    width: 14px;
-    height: 14px;
+    width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -69,26 +114,28 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
-    border: 4px solid transparent;
+    background-color: rgba(0, 0, 0, 0.15);
+    border: 2px solid transparent;
     background-clip: content-box;
     border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 html.dark ::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
 html.dark ::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(255, 255, 255, 0.35);
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
+/* ═══════════════════════════════════════════════════
+   Основная обертка приложения
+   ═══════════════════════════════════════════════════ */
 
-/* Основная обертка приложения */
 #app-main-wrapper {
     background-color: var(--color-app-bg);
     transform-origin: center top;
@@ -159,13 +206,15 @@ body:has(.app-stacked) {
     background-color: var(--bg-main) !important;
 }
 
-/* Мобильная шторка (iOS Opaque Style) */
+/* ═══════════════════════════════════════════════════
+   Мобильная шторка (iOS Opaque Style)
+   ═══════════════════════════════════════════════════ */
+
 .mobile-sheet {
     display: flex !important;
     flex-direction: column !important;
     overflow: hidden !important;
     width: 100% !important;
-    /* Убрали max-width для полной ширины */
     margin: 0 !important;
 
     /* Непрозрачный фон как в последних iOS */
@@ -177,7 +226,7 @@ body:has(.app-stacked) {
     border-top: 1px solid var(--color-app-border) !important;
     border-left: 1px solid var(--color-app-border) !important;
     border-right: 1px solid var(--color-app-border) !important;
-    border-radius: 20px 20px 0 0 !important;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
 
     height: calc(100dvh - env(safe-area-inset-top, 20px) - 24px) !important;
     padding-left: 0 !important;
@@ -194,6 +243,127 @@ body:has(.app-stacked) {
     background: transparent !important;
 }
 
+/* ═══════════════════════════════════════════════════
+   Утилиты Apple Music
+   ═══════════════════════════════════════════════════ */
+
+/* Frosted glass navbar */
+.apple-glass {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+}
+
+/* Карточки альбомов */
+.apple-card {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.apple-card:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-md);
+}
+
+.apple-card img {
+    border-radius: var(--radius-sm);
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* Секционные заголовки */
+.apple-section-title {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+/* Кнопки Apple-стиль */
+.apple-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    outline: none;
+}
+
+.apple-btn-primary {
+    background: var(--color-accent);
+    color: white;
+}
+
+.apple-btn-primary:hover {
+    background: var(--color-accent-hover);
+    transform: scale(1.02);
+}
+
+.apple-btn-ghost {
+    background: rgba(0, 0, 0, 0.05);
+    color: inherit;
+}
+
+.apple-btn-ghost:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+html.dark .apple-btn-ghost {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+html.dark .apple-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Apple Music меню */
+.apple-menu {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--color-app-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 6px;
+    min-width: 200px;
+}
+
+.apple-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: var(--radius-xs);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.15s ease;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    color: inherit;
+}
+
+.apple-menu-item:hover {
+    background: var(--hover-menu);
+}
+
+.apple-menu-separator {
+    height: 1px;
+    background: var(--color-app-border);
+    margin: 4px 8px;
+}
+
 @keyframes panel-in {
     from {
         opacity: 0;
@@ -204,4 +374,87 @@ body:has(.app-stacked) {
         opacity: 1;
         transform: scale(1) translateY(0);
     }
+}
+
+/* Плавная анимация появления */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.4s ease-out both;
+}
+
+/* ═══════════════════════════════════════════════════
+   Apple Music — Floating Player Bar
+   ═══════════════════════════════════════════════════ */
+
+.apple-player-bar {
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom) + 24px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 720px;
+    height: 64px;
+    border-radius: var(--radius-pill);
+    background: rgba(246, 246, 246, 0.48);
+    backdrop-filter: saturate(1.9) blur(30px);
+    -webkit-backdrop-filter: saturate(1.9) blur(30px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 40;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+html.dark .apple-player-bar {
+    background: rgba(40, 40, 40, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+.player-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: inherit;
+    opacity: 0.7;
+    transition: all 0.2s;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.player-btn:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+html.dark .player-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.player-btn.play {
+    width: 44px;
+    height: 44px;
+    opacity: 1;
+}
+
+.player-btn.play svg {
+    width: 24px;
+    height: 24px;
 }

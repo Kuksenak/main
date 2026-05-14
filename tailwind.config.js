@@ -6,14 +6,16 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'Inter', 'Helvetica Neue', 'system-ui', 'sans-serif'],
       },
-    
+      colors: {
+        'apple-red': '#fa233b',
+        'apple-red-hover': '#e01e34',
+      },
+      borderRadius: {
+        'apple': '12px',
+      }
     },
   },
   plugins: [],
 }
-
-// export default {
-//   darkMode: 'class',
-// }

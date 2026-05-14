@@ -8,21 +8,33 @@ export class NotificationService {
   private overlay = inject(Overlay);
   private activeToasts: any[] = [];
 
-  show(message: string, type: SnackType = 'info') {
+  // Удалили constructor, так как Safari блокирует авто-запрос прав при загрузке.
+
+  async show(message: string, type: SnackType = 'info') {
+    // WebKit/iOS требует, чтобы запрос прав происходил ТОЛЬКО по прямому клику пользователя.
+    if ('Notification' in window) {
+      if (Notification.permission === 'default') {
+        // Запрашиваем права. Это сработает, только если show() был вызван по клику кнопки.
+        await Notification.requestPermission();
+      }
+      
+      if (Notification.permission === 'granted') {
+          new Notification('My App', { 
+              body: message,
+              icon: '/favicon.ico'
+          });
+      }
+    }
+
+    // 2. Внутриигровой снек
     const overlayRef = this.overlay.create({
-      positionStrategy: this.overlay.position()
-        .global()
-        .bottom(this.getPosition(0))
-        .centerHorizontally(),
-      panelClass: 'pointer-events-none' // Чтобы не блокировать клики вне тоста
+      positionStrategy: this.getPositionStrategy(0),
+      panelClass: 'pointer-events-none'
     });
 
     // Сдвигаем старые вверх
     this.activeToasts.forEach((ref, i) => {
-      const pos = this.getPosition(this.activeToasts.length - i);
-      ref.updatePositionStrategy(
-        this.overlay.position().global().bottom(pos).centerHorizontally()
-      );
+      ref.updatePositionStrategy(this.getPositionStrategy(this.activeToasts.length - i));
     });
 
     const portal = new ComponentPortal<Snack>(Snack);
@@ -45,19 +57,23 @@ export class NotificationService {
     setTimeout(remove, 4000);
   }
 
-  private getPosition(index: number): string {
-    // Учитываем отступ снизу + безопасную зону iPhone
-    const baseGap = 20;
-    const toastHeight = 60;
-    return `calc(env(safe-area-inset-bottom) + ${baseGap + (index * (toastHeight + 12))}px)`;
+  private getPositionStrategy(index: number) {
+    const isDesktop = window.innerWidth >= 768;
+    // Отступ снизу. На мобилке нужно поднять выше плеера (~100px)
+    const baseGap = isDesktop ? 24 : 100; 
+    const toastHeight = 56;
+    const offset = baseGap + (index * (toastHeight + 8));
+
+    if (isDesktop) {
+      return this.overlay.position().global().bottom(`${offset}px`).right('24px');
+    } else {
+      return this.overlay.position().global().bottom(`calc(env(safe-area-inset-bottom) + ${offset}px)`).centerHorizontally();
+    }
   }
 
   private recalculate() {
     this.activeToasts.forEach((ref, i) => {
-      const pos = this.getPosition(this.activeToasts.length - 1 - i);
-      ref.updatePositionStrategy(
-        this.overlay.position().global().bottom(pos).centerHorizontally()
-      );
+      ref.updatePositionStrategy(this.getPositionStrategy(this.activeToasts.length - 1 - i));
     });
   }
 }

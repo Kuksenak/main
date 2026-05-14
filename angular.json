@@ -35,8 +35,7 @@
                 "input": "public",
                 "output": "/"
               },
-              "src/assets",
-              "src/CNAME"
+              "src/assets"
             ],
             "styles": [
               "src/styles.css"
@@ -105,8 +104,7 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              "src/CNAME"
+              }
             ],
             "styles": [
               "src/styles.css"

@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { environment } from '@environments/environment';
 import { Theme } from 'app/_todo-core/theme/theme'; // Твой ThemeService
 import { catchError, Observable, of, switchMap, tap, timeout } from 'rxjs';
+import { environment } from '@environments/environment';
 
 export interface UserProfile {
   id: string;
