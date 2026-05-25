@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './_todo-core/auth/auth-guard';
 import { Home } from './_todo-features/home/home';
-import { Settings } from './_todo-features/settings/settings';
 
 export const routes: Routes = [
     { path: 'home', component: Home, canActivate: [authGuard] },
@@ -13,6 +12,18 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () =>
             import('./features/settings/settings').then((m) => m.Settings),
+        canActivate: [authGuard],
+    },
+    {
+        path: 'events',
+        loadComponent: () =>
+            import('./features/events/events').then((m) => m.Events),
+        canActivate: [authGuard],
+    },
+    {
+        path: 'events-calendar',
+        loadComponent: () =>
+            import('./features/events/events-calendar').then((m) => m.EventsCalendar),
         canActivate: [authGuard],
     },
     // { path: '', redirectTo: 'home', pathMatch: 'full' },

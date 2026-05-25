@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Theme } from 'app/_todo-core/theme/theme'; // Твой ThemeService
-import { catchError, Observable, of, switchMap, tap, timeout } from 'rxjs';
+import { catchError, finalize, Observable, of, switchMap, tap, timeout } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export interface UserProfile {
@@ -13,6 +13,22 @@ export interface UserProfile {
   roles: string[];
   theme: string;
   accentColor: string;
+}
+
+export interface CalendarEvent {
+  id: string;
+  calendarId: string;
+  calendarName: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  isAllDay: boolean;
+  description: string | null;
+  location: string | null;
+}
+
+export interface EventsResponse {
+  events: CalendarEvent[];
 }
 
 @Injectable({
@@ -26,10 +42,14 @@ export class AuthStore {
   // Состояние (Private Signals)
   private _user = signal<UserProfile | null>(null);
   private _accessToken = signal<string | null>(null);
+  private _events = signal<CalendarEvent[]>([]);
+  private _eventsLoading = signal(false);
 
   // Публичные данные (Readonly)
   readonly user = this._user.asReadonly();
   readonly accessToken = this._accessToken.asReadonly();
+  readonly events = this._events.asReadonly();
+  readonly eventsLoading = this._eventsLoading.asReadonly();
   readonly isAuthenticated = computed(() => !!this._user());
 
   /**
@@ -65,6 +85,29 @@ export class AuthStore {
         if (user.theme) {
           this.themeService.updateFromProfile(user.theme, user.accentColor);
         }
+        this.fetchEvents().subscribe(); // Загружаем события после загрузки профиля
+      })
+    );
+  }
+
+  loadEvents(): Observable<EventsResponse> {
+    return this.fetchEvents();
+  }
+
+  private fetchEvents(): Observable<EventsResponse> {
+    this._eventsLoading.set(true);
+
+    return this.http.get<EventsResponse>(`${environment.apiUrl}/events`).pipe(
+      tap((response) => {
+        this._events.set(response.events ?? []);
+      }),
+      catchError((err) => {
+        console.error('Failed to load events', err);
+        this._events.set([]);
+        return of({ events: [] });
+      }),
+      finalize(() => {
+        this._eventsLoading.set(false);
       })
     );
   }

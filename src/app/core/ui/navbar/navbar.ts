@@ -1,5 +1,6 @@
 import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
 import { Component, computed, ElementRef, inject, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Sheet } from '../sheet/sheet';
 import { Settings } from 'app/features/settings/settings';
@@ -15,6 +16,7 @@ import { Settings } from 'app/features/settings/settings';
 export class Navbar {
   protected readonly auth = inject(AuthStore);
   private readonly sheet = inject(Sheet);
+  private readonly router = inject(Router);
 
   protected readonly userEmail = computed(() => this.auth.user()?.email ?? '');
   protected readonly userInitial = computed(() => {
@@ -26,6 +28,10 @@ export class Navbar {
 
   openSettings() {
     this.sheet.open(Settings);
+  }
+
+  openEvents() {
+    this.router.navigate(['/events']);
   }
 
   // openApplications() {

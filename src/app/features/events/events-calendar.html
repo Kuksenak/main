@@ -1,0 +1,203 @@
+<section class="flex flex-col gap-4">
+  <div class="flex items-center justify-between gap-3">
+    <div>
+      <h1 class="text-[22px] font-bold tracking-tight">Events by day</h1>
+      <p class="text-[13px] opacity-60">Grid view organized by date</p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="goToListView()"
+        title="Switch to list view"
+        class="w-9 h-9 flex items-center justify-center rounded-[10px] text-[13px] font-semibold bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 transition-all duration-200"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        (click)="refresh()"
+        class="px-4 py-2 rounded-[12px] text-[13px] font-semibold bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 transition-all duration-200"
+        [disabled]="loading()"
+      >
+        {{ loading() ? 'Loading...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <button
+      type="button"
+      [cdkMenuTriggerFor]="calendarMenu"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-[13px] font-semibold bg-white/50 dark:bg-white/[0.05] hover:bg-white/70 dark:hover:bg-white/[0.08] border border-black/8 dark:border-white/[0.12] transition-all duration-200"
+    >
+      <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+      </svg>
+      <span class="hidden md:inline">{{ selectedCalendar() === 'all' ? 'All calendars' : selectedCalendar() }}</span>
+      <svg class="w-3.5 h-3.5 opacity-50 ml-auto md:ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+
+    <ng-template #calendarMenu>
+      <div cdkMenu class="apple-menu mt-2">
+        <button
+          cdkMenuItem
+          (click)="onCalendarChange('all')"
+          class="apple-menu-item flex items-center gap-2"
+        >
+          @if (selectedCalendar() === 'all') {
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 12l5 5L19 7" />
+            </svg>
+          }
+          All calendars
+        </button>
+
+        <div class="apple-menu-separator"></div>
+
+        @for (calendar of calendars(); track calendar) {
+          <button
+            cdkMenuItem
+            (click)="onCalendarChange(calendar)"
+            [class.font-bold]="selectedCalendar() === calendar"
+            class="apple-menu-item flex items-center gap-2"
+          >
+            @if (selectedCalendar() === calendar) {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 12l5 5L19 7" />
+              </svg>
+            }
+            {{ calendar }}
+          </button>
+        }
+      </div>
+    </ng-template>
+  </div>
+
+  @if (dayGroups().length === 0 && !loading()) {
+    <div class="p-4 rounded-[14px] bg-black/[0.03] dark:bg-white/[0.04] text-[14px] opacity-70">
+      No events found.
+    </div>
+  }
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    @for (day of dayGroups(); track day.dateStr; let i = $index) {
+      @if (i === todayIndex()) {
+        <div 
+          #todayCard
+          class="rounded-[14px] border border-black/8 dark:border-white/10 bg-white/50 dark:bg-white/[0.03] overflow-hidden ring-2"
+          [style.--tw-ring-color]="'var(--color-accent)'"
+        >
+          <!-- Day Header -->
+          <div class="px-4 py-3 bg-gradient-to-r from-black/[0.03] to-transparent dark:from-white/[0.08] dark:to-transparent border-b border-black/8 dark:border-white/10">
+            <div class="font-bold text-[15px] tracking-tight">
+              {{ day.date | date: 'EEEE' }}
+            </div>
+            <div class="text-[13px] opacity-70 mt-0.5">
+              {{ day.date | date: 'MMM d, yyyy' }}
+            </div>
+            @if (isToday(day.date)) {
+              <div class="text-[11px] font-semibold text-[var(--color-accent)] mt-1 uppercase tracking-wider">
+                Today
+              </div>
+            }
+          </div>
+
+          <!-- Events in Day -->
+          <div class="divide-y divide-black/8 dark:divide-white/10">
+            @if (day.events.length === 0) {
+              <div class="px-4 py-3 text-[13px] opacity-50">No events</div>
+            }
+
+            @for (event of day.events; track event.id) {
+              <article class="px-4 py-3 hover:bg-black/[0.02] dark:hover:bg-white/[0.05] transition-colors duration-150">
+                <h3 class="text-[13px] font-semibold leading-tight mb-1">{{ event.title }}</h3>
+
+                <div class="text-[12px] opacity-70 mb-1">
+                  {{ event.startDate | date: 'HH:mm' }} - {{ event.endDate | date: 'HH:mm' }}
+                  @if (event.isAllDay) {
+                    <span class="font-medium">(All day)</span>
+                  }
+                </div>
+
+                <div class="text-[11px] opacity-60">
+                  {{ event.calendarName }}
+                </div>
+
+                @if (event.location) {
+                  <div class="text-[11px] opacity-70 mt-1">
+                    {{ event.location }}
+                  </div>
+                }
+
+                @if (event.description) {
+                  <p class="text-[11px] opacity-65 whitespace-pre-wrap mt-2 line-clamp-3">
+                    {{ event.description }}
+                  </p>
+                }
+              </article>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="rounded-[14px] border border-black/8 dark:border-white/10 bg-white/50 dark:bg-white/[0.03] overflow-hidden">
+          <!-- Day Header -->
+          <div class="px-4 py-3 bg-gradient-to-r from-black/[0.03] to-transparent dark:from-white/[0.08] dark:to-transparent border-b border-black/8 dark:border-white/10">
+            <div class="font-bold text-[15px] tracking-tight">
+              {{ day.date | date: 'EEEE' }}
+            </div>
+            <div class="text-[13px] opacity-70 mt-0.5">
+              {{ day.date | date: 'MMM d, yyyy' }}
+            </div>
+            @if (isToday(day.date)) {
+              <div class="text-[11px] font-semibold text-[var(--color-accent)] mt-1 uppercase tracking-wider">
+                Today
+              </div>
+            }
+          </div>
+
+          <!-- Events in Day -->
+          <div class="divide-y divide-black/8 dark:divide-white/10">
+            @if (day.events.length === 0) {
+              <div class="px-4 py-3 text-[13px] opacity-50">No events</div>
+            }
+
+            @for (event of day.events; track event.id) {
+              <article class="px-4 py-3 hover:bg-black/[0.02] dark:hover:bg-white/[0.05] transition-colors duration-150">
+                <h3 class="text-[13px] font-semibold leading-tight mb-1">{{ event.title }}</h3>
+
+                <div class="text-[12px] opacity-70 mb-1">
+                  {{ event.startDate | date: 'HH:mm' }} - {{ event.endDate | date: 'HH:mm' }}
+                  @if (event.isAllDay) {
+                    <span class="font-medium">(All day)</span>
+                  }
+                </div>
+
+                <div class="text-[11px] opacity-60">
+                  {{ event.calendarName }}
+                </div>
+
+                @if (event.location) {
+                  <div class="text-[11px] opacity-70 mt-1">
+                    {{ event.location }}
+                  </div>
+                }
+
+                @if (event.description) {
+                  <p class="text-[11px] opacity-65 whitespace-pre-wrap mt-2 line-clamp-3">
+                    {{ event.description }}
+                  </p>
+                }
+              </article>
+            }
+          </div>
+        </div>
+      }
+    }
+  </div>
+</section>
