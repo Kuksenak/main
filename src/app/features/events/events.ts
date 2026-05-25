@@ -1,19 +1,28 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
+import { Component, TemplateRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
+import { EventsConfig } from './events-config';
+import { Sheet } from 'app/core/ui/sheet/sheet';
+import { EventsNew } from './events-new';
+import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [DatePipe, CdkMenu, CdkMenuItem, CdkMenuTrigger],
+  imports: [DatePipe],
   templateUrl: './events.html',
 })
-export class Events implements OnInit {
+export class Events {
   private readonly store = inject(AuthStore);
-  private readonly router = inject(Router);
-  protected readonly selectedCalendar = signal('all');
+  private readonly config = inject(EventsConfig);
+  private readonly sheet = inject(Sheet);
+  private readonly header = createSheetHeaderRegistrar();
+  private readonly title = createSheetTitleRegistrar();
+
+  @ViewChild('sheetHeaderActions', { static: true })
+  private sheetHeaderActionsTpl?: TemplateRef<unknown>;
+
+  protected readonly selectedCalendar = this.config.selectedCalendar;
 
   protected readonly calendars = computed(() => {
     const uniqueNames = Array.from(new Set(this.store.events().map((event) => event.calendarName)));
@@ -32,10 +41,20 @@ export class Events implements OnInit {
   });
 
   protected readonly loading = this.store.eventsLoading;
+  protected isCalendarMenuOpen = signal(false);
 
   ngOnInit(): void {
+    this.title.set('Events');
+
+    // Load events if not already loaded
     if (this.store.events().length === 0) {
       this.refresh();
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (this.sheetHeaderActionsTpl) {
+      this.header.register(this.sheetHeaderActionsTpl);
     }
   }
 
@@ -43,11 +62,16 @@ export class Events implements OnInit {
     this.store.loadEvents().subscribe();
   }
 
-  onCalendarChange(value: string): void {
-    this.selectedCalendar.set(value);
+  protected openNewEvent(): void {
+    this.sheet.open(EventsNew);
   }
 
-  goToCalendarView(): void {
-    this.router.navigate(['/events-calendar']);
+  protected toggleCalendarMenu(): void {
+    this.isCalendarMenuOpen.update((value) => !value);
+  }
+
+  protected selectCalendar(calendar: string): void {
+    this.config.setSelectedCalendar(calendar);
+    this.isCalendarMenuOpen.set(false);
   }
 }

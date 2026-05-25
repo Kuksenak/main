@@ -1,22 +1,20 @@
-import { Component, ElementRef, HostBinding, HostListener, inject, Input, Type } from '@angular/core';
-import { CdkPortalOutlet, ComponentPortal, PortalModule } from '@angular/cdk/portal';
+import { Component, HostBinding, HostListener, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { OverlayRef } from '@angular/cdk/overlay';
-import { Theme } from 'app/_todo-core/theme/theme';
+import { SheetRef } from './sheet';
 
 @Component({
   selector: 'app-sheet-container',
   standalone: true,
-  imports: [PortalModule],
+  imports: [CommonModule, PortalModule],
   templateUrl: './sheet-container.html',
   host: {
     class: 'mobile-sheet relative'
   }
 })
 export class SheetContainer {
-  private theme = inject(Theme);
-  protected accentColor = this.theme.accentColor;
-
-  @Input({ required: true }) portal!: ComponentPortal<any>;
+  @Input({ required: true }) sheetRef!: SheetRef;
   @Input({ required: true }) overlayRef!: OverlayRef;
 
   private startY = 0;
@@ -58,9 +56,11 @@ export class SheetContainer {
   }
 
   close() {
-    // Notify the service through the overlayRef
-    // But we need the service to handle the app-stacked and disposal
-    // We'll use a custom event or just have the service handle it
-    this.overlayRef.detach(); // This will trigger the close logic in the service
+    this.sheetRef.close();
   }
+
+  getContentPortal(): ComponentPortal<any> {
+    return this.sheetRef.contentPortal;
+  }
+
 }

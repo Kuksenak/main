@@ -1,5 +1,5 @@
 import { TitleCasePipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { environment } from '@environments/environment';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
@@ -12,7 +12,7 @@ import { SignalRService } from 'app/_todo-core/realtime/signalr';
   templateUrl: './settings.html',
   // styleUrl: './settings.scss',
 })
-export class Settings implements OnInit {
+export class Settings {
   private themeService = inject(Theme);
   private store = inject(AuthStore);
   private signalR = inject(SignalRService);
@@ -39,19 +39,9 @@ export class Settings implements OnInit {
   ];
 
   ngOnInit() {
-
     this.signalR.onNotification((msg) => {
       console.log('Notification:', msg);
     });
-    // console.log('Настройки загружены, устанавливаем соединение с SignalR...');
-    // this.signalrService.startConnection();
-    // this.signalrService.notification$.subscribe((msg) => {
-    //   console.log('Сервер говорит:', msg);
-
-    //   // Логика: если что-то изменилось — перекачиваем данные по HTTP
-    //   this.messages.push(msg);
-    //   console.log('Текущие сообщения:', this.messages);
-    // });
   }
 
   currentAccent = this.themeService.accentColor;

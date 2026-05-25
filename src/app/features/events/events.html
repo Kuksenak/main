@@ -1,111 +1,94 @@
-<section class="flex flex-col gap-4">
-  <div class="flex items-center justify-between gap-3">
-    <div>
-      <h1 class="text-[22px] font-bold tracking-tight">Events</h1>
-      <p class="text-[13px] opacity-60">Data loaded from {{ '/events' }}</p>
-    </div>
-
-    <div class="flex items-center gap-2">
-      <button
-        type="button"
-        (click)="goToCalendarView()"
-        title="Switch to grid view"
-        class="w-9 h-9 flex items-center justify-center rounded-[10px] text-[13px] font-semibold bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 transition-all duration-200"
-      >
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-        </svg>
-      </button>
-
-      <button
-        type="button"
-        (click)="refresh()"
-        class="px-4 py-2 rounded-[12px] text-[13px] font-semibold bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15 transition-all duration-200"
-        [disabled]="loading()"
-      >
-        {{ loading() ? 'Loading...' : 'Refresh' }}
-      </button>
-    </div>
-  </div>
-
-  <div class="flex items-center gap-3">
-    <button
-      type="button"
-      [cdkMenuTriggerFor]="calendarMenu"
-      class="flex items-center gap-2 px-4 py-2.5 rounded-[12px] text-[13px] font-semibold bg-white/50 dark:bg-white/[0.05] hover:bg-white/70 dark:hover:bg-white/[0.08] border border-black/8 dark:border-white/[0.12] transition-all duration-200"
-    >
-      <svg class="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-      </svg>
-      <span class="hidden md:inline">{{ selectedCalendar() === 'all' ? 'All calendars' : selectedCalendar() }}</span>
-      <svg class="w-3.5 h-3.5 opacity-50 ml-auto md:ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
-      </svg>
-    </button>
-
-    <ng-template #calendarMenu>
-      <div cdkMenu class="apple-menu mt-2">
-        <button
-          cdkMenuItem
-          (click)="onCalendarChange('all')"
-          class="apple-menu-item flex items-center gap-2"
-        >
-          @if (selectedCalendar() === 'all') {
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 12l5 5L19 7" />
-            </svg>
-          }
-          All calendars
-        </button>
-
-        <div class="apple-menu-separator"></div>
-
-        @for (calendar of calendars(); track calendar) {
-          <button
-            cdkMenuItem
-            (click)="onCalendarChange(calendar)"
-            [class.font-bold]="selectedCalendar() === calendar"
-            class="apple-menu-item flex items-center gap-2"
-          >
-            @if (selectedCalendar() === calendar) {
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 12l5 5L19 7" />
-              </svg>
-            }
-            {{ calendar }}
-          </button>
-        }
-      </div>
-    </ng-template>
-  </div>
-
-  @if (events().length === 0 && !loading()) {
-    <div class="p-4 rounded-[14px] bg-black/[0.03] dark:bg-white/[0.04] text-[14px] opacity-70">
-      No events found.
-    </div>
-  }
-
-  <div class="flex flex-col gap-3">
-    @for (event of events(); track event.id) {
-      <article class="rounded-[14px] border border-black/8 dark:border-white/10 bg-white/50 dark:bg-white/[0.03] p-4">
-        <div class="flex flex-col gap-1">
-          <h2 class="text-[16px] font-semibold tracking-tight">{{ event.title }}</h2>
-          <div class="text-[13px] opacity-70">
-            {{ event.startDate | date: 'dd.MM.yyyy HH:mm' }} - {{ event.endDate | date: 'HH:mm' }}
-          </div>
-          <div class="text-[13px] opacity-70">{{ event.calendarName }} ({{ event.calendarId }})</div>
-
-          @if (event.location) {
-            <div class="text-[13px] opacity-75">{{ event.location }}</div>
-          }
-
-          @if (event.description) {
-            <p class="text-[13px] opacity-70 whitespace-pre-wrap mt-2 max-h-40 overflow-y-auto">
-              {{ event.description }}
+<section class="flex flex-col gap-6 px-1">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4">
+        <div>
+            <h1 class="text-[22px] font-bold tracking-tight">
+                Events
+            </h1>
+            <p class="text-[13px] opacity-60 mt-0.5">{{ events().length }} events
+                @if (selectedCalendar() !== 'all') {
+                {{ selectedCalendar() }}
+                }
             </p>
-          }
         </div>
-      </article>
+    </div>
+
+    @if (events().length === 0 && !loading()) {
+    <div class="p-4 rounded-[14px] bg-black/[0.03] dark:bg-white/[0.04] text-[14px] opacity-70 mx-4">
+        No events found.
+    </div>
     }
-  </div>
+
+    <div class="flex flex-col gap-3 px-4">
+        @for (event of events(); track event.id) {
+        <article class="rounded-[14px] border border-black/8 dark:border-white/10 bg-white/50 dark:bg-white/[0.03] p-4">
+            <div class="flex flex-col gap-1">
+                <h2 class="text-[16px] font-semibold tracking-tight">{{ event.title }}</h2>
+                <div class="text-[13px] opacity-70">
+                    {{ event.startDate | date: 'dd.MM.yyyy HH:mm' }} - {{ event.endDate | date: 'HH:mm' }}
+                </div>
+                <div class="text-[13px] opacity-70">{{ event.calendarName }} ({{ event.calendarId }})</div>
+
+                @if (event.location) {
+                <div class="text-[13px] opacity-75">{{ event.location }}</div>
+                }
+
+                @if (event.description) {
+                <p class="text-[13px] opacity-70 whitespace-pre-wrap mt-2 max-h-40 overflow-y-auto">
+                    {{ event.description }}
+                </p>
+                }
+            </div>
+        </article>
+        }
+    </div>
 </section>
+
+<ng-template #sheetHeaderActions>
+    <div class="h-10 inline-flex items-center rounded-full bg-white/45 dark:bg-white/[0.12] backdrop-blur-lg border border-white/65 dark:border-white/25 shadow-[0_6px_24px_rgba(0,0,0,0.08),inset_0_0.5px_0_rgba(255,255,255,0.3)] overflow-visible px-0.5 gap-0.5">
+        <div class="relative">
+            <button
+                type="button"
+                (click)="toggleCalendarMenu()"
+                class="w-9 h-9 flex items-center justify-center rounded-full text-[var(--color-accent)] hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-200"
+                aria-label="Select calendar"
+            >
+                <svg class="w-[24px] h-[24px]" fill="none" stroke="#ef4444" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </button>
+
+            @if (isCalendarMenuOpen()) {
+            <div class="absolute top-12 right-0 z-50 pointer-events-auto">
+                <div class="apple-menu min-w-[220px]">
+                    <button (click)="selectCalendar('all')" class="apple-menu-item" [class.font-semibold]="selectedCalendar() === 'all'">
+                        <svg class="w-4 h-4" [style.stroke]="selectedCalendar() === 'all' ? 'var(--color-accent)' : 'none'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                        All Calendars
+                    </button>
+
+                    @for (calendar of calendars(); track calendar) {
+                    <button (click)="selectCalendar(calendar)" class="apple-menu-item" [class.font-semibold]="selectedCalendar() === calendar">
+                        <svg class="w-4 h-4" [style.stroke]="selectedCalendar() === calendar ? 'var(--color-accent)' : 'none'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {{ calendar }}
+                    </button>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+
+        <button
+            type="button"
+            (click)="openNewEvent()"
+            class="w-9 h-9 flex items-center justify-center rounded-full text-[var(--color-accent)] hover:bg-white/10 dark:hover:bg-white/10 transition-all duration-200"
+            aria-label="Create event"
+        >
+            <svg class="w-[24px] h-[24px]" fill="none" stroke="#ef4444" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+            </svg>
+        </button>
+    </div>
+</ng-template>

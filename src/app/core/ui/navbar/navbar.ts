@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Sheet } from '../sheet/sheet';
 import { Settings } from 'app/features/settings/settings';
+import { Events } from 'app/features/events/events';
 
 @Component({
   selector: 'app-navbar',
@@ -31,7 +32,7 @@ export class Navbar {
   }
 
   openEvents() {
-    this.router.navigate(['/events']);
+    this.sheet.open(Events);
   }
 
   // openApplications() {

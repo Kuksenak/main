@@ -5,6 +5,7 @@ import { environment } from '@environments/environment';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Theme } from 'app/_todo-core/theme/theme';
 import { SignalRService } from 'app/_todo-core/realtime/signalr';
+import { createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
 
 @Component({
   selector: 'app-settings',
@@ -16,6 +17,7 @@ export class Settings implements OnInit {
   private themeService = inject(Theme);
   private store = inject(AuthStore);
   private signalR = inject(SignalRService);
+  private title = createSheetTitleRegistrar();
 
   readonly themes: string[] = ['light', 'dark', 'system'];
 
@@ -38,6 +40,8 @@ export class Settings implements OnInit {
   ];
 
   ngOnInit() {
+    this.title.set('Settings');
+
     this.signalR.onNotification((msg) => {
       console.log('Notification:', msg);
     });
@@ -45,7 +49,7 @@ export class Settings implements OnInit {
 
   currentAccent = this.themeService.accentColor;
   messages: string[] = [];
-  
+
   setAccent(value: string) {
     this.store.updateProfile({ accentColor: value });
     if ('vibrate' in navigator) navigator.vibrate(10);
