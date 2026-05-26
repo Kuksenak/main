@@ -231,6 +231,25 @@ html.dark ::-webkit-scrollbar-thumb:hover {
     padding-left: calc(1rem + env(safe-area-inset-left, 0px));
     padding-right: calc(1rem + env(safe-area-inset-right, 0px));
     padding-top: env(safe-area-inset-top, 0px);
+
+    /* Window Controls Overlay (PWA on desktop) */
+    padding-left: max(calc(1rem + env(safe-area-inset-left, 0px)), env(titlebar-area-x, 1rem));
+    padding-top: env(titlebar-area-y, 0px);
+    height: env(titlebar-area-height, auto);
+
+    /* Make navbar draggable for window move */
+    -webkit-app-region: drag;
+    app-region: drag;
+}
+
+/* All interactive elements inside navbar should NOT be draggable */
+.navbar-safe-area button,
+.navbar-safe-area select,
+.navbar-safe-area a,
+.navbar-safe-area [cdkMenuTriggerFor],
+.navbar-safe-area input {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
 }
 
 /* Эффект "карточки" при открытии шторки */

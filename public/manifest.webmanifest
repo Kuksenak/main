@@ -1,8 +1,10 @@
 {
-  "name": "main",
-  "short_name": "main",
-  "scope": "./",
-  "start_url": "./",
+  "version": "1.0.0",
+  "name": "Teira",
+  "short_name": "Teira",
+  "scope": "/",
+  "start_url": "/",
+  "id": "/",
   "icons": [
     {
       "src": "icons/icon-72x72.png",
@@ -53,11 +55,11 @@
       "purpose": "maskable any"
     }
   ],
-  "display": "standalone",
-  "display_override": [
-    "window-controls-overlay"
-  ],
+  "display": "fullscreen",
   "background_color": "#f3f3f3",
   "theme_color": "#f3f3f3",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }
