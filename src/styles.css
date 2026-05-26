@@ -36,9 +36,12 @@
     --radius-lg: 16px;
     --radius-xl: 20px;
     --radius-pill: 100px;
+
+    color-scheme: light;
 }
 
-html.dark {
+html.dark,
+html.dark :root {
     --bg-main: #33373a;
     --color-app-bg: #33373a;
     --color-app-surface: #2c2c2e;
@@ -53,6 +56,8 @@ html.dark {
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
     --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4);
     --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    color-scheme: dark;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -88,6 +93,14 @@ select,
 textarea,
 button {
     font-size: inherit;
+    color-scheme: inherit;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea,
+html.dark button {
+    color-scheme: dark;
 }
 
 html.dark,

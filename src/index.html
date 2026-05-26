@@ -3,20 +3,21 @@
 
 <head>
   <meta charset="utf-8">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f3f3f3" id="meta-theme-color">
   <script>
     (function() {
-      var theme = localStorage.getItem('app-theme') || 'system';
-      var isDark = theme === 'dark' ||
-        (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      try {
+        var theme = localStorage.getItem('app-theme') || 'system';
+        var isDark = theme === 'dark' ||
+          (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-        document.write('<meta name="theme-color" content="#33373a">');
-        document.write('<meta name="color-scheme" content="dark">');
-      } else {
-        document.write('<meta name="theme-color" content="#f3f3f3">');
-        document.write('<meta name="color-scheme" content="light">');
-      }
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+          document.querySelector('meta[name="color-scheme"]').content = 'dark';
+          document.querySelector('meta[name="theme-color"]').content = '#33373a';
+        }
+      } catch(e) {}
     })();
   </script>
   <title>Main</title>
