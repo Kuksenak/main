@@ -12,8 +12,10 @@
       if (isDark) {
         document.documentElement.classList.add('dark');
         document.write('<meta name="theme-color" content="#33373a">');
+        document.write('<meta name="color-scheme" content="dark">');
       } else {
         document.write('<meta name="theme-color" content="#f3f3f3">');
+        document.write('<meta name="color-scheme" content="light">');
       }
     })();
   </script>

@@ -79,13 +79,23 @@ export class Theme {
     const bgColor = dark ? '#33373a' : '#f3f3f3';
     this.document.body.style.backgroundColor = bgColor;
 
-    let meta = this.document.querySelector('meta[name="theme-color"]');
-    if (!meta) {
-      meta = this.document.createElement('meta');
-      meta.setAttribute('name', 'theme-color');
-      this.document.head.appendChild(meta);
+    // Update theme-color meta
+    let themeMeta = this.document.querySelector('meta[name="theme-color"]');
+    if (!themeMeta) {
+      themeMeta = this.document.createElement('meta');
+      themeMeta.setAttribute('name', 'theme-color');
+      this.document.head.appendChild(themeMeta);
     }
-    meta.setAttribute('content', bgColor);
+    themeMeta.setAttribute('content', bgColor);
+
+    // Update color-scheme meta for iOS native elements
+    let colorSchemeMeta = this.document.querySelector('meta[name="color-scheme"]');
+    if (!colorSchemeMeta) {
+      colorSchemeMeta = this.document.createElement('meta');
+      colorSchemeMeta.setAttribute('name', 'color-scheme');
+      this.document.head.appendChild(colorSchemeMeta);
+    }
+    colorSchemeMeta.setAttribute('content', dark ? 'dark' : 'light');
   }
 
   // private syncWithApi(theme: string, accentColor: string) {
