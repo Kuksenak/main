@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, TemplateRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
+import { Theme } from 'app/_todo-core/theme/theme';
 import { EventsConfig } from './events-config';
 import { Sheet } from 'app/core/ui/sheet/sheet';
 import { EventsNew } from './events-new';
@@ -14,10 +15,13 @@ import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/
 })
 export class Events {
   private readonly store = inject(AuthStore);
+  private readonly theme = inject(Theme);
   private readonly config = inject(EventsConfig);
   private readonly sheet = inject(Sheet);
   private readonly header = createSheetHeaderRegistrar();
   private readonly title = createSheetTitleRegistrar();
+
+  protected readonly accentColor = this.theme.accentColor;
 
   @ViewChild('sheetHeaderActions', { static: true })
   private sheetHeaderActionsTpl?: TemplateRef<unknown>;
