@@ -1,6 +1,4 @@
-import { TitleCasePipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { environment } from '@environments/environment';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Theme } from 'app/_todo-core/theme/theme';
@@ -8,25 +6,15 @@ import { SignalRService } from 'app/_todo-core/realtime/signalr';
 
 @Component({
   selector: 'app-settings',
-  imports: [FormsModule, TitleCasePipe],
+  imports: [],
   templateUrl: './settings.html',
-  // styleUrl: './settings.scss',
 })
 export class Settings {
   private themeService = inject(Theme);
   private store = inject(AuthStore);
   private signalR = inject(SignalRService);
 
-  readonly themes: string[] = ['light', 'dark', 'system'];
-
   protected version = environment.version;
-  protected currentTheme = this.themeService.theme;
-
-  changeTheme(value: string) {
-    // this.themeService.setTheme(val);
-    this.store.updateProfile({ theme: value });
-    if ('vibrate' in navigator) navigator.vibrate(10);
-  }
 
   readonly accentColors = [
     '#3b82f6', // Blue
@@ -46,9 +34,9 @@ export class Settings {
 
   currentAccent = this.themeService.accentColor;
   messages: string[] = [];
+
   setAccent(value: string) {
     this.store.updateProfile({ accentColor: value });
     if ('vibrate' in navigator) navigator.vibrate(10);
-
   }
 }

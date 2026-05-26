@@ -11,7 +11,6 @@ export interface UserProfile {
   lastName: string;
   email: string;
   roles: string[];
-  theme: string;
   accentColor: string;
 }
 
@@ -71,21 +70,17 @@ export class AuthStore {
   }
 
   /**
-   * Загрузка профиля и синхронизация темы
+   * Загрузка профиля и синхронизация акцента
    */
   private fetchProfile(): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${environment.apiUrl}/me`).pipe(
       tap(user => {
-        // 1. Сначала обновляем пользователя
         this._user.set(user);
         console.log('User profile loaded:', user);
-        // 2. Синхронизируем тему БЕЗ триггера повторного сохранения на бэк
-        // Используем метод 'setFromApi' (нужно добавить в ThemeService)
-        // или просто проверяем наличие данных
-        if (user.theme) {
-          this.themeService.updateFromProfile(user.theme, user.accentColor);
+        if (user.accentColor) {
+          this.themeService.setAccentColor(user.accentColor);
         }
-        this.fetchEvents().subscribe(); // Загружаем события после загрузки профиля
+        this.fetchEvents().subscribe();
       })
     );
   }
@@ -138,26 +133,21 @@ export class AuthStore {
   }
 
   /**
-   * Оптимистичное обновление профиля (тема, цвет)
+   * Оптимистичное обновление профиля (цвет акцента)
    */
-  updateProfile(updates: { theme?: string; accentColor?: string }): void {
+  updateProfile(updates: { accentColor?: string }): void {
     const previousUser = this._user();
     if (!previousUser) return;
 
-    const isThemeChanged = updates.theme !== undefined && updates.theme !== previousUser.theme;
     const isColorChanged = updates.accentColor !== undefined && updates.accentColor !== previousUser.accentColor;
-
-    if (!isThemeChanged && !isColorChanged) return;
+    if (!isColorChanged) return;
 
     this._user.set({
       ...previousUser,
       ...updates
     });
 
-    this.themeService.updateFromProfile(
-      updates.theme ?? previousUser.theme,
-      updates.accentColor ?? previousUser.accentColor
-    );
+    this.themeService.setAccentColor(updates.accentColor!);
 
     this.http.patch<void>(`${environment.apiUrl}/me`, updates)
       .subscribe({
@@ -166,13 +156,8 @@ export class AuthStore {
         },
         error: (err) => {
           console.error('Failed to save profile settings, reverting...', err);
-
           this._user.set(previousUser);
-
-          this.themeService.updateFromProfile(
-            previousUser.theme,
-            previousUser.accentColor
-          );
+          this.themeService.setAccentColor(previousUser.accentColor);
         }
       });
   }

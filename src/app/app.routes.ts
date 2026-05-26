@@ -26,5 +26,11 @@ export const routes: Routes = [
             import('./features/events/events-calendar').then((m) => m.EventsCalendar),
         canActivate: [authGuard],
     },
+    {
+        path: 'elements',
+        loadComponent: () =>
+            import('./features/elements/elements').then((m) => m.Elements),
+        canActivate: [authGuard],
+    },
     // { path: '', redirectTo: 'home', pathMatch: 'full' },
 ];

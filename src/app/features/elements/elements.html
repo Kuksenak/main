@@ -1,0 +1,161 @@
+<div class="flex flex-col gap-6 p-4">
+
+  <h1 class="text-2xl font-bold">Native HTML Elements</h1>
+  <p class="text-sm opacity-60">All elements respect system color-scheme automatically</p>
+
+  <!-- Date & Time Inputs -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Date & Time</h2>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Date</span>
+      <input type="date" [(ngModel)]="dateValue"
+        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
+    </label>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Time</span>
+      <input type="time" [(ngModel)]="timeValue"
+        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
+    </label>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">DateTime Local</span>
+      <input type="datetime-local" [(ngModel)]="datetimeValue"
+        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
+    </label>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Color Picker -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Color Picker</h2>
+
+    <label class="flex items-center gap-3">
+      <input type="color" [(ngModel)]="colorValue" class="w-12 h-12 rounded-lg cursor-pointer">
+      <span class="text-sm opacity-70">{{ colorValue }}</span>
+    </label>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Select & Datalist -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Select & Datalist</h2>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Native Select</span>
+      <select [(ngModel)]="selectValue"
+        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
+        <option value="">Choose option...</option>
+        <option value="apple">Apple</option>
+        <option value="banana">Banana</option>
+        <option value="orange">Orange</option>
+        <option value="grape">Grape</option>
+      </select>
+    </label>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Input with Datalist (autocomplete)</span>
+      <input list="fruits" [(ngModel)]="textValue" placeholder="Type or select..."
+        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
+      <datalist id="fruits">
+        <option value="Apple">
+        <option value="Banana">
+        <option value="Cherry">
+        <option value="Date">
+        <option value="Elderberry">
+      </datalist>
+    </label>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Range & Progress -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Range & Progress</h2>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Range Slider: {{ rangeValue }}</span>
+      <input type="range" min="0" max="100" [(ngModel)]="rangeValue" class="w-full">
+    </label>
+
+    <div class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Progress Bar</span>
+      <progress [value]="rangeValue" max="100" class="w-full h-3"></progress>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Meter (low/high/optimum)</span>
+      <meter [value]="rangeValue" min="0" max="100" low="30" high="70" optimum="80" class="w-full h-3"></meter>
+    </div>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Checkbox as Toggle -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Native Checkbox (Toggle base)</h2>
+
+    <label class="flex items-center gap-3 cursor-pointer">
+      <input type="checkbox" [(ngModel)]="checkboxValue" class="w-5 h-5 accent-[var(--app-accent,#3b82f6)]">
+      <span>Standard Checkbox: {{ checkboxValue ? 'ON' : 'OFF' }}</span>
+    </label>
+
+    <!-- CSS-only toggle using checkbox -->
+    <label class="flex items-center gap-3 cursor-pointer">
+      <input type="checkbox" [(ngModel)]="checkboxValue" class="sr-only peer">
+      <div class="w-11 h-6 bg-black/20 dark:bg-white/20 rounded-full peer peer-checked:bg-[var(--app-accent,#3b82f6)] transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:after:translate-x-5"></div>
+      <span>CSS Toggle: {{ checkboxValue ? 'ON' : 'OFF' }}</span>
+    </label>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Details/Summary (Accordion) -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Details/Summary (Native Accordion)</h2>
+
+    <details class="rounded-lg border border-black/10 dark:border-white/10 overflow-hidden">
+      <summary class="px-4 py-3 cursor-pointer bg-black/5 dark:bg-white/5 font-medium">
+        Click to expand
+      </summary>
+      <div class="px-4 py-3">
+        This content is hidden by default and reveals when you click the summary.
+        No JavaScript required!
+      </div>
+    </details>
+
+    <details class="rounded-lg border border-black/10 dark:border-white/10 overflow-hidden">
+      <summary class="px-4 py-3 cursor-pointer bg-black/5 dark:bg-white/5 font-medium">
+        Another accordion item
+      </summary>
+      <div class="px-4 py-3">
+        Each details element works independently.
+      </div>
+    </details>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Dialog -->
+  <section class="flex flex-col gap-4 mb-20">
+    <h2 class="text-lg font-semibold">Native Dialog</h2>
+
+    <button onclick="document.getElementById('nativeDialog').showModal()"
+      class="px-4 py-2 rounded-lg bg-[var(--app-accent,#3b82f6)] text-white font-medium">
+      Open Native Dialog
+    </button>
+
+    <dialog id="nativeDialog" class="rounded-xl p-6 backdrop:bg-black/50 backdrop:backdrop-blur-sm">
+      <h3 class="text-lg font-bold mb-2">Native Dialog</h3>
+      <p class="mb-4 opacity-70">This is a native HTML dialog element. Press Esc or click button to close.</p>
+      <button onclick="document.getElementById('nativeDialog').close()"
+        class="px-4 py-2 rounded-lg bg-[var(--app-accent,#3b82f6)] text-white font-medium">
+        Close
+      </button>
+    </dialog>
+  </section>
+
+</div>

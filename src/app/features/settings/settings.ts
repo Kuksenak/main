@@ -1,6 +1,4 @@
-import { TitleCasePipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { environment } from '@environments/environment';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Theme } from 'app/_todo-core/theme/theme';
@@ -10,7 +8,7 @@ import { createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helpe
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [FormsModule, TitleCasePipe],
+  imports: [],
   templateUrl: './settings.html',
 })
 export class Settings implements OnInit {
@@ -19,15 +17,7 @@ export class Settings implements OnInit {
   private signalR = inject(SignalRService);
   private title = createSheetTitleRegistrar();
 
-  readonly themes: string[] = ['light', 'dark', 'system'];
-
   protected version = environment.version;
-  protected currentTheme = this.themeService.theme;
-
-  changeTheme(value: string) {
-    this.store.updateProfile({ theme: value });
-    if ('vibrate' in navigator) navigator.vibrate(10);
-  }
 
   readonly accentColors = [
     '#3b82f6', // Blue

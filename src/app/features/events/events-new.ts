@@ -85,7 +85,7 @@ export class EventsNew {
     console.log('Creating event:', event);
     this.isSaving.set(false);
     this.closeSheet();
-    
+
     // Clear form after creation
     this.resetForm();
   }

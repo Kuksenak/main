@@ -20,6 +20,7 @@
                 <option value="">{{userEmail()}}</option>
                 <option value="settings">Settings</option>
                 <option value="events">Events</option>
+                <option value="elements">Elements</option>
                 <option value="reload">Reload App</option>
                 <option value="signout">Sign Out</option>
             </select>
@@ -61,6 +62,13 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M3 11h18M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
             </svg>
             Events
+        </button>
+
+        <button cdkMenuItem (click)="openElements()" class="apple-menu-item">
+            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            Elements
         </button>
 
         <button cdkMenuItem (click)="reload()" class="apple-menu-item">

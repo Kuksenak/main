@@ -5,6 +5,7 @@ import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Sheet } from '../sheet/sheet';
 import { Settings } from 'app/features/settings/settings';
 import { Events } from 'app/features/events/events';
+import { Elements } from 'app/features/elements/elements';
 
 @Component({
   selector: 'app-navbar',
@@ -35,6 +36,10 @@ export class Navbar {
     this.sheet.open(Events);
   }
 
+  openElements() {
+    this.sheet.open(Elements);
+  }
+
   // openApplications() {
   //   this.popupService.open(Applications, this.settingsTrigger.nativeElement);
   // }
@@ -50,6 +55,9 @@ export class Navbar {
         break;
       case 'events':
         this.openEvents();
+        break;
+      case 'elements':
+        this.openElements();
         break;
       case 'reload':
         this.reload();
