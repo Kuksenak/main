@@ -51,15 +51,15 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     :host {
       display: inline-block;
       -webkit-tap-highlight-color: transparent;
-      --switch-width: 66px;
-      --switch-height: 29px;
-      --switch-padding: 3px;
-      --switch-bg-off: #8c8c8f;
+      --switch-width: 64px;
+      --switch-height: 27px;
+      --switch-padding: 1.5px;
+      --switch-bg-off: #d1d1d6;
       --switch-bg-on: #34C759;
       --thumb-width: 42px;
       --thumb-height: 23px;
-      --thumb-width-expanded: 60px;
-      --thumb-height-expanded: 33px;
+      --thumb-width-expanded: 52px;
+      --thumb-height-expanded: 28px;
     }
 
     .ios26-switch {
@@ -69,8 +69,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       border-radius: calc(var(--switch-height) / 2);
       cursor: pointer;
       background-color: var(--switch-bg-off);
-      transition: background-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.08);
+      transition: background-color 0.3s ease;
       touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
@@ -95,15 +94,12 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       height: var(--thumb-height);
       border-radius: calc(var(--thumb-height) / 2);
       overflow: hidden;
-      box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.15),
-        0 0 0 0.5px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
       transition:
-        left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
-        width 0.26s cubic-bezier(0.25, 0.8, 0.25, 1),
-        height 0.26s cubic-bezier(0.25, 0.8, 0.25, 1),
-        border-radius 0.26s cubic-bezier(0.25, 0.8, 0.25, 1),
-        box-shadow 0.26s ease;
+        left 0.3s ease-out,
+        width 0.25s ease-out,
+        height 0.25s ease-out,
+        box-shadow 0.25s ease-out;
       z-index: 2;
     }
 
@@ -117,7 +113,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       width: var(--thumb-width-expanded);
       height: var(--thumb-height-expanded);
       border-radius: calc(var(--thumb-height-expanded) / 2);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
     }
 
     /* Expanded + unchecked — stays at left */
@@ -132,11 +128,11 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
     /* Switching animations based on direction */
     .ios26-switch--switching-right.ios26-switch--expanded .ios26-switch__thumb {
-      animation: overshoot-right 0.65s cubic-bezier(0.25, 0.8, 0.25, 1);
+      animation: overshoot-right 0.45s ease-out;
     }
 
     .ios26-switch--switching-left.ios26-switch--expanded .ios26-switch__thumb {
-      animation: overshoot-left 0.65s cubic-bezier(0.25, 0.8, 0.25, 1);
+      animation: overshoot-left 0.45s ease-out;
     }
 
     /* Overshoot animations */
@@ -146,8 +142,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
         width: var(--thumb-width);
         height: var(--thumb-height);
       }
-      50% {
-        left: calc(var(--switch-width) - var(--thumb-width) - var(--switch-padding) - 12px);
+      60% {
+        left: calc(var(--switch-width) - var(--thumb-width) - var(--switch-padding) - 5px);
         width: var(--thumb-width-expanded);
         height: var(--thumb-height-expanded);
       }
@@ -164,8 +160,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
         width: var(--thumb-width);
         height: var(--thumb-height);
       }
-      50% {
-        left: calc(var(--switch-padding) - 12px);
+      60% {
+        left: calc(var(--switch-padding) - 5px);
         width: var(--thumb-width-expanded);
         height: var(--thumb-height-expanded);
       }
@@ -195,10 +191,10 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
       opacity: 0;
       transition: opacity 0.2s ease;
     }
@@ -225,8 +221,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       --switch-padding: 2.5px;
       --thumb-width: 34px;
       --thumb-height: 21px;
-      --thumb-width-expanded: 47px;
-      --thumb-height-expanded: 29px;
+      --thumb-width-expanded: 42px;
+      --thumb-height-expanded: 25px;
     }
 
     .ios26-switch--large {
@@ -235,8 +231,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       --switch-padding: 3.5px;
       --thumb-width: 46px;
       --thumb-height: 29px;
-      --thumb-width-expanded: 63px;
-      --thumb-height-expanded: 40px;
+      --thumb-width-expanded: 56px;
+      --thumb-height-expanded: 34px;
     }
   `]
 })
@@ -244,7 +240,7 @@ export class Switch implements ControlValueAccessor, OnDestroy {
   @Input() disabled = false;
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
   @Input() colorOn = '#34C759';
-  @Input() colorOff = '#5f5f61';
+  @Input() colorOff = '#d1d1d6';
 
   checked = false;
   pressing = false;
@@ -276,7 +272,7 @@ export class Switch implements ControlValueAccessor, OnDestroy {
     this.transitionTimer = setTimeout(() => {
       this.transitioning = false;
       this.switchDirection = null;
-    }, 650);
+    }, 450);
   }
 
   onPressCancel() {
