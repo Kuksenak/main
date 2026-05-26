@@ -71,7 +71,7 @@ html,
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
         'Inter', 'Helvetica Neue', system-ui, sans-serif;
-    font-size: 16px;
+    font-size: 17px;
     -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -83,12 +83,11 @@ body {
     letter-spacing: -0.01em;
 }
 
-@media (max-width: 768px) {
-
-    html,
-    body {
-        font-size: 17px;
-    }
+input,
+select,
+textarea,
+button {
+    font-size: inherit;
 }
 
 html.dark,
@@ -100,6 +99,35 @@ html.dark body {
 
 body {
     line-height: 1.47;
+}
+
+.sheet-header-capsule {
+    transform-origin: center;
+    transition: transform 150ms ease-out, box-shadow 150ms ease-out, background-color 150ms ease-out;
+}
+
+@keyframes ios-switch-thumb-pop {
+    0% {
+        scale: 1;
+    }
+    42% {
+        scale: 1.6 1.35;
+    }
+    100% {
+        scale: 1;
+    }
+}
+
+.sheet-header-capsule:has(button:active),
+.sheet-header-capsule.is-pressed {
+    transform: scale(1.08);
+    background-color: rgba(255, 255, 255, 0.58);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+html.dark .sheet-header-capsule:has(button:active),
+html.dark .sheet-header-capsule.is-pressed {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 /* ═══════════════════════════════════════════════════

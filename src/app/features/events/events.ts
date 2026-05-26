@@ -46,6 +46,7 @@ export class Events {
 
   protected readonly loading = this.store.eventsLoading;
   protected isCalendarMenuOpen = signal(false);
+  protected isHeaderCapsulePressed = signal(false);
 
   ngOnInit(): void {
     this.title.set('Events');
@@ -77,5 +78,13 @@ export class Events {
   protected selectCalendar(calendar: string): void {
     this.config.setSelectedCalendar(calendar);
     this.isCalendarMenuOpen.set(false);
+  }
+
+  protected onHeaderPressStart(): void {
+    this.isHeaderCapsulePressed.set(true);
+  }
+
+  protected onHeaderPressEnd(): void {
+    this.isHeaderCapsulePressed.set(false);
   }
 }

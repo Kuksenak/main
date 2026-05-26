@@ -44,12 +44,16 @@
 </section>
 
 <ng-template #sheetHeaderActions>
-    <div class="h-11 inline-flex items-center rounded-full bg-white/45 dark:bg-white/[0.12] backdrop-blur-lg border border-white/65 dark:border-white/25 shadow-[0_6px_24px_rgba(0,0,0,0.08),inset_0_0.5px_0_rgba(255,255,255,0.3)] overflow-visible px-0.5 gap-0.5">
+    <div class="sheet-header-capsule h-12 inline-flex items-center rounded-full bg-white/45 dark:bg-white/[0.12] backdrop-blur-lg border border-white/65 dark:border-white/25 shadow-[0_6px_24px_rgba(0,0,0,0.08),inset_0_0.5px_0_rgba(255,255,255,0.3)] overflow-visible px-1 gap-1" [class.is-pressed]="isHeaderCapsulePressed()">
         <div class="relative">
             <button
                 type="button"
                 (click)="toggleCalendarMenu()"
-                class="w-10 h-10 flex items-center justify-center rounded-full text-[var(--color-accent)] hover:bg-white/10 dark:hover:bg-white/10 active:scale-110 active:bg-white/20 dark:active:bg-white/[0.18] active:shadow-[0_8px_22px_rgba(0,0,0,0.1)] transition-all duration-150 ease-out"
+                (pointerdown)="onHeaderPressStart()"
+                (pointerup)="onHeaderPressEnd()"
+                (pointerleave)="onHeaderPressEnd()"
+                (pointercancel)="onHeaderPressEnd()"
+                class="w-11 h-11 flex items-center justify-center rounded-full text-[var(--color-accent)] hover:bg-white/10 dark:hover:bg-white/10 active:bg-white/30 dark:active:bg-white/[0.24] active:shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition-all duration-150 ease-out"
                 aria-label="Select calendar"
             >
                 <svg class="w-[24px] h-[24px]" fill="none" [style.stroke]="accentColor()" viewBox="0 0 24 24">
@@ -83,7 +87,11 @@
         <button
             type="button"
             (click)="openNewEvent()"
-            class="w-10 h-10 flex items-center justify-center rounded-full text-[var(--color-accent)] hover:bg-white/10 dark:hover:bg-white/10 active:scale-110 active:bg-white/20 dark:active:bg-white/[0.18] active:shadow-[0_8px_22px_rgba(0,0,0,0.1)] transition-all duration-150 ease-out"
+            (pointerdown)="onHeaderPressStart()"
+            (pointerup)="onHeaderPressEnd()"
+            (pointerleave)="onHeaderPressEnd()"
+            (pointercancel)="onHeaderPressEnd()"
+            class="w-11 h-11 flex items-center justify-center rounded-full text-[var(--color-accent)] hover:bg-white/10 dark:hover:bg-white/10 active:bg-white/30 dark:active:bg-white/[0.24] active:shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition-all duration-150 ease-out"
             aria-label="Create event"
         >
             <svg class="w-[24px] h-[24px]" fill="none" [style.stroke]="accentColor()" viewBox="0 0 24 24">

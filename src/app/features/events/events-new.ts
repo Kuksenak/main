@@ -16,6 +16,7 @@ export class EventsNew {
   private themeService = inject(Theme);
   private header = createSheetHeaderRegistrar();
   private sheetTitle = createSheetTitleRegistrar();
+  private allDayFxTimer?: ReturnType<typeof setTimeout>;
 
   protected accentColor = this.themeService.accentColor;
 
@@ -27,6 +28,7 @@ export class EventsNew {
   protected description = signal('');
   protected location = signal('');
   protected isAllDay = signal(true);
+  protected isAllDaySwitching = signal(false);
   protected startDate = signal(this.getTodayDate());
   protected startTime = signal('09:00');
   protected endDate = signal(this.getTodayDate());
@@ -47,6 +49,19 @@ export class EventsNew {
 
   protected closeSheet(): void {
     this.header.sheetRef?.close();
+  }
+
+  protected toggleAllDay(): void {
+    this.isAllDay.set(!this.isAllDay());
+    this.isAllDaySwitching.set(true);
+
+    if (this.allDayFxTimer) {
+      clearTimeout(this.allDayFxTimer);
+    }
+
+    this.allDayFxTimer = setTimeout(() => {
+      this.isAllDaySwitching.set(false);
+    }, 1000);
   }
 
   private getTodayDate(): string {

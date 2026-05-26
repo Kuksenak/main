@@ -12,9 +12,21 @@
         </button> -->
 
         @if(auth.isAuthenticated()) {
-            <button type="button" [cdkMenuTriggerFor]="profileMenu" #profileTrigger class="flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/8 transition-all duration-200 text-[14px] font-semibold tracking-tight">
+            <select
+                class="md:hidden max-w-[220px] pl-0 pr-6 py-1 bg-transparent border-0 rounded-none text-[17px] font-semibold appearance-auto focus:outline-none"
+                (change)="onMobileProfileAction($any($event.target).value); $any($event.target).value = ''"
+                aria-label="Profile actions"
+            >
+                <option value="">{{userEmail()}}</option>
+                <option value="settings">Settings</option>
+                <option value="events">Events</option>
+                <option value="reload">Reload App</option>
+                <option value="signout">Sign Out</option>
+            </select>
+
+            <button type="button" [cdkMenuTriggerFor]="profileMenu" #profileTrigger class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full hover:bg-black/5 dark:hover:bg-white/8 transition-all duration-200 text-[16px] font-semibold tracking-tight">
                 {{userEmail()}}
-                <svg class="w-3 h-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
@@ -28,10 +40,10 @@
 </nav>
 
 <ng-template #profileMenu>
-    <div cdkMenu class="apple-menu mt-2">
+    <div cdkMenu class="apple-menu mt-2 min-w-[260px]">
         <div class="px-3 py-2 mb-1">
-            <div class="text-[12px] font-medium opacity-40 uppercase tracking-wider">Account</div>
-            <div class="truncate text-[14px] font-semibold mt-0.5">{{userEmail()}}</div>
+            <div class="text-[13px] font-medium opacity-40 uppercase tracking-wider">Account</div>
+            <div class="truncate text-[16px] font-semibold mt-0.5">{{userEmail()}}</div>
         </div>
 
         <div class="apple-menu-separator"></div>

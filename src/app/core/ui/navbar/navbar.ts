@@ -42,6 +42,25 @@ export class Navbar {
   reload() {
     window.location.reload();
   }
+
+  onMobileProfileAction(action: string) {
+    switch (action) {
+      case 'settings':
+        this.openSettings();
+        break;
+      case 'events':
+        this.openEvents();
+        break;
+      case 'reload':
+        this.reload();
+        break;
+      case 'signout':
+        this.auth.signout();
+        break;
+      default:
+        break;
+    }
+  }
 }
 
 
