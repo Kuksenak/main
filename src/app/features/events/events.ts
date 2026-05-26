@@ -8,12 +8,12 @@ import { EventsNew } from './events-new';
 import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
 
 import { SwitchComponent } from "app/core/ui/switch2/switch2";
-import { Switch } from 'app/core/ui/switch/switch';
+import { Toggle } from 'app/core/ui/toggle/toggle';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [DatePipe, Switch, SwitchComponent],
+  imports: [DatePipe, Toggle, SwitchComponent],
   templateUrl: './events.html',
 })
 export class Events {
