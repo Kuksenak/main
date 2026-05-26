@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
@@ -9,9 +9,22 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin="anonymous">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#f5f5f7" id="theme-color-meta" />
+  <meta name="theme-color" content="#f3f3f3" id="theme-color-meta" />
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+
+  <script>
+    (function() {
+      var theme = localStorage.getItem('app-theme') || 'system';
+      var isDark = theme === 'dark' ||
+        (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('theme-color-meta').content = '#33373a';
+      }
+    })();
+  </script>
 </head>
 
 <body>
