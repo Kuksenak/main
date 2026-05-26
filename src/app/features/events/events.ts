@@ -6,11 +6,13 @@ import { EventsConfig } from './events-config';
 import { Sheet } from 'app/core/ui/sheet/sheet';
 import { EventsNew } from './events-new';
 import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
+import { Switch } from "app/core/ui/switch/switch";
+import { SwitchComponent } from "app/core/ui/switch2/switch2";
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, Switch, SwitchComponent],
   templateUrl: './events.html',
 })
 export class Events {

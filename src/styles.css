@@ -106,15 +106,22 @@ body {
     transition: transform 150ms ease-out, box-shadow 150ms ease-out, background-color 150ms ease-out;
 }
 
-@keyframes ios-switch-thumb-pop {
+@keyframes ios-switch-liquid {
     0% {
-        scale: 1;
+        scale: 1.01 1.02;
+        opacity: 0.9;
     }
-    42% {
-        scale: 1.6 1.35;
+    30% {
+        scale: 1.08 1.1;
+        opacity: 0.7;
+    }
+    65% {
+        scale: 1.02 1.03;
+        opacity: 0.25;
     }
     100% {
-        scale: 1;
+        scale: 1 1;
+        opacity: 0;
     }
 }
 

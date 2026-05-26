@@ -61,7 +61,7 @@ export class EventsNew {
 
     this.allDayFxTimer = setTimeout(() => {
       this.isAllDaySwitching.set(false);
-    }, 1000);
+    }, 700);
   }
 
   private getTodayDate(): string {
