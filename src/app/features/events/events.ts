@@ -6,8 +6,9 @@ import { EventsConfig } from './events-config';
 import { Sheet } from 'app/core/ui/sheet/sheet';
 import { EventsNew } from './events-new';
 import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
-import { Switch } from "app/core/ui/switch/switch";
+
 import { SwitchComponent } from "app/core/ui/switch2/switch2";
+import { Switch } from 'app/core/ui/switch/switch';
 
 @Component({
   selector: 'app-events',
