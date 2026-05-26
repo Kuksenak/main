@@ -39,8 +39,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       border-radius: 15.5px;
       cursor: pointer;
       background-color: #e9e9ea;
-      transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+      transition: background-color 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.08);
       touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
@@ -63,49 +63,54 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       left: 3px;
       width: 30px;
       height: 19px;
-      border-radius: 8.5px;
+      border-radius: 9.5px;
       background: #ffffff;
       box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.1),
-        0 0.5px 1px rgba(0, 0, 0, 0.06),
+        0 1px 3px rgba(0, 0, 0, 0.12),
+        0 0.5px 1px rgba(0, 0, 0, 0.08),
         0 0 0 0.5px rgba(0, 0, 0, 0.04);
       transition:
-        left 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-        width 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
-        height 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
-        border-radius 0.2s cubic-bezier(0.25, 0.1, 0.25, 1),
+        left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+        width 0.26s cubic-bezier(0.25, 0.8, 0.25, 1),
+        height 0.26s cubic-bezier(0.25, 0.8, 0.25, 1),
+        border-radius 0.26s cubic-bezier(0.25, 0.8, 0.25, 1),
         background 0.2s ease,
-        box-shadow 0.2s ease;
-      z-index: 1;
+        box-shadow 0.26s ease;
+      z-index: 2;
     }
 
     /* Checked — thumb slides right */
     .ios26-switch--checked .ios26-switch__thumb {
-      left: 18px; /* 51 - 26 - 3 */
+      left: 18px; /* 51 - 30 - 3 */
     }
 
     /* -------- Expanded (pressing OR transitioning) -------- */
     .ios26-switch--expanded .ios26-switch__thumb {
-      width: 33px;
-      height: 26px;
-      border-radius: 13px;
+      width: 38px;
+      height: 28px; /* Выступает за рамки 24px на 2px сверху и снизу */
+      border-radius: 14px;
     }
 
-    /* Expanded + checked — shift left so right edge stays aligned */
+    /* Expanded + unchecked — slide closer to the left border, allowing slight overflow */
+    .ios26-switch--expanded:not(.ios26-switch--checked) .ios26-switch__thumb {
+      left: -1px;
+    }
+
+    /* Expanded + checked — shift left so right edge stays aligned, allowing slight overflow */
     .ios26-switch--checked.ios26-switch--expanded .ios26-switch__thumb {
-      left: 15px; /* 51 - 33 - 3 */
+      left: 14px; /* 51 - 38 + 1 (для небольшого выступа справа) */
     }
 
     /* -------- Glass effect (only during transition) -------- */
     .ios26-switch--glass .ios26-switch__thumb {
-      background: rgba(255, 255, 255, 0.32);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px) saturate(220%);
+      -webkit-backdrop-filter: blur(14px) saturate(220%);
       box-shadow:
-        0 1px 4px rgba(0, 0, 0, 0.06),
-        inset 0 1px 2px rgba(255, 255, 255, 0.6),
-        inset 0 -0.5px 1px rgba(0, 0, 0, 0.04),
-        0 0 0 0.5px rgba(255, 255, 255, 0.45);
+        0 4px 10px rgba(0, 0, 0, 0.12),
+        inset 0 1.5px 2.5px rgba(255, 255, 255, 0.95), /* Сверхъяркий верхний блик */
+        inset 0 -1px 2px rgba(0, 0, 0, 0.05),
+        0 0 0 0.85px rgba(255, 255, 255, 0.85); /* Четкая стеклянная граница */
     }
   `]
 })
@@ -135,7 +140,7 @@ export class Switch implements ControlValueAccessor, OnDestroy {
     if (this.transitionTimer) clearTimeout(this.transitionTimer);
     this.transitionTimer = setTimeout(() => {
       this.transitioning = false;
-    }, 400);
+    }, 300);
   }
 
   onPressCancel() {
