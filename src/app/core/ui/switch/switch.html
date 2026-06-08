@@ -1,0 +1,11 @@
+<label class="switch-container" [class.mobile]="isMobile()" [class.desktop]="!isMobile()">
+  <span class="switch-label">{{ label }}</span>
+  <input
+    type="checkbox"
+    switch
+    [checked]="checked"
+    [disabled]="disabled"
+    (change)="onToggle($event)"
+    class="switch-input"
+  >
+</label>

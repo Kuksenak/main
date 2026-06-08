@@ -782,8 +782,7 @@ html.dark .player-btn:hover {
 
 
 /* iOS-style Checkbox Label Typography */
-label:has(input[type="checkbox"]) span,
-.my-custom-switch {
+label:has(input[type="checkbox"]) span {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   font-size: 17px;
   font-weight: 400;
@@ -791,72 +790,4 @@ label:has(input[type="checkbox"]) span,
   line-height: 1.29;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.my-custom-switch {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* Текст слева, элемент справа */
-  width: 100%;
-  max-width: 350px; /* Ограничим ширину строки для красоты */
-  padding: 10px;
-  cursor: pointer;
-  user-select: none;
-}
-
-/* Стилизация для ДЕСКТОПА (Chrome, Firefox, Edge) */
-/* Мы отключаем стандартный вид чекбокса и рисуем свой большой тумблер */
-.my-custom-switch input[type="checkbox"] {
-  appearance: none;
-  -webkit-appearance: none; /* Для старых браузеров */
-  
-  /* Размеры самой капсулы тумблера (можете увеличивать эти цифры) */
-  width: 50px;
-  height: 28px;
-  
-  background-color: #e9e9ea;
-  border-radius: 14px;
-  position: relative;
-  outline: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-/* Кругляшок внутри тумблера */
-.my-custom-switch input[type="checkbox"]::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 24px;
-  height: 24px;
-  background-color: #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease;
-}
-
-/* Состояние ВКЛЮЧЕНО (десктоп): красим в зеленый и двигаем кружок вправо */
-.my-custom-switch input[type="checkbox"]:checked {
-  background-color: #34c759; /* Нативный зеленый цвет Apple */
-}
-
-.my-custom-switch input[type="checkbox"]:checked::after {
-  transform: translateX(22px); /* Смещаем кругляшок вправо */
-}
-
-
-/* 🍏 МАГИЯ ДЛЯ iOS: отменяем наши десктопные стили, чтобы не сломать нативный iOS switch */
-@supports (-webkit-touch-callout: none) {
-  .my-custom-switch input[type="checkbox"][switch] {
-    appearance: auto;
-    -webkit-appearance: checkbox; /* Возвращаем управление iOS */
-    width: auto;
-    height: auto;
-    background-color: transparent;
-  }
-  
-  .my-custom-switch input[type="checkbox"][switch]::after {
-    display: none; /* Прячем десктопный кружок, у iOS есть свой */
-  }
 }

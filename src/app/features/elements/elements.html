@@ -112,10 +112,8 @@
       <span>CSS Toggle: {{ checkboxValue ? 'ON' : 'OFF' }}</span>
     </label>
 
-    <label class="my-custom-switch">
-      Включить уведомления
-      <input type="checkbox" switch (change)="onToggle($event)">
-    </label>
+    <app-switch label="Включить уведомления" [(ngModel)]="checkboxValue"></app-switch>
+    <app-switch label="The Angular Material Timepicker allows users to set the time portion of a date object either by typing it in or by selecting it from a list of pre-defined options." [(ngModel)]="checkboxValue"></app-switch>
   </section>
 
   <hr class="border-black/10 dark:border-white/10">
