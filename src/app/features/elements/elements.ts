@@ -9,6 +9,9 @@ import { FormsModule } from '@angular/forms';
 })
 export class Elements {
   // Form values
+  onToggle($event: Event) {
+    console.log('Toggle event:', $event);
+  }
   dateValue = '';
   timeValue = '';
   datetimeValue = '';

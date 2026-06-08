@@ -106,8 +106,15 @@
     <!-- CSS-only toggle using checkbox -->
     <label class="flex items-center gap-3 cursor-pointer">
       <input type="checkbox" [(ngModel)]="checkboxValue" class="sr-only peer">
-      <div class="w-11 h-6 bg-black/20 dark:bg-white/20 rounded-full peer peer-checked:bg-[var(--app-accent,#3b82f6)] transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:after:translate-x-5"></div>
+      <div
+        class="w-11 h-6 bg-black/20 dark:bg-white/20 rounded-full peer peer-checked:bg-[var(--app-accent,#3b82f6)] transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:after:translate-x-5">
+      </div>
       <span>CSS Toggle: {{ checkboxValue ? 'ON' : 'OFF' }}</span>
+    </label>
+
+    <label class="my-custom-switch">
+      Включить уведомления
+      <input type="checkbox" switch (change)="onToggle($event)">
     </label>
   </section>
 
