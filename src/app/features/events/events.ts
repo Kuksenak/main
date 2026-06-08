@@ -9,11 +9,12 @@ import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/
 
 import { SwitchComponent } from "app/core/ui/switch2/switch2";
 import { Toggle } from 'app/core/ui/toggle/toggle';
+import { IconButtonDirective } from 'app/core/directives/icon-button.directive';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [DatePipe, Toggle, SwitchComponent],
+  imports: [DatePipe, Toggle, SwitchComponent, IconButtonDirective],
   templateUrl: './events.html',
 })
 export class Events {

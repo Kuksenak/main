@@ -6,10 +6,11 @@ import { environment } from '@environments/environment';
 import { SignalRService } from './_todo-core/realtime/signalr';
 import { NotificationService } from './_todo-core/notifications/notification-service';
 import { AppUpdateService } from './core/services/app-update.service';
+import { Button } from './core/ui/button/button';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar],
+  imports: [RouterOutlet, Navbar, Button],
   templateUrl: './app.html',
 })
 export class App implements OnInit {

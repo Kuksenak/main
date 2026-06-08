@@ -127,6 +127,34 @@
       <app-button variant="secondary">Secondary Button</app-button>
       <app-button variant="secondary" [disabled]="true">Disabled Secondary</app-button>
     </div>
+
+    <h3 class="text-md font-semibold mt-2">Icon Buttons (Directive)</h3>
+
+    <div class="flex items-center gap-3">
+      <button appIconButton>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <button appIconButton="tinted">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
+
+      <button appIconButton="ghost">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      <button appIconButton disabled>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
   </section>
 
   <hr class="border-black/10 dark:border-white/10">
@@ -161,18 +189,16 @@
   <section class="flex flex-col gap-4 mb-20">
     <h2 class="text-lg font-semibold">Native Dialog</h2>
 
-    <button onclick="document.getElementById('nativeDialog').showModal()"
-      class="px-4 py-2 rounded-lg bg-[var(--app-accent,#3b82f6)] text-white font-medium">
+    <app-button variant="primary" (clicked)="openDialog()">
       Open Native Dialog
-    </button>
+    </app-button>
 
-    <dialog id="nativeDialog" class="rounded-xl p-6 backdrop:bg-black/50 backdrop:backdrop-blur-sm">
-      <h3 class="text-lg font-bold mb-2">Native Dialog</h3>
-      <p class="mb-4 opacity-70">This is a native HTML dialog element. Press Esc or click button to close.</p>
-      <button onclick="document.getElementById('nativeDialog').close()"
-        class="px-4 py-2 rounded-lg bg-[var(--app-accent,#3b82f6)] text-white font-medium">
+    <dialog id="nativeDialog" style="width: 100%;">
+      <h3 class="text-lg font-bold">Native Dialog</h3>
+      <p class="">This is a native HTML dialog element. Press Esc or click button to close.</p>
+      <app-button variant="primary" (clicked)="closeDialog()">
         Close
-      </button>
+      </app-button>
     </dialog>
   </section>
 

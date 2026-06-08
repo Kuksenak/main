@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ComponentPortal, PortalModule } from '@angular/cdk/portal';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { SheetRef } from './sheet';
+import { IconButtonDirective } from '../../directives/icon-button.directive';
 
 @Component({
   selector: 'app-sheet-container',
   standalone: true,
-  imports: [CommonModule, PortalModule],
+  imports: [CommonModule, PortalModule, IconButtonDirective],
   templateUrl: './sheet-container.html',
   host: {
     class: 'mobile-sheet relative'

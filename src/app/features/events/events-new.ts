@@ -5,11 +5,12 @@ import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Theme } from 'app/_todo-core/theme/theme';
 import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
 import { Toggle } from 'app/core/ui/toggle/toggle';
+import { IconButtonDirective } from 'app/core/directives/icon-button.directive';
 
 @Component({
   selector: 'app-events-new',
   standalone: true,
-  imports: [CommonModule, FormsModule, Toggle],
+  imports: [CommonModule, FormsModule, Toggle, IconButtonDirective],
   templateUrl: './events-new.html',
 })
 export class EventsNew {

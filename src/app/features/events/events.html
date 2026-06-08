@@ -60,12 +60,11 @@
     <div class="sheet-header-capsule h-12 inline-flex items-center rounded-full bg-white/45 dark:bg-white/[0.12] backdrop-blur-lg border border-white/65 dark:border-white/25 shadow-[0_6px_24px_rgba(0,0,0,0.08),inset_0_0.5px_0_rgba(255,255,255,0.3)] overflow-visible px-1 gap-1"
         [class.is-pressed]="isHeaderCapsulePressed()">
         <div class="relative">
-            <button type="button" (click)="toggleCalendarMenu()" (pointerdown)="onHeaderPressStart()"
+            <button appIconButton="tinted" type="button" (click)="toggleCalendarMenu()" (pointerdown)="onHeaderPressStart()"
                 (pointerup)="onHeaderPressEnd()" (pointerleave)="onHeaderPressEnd()"
                 (pointercancel)="onHeaderPressEnd()"
-                class="w-11 h-11 flex items-center justify-center rounded-full text-[var(--color-accent)] hover:bg-white/10 dark:hover:bg-white/10 active:bg-white/30 dark:active:bg-white/[0.24] active:shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition-all duration-150 ease-out"
                 aria-label="Select calendar">
-                <svg class="w-[24px] h-[24px]" fill="none" [style.stroke]="accentColor()" viewBox="0 0 24 24">
+                <svg fill="none" [style.stroke]="accentColor()" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -100,11 +99,10 @@
             }
         </div>
 
-        <button type="button" (click)="openNewEvent()" (pointerdown)="onHeaderPressStart()"
+        <button appIconButton="tinted" type="button" (click)="openNewEvent()" (pointerdown)="onHeaderPressStart()"
             (pointerup)="onHeaderPressEnd()" (pointerleave)="onHeaderPressEnd()" (pointercancel)="onHeaderPressEnd()"
-            class="w-11 h-11 flex items-center justify-center rounded-full text-[var(--color-accent)] hover:bg-white/10 dark:hover:bg-white/10 active:bg-white/30 dark:active:bg-white/[0.24] active:shadow-[0_10px_24px_rgba(0,0,0,0.12)] transition-all duration-150 ease-out"
             aria-label="Create event">
-            <svg class="w-[24px] h-[24px]" fill="none" [style.stroke]="accentColor()" viewBox="0 0 24 24">
+            <svg fill="none" [style.stroke]="accentColor()" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
             </svg>
         </button>
