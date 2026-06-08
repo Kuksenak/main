@@ -1,8 +1,7 @@
 import { Component, Input, inject, output } from '@angular/core';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 
-type ButtonVariant = 'primary' | 'secondary' | 'glass' | 'ghost';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = 'primary' | 'secondary';
 
 @Component({
   selector: 'app-button',
@@ -12,9 +11,7 @@ type ButtonSize = 'sm' | 'md' | 'lg';
 })
 export class Button {
   @Input() variant: ButtonVariant = 'primary';
-  @Input() size: ButtonSize = 'md';
   @Input() disabled = false;
-  @Input() fullWidth = false;
 
   clicked = output<MouseEvent>();
 

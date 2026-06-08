@@ -125,18 +125,8 @@
     <div class="flex flex-col gap-3">
       <app-button variant="primary">Primary Button</app-button>
       <app-button variant="secondary">Secondary Button</app-button>
-      <app-button variant="glass">Glass Button (iOS-style)</app-button>
-      <app-button variant="ghost">Ghost Button</app-button>
+      <app-button variant="secondary" [disabled]="true">Disabled Secondary</app-button>
     </div>
-
-    <div class="flex flex-col gap-3">
-      <app-button variant="primary" size="sm">Small Button</app-button>
-      <app-button variant="primary" size="md">Medium Button</app-button>
-      <app-button variant="primary" size="lg">Large Button</app-button>
-    </div>
-
-    <app-button variant="primary" [fullWidth]="true">Full Width Button</app-button>
-    <app-button variant="glass" [disabled]="true">Disabled Button</app-button>
   </section>
 
   <hr class="border-black/10 dark:border-white/10">

@@ -26,121 +26,92 @@
   transform: scale(0.98);
 }
 
-.btn.full-width {
-  width: 100%;
-}
-
-/* Sizes - Mobile */
-.btn.mobile.btn-sm {
-  padding: 10px 16px;
-  font-size: 15px;
-  border-radius: 12px;
-  min-height: 44px; /* iOS touch target */
-}
-
-.btn.mobile.btn-md {
+/* Mobile size */
+.btn.mobile {
   padding: 12px 20px;
   font-size: 17px;
-  border-radius: 14px;
+  border-radius: 100px;
   min-height: 48px;
 }
 
-.btn.mobile.btn-lg {
-  padding: 14px 24px;
-  font-size: 19px;
-  border-radius: 16px;
-  min-height: 52px;
-}
-
-/* Sizes - Desktop */
-.btn.desktop.btn-sm {
-  padding: 6px 12px;
-  font-size: 14px;
-  border-radius: 8px;
-}
-
-.btn.desktop.btn-md {
+/* Desktop size */
+.btn.desktop {
   padding: 8px 16px;
   font-size: 15px;
-  border-radius: 10px;
+  border-radius: 100px;
 }
 
-.btn.desktop.btn-lg {
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 12px;
-}
-
-/* Variant: Primary */
+/* Variant: Primary (iOS glass style) */
 .btn-primary {
-  background: var(--color-accent, #fa233b);
+  background: var(--app-accent, #3b82f6);
   color: white;
+  box-shadow:
+    0 4px 12px color-mix(in srgb, var(--app-accent, #3b82f6) 25%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-accent-hover, #e01e34);
+  filter: brightness(1.1);
+  box-shadow:
+    0 6px 16px color-mix(in srgb, var(--app-accent, #3b82f6) 35%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
 .btn-primary:active:not(:disabled) {
-  background: var(--color-accent-hover, #e01e34);
+  filter: brightness(0.95);
+  box-shadow:
+    0 2px 8px color-mix(in srgb, var(--app-accent, #3b82f6) 20%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-/* Variant: Secondary */
+/* Variant: Secondary (iOS glass tinted) */
 .btn-secondary {
-  background: rgba(0, 0, 0, 0.05);
-  color: inherit;
+  background: color-mix(in srgb, var(--app-accent, #3b82f6) 10%, transparent);
+  backdrop-filter: blur(10px) saturate(1.5);
+  -webkit-backdrop-filter: blur(10px) saturate(1.5);
+  border: 1px solid color-mix(in srgb, var(--app-accent, #3b82f6) 20%, transparent);
+  color: var(--app-accent, #3b82f6);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.08);
+  background: color-mix(in srgb, var(--app-accent, #3b82f6) 15%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent, #3b82f6) 30%, transparent);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.btn-secondary:active:not(:disabled) {
+  background: color-mix(in srgb, var(--app-accent, #3b82f6) 20%, transparent);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 html.dark .btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--app-accent, #3b82f6) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-accent, #3b82f6) 25%, transparent);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 html.dark .btn-secondary:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.12);
+  background: color-mix(in srgb, var(--app-accent, #3b82f6) 25%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent, #3b82f6) 35%, transparent);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-/* Variant: Glass (iOS-style frosted glass) */
-.btn-glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px) saturate(1.8);
-  -webkit-backdrop-filter: blur(20px) saturate(1.8);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  color: inherit;
-}
-
-.btn-glass:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-}
-
-html.dark .btn-glass {
-  background: rgba(40, 40, 40, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-html.dark .btn-glass:hover:not(:disabled) {
-  background: rgba(50, 50, 50, 0.8);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-}
-
-/* Variant: Ghost */
-.btn-ghost {
-  background: transparent;
-  color: var(--color-accent, #fa233b);
-}
-
-.btn-ghost:hover:not(:disabled) {
-  background: rgba(250, 35, 59, 0.08);
-}
-
-html.dark .btn-ghost:hover:not(:disabled) {
-  background: rgba(250, 35, 59, 0.15);
+html.dark .btn-secondary:active:not(:disabled) {
+  background: color-mix(in srgb, var(--app-accent, #3b82f6) 30%, transparent);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* Ripple effect for mobile */

@@ -1,8 +1,7 @@
 <button
-  [class]="'btn btn-' + variant + ' btn-' + size"
+  [class]="'btn btn-' + variant"
   [class.mobile]="isMobile()"
   [class.desktop]="!isMobile()"
-  [class.full-width]="fullWidth"
   [disabled]="disabled"
   (click)="onClick($event)"
   type="button"
