@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Switch } from '../../core/ui/switch/switch';
+import { Button } from '../../core/ui/button/button';
 
 @Component({
   selector: 'app-elements',
   standalone: true,
-  imports: [FormsModule, Switch],
+  imports: [FormsModule, Switch, Button],
   templateUrl: './elements.html',
 })
 export class Elements {
