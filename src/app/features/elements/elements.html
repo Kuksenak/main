@@ -8,20 +8,20 @@
     <h2 class="text-lg font-semibold">Date & Time</h2>
 
     <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Date</span>
-      <input type="date" [(ngModel)]="dateValue"
+      <span class="text-sm opacity-70">Date Input (component)</span>
+      <app-date-input [(ngModel)]="dateValue" placeholder="dd/mm/yyyy"></app-date-input>
+    </label>
+
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Time (compact)</span>
+      <input type="time" [(ngModel)]="timeValue" placeholder="hh:mm"
         class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
     </label>
 
     <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Time</span>
-      <input type="time" [(ngModel)]="timeValue"
-        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
-    </label>
-
-    <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">DateTime Local</span>
-      <input type="datetime-local" [(ngModel)]="datetimeValue"
+      <span class="text-sm opacity-70">DateTime Local (compact)</span>
+      <input type="datetime-local" [(ngModel)]="datetimeValue" placeholder="dd/mm/yyyy hh:mm"
         class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
     </label>
   </section>
@@ -113,7 +113,9 @@
     </label>
 
     <app-switch label="Включить уведомления" [(ngModel)]="checkboxValue"></app-switch>
-    <app-switch label="The Angular Material Timepicker allows users to set the time portion of a date object either by typing it in or by selecting it from a list of pre-defined options." [(ngModel)]="checkboxValue"></app-switch>
+    <app-switch
+      label="The Angular Material Timepicker allows users to set the time portion of a date object either by typing it in or by selecting it from a list of pre-defined options."
+      [(ngModel)]="checkboxValue"></app-switch>
   </section>
 
   <hr class="border-black/10 dark:border-white/10">
@@ -121,6 +123,11 @@
   <!-- Buttons -->
   <section class="flex flex-col gap-4">
     <h2 class="text-lg font-semibold">Custom Buttons</h2>
+
+    <label class="flex flex-col gap-1">
+      <span class="text-sm opacity-70">Date Input (component)</span>
+      <app-date-input [(ngModel)]="dateValue" placeholder="dd/mm/yyyy"></app-date-input>
+    </label>
 
     <div class="flex flex-col gap-3">
       <app-button variant="primary">Primary Button</app-button>

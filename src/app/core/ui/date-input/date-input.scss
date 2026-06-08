@@ -1,0 +1,63 @@
+.date-input {
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  padding: 4px 0px 4px 16px;
+  border: none;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.3);
+  outline: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  cursor: pointer;
+  color: inherit;
+}
+
+.date-input:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.date-input:focus {
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.date-input:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.date-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Hide calendar icon completely */
+.date-input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+/* Dark mode */
+html.dark .date-input {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+html.dark .date-input:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+html.dark .date-input:focus {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Mobile size - same as buttons */
+@media (max-width: 767px) {
+  .date-input {
+    min-height: 48px;
+    padding: 8px 14px;
+    font-size: 17px;
+  }
+}

@@ -3,11 +3,12 @@ import { FormsModule } from '@angular/forms';
 import { Switch } from '../../core/ui/switch/switch';
 import { Button } from '../../core/ui/button/button';
 import { IconButtonDirective } from '../../core/directives/icon-button.directive';
+import { DateInput } from '../../core/ui/date-input/date-input';
 
 @Component({
   selector: 'app-elements',
   standalone: true,
-  imports: [FormsModule, Switch, Button, IconButtonDirective],
+  imports: [FormsModule, Switch, Button, IconButtonDirective, DateInput],
   templateUrl: './elements.html',
 })
 export class Elements {
