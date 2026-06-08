@@ -49,7 +49,7 @@ html.dark :root {
     --border-menu: rgba(255, 255, 255, 0.1);
     --hover-menu: rgba(255, 255, 255, 0.06);
 
-        /* --glass-bg: rgba(29, 29, 31, 0.72); */
+    /* --glass-bg: rgba(29, 29, 31, 0.72); */
     --glass-bg: #33373a;
 
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -124,14 +124,17 @@ body {
         scale: 1.01 1.02;
         opacity: 0.9;
     }
+
     30% {
         scale: 1.08 1.1;
         opacity: 0.7;
     }
+
     65% {
         scale: 1.02 1.03;
         opacity: 0.25;
     }
+
     100% {
         scale: 1 1;
         opacity: 0;
@@ -286,7 +289,7 @@ body:has(.app-stacked) {
     width: 100% !important;
     margin: 0 !important;
 
-    /* Непрозрачный фон как в последних iOS */
+    /* Непрозрачный фон */
     background-color: var(--color-app-surface) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -451,6 +454,7 @@ html.dark .apple-btn-ghost:hover {
         opacity: 0;
         transform: translateY(8px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -526,4 +530,333 @@ html.dark .player-btn:hover {
 .player-btn.play svg {
     width: 24px;
     height: 24px;
+}
+
+/* ==========================================================================
+   SMOOTH BORDERS COLLECTION
+   Полный набор стилей для создания идеальных и плавных границ в интерфейсе.
+   
+   Пример использования в HTML:
+   <div class="card smooth-shadow">Контент</div>
+   <div class="card smooth-gradient">Контент</div>
+   <div class="card smooth-ios">Контент</div>
+   <button class="smooth-button">Кнопка</button>
+   ========================================================================== */
+
+/* Глобальный сброс для корректного расчета размеров (box-sizing) */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Базовые стили для демонстрации карточек (можно изменить под себя) */
+.card {
+  width: 100%;
+  max-width: 350px;
+  min-height: 150px;
+  padding: 24px;
+  margin: 15px;
+  background-color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #333333;
+}
+
+
+/* --------------------------------------------------------------------------
+   ВАРИАНТ 1: Ультра-плавный бордер через мягкую тень (Эффект Windows 11 / Figma)
+   Вместо резкой линии используется едва заметное размытие.
+   -------------------------------------------------------------------------- */
+.smooth-shadow {
+  border-radius: 16px;
+  
+  /* Первое значение — тончайший контур, второе — мягкое размытие вниз */
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.06), 
+    0 4px 18px rgba(0, 0, 0, 0.03);
+  
+  /* Идеальное сопряжение фона карточки со скругленными углами */
+  background-clip: padding-box;
+  
+  /* Включение аппаратного сглаживания пикселей на видеокарте */
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* --------------------------------------------------------------------------
+   ВАРИАНТ 2: Плавный градиентный бордер (Премиальный вид)
+   Граница мягко переливается от одного оттенка к другому, размывая жесткий стык.
+   -------------------------------------------------------------------------- */
+.smooth-gradient {
+  border-radius: 20px;
+  
+  /* Делаем физическую рамку прозрачной, чтобы задать ей толщину */
+  border: 1px solid transparent;
+  
+  /* Магия: первый градиент заливает внутренность, второй — саму рамку */
+  background: 
+    linear-gradient(#ffffff, #ffffff) padding-box, 
+    linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #f1f5f9 100%) border-box;
+    
+  transform: translateZ(0);
+}
+
+
+/* --------------------------------------------------------------------------
+   ВАРИАНТ 3: Эстетика iOS (Микро-бордер + размытие)
+   Используется полупрозрачный черный цвет, который плавно адаптируется под любой фон.
+   -------------------------------------------------------------------------- */
+.smooth-ios {
+  border-radius: 24px;
+  
+  /* Всего 5% видимости границы делают её невероятно мягкой на глаз */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  
+  background-clip: padding-box;
+  transform: rotate(0.00001deg); /* Древний хак для идеального антиалиасинга углов в Safari */
+}
+
+
+/* --------------------------------------------------------------------------
+   БОНУС: Плавная анимация бордера для кнопок/ссылок при наведении (:hover)
+   Элемент меняет цвет границы без "прыжков" и дерганий верстки.
+   -------------------------------------------------------------------------- */
+.smooth-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #f8fafc;
+  cursor: pointer;
+  font-weight: 500;
+  
+  /* Скругление */
+  border-radius: 10px;
+  
+  /* Задаем бордер изначально (пусть и прозрачный), чтобы размеры кнопки не менялись */
+  border: 1.5px solid rgba(0, 0, 0, 0.08); 
+  
+  /* Плавный переход для цвета границы и тени (время: 0.25 секунды) */
+  transition: 
+    border-color 0.25s ease-in-out, 
+    box-shadow 0.25s ease-in-out, 
+    background-color 0.25s ease-in-out;
+}
+
+/* Состояние при наведении */
+.smooth-button:hover {
+  background-color: #ffffff;
+  border-color: #3b82f6; /* Плавное окрашивание в фирменный синий */
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.15); /* Мягкое неоновое свечение */
+}
+
+/* Состояние при клике (активация) */
+.smooth-button:active {
+  transform: scale(0.98); /* Легкий эффект физического нажатия */
+  transition: transform 0.1s ease;
+}
+
+/* ==========================================================================
+   SMOOTH BORDERS COLLECTION
+   Полный набор стилей для создания идеальных и плавных границ в интерфейсе.
+   
+   Пример использования в HTML:
+   <div class="card smooth-shadow">Контент</div>
+   <div class="card smooth-gradient">Контент</div>
+   <div class="card smooth-ios">Контент</div>
+   <button class="smooth-button">Кнопка</button>
+   ========================================================================== */
+
+/* Глобальный сброс для корректного расчета размеров (box-sizing) */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Базовые стили для демонстрации карточек (можно изменить под себя) */
+.card {
+  width: 100%;
+  max-width: 350px;
+  min-height: 150px;
+  padding: 24px;
+  margin: 15px;
+  background-color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #333333;
+}
+
+
+/* --------------------------------------------------------------------------
+   ВАРИАНТ 1: Ультра-плавный бордер через мягкую тень (Эффект Windows 11 / Figma)
+   Вместо резкой линии используется едва заметное размытие.
+   -------------------------------------------------------------------------- */
+.smooth-shadow {
+  border-radius: 16px;
+  
+  /* Первое значение — тончайший контур, второе — мягкое размытие вниз */
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.06), 
+    0 4px 18px rgba(0, 0, 0, 0.03);
+  
+  /* Идеальное сопряжение фона карточки со скругленными углами */
+  background-clip: padding-box;
+  
+  /* Включение аппаратного сглаживания пикселей на видеокарте */
+  transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+}
+
+
+/* --------------------------------------------------------------------------
+   ВАРИАНТ 2: Плавный градиентный бордер (Премиальный вид)
+   Граница мягко переливается от одного оттенка к другому, размывая жесткий стык.
+   -------------------------------------------------------------------------- */
+.smooth-gradient {
+  border-radius: 20px;
+  
+  /* Делаем физическую рамку прозрачной, чтобы задать ей толщину */
+  border: 1px solid transparent;
+  
+  /* Магия: первый градиент заливает внутренность, второй — саму рамку */
+  background: 
+    linear-gradient(#ffffff, #ffffff) padding-box, 
+    linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 50%, #f1f5f9 100%) border-box;
+    
+  transform: translateZ(0);
+}
+
+
+/* --------------------------------------------------------------------------
+   ВАРИАНТ 3: Эстетика iOS (Микро-бордер + размытие)
+   Используется полупрозрачный черный цвет, который плавно адаптируется под любой фон.
+   -------------------------------------------------------------------------- */
+.smooth-ios {
+  border-radius: 24px;
+  
+  /* Всего 5% видимости границы делают её невероятно мягкой на глаз */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  
+  background-clip: padding-box;
+  transform: rotate(0.00001deg); /* Древний хак для идеального антиалиасинга углов в Safari */
+}
+
+
+/* --------------------------------------------------------------------------
+   БОНУС: Плавная анимация бордера для кнопок/ссылок при наведении (:hover)
+   Элемент меняет цвет границы без "прыжков" и дерганий верстки.
+   -------------------------------------------------------------------------- */
+.smooth-button {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #f8fafc;
+  cursor: pointer;
+  font-weight: 500;
+  
+  /* Скругление */
+  border-radius: 10px;
+  
+  /* Задаем бордер изначально (пусть и прозрачный), чтобы размеры кнопки не менялись */
+  border: 1.5px solid rgba(0, 0, 0, 0.08); 
+  
+  /* Плавный переход для цвета границы и тени (время: 0.25 секунды) */
+  transition: 
+    border-color 0.25s ease-in-out, 
+    box-shadow 0.25s ease-in-out, 
+    background-color 0.25s ease-in-out;
+}
+
+/* Состояние при наведении */
+.smooth-button:hover {
+  background-color: #ffffff;
+  border-color: #3b82f6; /* Плавное окрашивание в фирменный синий */
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.15); /* Мягкое неоновое свечение */
+}
+
+/* Состояние при клике (активация) */
+.smooth-button:active {
+  transform: scale(0.98); /* Легкий эффект физического нажатия */
+  transition: transform 0.1s ease;
+}
+
+
+/* iOS-style Checkbox Label Typography */
+label:has(input[type="checkbox"]) span,
+.my-custom-switch {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.41px;
+  line-height: 1.29;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.my-custom-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Текст слева, элемент справа */
+  width: 100%;
+  max-width: 350px; /* Ограничим ширину строки для красоты */
+  padding: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Стилизация для ДЕСКТОПА (Chrome, Firefox, Edge) */
+/* Мы отключаем стандартный вид чекбокса и рисуем свой большой тумблер */
+.my-custom-switch input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none; /* Для старых браузеров */
+  
+  /* Размеры самой капсулы тумблера (можете увеличивать эти цифры) */
+  width: 50px;
+  height: 28px;
+  
+  background-color: #e9e9ea;
+  border-radius: 14px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Кругляшок внутри тумблера */
+.my-custom-switch input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 24px;
+  height: 24px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+/* Состояние ВКЛЮЧЕНО (десктоп): красим в зеленый и двигаем кружок вправо */
+.my-custom-switch input[type="checkbox"]:checked {
+  background-color: #34c759; /* Нативный зеленый цвет Apple */
+}
+
+.my-custom-switch input[type="checkbox"]:checked::after {
+  transform: translateX(22px); /* Смещаем кругляшок вправо */
+}
+
+
+/* 🍏 МАГИЯ ДЛЯ iOS: отменяем наши десктопные стили, чтобы не сломать нативный iOS switch */
+@supports (-webkit-touch-callout: none) {
+  .my-custom-switch input[type="checkbox"][switch] {
+    appearance: auto;
+    -webkit-appearance: checkbox; /* Возвращаем управление iOS */
+    width: auto;
+    height: auto;
+    background-color: transparent;
+  }
+  
+  .my-custom-switch input[type="checkbox"][switch]::after {
+    display: none; /* Прячем десктопный кружок, у iOS есть свой */
+  }
 }
