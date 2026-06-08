@@ -1,12 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
-import { filter } from 'rxjs';
 import { AuthStore } from './_todo-core/auth/auth-store';
 import { Navbar } from './core/ui/navbar/navbar';
 import { environment } from '@environments/environment';
 import { SignalRService } from './_todo-core/realtime/signalr';
 import { NotificationService } from './_todo-core/notifications/notification-service';
+import { AppUpdateService } from './core/services/app-update.service';
 
 @Component({
   selector: 'app-root',
@@ -18,10 +17,7 @@ export class App implements OnInit {
   authStore = inject(AuthStore);
   signalR = inject(SignalRService);
   notificationService = inject(NotificationService);
-  private swUpdate = inject(SwUpdate);
-
-  // Update state
-  updateAvailable = signal(false);
+  updateService = inject(AppUpdateService);
 
   ngOnInit() {
     this.signalR.startConnection();
@@ -32,23 +28,7 @@ export class App implements OnInit {
       this.notificationService.show(msg);
     });
 
-    this.checkForUpdates();
-  }
-
-  private checkForUpdates() {
-    if (!this.swUpdate.isEnabled) return;
-
-    this.swUpdate.versionUpdates
-      .pipe(filter((event): event is VersionReadyEvent => event.type === 'VERSION_READY'))
-      .subscribe(() => {
-        this.updateAvailable.set(true);
-      });
-
-    // Check every 30 seconds
-    setInterval(() => this.swUpdate.checkForUpdate(), 10000);
-  }
-
-  reloadApp() {
-    window.location.reload();
+    // Инициализируем проверку обновлений
+    this.updateService.init();
   }
 }
