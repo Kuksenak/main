@@ -23,12 +23,12 @@
 }
 
 .btn:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: scale(0.95);
 }
 
 /* Mobile size */
 .btn.mobile {
-  padding: 12px 20px;
+  padding: 8px 16px;
   font-size: 17px;
   border-radius: 100px;
   min-height: 48px;
@@ -36,36 +36,13 @@
 
 /* Desktop size */
 .btn.desktop {
-  padding: 8px 16px;
+  padding: 6px 12px;
   font-size: 15px;
-  border-radius: 100px;
-}
-
-/* Variant: Primary (iOS glass style) */
-.btn-primary {
-  background: var(--app-accent, #3b82f6);
-  color: white;
-  box-shadow:
-    0 4px 12px color-mix(in srgb, var(--app-accent, #3b82f6) 25%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-.btn-primary:hover:not(:disabled) {
-  filter: brightness(1.1);
-  box-shadow:
-    0 6px 16px color-mix(in srgb, var(--app-accent, #3b82f6) 35%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-.btn-primary:active:not(:disabled) {
-  filter: brightness(0.95);
-  box-shadow:
-    0 2px 8px color-mix(in srgb, var(--app-accent, #3b82f6) 20%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
 }
 
 /* Variant: Secondary (iOS glass tinted) */
-.btn-secondary {
+.btn-primary {
   background: color-mix(in srgb, var(--app-accent, #3b82f6) 10%, transparent);
   backdrop-filter: blur(10px) saturate(1.5);
   -webkit-backdrop-filter: blur(10px) saturate(1.5);
@@ -76,7 +53,18 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.btn-secondary:hover:not(:disabled) {
+.btn-warn {
+  background: color-mix(in srgb, #f63b3b 10%, transparent);
+  backdrop-filter: blur(10px) saturate(1.5);
+  -webkit-backdrop-filter: blur(10px) saturate(1.5);
+  border: 1px solid color-mix(in srgb, #f63b3b 20%, transparent);
+  color: #f63b3b;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.btn-primary:hover:not(:disabled) {
   background: color-mix(in srgb, var(--app-accent, #3b82f6) 15%, transparent);
   border-color: color-mix(in srgb, var(--app-accent, #3b82f6) 30%, transparent);
   box-shadow:
@@ -84,14 +72,14 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.btn-secondary:active:not(:disabled) {
+.btn-primary:active:not(:disabled) {
   background: color-mix(in srgb, var(--app-accent, #3b82f6) 20%, transparent);
   box-shadow:
     0 1px 4px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-html.dark .btn-secondary {
+html.dark .btn-primary {
   background: color-mix(in srgb, var(--app-accent, #3b82f6) 20%, transparent);
   border: 1px solid color-mix(in srgb, var(--app-accent, #3b82f6) 25%, transparent);
   box-shadow:
@@ -99,7 +87,7 @@ html.dark .btn-secondary {
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-html.dark .btn-secondary:hover:not(:disabled) {
+html.dark .btn-primary:hover:not(:disabled) {
   background: color-mix(in srgb, var(--app-accent, #3b82f6) 25%, transparent);
   border-color: color-mix(in srgb, var(--app-accent, #3b82f6) 35%, transparent);
   box-shadow:
@@ -107,7 +95,7 @@ html.dark .btn-secondary:hover:not(:disabled) {
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-html.dark .btn-secondary:active:not(:disabled) {
+html.dark .btn-primary:active:not(:disabled) {
   background: color-mix(in srgb, var(--app-accent, #3b82f6) 30%, transparent);
   box-shadow:
     0 1px 4px rgba(0, 0, 0, 0.15),

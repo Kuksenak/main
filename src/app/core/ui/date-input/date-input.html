@@ -1,10 +1,21 @@
-<input
-  #dateInput
-  type="date"
-  [value]="value"
-  [placeholder]="placeholder"
-  [disabled]="disabled"
-  (input)="onInput($event)"
-  (click)="onClick($event)"
-  class="date-input"
-/>
+<div class="custom-date-picker" (click)="openPicker(); onTouched()">
+  
+  <div class="visual-display">
+    <!-- <span class="date-text">
+      
+    </span>
+    <svg class="calendar-icon" viewBox="0 0 24 24" width="20" height="20">
+      <path fill="currentColor" d="M19,4H18V2H16V4H8V2H6V4H5C3.89,4 3,4.9 3,6V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V6A2,2 0 0,0 19,4M19,20H5V10H19V20M19,8H5V6H19V8Z" />
+    </svg> -->
+    {{ formattedDate || 'Выберите дату...' }}
+  </div>
+
+  <input 
+    #datepicker
+    type="date" 
+    [value]="nativeValue"
+    [disabled]="disabled"
+    (input)="onInput($event)"
+    (click)="$event.stopPropagation()" 
+    class="real-date-input">
+</div>

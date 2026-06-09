@@ -1,16 +1,19 @@
 import { inject, Injectable, signal, effect } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 
+export type ThemeMode = 'system' | 'light' | 'dark';
+
 @Injectable({ providedIn: 'root' })
 export class Theme {
   private document = inject(DOCUMENT);
 
   isDark = signal<boolean>(false);
   accentColor = signal<string>(localStorage.getItem('app-accent') || '#3b82f6');
+  themeMode = signal<ThemeMode>((localStorage.getItem('app-theme') as ThemeMode) || 'system');
 
   constructor() {
     // Применяем тему при старте
-    this.applySystemTheme();
+    this.applyTheme();
 
     // Следим за изменением акцента
     effect(() => {
@@ -21,15 +24,33 @@ export class Theme {
 
     // Слушаем системные изменения темы
     window.matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', () => this.applySystemTheme());
+      .addEventListener('change', () => {
+        if (this.themeMode() === 'system') {
+          this.applyTheme();
+        }
+      });
   }
 
   setAccentColor(color: string) {
     this.accentColor.set(color);
   }
 
-  private applySystemTheme() {
-    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setThemeMode(mode: ThemeMode) {
+    this.themeMode.set(mode);
+    localStorage.setItem('app-theme', mode);
+    this.applyTheme();
+  }
+
+  private applyTheme() {
+    const mode = this.themeMode();
+    let dark: boolean;
+
+    if (mode === 'system') {
+      dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } else {
+      dark = mode === 'dark';
+    }
+
     this.isDark.set(dark);
     this.document.documentElement.classList.toggle('dark', dark);
     this.updateEnvironmentStyles(dark);

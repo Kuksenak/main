@@ -1,5 +1,6 @@
 import { Component, Input, forwardRef, ElementRef, ViewChild, HostListener } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-date-input',
@@ -7,7 +8,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   templateUrl: './date-input.html',
   styleUrl: './date-input.scss',
   host: {
-    style: 'display: inline-flex;'
+    style: ''
   },
   providers: [
     {
@@ -18,71 +19,71 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   ],
 })
 export class DateInput implements ControlValueAccessor {
-  @Input() placeholder = 'dd/mm/yyyy';
-  @Input() disabled = false;
-  @ViewChild('dateInput', { static: false }) dateInputRef?: ElementRef<HTMLInputElement>;
+  // Получаем ссылку на HTML-инпут
+  @ViewChild('datepicker') datepicker!: ElementRef<HTMLInputElement>;
 
-  value = '';
-  private isPickerOpen = false;
+  nativeValue: string = '';
+  formattedDate: string = '';
+  disabled: boolean = false;
 
-  private onChange: (value: string) => void = () => {};
-  private onTouched: () => void = () => {};
+  onChange: (value: Date | null) => void = () => {};
+  onTouched: () => void = () => {};
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    const clickedInside = this.dateInputRef?.nativeElement.contains(target);
-
-    // If clicked outside and picker is open, close it
-    if (!clickedInside && this.isPickerOpen) {
-      this.closePicker();
+  // Метод для принудительного открытия календаря
+  openPicker(): void {
+    if (this.disabled) return;
+    
+    const inputEl = this.datepicker.nativeElement;
+    
+    // Проверяем, поддерживает ли браузер современный метод showPicker
+    if (typeof inputEl.showPicker === 'function') {
+      inputEl.showPicker();
+    } else {
+      // Фолбек для совсем старых браузеров
+      inputEl.click();
     }
   }
 
-  onInput(event: Event) {
-    if (this.disabled) return;
-
+  onInput(event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.value = target.value;
-    this.onChange(this.value);
-    this.onTouched();
-  }
+    const value = target.value;
 
-  onClick(event: Event) {
-    if (this.disabled) return;
-
-    event.stopPropagation();
-    const target = event.target as HTMLInputElement;
-
-    try {
-      // Open native date picker
-      target.showPicker?.();
-      this.isPickerOpen = true;
-    } catch (error) {
-      // Fallback if showPicker is not supported
-      console.log('showPicker not supported');
+    if (value) {
+      const date = new Date(value);
+      this.nativeValue = value;
+      this.formattedDate = this.formatToUserFriendly(date);
+      this.onChange(date);
+    } else {
+      this.nativeValue = '';
+      this.formattedDate = '';
+      this.onChange(null);
     }
   }
 
-  private closePicker() {
-    this.dateInputRef?.nativeElement.blur();
-    this.isPickerOpen = false;
+  // --- ControlValueAccessor ---
+  writeValue(value: Date | null): void {
+    if (value instanceof Date && !isNaN(value.getTime())) {
+      const year = value.getFullYear();
+      const month = String(value.getMonth() + 1).padStart(2, '0');
+      const day = String(value.getDate()).padStart(2, '0');
+      
+      this.nativeValue = `${year}-${month}-${day}`;
+      this.formattedDate = this.formatToUserFriendly(value);
+    } else {
+      this.nativeValue = '';
+      this.formattedDate = '';
+    }
   }
 
-  // ControlValueAccessor implementation
-  writeValue(value: string): void {
-    this.value = value || '';
-  }
+  registerOnChange(fn: any): void { this.onChange = fn; }
+  registerOnTouched(fn: any): void { this.onTouched = fn; }
+  setDisabledState?(isDisabled: boolean): void { this.disabled = isDisabled; }
 
-  registerOnChange(fn: (value: string) => void): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+  private formatToUserFriendly(date: Date): string {
+    return date.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
   }
 }

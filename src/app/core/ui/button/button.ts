@@ -1,7 +1,7 @@
 import { Component, Input, inject, output } from '@angular/core';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 
-type ButtonVariant = 'primary' | 'secondary';
+type ButtonVariant = 'primary' | 'warn';
 
 @Component({
   selector: 'app-button',
