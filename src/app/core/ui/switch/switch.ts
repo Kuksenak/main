@@ -6,7 +6,6 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
   selector: 'app-switch',
   imports: [],
   templateUrl: './switch.html',
-  styleUrl: './switch.scss',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
