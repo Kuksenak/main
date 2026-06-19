@@ -7,6 +7,7 @@ import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/
 import { Toggle } from 'app/core/ui/toggle/toggle';
 import { IconButtonDirective } from 'app/core/directives/icon-button.directive';
 
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-events-new',
   standalone: true,

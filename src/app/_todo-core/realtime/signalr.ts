@@ -2,6 +2,7 @@ import * as signalR from '@microsoft/signalr';
 import { Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
   private hubConnection!: signalR.HubConnection;

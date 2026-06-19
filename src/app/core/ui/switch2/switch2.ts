@@ -36,6 +36,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 //     </div>
 //   `
 // })
+/** @deprecated Эксперимент, заменён на Switch (core/ui/switch). Удалить. */
 @Component({
   selector: 'app-switch2',
   standalone: true,

@@ -4,6 +4,7 @@ import { ComponentPortal } from '@angular/cdk/portal';
 import { take } from 'rxjs';
 import { Theme } from '../theme/theme';
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({ providedIn: 'root' })
 export class Popup {
   private overlay = inject(Overlay);

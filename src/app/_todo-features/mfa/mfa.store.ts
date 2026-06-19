@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from "@angular/core";
 import { Mfa } from "app/_todo-features/mfa/mfa.model";
 import { environment } from "@environments/environment";
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({ providedIn: 'root' })
 export class MfaStore {
   private http = inject(HttpClient);

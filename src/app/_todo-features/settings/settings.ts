@@ -4,6 +4,7 @@ import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Theme } from 'app/_todo-core/theme/theme';
 import { SignalRService } from 'app/_todo-core/realtime/signalr';
 
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-settings',
   imports: [],

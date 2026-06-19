@@ -1,11 +1,30 @@
-<label class="switch-container" [class.mobile]="isMobile()" [class.desktop]="!isMobile()">
-  <span class="switch-label">{{ label }}</span>
+<label
+  class="flex items-center cursor-pointer select-none gap-3 has-[:disabled]:cursor-not-allowed"
+  [class.w-full]="isMobile()"
+  [class.justify-between]="isMobile()"
+  [class.flex-row-reverse]="!isMobile()"
+>
+  @if (label) {
+    <span class="text-[17px] font-normal tracking-[-0.41px] leading-[1.29] antialiased">{{ label }}</span>
+  }
   <input
     type="checkbox"
-    switch
+    [attr.switch]="isMobile() ? '' : null"
     [checked]="checked"
     [disabled]="disabled"
     (change)="onToggle($event)"
-    class="switch-input"
+    class="switch-input
+           shrink-0 appearance-none cursor-pointer outline-none
+           w-11 h-6 rounded-full relative
+           bg-[#d1d1d6] dark:bg-white/20
+           transition-colors duration-300
+           checked:bg-[#34c759]
+           disabled:opacity-50 disabled:cursor-not-allowed
+           after:content-[''] after:absolute after:top-0.5 after:left-0.5
+           after:w-5 after:h-5 after:bg-white after:rounded-full
+           after:shadow-[0_2px_4px_rgba(0,0,0,0.2)]
+           after:transition-transform after:duration-[250ms]
+           after:ease-[cubic-bezier(0.4,0,0.2,1)]
+           checked:after:translate-x-5"
   >
 </label>

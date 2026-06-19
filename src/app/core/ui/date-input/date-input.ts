@@ -2,6 +2,7 @@ import { Component, Input, forwardRef, ElementRef, ViewChild, HostListener } fro
 import { ControlValueAccessor, FormBuilder, FormGroup, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-date-input',
   imports: [],

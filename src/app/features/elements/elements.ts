@@ -1,36 +1,32 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Switch } from '../../core/ui/switch/switch';
-import { Button } from '../../core/ui/button/button';
-import { IconButtonDirective } from '../../core/directives/icon-button.directive';
-import { DateInput } from '../../core/ui/date-input/date-input';
+import { Select, SelectOption } from '../../core/ui/select/select';
 
 @Component({
   selector: 'app-elements',
   standalone: true,
-  imports: [FormsModule, Switch, Button, IconButtonDirective, DateInput],
+  imports: [FormsModule, Switch, Select],
   templateUrl: './elements.html',
 })
 export class Elements {
-  // Form values
-  dateValue = '';
-  timeValue = '';
-  datetimeValue = '';
-  colorValue = '#3b82f6';
-  selectValue = '';
-  rangeValue = 50;
-  checkboxValue = false;
-  textValue = '';
+  switchValue1 = false;
+  switchValue2 = true;
 
-  detailsOpen = false;
+  fruitValue: string | null = null;
+  countryValue: string | null = null;
 
-  openDialog() {
-    const dialog = document.getElementById('nativeDialog') as HTMLDialogElement;
-    dialog?.showModal();
-  }
+  readonly fruitOptions: SelectOption[] = [
+    { value: 'apple', label: 'Apple' },
+    { value: 'banana', label: 'Banana' },
+    { value: 'orange', label: 'Orange' },
+    { value: 'grape', label: 'Grape' },
+  ];
 
-  closeDialog() {
-    const dialog = document.getElementById('nativeDialog') as HTMLDialogElement;
-    dialog?.close();
-  }
+  readonly countryOptions: SelectOption[] = [
+    { value: 'us', label: 'United States' },
+    { value: 'de', label: 'Germany' },
+    { value: 'jp', label: 'Japan' },
+    { value: 'ua', label: 'Ukraine' },
+  ];
 }

@@ -1,101 +1,12 @@
-.switch-container {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-  gap: 12px;
-}
-
-.switch-container.mobile {
-  width: 100%;
-  justify-content: space-between;
-}
-
-.switch-container.desktop {
-  width: auto;
-  flex-direction: row-reverse;
-  justify-content: flex-end;
-}
-
-.switch-label {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
-  font-size: 17px;
-  font-weight: 400;
-  letter-spacing: -0.41px;
-  line-height: 1.29;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.switch-input {
-  appearance: none;
-  -webkit-appearance: none;
-
-  width: 50px;
-  height: 28px;
-
-  background-color: #e9e9ea;
-  border-radius: 14px;
-  position: relative;
-  outline: none;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  flex-shrink: 0;
-}
-
-.switch-input::after {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 24px;
-  height: 24px;
-  background-color: #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform 0.25s cubic-bezier(0.4, 0.0, 0.2, 1),
-              width 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-
-/* Состояние ВКЛЮЧЕНО (десктоп): Material Design стиль */
-.switch-input:checked {
-  background-color: #34c759;
-}
-
-.switch-input:checked::after {
-  transform: translateX(22px);
-  width: 24px; /* Можно увеличить до 28px для Material эффекта */
-}
-
-/* Disabled state */
-.switch-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.switch-container:has(.switch-input:disabled) {
-  cursor: not-allowed;
-}
-
-/* Dark mode support */
-html.dark .switch-input {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-html.dark .switch-input:checked {
-  background-color: #34c759;
-}
-
-@supports (-webkit-touch-callout: none) {
+/* iOS Safari (touch-only, not desktop Safari): use native toggle */
+@supports (-webkit-touch-callout: none) and (hover: none) {
   .switch-input[switch] {
     appearance: auto;
     -webkit-appearance: checkbox;
-    width: auto;
-    height: auto;
-    background-color: transparent;
-  }
+    width: auto !important;
+    height: auto !important;
+    background-color: transparent !important;
 
-  .switch-input[switch]::after {
-    display: none;
+    &::after { display: none; }
   }
 }

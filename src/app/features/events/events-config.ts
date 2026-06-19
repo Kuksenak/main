@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({ providedIn: 'root' })
 export class EventsConfig {
   private _selectedCalendar = signal('all');

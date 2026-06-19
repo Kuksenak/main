@@ -5,14 +5,21 @@ import { OverlayRef } from '@angular/cdk/overlay';
 import { SheetRef } from './sheet';
 import { IconButtonDirective } from '../../directives/icon-button.directive';
 
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-sheet-container',
   standalone: true,
   imports: [CommonModule, PortalModule, IconButtonDirective],
   templateUrl: './sheet-container.html',
   host: {
-    class: 'mobile-sheet relative'
-  }
+    class:
+      'relative flex flex-col w-full overflow-hidden will-change-transform ' +
+      'bg-white dark:bg-[#242426] ' +
+      'border-t border-x border-black/10 dark:border-white/10 ' +
+      'rounded-t-[20px] ' +
+      'shadow-[0_-2px_20px_rgba(0,0,0,0.08)] ' +
+      'h-[calc(100dvh_-_env(safe-area-inset-top,20px)_-_24px)]',
+  },
 })
 export class SheetContainer {
   @Input({ required: true }) sheetRef!: SheetRef;

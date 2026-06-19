@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { AuthStore } from './auth-store';
 
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-auth',
   imports: [],

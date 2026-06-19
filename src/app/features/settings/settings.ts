@@ -4,12 +4,12 @@ import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Theme, ThemeMode } from 'app/_todo-core/theme/theme';
 import { SignalRService } from 'app/_todo-core/realtime/signalr';
 import { createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
-import { Button } from 'app/core/ui/button/button';
 
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [Button],
+  imports: [],
   templateUrl: './settings.html',
 })
 export class Settings implements OnInit {
@@ -53,16 +53,8 @@ export class Settings implements OnInit {
     if ('vibrate' in navigator) navigator.vibrate(10);
   }
 
-  toggleTheme() {
-    const modes: ThemeMode[] = ['system', 'light', 'dark'];
-    const current = this.currentTheme();
-    const currentIndex = modes.indexOf(current);
-    const nextIndex = (currentIndex + 1) % modes.length;
-    this.themeService.setThemeMode(modes[nextIndex]);
-  }
-
-  get currentThemeLabel(): string {
-    const option = this.themeOptions.find(o => o.mode === this.currentTheme());
-    return option ? `${option.icon} ${option.label}` : '';
+  setTheme(mode: ThemeMode) {
+    this.themeService.setThemeMode(mode);
+    if ('vibrate' in navigator) navigator.vibrate(10);
   }
 }

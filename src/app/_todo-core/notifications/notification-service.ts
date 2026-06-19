@@ -3,6 +3,7 @@ import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { Snack, SnackType } from '../ui/snack/snack';
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
   private overlay = inject(Overlay);

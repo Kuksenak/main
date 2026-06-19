@@ -1,24 +1,24 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { AuthStore } from './_todo-core/auth/auth-store';
 import { Navbar } from './core/ui/navbar/navbar';
 import { environment } from '@environments/environment';
 import { SignalRService } from './_todo-core/realtime/signalr';
 import { NotificationService } from './_todo-core/notifications/notification-service';
 import { AppUpdateService } from './core/services/app-update.service';
-import { Button } from './core/ui/button/button';
+import { Theme } from './_todo-core/theme/theme';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Button],
+  imports: [Navbar],
   templateUrl: './app.html',
 })
 export class App implements OnInit {
   protected version = environment.version;
-  authStore = inject(AuthStore);
-  signalR = inject(SignalRService);
-  notificationService = inject(NotificationService);
-  updateService = inject(AppUpdateService);
+  protected authStore = inject(AuthStore);
+  private signalR = inject(SignalRService);
+  private notificationService = inject(NotificationService);
+  private updateService = inject(AppUpdateService);
+  private theme = inject(Theme);
 
   ngOnInit() {
     this.signalR.startConnection();
@@ -29,7 +29,6 @@ export class App implements OnInit {
       this.notificationService.show(msg);
     });
 
-    // Инициализируем проверку обновлений
     this.updateService.init();
   }
 }

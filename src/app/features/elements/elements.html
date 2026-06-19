@@ -1,211 +1,68 @@
 <div class="flex flex-col gap-6 p-4">
 
-  <h1 class="text-2xl font-bold">Native HTML Elements</h1>
-  <p class="text-sm opacity-60">All elements respect system color-scheme automatically</p>
+  <h1 class="text-2xl font-bold">Components</h1>
 
-  <!-- Date & Time Inputs -->
+  <!-- Switch -->
   <section class="flex flex-col gap-4">
-    <h2 class="text-lg font-semibold">Date & Time</h2>
+    <h2 class="text-lg font-semibold">Switch</h2>
+    <p class="text-sm opacity-60">
+      Mobile — native iOS toggle (<code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">switch</code> attribute),
+      desktop — custom Tailwind. Layout controlled by <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal.
+    </p>
 
-    <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Date Input (component)</span>
-      <app-date-input [(ngModel)]="dateValue" placeholder="dd/mm/yyyy"></app-date-input>
-    </label>
-
-
-    <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Time (compact)</span>
-      <input type="time" [(ngModel)]="timeValue" placeholder="hh:mm"
-        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
-    </label>
-
-    <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">DateTime Local (compact)</span>
-      <input type="datetime-local" [(ngModel)]="datetimeValue" placeholder="dd/mm/yyyy hh:mm"
-        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
-    </label>
-  </section>
-
-  <hr class="border-black/10 dark:border-white/10">
-
-  <!-- Color Picker -->
-  <section class="flex flex-col gap-4">
-    <h2 class="text-lg font-semibold">Color Picker</h2>
-
-    <label class="flex items-center gap-3">
-      <input type="color" [(ngModel)]="colorValue" class="w-12 h-12 rounded-lg cursor-pointer">
-      <span class="text-sm opacity-70">{{ colorValue }}</span>
-    </label>
-  </section>
-
-  <hr class="border-black/10 dark:border-white/10">
-
-  <!-- Select & Datalist -->
-  <section class="flex flex-col gap-4">
-    <h2 class="text-lg font-semibold">Select & Datalist</h2>
-
-    <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Native Select</span>
-      <select [(ngModel)]="selectValue"
-        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
-        <option value="">Choose option...</option>
-        <option value="apple">Apple</option>
-        <option value="banana">Banana</option>
-        <option value="orange">Orange</option>
-        <option value="grape">Grape</option>
-      </select>
-    </label>
-
-    <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Input with Datalist (autocomplete)</span>
-      <input list="fruits" [(ngModel)]="textValue" placeholder="Type or select..."
-        class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent">
-      <datalist id="fruits">
-        <option value="Apple">
-        <option value="Banana">
-        <option value="Cherry">
-        <option value="Date">
-        <option value="Elderberry">
-      </datalist>
-    </label>
-  </section>
-
-  <hr class="border-black/10 dark:border-white/10">
-
-  <!-- Range & Progress -->
-  <section class="flex flex-col gap-4">
-    <h2 class="text-lg font-semibold">Range & Progress</h2>
-
-    <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Range Slider: {{ rangeValue }}</span>
-      <input type="range" min="0" max="100" [(ngModel)]="rangeValue" class="w-full">
-    </label>
-
-    <div class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Progress Bar</span>
-      <progress [value]="rangeValue" max="100" class="w-full h-3"></progress>
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default</span>
+      <app-switch label="Enable notifications" [(ngModel)]="switchValue1"></app-switch>
+      <app-switch label="Dark theme" [(ngModel)]="switchValue2"></app-switch>
     </div>
 
-    <div class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Meter (low/high/optimum)</span>
-      <meter [value]="rangeValue" min="0" max="100" low="30" high="70" optimum="80" class="w-full h-3"></meter>
-    </div>
-  </section>
-
-  <hr class="border-black/10 dark:border-white/10">
-
-  <!-- Checkbox as Toggle -->
-  <section class="flex flex-col gap-4">
-    <h2 class="text-lg font-semibold">Native Checkbox (Toggle base)</h2>
-
-    <label class="flex items-center gap-3 cursor-pointer">
-      <input type="checkbox" [(ngModel)]="checkboxValue" class="w-5 h-5 accent-[var(--app-accent,#3b82f6)]">
-      <span>Standard Checkbox: {{ checkboxValue ? 'ON' : 'OFF' }}</span>
-    </label>
-
-    <!-- CSS-only toggle using checkbox -->
-    <label class="flex items-center gap-3 cursor-pointer">
-      <input type="checkbox" [(ngModel)]="checkboxValue" class="sr-only peer">
-      <div
-        class="w-11 h-6 bg-black/20 dark:bg-white/20 rounded-full peer peer-checked:bg-[var(--app-accent,#3b82f6)] transition-colors relative after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-transform peer-checked:after:translate-x-5">
-      </div>
-      <span>CSS Toggle: {{ checkboxValue ? 'ON' : 'OFF' }}</span>
-    </label>
-
-    <app-switch label="Включить уведомления" [(ngModel)]="checkboxValue"></app-switch>
-    <app-switch
-      label="The Angular Material Timepicker allows users to set the time portion of a date object either by typing it in or by selecting it from a list of pre-defined options."
-      [(ngModel)]="checkboxValue"></app-switch>
-  </section>
-
-  <hr class="border-black/10 dark:border-white/10">
-
-  <!-- Buttons -->
-  <section class="flex flex-col gap-4">
-    <h2 class="text-lg font-semibold">Custom Buttons</h2>
-
-    <label class="flex flex-col gap-1">
-      <span class="text-sm opacity-70">Date Input (component)</span>
-      <app-date-input [(ngModel)]="dateValue" placeholder="dd/mm/yyyy"></app-date-input>
-    </label>
-
-    <div class="flex flex-col gap-3">
-      <app-button variant="primary">Primary Button</app-button>
-      <app-button variant="warn">Secondary Button</app-button>
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Long label</span>
+      <app-switch
+        label="Automatically sync data when connected to Wi-Fi in background mode"
+        [(ngModel)]="switchValue1"></app-switch>
     </div>
 
-    <h3 class="text-md font-semibold mt-2">Icon Buttons (Directive)</h3>
-
-    <div class="flex items-center gap-3">
-      <button appIconButton>
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-
-      <button appIconButton="tinted">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-        </svg>
-      </button>
-
-      <button appIconButton="ghost">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      <button appIconButton disabled>
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Without label</span>
+      <app-switch [(ngModel)]="switchValue1"></app-switch>
     </div>
+
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Disabled</span>
+      <app-switch label="Disabled (ON)" [ngModel]="true" [disabled]="true"></app-switch>
+      <app-switch label="Disabled (OFF)" [ngModel]="false" [disabled]="true"></app-switch>
+    </div>
+
+    <p class="text-sm opacity-50">State: {{ switchValue1 ? 'ON' : 'OFF' }} / {{ switchValue2 ? 'ON' : 'OFF' }}</p>
   </section>
 
   <hr class="border-black/10 dark:border-white/10">
 
-  <!-- Details/Summary (Accordion) -->
+  <!-- Select -->
   <section class="flex flex-col gap-4">
-    <h2 class="text-lg font-semibold">Details/Summary (Native Accordion)</h2>
+    <h2 class="text-lg font-semibold">Select</h2>
+    <p class="text-sm opacity-60">
+      Mobile — native OS picker, desktop — custom iOS-style dropdown via CDK overlay.
+      Same <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal switch.
+    </p>
 
-    <details class="rounded-lg border border-black/10 dark:border-white/10 overflow-hidden">
-      <summary class="px-4 py-3 cursor-pointer bg-black/5 dark:bg-white/5 font-medium">
-        Click to expand
-      </summary>
-      <div class="px-4 py-3">
-        This content is hidden by default and reveals when you click the summary.
-        No JavaScript required!
-      </div>
-    </details>
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default</span>
+      <app-select label="Fruit" placeholder="Choose a fruit…" [options]="fruitOptions" [(ngModel)]="fruitValue"></app-select>
+    </div>
 
-    <details class="rounded-lg border border-black/10 dark:border-white/10 overflow-hidden">
-      <summary class="px-4 py-3 cursor-pointer bg-black/5 dark:bg-white/5 font-medium">
-        Another accordion item
-      </summary>
-      <div class="px-4 py-3">
-        Each details element works independently.
-      </div>
-    </details>
-  </section>
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Without label</span>
+      <app-select placeholder="Pick a country…" [options]="countryOptions" [(ngModel)]="countryValue"></app-select>
+    </div>
 
-  <hr class="border-black/10 dark:border-white/10">
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Disabled</span>
+      <app-select label="Disabled" placeholder="Can't open" [options]="fruitOptions" [disabled]="true"></app-select>
+    </div>
 
-  <!-- Dialog -->
-  <section class="flex flex-col gap-4 mb-20">
-    <h2 class="text-lg font-semibold">Native Dialog</h2>
-
-    <app-button variant="primary" (clicked)="openDialog()">
-      Open Native Dialog
-    </app-button>
-
-    <dialog id="nativeDialog" style="width: 100%;">
-      <h3 class="text-lg font-bold">Native Dialog</h3>
-      <p class="">This is a native HTML dialog element. Press Esc or click button to close.</p>
-      <app-button variant="primary" (clicked)="closeDialog()">
-        Close
-      </app-button>
-    </dialog>
+    <p class="text-sm opacity-50">Selected: {{ fruitValue ?? '—' }} / {{ countryValue ?? '—' }}</p>
   </section>
 
 </div>

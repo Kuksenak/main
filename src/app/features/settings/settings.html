@@ -7,10 +7,15 @@
             <span class="text-[13px] opacity-40 mt-0.5">Выберите оформление</span>
         </div>
 
-        <div class="w-full md:w-[200px]">
-            <app-button (clicked)="toggleTheme()">
-                {{currentThemeLabel}}
-            </app-button>
+        <div class="flex items-center gap-2.5 py-2">
+            @for (option of themeOptions; track option.mode) {
+            <button (click)="setTheme(option.mode)"
+                class="btn btn-round btn-secondary hover:scale-110 active:scale-90"
+                [class.ring-2]="currentTheme() === option.mode"
+                [class.ring-blue-500]="currentTheme() === option.mode">
+                {{option.icon}}
+            </button>
+            }
         </div>
     </div>
 

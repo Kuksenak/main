@@ -30,6 +30,7 @@ export interface EventsResponse {
   events: CalendarEvent[];
 }
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({
   providedIn: 'root'
 })

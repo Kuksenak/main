@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter } from 'rxjs';
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({
   providedIn: 'root',
 })

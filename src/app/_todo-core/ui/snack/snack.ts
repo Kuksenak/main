@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 
 export type SnackType = 'info' | 'success' | 'error';
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-snack',
   imports: [],

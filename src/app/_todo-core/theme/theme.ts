@@ -3,6 +3,7 @@ import { DOCUMENT } from '@angular/common';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({ providedIn: 'root' })
 export class Theme {
   private document = inject(DOCUMENT);

@@ -1,74 +1,24 @@
-import { CdkMenu, CdkMenuItem, CdkMenuTrigger } from '@angular/cdk/menu';
-import { Component, computed, ElementRef, inject, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, computed, inject } from '@angular/core';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Sheet } from '../sheet/sheet';
 import { Settings } from 'app/features/settings/settings';
 import { Events } from 'app/features/events/events';
 import { Elements } from 'app/features/elements/elements';
 
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-navbar',
-  imports: [CdkMenuItem, CdkMenuTrigger, CdkMenu],
+  imports: [],
   templateUrl: './navbar.html',
-  host: {
-    class: 'block w-full'
-  }
+  host: { class: 'block w-full' }
 })
 export class Navbar {
   protected readonly auth = inject(AuthStore);
   private readonly sheet = inject(Sheet);
-  private readonly router = inject(Router);
 
   protected readonly userEmail = computed(() => this.auth.user()?.email ?? '');
-  protected readonly userInitial = computed(() => {
-    return this.userEmail() ? this.userEmail().charAt(0).toUpperCase() : '';
-  });
 
-  @ViewChild('profileTrigger', { read: ElementRef })
-  private readonly profileTrigger?: ElementRef<HTMLElement>;
-
-  openSettings() {
-    this.sheet.open(Settings);
-  }
-
-  openEvents() {
-    this.sheet.open(Events);
-  }
-
-  openElements() {
-    this.sheet.open(Elements);
-  }
-
-  // openApplications() {
-  //   this.popupService.open(Applications, this.settingsTrigger.nativeElement);
-  // }
-
-  reload() {
-    window.location.reload();
-  }
-
-  onMobileProfileAction(action: string) {
-    switch (action) {
-      case 'settings':
-        this.openSettings();
-        break;
-      case 'events':
-        this.openEvents();
-        break;
-      case 'elements':
-        this.openElements();
-        break;
-      case 'reload':
-        this.reload();
-        break;
-      case 'signout':
-        this.auth.signout();
-        break;
-      default:
-        break;
-    }
-  }
+  openSettings() { this.sheet.open(Settings); }
+  openEvents()   { this.sheet.open(Events); }
+  openElements() { this.sheet.open(Elements); }
 }
-
-

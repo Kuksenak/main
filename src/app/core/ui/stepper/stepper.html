@@ -1,0 +1,18 @@
+<div class="stepper">
+  <button class="stepper-btn" (click)="decrement()" [disabled]="value() <= min">
+    <span class="stepper-icon">−</span>
+  </button>
+
+  <div class="stepper-value">
+    <span
+      class="value-text"
+      [class.animating-up]="isAnimating && animationDirection === 1"
+      [class.animating-down]="isAnimating && animationDirection === -1">
+      {{ value() }}
+    </span>
+  </div>
+
+  <button class="stepper-btn" (click)="increment()" [disabled]="value() >= max">
+    <span class="stepper-icon">+</span>
+  </button>
+</div>

@@ -10,6 +10,7 @@ interface DayGroup {
   events: CalendarEvent[];
 }
 
+/** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-events-calendar',
   standalone: true,

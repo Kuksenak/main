@@ -1,101 +1,18 @@
-<nav class="flex items-center justify-between navbar-safe-area apple-glass ">
-    <div>
-        <!-- <strong class="text-[17px] font-bold tracking-tight">My App</strong> -->
-    </div>
+<nav class="flex items-center justify-between px-4 py-3 border-b border-black/8 dark:border-white/8">
+  <div class="flex items-center gap-1">
+    @if (auth.isAuthenticated()) {
+      <button (click)="openElements()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-colors">Elements</button>
+      <button (click)="openEvents()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-colors">Events</button>
+      <button (click)="openSettings()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-colors">Settings</button>
+    }
+  </div>
 
-    <div class="flex items-center gap-1.5">
-        <!-- <button (click)="openSettings()" class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/8 transition-all duration-200" title="Settings">
-            <svg class="w-[18px] h-[18px] opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-        </button> -->
-
-        @if(auth.isAuthenticated()) {
-            <select
-                class="md:hidden max-w-[220px] pl-0 pr-6 py-1 bg-transparent border-0 rounded-none text-[17px] font-semibold appearance-auto focus:outline-none"
-                (change)="onMobileProfileAction($any($event.target).value); $any($event.target).value = ''"
-                aria-label="Profile actions"
-            >
-                <option value="">{{userEmail()}}</option>
-                <option value="settings">Settings</option>
-                <option value="events">Events</option>
-                <option value="elements">Elements</option>
-                <option value="reload">Reload App</option>
-                <option value="signout">Sign Out</option>
-            </select>
-
-            <button type="button" [cdkMenuTriggerFor]="profileMenu" #profileTrigger class="hidden md:flex items-center gap-2 px-4 py-2 rounded-full hover:bg-black/5 dark:hover:bg-white/8 transition-all duration-200 text-[16px] font-semibold tracking-tight">
-                {{userEmail()}}
-                <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
-        }
-        @else {
-            <button type="button" [cdkMenuTriggerFor]="authMenu" class="apple-btn apple-btn-primary text-[13px] py-1.5 px-4">
-                Sign In
-            </button>
-        }
-    </div>
+  <div class="flex items-center gap-3">
+    @if (auth.isAuthenticated()) {
+      <span class="text-[13px] opacity-40">{{ userEmail() }}</span>
+      <button (click)="auth.signout()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium text-[#fa233b] hover:bg-red-500/10 transition-colors">Sign Out</button>
+    } @else {
+      <button (click)="auth.signin()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-colors">Sign In</button>
+    }
+  </div>
 </nav>
-
-<ng-template #profileMenu>
-    <div cdkMenu class="apple-menu mt-2 min-w-[260px]">
-        <div class="px-3 py-2 mb-1">
-            <div class="text-[13px] font-medium opacity-40 uppercase tracking-wider">Account</div>
-            <div class="truncate text-[16px] font-semibold mt-0.5">{{userEmail()}}</div>
-        </div>
-
-        <div class="apple-menu-separator"></div>
-
-        <button cdkMenuItem (click)="openSettings()" class="apple-menu-item">
-            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Settings
-        </button>
-
-        <button cdkMenuItem (click)="openEvents()" class="apple-menu-item">
-            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3M3 11h18M5 5h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z" />
-            </svg>
-            Events
-        </button>
-
-        <button cdkMenuItem (click)="openElements()" class="apple-menu-item">
-            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-            Elements
-        </button>
-
-        <button cdkMenuItem (click)="reload()" class="apple-menu-item">
-            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a8 8 0 0114-4.9M20 15a8 8 0 01-14 4.9" />
-            </svg>
-            Reload App
-        </button>
-
-        <div class="apple-menu-separator"></div>
-
-        <button cdkMenuItem (click)="auth.signout()" class="apple-menu-item text-[#fa233b] hover:bg-red-500/8">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Sign Out
-        </button>
-    </div>
-</ng-template>
-
-<ng-template #authMenu>
-    <div cdkMenu class="apple-menu mt-2">
-        <button cdkMenuItem (click)="auth.signin()" class="apple-menu-item">
-            <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Sign In / Register
-        </button>
-    </div>
-</ng-template>

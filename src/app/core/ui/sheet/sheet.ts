@@ -31,6 +31,7 @@ export class SheetRef {
   }
 }
 
+/** @deprecated Не отрефакторено (legacy). Почистить и переписать. */
 @Injectable({ providedIn: 'root' })
 export class Sheet {
   private overlay = inject(Overlay);
