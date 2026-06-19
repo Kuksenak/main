@@ -10,9 +10,9 @@
   <div class="flex items-center gap-3">
     @if (auth.isAuthenticated()) {
       <span class="text-[13px] opacity-40">{{ userEmail() }}</span>
-      <button (click)="auth.signout()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium text-[#fa233b] hover:bg-red-500/10 transition-colors">Sign Out</button>
+      <button appButton variant="warn" (click)="auth.signout()">Sign Out</button>
     } @else {
-      <button (click)="auth.signin()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-colors">Sign In</button>
+      <button appButton (click)="auth.signin()">Sign In</button>
     }
   </div>
 </nav>

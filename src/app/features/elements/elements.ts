@@ -2,11 +2,13 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Switch } from '../../core/ui/switch/switch';
 import { Select, SelectOption } from '../../core/ui/select/select';
+import { ButtonDirective } from '../../core/ui/button/button.directive';
+import { IconButtonDirective } from '../../core/directives/icon-button.directive';
 
 @Component({
   selector: 'app-elements',
   standalone: true,
-  imports: [FormsModule, Switch, Select],
+  imports: [FormsModule, Switch, Select, ButtonDirective, IconButtonDirective],
   templateUrl: './elements.html',
 })
 export class Elements {

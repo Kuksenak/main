@@ -65,4 +65,45 @@
     <p class="text-sm opacity-50">Selected: {{ fruitValue ?? '—' }} / {{ countryValue ?? '—' }}</p>
   </section>
 
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Buttons -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Buttons</h2>
+    <p class="text-sm opacity-60">
+      Directive <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">appButton</code> on native
+      <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;button&gt;</code>/<code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;a&gt;</code>.
+    </p>
+
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Text</span>
+      <div class="flex flex-wrap items-center gap-3">
+        <button appButton>Primary</button>
+        <button appButton variant="warn">Warn</button>
+        <button appButton disabled>Disabled</button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Icon (iOS-26 circle)</span>
+      <div class="flex flex-wrap items-center gap-3">
+        <button appIconButton aria-label="Add">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+        <button appIconButton="warn" aria-label="Delete">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <button appIconButton disabled aria-label="Add">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
 </div>

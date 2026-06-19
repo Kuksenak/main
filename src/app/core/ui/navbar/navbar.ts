@@ -4,11 +4,12 @@ import { Sheet } from '../sheet/sheet';
 import { Settings } from 'app/features/settings/settings';
 import { Events } from 'app/features/events/events';
 import { Elements } from 'app/features/elements/elements';
+import { ButtonDirective } from '../button/button.directive';
 
 /** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-navbar',
-  imports: [],
+  imports: [ButtonDirective],
   templateUrl: './navbar.html',
   host: { class: 'block w-full' }
 })
