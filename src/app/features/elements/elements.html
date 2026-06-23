@@ -89,6 +89,33 @@
 
   <hr class="border-black/10 dark:border-white/10">
 
+  <!-- Time -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Time</h2>
+    <p class="text-sm opacity-60 text-pretty">
+      Mobile — native time picker, desktop — custom iOS-style hour/minute columns via CDK overlay.
+    </p>
+
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default (5-min step)</span>
+      <app-time label="Reminder" placeholder="Pick a time…" [(ngModel)]="timeValue"></app-time>
+    </div>
+
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">1-min step</span>
+      <app-time label="Exact" placeholder="Pick a time…" [minuteStep]="1" [(ngModel)]="timeValue"></app-time>
+    </div>
+
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Disabled</span>
+      <app-time label="Disabled" placeholder="Can't open" [disabled]="true"></app-time>
+    </div>
+
+    <p class="text-sm opacity-50">Selected: {{ timeValue ?? '—' }}</p>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
   <!-- Buttons -->
   <section class="flex flex-col gap-4">
     <h2 class="text-lg font-semibold">Buttons</h2>
