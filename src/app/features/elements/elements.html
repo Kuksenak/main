@@ -5,7 +5,7 @@
   <!-- Switch -->
   <section class="flex flex-col gap-4">
     <h2 class="text-lg font-semibold">Switch</h2>
-    <p class="text-sm opacity-60">
+    <p class="text-sm opacity-60 text-pretty">
       Mobile — native iOS toggle (<code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">switch</code> attribute),
       desktop — custom Tailwind. Layout controlled by <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal.
     </p>
@@ -42,7 +42,7 @@
   <!-- Select -->
   <section class="flex flex-col gap-4">
     <h2 class="text-lg font-semibold">Select</h2>
-    <p class="text-sm opacity-60">
+    <p class="text-sm opacity-60 text-pretty">
       Mobile — native OS picker, desktop — custom iOS-style dropdown via CDK overlay.
       Same <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal switch.
     </p>
@@ -67,10 +67,32 @@
 
   <hr class="border-black/10 dark:border-white/10">
 
+  <!-- Date -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold">Date</h2>
+    <p class="text-sm opacity-60 text-pretty">
+      Mobile — native date picker, desktop — custom iOS-style calendar via CDK overlay (no Material dep).
+    </p>
+
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default</span>
+      <app-date label="Birthday" placeholder="Pick a date…" [(ngModel)]="dateValue"></app-date>
+    </div>
+
+    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Disabled</span>
+      <app-date label="Disabled" placeholder="Can't open" [disabled]="true"></app-date>
+    </div>
+
+    <p class="text-sm opacity-50">Selected: {{ dateValue ? dateValue.toLocaleDateString() : '—' }}</p>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
   <!-- Buttons -->
   <section class="flex flex-col gap-4">
     <h2 class="text-lg font-semibold">Buttons</h2>
-    <p class="text-sm opacity-60">
+    <p class="text-sm opacity-60 text-pretty">
       Directive <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">appButton</code> on native
       <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;button&gt;</code>/<code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;a&gt;</code>.
     </p>

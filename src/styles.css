@@ -15,6 +15,18 @@ button {
     font-size: 17px;
 }
 
+/* Crisper text on macOS (ignored elsewhere) — applied once at the root */
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* One-shot enter animation for popover/dropdown surfaces (opacity + lift + scale) */
+@keyframes dropdownIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 /* ───────────────────────────────────────────────────────────
    App shell + sheet chrome.
    Эти классы тоглятся из JS (sheet.ts) на глобальных элементах

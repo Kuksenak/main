@@ -1,11 +1,11 @@
 <label
-  class="flex items-center cursor-pointer select-none gap-3 has-[:disabled]:cursor-not-allowed"
+  class="flex items-center min-h-10 cursor-pointer select-none gap-3 has-[:disabled]:cursor-not-allowed"
   [class.w-full]="isMobile()"
   [class.justify-between]="isMobile()"
   [class.flex-row-reverse]="!isMobile()"
 >
   @if (label) {
-    <span class="text-[17px] font-normal tracking-[-0.41px] leading-[1.29] antialiased">{{ label }}</span>
+    <span class="text-[17px] font-normal tracking-[-0.41px] leading-[1.29] text-pretty">{{ label }}</span>
   }
 
   @if (isMobile()) {

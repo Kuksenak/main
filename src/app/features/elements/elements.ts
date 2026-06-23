@@ -2,13 +2,14 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Switch } from '../../core/ui/switch/switch';
 import { Select, SelectOption } from '../../core/ui/select/select';
+import { DateField } from '../../core/ui/date/date';
 import { ButtonDirective } from '../../core/ui/button/button.directive';
 import { IconButtonDirective } from '../../core/directives/icon-button.directive';
 
 @Component({
   selector: 'app-elements',
   standalone: true,
-  imports: [FormsModule, Switch, Select, ButtonDirective, IconButtonDirective],
+  imports: [FormsModule, Switch, Select, DateField, ButtonDirective, IconButtonDirective],
   templateUrl: './elements.html',
 })
 export class Elements {
@@ -17,6 +18,8 @@ export class Elements {
 
   fruitValue: string | null = null;
   countryValue: string | null = null;
+
+  dateValue: Date | null = null;
 
   readonly fruitOptions: SelectOption[] = [
     { value: 'apple', label: 'Apple' },
