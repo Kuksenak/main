@@ -1,9 +1,9 @@
 <nav class="flex items-center justify-between px-4 py-3 border-b border-black/8 dark:border-white/8">
   <div class="flex items-center gap-1">
     @if (auth.isAuthenticated()) {
-      <button (click)="openElements()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-colors">Elements</button>
-      <button (click)="openEvents()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-colors">Events</button>
-      <button (click)="openSettings()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-colors">Settings</button>
+      <button (click)="openElements()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-[transform,background-color] active:scale-[0.96]">Elements</button>
+      <button (click)="openEvents()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-[transform,background-color] active:scale-[0.96]">Events</button>
+      <button (click)="openSettings()" class="px-3 py-1.5 rounded-lg text-[15px] font-medium hover:bg-black/5 dark:hover:bg-white/8 transition-[transform,background-color] active:scale-[0.96]">Settings</button>
     }
   </div>
 
