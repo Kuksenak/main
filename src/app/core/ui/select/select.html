@@ -8,7 +8,7 @@
     <select
       [disabled]="disabled"
       (change)="onNativeChange($event)"
-      class="w-full px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[17px] appearance-auto focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
+      class="w-full px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[15px] appearance-auto focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
     >
       @if (selectedIndex < 0) {
         <option value="-1" disabled selected hidden>{{ placeholder }}</option>
@@ -26,7 +26,7 @@
       #origin="cdkOverlayOrigin"
       [disabled]="disabled"
       (click)="toggle(trigger)"
-      class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[17px] text-left focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
+      class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[15px] text-left focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
     >
       <span [class.opacity-40]="selectedIndex < 0">{{ selectedOption?.label ?? placeholder }}</span>
       <svg
@@ -48,19 +48,19 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <div class="w-full mt-1.5 py-1 rounded-xl bg-white dark:bg-[#242426] overflow-hidden max-h-72 overflow-y-auto
+      <div class="w-full mt-1.5 py-1 rounded-xl bg-[#faf9f7] dark:bg-[#2a2522] overflow-hidden max-h-72 overflow-y-auto
                   origin-top [animation:dropdownIn_160ms_cubic-bezier(0.2,0,0,1)]
-                  shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_8px_30px_rgba(0,0,0,0.12)]
-                  dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_8px_30px_rgba(0,0,0,0.4)]">
+                  shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.12)]
+                  dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_8px_30px_rgba(0,0,0,0.5)]">
         @for (opt of options; track opt.value) {
           <button
             type="button"
             (click)="select(opt)"
-            class="w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-[17px] hover:bg-black/5 dark:hover:bg-white/8 transition-colors"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2 text-left text-[15px] hover:bg-black/5 dark:hover:bg-white/8 transition-colors"
           >
             <span>{{ opt.label }}</span>
             @if (opt.value === value) {
-              <svg class="w-4 h-4 shrink-0 text-[#0071eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+              <svg class="w-4 h-4 shrink-0 text-[#d4732f]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             }

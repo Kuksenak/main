@@ -4,18 +4,56 @@
 <head>
   <meta charset="utf-8">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f3f3f3" id="meta-theme-color">
+  <meta name="theme-color" content="#faf9f7" id="meta-theme-color">
   <script>
     (function() {
       try {
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) {
           document.documentElement.classList.add('dark');
           document.querySelector('meta[name="color-scheme"]').content = 'dark';
-          document.querySelector('meta[name="theme-color"]').content = '#33373a';
+          document.getElementById('meta-theme-color').content = '#1c1917';
         }
+        var ua = navigator.userAgent;
+        var mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||
+                     'ontouchstart' in window ||
+                     navigator.maxTouchPoints > 0;
+        document.documentElement.dataset.device = mobile ? 'mobile' : 'desktop';
+
+        // Inject device-specific stylesheet before Angular renders anything.
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = mobile ? 'styles-mobile.css' : 'styles-desktop.css';
+        document.head.appendChild(link);
       } catch(e) {}
     })();
   </script>
+  <style>
+    #app-splash {
+      position: fixed;
+      inset: 0;
+      background: #faf9f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.25s ease;
+    }
+    html.dark #app-splash { background: #1c1917; }
+    #app-splash.out { opacity: 0; pointer-events: none; }
+    #app-splash::after {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #d4732f;
+      animation: sp 1.2s ease-in-out infinite;
+    }
+    @keyframes sp {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50%       { opacity: 0.7; transform: scale(1.5); }
+    }
+  </style>
   <title></title>
   <base href="/">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -27,6 +65,7 @@
 </head>
 
 <body>
+  <div id="app-splash" aria-hidden="true"></div>
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>

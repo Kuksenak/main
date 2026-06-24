@@ -5,7 +5,7 @@
   [class.flex-row-reverse]="!isMobile()"
 >
   @if (label) {
-    <span class="text-[17px] font-normal tracking-[-0.41px] leading-[1.29] text-pretty">{{ label }}</span>
+    <span class="text-[15px] leading-[1.4] text-pretty">{{ label }}</span>
   }
 
   @if (isMobile()) {
@@ -16,7 +16,7 @@
       [checked]="checked"
       [disabled]="disabled"
       (change)="onToggle($event)"
-      class="shrink-0 accent-[#34c759] disabled:opacity-50 disabled:cursor-not-allowed"
+      class="shrink-0 accent-[#d4732f] disabled:opacity-50 disabled:cursor-not-allowed"
     >
   } @else {
     <!-- Desktop: custom iOS-style slider -->
@@ -29,7 +29,7 @@
              w-11 h-6 rounded-full relative
              bg-[#d1d1d6] dark:bg-white/20
              transition-colors duration-300
-             checked:bg-[#34c759]
+             checked:bg-[#d4732f]
              disabled:opacity-50 disabled:cursor-not-allowed
              after:content-[''] after:absolute after:top-0.5 after:left-0.5
              after:w-5 after:h-5 after:bg-white after:rounded-full

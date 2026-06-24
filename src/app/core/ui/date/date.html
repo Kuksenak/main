@@ -10,7 +10,7 @@
       [value]="nativeValue()"
       [disabled]="disabled"
       (change)="onNativeChange($event)"
-      class="w-full px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[17px] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
+      class="w-full px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[15px] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
     >
   } @else {
     <!-- Desktop: custom iOS-style calendar via CDK overlay -->
@@ -21,7 +21,7 @@
       #origin="cdkOverlayOrigin"
       [disabled]="disabled"
       (click)="toggle(trigger)"
-      class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[17px] text-left focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
+      class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-transparent text-[15px] text-left focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
     >
       <span [class.opacity-40]="!value()">{{ triggerLabel() }}</span>
       <svg class="w-4 h-4 opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -38,10 +38,10 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <div class="mt-1.5 p-3 w-[300px] rounded-2xl bg-white dark:bg-[#242426] overflow-hidden
+      <div class="mt-1.5 p-3 w-[300px] rounded-2xl bg-[#faf9f7] dark:bg-[#2a2522] overflow-hidden
                   origin-top [animation:dropdownIn_160ms_cubic-bezier(0.2,0,0,1)]
-                  shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_8px_30px_rgba(0,0,0,0.12)]
-                  dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_8px_30px_rgba(0,0,0,0.4)]">
+                  shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.12)]
+                  dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_8px_30px_rgba(0,0,0,0.5)]">
 
         <!-- Header: month nav -->
         <div class="flex items-center justify-between mb-2">
@@ -78,9 +78,9 @@
                   class="w-9 h-9 rounded-full text-[15px] flex items-center justify-center transition-colors [-webkit-tap-highlight-color:transparent]"
                   [class.opacity-30]="!cell.inMonth"
                   [class]="isSelected(cell.date)
-                    ? 'bg-[#0071eb] text-white font-semibold'
+                    ? 'bg-[#d4732f] text-white font-semibold'
                     : isToday(cell.date)
-                      ? 'text-[#0071eb] font-semibold hover:bg-black/5 dark:hover:bg-white/10'
+                      ? 'text-[#d4732f] font-semibold hover:bg-black/5 dark:hover:bg-white/10'
                       : 'hover:bg-black/5 dark:hover:bg-white/10'"
                 >
                   {{ cell.date.getDate() }}

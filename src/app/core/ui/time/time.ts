@@ -16,8 +16,8 @@ function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-const CLS_SELECTED = 'bg-[#0071eb] text-white font-semibold';
-const CLS_CURRENT = 'text-[#0071eb] font-semibold hover:bg-black/5 dark:hover:bg-white/10';
+const CLS_SELECTED = 'bg-[#d4732f] text-white font-semibold';
+const CLS_CURRENT = 'text-[#d4732f] font-semibold hover:bg-black/5 dark:hover:bg-white/10';
 const CLS_PLAIN = 'hover:bg-black/5 dark:hover:bg-white/10';
 
 @Component({

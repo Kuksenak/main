@@ -7,12 +7,13 @@
 html,
 body,
 button {
-    font-family: -apple-system,
-        BlinkMacSystemFont,
-        'SF Pro Text',
+    font-family: ui-sans-serif,
         system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        'Segoe UI',
         sans-serif;
-    font-size: 17px;
+    font-size: 15px;
 }
 
 /* Crisper text on macOS (ignored elsewhere) — applied once at the root */
@@ -21,20 +22,7 @@ html {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* One-shot enter animation for popover/dropdown surfaces (opacity + lift + scale) */
-@keyframes dropdownIn {
-    from { opacity: 0; transform: translateY(-4px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* ───────────────────────────────────────────────────────────
-   App shell + sheet chrome.
-   Эти классы тоглятся из JS (sheet.ts) на глобальных элементах
-   (#app-main-wrapper, CDK backdrop), вне шаблонов компонентов,
-   поэтому выражаются обычным CSS, а не Tailwind-утилитами.
-   ─────────────────────────────────────────────────────────── */
-
-/* Тёмный фон, который видно за "карточкой" при открытой шторке */
+/* Dark background visible behind the "card" when a sheet is open */
 body {
     background-color: #000;
 }
@@ -45,18 +33,4 @@ body {
         transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
         border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1);
     will-change: transform;
-}
-
-/* Эффект "карточки": главный экран отъезжает вглубь, когда открыта шторка */
-.app-stacked {
-    transform: translateY(calc(env(safe-area-inset-top, 20px) + 8px)) scale(0.93);
-    border-radius: 16px;
-    overflow: hidden;
-    pointer-events: none;
-    user-select: none;
-}
-
-/* Затемнение фона под шторкой */
-.sheet-backdrop {
-    background-color: rgba(0, 0, 0, 0.4);
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, afterNextRender, inject, OnInit } from '@angular/core';
 import { AuthStore } from './_todo-core/auth/auth-store';
 import { Navbar } from './core/ui/navbar/navbar';
 import { environment } from '@environments/environment';
@@ -19,6 +19,15 @@ export class App implements OnInit {
   private notificationService = inject(NotificationService);
   private updateService = inject(AppUpdateService);
   private theme = inject(Theme);
+
+  constructor() {
+    afterNextRender(() => {
+      const splash = document.getElementById('app-splash');
+      if (!splash) return;
+      splash.classList.add('out');
+      setTimeout(() => splash.remove(), 300);
+    });
+  }
 
   ngOnInit() {
     this.signalR.startConnection();

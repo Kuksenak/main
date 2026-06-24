@@ -1,0 +1,19 @@
+/* Desktop-only styles — loaded only when data-device="desktop" is detected */
+
+/* Enter animation for dropdown/popover surfaces */
+@keyframes dropdownIn {
+    from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Thin scrollbar for the time-picker columns */
+.time-picker-col {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+.time-picker-col::-webkit-scrollbar { width: 4px; }
+.time-picker-col::-webkit-scrollbar-track { background: transparent; }
+.time-picker-col::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+}
