@@ -24,8 +24,13 @@ export class App implements OnInit {
     afterNextRender(() => {
       const splash = document.getElementById('app-splash');
       if (!splash) return;
-      splash.classList.add('out');
-      setTimeout(() => splash.remove(), 300);
+      sessionStorage.setItem('app-loaded', '1');
+      const elapsed = Date.now() - ((window as any).__splashAt ?? Date.now());
+      const wait = Math.max(0, 1000 - elapsed);
+      setTimeout(() => {
+        splash.classList.add('out');
+        setTimeout(() => splash.remove(), 300);
+      }, wait);
     });
   }
 

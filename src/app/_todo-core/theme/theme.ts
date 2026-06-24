@@ -58,8 +58,7 @@ export class Theme {
   }
 
   private updateEnvironmentStyles(dark: boolean) {
-    const bgColor = dark ? '#33373a' : '#f3f3f3';
-    this.document.body.style.backgroundColor = bgColor;
+    const themeColor = dark ? '#1c1917' : '#faf9f7';
 
     let themeMeta = this.document.querySelector('meta[name="theme-color"]');
     if (!themeMeta) {
@@ -67,7 +66,7 @@ export class Theme {
       themeMeta.setAttribute('name', 'theme-color');
       this.document.head.appendChild(themeMeta);
     }
-    themeMeta.setAttribute('content', bgColor);
+    themeMeta.setAttribute('content', themeColor);
 
     let colorSchemeMeta = this.document.querySelector('meta[name="color-scheme"]');
     if (!colorSchemeMeta) {

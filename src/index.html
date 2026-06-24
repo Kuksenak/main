@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#faf9f7" id="meta-theme-color">
+  <meta name="theme-color" content="#d4732f" id="meta-theme-color">
   <script>
     (function() {
       try {
@@ -12,13 +12,17 @@
         if (dark) {
           document.documentElement.classList.add('dark');
           document.querySelector('meta[name="color-scheme"]').content = 'dark';
-          document.getElementById('meta-theme-color').content = '#1c1917';
         }
         var ua = navigator.userAgent;
         var mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||
                      'ontouchstart' in window ||
                      navigator.maxTouchPoints > 0;
         document.documentElement.dataset.device = mobile ? 'mobile' : 'desktop';
+        if (sessionStorage.getItem('app-loaded')) {
+          document.documentElement.classList.add('no-splash');
+        } else {
+          window.__splashAt = Date.now();
+        }
 
         // Inject device-specific stylesheet before Angular renders anything.
         var link = document.createElement('link');
@@ -32,26 +36,26 @@
     #app-splash {
       position: fixed;
       inset: 0;
-      background: #faf9f7;
+      background: #d4732f;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
-      transition: opacity 0.25s ease;
+      transition: opacity 0.3s ease;
     }
-    html.dark #app-splash { background: #1c1917; }
     #app-splash.out { opacity: 0; pointer-events: none; }
+    html.no-splash #app-splash { display: none; }
     #app-splash::after {
       content: '';
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #d4732f;
+      background: rgba(255, 255, 255, 0.7);
       animation: sp 1.2s ease-in-out infinite;
     }
     @keyframes sp {
-      0%, 100% { opacity: 0.3; transform: scale(1); }
-      50%       { opacity: 0.7; transform: scale(1.5); }
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50%       { opacity: 0.9; transform: scale(1.5); }
     }
   </style>
   <title></title>

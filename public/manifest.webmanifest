@@ -54,8 +54,8 @@
     }
   ],
   "display": "fullscreen",
-  "background_color": "#f3f3f3",
-  "theme_color": "#f3f3f3",
+  "background_color": "#d4732f",
+  "theme_color": "#d4732f",
   "orientation": "portrait",
   "launch_handler": {
     "client_mode": "navigate-existing"

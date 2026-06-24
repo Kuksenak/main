@@ -19,3 +19,9 @@ html, body, button, input, select, textarea {
 .sheet-backdrop {
     background-color: rgba(0, 0, 0, 0.4);
 }
+
+/* Pill-shaped buttons on mobile (overrides shared rounded-lg) */
+button[appButton], a[appButton],
+button[appIconButton], a[appIconButton] {
+    border-radius: 9999px;
+}
