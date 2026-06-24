@@ -8,6 +8,9 @@
   </div>
 
   <div class="flex items-center gap-3">
+    @if (appUpdate.updateAvailable()) {
+      <button appButton (click)="appUpdate.reloadApp()">Update available</button>
+    }
     @if (auth.isAuthenticated()) {
       <span class="text-[13px] opacity-40">{{ userEmail() }}</span>
       <button appButton variant="warn" (click)="auth.signout()">Sign Out</button>

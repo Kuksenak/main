@@ -1,5 +1,11 @@
 /* Mobile-only styles — loaded only when data-device="mobile" is detected */
 
+/* Restore iOS default font and size (overrides the shared 15px/neutral stack) */
+html, body, button, input, select, textarea {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    font-size: 17px;
+}
+
 /* Card effect: main screen scales back when a bottom sheet is open */
 .app-stacked {
     transform: translateY(calc(env(safe-area-inset-top, 20px) + 8px)) scale(0.93);
