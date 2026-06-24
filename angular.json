@@ -37,9 +37,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css",
-              { "input": "src/styles-mobile.css",  "bundleName": "styles-mobile",  "inject": false },
-              { "input": "src/styles-desktop.css", "bundleName": "styles-desktop", "inject": false }
+              "src/styles.css"
             ]
           },
           "configurations": {
@@ -62,7 +60,7 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "bundles",
+              "outputHashing": "all",
               "baseHref": "/",
               "serviceWorker": "ngsw-config.json"
             },
