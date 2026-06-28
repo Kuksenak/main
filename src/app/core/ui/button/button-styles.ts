@@ -26,11 +26,11 @@ export const ICON_BUTTON_BASE =
   '[[data-device=mobile]_&]:w-12 [[data-device=mobile]_&]:h-12 ' +
   'select-none cursor-pointer outline-none transition-[transform,background-color] duration-150 ease-out ' +
   'active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ' +
-  '[-webkit-tap-highlight-color:transparent] [&>svg]:w-[65%] [&>svg]:h-[65%]';
+  '[-webkit-tap-highlight-color:transparent] [&>svg]:w-[70%] [&>svg]:h-[70%] [&_*]:[stroke-width:2]';
 
 // `glass` is a solid placeholder for now — real liquid-glass (translucent + blur)
 // comes once the transparency issue is sorted out.
 export const ICON_BUTTON_VARIANT: Record<IconButtonVariant, string> = {
-  glass: 'bg-black/6 dark:bg-white/8 hover:bg-black/10 dark:hover:bg-white/12',
+  glass: 'text-black/70 dark:text-white/75 bg-black/6 dark:bg-white/8 hover:bg-black/10 dark:hover:bg-white/12',
   warn: 'bg-[#e5484d]/10 text-[#e5484d] hover:bg-[#e5484d]/18',
 };
