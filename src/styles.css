@@ -4,6 +4,22 @@
 /* Dark mode driven by `html.dark` (toggled by Theme service), not prefers-color-scheme */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Design tokens.
+   --app-bg  : the app's base background (the "body" colour).
+   --surface : elevated surfaces — toolbar, sheet, dropdowns. One shared value
+               so they read as the same material, slightly lifted off --app-bg. */
+:root {
+    --app-bg: #e5e5ea;
+    --surface: #f2f2f7;
+    --card: #ffffff;
+}
+
+html.dark {
+    --app-bg: #000000;
+    --surface: #1c1c1e;
+    --card: #2c2c2e;
+}
+
 html,
 body,
 button {
@@ -22,15 +38,62 @@ html {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Dark background visible behind the "card" when a sheet is open */
 body {
-    background-color: #000;
+    background-color: var(--app-bg);
 }
 
-#app-main-wrapper {
-    transform-origin: center top;
+/* When a sheet is open, the toolbar slides up under it — the only background motion. */
+#app-main-wrapper nav {
     transition:
-        transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
-        border-radius 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+        transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+        opacity 0.3s ease;
     will-change: transform;
+}
+
+#app-main-wrapper.app-stacked nav {
+    transform: translateY(2rem);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* No dim/shadow behind the sheet — the background keeps its colour.
+   The class stays so outside clicks still close the sheet. */
+.sheet-backdrop {
+    background-color: transparent;
+}
+
+/* Unified slim scrollbar — page, sheet content, dropdown columns */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+html.dark * {
+    scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 9999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.22);
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.32);
+    background-clip: content-box;
 }

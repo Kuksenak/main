@@ -58,7 +58,7 @@ export class Theme {
   }
 
   private updateEnvironmentStyles(dark: boolean) {
-    const themeColor = dark ? '#1c1917' : '#faf9f7';
+    const themeColor = dark ? '#000000' : '#e5e5ea';
 
     let themeMeta = this.document.querySelector('meta[name="theme-color"]');
     if (!themeMeta) {

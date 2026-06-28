@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#d4732f" id="meta-theme-color">
+  <meta name="theme-color" content="#000000" id="meta-theme-color">
   <script>
     (function() {
       try {
@@ -13,6 +13,8 @@
           document.documentElement.classList.add('dark');
           document.querySelector('meta[name="color-scheme"]').content = 'dark';
         }
+        var tc = document.getElementById('meta-theme-color');
+        if (tc) tc.content = dark ? '#000000' : '#e5e5ea';
         var ua = navigator.userAgent;
         var mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||
                      'ontouchstart' in window ||
@@ -36,12 +38,15 @@
     #app-splash {
       position: fixed;
       inset: 0;
-      background: #d4732f;
+      background: #e5e5ea;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
       transition: opacity 0.3s ease;
+    }
+    @media (prefers-color-scheme: dark) {
+      #app-splash { background: #000000; }
     }
     #app-splash.out { opacity: 0; pointer-events: none; }
     html.no-splash #app-splash { display: none; }
@@ -50,7 +55,7 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.7);
+      background: #d4732f;
       animation: sp 1.2s ease-in-out infinite;
     }
     @keyframes sp {

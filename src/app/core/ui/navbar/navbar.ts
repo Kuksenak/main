@@ -5,14 +5,14 @@ import { Settings } from 'app/features/settings/settings';
 import { Events } from 'app/features/events/events';
 import { Elements } from 'app/features/elements/elements';
 import { ButtonDirective } from '../button/button.directive';
+import { IconButtonDirective } from '../../directives/icon-button.directive';
 import { AppUpdateService } from '../../services/app-update.service';
 
 /** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-navbar',
-  imports: [ButtonDirective],
+  imports: [ButtonDirective, IconButtonDirective],
   templateUrl: './navbar.html',
-  host: { class: 'block w-full' }
 })
 export class Navbar {
   protected readonly auth = inject(AuthStore);

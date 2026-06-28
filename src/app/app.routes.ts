@@ -3,11 +3,8 @@ import { authGuard } from './_todo-core/auth/auth-guard';
 import { Home } from './_todo-features/home/home';
 
 export const routes: Routes = [
-    { path: 'home', component: Home, canActivate: [authGuard] },
-    // { path: 'settings', component: Settings, canActivate: [authGuard] },
-    { path: 'server-error', redirectTo: 'home', pathMatch: 'full' },
-    { path: '', redirectTo: 'home', pathMatch: 'full' },
-    // { path: 'devices', component: Devices, canActivate: [authGuard] },
+    { path: '', component: Home, canActivate: [authGuard] },
+    { path: 'server-error', redirectTo: '', pathMatch: 'full' },
     {
         path: 'settings',
         loadComponent: () =>

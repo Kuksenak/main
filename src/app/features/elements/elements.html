@@ -10,25 +10,25 @@
       desktop — custom Tailwind. Layout controlled by <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal.
     </p>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default</span>
       <app-switch label="Enable notifications" [(ngModel)]="switchValue1"></app-switch>
       <app-switch label="Dark theme" [(ngModel)]="switchValue2"></app-switch>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Long label</span>
       <app-switch
         label="Automatically sync data when connected to Wi-Fi in background mode"
         [(ngModel)]="switchValue1"></app-switch>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Without label</span>
       <app-switch [(ngModel)]="switchValue1"></app-switch>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Disabled</span>
       <app-switch label="Disabled (ON)" [ngModel]="true" [disabled]="true"></app-switch>
       <app-switch label="Disabled (OFF)" [ngModel]="false" [disabled]="true"></app-switch>
@@ -47,17 +47,17 @@
       Same <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal switch.
     </p>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default</span>
       <app-select label="Fruit" placeholder="Choose a fruit…" [options]="fruitOptions" [(ngModel)]="fruitValue"></app-select>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Without label</span>
       <app-select placeholder="Pick a country…" [options]="countryOptions" [(ngModel)]="countryValue"></app-select>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Disabled</span>
       <app-select label="Disabled" placeholder="Can't open" [options]="fruitOptions" [disabled]="true"></app-select>
     </div>
@@ -74,12 +74,12 @@
       Mobile — native date picker, desktop — custom iOS-style calendar via CDK overlay (no Material dep).
     </p>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default</span>
       <app-date label="Birthday" placeholder="Pick a date…" [(ngModel)]="dateValue"></app-date>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Disabled</span>
       <app-date label="Disabled" placeholder="Can't open" [disabled]="true"></app-date>
     </div>
@@ -96,17 +96,17 @@
       Mobile — native time picker, desktop — custom iOS-style hour/minute columns via CDK overlay.
     </p>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default (5-min step)</span>
       <app-time label="Reminder" placeholder="Pick a time…" [(ngModel)]="timeValue"></app-time>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">1-min step</span>
       <app-time label="Exact" placeholder="Pick a time…" [minuteStep]="1" [(ngModel)]="timeValue"></app-time>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Disabled</span>
       <app-time label="Disabled" placeholder="Can't open" [disabled]="true"></app-time>
     </div>
@@ -124,7 +124,7 @@
       <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;button&gt;</code>/<code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;a&gt;</code>.
     </p>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Text</span>
       <div class="flex flex-wrap items-center gap-3">
         <button appButton>Primary</button>
@@ -133,7 +133,7 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Icon (iOS-26 circle)</span>
       <div class="flex flex-wrap items-center gap-3">
         <button appIconButton aria-label="Add">
