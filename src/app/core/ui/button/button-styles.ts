@@ -26,7 +26,7 @@ export const ICON_BUTTON_BASE =
   '[[data-device=mobile]_&]:w-12 [[data-device=mobile]_&]:h-12 ' +
   'select-none cursor-pointer outline-none transition-[transform,background-color] duration-150 ease-out ' +
   'active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ' +
-  '[-webkit-tap-highlight-color:transparent] [&>svg]:w-[70%] [&>svg]:h-[70%] [&_*]:[stroke-width:2]';
+  '[-webkit-tap-highlight-color:transparent] [&>svg]:w-[70%] [&>svg]:h-[70%] [&_*]:[stroke-width:1.5]';
 
 // `glass` is a solid placeholder for now — real liquid-glass (translucent + blur)
 // comes once the transparency issue is sorted out.
