@@ -16,7 +16,7 @@ import { IconButtonDirective } from '../../directives/icon-button.directive';
       'relative flex flex-col w-full overflow-hidden will-change-transform ' +
       'bg-[var(--surface)] ' +
       'border-t border-x border-black/10 dark:border-white/10 ' +
-      'rounded-t-[20px] ' +
+      'rounded-t-[28px] ' +
       'shadow-[0_-2px_20px_rgba(0,0,0,0.08)] ' +
       'h-[calc(100dvh_-_env(safe-area-inset-top,20px)_-_12px)]',
   },
