@@ -7,7 +7,9 @@ export type IconButtonVariant = 'glass' | 'warn';
 /* ── Text button (appButton) ───────────────────────────────── */
 
 export const BUTTON_BASE =
-  'inline-flex items-center justify-center gap-2 h-9 px-4 text-[14px] font-medium rounded-lg no-underline ' +
+  'inline-flex items-center justify-center gap-2 h-9 px-4 text-[14px] ' +
+  '[[data-device=mobile]_&]:h-12 [[data-device=mobile]_&]:px-6 [[data-device=mobile]_&]:text-[16px] ' +
+  'font-medium rounded-lg no-underline ' +
   'select-none cursor-pointer outline-none transition-[transform,background-color,filter] duration-150 ease-out ' +
   'active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ' +
   '[-webkit-tap-highlight-color:transparent]';
@@ -21,6 +23,7 @@ export const BUTTON_VARIANT: Record<ButtonVariant, string> = {
 
 export const ICON_BUTTON_BASE =
   'inline-flex items-center justify-center rounded-lg shrink-0 w-9 h-9 ' +
+  '[[data-device=mobile]_&]:w-12 [[data-device=mobile]_&]:h-12 ' +
   'select-none cursor-pointer outline-none transition-[transform,background-color] duration-150 ease-out ' +
   'active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ' +
   '[-webkit-tap-highlight-color:transparent] [&>svg]:w-[40%] [&>svg]:h-[40%]';

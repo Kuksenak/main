@@ -41,7 +41,7 @@
 
 @if (sheetRef.buttonsPortal$ | async; as buttonsPortal) {
   @if (buttonsPortal) {
-    <div class="absolute bottom-0 left-0 right-0 z-20 p-4 bg-[linear-gradient(to_top,var(--surface)_60%,transparent)] backdrop-blur-xl pointer-events-auto">
+    <div class="absolute bottom-0 left-0 right-0 z-20 p-4 bg-[linear-gradient(to_top,var(--surface)_70%,transparent)] pointer-events-auto">
       <ng-template [cdkPortalOutlet]="buttonsPortal"></ng-template>
     </div>
   }
