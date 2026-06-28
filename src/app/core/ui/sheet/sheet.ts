@@ -65,7 +65,7 @@ export class Sheet {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         containerRef.instance.transition = 'transform 0.5s cubic-bezier(0.32, 0.72, 0, 1)';
-        containerRef.instance.transform = 'translateY(0)';
+        containerRef.instance.transform = 'translate3d(0, 0, 0)';
       });
     });
 
@@ -101,7 +101,7 @@ export class Sheet {
     sheetRef.buttonsPortal$.next(null);
 
     container.transition = 'transform 0.5s cubic-bezier(0.32, 0.72, 0, 1)';
-    container.transform = 'translateY(100%)';
+    container.transform = 'translate3d(0, 100%, 0)';
 
     const backdrop = overlayRef.backdropElement;
     if (backdrop) {

@@ -28,7 +28,7 @@ export class SheetContainer {
   private startY = 0;
   private isDragging = false;
 
-  @HostBinding('style.transform') transform = 'translateY(100%)';
+  @HostBinding('style.transform') transform = 'translate3d(0, 100%, 0)';
   @HostBinding('style.transition') transition = 'none';
 
   onPointerDown(e: PointerEvent) {
@@ -43,7 +43,7 @@ export class SheetContainer {
     if (!this.isDragging) return;
     const deltaY = e.clientY - this.startY;
     if (deltaY > 0) {
-      this.transform = `translateY(${deltaY}px)`;
+      this.transform = `translate3d(0, ${deltaY}px, 0)`;
     }
   }
 
@@ -58,7 +58,7 @@ export class SheetContainer {
       this.close();
     } else {
       this.transition = 'transform 0.5s cubic-bezier(0.32, 0.72, 0, 1)';
-      this.transform = 'translateY(0)';
+      this.transform = 'translate3d(0, 0, 0)';
     }
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   }
