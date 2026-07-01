@@ -7,11 +7,12 @@ import { Elements } from 'app/features/elements/elements';
 import { ButtonDirective } from '../button/button.directive';
 import { IconButtonDirective } from '../../directives/icon-button.directive';
 import { AppUpdateService } from '../../services/app-update.service';
+import { ConfirmDirective } from '../confirm/confirm.directive';
 
 /** @deprecated Не отрефакторено (legacy). Мигрировать на Tailwind + signals. */
 @Component({
   selector: 'app-navbar',
-  imports: [ButtonDirective, IconButtonDirective],
+  imports: [ButtonDirective, IconButtonDirective, ConfirmDirective],
   templateUrl: './navbar.html',
 })
 export class Navbar {

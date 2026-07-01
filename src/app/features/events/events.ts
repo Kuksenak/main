@@ -1,13 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, TemplateRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
-import { Theme } from 'app/_todo-core/theme/theme';
 import { EventsConfig } from './events-config';
 import { Sheet } from 'app/core/ui/sheet/sheet';
 import { EventsNew } from './events-new';
 import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
 
-import { SwitchComponent } from "app/core/ui/switch2/switch2";
 import { Toggle } from 'app/core/ui/toggle/toggle';
 import { IconButtonDirective } from 'app/core/directives/icon-button.directive';
 
@@ -15,18 +13,15 @@ import { IconButtonDirective } from 'app/core/directives/icon-button.directive';
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [DatePipe, Toggle, SwitchComponent, IconButtonDirective],
+  imports: [DatePipe, Toggle, IconButtonDirective],
   templateUrl: './events.html',
 })
 export class Events {
   private readonly store = inject(AuthStore);
-  private readonly theme = inject(Theme);
   private readonly config = inject(EventsConfig);
   private readonly sheet = inject(Sheet);
   private readonly header = createSheetHeaderRegistrar();
   private readonly title = createSheetTitleRegistrar();
-
-  protected readonly accentColor = this.theme.accentColor;
 
   @ViewChild('sheetHeaderActions', { static: true })
   private sheetHeaderActionsTpl?: TemplateRef<unknown>;

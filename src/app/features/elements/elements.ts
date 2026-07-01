@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Switch } from '../../core/ui/switch/switch';
+import { NavbarVisibility } from '../../core/services/navbar-visibility.service';
 import { Select, SelectOption } from '../../core/ui/select/select';
 import { DateField } from '../../core/ui/date/date';
 import { TimeField } from '../../core/ui/time/time';
@@ -14,6 +15,8 @@ import { IconButtonDirective } from '../../core/directives/icon-button.directive
   templateUrl: './elements.html',
 })
 export class Elements {
+  protected navbarVisibility = inject(NavbarVisibility);
+
   switchValue1 = false;
   switchValue2 = true;
 

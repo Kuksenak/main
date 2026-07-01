@@ -113,7 +113,7 @@ export class Sheet {
   }
 
   private setAppStacked(isStacked: boolean) {
-    const wrapper = document.getElementById('app-main-wrapper');
-    if (wrapper) wrapper.classList.toggle('app-stacked', isStacked);
+    document.getElementById('app-main-wrapper')?.classList.toggle('app-stacked', isStacked);
+    document.getElementById('app-navbar')?.classList.toggle('sheet-open', isStacked);
   }
 }

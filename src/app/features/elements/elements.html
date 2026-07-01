@@ -2,6 +2,18 @@
 
   <h1 class="text-2xl font-bold text-balance">Components</h1>
 
+  <!-- UI Preferences -->
+  <section class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
+    <span class="text-xs font-medium opacity-40 uppercase tracking-wider">UI</span>
+    <app-switch
+      label="Скрывать навбар при открытии"
+      [ngModel]="navbarVisibility.hideOnSheet()"
+      (ngModelChange)="navbarVisibility.set($event)">
+    </app-switch>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
   <!-- Switch -->
   <section class="flex flex-col gap-4">
     <h2 class="text-lg font-semibold text-balance">Switch</h2>

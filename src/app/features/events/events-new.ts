@@ -2,7 +2,6 @@ import { Component, TemplateRef, ViewChild, inject, signal } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
-import { Theme } from 'app/_todo-core/theme/theme';
 import { createSheetHeaderRegistrar, createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helper';
 import { Toggle } from 'app/core/ui/toggle/toggle';
 import { IconButtonDirective } from 'app/core/directives/icon-button.directive';
@@ -16,11 +15,8 @@ import { IconButtonDirective } from 'app/core/directives/icon-button.directive';
 })
 export class EventsNew {
   private store = inject(AuthStore);
-  private themeService = inject(Theme);
   private header = createSheetHeaderRegistrar();
   private sheetTitle = createSheetTitleRegistrar();
-
-  protected accentColor = this.themeService.accentColor;
 
   @ViewChild('sheetHeaderActions', { static: true })
   private sheetHeaderActionsTpl?: TemplateRef<unknown>;

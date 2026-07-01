@@ -78,9 +78,7 @@ export class AuthStore {
       tap(user => {
         this._user.set(user);
         console.log('User profile loaded:', user);
-        if (user.accentColor) {
-          this.themeService.setAccentColor(user.accentColor);
-        }
+
         this.fetchEvents().subscribe();
       })
     );
@@ -136,30 +134,5 @@ export class AuthStore {
   /**
    * Оптимистичное обновление профиля (цвет акцента)
    */
-  updateProfile(updates: { accentColor?: string }): void {
-    const previousUser = this._user();
-    if (!previousUser) return;
-
-    const isColorChanged = updates.accentColor !== undefined && updates.accentColor !== previousUser.accentColor;
-    if (!isColorChanged) return;
-
-    this._user.set({
-      ...previousUser,
-      ...updates
-    });
-
-    this.themeService.setAccentColor(updates.accentColor!);
-
-    this.http.patch<void>(`${environment.apiUrl}/me`, updates)
-      .subscribe({
-        next: () => {
-          console.log('Profile settings saved successfully');
-        },
-        error: (err) => {
-          console.error('Failed to save profile settings, reverting...', err);
-          this._user.set(previousUser);
-          this.themeService.setAccentColor(previousUser.accentColor);
-        }
-      });
-  }
+  updateProfile(_updates: { accentColor?: string }): void {}
 }
