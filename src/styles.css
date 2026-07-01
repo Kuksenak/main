@@ -9,13 +9,13 @@
    --surface : elevated surfaces — toolbar, sheet, dropdowns. One shared value
                so they read as the same material, slightly lifted off --app-bg. */
 :root {
-    --app-bg: #e5e5ea;
+    --app-bg: #faf9f7;
     --surface: #f2f2f7;
     --card: #ffffff;
 }
 
 html.dark {
-    --app-bg: #000000;
+    --app-bg: #1c1917;
     --surface: #1c1c1e;
     --card: #2c2c2e;
 }

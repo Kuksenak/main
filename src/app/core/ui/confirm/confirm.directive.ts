@@ -28,15 +28,14 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
   template: `
     <div
       class="w-56 rounded-2xl overflow-hidden origin-bottom-right
-             bg-[#faf9f7] dark:bg-[#2a2522]
+             bg-white/70 dark:bg-[#2a2522]/75 backdrop-blur-xl
              shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_16px_40px_rgba(0,0,0,0.16)]
              dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_16px_40px_rgba(0,0,0,0.5)]
              [animation:popoverIn_180ms_cubic-bezier(0.2,0,0,1)]"
     >
-      <p class="px-4 pt-3 pb-2.5 text-[13px] leading-snug opacity-50 text-pretty select-none">
+      <p class="px-5 pt-6 pb-5 text-[13px] [[data-device=mobile]_&]:text-[15px] leading-snug opacity-50 text-pretty select-none text-center">
         {{ data.message }}
       </p>
-      <div class="h-px bg-black/8 dark:bg-white/8"></div>
       <div class="px-3 py-3 flex justify-center">
         <button
           type="button"
