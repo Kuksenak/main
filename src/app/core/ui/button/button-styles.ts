@@ -8,7 +8,7 @@ export type IconButtonVariant = 'glass' | 'warn';
 
 export const BUTTON_BASE =
   'inline-flex items-center justify-center gap-2 h-9 px-4 text-[14px] ' +
-  '[[data-device=mobile]_&]:h-12 [[data-device=mobile]_&]:px-6 [[data-device=mobile]_&]:text-[16px] ' +
+  '[[data-device=mobile]_&]:h-12 [[data-device=mobile]_&]:px-6 [[data-device=mobile]_&]:text-[18px]' +
   'font-medium rounded-lg no-underline ' +
   'select-none cursor-pointer outline-none transition-[transform,background-color,filter] duration-150 ease-out ' +
   'active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ' +

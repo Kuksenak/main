@@ -3,7 +3,7 @@
 /* Restore iOS default font and size (overrides the shared 15px/neutral stack) */
 html, body, button, input, select, textarea {
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
-    font-size: 17px;
+    font-size: 19px;
 }
 
 /* Card effect: main screen scales back when a bottom sheet is open */

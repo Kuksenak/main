@@ -36,7 +36,7 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
         : 'popoverIn 220ms cubic-bezier(0.2,0,0,1)'"
     >
       <div class="rounded-[28px] overflow-hidden">
-        <p class="px-5 pt-6 pb-5 text-[14px] [[data-device=mobile]_&]:text-[16px] leading-snug opacity-50 text-pretty select-none text-center">
+        <p class="px-5 pt-6 pb-5 text-[14px] [[data-device=mobile]_&]:text-[18px] leading-snug opacity-50 text-pretty select-none text-center">
           {{ data.message }}
         </p>
         <div class="p-3">
