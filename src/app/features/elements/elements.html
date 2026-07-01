@@ -5,11 +5,63 @@
   <!-- UI Preferences -->
   <section class="flex flex-col gap-3 rounded-xl bg-black/3 dark:bg-white/3 p-4">
     <span class="text-xs font-medium opacity-40 uppercase tracking-wider">UI</span>
-    <app-switch
-      label="Скрывать навбар при открытии"
-      [ngModel]="navbarVisibility.hideOnSheet()"
+    <app-switch label="Скрывать навбар при открытии" [ngModel]="navbarVisibility.hideOnSheet()"
       (ngModelChange)="navbarVisibility.set($event)">
     </app-switch>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Confirm -->
+  <section class="flex flex-col gap-4">
+    <h2 class="text-lg font-semibold text-balance">Confirm</h2>
+    <p class="text-sm opacity-60 text-pretty">
+      Custom popover vs native iOS card via <code
+        class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;select&gt;</code>.
+    </p>
+
+    <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
+      <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Examples</span>
+      <div class="flex flex-wrap items-center gap-3">
+
+        <!-- Custom popover -->
+        <button appButton variant="warn" appConfirm="Delete this item?" confirmLabel="Delete" confirmVariant="warn"
+          (confirmed)="switchValue1 = false">Custom popover</button>
+
+        <!-- Native select → iOS card -->
+        <div class="relative inline-flex">
+          <button appButton variant="warn">Native iOS card</button>
+          <select class="absolute inset-0 opacity-0 w-full h-full cursor-pointer" (change)="onNativeConfirm($event)">
+            <option value="" disabled selected></option>
+            <option value="confirm">Delete</option>
+            <option value="cancel">Cancel</option>
+          </select>
+        </div>
+
+        <p> <button appIconButton aria-label="Add" appConfirm="Delete this item?" confirmLabel="Delete"
+            confirmVariant="warn" (confirmed)="switchValue1 = false">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+
+        </p>
+
+
+
+
+      </div>
+      <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
+        <p>
+          <button appIconButton aria-label="Add" appConfirm="Delete this item?" confirmLabel="Delete"
+            confirmVariant="warn" (confirmed)="switchValue1 = false">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </p>
+      </div>
+    </div>
   </section>
 
   <hr class="border-black/10 dark:border-white/10">
@@ -18,8 +70,10 @@
   <section class="flex flex-col gap-4">
     <h2 class="text-lg font-semibold text-balance">Switch</h2>
     <p class="text-sm opacity-60 text-pretty">
-      Mobile — native iOS toggle (<code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">switch</code> attribute),
-      desktop — custom Tailwind. Layout controlled by <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal.
+      Mobile — native iOS toggle (<code
+        class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">switch</code> attribute),
+      desktop — custom Tailwind. Layout controlled by <code
+        class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal.
     </p>
 
     <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
@@ -30,8 +84,7 @@
 
     <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Long label</span>
-      <app-switch
-        label="Automatically sync data when connected to Wi-Fi in background mode"
+      <app-switch label="Automatically sync data when connected to Wi-Fi in background mode"
         [(ngModel)]="switchValue1"></app-switch>
     </div>
 
@@ -56,12 +109,14 @@
     <h2 class="text-lg font-semibold text-balance">Select</h2>
     <p class="text-sm opacity-60 text-pretty">
       Mobile — native OS picker, desktop — custom iOS-style dropdown via CDK overlay.
-      Same <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal switch.
+      Same <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">isMobile()</code> signal
+      switch.
     </p>
 
     <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
       <span class="text-xs font-medium opacity-40 uppercase tracking-wider">Default</span>
-      <app-select label="Fruit" placeholder="Choose a fruit…" [options]="fruitOptions" [(ngModel)]="fruitValue"></app-select>
+      <app-select label="Fruit" placeholder="Choose a fruit…" [options]="fruitOptions"
+        [(ngModel)]="fruitValue"></app-select>
     </div>
 
     <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">
@@ -132,8 +187,10 @@
   <section class="flex flex-col gap-4">
     <h2 class="text-lg font-semibold text-balance">Buttons</h2>
     <p class="text-sm opacity-60 text-pretty">
-      Directive <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">appButton</code> on native
-      <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;button&gt;</code>/<code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;a&gt;</code>.
+      Directive <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">appButton</code> on
+      native
+      <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;button&gt;</code>/<code
+        class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">&lt;a&gt;</code>.
     </p>
 
     <div class="flex flex-col gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-4">

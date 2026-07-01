@@ -7,11 +7,12 @@ import { DateField } from '../../core/ui/date/date';
 import { TimeField } from '../../core/ui/time/time';
 import { ButtonDirective } from '../../core/ui/button/button.directive';
 import { IconButtonDirective } from '../../core/directives/icon-button.directive';
+import { ConfirmDirective } from '../../core/ui/confirm/confirm.directive';
 
 @Component({
   selector: 'app-elements',
   standalone: true,
-  imports: [FormsModule, Switch, Select, DateField, TimeField, ButtonDirective, IconButtonDirective],
+  imports: [FormsModule, Switch, Select, DateField, TimeField, ButtonDirective, IconButtonDirective, ConfirmDirective],
   templateUrl: './elements.html',
 })
 export class Elements {
@@ -19,6 +20,12 @@ export class Elements {
 
   switchValue1 = false;
   switchValue2 = true;
+
+  protected onNativeConfirm(event: Event) {
+    const select = event.target as HTMLSelectElement;
+    if (select.value === 'confirm') alert('Confirmed via native select!');
+    select.value = '';
+  }
 
   fruitValue: string | null = null;
   countryValue: string | null = null;
