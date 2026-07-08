@@ -32,13 +32,13 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
     @if (data.isMobile) {
       <!-- Mobile: full-width bottom sheet — action group + separate Cancel -->
       <div
-        class="w-full px-2 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] will-change-transform"
+        class="w-full px-2 pb-[calc(env(safe-area-inset-bottom,0px)+4px)] will-change-transform"
         [style.animation]="closing
           ? 'sheetDown 300ms cubic-bezier(0.32,0.72,0,1) forwards'
           : 'sheetUp 350ms cubic-bezier(0.32,0.72,0,1)'"
       >
         <!-- Message + action -->
-        <div class="mb-2 rounded-2xl overflow-hidden bg-[var(--surface)] border border-black/10 dark:border-white/10 shadow-[0_-2px_20px_rgba(0,0,0,0.08)]">
+        <div class="mb-2 rounded-2xl overflow-hidden bg-[var(--card)] shadow-[0_6px_28px_rgba(0,0,0,0.1)]">
           <p class="px-4 pt-4 pb-3 text-center text-[15px] leading-snug opacity-50 text-pretty select-none">
             {{ data.message }}
           </p>
@@ -46,7 +46,7 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
             type="button"
             (click)="confirm()"
             [style.color]="actionColor"
-            class="w-full py-[18px] text-[18px] font-medium select-none active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
+            class="w-full py-3.5 text-[19px] select-none active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
           >{{ data.confirmLabel }}</button>
         </div>
 
@@ -54,7 +54,7 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
         <button
           type="button"
           (click)="dismiss()"
-          class="w-full rounded-2xl bg-[var(--surface)] border border-black/10 dark:border-white/10 shadow-[0_-2px_20px_rgba(0,0,0,0.08)] py-[18px] text-[18px] font-semibold select-none active:brightness-95 dark:active:brightness-125 transition-[filter] [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
+          class="w-full rounded-2xl bg-[var(--card)] shadow-[0_6px_28px_rgba(0,0,0,0.1)] py-3.5 text-[19px] text-[#d4732f] select-none active:brightness-95 dark:active:brightness-125 transition-[filter] [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
         >Cancel</button>
       </div>
     } @else {
@@ -147,12 +147,32 @@ export class ConfirmDirective {
     const panelRef = this.overlayRef.attach(new ComponentPortal(ConfirmPanel, null, injector));
     this.panelInstance = panelRef.instance;
 
+    // Instant dim (no fade) so the web backdrop and the OS status bar (theme-color,
+    // which can't be animated) darken at the same moment — no out-of-sync flash.
+    if (isMobile) this.setStatusBarDim(true);
+
     this.overlayRef.backdropClick().subscribe(() => this.panelInstance?.dismiss());
     this.overlayRef.detachments().subscribe(() => {
+      this.setStatusBarDim(false);
       if (panelRef.instance.confirmed) this.confirmed.emit();
       this.overlayRef = null;
       this.panelInstance = null;
     });
+  }
+
+  private prevThemeColor: string | null = null;
+
+  private setStatusBarDim(on: boolean) {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) return;
+    if (on) {
+      this.prevThemeColor = meta.getAttribute('content');
+      const dark = document.documentElement.classList.contains('dark');
+      meta.setAttribute('content', dark ? '#161412' : '#c8c7c6'); // app-bg × 0.8 ≈ 20% dim
+    } else if (this.prevThemeColor !== null) {
+      meta.setAttribute('content', this.prevThemeColor);
+      this.prevThemeColor = null;
+    }
   }
 
   private buildConfig(isMobile: boolean): OverlayConfig {
@@ -161,7 +181,7 @@ export class ConfirmDirective {
         positionStrategy: this.overlay.position().global().centerHorizontally().bottom('0'),
         width: '100%',
         hasBackdrop: true,
-        backdropClass: 'cdk-overlay-transparent-backdrop',
+        backdropClass: 'picker-backdrop',
         scrollStrategy: this.overlay.scrollStrategies.noop(),
       });
     }

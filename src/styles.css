@@ -59,9 +59,12 @@ body {
     background-color: transparent;
 }
 
-/* Subtle full-screen dim behind the mobile confirm sheet */
+/* Light full-screen dim behind the mobile confirm sheet.
+   No fade — appears instantly so it stays in sync with the status-bar
+   theme-color change (which can't be animated). */
 .picker-backdrop {
-    background-color: rgba(0, 0, 0, 0.28);
+    background-color: rgba(0, 0, 0, 0.2);
+    transition: none !important;
 }
 
 /* Unified slim scrollbar — page, sheet content, dropdown columns */
