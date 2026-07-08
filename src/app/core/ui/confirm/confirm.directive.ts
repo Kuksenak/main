@@ -39,14 +39,14 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
       >
         <!-- Message + action -->
         <div class="mb-2 rounded-2xl overflow-hidden bg-[var(--surface)] border border-black/10 dark:border-white/10 shadow-[0_-2px_20px_rgba(0,0,0,0.08)]">
-          <p class="px-4 pt-3.5 pb-2 text-center text-[13px] leading-snug opacity-50 text-pretty select-none">
+          <p class="px-4 pt-4 pb-3 text-center text-[15px] leading-snug opacity-50 text-pretty select-none">
             {{ data.message }}
           </p>
           <button
             type="button"
             (click)="confirm()"
             [style.color]="actionColor"
-            class="w-full py-3.5 text-[17px] font-medium select-none active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
+            class="w-full py-[18px] text-[18px] font-medium select-none active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
           >{{ data.confirmLabel }}</button>
         </div>
 
@@ -54,7 +54,7 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
         <button
           type="button"
           (click)="dismiss()"
-          class="w-full rounded-2xl bg-[var(--surface)] border border-black/10 dark:border-white/10 shadow-[0_-2px_20px_rgba(0,0,0,0.08)] py-3.5 text-[17px] font-semibold select-none active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
+          class="w-full rounded-2xl bg-[var(--surface)] border border-black/10 dark:border-white/10 shadow-[0_-2px_20px_rgba(0,0,0,0.08)] py-[18px] text-[18px] font-semibold select-none active:brightness-95 dark:active:brightness-125 transition-[filter] [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
         >Cancel</button>
       </div>
     } @else {
