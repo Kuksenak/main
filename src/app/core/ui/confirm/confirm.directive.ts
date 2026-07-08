@@ -29,20 +29,33 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
   imports: [ButtonDirective],
   template: `
     @if (data.isMobile) {
-      <!-- Mobile: bottom sheet -->
+      <!-- Mobile: iOS-style action sheet — action group + separate Cancel -->
       <div
-        class="w-full rounded-t-[28px] bg-[var(--surface)] px-4 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)]
-               shadow-[0_-2px_30px_rgba(0,0,0,0.18)] will-change-transform"
+        class="w-full px-2 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] will-change-transform"
         [style.animation]="closing
           ? 'sheetDown 300ms cubic-bezier(0.32,0.72,0,1) forwards'
           : 'sheetUp 350ms cubic-bezier(0.32,0.72,0,1)'"
       >
-        <p class="pb-4 text-[16px] leading-snug opacity-50 text-pretty select-none text-center">
-          {{ data.message }}
-        </p>
-        <button type="button" appButton [variant]="data.variant" (click)="confirm()" class="w-full">
-          {{ data.confirmLabel }}
-        </button>
+        <!-- Message + action -->
+        <div class="mb-2 rounded-[20px] overflow-hidden bg-[var(--surface)]">
+          <p class="px-4 py-3.5 text-center text-[13px] leading-snug opacity-50 text-pretty select-none">
+            {{ data.message }}
+          </p>
+          <div class="h-px bg-black/8 dark:bg-white/12"></div>
+          <button
+            type="button"
+            (click)="confirm()"
+            [style.color]="actionColor"
+            class="w-full py-3.5 text-[17px] font-medium active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent]"
+          >{{ data.confirmLabel }}</button>
+        </div>
+
+        <!-- Cancel -->
+        <button
+          type="button"
+          (click)="dismiss()"
+          class="w-full rounded-[20px] bg-[var(--surface)] py-3.5 text-[17px] font-semibold text-[#d4732f] active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent]"
+        >Cancel</button>
       </div>
     } @else {
       <!-- Desktop: popover anchored to the trigger -->
@@ -73,6 +86,10 @@ export class ConfirmPanel {
   private readonly overlayRef = inject(PANEL_OVERLAY);
   confirmed = false;
   closing = false;
+
+  get actionColor(): string {
+    return this.data.variant === 'warn' ? '#e5484d' : '#d4732f';
+  }
 
   dismiss() {
     this.closing = true;
@@ -142,7 +159,7 @@ export class ConfirmDirective {
   private buildConfig(isMobile: boolean): OverlayConfig {
     if (isMobile) {
       return new OverlayConfig({
-        positionStrategy: this.overlay.position().global().centerHorizontally().bottom('0'),
+        positionStrategy: this.overlay.position().global().left('0').bottom('0'),
         width: '100%',
         hasBackdrop: true,
         backdropClass: 'picker-backdrop',
