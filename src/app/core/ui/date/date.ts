@@ -27,15 +27,15 @@ function startOfMonth(d: Date): Date {
 export class DateField implements ControlValueAccessor {
   @Input() label = '';
   @Input() placeholder = 'Select date…';
+  @Input() disabled = false;
 
   private deviceService = inject(DeviceDetectionService);
 
   isMobile = this.deviceService.isMobile;
 
   readonly value = signal<Date | null>(null);
-  readonly view = signal(startOfMonth(new Date())); // first day of the displayed month
+  readonly view = signal(startOfMonth(new Date()));
   readonly isOpen = signal(false);
-  @Input() disabled = false;
 
   private readonly today = new Date();
 
@@ -55,7 +55,6 @@ export class DateField implements ControlValueAccessor {
     this.view().toLocaleDateString(undefined, { month: 'long', year: 'numeric' }),
   );
 
-  // 6 weeks × 7 days, Monday-first, with leading/trailing days from adjacent months.
   readonly weeks = computed<DayCell[][]>(() => {
     const monthStart = this.view();
     const month = monthStart.getMonth();
@@ -144,7 +143,6 @@ export class DateField implements ControlValueAccessor {
     );
   }
 
-  // ControlValueAccessor
   writeValue(value: Date | null): void {
     const valid = value instanceof Date && !isNaN(value.getTime());
     this.value.set(valid ? value : null);

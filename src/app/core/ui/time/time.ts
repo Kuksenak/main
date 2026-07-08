@@ -36,8 +36,6 @@ export class TimeField implements ControlValueAccessor {
   @Input() label = '';
   @Input() placeholder = 'Select time…';
   @Input() disabled = false;
-
-  // Minute granularity for the desktop picker (native input is unaffected).
   @Input() minuteStep = 5;
 
   private deviceService = inject(DeviceDetectionService);
@@ -47,10 +45,8 @@ export class TimeField implements ControlValueAccessor {
 
   isMobile = this.deviceService.isMobile;
 
-  // Value is an 'HH:mm' string (same format the native time input uses), or null.
   readonly value = signal<string | null>(null);
   readonly isOpen = signal(false);
-  // Refreshed each time the picker opens, so "current" highlight stays accurate.
   readonly now = signal(new Date());
 
   readonly hours = Array.from({ length: 24 }, (_, i) => i);
@@ -75,7 +71,6 @@ export class TimeField implements ControlValueAccessor {
     return v ? Number(v.split(':')[1]) : null;
   });
 
-  // The row to highlight / scroll to: the chosen value, or "now" as a preview.
   readonly activeHour = computed(() => this.selectedHour() ?? this.now().getHours());
   readonly activeMinute = computed(() => this.selectedMinute() ?? this.currentStepMinute());
 
@@ -96,7 +91,6 @@ export class TimeField implements ControlValueAccessor {
   }
 
   onOpened() {
-    // Scroll the active hour/minute into the middle of each column once rendered.
     setTimeout(() => {
       this.scrollActiveIntoView(this.hourCol?.nativeElement);
       this.scrollActiveIntoView(this.minuteCol?.nativeElement);
@@ -154,7 +148,6 @@ export class TimeField implements ControlValueAccessor {
     this.onTouched();
   }
 
-  // ControlValueAccessor
   writeValue(value: string | null): void {
     this.value.set(value ?? null);
   }
