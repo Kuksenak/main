@@ -38,7 +38,7 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
           : 'sheetUp 350ms cubic-bezier(0.32,0.72,0,1)'"
       >
         <!-- Message + action -->
-        <div class="mb-2 rounded-2xl overflow-hidden bg-[var(--card)] ring-1 ring-black/5 dark:ring-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.12)]">
+        <div class="mb-2 rounded-2xl overflow-hidden bg-[var(--surface)] border border-black/10 dark:border-white/10 shadow-[0_-2px_20px_rgba(0,0,0,0.08)]">
           <p class="px-4 pt-3.5 pb-2 text-center text-[13px] leading-snug opacity-50 text-pretty select-none">
             {{ data.message }}
           </p>
@@ -46,7 +46,7 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
             type="button"
             (click)="confirm()"
             [style.color]="actionColor"
-            class="w-full py-3.5 text-[17px] font-medium active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent]"
+            class="w-full py-3.5 text-[17px] font-medium select-none active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
           >{{ data.confirmLabel }}</button>
         </div>
 
@@ -54,15 +54,14 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
         <button
           type="button"
           (click)="dismiss()"
-          class="w-full rounded-2xl bg-[var(--card)] ring-1 ring-black/5 dark:ring-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.12)] py-3.5 text-[17px] font-semibold active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent]"
+          class="w-full rounded-2xl bg-[var(--surface)] border border-black/10 dark:border-white/10 shadow-[0_-2px_20px_rgba(0,0,0,0.08)] py-3.5 text-[17px] font-semibold select-none active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]"
         >Cancel</button>
       </div>
     } @else {
       <!-- Desktop: popover anchored to the trigger -->
       <div
-        class="w-56 rounded-2xl origin-top-right bg-[var(--card)]
-               shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_10px_40px_rgba(0,0,0,0.15)]
-               dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_10px_40px_rgba(0,0,0,0.5)]"
+        class="w-56 rounded-2xl origin-top-right bg-[var(--surface)] border border-black/10 dark:border-white/10
+               shadow-[0_-2px_20px_rgba(0,0,0,0.08)]"
         [style.animation]="closing
           ? 'popoverOut 160ms cubic-bezier(0.4,0,1,1) forwards'
           : 'popoverIn 220ms cubic-bezier(0.2,0,0,1)'"

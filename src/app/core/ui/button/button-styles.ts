@@ -8,11 +8,11 @@ export type IconButtonVariant = 'glass' | 'warn';
 
 export const BUTTON_BASE =
   'inline-flex items-center justify-center gap-2 h-9 px-4 text-[14px] ' +
-  '[[data-device=mobile]_&]:h-12 [[data-device=mobile]_&]:px-6 [[data-device=mobile]_&]:text-[18px]' +
+  '[[data-device=mobile]_&]:h-12 [[data-device=mobile]_&]:px-6 [[data-device=mobile]_&]:text-[18px] ' +
   'font-medium rounded-lg no-underline ' +
   'select-none cursor-pointer outline-none transition-[transform,background-color,filter] duration-150 ease-out ' +
   'active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ' +
-  '[-webkit-tap-highlight-color:transparent]';
+  '[-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none]';
 
 export const BUTTON_VARIANT: Record<ButtonVariant, string> = {
   primary: 'bg-[#d4732f]/12 text-[#d4732f] hover:bg-[#d4732f]/20',
@@ -26,7 +26,7 @@ export const ICON_BUTTON_BASE =
   '[[data-device=mobile]_&]:w-12 [[data-device=mobile]_&]:h-12 ' +
   'select-none cursor-pointer outline-none transition-[transform,background-color] duration-150 ease-out ' +
   'active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ' +
-  '[-webkit-tap-highlight-color:transparent] [&>svg]:w-[70%] [&>svg]:h-[70%] [&_*]:[stroke-width:1.5]';
+  '[-webkit-tap-highlight-color:transparent] [-webkit-touch-callout:none] [&>svg]:w-[70%] [&>svg]:h-[70%] [&_*]:[stroke-width:1.5]';
 
 // `glass` is a solid placeholder for now — real liquid-glass (translucent + blur)
 // comes once the transparency issue is sorted out.
