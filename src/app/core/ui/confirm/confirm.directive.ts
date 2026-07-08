@@ -147,32 +147,12 @@ export class ConfirmDirective {
     const panelRef = this.overlayRef.attach(new ComponentPortal(ConfirmPanel, null, injector));
     this.panelInstance = panelRef.instance;
 
-    // Instant dim (no fade) so the web backdrop and the OS status bar (theme-color,
-    // which can't be animated) darken at the same moment — no out-of-sync flash.
-    if (isMobile) this.setStatusBarDim(true);
-
     this.overlayRef.backdropClick().subscribe(() => this.panelInstance?.dismiss());
     this.overlayRef.detachments().subscribe(() => {
-      this.setStatusBarDim(false);
       if (panelRef.instance.confirmed) this.confirmed.emit();
       this.overlayRef = null;
       this.panelInstance = null;
     });
-  }
-
-  private prevThemeColor: string | null = null;
-
-  private setStatusBarDim(on: boolean) {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) return;
-    if (on) {
-      this.prevThemeColor = meta.getAttribute('content');
-      const dark = document.documentElement.classList.contains('dark');
-      meta.setAttribute('content', dark ? '#161412' : '#c8c7c6'); // app-bg × 0.8 ≈ 20% dim
-    } else if (this.prevThemeColor !== null) {
-      meta.setAttribute('content', this.prevThemeColor);
-      this.prevThemeColor = null;
-    }
   }
 
   private buildConfig(isMobile: boolean): OverlayConfig {

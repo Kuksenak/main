@@ -23,7 +23,7 @@ export class Elements {
 
   protected onNativeConfirm(event: Event) {
     const select = event.target as HTMLSelectElement;
-    if (select.value === 'confirm') alert('Confirmed via native select!');
+    if (select.value === 'confirm') alert('Signed out via native iOS card!');
     select.value = '';
   }
 

@@ -30,11 +30,11 @@
 
         <!-- Native select → iOS card -->
         <div class="relative inline-flex">
-          <button appButton variant="warn">Native iOS card</button>
+          <button appButton variant="warn">🚪 Sign Out</button>
           <select class="absolute inset-0 opacity-0 w-full h-full cursor-pointer" (change)="onNativeConfirm($event)">
-            <option value="" disabled selected></option>
-            <option value="confirm">Delete</option>
-            <option value="cancel">Cancel</option>
+            <option value="" disabled selected>Sign out of your account?</option>
+            <option value="confirm" style="color:#e5484d">🚪 Sign Out</option>
+            <option value="cancel" style="color:#0a84ff">✕ Cancel</option>
           </select>
         </div>
 
