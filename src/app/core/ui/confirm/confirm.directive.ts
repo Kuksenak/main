@@ -27,9 +27,10 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
   selector: 'app-confirm-panel',
   standalone: true,
   imports: [ButtonDirective],
+  host: { class: 'block w-full' },
   template: `
     @if (data.isMobile) {
-      <!-- Mobile: iOS-style action sheet — action group + separate Cancel -->
+      <!-- Mobile: full-width bottom sheet — action group + separate Cancel -->
       <div
         class="w-full px-2 pb-[calc(env(safe-area-inset-bottom,0px)+8px)] will-change-transform"
         [style.animation]="closing
@@ -37,11 +38,10 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
           : 'sheetUp 350ms cubic-bezier(0.32,0.72,0,1)'"
       >
         <!-- Message + action -->
-        <div class="mb-2 rounded-[20px] overflow-hidden bg-[var(--surface)]">
-          <p class="px-4 py-3.5 text-center text-[13px] leading-snug opacity-50 text-pretty select-none">
+        <div class="mb-2 rounded-2xl overflow-hidden bg-[var(--card)] ring-1 ring-black/5 dark:ring-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.12)]">
+          <p class="px-4 pt-3.5 pb-2 text-center text-[13px] leading-snug opacity-50 text-pretty select-none">
             {{ data.message }}
           </p>
-          <div class="h-px bg-black/8 dark:bg-white/12"></div>
           <button
             type="button"
             (click)="confirm()"
@@ -54,20 +54,20 @@ const PANEL_OVERLAY = new InjectionToken<OverlayRef>('confirm-panel-overlay');
         <button
           type="button"
           (click)="dismiss()"
-          class="w-full rounded-[20px] bg-[var(--surface)] py-3.5 text-[17px] font-semibold text-[#d4732f] active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent]"
+          class="w-full rounded-2xl bg-[var(--card)] ring-1 ring-black/5 dark:ring-white/10 shadow-[0_4px_20px_rgba(0,0,0,0.12)] py-3.5 text-[17px] font-semibold active:bg-black/5 dark:active:bg-white/10 transition-colors [-webkit-tap-highlight-color:transparent]"
         >Cancel</button>
       </div>
     } @else {
       <!-- Desktop: popover anchored to the trigger -->
       <div
-        class="w-56 rounded-[22px] origin-top-right bg-[var(--surface)]
+        class="w-56 rounded-2xl origin-top-right bg-[var(--card)]
                shadow-[0_0_0_1px_rgba(0,0,0,0.06),0_10px_40px_rgba(0,0,0,0.15)]
                dark:shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_10px_40px_rgba(0,0,0,0.5)]"
         [style.animation]="closing
           ? 'popoverOut 160ms cubic-bezier(0.4,0,1,1) forwards'
           : 'popoverIn 220ms cubic-bezier(0.2,0,0,1)'"
       >
-        <div class="rounded-[22px] overflow-hidden">
+        <div class="rounded-2xl overflow-hidden">
           <p class="px-5 pt-5 pb-4 text-[14px] leading-snug opacity-50 text-pretty select-none text-center">
             {{ data.message }}
           </p>
@@ -159,11 +159,11 @@ export class ConfirmDirective {
   private buildConfig(isMobile: boolean): OverlayConfig {
     if (isMobile) {
       return new OverlayConfig({
-        positionStrategy: this.overlay.position().global().left('0').bottom('0'),
+        positionStrategy: this.overlay.position().global().centerHorizontally().bottom('0'),
         width: '100%',
         hasBackdrop: true,
-        backdropClass: 'picker-backdrop',
-        scrollStrategy: this.overlay.scrollStrategies.block(),
+        backdropClass: 'cdk-overlay-transparent-backdrop',
+        scrollStrategy: this.overlay.scrollStrategies.noop(),
       });
     }
 

@@ -59,9 +59,9 @@ body {
     background-color: transparent;
 }
 
-/* Bottom-sheet pickers (Select/Date/Time on mobile) get a subtle dim */
+/* Subtle full-screen dim behind the mobile confirm sheet */
 .picker-backdrop {
-    background-color: rgba(0, 0, 0, 0.32);
+    background-color: rgba(0, 0, 0, 0.28);
 }
 
 /* Unified slim scrollbar — page, sheet content, dropdown columns */
