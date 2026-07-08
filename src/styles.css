@@ -59,9 +59,9 @@ body {
     background-color: transparent;
 }
 
-/* Light dim behind the mobile confirm sheet (web layer; fades smoothly). */
+/* Dim behind the confirm sheet (web layer; fades smoothly). */
 .picker-backdrop {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.18);
 }
 
 /* Unified slim scrollbar — page, sheet content, dropdown columns */
@@ -102,7 +102,7 @@ html.dark ::-webkit-scrollbar-thumb {
 
 /* Navbar slide-away: only fires when html.navbar-hides-on-sheet is set */
 #app-navbar nav {
-    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease;
+    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.4s ease, filter 0.2s ease;
 }
 
 html.navbar-hides-on-sheet #app-navbar.sheet-open nav {
@@ -110,6 +110,7 @@ html.navbar-hides-on-sheet #app-navbar.sheet-open nav {
     opacity: 0;
     pointer-events: none;
 }
+
 
 @keyframes popoverIn {
     from { opacity: 0; transform: scale(0.2); }
@@ -129,4 +130,15 @@ html.navbar-hides-on-sheet #app-navbar.sheet-open nav {
 @keyframes sheetDown {
     from { transform: translate3d(0, 0, 0); }
     to   { transform: translate3d(0, 100%, 0); }
+}
+
+/* Centered confirm alert */
+@keyframes alertIn {
+    from { opacity: 0; transform: scale(1.1); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes alertOut {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0; transform: scale(1.05); }
 }

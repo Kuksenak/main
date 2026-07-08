@@ -7,8 +7,8 @@ export type IconButtonVariant = 'glass' | 'warn';
 /* ── Text button (appButton) ───────────────────────────────── */
 
 export const BUTTON_BASE =
-  'inline-flex items-center justify-center gap-2 h-9 px-4 text-[14px] ' +
-  '[[data-device=mobile]_&]:h-12 [[data-device=mobile]_&]:px-6 [[data-device=mobile]_&]:text-[18px] ' +
+  'inline-flex items-center justify-center gap-2 h-11 px-4 text-[20px] ' +
+  '[[data-device=mobile]_&]:h-14 [[data-device=mobile]_&]:px-6 [[data-device=mobile]_&]:text-[24px] ' +
   'font-medium rounded-lg no-underline ' +
   'select-none cursor-pointer outline-none transition-[transform,background-color,filter] duration-150 ease-out ' +
   'active:scale-[0.96] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ' +
