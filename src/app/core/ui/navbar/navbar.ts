@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { AuthStore } from 'app/_todo-core/auth/auth-store';
 import { Sheet } from '../sheet/sheet';
-import { Settings } from 'app/features/settings/settings';
+import { Health } from 'app/features/health/health';
 import { Events } from 'app/features/events/events';
 import { Elements } from 'app/features/elements/elements';
 import { ButtonDirective } from '../button/button.directive';
@@ -22,7 +22,7 @@ export class Navbar {
 
   protected readonly userEmail = computed(() => this.auth.user()?.email ?? '');
 
-  openSettings() { this.sheet.open(Settings); }
+  openHealth()   { this.sheet.open(Health); }
   openEvents()   { this.sheet.open(Events); }
   openElements() { this.sheet.open(Elements); }
 }

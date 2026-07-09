@@ -6,6 +6,7 @@ import { SignalRService } from './_todo-core/realtime/signalr';
 import { NotificationService } from './_todo-core/notifications/notification-service';
 import { AppUpdateService } from './core/services/app-update.service';
 import { Theme } from './_todo-core/theme/theme';
+import { HealthService } from './core/services/health.service';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,7 @@ export class App implements OnInit {
   private notificationService = inject(NotificationService);
   private updateService = inject(AppUpdateService);
   private theme = inject(Theme);
+  private health = inject(HealthService); // ingests ?health= from the Shortcut on boot
 
   constructor() {
     afterNextRender(() => {

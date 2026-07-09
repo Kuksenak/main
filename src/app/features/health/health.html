@@ -1,0 +1,67 @@
+<div class="flex flex-col gap-6 p-4">
+
+  <!-- Steps -->
+  <section class="flex flex-col gap-3">
+    <h2 class="text-lg font-semibold text-balance">Steps by day</h2>
+    <app-health-card></app-health-card>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
+  <!-- Setup -->
+  <section class="flex flex-col gap-3">
+    <h2 class="text-lg font-semibold text-balance">Set up the Shortcut</h2>
+    <p class="text-sm opacity-60 text-pretty">
+      Reads steps from the Health app and reopens this app with them. No native app, no account.
+    </p>
+
+    <!-- 1-tap install via iCloud link -->
+    @if (shortcutReady) {
+      <a appButton [href]="shortcutUrl" target="_blank" rel="noopener" class="w-full">
+        Add to Shortcuts
+      </a>
+      <p class="text-xs opacity-40 text-pretty">
+        Opens the shortcut in the Shortcuts app — tap “Add Shortcut” once. Then use Sync above.
+      </p>
+    } @else {
+      <p class="text-sm text-[#d4732f] text-pretty">
+        Install link not set yet. Build the shortcut once (steps below), Share → Copy iCloud Link,
+        and paste it into <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">shortcutUrl</code> in <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">health.ts</code>.
+      </p>
+    }
+
+    <p class="text-sm font-medium opacity-70 pt-1">Or build it manually:</p>
+
+    <ol class="flex flex-col gap-2">
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">1</span>
+        <span class="text-sm text-pretty"><b>Find Health Samples</b> → Sample Type <b>Steps</b>, filter <b>Start Date is today</b>.</span>
+      </li>
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">2</span>
+        <span class="text-sm text-pretty"><b>Calculate Statistics</b> → operation <b>Sum</b>.</span>
+      </li>
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">3</span>
+        <span class="text-sm text-pretty">
+          <b>URL</b> action →
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded break-all">{{ appUrl }}/?steps=[Statistics]</code>
+          (insert the <b>Statistics</b> variable). The date is filled in by the app.
+        </span>
+      </li>
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">4</span>
+        <span class="text-sm text-pretty"><b>Open URLs</b> → feed it the <b>URL</b> from step 3 (using the URL action avoids the “rich text” error).</span>
+      </li>
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">5</span>
+        <span class="text-sm text-pretty">Name the Shortcut exactly <b>SyncHealth</b>.</span>
+      </li>
+    </ol>
+
+    <p class="text-xs opacity-40 text-pretty">
+      Each run adds/updates today’s steps; the daily chart builds up over time.
+    </p>
+  </section>
+
+</div>
