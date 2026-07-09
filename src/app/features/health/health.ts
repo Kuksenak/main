@@ -3,6 +3,7 @@ import { createSheetTitleRegistrar } from 'app/core/ui/sheet/sheet-buttons.helpe
 import { HealthCard } from 'app/core/ui/health-card/health-card';
 import { WorkoutsCard } from 'app/core/ui/health-card/workouts-card';
 import { HealthService } from 'app/core/services/health.service';
+import { environment } from '@environments/environment';
 
 @Component({
   selector: 'app-health-page',
@@ -15,8 +16,11 @@ export class Health implements OnInit {
 
   protected readonly health = inject(HealthService);
 
-  // The Shortcut POSTs here (uses the app's /api proxy → Core backend).
-  protected readonly postUrl = `${window.location.origin}/api/health-sync`;
+  // The Shortcut POSTs here. Must be an absolute URL pointing at the API host
+  // (in prod that's a separate domain, e.g. https://api.inky.one).
+  protected readonly postUrl = /^https?:\/\//.test(environment.apiUrl)
+    ? `${environment.apiUrl}/health-sync`
+    : `${window.location.origin}${environment.apiUrl}/health-sync`;
 
   ngOnInit() {
     this.title.set('Health');

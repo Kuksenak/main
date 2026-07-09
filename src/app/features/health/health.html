@@ -20,9 +20,9 @@
   <section class="flex flex-col gap-3">
     <h2 class="text-lg font-semibold text-balance">Set up the Shortcut</h2>
     <p class="text-sm opacity-60 text-pretty">
-      Build a Shortcut named <b>SyncHealth</b>. When you tap <b>Sync</b> above, the app launches it and
-      passes your token automatically as the <b>Shortcut Input</b> — you never paste it. The Shortcut
-      POSTs your data to the backend; the app then reloads it.
+      Build a Shortcut named <b>SyncHealth</b>. Paste your token into it once (below) — that literal is
+      used for background automations. When you tap <b>Sync</b> in the app, it also passes the token as
+      the <b>Shortcut Input</b>, which overrides the literal. So the same Shortcut works both ways.
     </p>
 
     <!-- Token (only for standalone runs) -->
@@ -38,8 +38,8 @@
           </button>
         </div>
         <span class="text-xs opacity-40 text-pretty">
-          Only needed if you run the Shortcut standalone (Back Tap / a daily automation). Launched from
-          the app it arrives as the Shortcut Input automatically.
+          Paste this into the Shortcut’s Text action (step 1). It’s the fallback for background runs;
+          launching from the app overrides it via the Shortcut Input.
         </span>
       </div>
     }
@@ -48,14 +48,26 @@
     <ol class="flex flex-col gap-2">
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
         <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">1</span>
-        <span class="text-sm text-pretty"><b>Find Health Samples</b> → Sample Type <b>Steps</b>, filter <b>Start Date is today</b>.</span>
+        <span class="text-sm text-pretty"><b>Text</b> → paste your token (from the box above). This is the fallback for background runs.</span>
       </li>
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
         <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">2</span>
-        <span class="text-sm text-pretty"><b>Calculate Statistics</b> → operation <b>Sum</b>.</span>
+        <span class="text-sm text-pretty">
+          <b>If</b> → set the condition input to <b>Shortcut Input</b>, condition <b>has any value</b>.
+          <br>• <b>Set Variable</b> <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">Token</code> to <b>Shortcut Input</b>.
+          <br>• <b>Otherwise</b> → <b>Set Variable</b> <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">Token</code> to the <b>Text</b> from step 1.
+        </span>
       </li>
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
         <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">3</span>
+        <span class="text-sm text-pretty"><b>Find Health Samples</b> → Sample Type <b>Steps</b>, filter <b>Start Date is today</b>.</span>
+      </li>
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">4</span>
+        <span class="text-sm text-pretty"><b>Calculate Statistics</b> → operation <b>Sum</b>.</span>
+      </li>
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">5</span>
         <span class="text-sm text-pretty">
           <b>Get Contents of URL</b> →
           Method <b>POST</b>,
@@ -64,15 +76,15 @@
         </span>
       </li>
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
-        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">4</span>
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">6</span>
         <span class="text-sm text-pretty">
           Request Body <b>JSON</b> with fields:
-          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">token</code> = <b>Shortcut Input</b>,
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">token</code> = the <b>Token</b> variable,
           <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">steps</code> = the <b>Statistics</b> number.
         </span>
       </li>
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
-        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">5</span>
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">7</span>
         <span class="text-sm text-pretty">Name the Shortcut exactly <b>SyncHealth</b>.</span>
       </li>
     </ol>
