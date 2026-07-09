@@ -21,19 +21,15 @@ import { ButtonDirective } from '../button/button.directive';
             </div>
           }
         </div>
-        <span class="text-xs opacity-40">Synced {{ health.data()!.syncedAt | date: 'short' }}</span>
       } @else {
         <p class="text-sm opacity-50 text-pretty">
           No steps yet. Tap sync — it runs the “SyncHealth” Shortcut, which reads your daily steps
-          from the Health app and reopens the app with them.
+          from the Health app and sends them to the backend. Pull down / reopen to see them.
         </p>
       }
 
       <div class="flex items-center gap-2">
         <button appButton (click)="health.sync()">Sync from Apple Health</button>
-        @if (days().length) {
-          <button appButton variant="warn" (click)="health.clear()">Clear</button>
-        }
       </div>
     </div>
   `,

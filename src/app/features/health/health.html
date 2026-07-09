@@ -8,30 +8,43 @@
 
   <hr class="border-black/10 dark:border-white/10">
 
+  <!-- Runs -->
+  <section class="flex flex-col gap-3">
+    <h2 class="text-lg font-semibold text-balance">Runs</h2>
+    <app-workouts-card></app-workouts-card>
+  </section>
+
+  <hr class="border-black/10 dark:border-white/10">
+
   <!-- Setup -->
   <section class="flex flex-col gap-3">
     <h2 class="text-lg font-semibold text-balance">Set up the Shortcut</h2>
     <p class="text-sm opacity-60 text-pretty">
-      Reads steps from the Health app and reopens this app with them. No native app, no account.
+      Build a Shortcut named <b>SyncHealth</b>. When you tap <b>Sync</b> above, the app launches it and
+      passes your token automatically as the <b>Shortcut Input</b> — you never paste it. The Shortcut
+      POSTs your data to the backend; the app then reloads it.
     </p>
 
-    <!-- 1-tap install via iCloud link -->
-    @if (shortcutReady) {
-      <a appButton [href]="shortcutUrl" target="_blank" rel="noopener" class="w-full">
-        Add to Shortcuts
-      </a>
-      <p class="text-xs opacity-40 text-pretty">
-        Opens the shortcut in the Shortcuts app — tap “Add Shortcut” once. Then use Sync above.
-      </p>
-    } @else {
-      <p class="text-sm text-[#d4732f] text-pretty">
-        Install link not set yet. Build the shortcut once (steps below), Share → Copy iCloud Link,
-        and paste it into <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">shortcutUrl</code> in <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">health.ts</code>.
-      </p>
+    <!-- Token (only for standalone runs) -->
+    @if (health.token(); as token) {
+      <div class="flex flex-col gap-1.5 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="text-xs font-semibold opacity-50">Your sync token</span>
+        <div class="flex items-center gap-2">
+          <code class="flex-1 truncate rounded-lg bg-black/5 dark:bg-white/10 px-3 py-2 text-xs">{{ token }}</code>
+          <button
+            class="shrink-0 rounded-lg bg-[#d4732f]/12 text-[#d4732f] px-3 py-2 text-xs font-medium active:scale-[0.96]"
+            (click)="copyToken()">
+            Copy
+          </button>
+        </div>
+        <span class="text-xs opacity-40 text-pretty">
+          Only needed if you run the Shortcut standalone (Back Tap / a daily automation). Launched from
+          the app it arrives as the Shortcut Input automatically.
+        </span>
+      </div>
     }
 
-    <p class="text-sm font-medium opacity-70 pt-1">Or build it manually:</p>
-
+    <p class="text-sm font-medium opacity-70 pt-1">Steps:</p>
     <ol class="flex flex-col gap-2">
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
         <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">1</span>
@@ -44,14 +57,19 @@
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
         <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">3</span>
         <span class="text-sm text-pretty">
-          <b>URL</b> action →
-          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded break-all">{{ appUrl }}/?steps=[Statistics]</code>
-          (insert the <b>Statistics</b> variable). The date is filled in by the app.
+          <b>Get Contents of URL</b> →
+          Method <b>POST</b>,
+          URL <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded break-all">{{ postUrl }}</code>,
+          Header <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">Content-Type: application/json</code>.
         </span>
       </li>
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
         <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">4</span>
-        <span class="text-sm text-pretty"><b>Open URLs</b> → feed it the <b>URL</b> from step 3 (using the URL action avoids the “rich text” error).</span>
+        <span class="text-sm text-pretty">
+          Request Body <b>JSON</b> with fields:
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">token</code> = <b>Shortcut Input</b>,
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">steps</code> = the <b>Statistics</b> number.
+        </span>
       </li>
       <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
         <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">5</span>
@@ -60,7 +78,36 @@
     </ol>
 
     <p class="text-xs opacity-40 text-pretty">
-      Each run adds/updates today’s steps; the daily chart builds up over time.
+      Each run upserts today’s steps; the daily chart builds up over time.
+    </p>
+
+    <p class="text-sm font-medium opacity-70 pt-3">Runs (add to the same request):</p>
+    <ol class="flex flex-col gap-2">
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">a</span>
+        <span class="text-sm text-pretty"><b>Find Workouts</b> → filter <b>Type is Running</b>, Limit 10, sort by End Date (newest).</span>
+      </li>
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">b</span>
+        <span class="text-sm text-pretty">
+          <b>Repeat with Each</b> workout → build a <b>Dictionary</b> per run with keys
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">date</code> (Start Date, <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">yyyy-MM-dd</code>),
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">distanceKm</code>,
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">durationMin</code>,
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">calories</code>,
+          <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">avgHr</code>. Add each dictionary to a list (<b>Add to Variable</b> Runs).
+        </span>
+      </li>
+      <li class="flex gap-3 rounded-2xl bg-[var(--card)] shadow-[0_1px_3px_rgba(0,0,0,0.06)] p-3">
+        <span class="shrink-0 w-6 h-6 rounded-full bg-[#d4732f]/12 text-[#d4732f] text-xs font-semibold flex items-center justify-center">c</span>
+        <span class="text-sm text-pretty">
+          In the JSON body add a field <code class="font-mono text-xs bg-black/8 dark:bg-white/8 px-1 py-0.5 rounded">runs</code> (Array) = the <b>Runs</b> list.
+        </span>
+      </li>
+    </ol>
+    <p class="text-xs opacity-40 text-pretty">
+      Distance in km, duration in minutes. Pace is computed here. Cadence / per-km splits / route
+      aren’t available via Shortcuts — those need a native HealthKit app.
     </p>
   </section>
 

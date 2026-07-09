@@ -7,6 +7,8 @@ import { NotificationService } from './_todo-core/notifications/notification-ser
 import { AppUpdateService } from './core/services/app-update.service';
 import { Theme } from './_todo-core/theme/theme';
 import { HealthService } from './core/services/health.service';
+import { Sheet } from './core/ui/sheet/sheet';
+import { Health } from './features/health/health';
 
 @Component({
   selector: 'app-root',
@@ -20,10 +22,16 @@ export class App implements OnInit {
   private notificationService = inject(NotificationService);
   private updateService = inject(AppUpdateService);
   private theme = inject(Theme);
-  private health = inject(HealthService); // ingests ?health= from the Shortcut on boot
+  private health = inject(HealthService); // ingests ?steps=/?days= from the Shortcut on boot
+  private sheet = inject(Sheet);
 
   constructor() {
     afterNextRender(() => {
+      // Fresh data arrived via the Shortcut redirect → jump straight to Health.
+      if (this.health.ingested()) {
+        setTimeout(() => this.sheet.open(Health), 50);
+      }
+
       const splash = document.getElementById('app-splash');
       if (!splash) return;
       sessionStorage.setItem('app-loaded', '1');

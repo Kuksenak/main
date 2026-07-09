@@ -1,107 +1,77 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@environments/environment';
 
 /**
- * Apple Health bridge WITHOUT a native app and WITHOUT a backend.
- *
- * Flow:
- *   1. An Apple Shortcut ("Команды") reads Health samples (steps, heart rate, …).
- *   2. The Shortcut base64-encodes them as JSON and opens the PWA:
- *        https://<app>/?health=<base64-json>
- *   3. This service reads that query param on boot, decodes it, stores it in
- *      localStorage, and cleans the URL.
- *   4. `sync()` deep-links back to run the Shortcut (`shortcuts://run-shortcut`).
- *
- * Everything stays on-device.
+ * Apple Health via backend (Core API) + an Apple Shortcut.
+ *   • Shortcut POSTs steps/runs to `POST /api/health-sync` using the user's sync token.
+ *   • This service reads `GET /api/health-sync` (cookie-auth) and shows the token
+ *     (`GET /api/health-sync/token`) for the user to paste into the Shortcut.
+ * Works silently in the background and with the installed PWA (no URL round-trip).
  */
 
 export interface DaySteps {
-  date: string; // YYYY-MM-DD
+  date: string;
   steps: number;
 }
 
-export interface HealthData {
-  syncedAt: number;
-  days?: DaySteps[];
-  [key: string]: unknown;
+export interface Workout {
+  date: string;
+  distanceKm: number;
+  durationMin: number;
+  calories: number;
+  avgHr?: number;
 }
 
-// Name of the Shortcut the user installs (must match exactly).
+export interface HealthData {
+  days?: DaySteps[];
+  workouts?: Workout[];
+}
+
 const SHORTCUT_NAME = 'SyncHealth';
-const STORAGE_KEY = 'apple-health-data';
 
 @Injectable({ providedIn: 'root' })
 export class HealthService {
-  readonly data = signal<HealthData | null>(this.load());
+  private http = inject(HttpClient);
+  private readonly base = `${environment.apiUrl}/health-sync`;
+
+  readonly data = signal<HealthData | null>(null);
+  readonly token = signal<string | null>(null);
+  // Kept for App boot compatibility (no URL round-trip anymore).
+  readonly ingested = signal(false);
 
   constructor() {
-    this.ingestFromUrl();
+    this.refresh();
+    this.loadToken();
   }
 
-  /** Deep-link to run the pre-installed Shortcut (iOS only). */
+  refresh(): void {
+    this.http.get<HealthData>(this.base).subscribe({
+      next: (d) => this.data.set(d ?? null),
+      error: () => {},
+    });
+  }
+
+  /**
+   * Run the Shortcut, then pull the fresh data.
+   * The token is passed as the Shortcut's *input* (`Shortcut Input`), so the
+   * user never pastes it — the Shortcut reads it straight from the deep link.
+   */
   sync(): void {
-    window.location.href = `shortcuts://run-shortcut?name=${encodeURIComponent(SHORTCUT_NAME)}`;
+    const name = encodeURIComponent(SHORTCUT_NAME);
+    const token = this.token();
+    const url = token
+      ? `shortcuts://run-shortcut?name=${name}&input=text&text=${encodeURIComponent(token)}`
+      : `shortcuts://run-shortcut?name=${name}`;
+    window.location.href = url;
+    setTimeout(() => this.refresh(), 2000);
+    setTimeout(() => this.refresh(), 5000);
   }
 
-  clear(): void {
-    localStorage.removeItem(STORAGE_KEY);
-    this.data.set(null);
-  }
-
-  private ingestFromUrl(): void {
-    const params = new URLSearchParams(window.location.search);
-
-    let days: DaySteps[] = [];
-
-    // Option A: full daily list  →  ?days=2026-07-09:1234,2026-07-08:5678
-    const raw = params.get('days');
-    // Option B (simpler Shortcut): just today's total  →  ?steps=1234
-    const stepsToday = params.get('steps');
-
-    if (raw) {
-      days = raw
-        .split(',')
-        .map((pair) => {
-          const [date, steps] = pair.split(':');
-          return { date, steps: Number(steps) };
-        })
-        .filter((d) => d.date && !isNaN(d.steps));
-    } else if (stepsToday !== null && stepsToday !== '' && !isNaN(Number(stepsToday))) {
-      const now = new Date();
-      const date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-      days = [{ date, steps: Number(stepsToday) }];
-    }
-
-    days.sort((a, b) => a.date.localeCompare(b.date));
-    if (!days.length) return;
-
-    // Upsert by date into existing history (so syncing "just today" still builds
-    // a daily chart over time), keep the most recent 30 days.
-    const byDate = new Map<string, number>((this.load()?.days ?? []).map((d) => [d.date, d.steps]));
-    for (const d of days) byDate.set(d.date, d.steps);
-    const mergedDays = [...byDate.entries()]
-      .map(([date, steps]) => ({ date, steps }))
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .slice(-30);
-
-    const merged: HealthData = { days: mergedDays, syncedAt: Date.now() };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
-    this.data.set(merged);
-
-    // Strip the params so a refresh doesn't re-ingest.
-    params.delete('days');
-    params.delete('steps');
-    const query = params.toString();
-    window.history.replaceState({}, '', window.location.pathname + (query ? `?${query}` : ''));
-  }
-
-  private load(): HealthData | null {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? (JSON.parse(stored) as HealthData) : null;
-  }
-
-  private decodeBase64Utf8(b64: string): string {
-    // atob → binary string → proper UTF-8
-    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    return new TextDecoder().decode(bytes);
+  private loadToken(): void {
+    this.http.get<{ token: string }>(`${this.base}/token`).subscribe({
+      next: (r) => this.token.set(r.token),
+      error: () => {},
+    });
   }
 }
