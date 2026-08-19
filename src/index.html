@@ -3,78 +3,24 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#000000" id="meta-theme-color">
-  <script>
-    (function() {
-      try {
-        var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (dark) {
-          document.documentElement.classList.add('dark');
-          document.querySelector('meta[name="color-scheme"]').content = 'dark';
-        }
-        var tc = document.getElementById('meta-theme-color');
-        if (tc) tc.content = dark ? '#000000' : '#e5e5ea';
-        var ua = navigator.userAgent;
-        var mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||
-                     'ontouchstart' in window ||
-                     navigator.maxTouchPoints > 0;
-        document.documentElement.dataset.device = mobile ? 'mobile' : 'desktop';
-        if (sessionStorage.getItem('app-loaded')) {
-          document.documentElement.classList.add('no-splash');
-        } else {
-          window.__splashAt = Date.now();
-        }
-
-        // Inject device-specific stylesheet before Angular renders anything.
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = mobile ? 'styles-mobile.css' : 'styles-desktop.css';
-        document.head.appendChild(link);
-      } catch(e) {}
-    })();
-  </script>
-  <style>
-    #app-splash {
-      position: fixed;
-      inset: 0;
-      background: #e5e5ea;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.3s ease;
-    }
-    @media (prefers-color-scheme: dark) {
-      #app-splash { background: #000000; }
-    }
-    #app-splash.out { opacity: 0; pointer-events: none; }
-    html.no-splash #app-splash { display: none; }
-    #app-splash::after {
-      content: '';
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #d4732f;
-      animation: sp 1.2s ease-in-out infinite;
-    }
-    @keyframes sp {
-      0%, 100% { opacity: 0.4; transform: scale(1); }
-      50%       { opacity: 0.9; transform: scale(1.5); }
-    }
-  </style>
-  <title></title>
+  <title>App</title>
   <base href="/">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#faf9f7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+  <script>
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
 </head>
 
 <body>
-  <div id="app-splash" aria-hidden="true"></div>
   <app-root></app-root>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>

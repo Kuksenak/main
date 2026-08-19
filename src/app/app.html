@@ -1,15 +1,7 @@
-<!-- Keeps safe-area colour consistent regardless of sheet backdrop (z > CDK overlay 1000) -->
-<div class="fixed inset-x-0 top-0 z-[1001] bg-[#faf9f7] dark:bg-[#1c1917]"
-     style="height: env(safe-area-inset-top, 0px)"></div>
-
-<div class="flex flex-col h-dvh w-full overflow-hidden">
-  <app-navbar id="app-navbar"></app-navbar>
-
-  <div id="app-main-wrapper" class="flex-1 overflow-hidden bg-[#faf9f7] dark:bg-[#1c1917]">
-    @if (!authStore.isAuthenticated()) {
-      <div class="h-full flex items-center justify-center">
-        <p class="text-sm opacity-40">Sign in to continue</p>
-      </div>
-    }
-  </div>
-</div>
+@if (!auth.initialized()) {
+  <main class="min-h-dvh flex items-center justify-center text-neutral-900 dark:text-neutral-100">
+    <p class="text-sm opacity-40">Loading…</p>
+  </main>
+} @else {
+  <router-outlet></router-outlet>
+}
