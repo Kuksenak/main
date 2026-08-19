@@ -36,6 +36,13 @@
         </a>
       }
 
+      <a
+        routerLink="/telegram"
+        class="w-full rounded-xl border border-neutral-200 px-4 py-3 text-center text-sm font-semibold active:opacity-70 dark:border-neutral-800"
+      >
+        Telegram
+      </a>
+
       @if (auth.devices().length) {
         <ul class="flex w-full flex-col gap-2">
           @for (device of auth.devices(); track device.id) {

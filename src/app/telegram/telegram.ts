@@ -1,0 +1,49 @@
+import { DatePipe } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { TelegramStore } from './telegram.store';
+
+@Component({
+  selector: 'app-telegram',
+  imports: [DatePipe, FormsModule, RouterLink],
+  templateUrl: './telegram.html',
+})
+export class Telegram implements OnInit, OnDestroy {
+  protected readonly tg = inject(TelegramStore);
+  protected draft = '';
+  private timer: ReturnType<typeof setInterval> | undefined;
+
+  ngOnInit(): void {
+    this.tg.loadStatus();
+    this.tg.loadMessages();
+    this.timer = setInterval(() => {
+      if (this.tg.linked()) {
+        this.tg.loadMessages();
+      }
+    }, 4000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  }
+
+  connect(): void {
+    this.tg.link().subscribe((res) => {
+      if (res?.deepLink) {
+        window.open(res.deepLink, '_blank');
+      }
+    });
+  }
+
+  submit(): void {
+    const text = this.draft.trim();
+    if (!text) {
+      return;
+    }
+    this.tg.send(text).subscribe();
+    this.draft = '';
+  }
+}

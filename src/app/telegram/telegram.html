@@ -1,0 +1,65 @@
+<main class="flex h-dvh flex-col px-4 py-4 text-neutral-900 dark:text-neutral-100">
+  <div class="mb-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a routerLink="/" class="text-sm opacity-60 active:opacity-100">← Back</a>
+      <p class="text-base font-medium">Telegram</p>
+    </div>
+    @if (tg.linked()) {
+      <button type="button" (click)="tg.unlink()" class="text-xs font-semibold text-red-600 active:opacity-70">
+        Unlink
+      </button>
+    }
+  </div>
+
+  @if (!tg.status().enabled) {
+    <p class="text-sm opacity-50">Telegram integration is not configured on the server.</p>
+  } @else if (!tg.linked()) {
+    <div class="my-auto flex flex-col items-center gap-4 text-center">
+      <p class="text-sm opacity-70">Connect your Telegram to exchange messages with the app.</p>
+      <button
+        type="button"
+        (click)="connect()"
+        class="rounded-full bg-neutral-900 px-6 py-2.5 text-sm font-semibold text-white active:opacity-80 dark:bg-white dark:text-neutral-900"
+      >
+        Connect Telegram
+      </button>
+      <p class="text-xs opacity-40">Opens the bot in Telegram — tap Start to link.</p>
+    </div>
+  } @else {
+    <ul class="flex flex-1 flex-col gap-2 overflow-y-auto pb-2">
+      @for (msg of tg.messages(); track msg.id) {
+        <li class="flex" [class.justify-end]="!msg.isIncoming">
+          <div
+            class="max-w-[80%] rounded-2xl px-3 py-2"
+            [class.bg-neutral-200]="msg.isIncoming"
+            [class.dark:bg-neutral-800]="msg.isIncoming"
+            [class.bg-blue-600]="!msg.isIncoming"
+            [class.text-white]="!msg.isIncoming"
+          >
+            <p class="whitespace-pre-wrap break-words text-sm">{{ msg.text }}</p>
+            <p class="mt-0.5 text-[10px] opacity-60">{{ msg.createdAt | date: 'short' }}</p>
+          </div>
+        </li>
+      } @empty {
+        <li class="mt-6 text-center text-xs opacity-40">No messages yet.</li>
+      }
+    </ul>
+
+    <form (ngSubmit)="submit()" class="mt-2 flex items-center gap-2">
+      <input
+        name="draft"
+        [(ngModel)]="draft"
+        type="text"
+        autocomplete="off"
+        placeholder="Message"
+        class="flex-1 rounded-full border border-neutral-300 bg-transparent px-4 py-2 text-sm outline-none dark:border-neutral-700"
+      />
+      <button
+        type="submit"
+        class="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white active:opacity-80"
+      >
+        Send
+      </button>
+    </form>
+  }
+</main>
