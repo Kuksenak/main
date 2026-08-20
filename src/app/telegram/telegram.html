@@ -19,7 +19,7 @@
       <button
         type="button"
         (click)="connect()"
-        class="rounded-full bg-neutral-900 px-6 py-2.5 text-sm font-semibold text-white active:opacity-80 dark:bg-white dark:text-neutral-900"
+        class="rounded-full bg-[var(--accent)] px-6 py-2.5 text-sm font-semibold text-[var(--accent-fg)] active:opacity-80"
       >
         Connect Telegram
       </button>
@@ -33,8 +33,8 @@
             class="max-w-[80%] rounded-2xl px-3 py-2"
             [class.bg-neutral-200]="msg.isIncoming"
             [class.dark:bg-neutral-800]="msg.isIncoming"
-            [class.bg-blue-600]="!msg.isIncoming"
-            [class.text-white]="!msg.isIncoming"
+            [style.background]="msg.isIncoming ? null : 'var(--accent)'"
+            [style.color]="msg.isIncoming ? null : 'var(--accent-fg)'"
           >
             <p class="whitespace-pre-wrap break-words text-sm">{{ msg.text }}</p>
             <p class="mt-0.5 text-[10px] opacity-60">{{ msg.createdAt | date: 'short' }}</p>
@@ -56,7 +56,7 @@
       />
       <button
         type="submit"
-        class="shrink-0 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white active:opacity-80"
+        class="shrink-0 rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-fg)] active:opacity-80"
       >
         Send
       </button>

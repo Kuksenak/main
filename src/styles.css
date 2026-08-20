@@ -4,10 +4,14 @@
 
 :root {
   --app-bg: #faf9f7;
+  --accent: #2b9a41;
+  --accent-fg: #ffffff;
 }
 
 html.dark {
   --app-bg: #1c1917;
+  --accent: #3bb257;
+  --accent-fg: #08120a;
 }
 
 @font-face {
