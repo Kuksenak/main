@@ -5,3 +5,13 @@
 } @else {
   <router-outlet></router-outlet>
 }
+
+@if (updateReady()) {
+  <button
+    type="button"
+    (click)="reload()"
+    class="fixed bottom-5 left-1/2 z-[2000] -translate-x-1/2 rounded-full bg-[var(--accent)] px-6 py-3 text-sm font-semibold text-[var(--accent-fg)] shadow-lg active:opacity-80"
+  >
+    Update available — Reload
+  </button>
+}

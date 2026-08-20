@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, effect, ElementRef, inject, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TelegramStore } from './telegram.store';
@@ -13,6 +13,17 @@ export class Telegram implements OnInit, OnDestroy {
   protected readonly tg = inject(TelegramStore);
   protected draft = '';
   private timer: ReturnType<typeof setInterval> | undefined;
+  private scroller = viewChild<ElementRef<HTMLElement>>('scroller');
+
+  constructor() {
+    effect(() => {
+      this.tg.messages();
+      const el = this.scroller()?.nativeElement;
+      if (el) {
+        setTimeout(() => (el.scrollTop = el.scrollHeight), 0);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.tg.loadStatus();

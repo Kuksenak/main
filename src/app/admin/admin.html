@@ -5,9 +5,11 @@
   </div>
 
   @if (store.loading() && !store.users().length) {
-    <p class="text-xs opacity-40">Loading…</p>
+    <p class="text-sm opacity-40">Loading…</p>
+  } @else if (store.error()) {
+    <p class="text-sm text-red-500">Failed to load users (is the API restarted with the latest migration?).</p>
   } @else if (!store.users().length) {
-    <p class="text-xs opacity-40">No users.</p>
+    <p class="text-sm opacity-40">No users.</p>
   } @else {
     <ul class="flex flex-col gap-2">
       @for (user of store.users(); track user.id) {

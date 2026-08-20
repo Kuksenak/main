@@ -20,17 +20,24 @@ export class AdminStore {
 
   private _users = signal<AdminUser[]>([]);
   private _loading = signal(false);
+  private _error = signal(false);
 
   readonly users = this._users.asReadonly();
   readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
 
   loadUsers(): void {
     this._loading.set(true);
+    this._error.set(false);
     this.http
       .get<{ users: AdminUser[] }>(`${environment.apiUrl}/admin/users`)
-      .pipe(catchError(() => of({ users: [] })))
+      .pipe(catchError(() => of(null)))
       .subscribe((res) => {
-        this._users.set(res.users ?? []);
+        if (res === null) {
+          this._error.set(true);
+        } else {
+          this._users.set(res.users ?? []);
+        }
         this._loading.set(false);
       });
   }
