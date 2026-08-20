@@ -1,12 +1,11 @@
 import { DatePipe } from '@angular/common';
 import { Component, effect, ElementRef, inject, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { TelegramStore } from './telegram.store';
 
 @Component({
   selector: 'app-telegram',
-  imports: [DatePipe, FormsModule, RouterLink],
+  imports: [DatePipe, FormsModule],
   templateUrl: './telegram.html',
 })
 export class Telegram implements OnInit, OnDestroy {

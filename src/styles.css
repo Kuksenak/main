@@ -1,17 +1,24 @@
 @import "tailwindcss";
+@import "@angular/cdk/overlay-prebuilt.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --app-bg: #faf9f7;
+  --surface: #f2f2f7;
   --accent: #53ae8a;
   --accent-fg: #0c1a12;
 }
 
 html.dark {
   --app-bg: #1c1917;
+  --surface: #1c1c1e;
   --accent: #a9d588;
   --accent-fg: #0c1a12;
+}
+
+.sheet-backdrop {
+  background: rgba(0, 0, 0, 0.35);
 }
 
 @font-face {

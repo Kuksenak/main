@@ -1,10 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { AdminStore, AdminUser } from './admin.store';
 
 @Component({
   selector: 'app-admin',
-  imports: [RouterLink],
   templateUrl: './admin.html',
 })
 export class Admin implements OnInit {

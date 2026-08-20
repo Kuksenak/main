@@ -29,31 +29,34 @@
         </div>
 
         @if (auth.calendarConnected()) {
-          <a
-            routerLink="/events"
+          <button
+            type="button"
+            (click)="openEvents()"
             class="w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-center text-sm font-semibold text-[var(--accent-fg)] active:opacity-80"
           >
             View events
-          </a>
+          </button>
         }
       }
 
       @if (auth.telegramAvailable()) {
-        <a
-          routerLink="/telegram"
+        <button
+          type="button"
+          (click)="openTelegram()"
           class="w-full rounded-xl border border-neutral-200 px-4 py-3 text-center text-sm font-semibold active:opacity-70 dark:border-neutral-800"
         >
           Telegram
-        </a>
+        </button>
       }
 
       @if (auth.isAdmin()) {
-        <a
-          routerLink="/admin"
+        <button
+          type="button"
+          (click)="openAdmin()"
           class="w-full rounded-xl border border-neutral-200 px-4 py-3 text-center text-sm font-semibold active:opacity-70 dark:border-neutral-800"
         >
           Admin
-        </a>
+        </button>
       }
 
       @if (auth.devices().length) {

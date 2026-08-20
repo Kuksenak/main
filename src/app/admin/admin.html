@@ -1,8 +1,5 @@
-<main class="min-h-dvh px-4 py-4 text-neutral-900 dark:text-neutral-100">
-  <div class="mb-4 flex items-center gap-3">
-    <a routerLink="/" class="text-sm opacity-60 active:opacity-100">← Back</a>
-    <p class="text-base font-medium">Admin — Users</p>
-  </div>
+<div class="h-full overflow-y-auto px-4 py-3 text-neutral-900 dark:text-neutral-100">
+  <p class="mb-4 text-base font-semibold">Admin — Users</p>
 
   @if (store.loading() && !store.users().length) {
     <p class="text-sm opacity-40">Loading…</p>
@@ -62,4 +59,4 @@
       }
     </ul>
   }
-</main>
+</div>
