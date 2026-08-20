@@ -7,6 +7,9 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   email: string;
+  calendarEnabled: boolean;
+  telegramEnabled: boolean;
+  isAdmin: boolean;
 }
 
 export interface Device {
@@ -51,6 +54,9 @@ export class AuthStore {
   readonly initialized = this._initialized.asReadonly();
   readonly isAuthenticated = computed(() => this._user() !== null);
   readonly email = computed(() => this._user()?.email ?? null);
+  readonly isAdmin = computed(() => this._user()?.isAdmin ?? false);
+  readonly calendarAvailable = computed(() => this._user()?.calendarEnabled ?? false);
+  readonly telegramAvailable = computed(() => this._user()?.telegramEnabled ?? false);
 
   setAccessToken(token: string): void {
     this._accessToken.set(token);
