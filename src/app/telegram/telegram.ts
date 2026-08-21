@@ -43,7 +43,7 @@ export class Telegram implements OnInit, OnDestroy {
   connect(): void {
     this.tg.link().subscribe((res) => {
       if (res?.deepLink) {
-        window.open(res.deepLink, '_blank');
+        window.location.href = res.deepLink;
       }
     });
   }

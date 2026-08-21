@@ -1,6 +1,13 @@
 <div class="h-full overflow-y-auto px-4 py-3 text-neutral-900 dark:text-neutral-100">
   <p class="mb-4 text-base font-semibold">Admin — Users</p>
 
+  <div class="mb-4 flex flex-col gap-3 rounded-xl border border-neutral-200 px-4 py-3 dark:border-neutral-800">
+    <p class="text-sm font-medium">Pickers test</p>
+    <app-date label="Date" [(ngModel)]="testDate" />
+    <app-time label="Time" [(ngModel)]="testTime" />
+    <p class="text-xs opacity-50">date: {{ testDate | date: 'mediumDate' }} · time: {{ testTime || '—' }}</p>
+  </div>
+
   @if (store.loading() && !store.users().length) {
     <p class="text-sm opacity-40">Loading…</p>
   } @else if (store.error()) {

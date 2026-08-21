@@ -25,6 +25,12 @@
       }
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });
+
+      var ua = navigator.userAgent;
+      var mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||
+                   'ontouchstart' in window ||
+                   navigator.maxTouchPoints > 0;
+      document.documentElement.dataset.device = mobile ? 'mobile' : 'desktop';
     })();
   </script>
 </head>
