@@ -4,15 +4,17 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --app-bg: #ffffff;
-  --sheet-bg: #f2f2f6;
+  --app-bg: #e2e6ef;
+  --sheet-bg: #fbfbfb;
+  --surface: #ffffff;
   --accent: #53ae8a;
   --accent-fg: #0c1a12;
 }
 
 html.dark {
-  --app-bg: #000000;
-  --sheet-bg: #1c1c1e;
+  --app-bg: #161617;
+  --sheet-bg: #000000;
+  --surface: #1c1c1e;
   --accent: #a9d588;
   --accent-fg: #0c1a12;
 }
@@ -37,6 +39,45 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
+}
+
+@layer components {
+  /* Primary action — accent pill */
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-[var(--accent)]
+           px-6 py-2.5 text-[15px] font-semibold text-[var(--accent-fg)] active:opacity-80;
+  }
+
+  /* Secondary action — neutral iOS pill */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full bg-black/[0.06]
+           px-5 py-2.5 text-[15px] font-semibold text-black/80 active:opacity-70
+           dark:bg-white/15 dark:text-white;
+  }
+
+  /* Icon button — translucent grey circle */
+  .icon-btn {
+    @apply inline-flex size-11 shrink-0 items-center justify-center rounded-full
+           bg-black/[0.06] text-black/70 active:opacity-70
+           dark:bg-white/15 dark:text-white/80;
+  }
+
+  /* Confirm — accent circle (for a checkmark) */
+  .btn-confirm {
+    @apply inline-flex size-11 shrink-0 items-center justify-center rounded-full
+           bg-[var(--accent)] text-[var(--accent-fg)] active:opacity-80;
+  }
+
+  /* iOS grouped list container */
+  .ios-group {
+    @apply overflow-hidden rounded-2xl bg-white dark:bg-white/[0.06];
+  }
+
+  /* Row inside an iOS group (divider between rows) */
+  .ios-row {
+    @apply flex items-center justify-between gap-3 px-4 py-3
+           border-b border-black/[0.06] last:border-b-0 dark:border-white/[0.08];
+  }
 }
 
 * {

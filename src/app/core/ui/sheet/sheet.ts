@@ -29,7 +29,7 @@ export class Sheet {
         backdropClass: 'sheet-backdrop',
         panelClass: 'sheet-panel',
         width: '100%',
-        maxWidth: '640px',
+        maxWidth: '760px',
         scrollStrategy: this.overlay.scrollStrategies.block(),
       }),
     );

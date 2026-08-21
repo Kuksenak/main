@@ -6,11 +6,7 @@
   } @else if (!tg.linked()) {
     <div class="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
       <p class="text-base opacity-70">Connect your Telegram to exchange messages with the app.</p>
-      <button
-        type="button"
-        (click)="connect()"
-        class="rounded-full bg-[var(--accent)] px-7 py-3 text-base font-semibold text-[var(--accent-fg)] active:opacity-80"
-      >
+      <button type="button" (click)="connect()" class="btn-primary px-7 py-3 text-base">
         Connect Telegram
       </button>
       <p class="text-sm opacity-40">Opens the bot in Telegram — tap Start to link.</p>
@@ -61,7 +57,7 @@
             <button
               type="submit"
               aria-label="Send"
-              class="absolute right-1.5 flex size-9 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-fg)] active:opacity-80"
+              class="absolute right-1.5 flex size-10 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-fg)] active:opacity-80"
             >
               <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 19V5" />

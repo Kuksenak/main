@@ -1,0 +1,43 @@
+<div class="relative h-full overflow-hidden text-neutral-900 dark:text-neutral-100">
+  @if (!auth.calendarConnected()) {
+    <div class="flex h-full flex-col items-center justify-center gap-5 px-6 text-center">
+      <p class="text-base opacity-70">Connect Google Calendar to see your events in the app.</p>
+      <button type="button" (click)="connect()" class="btn-primary px-7 py-3 text-base">
+        Connect Google Calendar
+      </button>
+    </div>
+  } @else {
+    <div class="absolute inset-0 overflow-y-auto px-4 pb-6 pt-14">
+      @if (auth.eventsLoading()) {
+        <p class="text-sm opacity-40">Loading events…</p>
+      } @else if (auth.events().length) {
+        <div class="ios-group">
+          @for (event of auth.events(); track event.id) {
+            <div class="border-b border-black/[0.06] px-4 py-3 last:border-b-0 dark:border-white/[0.08]">
+              <p class="break-words text-[15px] font-medium">{{ event.title }}</p>
+              <p class="mt-1 text-xs opacity-60">
+                @if (event.isAllDay) {
+                  {{ event.startDate | date: 'EEE, MMM d' }} · All day
+                } @else {
+                  {{ event.startDate | date: 'EEE, MMM d, HH:mm' }} – {{ event.endDate | date: 'HH:mm' }}
+                }
+              </p>
+              <p class="mt-0.5 break-words text-xs opacity-40">
+                {{ event.calendarName }}@if (event.location) { · {{ event.location }} }
+              </p>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-sm opacity-40">No events in the next month.</p>
+      }
+    </div>
+
+    <header class="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pb-2 pt-3">
+      <p class="text-base font-semibold">Calendar</p>
+      <button type="button" (click)="disconnect()" class="text-sm font-semibold text-red-500 active:opacity-70">
+        Disconnect
+      </button>
+    </header>
+  }
+</div>

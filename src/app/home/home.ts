@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { AuthStore } from '../auth/auth.store';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { Admin } from '../admin/admin';
-import { Events } from '../events/events';
+import { Calendar } from '../calendar/calendar';
 import { Telegram } from '../telegram/telegram';
 
 @Component({
@@ -15,8 +15,8 @@ export class Home {
   protected readonly auth = inject(AuthStore);
   private sheet = inject(Sheet);
 
-  openEvents(): void {
-    this.sheet.open(Events);
+  openCalendar(): void {
+    this.sheet.open(Calendar);
   }
 
   openTelegram(): void {

@@ -13,13 +13,8 @@ import { SheetRef } from './sheet';
       (pointerup)="onUp($event)"
       (pointercancel)="onUp($event)"
     >
-      <button
-        type="button"
-        aria-label="Close"
-        (click)="sheetRef.close()"
-        class="flex size-9 items-center justify-center rounded-full bg-black/[0.08] text-black/60 active:opacity-70 dark:bg-white/15 dark:text-white/70"
-      >
-        <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <button type="button" aria-label="Close" (click)="sheetRef.close()" class="icon-btn">
+        <svg viewBox="0 0 24 24" fill="none" class="size-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M6 6 18 18M18 6 6 18" />
         </svg>
       </button>
@@ -37,9 +32,8 @@ import { SheetRef } from './sheet';
   `,
   host: {
     class:
-      'flex w-full flex-col overflow-hidden rounded-t-[24px] ' +
+      'flex w-full flex-col overflow-hidden rounded-t-[36px] ' +
       'bg-[var(--sheet-bg)] will-change-transform ' +
-      'shadow-[0_-8px_40px_rgba(0,0,0,0.16)] ' +
       'mt-[calc(env(safe-area-inset-top,20px)+8px)]',
     '[style.height]': 'height()',
     '[style.transform]': 'transform()',

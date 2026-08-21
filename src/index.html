@@ -8,7 +8,7 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#ffffff">
+  <meta name="theme-color" content="#e2e6ef">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="favicon.png">
@@ -21,7 +21,7 @@
       function apply(isDark) {
         document.documentElement.classList.toggle('dark', isDark);
         var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', isDark ? '#000000' : '#ffffff');
+        if (meta) meta.setAttribute('content', isDark ? '#161617' : '#e2e6ef');
       }
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });
