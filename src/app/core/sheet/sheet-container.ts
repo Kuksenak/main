@@ -1,4 +1,4 @@
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { PortalModule } from '@angular/cdk/portal';
 import { SheetRef } from './sheet';
 
@@ -23,74 +23,55 @@ import { SheetRef } from './sheet';
   host: {
     class:
       'flex w-full flex-col overflow-hidden rounded-t-[24px] border-t border-black/10 ' +
-      'bg-[var(--surface)] will-change-transform dark:border-white/10',
-    '[style.height]': 'heightStyle()',
+      'bg-[var(--surface)] will-change-transform dark:border-white/10 ' +
+      'mt-[calc(env(safe-area-inset-top,20px)+8px)]',
+    '[style.height]': 'height()',
     '[style.transform]': 'transform()',
     '[style.transition]': 'transition()',
   },
 })
 export class SheetContainer implements OnInit, OnDestroy {
+  private el = inject<ElementRef<HTMLElement>>(ElementRef);
+
   sheetRef!: SheetRef;
 
   private open = signal(false);
   private dragDelta = signal(0);
-  private keyboardOffset = signal(0);
-  private viewportHeight = signal<number | null>(null);
-
   protected transition = signal('none');
+  protected height = signal('100dvh');
 
-  protected transform = computed(() => {
-    if (!this.open()) {
-      return 'translate3d(0, 100%, 0)';
-    }
-    const y = this.dragDelta() - this.keyboardOffset();
-    return `translate3d(0, ${y}px, 0)`;
-  });
+  protected transform = computed(() =>
+    this.open() ? `translate3d(0, ${this.dragDelta()}px, 0)` : 'translate3d(0, 100%, 0)',
+  );
 
-  protected heightStyle = computed(() => {
-    const vh = this.viewportHeight();
-    return vh !== null
-      ? `${vh}px`
-      : 'calc(100dvh - env(safe-area-inset-top, 20px) - 10px)';
-  });
-
+  private gap = 0;
   private startY = 0;
   private dragging = false;
 
   ngOnInit(): void {
-    const vv = window.visualViewport;
-    if (vv) {
-      vv.addEventListener('resize', this.onViewport);
-      vv.addEventListener('scroll', this.onViewport);
-    }
+    this.gap = parseFloat(getComputedStyle(this.el.nativeElement).marginTop) || 0;
+    this.updateHeight(false);
+
+    window.visualViewport?.addEventListener('resize', this.onViewport);
+    window.visualViewport?.addEventListener('scroll', this.onViewport);
+    window.addEventListener('resize', this.onViewport);
   }
 
   ngOnDestroy(): void {
-    const vv = window.visualViewport;
-    if (vv) {
-      vv.removeEventListener('resize', this.onViewport);
-      vv.removeEventListener('scroll', this.onViewport);
-    }
+    window.visualViewport?.removeEventListener('resize', this.onViewport);
+    window.visualViewport?.removeEventListener('scroll', this.onViewport);
+    window.removeEventListener('resize', this.onViewport);
   }
 
-  private onViewport = (): void => {
-    const vv = window.visualViewport;
-    if (!vv) return;
+  private onViewport = (): void => this.updateHeight(true);
 
-    const keyboard = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-
-    if (!this.dragging) {
-      this.transition.set('transform 0.25s ease, height 0.25s ease');
+  private updateHeight(animate: boolean): void {
+    const visible = window.visualViewport?.height ?? window.innerHeight;
+    if (animate && !this.dragging) {
+      this.transition.set('transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), height 0.25s ease');
     }
-
-    if (keyboard > 80) {
-      this.keyboardOffset.set(keyboard);
-      this.viewportHeight.set(vv.height);
-    } else {
-      this.keyboardOffset.set(0);
-      this.viewportHeight.set(null);
-    }
-  };
+    this.height.set(`${Math.round(visible - this.gap)}px`);
+  }
 
   enter(): void {
     this.transition.set('transform 0.5s cubic-bezier(0.32, 0.72, 0, 1)');

@@ -38,7 +38,7 @@
     </div>
 
     <header
-      class="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pb-2 pt-3 backdrop-blur-md"
+      class="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pb-2 pt-3"
     >
       <p class="text-base font-semibold">Telegram</p>
       <button type="button" (click)="tg.unlink()" class="text-sm font-semibold text-red-500 active:opacity-70">
@@ -47,7 +47,7 @@
     </header>
 
     <div class="absolute inset-x-0 bottom-0 z-10">
-      <div class="px-3 pb-3 pt-2 backdrop-blur-md">
+      <div class="px-3 pb-3 pt-2">
         <form (ngSubmit)="submit()" class="flex items-center gap-2">
           <input
             name="draft"

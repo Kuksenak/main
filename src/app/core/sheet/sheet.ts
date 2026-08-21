@@ -24,7 +24,7 @@ export class Sheet {
   open<T>(component: Type<T>): SheetRef {
     const overlayRef = this.overlay.create(
       new OverlayConfig({
-        positionStrategy: this.overlay.position().global().centerHorizontally().bottom('0'),
+        positionStrategy: this.overlay.position().global().centerHorizontally().top('0'),
         hasBackdrop: true,
         backdropClass: 'sheet-backdrop',
         panelClass: 'sheet-panel',
