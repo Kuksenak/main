@@ -43,6 +43,29 @@
       }
 
       <button type="button" (click)="auth.logout()" class="btn-primary w-full py-3">Log out</button>
+
+      <div class="relative flex items-center">
+        <input
+          name="homeDraft"
+          [(ngModel)]="draft"
+          type="text"
+          autocomplete="off"
+          placeholder="Message"
+          class="w-full rounded-full border border-black/10 bg-[var(--surface)] py-3 pl-4 pr-14 text-[17px] outline-none dark:border-white/15"
+        />
+        @if (draft.trim()) {
+          <button
+            type="button"
+            aria-label="Send"
+            class="absolute right-1.5 flex size-10 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-fg)] active:opacity-80"
+          >
+            <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 19V5" />
+              <path d="m6 11 6-6 6 6" />
+            </svg>
+          </button>
+        }
+      </div>
     } @else {
       <button type="button" (click)="auth.login()" class="btn-primary w-full py-3">Log in with Google</button>
     }

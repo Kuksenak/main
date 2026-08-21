@@ -4,16 +4,16 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --app-bg: #e2e6ef;
-  --sheet-bg: #fbfbfb;
+  --app-bg: #f2f2f6;
+  --sheet-bg: #ffffff;
   --surface: #ffffff;
   --accent: #53ae8a;
   --accent-fg: #0c1a12;
 }
 
 html.dark {
-  --app-bg: #161617;
-  --sheet-bg: #000000;
+  --app-bg: #000000;
+  --sheet-bg: #1c1c1e;
   --surface: #1c1c1e;
   --accent: #a9d588;
   --accent-fg: #0c1a12;
