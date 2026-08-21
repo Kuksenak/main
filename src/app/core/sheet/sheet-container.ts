@@ -37,11 +37,14 @@ export class SheetContainer implements OnInit, OnDestroy {
 
   private open = signal(false);
   private dragDelta = signal(0);
+  private viewportOffset = signal(0);
   protected transition = signal('none');
   protected height = signal('100dvh');
 
   protected transform = computed(() =>
-    this.open() ? `translate3d(0, ${this.dragDelta()}px, 0)` : 'translate3d(0, 100%, 0)',
+    this.open()
+      ? `translate3d(0, ${this.viewportOffset() + this.dragDelta()}px, 0)`
+      : 'translate3d(0, 100%, 0)',
   );
 
   private gap = 0;
@@ -66,10 +69,14 @@ export class SheetContainer implements OnInit, OnDestroy {
   private onViewport = (): void => this.updateHeight(true);
 
   private updateHeight(animate: boolean): void {
-    const visible = window.visualViewport?.height ?? window.innerHeight;
+    const vv = window.visualViewport;
+    const visible = vv?.height ?? window.innerHeight;
+    const offset = vv?.offsetTop ?? 0;
+
     if (animate && !this.dragging) {
-      this.transition.set('transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), height 0.25s ease');
+      this.transition.set('transform 0.25s ease, height 0.25s ease');
     }
+    this.viewportOffset.set(offset);
     this.height.set(`${Math.round(visible - this.gap)}px`);
   }
 
