@@ -1,8 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { Toggle } from '../core/ui/toggle/toggle';
 import { AdminStore, AdminUser } from './admin.store';
 
 @Component({
   selector: 'app-admin',
+  imports: [Toggle],
   templateUrl: './admin.html',
 })
 export class Admin implements OnInit {
@@ -12,11 +14,11 @@ export class Admin implements OnInit {
     this.store.loadUsers();
   }
 
-  toggleCalendar(user: AdminUser): void {
-    this.store.setIntegrations(user, !user.calendarEnabled, user.telegramEnabled);
+  setCalendar(user: AdminUser, enabled: boolean): void {
+    this.store.setIntegrations(user, enabled, user.telegramEnabled);
   }
 
-  toggleTelegram(user: AdminUser): void {
-    this.store.setIntegrations(user, user.calendarEnabled, !user.telegramEnabled);
+  setTelegram(user: AdminUser, enabled: boolean): void {
+    this.store.setIntegrations(user, user.calendarEnabled, enabled);
   }
 }

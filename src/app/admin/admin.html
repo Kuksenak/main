@@ -18,41 +18,25 @@
 
           <div class="mt-3 flex flex-col gap-2">
             <div class="flex items-center justify-between gap-3">
-              <div class="text-xs">
+              <div class="text-sm">
                 <span class="font-medium">Calendar</span>
                 <span class="opacity-50">· {{ user.calendarConnected ? 'connected' : 'not connected' }}</span>
               </div>
-              <button
-                type="button"
-                (click)="toggleCalendar(user)"
-                class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold active:opacity-70"
-                [style.background]="user.calendarEnabled ? 'var(--accent)' : 'transparent'"
-                [style.color]="user.calendarEnabled ? 'var(--accent-fg)' : null"
-                [class.border]="!user.calendarEnabled"
-                [class.border-neutral-300]="!user.calendarEnabled"
-                [class.dark:border-neutral-700]="!user.calendarEnabled"
-              >
-                {{ user.calendarEnabled ? 'Enabled' : 'Disabled' }}
-              </button>
+              <app-toggle
+                [checked]="user.calendarEnabled"
+                (checkedChange)="setCalendar(user, $event)"
+              />
             </div>
 
             <div class="flex items-center justify-between gap-3">
-              <div class="text-xs">
+              <div class="text-sm">
                 <span class="font-medium">Telegram</span>
                 <span class="opacity-50">· {{ user.telegramLinked ? 'linked' : 'not linked' }}</span>
               </div>
-              <button
-                type="button"
-                (click)="toggleTelegram(user)"
-                class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold active:opacity-70"
-                [style.background]="user.telegramEnabled ? 'var(--accent)' : 'transparent'"
-                [style.color]="user.telegramEnabled ? 'var(--accent-fg)' : null"
-                [class.border]="!user.telegramEnabled"
-                [class.border-neutral-300]="!user.telegramEnabled"
-                [class.dark:border-neutral-700]="!user.telegramEnabled"
-              >
-                {{ user.telegramEnabled ? 'Enabled' : 'Disabled' }}
-              </button>
+              <app-toggle
+                [checked]="user.telegramEnabled"
+                (checkedChange)="setTelegram(user, $event)"
+              />
             </div>
           </div>
         </li>

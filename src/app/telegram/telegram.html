@@ -47,28 +47,30 @@
     </header>
 
     <div class="absolute inset-x-0 bottom-0 z-10">
-      <div class="px-3 pb-3 pt-2">
-        <form (ngSubmit)="submit()" class="flex items-center gap-2">
+      <form (ngSubmit)="submit()" class="px-3 pb-3 pt-2">
+        <div class="relative flex items-center">
           <input
             name="draft"
             [(ngModel)]="draft"
             type="text"
             autocomplete="off"
             placeholder="Message"
-            class="min-w-0 flex-1 rounded-full border border-neutral-300 bg-[var(--app-bg)] px-4 py-2.5 text-base outline-none dark:border-neutral-700"
+            class="w-full rounded-full border border-black/10 bg-white py-3.5 pl-4 pr-14 text-base outline-none dark:border-white/15 dark:bg-neutral-800"
           />
-          <button
-            type="submit"
-            aria-label="Send"
-            class="flex size-11 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-fg)] active:opacity-80"
-          >
-            <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 2 11 13" />
-              <path d="M22 2 15 22l-4-9-9-4 20-7Z" />
-            </svg>
-          </button>
-        </form>
-      </div>
+          @if (draft.trim()) {
+            <button
+              type="submit"
+              aria-label="Send"
+              class="absolute right-1.5 flex size-9 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-fg)] active:opacity-80"
+            >
+              <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 19V5" />
+                <path d="m6 11 6-6 6 6" />
+              </svg>
+            </button>
+          }
+        </div>
+      </form>
     </div>
   }
 </div>

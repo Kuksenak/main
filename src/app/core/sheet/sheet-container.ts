@@ -23,7 +23,7 @@ import { SheetRef } from './sheet';
   host: {
     class:
       'flex w-full flex-col overflow-hidden rounded-t-[24px] border-t border-black/10 ' +
-      'bg-[var(--surface)] will-change-transform dark:border-white/10 ' +
+      'bg-[var(--sheet-bg)] will-change-transform dark:border-white/10 ' +
       'mt-[calc(env(safe-area-inset-top,20px)+8px)]',
     '[style.height]': 'height()',
     '[style.transform]': 'transform()',
