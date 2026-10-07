@@ -1,0 +1,171 @@
+<main class="flex w-full flex-1 flex-col gap-6 px-4 py-4 lg:flex-row lg:items-start">
+  <!-- Calendar -->
+  <section class="w-full lg:max-w-md lg:flex-1">
+    <!-- Month header -->
+    <div class="mb-3 flex items-center gap-3">
+      <h1 class="text-xl font-semibold">{{ month() | date: 'MMMM yyyy' }}</h1>
+      @if (loading()) {
+        <span class="text-xs opacity-40">Loading…</span>
+      }
+      <div class="ml-auto flex items-center gap-2">
+        <button type="button" (click)="today()" class="btn-secondary !px-4 !py-1.5">Today</button>
+        <button type="button" (click)="prevMonth()" class="icon-btn !size-9">
+          <svg viewBox="0 0 24 24" fill="none" class="size-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+        <button type="button" (click)="nextMonth()" class="icon-btn !size-9">
+          <svg viewBox="0 0 24 24" fill="none" class="size-4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Weekday row -->
+    <div class="grid grid-cols-7">
+      @for (wd of weekdays; track wd) {
+        <div class="pb-1 text-center text-[11px] font-medium uppercase opacity-40">{{ wd }}</div>
+      }
+    </div>
+
+    <!-- Day rows with thin iOS separators -->
+    @for (week of weeks(); track $index) {
+      <div class="grid grid-cols-7 border-b border-black/[0.06] last:border-b-0 dark:border-white/[0.08]">
+        @for (day of week; track day.getTime()) {
+          <button
+            type="button"
+            (click)="selectDay(day)"
+            class="flex h-12 flex-col items-center justify-center gap-1 active:opacity-60"
+            [style.opacity]="inMonth(day) ? null : '0.3'"
+          >
+            <span
+              class="flex size-9 items-center justify-center rounded-full text-[15px] font-semibold tabular-nums"
+              [ngClass]="isSelected(day) ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900' : ''"
+              [style.color]="!isSelected(day) && isToday(day) ? 'var(--accent)' : null"
+            >{{ day | date: 'd' }}</span>
+            <span
+              class="size-1 rounded-full"
+              [style.background]="countFor(day) > 0 ? 'var(--accent)' : 'transparent'"
+            ></span>
+          </button>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Selected day events -->
+  <section class="flex flex-col lg:min-h-96 lg:flex-1">
+    <div class="mb-3 flex h-9 items-center">
+      <h2 class="text-xl font-semibold">{{ selectedDate() | date: 'EEEE, MMM d' }}</h2>
+    </div>
+
+    @if (dayLessons().length) {
+      <div class="ios-group">
+        @for (lesson of dayLessons(); track lesson.id) {
+          <button type="button" (click)="openEdit(lesson)" class="ios-row w-full text-left active:opacity-60">
+            <div class="flex min-w-0 items-center gap-3">
+              <div class="shrink-0 text-center">
+                <p class="text-sm font-semibold tabular-nums">{{ timeLabel(lesson.startsAt) }}</p>
+                <p class="text-[11px] opacity-50 tabular-nums">{{ endLabel(lesson.startsAt, lesson.durationMinutes) }}</p>
+              </div>
+              <div class="min-w-0">
+                <p class="truncate text-[15px] font-medium"
+                   [style.text-decoration]="lesson.status === 'Cancelled' ? 'line-through' : null"
+                   [style.opacity]="lesson.status === 'Scheduled' ? null : '0.5'">{{ lesson.studentName }}</p>
+                @if (lesson.note) {
+                  <p class="truncate text-xs opacity-50">{{ lesson.note }}</p>
+                }
+              </div>
+            </div>
+            @if (lesson.status !== 'Scheduled') {
+              <span class="shrink-0 rounded-full bg-black/[0.06] px-2 py-0.5 text-[10px] font-semibold opacity-60 dark:bg-white/10">{{ lesson.status }}</span>
+            }
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="flex flex-1 items-center justify-center rounded-2xl border border-dashed border-black/10 py-16 dark:border-white/10">
+        <p class="text-sm opacity-40">No lessons this day</p>
+      </div>
+    }
+  </section>
+</main>
+
+<!-- Add button (mobile) -->
+<button
+  type="button"
+  (click)="openNew()"
+  aria-label="Add lesson"
+  class="fixed bottom-6 right-6 z-20 flex size-14 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-fg)] shadow-lg active:opacity-80"
+>
+  <svg viewBox="0 0 24 24" fill="none" class="size-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+</button>
+
+<!-- Editor modal -->
+@if (editor(); as m) {
+  <div class="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4" (click)="closeEditor()">
+    <div
+      class="w-full max-w-md rounded-t-2xl bg-[var(--sheet-bg)] p-5 text-neutral-900 shadow-xl dark:text-neutral-100 sm:rounded-2xl"
+      (click)="$event.stopPropagation()"
+    >
+      <h3 class="mb-4 text-lg font-semibold">{{ m.id ? 'Edit lesson' : 'New lesson' }}</h3>
+
+      <div class="flex flex-col gap-3">
+        <input
+          name="studentName"
+          [(ngModel)]="m.studentName"
+          type="text"
+          placeholder="Student name"
+          autocomplete="off"
+          class="w-full rounded-xl border border-black/10 bg-[var(--surface)] px-3 py-2.5 text-[15px] outline-none focus:border-[var(--accent)] dark:border-white/15"
+        />
+
+        <div class="flex flex-wrap items-end gap-3">
+          @if (m.id) {
+            <app-date
+              [ngModel]="editorDate()"
+              (ngModelChange)="setDate($event)"
+              [ngModelOptions]="{ standalone: true }"
+            />
+          }
+          <app-time
+            [ngModel]="m.time"
+            (ngModelChange)="m.time = $event"
+            [ngModelOptions]="{ standalone: true }"
+          />
+          <app-select
+            label="Duration"
+            [options]="durationOptions"
+            [ngModel]="m.durationMinutes"
+            (ngModelChange)="m.durationMinutes = $event"
+            [ngModelOptions]="{ standalone: true }"
+          />
+          @if (m.id) {
+            <app-select
+              label="Status"
+              [options]="statusOptions"
+              [ngModel]="m.status"
+              (ngModelChange)="m.status = $event"
+              [ngModelOptions]="{ standalone: true }"
+            />
+          }
+        </div>
+
+        <textarea
+          name="note"
+          [(ngModel)]="m.note"
+          rows="2"
+          placeholder="Note (optional)"
+          class="w-full resize-none rounded-xl border border-black/10 bg-[var(--surface)] px-3 py-2.5 text-[15px] outline-none focus:border-[var(--accent)] dark:border-white/15"
+        ></textarea>
+      </div>
+
+      <div class="mt-5 flex items-center gap-2">
+        @if (m.id) {
+          <button type="button" (click)="remove()" class="text-sm font-semibold text-red-500 active:opacity-60">Delete</button>
+        }
+        <div class="ml-auto flex gap-2">
+          <button type="button" (click)="closeEditor()" class="btn-secondary !px-4 !py-2">Cancel</button>
+          <button type="button" (click)="save()" class="btn-primary !px-5 !py-2">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

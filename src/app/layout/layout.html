@@ -1,0 +1,15 @@
+<div class="flex min-h-dvh flex-col text-neutral-900 dark:text-neutral-100">
+  <header class="sticky top-0 z-10 flex items-center gap-2 border-b border-black/[0.06] bg-[var(--surface)] px-4 py-2 dark:border-white/[0.08]">
+    <nav class="flex flex-1 items-center gap-1">
+      <a
+        routerLink="/schedule"
+        routerLinkActive="bg-[var(--accent)] text-[var(--accent-fg)]"
+        class="rounded-full px-4 py-1.5 text-[15px] font-medium"
+      >Schedule</a>
+    </nav>
+    <span class="hidden max-w-48 truncate text-xs opacity-60 sm:block">{{ auth.email() }}</span>
+    <button type="button" (click)="auth.logout()" class="btn-secondary !px-4 !py-1.5">Log out</button>
+  </header>
+
+  <router-outlet></router-outlet>
+</div>

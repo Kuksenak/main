@@ -58,31 +58,6 @@ export class TimeField implements ControlValueAccessor {
     return arr;
   });
 
-  // Looping lists: the base sequence repeated, so scrolling never hits an end.
-  readonly loopCount = 5;
-  readonly loopHours = computed(() => {
-    const out: number[] = [];
-    for (let i = 0; i < this.loopCount; i++) out.push(...this.hours);
-    return out;
-  });
-  readonly loopMinutes = computed(() => {
-    const base = this.minutes();
-    const out: number[] = [];
-    for (let i = 0; i < this.loopCount; i++) out.push(...base);
-    return out;
-  });
-
-  // Keep the scroll position within the middle copies for a seamless loop.
-  onColScroll(el: HTMLElement): void {
-    const block = el.scrollHeight / this.loopCount;
-    if (block <= 0) return;
-    if (el.scrollTop < block) {
-      el.scrollTop += block;
-    } else if (el.scrollTop > block * (this.loopCount - 1)) {
-      el.scrollTop -= block;
-    }
-  }
-
   private onChange: (value: string | null) => void = () => {};
   private onTouched: () => void = () => {};
 
@@ -162,10 +137,8 @@ export class TimeField implements ControlValueAccessor {
 
   private scrollActiveIntoView(col?: HTMLElement) {
     if (!col) return;
-    const actives = col.querySelectorAll<HTMLElement>('[data-active]');
-    if (!actives.length) return;
-    // Center the active item from a middle copy so there's room to loop both ways.
-    const active = actives[Math.floor(actives.length / 2)];
+    const active = col.querySelector<HTMLElement>('[data-active]');
+    if (!active) return;
     col.scrollTop = active.offsetTop - col.clientHeight / 2 + active.clientHeight / 2;
   }
 

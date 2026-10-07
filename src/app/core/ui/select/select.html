@@ -1,0 +1,68 @@
+<div class="inline-flex w-auto flex-col gap-1.5">
+  @if (label) {
+    <span class="text-sm opacity-70">{{ label }}</span>
+  }
+
+  @if (isMobile()) {
+    <!-- Mobile: native select -->
+    <select
+      [value]="value() ?? ''"
+      [disabled]="disabled"
+      (change)="onNativeChange($event)"
+      class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.04] dark:bg-white/[0.06] text-[15px] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
+    >
+      @for (opt of options; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
+    </select>
+  } @else {
+    <!-- Desktop: custom iOS-style dropdown via CDK overlay -->
+    <button
+      #trigger
+      type="button"
+      cdkOverlayOrigin
+      #origin="cdkOverlayOrigin"
+      [disabled]="disabled"
+      (click)="toggle()"
+      class="inline-flex w-auto items-center gap-2 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
+    >
+      <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
+      <svg class="w-4 h-4 opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+
+    <ng-template
+      cdkConnectedOverlay
+      [cdkConnectedOverlayOrigin]="origin"
+      [cdkConnectedOverlayOpen]="isOpen()"
+      [cdkConnectedOverlayHasBackdrop]="true"
+      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+      (backdropClick)="close()"
+      (detach)="close()"
+    >
+      <div class="mt-1.5 p-1 min-w-[160px] rounded-2xl bg-[var(--surface)] overflow-hidden
+                  origin-top [animation:dropdownIn_160ms_cubic-bezier(0.2,0,0,1)]
+                  shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.12)]
+                  dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_8px_30px_rgba(0,0,0,0.5)]">
+        @for (opt of options; track opt.value) {
+          <button
+            type="button"
+            (click)="select(opt)"
+            class="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-[15px] text-left transition-[transform,background-color] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
+            [class]="isSelected(opt)
+              ? 'bg-[var(--accent)] text-white font-semibold'
+              : 'hover:bg-black/5 dark:hover:bg-white/10'"
+          >
+            <span>{{ opt.label }}</span>
+            @if (isSelected(opt)) {
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            }
+          </button>
+        }
+      </div>
+    </ng-template>
+  }
+</div>

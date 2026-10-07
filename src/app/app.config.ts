@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideServiceWorker } from '@angular/service-worker';
+import { firstValueFrom } from 'rxjs';
 import { routes } from './app.routes';
 import { authInterceptor } from './auth/auth.interceptor';
 import { AuthStore } from './auth/auth.store';
@@ -23,8 +24,6 @@ export const appConfig: ApplicationConfig = {
       registrationStrategy: 'registerWhenStable:30000',
     }),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideAppInitializer(() => {
-      inject(AuthStore).initAuth().subscribe();
-    }),
+    provideAppInitializer(() => firstValueFrom(inject(AuthStore).initAuth())),
   ],
 };
