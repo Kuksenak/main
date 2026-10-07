@@ -10,7 +10,7 @@
       [value]="value() ?? ''"
       [disabled]="disabled"
       (change)="onNativeChange($event)"
-      class="px-3 py-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[17px] tabular-nums [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
+      class="appearance-none border-0 px-3 py-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[17px] tabular-nums [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
     >
   } @else {
     <!-- Desktop: custom iOS-style time picker via CDK overlay -->
@@ -24,7 +24,7 @@
       (keydown)="onKeydown($event)"
       class="inline-flex w-auto items-center px-3 py-2 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
     >
-      <span class="tabular-nums text-[17px] [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif]" [class.opacity-40]="!value()">{{ triggerLabel() }}</span>
+      <span class="tabular-nums text-[15px] [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif]" [class.opacity-40]="!value()">{{ triggerLabel() }}</span>
     </button>
 
     <ng-template

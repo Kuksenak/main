@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
+import { DateField } from '../core/ui/date/date';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
 import { Lesson, LessonService, LessonStatus } from './lesson.service';
@@ -67,7 +68,7 @@ function toTimeInput(d: Date): string {
 
 @Component({
   selector: 'app-schedule',
-  imports: [FormsModule, DatePipe, TimeField, SelectField],
+  imports: [FormsModule, DatePipe, TimeField, SelectField, DateField],
   templateUrl: './schedule.html',
 })
 export class Schedule {
@@ -98,6 +99,8 @@ export class Schedule {
   });
 
   protected readonly editor = signal<EditorModel | null>(null);
+  // How far to lift the sheet so the focused field stays above the mobile keyboard.
+  protected readonly keyboardInset = signal(0);
 
   // Lessons grouped by day key for O(1) cell lookup.
   private readonly byDay = computed(() => {
@@ -133,6 +136,17 @@ export class Schedule {
         meta.setAttribute('content', dark ? '#000000' : '#f2f2f6');
       }
     });
+
+    // Lift the sheet above the on-screen keyboard (mobile) using VisualViewport.
+    const vv = window.visualViewport;
+    if (vv) {
+      const update = () => {
+        const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+        this.keyboardInset.set(this.editor() ? inset : 0);
+      };
+      vv.addEventListener('resize', update);
+      vv.addEventListener('scroll', update);
+    }
   }
 
   private loadRange(): { from: Date; to: Date } {
@@ -142,6 +156,11 @@ export class Schedule {
 
   protected countFor(day: Date): number {
     return this.byDay().get(toDateInput(day))?.length ?? 0;
+  }
+
+  // One dot per event, capped at 5.
+  protected dotsFor(day: Date): number[] {
+    return Array.from({ length: Math.min(this.countFor(day), 5) });
   }
 
   protected inMonth(day: Date): boolean {
@@ -219,6 +238,21 @@ export class Schedule {
       note: lesson.note ?? '',
       status: lesson.status,
     });
+  }
+
+  // Stable Date reference for the <app-date> picker (edit mode), recomputed only
+  // when the editor changes so the ngModel binding doesn't loop.
+  protected readonly editorDate = computed(() => {
+    const m = this.editor();
+    if (!m) return null;
+    const [y, mo, d] = m.date.split('-').map(Number);
+    return new Date(y, mo - 1, d);
+  });
+
+  protected setDate(date: Date | null): void {
+    const m = this.editor();
+    if (!m || !date) return;
+    this.editor.set({ ...m, date: toDateInput(date) });
   }
 
   protected dateLabel(key: string): string {

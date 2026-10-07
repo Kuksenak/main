@@ -38,18 +38,19 @@
           <button
             type="button"
             (click)="selectDay(day)"
-            class="relative flex h-12 items-center justify-center active:opacity-60"
+            class="flex h-12 flex-col items-center gap-1.5 pt-1.5 active:opacity-60"
             [style.opacity]="inMonth(day) ? null : '0.3'"
           >
             <span
-              class="flex size-8 items-center justify-center rounded-full text-[15px] font-semibold tabular-nums"
+              class="flex size-7 items-center justify-center rounded-full text-[14px] font-semibold tabular-nums"
               [style.background]="isSelected(day) ? 'var(--accent)' : null"
               [style.color]="isSelected(day) ? 'var(--accent-fg)' : (isToday(day) ? 'var(--accent)' : null)"
             >{{ day | date: 'd' }}</span>
-            <span
-              class="absolute bottom-0.5 left-1/2 size-1 -translate-x-1/2 rounded-full"
-              [style.background]="countFor(day) > 0 ? 'var(--accent)' : 'transparent'"
-            ></span>
+            <span class="flex h-1 items-center gap-0.5">
+              @for (dot of dotsFor(day); track $index) {
+                <span class="size-1 rounded-full" [style.background]="'var(--accent)'"></span>
+              }
+            </span>
           </button>
         }
       </div>
@@ -108,7 +109,8 @@
 @if (editor(); as m) {
   <div class="fixed inset-0 z-30 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4" (click)="closeEditor()">
     <div
-      class="w-full max-w-md rounded-t-2xl bg-[var(--sheet-bg)] p-5 text-neutral-900 shadow-xl dark:text-neutral-100 sm:rounded-2xl"
+      class="w-full max-w-md rounded-t-2xl bg-[var(--sheet-bg)] p-5 text-neutral-900 shadow-xl transition-transform duration-200 dark:text-neutral-100 sm:rounded-2xl"
+      [style.transform]="keyboardInset() ? 'translateY(-' + keyboardInset() + 'px)' : null"
       (click)="$event.stopPropagation()"
     >
       <h3 class="mb-4 text-lg font-semibold">{{ m.id ? 'Edit lesson' : 'New lesson' }}</h3>
@@ -128,7 +130,15 @@
           <div class="ios-row !py-1.5">
             <span class="text-[15px]">Starts</span>
             <div class="ml-auto flex items-center gap-2">
-              <span class="text-[15px] opacity-60">{{ dateLabel(m.date) }}</span>
+              @if (m.id) {
+                <app-date
+                  [ngModel]="editorDate()"
+                  (ngModelChange)="setDate($event)"
+                  [ngModelOptions]="{ standalone: true }"
+                />
+              } @else {
+                <span class="text-[15px] opacity-60">{{ dateLabel(m.date) }}</span>
+              }
               <app-time
                 [ngModel]="m.startTime"
                 (ngModelChange)="onStartChange(m, $event)"
@@ -178,8 +188,8 @@
           <button type="button" (click)="remove()" class="text-sm font-semibold text-red-500 active:opacity-60">Delete</button>
         }
         <div class="ml-auto flex gap-2">
-          <button type="button" (click)="closeEditor()" class="btn-secondary !px-5 !py-2.5 text-[17px]">Cancel</button>
-          <button type="button" (click)="save()" [disabled]="isInvalid(m)" class="btn-primary !px-6 !py-2.5 text-[17px] disabled:opacity-40">Save</button>
+          <button type="button" (click)="closeEditor()" class="btn-secondary !px-5 !py-2.5 text-[17px] lg:!py-2 lg:text-[15px]">Cancel</button>
+          <button type="button" (click)="save()" [disabled]="isInvalid(m)" class="btn-primary !px-6 !py-2.5 text-[17px] disabled:opacity-40 lg:!px-5 lg:!py-2 lg:text-[15px]">Save</button>
         </div>
       </div>
     </div>
