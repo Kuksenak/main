@@ -21,7 +21,8 @@
       #origin="cdkOverlayOrigin"
       [disabled]="disabled"
       (click)="toggle(trigger)"
-      class="inline-flex w-auto items-center px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
+      (keydown)="onKeydown($event)"
+      class="inline-flex w-auto items-center px-3 py-2 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
     >
       <span [class.opacity-40]="!value()">{{ triggerLabel() }}</span>
     </button>
@@ -38,8 +39,7 @@
     >
       <div class="mt-1.5 p-2 w-[180px] rounded-2xl bg-[var(--surface)] overflow-hidden
                   origin-top [animation:dropdownIn_160ms_cubic-bezier(0.2,0,0,1)]
-                  shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.12)]
-                  dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_8px_30px_rgba(0,0,0,0.5)]">
+                  shadow-[0_8px_30px_rgba(0,0,0,0.18)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.6)]">
 
         <div class="flex gap-1">
           <!-- Hours -->

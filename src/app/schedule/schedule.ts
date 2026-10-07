@@ -1,7 +1,7 @@
-import { DatePipe, NgClass } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DateField } from '../core/ui/date/date';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
 import { Lesson, LessonService, LessonStatus } from './lesson.service';
@@ -9,11 +9,24 @@ import { Lesson, LessonService, LessonStatus } from './lesson.service';
 interface EditorModel {
   id: string | null;
   studentName: string;
-  date: string; // yyyy-MM-dd
-  time: string; // HH:mm
-  durationMinutes: number;
+  date: string; // yyyy-MM-dd (display only)
+  startTime: string; // HH:mm
+  endTime: string; // HH:mm
   note: string;
   status: LessonStatus;
+}
+
+function timeToMin(t: string): number {
+  const [h, m] = t.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function minToTime(mins: number): string {
+  const clamped = Math.max(0, Math.min(23 * 60 + 59, mins));
+  const h = Math.floor(clamped / 60);
+  const m = clamped % 60;
+  const p = (n: number) => `${n}`.padStart(2, '0');
+  return `${p(h)}:${p(m)}`;
 }
 
 function startOfDay(d: Date): Date {
@@ -54,21 +67,17 @@ function toTimeInput(d: Date): string {
 
 @Component({
   selector: 'app-schedule',
-  imports: [FormsModule, DatePipe, NgClass, DateField, TimeField, SelectField],
+  imports: [FormsModule, DatePipe, TimeField, SelectField],
   templateUrl: './schedule.html',
 })
 export class Schedule {
   private service = inject(LessonService);
 
+  protected readonly isMobile = inject(DeviceDetectionService).isMobile;
   protected readonly loading = this.service.loading;
+  private touchStartY = 0;
+  private touchStartX = 0;
   protected readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  protected readonly durationOptions: SelectOption[] = [
-    { label: '30 min', value: 30 },
-    { label: '45 min', value: 45 },
-    { label: '60 min', value: 60 },
-    { label: '90 min', value: 90 },
-    { label: '120 min', value: 120 },
-  ];
   protected readonly statusOptions: SelectOption[] = [
     { label: 'Scheduled', value: 'Scheduled' },
     { label: 'Done', value: 'Done' },
@@ -149,23 +158,23 @@ export class Schedule {
     this.selectedDate.set(startOfDay(new Date()));
   }
 
-  protected timeLabel(iso: string): string {
-    return toTimeInput(new Date(iso));
+  // Swipe up → next month, swipe down → previous month (mobile).
+  protected onCalendarTouchStart(e: TouchEvent): void {
+    this.touchStartY = e.changedTouches[0].clientY;
+    this.touchStartX = e.changedTouches[0].clientX;
   }
 
-  // Stable Date reference for the <app-date> picker — recomputed only when the
-  // editor changes, so the ngModel binding doesn't produce a new object per cycle.
-  protected readonly editorDate = computed(() => {
-    const m = this.editor();
-    if (!m) return null;
-    const [y, mo, d] = m.date.split('-').map(Number);
-    return new Date(y, mo - 1, d);
-  });
+  protected onCalendarTouchEnd(e: TouchEvent): void {
+    const dy = e.changedTouches[0].clientY - this.touchStartY;
+    const dx = e.changedTouches[0].clientX - this.touchStartX;
+    // Ignore taps and mostly-horizontal moves (those are day selections / scrolls).
+    if (Math.abs(dy) < 45 || Math.abs(dy) < Math.abs(dx)) return;
+    if (dy < 0) this.nextMonth();
+    else this.prevMonth();
+  }
 
-  protected setDate(date: Date | null): void {
-    const m = this.editor();
-    if (!m || !date) return;
-    this.editor.set({ ...m, date: toDateInput(date) });
+  protected timeLabel(iso: string): string {
+    return toTimeInput(new Date(iso));
   }
 
   protected endLabel(iso: string, minutes: number): string {
@@ -178,8 +187,8 @@ export class Schedule {
       id: null,
       studentName: '',
       date: toDateInput(d),
-      time: '18:00',
-      durationMinutes: 60,
+      startTime: '18:00',
+      endTime: '19:00',
       note: '',
       status: 'Scheduled',
     });
@@ -191,11 +200,35 @@ export class Schedule {
       id: lesson.id,
       studentName: lesson.studentName,
       date: toDateInput(start),
-      time: toTimeInput(start),
-      durationMinutes: lesson.durationMinutes,
+      startTime: toTimeInput(start),
+      endTime: minToTime(timeToMin(toTimeInput(start)) + lesson.durationMinutes),
       note: lesson.note ?? '',
       status: lesson.status,
     });
+  }
+
+  protected dateLabel(key: string): string {
+    const [y, mo, d] = key.split('-').map(Number);
+    return new Date(y, mo - 1, d).toLocaleDateString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  // Changing the start keeps the previous duration and shifts the end along.
+  protected onStartChange(m: EditorModel, value: string): void {
+    const duration = Math.max(0, timeToMin(m.endTime) - timeToMin(m.startTime));
+    m.startTime = value;
+    m.endTime = minToTime(timeToMin(value) + duration);
+  }
+
+  protected onEndChange(m: EditorModel, value: string): void {
+    m.endTime = value;
+  }
+
+  protected isInvalid(m: EditorModel): boolean {
+    return timeToMin(m.endTime) <= timeToMin(m.startTime);
   }
 
   protected closeEditor(): void {
@@ -204,13 +237,13 @@ export class Schedule {
 
   protected save(): void {
     const m = this.editor();
-    if (!m || !m.studentName.trim()) return;
+    if (!m || !m.studentName.trim() || this.isInvalid(m)) return;
 
-    const startsAt = new Date(`${m.date}T${m.time}`).toISOString();
+    const startsAt = new Date(`${m.date}T${m.startTime}`).toISOString();
     const input = {
       studentName: m.studentName.trim(),
       startsAt,
-      durationMinutes: Number(m.durationMinutes) || 60,
+      durationMinutes: timeToMin(m.endTime) - timeToMin(m.startTime),
       note: m.note.trim() || null,
       status: m.status,
     };

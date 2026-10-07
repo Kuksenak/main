@@ -48,6 +48,7 @@ export class TimeField implements ControlValueAccessor {
   readonly value = signal<string | null>(null);
   readonly isOpen = signal(false);
   readonly now = signal(new Date());
+  readonly activeCol = signal<'h' | 'm'>('h');
 
   readonly hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -126,6 +127,40 @@ export class TimeField implements ControlValueAccessor {
     if (!this.isOpen()) return;
     this.isOpen.set(false);
     this.onTouched();
+  }
+
+  // Keyboard: ↑/↓ change the active column, ←/→ switch between hours and minutes.
+  onKeydown(e: KeyboardEvent) {
+    if (!this.isOpen()) return;
+    switch (e.key) {
+      case 'ArrowLeft':
+        e.preventDefault();
+        this.activeCol.set('h');
+        break;
+      case 'ArrowRight':
+        e.preventDefault();
+        this.activeCol.set('m');
+        break;
+      case 'ArrowUp':
+      case 'ArrowDown': {
+        e.preventDefault();
+        const dir = e.key === 'ArrowUp' ? -1 : 1;
+        if (this.activeCol() === 'h') {
+          this.selectHour(((this.activeHour() + dir) % 24 + 24) % 24);
+          setTimeout(() => this.scrollActiveIntoView(this.hourCol?.nativeElement));
+        } else {
+          const mins = this.minutes();
+          const idx = Math.max(0, mins.indexOf(this.activeMinute()));
+          this.selectMinute(mins[(idx + dir + mins.length) % mins.length]);
+          setTimeout(() => this.scrollActiveIntoView(this.minuteCol?.nativeElement));
+        }
+        break;
+      }
+      case 'Enter':
+        e.preventDefault();
+        this.close();
+        break;
+    }
   }
 
   selectHour(h: number) {

@@ -4,19 +4,19 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --app-bg: #f9f9fb;
+  --app-bg: #f2f2f7;
   --sheet-bg: #ffffff;
   --surface: #ffffff;
-  --accent: #0060df;
+  --accent: #007aff;
   --accent-fg: #ffffff;
 }
 
 html.dark {
-  --app-bg: #1c1b22;
-  --sheet-bg: #2b2a33;
-  --surface: #2b2a33;
-  --accent: #0df;
-  --accent-fg: #1c1b22;
+  --app-bg: #000000;
+  --sheet-bg: #1c1c1e;
+  --surface: #1c1c1e;
+  --accent: #0a84ff;
+  --accent-fg: #ffffff;
 }
 
 .sheet-backdrop {

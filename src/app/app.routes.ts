@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { About } from './about/about';
 import { authGuard, guestGuard } from './auth/auth.guard';
 import { Layout } from './layout/layout';
 import { Login } from './login/login';
@@ -12,6 +13,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'schedule', component: Schedule },
+      { path: 'about', component: About },
       { path: '', pathMatch: 'full', redirectTo: 'schedule' },
     ],
   },
