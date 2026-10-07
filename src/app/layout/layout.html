@@ -7,12 +7,12 @@
       <a
         routerLink="/schedule"
         routerLinkActive="bg-[var(--accent)] text-[var(--accent-fg)]"
-        class="rounded-full px-4 py-1.5 text-[15px] font-medium"
+        class="inline-flex h-11 items-center rounded-full px-4 text-[17px] font-medium"
       >Schedule</a>
       <a
         routerLink="/about"
         routerLinkActive="bg-[var(--accent)] text-[var(--accent-fg)]"
-        class="rounded-full px-4 py-1.5 text-[15px] font-medium"
+        class="inline-flex h-11 items-center rounded-full px-4 text-[17px] font-medium"
       >About</a>
     </nav>
     <!-- Account avatar: first letter of the email; dot when an app update is ready -->
@@ -20,11 +20,11 @@
       type="button"
       (click)="accountOpen.set(true)"
       aria-label="Account"
-      class="relative -mr-1 flex size-11 shrink-0 items-center justify-center rounded-full active:opacity-70"
+      class="relative flex size-11 shrink-0 items-center justify-center rounded-full active:opacity-70"
     >
-      <span class="flex size-9 items-center justify-center rounded-full bg-[var(--accent)] text-[17px] font-semibold uppercase text-[var(--accent-fg)]">{{ initial() }}</span>
+      <span class="flex size-11 items-center justify-center rounded-full bg-[var(--accent)] text-[19px] font-semibold uppercase text-[var(--accent-fg)]">{{ initial() }}</span>
       @if (updates.updateReady()) {
-        <span class="absolute right-0.5 top-0.5 size-3 rounded-full bg-red-500 ring-2 ring-[var(--app-bg)]"></span>
+        <span class="absolute right-0 top-0 size-3 rounded-full bg-red-500 ring-2 ring-[var(--app-bg)]"></span>
       }
     </button>
   </header>
@@ -35,8 +35,7 @@
     <app-sheet #sheet (closed)="accountOpen.set(false)">
       <div class="flex flex-col gap-6">
         <div class="ios-group">
-          <div class="ios-row !justify-start">
-            <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[19px] font-semibold uppercase text-[var(--accent-fg)]">{{ initial() }}</span>
+          <div class="ios-row h-11 !py-0">
             <span class="min-w-0 truncate text-[17px]">{{ auth.email() }}</span>
           </div>
         </div>

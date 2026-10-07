@@ -174,16 +174,16 @@ app-about {
 }
 
 @layer components {
-  /* Primary action — accent pill */
+  /* Primary action — accent pill (44pt tall, iOS touch target) */
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-[var(--accent)]
-           px-6 py-2.5 text-[15px] font-semibold text-[var(--accent-fg)] active:opacity-80;
+    @apply inline-flex h-11 items-center justify-center rounded-full bg-[var(--accent)]
+           px-5 text-[17px] font-semibold text-[var(--accent-fg)] active:opacity-80;
   }
 
   /* Secondary action — neutral iOS pill */
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full bg-black/[0.06]
-           px-5 py-2.5 text-[15px] font-semibold text-black/80 active:opacity-70
+    @apply inline-flex h-11 items-center justify-center rounded-full bg-black/[0.06]
+           px-5 text-[17px] font-semibold text-black/80 active:opacity-70
            dark:bg-white/15 dark:text-white;
   }
 

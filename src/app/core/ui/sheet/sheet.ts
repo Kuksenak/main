@@ -1,7 +1,8 @@
 import { Component, output, signal } from '@angular/core';
 
 /**
- * iOS-style bottom sheet (mobile) / centered dialog (desktop).
+ * iOS-style floating bottom sheet (mobile: 8px inset, large continuous corners,
+ * at least ~half the screen tall) / centered dialog (desktop).
  * Render it with @if; call close() to animate out, then `closed` fires so the
  * parent can drop it. No header — drag the grabber down or tap outside to dismiss.
  */
@@ -17,12 +18,12 @@ import { Component, output, signal } from '@angular/core';
       ></div>
 
       <div
-        class="absolute inset-x-0 bottom-0 flex max-h-[calc(100dvh-env(safe-area-inset-top)-0.75rem)] flex-col overflow-hidden rounded-t-[20px] sheet-panel [animation:sheetUp_380ms_cubic-bezier(0.32,0.72,0,1)] sm:relative sm:inset-auto sm:w-full sm:max-w-sm sm:rounded-2xl sm:shadow-xl"
-        [style.transform]="closing() ? 'translateY(100%)' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
+        class="absolute inset-x-2 bottom-2 flex min-h-[55dvh] max-h-[calc(100dvh-env(safe-area-inset-top)-1.25rem)] flex-col overflow-hidden rounded-[44px] [corner-shape:squircle] sheet-panel [animation:sheetUp_380ms_cubic-bezier(0.32,0.72,0,1)] sm:relative sm:inset-auto sm:min-h-0 sm:w-full sm:max-w-sm sm:rounded-2xl sm:shadow-xl"
+        [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
         [style.transition]="dragging() ? 'none' : 'transform 280ms cubic-bezier(0.32,0.72,0,1)'"
       >
         <div
-          class="shrink-0 touch-none px-4 pb-3 pt-2 sm:pb-0 sm:pt-5"
+          class="shrink-0 touch-none px-4 pb-4 pt-2.5 sm:pb-0 sm:pt-5"
           (touchstart)="dragStart($event)"
           (touchmove)="dragMove($event)"
           (touchend)="dragEnd()"
@@ -31,7 +32,7 @@ import { Component, output, signal } from '@angular/core';
           <div class="mx-auto h-[5px] w-9 rounded-full bg-black/20 dark:bg-white/25 sm:hidden"></div>
         </div>
 
-        <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 sm:pb-5">
+        <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-1 sm:pb-5">
           <ng-content />
         </div>
       </div>
