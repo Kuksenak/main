@@ -120,8 +120,6 @@ export class Schedule implements AfterViewInit {
   }
 
   protected readonly editor = signal<EditorModel | null>(null);
-  // How far to lift the sheet so the focused field stays above the mobile keyboard.
-  protected readonly keyboardInset = signal(0);
 
   // Two sheet styles to compare: 1 = side page, 2 = draggable bottom sheet.
   protected readonly sheetVariant = signal<1 | 2>(this.readVariant());
@@ -190,16 +188,11 @@ export class Schedule implements AfterViewInit {
     // Load lessons for the whole scrollable window once.
     this.service.load(this.weeksStart, addDays(this.weeksStart, Schedule.WEEKS_TOTAL * 7));
 
-    // Lift the sheet above the on-screen keyboard (mobile) using VisualViewport.
-    const vv = window.visualViewport;
-    if (vv) {
-      const update = () => {
-        const inset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-        this.keyboardInset.set(this.editor() ? inset : 0);
-      };
-      vv.addEventListener('resize', update);
-      vv.addEventListener('scroll', update);
-    }
+    // Keep the editor sheet pinned: iOS scrolls the document to reveal a focused
+    // field even with overflow hidden — snap it back so the sheet never shifts.
+    window.addEventListener('scroll', () => {
+      if (this.editor() && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
+    });
   }
 
   ngAfterViewInit(): void {
