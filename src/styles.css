@@ -5,23 +5,22 @@
 
 :root {
   --app-bg: #faf9f5;
-  --sheet-bg: #f5f4ee;
-  --surface: #ffffff;
-  --text: #141413;
-  --accent: #c96442;
+  --sheet-bg: #f0eee6;
+  --sheet-surface: #fffefb;
+  --surface: #fffefb;
+  --text: #171717;
+  --accent: #007aff;
   --accent-fg: #ffffff;
-  /* Status-bar tint while the bottom sheet's dim backdrop is up (app-bg under 40% black). */
-  --app-bg-dimmed: #969593;
 }
 
 html.dark {
   --app-bg: #262624;
-  --sheet-bg: #1f1e1d;
+  --sheet-bg: #30302e;
+  --sheet-surface: #3d3d3a;
   --surface: #30302e;
-  --text: #faf9f5;
-  --accent: #d97757;
+  --text: #f5f5f5;
+  --accent: #0a84ff;
   --accent-fg: #ffffff;
-  --app-bg-dimmed: #171716;
 }
 
 .sheet-backdrop {
@@ -201,9 +200,19 @@ app-about {
            bg-[var(--accent)] text-[var(--accent-fg)] active:opacity-80;
   }
 
+  /* Bottom-sheet panel: no backdrop dimming, it stands out by its own color,
+     a hairline top edge and a soft shadow. Cards inside use the sheet surface. */
+  .sheet-panel {
+    --surface: var(--sheet-surface);
+    @apply bg-[var(--sheet-bg)] text-[var(--text)]
+           shadow-[0_-1px_0_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.10)]
+           dark:shadow-[0_-1px_0_rgba(255,255,255,0.08),0_-10px_40px_rgba(0,0,0,0.5)];
+  }
+
   /* iOS grouped list container */
   .ios-group {
-    @apply overflow-hidden rounded-2xl bg-[var(--surface)];
+    @apply overflow-hidden rounded-2xl border-[0.5px] border-black/[0.08] bg-[var(--surface)]
+           dark:border-white/[0.08];
   }
 
   /* Row inside an iOS group (divider between rows) */

@@ -3,7 +3,6 @@ import {
   AfterViewInit,
   Component,
   computed,
-  effect,
   ElementRef,
   inject,
   signal,
@@ -121,53 +120,7 @@ export class Schedule implements AfterViewInit {
 
   protected readonly editor = signal<EditorModel | null>(null);
 
-  // Two sheet styles to compare: 1 = side page, 2 = draggable bottom sheet.
-  protected readonly sheetVariant = signal<1 | 2>(this.readVariant());
-  protected readonly dragY = signal(0);
-  protected readonly dragging = signal(false);
   protected readonly sheetClosing = signal(false);
-  private dragStartY = 0;
-
-  private readVariant(): 1 | 2 {
-    try {
-      return localStorage.getItem('sheetVariant') === '2' ? 2 : 1;
-    } catch {
-      return 1;
-    }
-  }
-
-  protected toggleVariant(): void {
-    const v: 1 | 2 = this.sheetVariant() === 1 ? 2 : 1;
-    this.sheetVariant.set(v);
-    try {
-      localStorage.setItem('sheetVariant', String(v));
-    } catch {
-      /* ignore */
-    }
-  }
-
-  private pointerY(e: TouchEvent | PointerEvent): number {
-    return 'touches' in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
-  }
-
-  protected onSheetDragStart(e: TouchEvent | PointerEvent): void {
-    this.dragging.set(true);
-    this.dragStartY = this.pointerY(e);
-  }
-
-  protected onSheetDragMove(e: TouchEvent | PointerEvent): void {
-    if (!this.dragging()) return;
-    this.dragY.set(Math.max(0, this.pointerY(e) - this.dragStartY));
-  }
-
-  protected onSheetDragEnd(): void {
-    if (!this.dragging()) return;
-    this.dragging.set(false);
-    if (this.dragY() > 120) {
-      this.closeEditor();
-    }
-    this.dragY.set(0);
-  }
 
   // Lessons grouped by day key for O(1) cell lookup.
   private readonly byDay = computed(() => {
@@ -192,17 +145,6 @@ export class Schedule implements AfterViewInit {
     // field even with overflow hidden — snap it back so the sheet never shifts.
     window.addEventListener('scroll', () => {
       if (this.editor() && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
-    });
-
-    // Tint the status bar (Safari / non-translucent PWA) to match the dim backdrop
-    // while the sheet is up, so the clock area doesn't stay bright above it.
-    effect(() => {
-      const dimmed = this.editor() !== null && !this.sheetClosing();
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (!meta) return;
-      const css = getComputedStyle(document.documentElement);
-      const color = css.getPropertyValue(dimmed ? '--app-bg-dimmed' : '--app-bg').trim();
-      if (color) meta.setAttribute('content', color);
     });
   }
 
@@ -345,13 +287,11 @@ export class Schedule implements AfterViewInit {
 
   protected closeEditor(): void {
     if (this.editor() === null || this.sheetClosing()) return;
-    // Animate the sheet down, then remove it.
-    this.dragging.set(false);
+    // Slide the page out to the right, then remove it.
     this.sheetClosing.set(true);
     setTimeout(() => {
       this.editor.set(null);
       this.sheetClosing.set(false);
-      this.dragY.set(0);
     }, 240);
   }
 
