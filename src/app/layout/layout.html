@@ -22,7 +22,7 @@
   <router-outlet></router-outlet>
 
   <!-- Global loading bar — fixed strip at the bottom; components report via LoadingService -->
-  <div class="pointer-events-none fixed inset-x-0 bottom-0 z-[2001] h-0.5 overflow-hidden" style="padding-bottom: env(safe-area-inset-bottom)">
+  <div class="pointer-events-none fixed inset-x-0 bottom-0 z-[2001] h-0.5 overflow-hidden">
     @if (loading.visible()) {
       <div class="h-0.5 w-2/5 rounded-full bg-[var(--accent)] [animation:loadingBar_1.1s_ease-in-out_infinite]"></div>
     }

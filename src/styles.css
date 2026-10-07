@@ -31,6 +31,15 @@ html.dark {
   font-display: swap;
 }
 
+@keyframes pageInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 @keyframes sheetUp {
   from {
     transform: translateY(100%);
@@ -118,6 +127,19 @@ body {
 }
 html.dark *::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.25);
+}
+
+/* Pointer cursor on anything clickable (Tailwind v4 drops it from buttons). */
+button:not(:disabled),
+a[href],
+[role="button"],
+label,
+summary,
+select {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
 }
 
 /* Routed components fill the layout's content area so inner panels can scroll. */
