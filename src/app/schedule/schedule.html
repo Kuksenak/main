@@ -115,7 +115,7 @@
 
       <div class="flex flex-col gap-3">
         <div class="ios-group">
-          <div class="ios-row !py-2">
+          <div class="ios-row !py-3">
             <input
               name="studentName"
               [(ngModel)]="m.studentName"
@@ -125,7 +125,7 @@
               class="w-full bg-transparent text-[15px] outline-none placeholder:opacity-40"
             />
           </div>
-          <div class="ios-row !py-2">
+          <div class="ios-row !py-1.5">
             <span class="text-[15px]">Starts</span>
             <div class="ml-auto flex items-center gap-2">
               <span class="text-[15px] opacity-60">{{ dateLabel(m.date) }}</span>
@@ -136,7 +136,7 @@
               />
             </div>
           </div>
-          <div class="ios-row !py-2">
+          <div class="ios-row !py-1.5">
             <span class="text-[15px]">Ends</span>
             <div class="ml-auto flex items-center gap-2">
               <span
@@ -150,7 +150,7 @@
               />
             </div>
           </div>
-          <div class="ios-row !py-2">
+          <div class="ios-row !py-3">
             <textarea
               name="note"
               [(ngModel)]="m.note"
@@ -178,8 +178,8 @@
           <button type="button" (click)="remove()" class="text-sm font-semibold text-red-500 active:opacity-60">Delete</button>
         }
         <div class="ml-auto flex gap-2">
-          <button type="button" (click)="closeEditor()" class="btn-secondary !px-4 !py-2">Cancel</button>
-          <button type="button" (click)="save()" [disabled]="isInvalid(m)" class="btn-primary !px-5 !py-2 disabled:opacity-40">Save</button>
+          <button type="button" (click)="closeEditor()" class="btn-secondary !px-5 !py-2.5 text-[17px]">Cancel</button>
+          <button type="button" (click)="save()" [disabled]="isInvalid(m)" class="btn-primary !px-6 !py-2.5 text-[17px] disabled:opacity-40">Save</button>
         </div>
       </div>
     </div>

@@ -119,6 +119,20 @@ export class Schedule {
       const from = this.gridStart();
       this.service.load(from, addDays(from, 42));
     });
+
+    // While the sheet is open, darken the status-bar theme-color so the top strip
+    // (driven by the manifest) matches the dimmed backdrop instead of staying light.
+    effect(() => {
+      const open = this.editor() !== null;
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (!meta) return;
+      const dark = document.documentElement.classList.contains('dark');
+      if (open) {
+        meta.setAttribute('content', dark ? '#000000' : '#919191');
+      } else {
+        meta.setAttribute('content', dark ? '#000000' : '#f2f2f6');
+      }
+    });
   }
 
   private loadRange(): { from: Date; to: Date } {

@@ -185,8 +185,14 @@ export class TimeField implements ControlValueAccessor {
 
   // Mobile native input
   onNativeChange(event: Event) {
-    const v = (event.target as HTMLInputElement).value; // 'HH:mm' or ''
-    this.setValue(v || null);
+    const input = event.target as HTMLInputElement;
+    const v = input.value; // 'HH:mm' or ''
+    if (!v) {
+      // Native picker "Reset" clears the field — keep the value it was opened with.
+      input.value = this.value() ?? '';
+      return;
+    }
+    this.setValue(v);
   }
 
   private currentStepMinute(): number {
