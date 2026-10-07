@@ -1,5 +1,5 @@
-<div class="flex min-h-dvh flex-col text-neutral-900 dark:text-neutral-100">
-  <header class="sticky top-0 z-10 flex items-center gap-2 border-b border-black/[0.06] bg-[var(--surface)] px-4 py-2 dark:border-white/[0.08]">
+<div class="flex h-dvh flex-col overflow-hidden text-neutral-900 dark:text-neutral-100">
+  <header class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
     <a routerLink="/about" aria-label="About" class="mr-1 hidden shrink-0 active:opacity-70 sm:block">
       <img src="icons/icon-96x96.png" alt="Logo" class="size-8" width="32" height="32" />
     </a>
@@ -20,4 +20,11 @@
   </header>
 
   <router-outlet></router-outlet>
+
+  <!-- Global loading bar — fixed strip at the bottom; components report via LoadingService -->
+  <div class="pointer-events-none fixed inset-x-0 bottom-0 z-[2001] h-0.5 overflow-hidden" style="padding-bottom: env(safe-area-inset-bottom)">
+    @if (loading.visible()) {
+      <div class="h-0.5 w-2/5 rounded-full bg-[var(--accent)] [animation:loadingBar_1.1s_ease-in-out_infinite]"></div>
+    }
+  </div>
 </div>

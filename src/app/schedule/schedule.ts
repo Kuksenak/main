@@ -75,7 +75,6 @@ export class Schedule {
   private service = inject(LessonService);
 
   protected readonly isMobile = inject(DeviceDetectionService).isMobile;
-  protected readonly loading = this.service.loading;
   private touchStartY = 0;
   private touchStartX = 0;
   protected readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -92,11 +91,18 @@ export class Schedule {
   protected readonly gridDays = computed(() =>
     Array.from({ length: 42 }, (_, i) => addDays(this.gridStart(), i)),
   );
-  // Same days chunked into 6 weeks for row-by-row rendering.
-  protected readonly weeks = computed(() => {
-    const days = this.gridDays();
-    return Array.from({ length: 6 }, (_, w) => days.slice(w * 7, w * 7 + 7));
+  // The current month — six weeks.
+  protected readonly displayWeeks = computed(() => {
+    const start = this.gridStart();
+    return Array.from({ length: 6 }, (_, w) =>
+      Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)),
+    );
   });
+
+  private lastWheel = 0;
+  // Direction of the last month change, for the slide transition (1 = forward, -1 = back).
+  protected readonly navDir = signal(1);
+  protected readonly monthKey = computed(() => this.month().getTime());
 
   protected readonly editor = signal<EditorModel | null>(null);
   // How far to lift the sheet so the focused field stays above the mobile keyboard.
@@ -123,20 +129,6 @@ export class Schedule {
       this.service.load(from, addDays(from, 42));
     });
 
-    // While the sheet is open, darken the status-bar theme-color so the top strip
-    // (driven by the manifest) matches the dimmed backdrop instead of staying light.
-    effect(() => {
-      const open = this.editor() !== null;
-      const meta = document.querySelector('meta[name="theme-color"]');
-      if (!meta) return;
-      const dark = document.documentElement.classList.contains('dark');
-      if (open) {
-        meta.setAttribute('content', dark ? '#000000' : '#919191');
-      } else {
-        meta.setAttribute('content', dark ? '#000000' : '#f2f2f6');
-      }
-    });
-
     // Lift the sheet above the on-screen keyboard (mobile) using VisualViewport.
     const vv = window.visualViewport;
     if (vv) {
@@ -158,9 +150,18 @@ export class Schedule {
     return this.byDay().get(toDateInput(day))?.length ?? 0;
   }
 
-  // One dot per event, capped at 5.
-  protected dotsFor(day: Date): number[] {
-    return Array.from({ length: Math.min(this.countFor(day), 5) });
+  // Indicator width: a single dot for one event, a longer oval for several (capped at 5).
+  protected dotWidth(day: Date): number {
+    const n = Math.min(this.countFor(day), 5);
+    return n <= 1 ? 4 : 4 + (n - 1) * 4;
+  }
+
+  // If a week contains the 1st of a month, return that month's label (for scroll dividers).
+  protected monthBoundary(week: Date[]): string | null {
+    const first = week.find((d) => d.getDate() === 1);
+    return first
+      ? first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+      : null;
   }
 
   protected inMonth(day: Date): boolean {
@@ -176,19 +177,44 @@ export class Schedule {
   }
 
   protected selectDay(day: Date): void {
-    this.selectedDate.set(startOfDay(day));
+    const d = startOfDay(day);
+    const curMonth = startOfMonth(this.selectedDate()).getTime();
+    const newMonth = startOfMonth(d).getTime();
+    if (newMonth !== curMonth) {
+      this.navDir.set(newMonth > curMonth ? 1 : -1);
+    }
+    this.selectedDate.set(d);
   }
 
   protected prevMonth(): void {
+    this.navDir.set(-1);
     this.selectedDate.set(addMonths(this.selectedDate(), -1));
   }
 
   protected nextMonth(): void {
+    this.navDir.set(1);
     this.selectedDate.set(addMonths(this.selectedDate(), 1));
   }
 
   protected today(): void {
-    this.selectedDate.set(startOfDay(new Date()));
+    const target = startOfDay(new Date());
+    const curMonth = startOfMonth(this.selectedDate()).getTime();
+    const newMonth = startOfMonth(target).getTime();
+    if (newMonth !== curMonth) {
+      this.navDir.set(newMonth > curMonth ? 1 : -1);
+    }
+    this.selectedDate.set(target);
+  }
+
+  // Desktop: mouse wheel over the calendar flips months (throttled to one per gesture).
+  protected onWheel(e: WheelEvent): void {
+    if (this.isMobile() || Math.abs(e.deltaY) < 8) return;
+    e.preventDefault();
+    const now = Date.now();
+    if (now - this.lastWheel < 250) return;
+    this.lastWheel = now;
+    if (e.deltaY > 0) this.nextMonth();
+    else this.prevMonth();
   }
 
   // Swipe up → next month, swipe down → previous month (mobile).

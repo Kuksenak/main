@@ -1,7 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, of, tap } from 'rxjs';
+import { catchError, finalize, of } from 'rxjs';
 import { environment } from '@environments/environment';
+import { LoadingService } from '../core/services/loading.service';
 
 export type LessonStatus = 'Scheduled' | 'Done' | 'Cancelled';
 
@@ -25,21 +26,20 @@ export interface LessonInput {
 @Injectable({ providedIn: 'root' })
 export class LessonService {
   private http = inject(HttpClient);
+  private loadingService = inject(LoadingService);
   private base = `${environment.apiUrl}/lessons`;
 
   private _lessons = signal<Lesson[]>([]);
-  private _loading = signal(false);
   readonly lessons = this._lessons.asReadonly();
-  readonly loading = this._loading.asReadonly();
 
   load(from: Date, to: Date): void {
-    this._loading.set(true);
+    this.loadingService.begin();
     const params = { from: from.toISOString(), to: to.toISOString() };
     this.http
       .get<{ lessons: Lesson[] }>(this.base, { params })
       .pipe(
         catchError(() => of({ lessons: [] })),
-        finalize(() => this._loading.set(false)),
+        finalize(() => this.loadingService.end()),
       )
       .subscribe((res) => this._lessons.set(res.lessons ?? []));
   }

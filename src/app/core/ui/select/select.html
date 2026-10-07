@@ -9,7 +9,7 @@
       [value]="value() ?? ''"
       [disabled]="disabled"
       (change)="onNativeChange($event)"
-      class="px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.04] dark:bg-white/[0.06] text-[15px] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
+      class="appearance-none border-0 px-3 py-1.5 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[17px] [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
     >
       @for (opt of options; track opt.value) {
         <option [value]="opt.value">{{ opt.label }}</option>
@@ -24,12 +24,9 @@
       #origin="cdkOverlayOrigin"
       [disabled]="disabled"
       (click)="toggle()"
-      class="inline-flex w-auto items-center gap-2 px-3 py-2 rounded-lg border border-black/10 dark:border-white/10 bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/3 dark:hover:bg-white/5 transition-colors"
+      class="inline-flex w-auto items-center gap-2 px-3 py-2 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
     >
       <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
-      <svg class="w-4 h-4 opacity-40 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
     </button>
 
     <ng-template
