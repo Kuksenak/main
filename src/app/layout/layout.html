@@ -15,11 +15,52 @@
         class="rounded-full px-4 py-1.5 text-[15px] font-medium"
       >About</a>
     </nav>
-    <span class="hidden max-w-48 truncate text-xs opacity-60 sm:block">{{ auth.email() }}</span>
-    <button type="button" (click)="auth.logout()" class="btn-secondary !px-4 !py-1.5">Log out</button>
+    <!-- Account avatar: first letter of the email; dot when an app update is ready -->
+    <button
+      type="button"
+      (click)="accountOpen.set(true)"
+      aria-label="Account"
+      class="relative -mr-1 flex size-11 shrink-0 items-center justify-center rounded-full active:opacity-70"
+    >
+      <span class="flex size-9 items-center justify-center rounded-full bg-[var(--accent)] text-[17px] font-semibold uppercase text-[var(--accent-fg)]">{{ initial() }}</span>
+      @if (updates.updateReady()) {
+        <span class="absolute right-0.5 top-0.5 size-3 rounded-full bg-red-500 ring-2 ring-[var(--app-bg)]"></span>
+      }
+    </button>
   </header>
 
   <router-outlet></router-outlet>
+
+  @if (accountOpen()) {
+    <app-sheet #sheet title="Account" (closed)="accountOpen.set(false)">
+      <div class="flex flex-col gap-6">
+        <div class="ios-group">
+          <div class="ios-row !justify-start">
+            <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[19px] font-semibold uppercase text-[var(--accent-fg)]">{{ initial() }}</span>
+            <span class="min-w-0 truncate text-[17px]">{{ auth.email() }}</span>
+          </div>
+        </div>
+
+        <div class="ios-group">
+          @if (updates.updateReady()) {
+            <button type="button" (click)="updates.apply()" class="ios-row h-11 w-full !py-0 text-left active:opacity-60">
+              <span class="flex items-center gap-2 text-[17px] font-semibold text-[var(--accent)]">
+                <span class="size-2 rounded-full bg-red-500"></span>
+                Update available
+              </span>
+              <span class="text-[15px] opacity-50">Restart</span>
+            </button>
+          }
+          <div class="ios-row h-11 !py-0">
+            <span class="text-[17px]">Version</span>
+            <span class="text-[17px] tabular-nums opacity-50">{{ updates.version }}</span>
+          </div>
+        </div>
+
+        <button type="button" (click)="logout(sheet)" class="ios-group flex h-11 w-full items-center justify-center text-[17px] font-semibold text-red-500 active:opacity-60">Log out</button>
+      </div>
+    </app-sheet>
+  }
 
   <!-- Global loading bar — fixed strip at the bottom; components report via LoadingService -->
   <div class="pointer-events-none fixed inset-x-0 bottom-0 z-[2001] h-0.5 overflow-hidden">

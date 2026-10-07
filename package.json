@@ -1,13 +1,13 @@
 {
   "name": "main",
-  "version": "0.0.56",
+  "version": "0.0.57",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "deploy": "npm version patch --no-git-tag-version && ng build --configuration production --base-href / && npx angular-cli-ghpages --dir=dist/main/browser"
+    "deploy": "ng build --configuration production --base-href / && npx angular-cli-ghpages --dir=dist/main/browser"
   },
   "prettier": {
     "printWidth": 100,

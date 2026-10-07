@@ -1,0 +1,5 @@
+#!/bin/sh
+# Bump the patch version on every commit so the app shows a fresh version
+# (Account sheet → Version). Enable once per clone: git config core.hooksPath .githooks
+npm version patch --no-git-tag-version --ignore-scripts >/dev/null || exit 1
+git add package.json package-lock.json
