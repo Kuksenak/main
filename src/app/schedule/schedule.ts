@@ -127,6 +127,7 @@ export class Schedule implements AfterViewInit {
   protected readonly sheetVariant = signal<1 | 2>(this.readVariant());
   protected readonly dragY = signal(0);
   protected readonly dragging = signal(false);
+  protected readonly sheetClosing = signal(false);
   private dragStartY = 0;
 
   private readVariant(): 1 | 2 {
@@ -339,9 +340,15 @@ export class Schedule implements AfterViewInit {
   }
 
   protected closeEditor(): void {
-    this.editor.set(null);
-    this.dragY.set(0);
+    if (this.editor() === null || this.sheetClosing()) return;
+    // Animate the sheet down, then remove it.
     this.dragging.set(false);
+    this.sheetClosing.set(true);
+    setTimeout(() => {
+      this.editor.set(null);
+      this.sheetClosing.set(false);
+      this.dragY.set(0);
+    }, 240);
   }
 
   protected save(): void {
