@@ -8,7 +8,7 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#f2f2f7">
+  <meta name="theme-color" content="#faf9f5">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,7 +23,7 @@
       function apply(isDark) {
         document.documentElement.classList.toggle('dark', isDark);
         var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', isDark ? '#000000' : '#f2f2f7');
+        if (meta) meta.setAttribute('content', isDark ? '#262624' : '#faf9f5');
       }
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });

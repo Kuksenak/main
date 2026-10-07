@@ -100,23 +100,41 @@
 
 <!-- Editor modal -->
 @if (editor(); as m) {
-  <!-- Side page (slides in from the right, slides out on close) -->
-  <div class="fixed inset-0 z-30 sm:flex sm:items-center sm:justify-center sm:bg-black/30 sm:p-4" (click)="closeEditor()">
+  <!-- Mobile: iOS page sheet sliding up from the bottom, leaving a gap under the status bar.
+       Desktop: centered dialog. -->
+  <div class="fixed inset-0 z-30 sm:flex sm:items-center sm:justify-center sm:p-4">
+    <!-- Dim backdrop (covers the status bar area too, which is transparent in the PWA) -->
     <div
-      class="flex h-full w-full flex-col bg-[var(--app-bg)] text-neutral-900 [animation:pageInRight_360ms_cubic-bezier(0.2,0,0,1)] dark:text-neutral-100 sm:h-auto sm:max-w-md sm:rounded-2xl sm:bg-[var(--sheet-bg)] sm:p-5 sm:shadow-xl"
-      [style.transform]="sheetClosing() ? 'translateX(100%)' : null"
-      [style.transition]="sheetClosing() ? 'transform 240ms cubic-bezier(0.2,0,0,1)' : null"
-      (click)="$event.stopPropagation()"
+      class="absolute inset-0 bg-black/40 [animation:fadeIn_280ms_ease-out] sm:bg-black/30"
+      [style.opacity]="sheetClosing() ? 0 : null"
+      [style.transition]="'opacity 240ms ease-out'"
+      (click)="closeEditor()"
+    ></div>
+
+    <div
+      class="absolute inset-x-0 bottom-0 top-[calc(env(safe-area-inset-top)+0.75rem)] flex flex-col overflow-hidden rounded-t-[20px] bg-[var(--sheet-bg)] text-[var(--text)] shadow-[0_-8px_30px_rgba(0,0,0,0.12)] [animation:sheetUp_380ms_cubic-bezier(0.32,0.72,0,1)] sm:relative sm:inset-auto sm:w-full sm:max-w-md sm:rounded-2xl sm:p-5 sm:shadow-xl"
+      [style.transform]="sheetClosing() ? 'translateY(100%)' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
+      [style.transition]="dragging() ? 'none' : 'transform 280ms cubic-bezier(0.32,0.72,0,1)'"
     >
-      <!-- Mobile top bar: back + Save. Same 16px side inset as the cards below; 44pt iOS controls. -->
-      <div class="flex shrink-0 items-center gap-2 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] sm:hidden">
-        <button type="button" (click)="closeEditor()" aria-label="Back" class="icon-btn !text-current">
-          <svg viewBox="0 0 24 24" fill="none" class="size-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-        </button>
-        <button type="button" (click)="save()" [disabled]="isInvalid(m)" class="btn-primary ml-auto h-11 !px-5 !py-0 !text-[17px] disabled:opacity-40">Save</button>
+      <!-- Mobile header: grabber (drag down to close) + close / title / Save, 16px side inset like the cards -->
+      <div
+        class="shrink-0 touch-none px-4 pb-3 pt-2 sm:hidden"
+        (touchstart)="onSheetDragStart($event)"
+        (touchmove)="onSheetDragMove($event)"
+        (touchend)="onSheetDragEnd()"
+        (touchcancel)="onSheetDragEnd()"
+      >
+        <div class="mx-auto mb-2 h-[5px] w-9 rounded-full bg-black/20 dark:bg-white/25"></div>
+        <div class="relative flex items-center gap-2">
+          <button type="button" (click)="closeEditor()" aria-label="Close" class="icon-btn !text-current">
+            <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          </button>
+          <span class="pointer-events-none absolute inset-x-0 text-center text-[17px] font-semibold">{{ m.id ? 'Edit Lesson' : 'New Lesson' }}</span>
+          <button type="button" (click)="save()" [disabled]="isInvalid(m)" class="btn-primary relative ml-auto h-11 !px-5 !py-0 !text-[17px] disabled:opacity-40">Save</button>
+        </div>
       </div>
 
-      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] sm:flex-none sm:overflow-visible sm:px-0 sm:pb-0">
+      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 sm:flex-none sm:overflow-visible sm:px-0 sm:pb-0 sm:pt-0">
         <ng-container [ngTemplateOutlet]="fieldsTpl" />
         @if (m.id) {
           <button type="button" (click)="remove()" class="ios-group mt-6 flex h-11 w-full items-center justify-center text-[17px] font-semibold text-red-500 active:opacity-60 sm:hidden">Delete</button>

@@ -193,6 +193,17 @@ export class Schedule implements AfterViewInit {
     window.addEventListener('scroll', () => {
       if (this.editor() && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
     });
+
+    // Tint the status bar (Safari / non-translucent PWA) to match the dim backdrop
+    // while the sheet is up, so the clock area doesn't stay bright above it.
+    effect(() => {
+      const dimmed = this.editor() !== null && !this.sheetClosing();
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (!meta) return;
+      const css = getComputedStyle(document.documentElement);
+      const color = css.getPropertyValue(dimmed ? '--app-bg-dimmed' : '--app-bg').trim();
+      if (color) meta.setAttribute('content', color);
+    });
   }
 
   ngAfterViewInit(): void {

@@ -4,19 +4,24 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --app-bg: #f2f2f7;
-  --sheet-bg: #ffffff;
+  --app-bg: #faf9f5;
+  --sheet-bg: #f5f4ee;
   --surface: #ffffff;
-  --accent: #007aff;
+  --text: #141413;
+  --accent: #c96442;
   --accent-fg: #ffffff;
+  /* Status-bar tint while the bottom sheet's dim backdrop is up (app-bg under 40% black). */
+  --app-bg-dimmed: #969593;
 }
 
 html.dark {
-  --app-bg: #000000;
-  --sheet-bg: #1c1c1e;
-  --surface: #1c1c1e;
-  --accent: #0a84ff;
+  --app-bg: #262624;
+  --sheet-bg: #1f1e1d;
+  --surface: #30302e;
+  --text: #faf9f5;
+  --accent: #d97757;
   --accent-fg: #ffffff;
+  --app-bg-dimmed: #171716;
 }
 
 .sheet-backdrop {
@@ -46,6 +51,15 @@ html.dark {
   }
   to {
     transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -97,6 +111,7 @@ body {
   height: 100dvh;
   overflow: hidden;
   background: var(--app-bg);
+  color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Inter', sans-serif;
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
@@ -188,7 +203,7 @@ app-about {
 
   /* iOS grouped list container */
   .ios-group {
-    @apply overflow-hidden rounded-2xl bg-white dark:bg-white/[0.06];
+    @apply overflow-hidden rounded-2xl bg-[var(--surface)];
   }
 
   /* Row inside an iOS group (divider between rows) */
