@@ -27,6 +27,10 @@
       class="inline-flex w-auto items-center gap-2 px-3 py-2 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
     >
       <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
+      <svg viewBox="0 0 24 24" fill="none" class="size-4 shrink-0 opacity-50" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m8 9 4-4 4 4" />
+        <path d="m16 15-4 4-4-4" />
+      </svg>
     </button>
 
     <ng-template

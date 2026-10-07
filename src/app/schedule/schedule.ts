@@ -1,5 +1,14 @@
-import { DatePipe } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import {
+  AfterViewInit,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { DateField } from '../core/ui/date/date';
@@ -46,6 +55,12 @@ function startOfGrid(d: Date): Date {
   return addDays(first, -day);
 }
 
+function startOfWeek(d: Date): Date {
+  const x = startOfDay(d);
+  const day = (x.getDay() + 6) % 7; // Monday = 0
+  return addDays(x, -day);
+}
+
 function addDays(d: Date, n: number): Date {
   const x = new Date(d);
   x.setDate(x.getDate() + n);
@@ -68,16 +83,16 @@ function toTimeInput(d: Date): string {
 
 @Component({
   selector: 'app-schedule',
-  imports: [FormsModule, DatePipe, TimeField, SelectField, DateField],
+  imports: [FormsModule, DatePipe, NgTemplateOutlet, TimeField, SelectField, DateField],
   templateUrl: './schedule.html',
 })
-export class Schedule {
+export class Schedule implements AfterViewInit {
   private service = inject(LessonService);
 
   protected readonly isMobile = inject(DeviceDetectionService).isMobile;
-  private touchStartY = 0;
-  private touchStartX = 0;
   protected readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  private readonly cal = viewChild<ElementRef<HTMLElement>>('cal');
   protected readonly statusOptions: SelectOption[] = [
     { label: 'Scheduled', value: 'Scheduled' },
     { label: 'Done', value: 'Done' },
@@ -85,28 +100,75 @@ export class Schedule {
   ];
 
   protected readonly selectedDate = signal(startOfDay(new Date()));
-  // Month shown in the grid follows the selected date.
-  protected readonly month = computed(() => startOfMonth(this.selectedDate()));
-  protected readonly gridStart = computed(() => startOfGrid(this.month()));
-  protected readonly gridDays = computed(() =>
-    Array.from({ length: 42 }, (_, i) => addDays(this.gridStart(), i)),
-  );
-  // The current month — six weeks.
-  protected readonly displayWeeks = computed(() => {
-    const start = this.gridStart();
-    return Array.from({ length: 6 }, (_, w) =>
-      Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)),
-    );
-  });
 
-  private lastWheel = 0;
-  // Direction of the last month change, for the slide transition (1 = forward, -1 = back).
-  protected readonly navDir = signal(1);
-  protected readonly monthKey = computed(() => this.month().getTime());
+  // Continuous calendar: a long window of weeks the user scrolls through. The
+  // title follows whichever month fills the middle of the viewport.
+  private static readonly WEEKS_BEFORE = 26;
+  private static readonly WEEKS_TOTAL = 53;
+  private readonly weeksStart = addDays(
+    startOfWeek(new Date()),
+    -Schedule.WEEKS_BEFORE * 7,
+  );
+  protected readonly allWeeks: Date[][] = Array.from(
+    { length: Schedule.WEEKS_TOTAL },
+    (_, w) => Array.from({ length: 7 }, (_, d) => addDays(this.weeksStart, w * 7 + d)),
+  );
+  protected readonly visibleMonth = signal(startOfMonth(new Date()));
+
+  private rowPx(): number {
+    return this.isMobile() ? 44 : 48;
+  }
 
   protected readonly editor = signal<EditorModel | null>(null);
   // How far to lift the sheet so the focused field stays above the mobile keyboard.
   protected readonly keyboardInset = signal(0);
+
+  // Two sheet styles to compare: 1 = side page, 2 = draggable bottom sheet.
+  protected readonly sheetVariant = signal<1 | 2>(this.readVariant());
+  protected readonly dragY = signal(0);
+  protected readonly dragging = signal(false);
+  private dragStartY = 0;
+
+  private readVariant(): 1 | 2 {
+    try {
+      return localStorage.getItem('sheetVariant') === '2' ? 2 : 1;
+    } catch {
+      return 1;
+    }
+  }
+
+  protected toggleVariant(): void {
+    const v: 1 | 2 = this.sheetVariant() === 1 ? 2 : 1;
+    this.sheetVariant.set(v);
+    try {
+      localStorage.setItem('sheetVariant', String(v));
+    } catch {
+      /* ignore */
+    }
+  }
+
+  private pointerY(e: TouchEvent | PointerEvent): number {
+    return 'touches' in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
+  }
+
+  protected onSheetDragStart(e: TouchEvent | PointerEvent): void {
+    this.dragging.set(true);
+    this.dragStartY = this.pointerY(e);
+  }
+
+  protected onSheetDragMove(e: TouchEvent | PointerEvent): void {
+    if (!this.dragging()) return;
+    this.dragY.set(Math.max(0, this.pointerY(e) - this.dragStartY));
+  }
+
+  protected onSheetDragEnd(): void {
+    if (!this.dragging()) return;
+    this.dragging.set(false);
+    if (this.dragY() > 120) {
+      this.closeEditor();
+    }
+    this.dragY.set(0);
+  }
 
   // Lessons grouped by day key for O(1) cell lookup.
   private readonly byDay = computed(() => {
@@ -124,10 +186,8 @@ export class Schedule {
   );
 
   constructor() {
-    effect(() => {
-      const from = this.gridStart();
-      this.service.load(from, addDays(from, 42));
-    });
+    // Load lessons for the whole scrollable window once.
+    this.service.load(this.weeksStart, addDays(this.weeksStart, Schedule.WEEKS_TOTAL * 7));
 
     // Lift the sheet above the on-screen keyboard (mobile) using VisualViewport.
     const vv = window.visualViewport;
@@ -141,9 +201,29 @@ export class Schedule {
     }
   }
 
+  ngAfterViewInit(): void {
+    // Start scrolled to the current week.
+    setTimeout(() => this.scrollToToday());
+  }
+
   private loadRange(): { from: Date; to: Date } {
-    const from = this.gridStart();
-    return { from, to: addDays(from, 42) };
+    return { from: this.weeksStart, to: addDays(this.weeksStart, Schedule.WEEKS_TOTAL * 7) };
+  }
+
+  // Scroll handler: title follows the month filling the middle of the viewport.
+  protected onCalScroll(el: HTMLElement): void {
+    const idx = Math.floor((el.scrollTop + el.clientHeight / 2) / this.rowPx());
+    const week = this.allWeeks[Math.max(0, Math.min(this.allWeeks.length - 1, idx))];
+    const m = startOfMonth(week[3]); // Thursday — representative day of the week
+    if (m.getTime() !== this.visibleMonth().getTime()) {
+      this.visibleMonth.set(m);
+    }
+  }
+
+  protected scrollToToday(): void {
+    const el = this.cal()?.nativeElement;
+    if (el) el.scrollTop = Schedule.WEEKS_BEFORE * this.rowPx();
+    this.visibleMonth.set(startOfMonth(new Date()));
   }
 
   protected countFor(day: Date): number {
@@ -156,16 +236,16 @@ export class Schedule {
     return n <= 1 ? 4 : 4 + (n - 1) * 4;
   }
 
-  // If a week contains the 1st of a month, return that month's label (for scroll dividers).
-  protected monthBoundary(week: Date[]): string | null {
+  // Month label for a week when it contains the 1st (inline divider in the scroll).
+  protected monthStart(week: Date[]): string | null {
     const first = week.find((d) => d.getDate() === 1);
-    return first
-      ? first.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
-      : null;
+    return first ? first.toLocaleDateString(undefined, { month: 'short' }) : null;
   }
 
+  // Dim days outside the month currently shown in the title.
   protected inMonth(day: Date): boolean {
-    return day.getMonth() === this.month().getMonth();
+    const vm = this.visibleMonth();
+    return day.getMonth() === vm.getMonth() && day.getFullYear() === vm.getFullYear();
   }
 
   protected isSelected(day: Date): boolean {
@@ -177,59 +257,12 @@ export class Schedule {
   }
 
   protected selectDay(day: Date): void {
-    const d = startOfDay(day);
-    const curMonth = startOfMonth(this.selectedDate()).getTime();
-    const newMonth = startOfMonth(d).getTime();
-    if (newMonth !== curMonth) {
-      this.navDir.set(newMonth > curMonth ? 1 : -1);
-    }
-    this.selectedDate.set(d);
-  }
-
-  protected prevMonth(): void {
-    this.navDir.set(-1);
-    this.selectedDate.set(addMonths(this.selectedDate(), -1));
-  }
-
-  protected nextMonth(): void {
-    this.navDir.set(1);
-    this.selectedDate.set(addMonths(this.selectedDate(), 1));
+    this.selectedDate.set(startOfDay(day));
   }
 
   protected today(): void {
-    const target = startOfDay(new Date());
-    const curMonth = startOfMonth(this.selectedDate()).getTime();
-    const newMonth = startOfMonth(target).getTime();
-    if (newMonth !== curMonth) {
-      this.navDir.set(newMonth > curMonth ? 1 : -1);
-    }
-    this.selectedDate.set(target);
-  }
-
-  // Desktop: mouse wheel over the calendar flips months (throttled to one per gesture).
-  protected onWheel(e: WheelEvent): void {
-    if (this.isMobile() || Math.abs(e.deltaY) < 8) return;
-    e.preventDefault();
-    const now = Date.now();
-    if (now - this.lastWheel < 250) return;
-    this.lastWheel = now;
-    if (e.deltaY > 0) this.nextMonth();
-    else this.prevMonth();
-  }
-
-  // Swipe up → next month, swipe down → previous month (mobile).
-  protected onCalendarTouchStart(e: TouchEvent): void {
-    this.touchStartY = e.changedTouches[0].clientY;
-    this.touchStartX = e.changedTouches[0].clientX;
-  }
-
-  protected onCalendarTouchEnd(e: TouchEvent): void {
-    const dy = e.changedTouches[0].clientY - this.touchStartY;
-    const dx = e.changedTouches[0].clientX - this.touchStartX;
-    // Ignore taps and mostly-horizontal moves (those are day selections / scrolls).
-    if (Math.abs(dy) < 45 || Math.abs(dy) < Math.abs(dx)) return;
-    if (dy < 0) this.nextMonth();
-    else this.prevMonth();
+    this.selectedDate.set(startOfDay(new Date()));
+    this.scrollToToday();
   }
 
   protected timeLabel(iso: string): string {
@@ -307,6 +340,8 @@ export class Schedule {
 
   protected closeEditor(): void {
     this.editor.set(null);
+    this.dragY.set(0);
+    this.dragging.set(false);
   }
 
   protected save(): void {
