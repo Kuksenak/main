@@ -99,9 +99,10 @@
            backdrop-blur-none;
   }
 
-  /* Desktop dropdown surface (pickers). */
+  /* Desktop dropdown surface (pickers): slightly see-through, blurring what's behind. */
   .popover-panel {
-    @apply origin-top overflow-hidden rounded-xl bg-[var(--surface)] shadow-[var(--shadow-popover)]
+    @apply origin-top overflow-hidden rounded-xl bg-[color-mix(in_srgb,var(--surface)_80%,transparent)]
+           shadow-[var(--shadow-popover)] backdrop-blur-xl
            [animation:dropdownIn_160ms_var(--ease-out-quick)];
   }
 
