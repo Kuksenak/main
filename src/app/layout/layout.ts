@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { LoadingService } from '../core/services/loading.service';
+import { ToolbarService } from '../core/services/toolbar.service';
 import { UpdateService } from '../core/services/update.service';
 import { Sheet } from '../core/ui/sheet/sheet';
 
@@ -14,6 +15,7 @@ export class Layout {
   protected readonly auth = inject(AuthStore);
   protected readonly loading = inject(LoadingService);
   protected readonly updates = inject(UpdateService);
+  protected readonly toolbar = inject(ToolbarService);
   private readonly router = inject(Router);
 
   protected readonly navItems = [

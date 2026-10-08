@@ -1,16 +1,20 @@
-import { DatePipe, NgTemplateOutlet } from '@angular/common';
+import { DatePipe, formatDate, NgTemplateOutlet } from '@angular/common';
 import {
   AfterViewInit,
   afterRenderEffect,
   Component,
   computed,
+  DestroyRef,
+  effect,
   ElementRef,
   inject,
+  LOCALE_ID,
   signal,
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
+import { ToolbarService } from '../core/services/toolbar.service';
 import { DateField } from '../core/ui/date/date';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
@@ -129,6 +133,8 @@ export class Schedule implements AfterViewInit {
   protected readonly editor = signal<EditorModel | null>(null);
 
   protected readonly sheetClosing = signal(false);
+  // Editor renders as a solid centered dialog on desktop (Tailwind `sm`).
+  protected readonly isDesktop = window.matchMedia('(min-width: 40rem)').matches;
 
   // Lessons grouped by day key for O(1) cell lookup.
   private readonly byDay = computed(() => {
@@ -146,6 +152,12 @@ export class Schedule implements AfterViewInit {
   );
 
   constructor() {
+    // Show the visible month in the mobile toolbar while this page is open.
+    const toolbar = inject(ToolbarService);
+    const locale = inject(LOCALE_ID);
+    effect(() => toolbar.title.set(formatDate(this.visibleMonth(), 'MMMM yyyy', locale)));
+    inject(DestroyRef).onDestroy(() => toolbar.title.set(''));
+
     // Load lessons for the whole scrollable window once.
     this.service.load(this.weeksStart, addDays(this.weeksStart, Schedule.WEEKS_TOTAL * 7));
 

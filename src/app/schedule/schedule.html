@@ -1,8 +1,8 @@
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 lg:flex-row lg:items-stretch lg:gap-6">
   <!-- Calendar -->
   <section class="flex min-h-0 w-full shrink-0 flex-col lg:max-w-md lg:flex-1">
-    <!-- Month header -->
-    <div class="mb-3 flex items-center gap-3">
+    <!-- Month header (desktop; on mobile the month lives in the toolbar) -->
+    <div class="mb-3 hidden items-center gap-3 sm:flex">
       <h1 class="text-xl font-semibold">{{ visibleMonth() | date: 'MMMM yyyy' }}</h1>
       <div class="ml-auto flex items-center gap-2">
         <button type="button" (click)="today()" class="btn-secondary">Today</button>
@@ -50,8 +50,9 @@
 
   <!-- Selected day events -->
   <section class="flex min-h-0 flex-1 flex-col lg:flex-1">
-    <div class="mb-3 flex h-11 shrink-0 items-center">
+    <div class="mb-1.5 flex h-11 shrink-0 items-center">
       <h2 class="text-xl font-semibold">{{ selectedDate() | date: 'EEEE, MMM d' }}</h2>
+      <button type="button" (click)="today()" class="btn-secondary ml-auto sm:hidden">Today</button>
     </div>
 
     <!-- The rounded card itself is the scroll area, so its corners stay put while events scroll
@@ -67,7 +68,7 @@
         [style.opacity]="listScrolling() ? 1 : 0.5"
       ></div>
     }
-    <div #list (scroll)="onListScroll()" class="ios-group no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+    <div #list (scroll)="onListScroll()" class="ios-group !rounded-[26px] [corner-shape:squircle] no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
     @if (dayLessons().length) {
       <div class="pb-14">
         @for (lesson of dayLessons(); track lesson.id) {
@@ -118,7 +119,8 @@
        fights a sheet; info-only menus use the bottom <app-sheet>. Desktop: centered dialog. -->
   <div class="fixed inset-0 z-30 sm:flex sm:items-center sm:justify-center sm:bg-black/30 sm:p-4" (click)="closeEditor()">
     <div
-      class="flex h-full w-full flex-col bg-[var(--app-bg)] text-[var(--text)] [animation:pageInRight_360ms_cubic-bezier(0.2,0,0,1)] sm:h-auto sm:max-w-md sm:rounded-2xl sm:bg-[var(--sheet-bg)] sm:p-5 sm:shadow-xl sm:[--surface:var(--sheet-surface)]"
+      class="flex h-full w-full flex-col text-[var(--text)] max-sm:bg-[var(--app-bg)] [animation:pageInRight_360ms_cubic-bezier(0.2,0,0,1)] sm:h-auto sm:max-w-md sm:p-4"
+      [class.dialog-panel]="isDesktop"
       [style.transform]="sheetClosing() ? 'translateX(100%)' : null"
       [style.transition]="sheetClosing() ? 'transform 240ms cubic-bezier(0.2,0,0,1)' : null"
       (click)="$event.stopPropagation()"
@@ -140,7 +142,7 @@
       </div>
 
       <!-- Desktop footer -->
-      <div class="mt-5 hidden items-center gap-2 sm:flex">
+      <div class="mt-4 hidden items-center gap-2 sm:flex">
         @if (m.id) {
           <button type="button" (click)="remove()" class="text-sm font-semibold text-red-500 active:opacity-60">Delete</button>
         }

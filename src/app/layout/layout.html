@@ -4,7 +4,9 @@
       <img src="icons/icon-96x96.png" alt="Logo" class="size-8" width="32" height="32" />
     </a>
     <!-- Desktop tabs; on mobile navigation lives in the ⋯ sheet -->
-    <nav class="flex flex-1 items-center gap-1">
+    <nav class="flex min-w-0 flex-1 items-center gap-1">
+      <!-- Mobile: the current page's title (e.g. month on Schedule) -->
+      <span class="truncate text-xl font-semibold sm:hidden">{{ toolbar.title() }}</span>
       @for (item of navItems; track item.path) {
         <a
           [routerLink]="item.path"
