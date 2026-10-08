@@ -39,32 +39,39 @@ import { EventList } from './event-list';
         @if (!editing()) {
           <div class="flex items-center gap-3">
             <h1 class="min-w-0 flex-1 text-2xl font-semibold mobile:hidden">{{ heading() }}</h1>
-            <button type="button" (click)="shareLink()" class="btn-secondary mobile:ml-auto">
-              {{ (copied() ? 'lessons.copied' : 'lessons.share') | t }}
-            </button>
-            <button type="button" (click)="edit()" class="btn-secondary">{{ 'action.edit' | t }}</button>
+            <!-- Public lessons: copy the link -->
+            @if (lesson()?.shareToken; as token) {
+              <button type="button" (click)="copy(token)" [attr.aria-label]="'lessons.copy' | t" class="icon-btn mobile:ml-auto">
+                <app-icon [name]="copied() ? 'check' : 'copy'" class="size-5" />
+              </button>
+            }
+            <button type="button" (click)="edit()" class="btn-secondary" [class.mobile:ml-auto]="!lesson()?.shareToken">{{ 'action.edit' | t }}</button>
           </div>
-
-          <!-- Public link: anyone with it can read the lesson, no sign-in -->
-          @if (lesson()?.shareToken; as token) {
-            <div class="flex flex-col gap-1.5">
-              <div class="card">
-                <div class="list-row">
-                  <app-icon name="link" class="size-5 text-[var(--accent)]" />
-                  <a [href]="url(token)" target="_blank" rel="noopener" class="min-w-0 flex-1 truncate text-[var(--accent)]">{{ url(token) }}</a>
-                  <button type="button" (click)="copy(token)" class="text-[var(--accent)] active:opacity-60">{{ 'lessons.copy' | t }}</button>
-                </div>
-                <button type="button" (click)="unshare()" class="list-row w-full text-left text-[var(--danger)]">{{ 'lessons.unshare' | t }}</button>
-              </div>
-              <p class="text-footnote px-4 opacity-50">{{ 'lessons.publicHint' | t }}</p>
-            </div>
-          }
         }
 
         @if (editing()) {
           <app-lesson-form [(value)]="draft" />
         } @else if (lesson(); as l) {
           <app-lesson-content [blocks]="l.blocks" />
+
+          <!-- Public: anyone with the link can read it, no sign-in -->
+          <div class="flex flex-col gap-1.5">
+            <div class="card">
+              <div class="list-row">
+                <span>{{ 'lessons.public' | t }}</span>
+                <button
+                  type="button"
+                  role="switch"
+                  class="switch"
+                  [attr.aria-checked]="!!l.shareToken"
+                  [attr.aria-label]="'lessons.public' | t"
+                  (click)="setPublic(!l.shareToken)"
+                ></button>
+              </div>
+            </div>
+            <p class="text-footnote px-4 opacity-50">{{ 'lessons.publicHint' | t }}</p>
+          </div>
+
           <app-event-list [lessonId]="l.id" />
         }
       </div>
@@ -119,15 +126,11 @@ export class LessonCard implements OnInit {
     this.closed.emit();
   }
 
-  protected readonly url = shareUrl;
   protected readonly copied = signal(false);
 
-  // Share: turn the link on if needed, then copy it (the link row below shows it either way).
-  protected shareLink(): void {
-    const l = this.lesson();
-    if (!l) return;
-    if (l.shareToken) this.copy(l.shareToken);
-    else this.lessons.share(l.id, true, (token) => token && this.copy(token));
+  protected setPublic(on: boolean): void {
+    const id = this.id();
+    if (id) this.lessons.share(id, on);
   }
 
   protected copy(token: string): void {
@@ -136,13 +139,8 @@ export class LessonCard implements OnInit {
         this.copied.set(true);
         setTimeout(() => this.copied.set(false), 2000);
       },
-      () => {}, // e.g. iOS after an async step: the link row's Copy works
+      () => {},
     );
-  }
-
-  protected unshare(): void {
-    const id = this.id();
-    if (id) this.lessons.share(id, false);
   }
 
   protected edit(): void {

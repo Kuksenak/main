@@ -209,6 +209,21 @@
     }
   }
 
+  /* On / off switch (iOS-like): <button role="switch" class="switch" [attr.aria-checked]="on">. */
+  .switch {
+    @apply relative inline-flex h-[1.9375rem] w-[3.1875rem] shrink-0 rounded-full bg-[var(--fill)]
+           transition-colors duration-200
+           after:absolute after:left-0.5 after:top-0.5 after:size-[1.6875rem] after:rounded-full
+           after:bg-white after:shadow-[0_2px_4px_rgb(0_0_0/0.2)] after:transition-transform
+           after:duration-200;
+    &[aria-checked='true'] {
+      @apply bg-[var(--success)] after:translate-x-5;
+    }
+    &:active {
+      transform: none;
+    }
+  }
+
   /* Small icon-only button without a background (clear ×, go-to ›). */
   .icon-plain {
     @apply mobile:size-9 inline-flex size-7 shrink-0 items-center justify-center
