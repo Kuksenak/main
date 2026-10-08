@@ -40,6 +40,8 @@ app-root {
 /* Routed components fill the layout's content area so inner panels can scroll. */
 app-schedule,
 app-students,
+app-lessons,
+app-lesson-view,
 app-about {
   display: flex;
   flex: 1 1 auto;
