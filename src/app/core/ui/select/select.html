@@ -15,8 +15,18 @@
       @if (value() === null) {
         <option value="" disabled selected>{{ triggerLabel() }}</option>
       }
-      @for (opt of options; track opt.value) {
-        <option [value]="opt.value">{{ opt.label }}</option>
+      @for (sec of sections(); track $index) {
+        @if (sec.label) {
+          <optgroup [label]="sec.label">
+            @for (opt of sec.options; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </optgroup>
+        } @else {
+          @for (opt of sec.options; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        }
       }
     </select>
     <app-icon name="chevrons-up-down" class="pointer-events-none absolute right-2 size-5" />
@@ -45,8 +55,14 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <div class="popover-panel mt-1.5 max-h-72 min-w-40 overflow-y-auto p-1">
-        @for (opt of options; track opt.value) {
+      <!-- overflow-visible: the scroll indicator sits just outside the panel -->
+      <div class="popover-panel mt-1.5 min-w-40 !overflow-visible p-1">
+        <app-scroll-area class="max-h-72" [gutter]="12">
+        @for (sec of sections(); track $index) {
+          @if (sec.label) {
+            <div class="text-footnote px-3 pb-1 pt-2 uppercase opacity-50">{{ sec.label }}</div>
+          }
+          @for (opt of sec.options; track opt.value) {
           <button
             type="button"
             (click)="select(opt)"
@@ -61,6 +77,8 @@
             }
           </button>
         }
+        }
+        </app-scroll-area>
       </div>
     </ng-template>
   }

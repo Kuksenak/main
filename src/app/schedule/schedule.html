@@ -50,15 +50,7 @@
        inner bottom padding lets the last event scroll clear of the floating buttons. The native
        scrollbar is hidden and a custom indicator is drawn at the right edge. -->
   <section class="relative flex min-h-0 flex-1 flex-col desktop:flex-1">
-    @if (listThumb(); as t) {
-      <div
-        class="scroll-indicator -right-2.5"
-        [style.top.%]="t.top"
-        [style.height.%]="t.height"
-        [style.opacity]="listScrolling() ? 1 : 0.5"
-      ></div>
-    }
-    <div #list (scroll)="onListScroll()" class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+    <app-scroll-area class="min-h-0 flex-1">
       @if (dayLessons().length) {
         <div class="pb-14">
           @for (lesson of dayLessons(); track lesson.id) {
@@ -92,7 +84,7 @@
           <p class="text-body opacity-40">{{ 'schedule.noEvents' | t }}</p>
         </div>
       }
-    </div>
+    </app-scroll-area>
   </section>
 </main>
 
@@ -104,138 +96,3 @@
 <button type="button" (click)="openNew()" [attr.aria-label]="'schedule.addLesson' | t" class="btn-confirm float-bottom right-4">
   <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
 </button>
-
-<!-- Lesson editor (form → page sheet) -->
-@if (editor(); as m) {
-  <app-page-sheet [title]="(m.id ? 'lesson.edit' : 'lesson.new') | t" (closed)="editor.set(null)">
-    <!-- Mobile top bar: back (✕ once edited) · ✓ (blue when valid and changed) -->
-    <button
-      leading
-      type="button"
-      (click)="closeEditor()"
-      [attr.aria-label]="(isDirty(m) ? 'action.discard' : 'action.back') | t"
-      class="icon-btn relative"
-    >
-      @if (isDirty(m)) {
-        <app-icon name="close" class="size-6" />
-      } @else {
-        <app-icon name="chevron-left" class="-ml-0.5 size-7" />
-      }
-    </button>
-    <button
-      trailing
-      type="button"
-      (click)="save()"
-      [disabled]="!canSave(m)"
-      [attr.aria-label]="'action.save' | t"
-      [class.btn-confirm]="canSave(m)"
-      [class.icon-btn]="!canSave(m)"
-      [class.opacity-40]="!canSave(m)"
-    >
-      <app-icon name="check" [strokeWidth]="2" class="size-7" />
-    </button>
-
-    <div class="flex flex-col gap-6">
-      <div class="card">
-        <div class="list-row">
-          <input
-            name="title"
-            [(ngModel)]="m.title"
-            type="text"
-            [placeholder]="'lesson.title' | t"
-            autocomplete="off"
-            class="row-input"
-          />
-        </div>
-        <div class="list-row">
-          <span>{{ 'lesson.student' | t }}</span>
-          <app-select
-            class="ml-auto"
-            [options]="studentOptions()"
-            [ngModel]="m.studentName || null"
-            (ngModelChange)="m.studentName = $event ?? ''"
-            [ngModelOptions]="{ standalone: true }"
-          />
-          <!-- Open this student's card -->
-          @if (studentId(m.studentName); as id) {
-            <button type="button" (click)="openStudent(id)" [attr.aria-label]="'lesson.openStudent' | t" class="icon-plain -mr-2">
-              <app-icon name="chevron-right" class="size-5" />
-            </button>
-          }
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="list-row py-3 desktop:py-2">
-          <textarea
-            name="note"
-            [(ngModel)]="m.note"
-            rows="2"
-            [placeholder]="'lesson.note' | t"
-            autocomplete="off"
-            class="row-input resize-y leading-snug"
-          ></textarea>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="list-row">
-          <span>{{ 'lesson.starts' | t }}</span>
-          <div class="ml-auto flex items-center gap-2">
-            @if (m.id) {
-              <app-date
-                [ngModel]="editorDate()"
-                (ngModelChange)="setDate($event)"
-                [ngModelOptions]="{ standalone: true }"
-              />
-            } @else {
-              <span class="opacity-60">{{ dateLabel(m.date) }}</span>
-            }
-            <app-time
-              [ngModel]="m.startTime"
-              (ngModelChange)="onStartChange(m, $event)"
-              [ngModelOptions]="{ standalone: true }"
-            />
-          </div>
-        </div>
-        <div class="list-row">
-          <span>{{ 'lesson.ends' | t }}</span>
-          <div class="ml-auto flex items-center gap-2">
-            <!-- End before start: warning orange -->
-            <span [class.opacity-60]="!isInvalid(m)" [class.text-[var(--warning)]]="isInvalid(m)" [class.line-through]="isInvalid(m)">{{ dateLabel(m.date) }}</span>
-            <app-time
-              [ngModel]="m.endTime"
-              (ngModelChange)="onEndChange(m, $event)"
-              [ngModelOptions]="{ standalone: true }"
-            />
-          </div>
-        </div>
-        @if (m.id) {
-          <div class="list-row">
-            <span>{{ 'lesson.status' | t }}</span>
-            <app-select
-              class="ml-auto"
-              [options]="statusOptions()"
-              [ngModel]="m.status"
-              (ngModelChange)="m.status = $event"
-              [ngModelOptions]="{ standalone: true }"
-            />
-          </div>
-        }
-      </div>
-
-      @if (m.id) {
-        <button type="button" (click)="remove()" class="card-btn text-[var(--danger)] desktop:hidden">{{ 'action.delete' | t }}</button>
-      }
-    </div>
-
-    <!-- Desktop footer -->
-    <div footer class="flex w-full items-center gap-2">
-      @if (m.id) {
-        <button type="button" (click)="remove()" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
-      }
-      <button type="button" (click)="closeEditor()" class="btn-secondary ml-auto">{{ 'action.cancel' | t }}</button>
-      <button type="button" (click)="save()" [disabled]="!canSave(m)" class="btn-primary">{{ 'action.save' | t }}</button>
-    </div>
-  </app-page-sheet>
-}

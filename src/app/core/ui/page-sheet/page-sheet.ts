@@ -1,16 +1,24 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { TranslatePipe } from '../../i18n/t.pipe';
 import { DeviceDetectionService } from '../../services/device-detection.service';
+import { Icon } from '../icon/icon';
 
 /**
- * Layout for forms (screens with inputs):
- * - mobile: full-screen page sliding in from the right, so the keyboard never fights a
- *   sheet. Top bar: [leading] button · title · [trailing] button;
- * - desktop: centered solid dialog, capped to the viewport; [footer] holds its buttons.
+ * Layout for forms and other screens with inputs:
+ * - mobile: full-screen page sliding in from the right, so the keyboard never fights a sheet;
+ * - desktop: centered solid dialog, capped to the viewport.
+ * Several can be open at once (cards stacked by NavStack): each slides in over the previous.
+ *
+ * With `actions` (default) it renders the editor chrome:
+ * - mobile top bar: back (✕ once `dirty`) · title · ✓ (blue when `canSave`); Delete at the end
+ *   of the content when `deletable`;
+ * - desktop footer: Delete (when `deletable`) · Cancel · Save.
  * Menus without inputs use <app-sheet> instead.
  * Render it with @if; call close() to animate out, then `closed` fires.
  */
 @Component({
   selector: 'app-page-sheet',
+  imports: [Icon, TranslatePipe],
   template: `
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:bg-[var(--backdrop)] desktop:p-4"
@@ -25,29 +33,81 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
       >
         <!-- Mobile top bar: same side inset as the cards, round controls -->
         <div class="relative flex shrink-0 items-center gap-2 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] desktop:hidden">
-          <ng-content select="[leading]" />
+          <button
+            type="button"
+            (click)="close()"
+            [attr.aria-label]="(dirty() ? 'action.discard' : 'action.back') | t"
+            class="icon-btn relative"
+          >
+            @if (dirty()) {
+              <app-icon name="close" class="size-6" />
+            } @else {
+              <app-icon name="chevron-left" class="-ml-0.5 size-7" />
+            }
+          </button>
           <span class="text-body pointer-events-none absolute inset-x-0 text-center font-semibold">{{ title() }}</span>
-          <span class="relative ml-auto flex"><ng-content select="[trailing]" /></span>
+          @if (actions()) {
+            <button
+              type="button"
+              (click)="save.emit()"
+              [disabled]="!canSave()"
+              [attr.aria-label]="'action.save' | t"
+              class="relative ml-auto"
+              [class.btn-confirm]="canSave()"
+              [class.icon-btn]="!canSave()"
+              [class.opacity-40]="!canSave()"
+            >
+              <app-icon name="check" [strokeWidth]="2" class="size-7" />
+            </button>
+          }
         </div>
 
         <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 desktop:flex-initial desktop:px-0 desktop:pb-0 desktop:pt-0">
           <ng-content />
+          @if (actions() && deletable()) {
+            <button type="button" (click)="delete.emit()" class="card-btn mt-6 text-[var(--danger)] desktop:hidden">
+              {{ 'action.delete' | t }}
+            </button>
+          }
         </div>
 
-        <!-- Desktop footer -->
-        <div class="mt-4 flex items-center gap-2 mobile:hidden">
-          <ng-content select="[footer]" />
-        </div>
+        @if (actions()) {
+          <!-- Desktop footer -->
+          <div class="mt-4 flex items-center gap-2 mobile:hidden">
+            @if (deletable()) {
+              <button type="button" (click)="delete.emit()" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+            }
+            <button type="button" (click)="close()" class="btn-secondary ml-auto">{{ 'action.cancel' | t }}</button>
+            <button type="button" (click)="save.emit()" [disabled]="!canSave()" class="btn-primary">{{ 'action.save' | t }}</button>
+          </div>
+        }
       </div>
     </div>
   `,
 })
 export class PageSheet {
   readonly title = input('');
+  readonly actions = input(true); // editor chrome (✓ / Save / Delete); false for pickers
+  readonly dirty = input(false);
+  readonly canSave = input(false);
+  readonly deletable = input(false);
+
+  readonly save = output<void>();
+  readonly delete = output<void>();
   readonly closed = output<void>();
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly closing = signal(false);
+
+  constructor() {
+    // Keep the page pinned: iOS scrolls the document to reveal a focused field even with
+    // overflow hidden — snap it back so the sheet never shifts.
+    const pin = () => {
+      if (window.scrollY || window.scrollX) window.scrollTo(0, 0);
+    };
+    window.addEventListener('scroll', pin);
+    inject(DestroyRef).onDestroy(() => window.removeEventListener('scroll', pin));
+  }
 
   close(): void {
     if (this.closing()) return;

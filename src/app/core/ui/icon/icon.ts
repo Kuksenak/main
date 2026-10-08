@@ -9,6 +9,7 @@ export type IconName =
   | 'chevrons-up-down'
   | 'grid'
   | 'search'
+  | 'person'
   | 'google'
   | 'apple';
 
@@ -33,6 +34,7 @@ export type IconName =
         @case ('plus') { <path d="M12 5v14M5 12h14" /> }
         @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
         @case ('close') { <path d="M18 6 6 18M6 6l12 12" /> }
+        @case ('person') { <circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /> }
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }

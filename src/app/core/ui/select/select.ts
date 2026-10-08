@@ -4,15 +4,22 @@ import { OverlayModule } from '@angular/cdk/overlay';
 import { I18nService } from '../../i18n/i18n.service';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 import { Icon } from '../icon/icon';
+import { ScrollArea } from '../scroll-area/scroll-area';
 
 export interface SelectOption {
   label: string;
   value: string | number;
+  section?: string; // consecutive options with the same section are grouped under it
+}
+
+interface SelectSection {
+  label: string | undefined;
+  options: SelectOption[];
 }
 
 @Component({
   selector: 'app-select',
-  imports: [OverlayModule, Icon],
+  imports: [OverlayModule, Icon, ScrollArea],
   templateUrl: './select.html',
   providers: [
     {
@@ -58,6 +65,17 @@ export class SelectField implements ControlValueAccessor {
   select(opt: SelectOption): void {
     this.setValue(opt.value);
     this.isOpen.set(false);
+  }
+
+  // Options split into consecutive runs by `section`.
+  sections(): SelectSection[] {
+    const out: SelectSection[] = [];
+    for (const opt of this.options) {
+      const last = out.at(-1);
+      if (last && last.label === opt.section) last.options.push(opt);
+      else out.push({ label: opt.section, options: [opt] });
+    }
+    return out;
   }
 
   isSelected(opt: SelectOption): boolean {

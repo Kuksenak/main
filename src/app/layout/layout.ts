@@ -8,12 +8,13 @@ import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { UpdateService } from '../core/services/update.service';
+import { StackHost } from '../cards/stack-host';
 import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, StackHost, TranslatePipe],
   templateUrl: './layout.html',
 })
 export class Layout {
