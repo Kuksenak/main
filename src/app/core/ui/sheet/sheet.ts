@@ -30,7 +30,7 @@ const DESKTOP = '(min-width: 40rem)'; // Tailwind `sm`
         (backdropClick)="close()"
         (detach)="close()"
       >
-        <div class="dialog-panel w-72 origin-top-right !rounded-[24px] p-2 [animation:dropdownIn_160ms_cubic-bezier(0.2,0,0,1)]">
+        <div class="dialog-panel w-72 origin-top-right !rounded-[14px] p-3 [animation:dropdownIn_160ms_cubic-bezier(0.2,0,0,1)]">
           <ng-container [ngTemplateOutlet]="content" />
         </div>
       </ng-template>
@@ -60,7 +60,7 @@ const DESKTOP = '(min-width: 40rem)'; // Tailwind `sm`
             <div class="mx-auto h-[5px] w-9 rounded-full bg-black/20 dark:bg-white/25 sm:hidden"></div>
           </div>
 
-          <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-1 sm:pb-4">
+          <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 sm:px-4 sm:pb-4">
             <ng-container [ngTemplateOutlet]="content" />
           </div>
         </div>

@@ -10,7 +10,7 @@
       [value]="nativeValue()"
       [disabled]="disabled"
       (change)="onNativeChange($event)"
-      class="appearance-none border-0 px-2.5 py-1 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[17px] tabular-nums [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
+      class="appearance-none border-0 px-2.5 py-1 rounded-lg sm:rounded-md bg-black/[0.04] dark:bg-white/[0.06] text-[17px] tabular-nums [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
     >
   } @else {
     <!-- Desktop: custom iOS-style calendar via CDK overlay -->
@@ -21,7 +21,7 @@
       #origin="cdkOverlayOrigin"
       [disabled]="disabled"
       (click)="toggle(trigger)"
-      class="inline-flex w-auto items-center px-2.5 py-1 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+      class="inline-flex w-auto items-center px-2.5 py-1 rounded-lg sm:rounded-md bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
     >
       <span [class.opacity-40]="!value()">{{ triggerLabel() }}</span>
     </button>
@@ -35,7 +35,7 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <div class="mt-1.5 p-3 w-[300px] rounded-2xl bg-[var(--surface)] overflow-hidden
+      <div class="mt-1.5 p-3 w-[300px] rounded-xl bg-[var(--surface)] overflow-hidden
                   origin-top [animation:dropdownIn_160ms_cubic-bezier(0.2,0,0,1)]
                   shadow-[0_0_0_1px_rgba(0,0,0,0.08),0_8px_30px_rgba(0,0,0,0.12)]
                   dark:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_8px_30px_rgba(0,0,0,0.5)]">

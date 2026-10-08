@@ -249,14 +249,14 @@ app-about {
   .btn-primary {
     @apply glass-accent inline-flex h-11 items-center justify-center rounded-full
            px-5 text-[17px] font-semibold active:opacity-80
-           sm:h-9 sm:px-4 sm:text-[15px];
+           sm:h-9 sm:rounded-lg sm:px-4 sm:text-[15px];
   }
 
   /* Secondary action — neutral iOS pill */
   .btn-secondary {
     @apply glass-neutral inline-flex h-11 items-center justify-center rounded-full
            px-5 text-[17px] font-medium active:opacity-70
-           sm:h-9 sm:px-4 sm:text-[15px];
+           sm:h-9 sm:rounded-lg sm:px-4 sm:text-[15px];
   }
 
   /* Icon button — translucent grey circle */
@@ -282,11 +282,11 @@ app-about {
            dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_0.5px_rgba(0,0,0,0.6),0_16px_48px_rgba(0,0,0,0.55)];
   }
 
-  /* Desktop dialog surface: solid background, solid cards, concentric corners
-     (32px outer = 16px card radius + 16px padding). */
+  /* Desktop dialog surface: solid background, solid cards, modest desktop corners
+     (16px outer around 10px cards). */
   .dialog-panel {
     --surface: var(--card);
-    @apply rounded-[32px] border-0 bg-[var(--dialog-bg)] text-[var(--text)] backdrop-blur-none
+    @apply rounded-2xl border-0 bg-[var(--dialog-bg)] text-[var(--text)] backdrop-blur-none
            shadow-[0_0_0_0.5px_rgba(0,0,0,0.08),0_24px_64px_rgba(0,0,0,0.22)]
            dark:shadow-[0_0_0_0.5px_rgba(255,255,255,0.08),0_24px_64px_rgba(0,0,0,0.6)];
   }
@@ -294,7 +294,7 @@ app-about {
   /* iOS grouped list container */
   .ios-group {
     @apply overflow-hidden rounded-2xl border-[0.5px] border-black/[0.08] bg-[var(--surface)]
-           dark:border-white/[0.08];
+           dark:border-white/[0.08] sm:rounded-[10px];
   }
 
   /* Row inside an iOS group (divider between rows) */
