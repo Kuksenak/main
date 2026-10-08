@@ -1,12 +1,12 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { SearchField } from '../core/ui/search-field';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
 import { GroupService, colorVar } from '../students/group.service';
@@ -19,24 +19,10 @@ import { StudentService } from '../students/student.service';
  */
 @Component({
   selector: 'app-who-picker',
-  imports: [FormsModule, NgTemplateOutlet, Icon, PageSheet, ScrollArea, Sheet, TranslatePipe],
+  imports: [NgTemplateOutlet, Icon, PageSheet, ScrollArea, SearchField, Sheet, TranslatePipe],
   template: `
     <ng-template #search>
-      <label class="field">
-        <app-icon name="search" class="size-5 opacity-40 desktop:size-4" />
-        <input
-          type="search"
-          [ngModel]="query()"
-          (ngModelChange)="query.set($event)"
-          [placeholder]="'students.search' | t"
-          autocomplete="off"
-        />
-        @if (query()) {
-          <button type="button" (click)="query.set('')" [attr.aria-label]="'action.clear' | t" class="icon-plain -mr-1">
-            <app-icon name="close" [strokeWidth]="2.2" class="size-5 desktop:size-4" />
-          </button>
-        }
-      </label>
+      <app-search-field [(value)]="query" />
     </ng-template>
 
     <ng-template #lists>

@@ -20,6 +20,12 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* Rotate notice: the phone turns from landscape back to portrait, pauses, repeats. */
+@keyframes rotateBack {
+  0%, 15% { transform: rotate(-90deg); }
+  55%, 100% { transform: rotate(0deg); }
+}
+
 @keyframes loadingBar {
   0% { transform: translateX(-120%); }
   100% { transform: translateX(320%); }

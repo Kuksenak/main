@@ -30,8 +30,6 @@ interface SelectSection {
   ],
 })
 export class SelectField implements ControlValueAccessor {
-  @Input() label = '';
-  @Input() placeholder = ''; // defaults to the translated 'Select…'
   @Input() disabled = false;
   @Input() options: SelectOption[] = [];
 
@@ -48,7 +46,7 @@ export class SelectField implements ControlValueAccessor {
   readonly triggerLabel = computed(() => {
     const v = this.value();
     const opt = this.options.find((o) => o.value === v);
-    return opt ? opt.label : this.placeholder || this.i18n.t('picker.select');
+    return opt ? opt.label : this.i18n.t('picker.select');
   });
 
   toggle(): void {

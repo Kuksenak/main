@@ -1,19 +1,5 @@
 <ng-template #search>
-  <label class="field">
-    <app-icon name="search" class="size-5 opacity-40 desktop:size-4" />
-    <input
-      type="search"
-      [ngModel]="query()"
-      (ngModelChange)="query.set($event)"
-      [placeholder]="'students.search' | t"
-      autocomplete="off"
-    />
-    @if (query()) {
-      <button type="button" (click)="query.set('')" [attr.aria-label]="'action.clear' | t" class="icon-plain -mr-1">
-        <app-icon name="close" [strokeWidth]="2.2" class="size-5 desktop:size-4" />
-      </button>
-    }
-  </label>
+  <app-search-field [(value)]="query" />
 </ng-template>
 
 <!-- Mobile: list only (tap opens the card). Desktop: list on the left (calendar width), the

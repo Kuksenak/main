@@ -28,8 +28,6 @@ function startOfMonth(d: Date): Date {
   ],
 })
 export class DateField implements ControlValueAccessor {
-  @Input() label = '';
-  @Input() placeholder = ''; // defaults to the translated 'Select date…'
   @Input() disabled = false;
 
   private deviceService = inject(DeviceDetectionService);
@@ -52,7 +50,7 @@ export class DateField implements ControlValueAccessor {
     const v = this.value();
     return v
       ? v.toLocaleDateString(this.i18n.locale(), { day: 'numeric', month: 'short', year: 'numeric' })
-      : this.placeholder || this.i18n.t('picker.selectDate');
+      : this.i18n.t('picker.selectDate');
   });
 
   readonly monthLabel = computed(() =>
@@ -86,7 +84,7 @@ export class DateField implements ControlValueAccessor {
   });
 
   // Desktop calendar
-  toggle(trigger: HTMLElement) {
+  toggle() {
     if (this.disabled) return;
     if (!this.isOpen()) this.view.set(startOfMonth(this.value() ?? new Date()));
     this.isOpen.update((open) => !open);

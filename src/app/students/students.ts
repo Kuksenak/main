@@ -1,6 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { GroupMembers, StudentGroups } from '../cards/related-lists';
 import { LessonList } from '../cards/lesson-list';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -11,6 +10,7 @@ import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
 import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { SearchField } from '../core/ui/search-field';
 import { initial } from '../core/utils/text';
 import { Group, GroupService, colorVar } from './group.service';
 import { Student, StudentService } from './student.service';
@@ -25,7 +25,7 @@ type Tab = 'students' | 'groups';
  */
 @Component({
   selector: 'app-students',
-  imports: [FormsModule, NgTemplateOutlet, GroupMembers, Icon, LessonList, LongPress, ScrollArea, StudentGroups, TranslatePipe],
+  imports: [NgTemplateOutlet, GroupMembers, Icon, LessonList, LongPress, ScrollArea, SearchField, StudentGroups, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {

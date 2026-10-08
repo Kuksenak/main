@@ -34,8 +34,6 @@ const CLS_PLAIN = 'option';
   ],
 })
 export class TimeField implements ControlValueAccessor {
-  @Input() label = '';
-  @Input() placeholder = ''; // defaults to the translated 'Select time…'
   @Input() disabled = false;
   @Input() minuteStep = 5;
 
@@ -104,7 +102,7 @@ export class TimeField implements ControlValueAccessor {
 
   readonly triggerLabel = computed(() => {
     const v = this.value();
-    if (!v) return this.placeholder || this.i18n.t('picker.selectTime');
+    if (!v) return this.i18n.t('picker.selectTime');
     const [h, m] = v.split(':').map(Number);
     const d = new Date();
     d.setHours(h, m, 0, 0);
@@ -112,7 +110,7 @@ export class TimeField implements ControlValueAccessor {
   });
 
   // Desktop picker
-  toggle(trigger: HTMLElement) {
+  toggle() {
     if (this.disabled) return;
     if (!this.isOpen()) this.now.set(new Date());
     this.isOpen.update((open) => !open);

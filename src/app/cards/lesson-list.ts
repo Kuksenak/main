@@ -6,7 +6,7 @@ import { NavStack } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { Section } from '../core/ui/section/section';
 import { LessonTitleStore } from '../schedule/lesson-title.store';
-import { Lesson, LessonService } from '../schedule/lesson.service';
+import { Lesson, LessonService, lessonEnd, statusKey } from '../schedule/lesson.service';
 import { GroupService } from '../students/group.service';
 
 /**
@@ -36,7 +36,7 @@ import { GroupService } from '../students/group.service';
                   </p>
                 </div>
                 @if (l.status !== 'Scheduled') {
-                  <span class="badge">{{ statusKey(l) | t }}</span>
+                  <span class="badge">{{ statusKey(l.status) | t }}</span>
                 }
                 <app-icon name="chevron-right" class="row-chevron" />
               </button>
@@ -57,7 +57,8 @@ export class LessonList {
   protected titles = inject(LessonTitleStore);
 
   private readonly mine = computed(() => this.lessons.lessons().filter((l) => l.studentName === this.who()));
-  private end = (l: Lesson) => new Date(l.startsAt).getTime() + l.durationMinutes * 60_000;
+  private end = (l: Lesson) => lessonEnd(l).getTime();
+  protected readonly statusKey = statusKey;
   protected readonly upcoming = computed(() =>
     this.mine()
       .filter((l) => this.end(l) >= Date.now())
@@ -86,21 +87,10 @@ export class LessonList {
   }
 
   protected date(l: Lesson): string {
-    return new Date(l.startsAt).toLocaleDateString(this.i18n.locale(), {
-      weekday: 'short',
-      day: 'numeric',
-      month: 'short',
-    });
+    return this.i18n.date(new Date(l.startsAt), { weekday: 'short', day: 'numeric', month: 'short' });
   }
 
   protected time(l: Lesson): string {
-    const start = new Date(l.startsAt);
-    const end = new Date(this.end(l));
-    const fmt = (d: Date) => d.toLocaleTimeString(this.i18n.locale(), { hour: '2-digit', minute: '2-digit' });
-    return `${fmt(start)}–${fmt(end)}`;
-  }
-
-  protected statusKey(l: Lesson): TranslationKey {
-    return `lesson.status.${l.status}`;
+    return `${this.i18n.time(new Date(l.startsAt))}–${this.i18n.time(lessonEnd(l))}`;
   }
 }

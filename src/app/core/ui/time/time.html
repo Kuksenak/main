@@ -1,7 +1,4 @@
 <div class="inline-flex w-auto flex-col gap-1.5">
-  @if (label) {
-    <span class="text-sm opacity-70">{{ label }}</span>
-  }
 
   @if (isMobile()) {
     <!-- Mobile: native time picker -->
@@ -15,12 +12,12 @@
   } @else {
     <!-- Desktop: custom iOS-style time picker via CDK overlay -->
     <button
-      #trigger
+     
       type="button"
       cdkOverlayOrigin
       #origin="cdkOverlayOrigin"
       [disabled]="disabled"
-      (click)="toggle(trigger)"
+      (click)="toggle()"
       (keydown)="onKeydown($event)"
       class="chip"
     >

@@ -18,19 +18,16 @@
         <a
           [routerLink]="item.path"
           routerLinkActive="glass-accent"
-          class="text-body inline-flex h-9 items-center rounded-lg px-4 font-medium mobile:hidden"
-        >{{ item.label | t }}</a>
+          class="text-body inline-flex h-9 items-center gap-2 rounded-lg pl-2 pr-4 font-medium mobile:hidden"
+        >
+          <app-brand-icon [name]="item.icon" class="size-6" />
+          {{ item.label | t }}
+        </a>
       }
     </nav>
-    <!-- Navigation menus, three styles side by side to compare (TEMP: keep one) -->
-    <button #navTilesBtn type="button" (click)="navOpen.set('tiles')" [attr.aria-label]="'nav.menu' | t" class="icon-btn">
+    <!-- Navigation menu (mobile; desktop has the tabs) -->
+    <button #navBtn type="button" (click)="navOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn desktop:hidden">
       <app-icon name="grid" class="size-6" />
-    </button>
-    <button #navBtn type="button" (click)="navOpen.set('icons')" [attr.aria-label]="'nav.menu' | t" class="icon-btn">
-      <app-icon name="list" class="size-6" />
-    </button>
-    <button #navListBtn type="button" (click)="navOpen.set('list')" [attr.aria-label]="'nav.menu' | t" class="icon-btn">
-      <app-icon name="menu" class="size-6" />
     </button>
     <!-- Account: first letter of the email; green dot when an app update is ready -->
     <button
@@ -53,51 +50,20 @@
   <app-stack-host />
 
   @if (navOpen()) {
-    <app-sheet
-      #navSheet
-      [origin]="navOpen() === 'list' ? navListBtn : navOpen() === 'tiles' ? navTilesBtn : navBtn"
-      (closed)="navOpen.set(null)"
-    >
-      @if (navOpen() === 'tiles') {
-        <!-- Tiles: icon above label, no borders or backgrounds; the current one's label is blue -->
-        <div class="grid grid-cols-3 gap-2">
-          @for (item of navItems; track item.path) {
-            <button type="button" (click)="go(item.path, navSheet)" class="nav-tile">
-              <app-brand-icon [name]="item.icon" class="size-11" />
-              <span class="text-footnote w-full truncate text-center" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
-            </button>
-          }
-        </div>
-      } @else if (navOpen() === 'list') {
-        <!-- Like the account menu: text rows in cards, About in its own block -->
-        <div class="flex flex-col gap-2">
-          @for (group of [mainNav, infoNav]; track $index) {
-            <div class="card">
-              @for (item of group; track item.path) {
-                <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full text-left">
-                  <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
-                  @if (isActive(item.path)) {
-                    <app-icon name="check" class="size-5 text-[var(--accent)]" />
-                  }
-                </button>
-              }
-            </div>
-          }
-        </div>
-      } @else {
-        <!-- Borderless rows with the brand icons; the current one in the accent color -->
-        <div class="flex flex-col">
-          @for (item of navItems; track item.path) {
-            <button type="button" (click)="go(item.path, navSheet)" class="menu-row">
-              <app-brand-icon [name]="item.icon === 'info' ? 'info-plain' : item.icon" class="size-9" />
-              <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
-              @if (isActive(item.path)) {
-                <app-icon name="check" class="size-5 text-[var(--accent)]" />
-              }
-            </button>
-          }
-        </div>
-      }
+    <app-sheet #navSheet [origin]="navBtn" (closed)="navOpen.set(false)">
+      <!-- Sections, one per row with its brand icon; the current one in the accent color.
+           No card background or outline — just the rows and the dividers between them. -->
+      <div class="flex flex-col">
+        @for (item of navItems; track item.path) {
+          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full py-1.5 text-left">
+            <app-brand-icon [name]="item.icon" class="size-8" />
+            <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
+            @if (isActive(item.path)) {
+              <app-icon name="check" class="size-5 text-[var(--accent)]" />
+            }
+          </button>
+        }
+      </div>
     </app-sheet>
   }
 

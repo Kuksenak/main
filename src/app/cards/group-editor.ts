@@ -6,6 +6,7 @@ import { NavStack, StackEntry } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { SearchField } from '../core/ui/search-field';
 import { Section } from '../core/ui/section/section';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
@@ -22,7 +23,7 @@ interface Model {
 /** Group card (new or existing), opened on the NavStack: name, color, members, lessons. */
 @Component({
   selector: 'app-group-editor',
-  imports: [FormsModule, Icon, LessonList, PageSheet, ScrollArea, Section, Sheet, TranslatePipe],
+  imports: [FormsModule, Icon, LessonList, PageSheet, ScrollArea, SearchField, Section, Sheet, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -92,15 +93,7 @@ interface Model {
     @if (pickingMembers()) {
       <app-sheet #memberSheet (closed)="pickingMembers.set(false)">
         <div class="flex min-h-0 flex-1 flex-col gap-3">
-          <label class="field">
-            <app-icon name="search" class="size-5 opacity-40 desktop:size-4" />
-            <input type="search" [ngModel]="memberQuery()" (ngModelChange)="memberQuery.set($event)" [placeholder]="'students.search' | t" autocomplete="off" />
-            @if (memberQuery()) {
-              <button type="button" (click)="memberQuery.set('')" [attr.aria-label]="'action.clear' | t" class="icon-plain -mr-1">
-                <app-icon name="close" [strokeWidth]="2.2" class="size-5 desktop:size-4" />
-              </button>
-            }
-          </label>
+          <app-search-field [(value)]="memberQuery" />
           <app-scroll-area class="min-h-0 shrink" viewportClass="card">
             @for (s of pickerStudents(); track s.id) {
               <button type="button" (click)="toggle(s.id)" class="list-row w-full py-2 text-left">

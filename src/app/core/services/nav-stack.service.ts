@@ -10,7 +10,6 @@ export interface StackEntry {
   kind: 'lesson' | 'student' | 'group';
   id: string | null; // null = new
   date?: string; // new lesson: its day ('yyyy-MM-dd')
-  time?: string; // new lesson: its start ('HH:mm'), one hour long
   studentIds?: string[]; // new group: pre-selected members
 }
 

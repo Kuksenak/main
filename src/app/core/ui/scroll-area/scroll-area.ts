@@ -1,6 +1,5 @@
 import {
   Component,
-  output,
   DestroyRef,
   ElementRef,
   afterNextRender,
@@ -18,8 +17,8 @@ import {
  *
  * `viewportClass` styles the scrolling element itself (e.g. `card`, so its rounded corners stay
  * put while the content scrolls inside); the content is a full-height flex column (extend it
- * with `contentClass`); `gutter` is how far outside the content edge the thumb sits — keep the
- * default so it's the same everywhere. Padding on the host is the room the thumb sits in.
+ * with `contentClass`). The thumb sits 10px outside the content edge, the same everywhere;
+ * padding on the host is the room it sits in.
  */
 @Component({
   selector: 'app-scroll-area',
@@ -30,7 +29,7 @@ import {
       @if (thumb(); as t) {
         <div
           class="scroll-indicator"
-          [style.right.px]="-gutter()"
+          [style.right.px]="-gutter"
           [style.top.%]="t.top"
           [style.height.%]="t.height"
           [style.opacity]="scrolling() ? 1 : 0.5"
@@ -50,9 +49,8 @@ import {
 export class ScrollArea {
   readonly viewportClass = input(''); // the scrolling element (e.g. `card`)
   readonly contentClass = input(''); // the content column inside it (e.g. `gap-3`)
-  readonly gutter = input(10);
-  /** Fires on every scroll of the area (read positions via `element`). */
-  readonly scrolled = output<HTMLElement>();
+  // How far outside the content edge the thumb sits — the same everywhere.
+  protected readonly gutter = 10;
 
   private readonly viewport = viewChild.required<ElementRef<HTMLElement>>('viewport');
   private readonly content = viewChild.required<ElementRef<HTMLElement>>('content');
@@ -73,13 +71,7 @@ export class ScrollArea {
     });
   }
 
-  /** The scrolling element — for code that scrolls to / reads positions inside the area. */
-  get element(): HTMLElement {
-    return this.viewport().nativeElement;
-  }
-
   protected onScroll(): void {
-    this.scrolled.emit(this.viewport().nativeElement);
     this.update();
     this.scrolling.set(true);
     clearTimeout(this.timer);

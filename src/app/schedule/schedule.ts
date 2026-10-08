@@ -11,23 +11,16 @@ import {
 } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { TranslationKey } from '../core/i18n/translations';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { NavStack } from '../core/services/nav-stack.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
 import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
-import { addDays, startOfDay, toDateInput, toTimeInput } from '../core/utils/time';
+import { addDays, startOfDay, toDateInput } from '../core/utils/time';
 import { GroupService } from '../students/group.service';
 import { LessonTitleStore } from './lesson-title.store';
-import {
-  LESSON_WEEKS_TOTAL,
-  Lesson,
-  LessonService,
-  LessonStatus,
-  lessonWindow,
-} from './lesson.service';
+import { LESSON_WEEKS_TOTAL, Lesson, LessonService, lessonEnd, lessonWindow, statusKey } from './lesson.service';
 
 function startOfMonth(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -77,13 +70,9 @@ export class Schedule implements AfterViewInit {
   }
 
   // Month title, e.g. "October 2026" / "Październik 2026" (capitalized for every language).
-  protected readonly monthTitle = computed(() => {
-    const s = this.visibleMonth().toLocaleDateString(this.i18n.locale(), {
-      month: 'long',
-      year: 'numeric',
-    });
-    return s.charAt(0).toLocaleUpperCase(this.i18n.locale()) + s.slice(1);
-  });
+  protected readonly monthTitle = computed(() =>
+    this.i18n.capitalize(this.i18n.date(this.visibleMonth(), { month: 'long', year: 'numeric' })),
+  );
 
   // Lessons grouped by day key for O(1) cell lookup.
   private readonly byDay = computed(() => {
@@ -101,7 +90,7 @@ export class Schedule implements AfterViewInit {
     const now = Date.now();
     return this.service
       .lessons()
-      .filter((l) => l.status !== 'Cancelled' && new Date(l.startsAt).getTime() + l.durationMinutes * 60_000 >= now)
+      .filter((l) => l.status !== 'Cancelled' && lessonEnd(l).getTime() >= now)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
       .slice(0, this.upcomingFit());
   });
@@ -131,8 +120,8 @@ export class Schedule implements AfterViewInit {
   // "Wed, 8 Oct · 18:00–19:00"
   protected upcomingWhen(l: Lesson): string {
     const start = new Date(l.startsAt);
-    const day = start.toLocaleDateString(this.i18n.locale(), { weekday: 'short', day: 'numeric', month: 'short' });
-    return `${day} · ${toTimeInput(start)}–${this.endLabel(l.startsAt, l.durationMinutes)}`;
+    const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
+    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(lessonEnd(l))}`;
   }
 
   protected readonly dayLessons = computed(
@@ -218,26 +207,21 @@ export class Schedule implements AfterViewInit {
   }
 
   // Desktop title above the day's lessons, e.g. "Wednesday, 8 October".
-  protected readonly dayTitle = computed(() => {
-    const s = this.selectedDate().toLocaleDateString(this.i18n.locale(), {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-    });
-    return s.charAt(0).toLocaleUpperCase(this.i18n.locale()) + s.slice(1);
-  });
+  protected readonly dayTitle = computed(() =>
+    this.i18n.capitalize(this.i18n.date(this.selectedDate(), { weekday: 'long', day: 'numeric', month: 'long' })),
+  );
 
   protected today(): void {
     this.selectedDate.set(startOfDay(new Date()));
     this.scrollToToday();
   }
 
-  protected timeLabel(iso: string): string {
-    return toTimeInput(new Date(iso));
+  protected startLabel(l: Lesson): string {
+    return this.i18n.time(new Date(l.startsAt));
   }
 
-  protected endLabel(iso: string, minutes: number): string {
-    return toTimeInput(new Date(new Date(iso).getTime() + minutes * 60_000));
+  protected endLabel(l: Lesson): string {
+    return this.i18n.time(lessonEnd(l));
   }
 
   // Calendar color of a lesson (bar on the left of each row, calendar dots): the group's color
@@ -251,9 +235,7 @@ export class Schedule implements AfterViewInit {
     return this.titles.get(lesson.id);
   }
 
-  protected statusKey(status: LessonStatus): TranslationKey {
-    return `lesson.status.${status}`;
-  }
+  protected readonly statusKey = statusKey;
 
   protected openNew(): void {
     this.stack.push({ kind: 'lesson', id: null, date: toDateInput(this.selectedDate()) });

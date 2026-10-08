@@ -21,6 +21,21 @@ export class I18nService {
     document.documentElement.lang = this.lang();
   }
 
+  /** Time of day in the current locale, e.g. "18:00" / "06:00 PM". */
+  time(d: Date): string {
+    return d.toLocaleTimeString(this.locale(), { hour: '2-digit', minute: '2-digit' });
+  }
+
+  /** A date in the current locale with the given parts, e.g. { weekday: 'short', day: 'numeric' }. */
+  date(d: Date, parts: Intl.DateTimeFormatOptions): string {
+    return d.toLocaleDateString(this.locale(), parts);
+  }
+
+  /** First letter uppercased (month / weekday names are lowercase in some languages). */
+  capitalize(s: string): string {
+    return s.charAt(0).toLocaleUpperCase(this.locale()) + s.slice(1);
+  }
+
   t(key: TranslationKey): string {
     return DICTIONARIES[this.lang()][key] ?? DICTIONARIES.en[key] ?? key;
   }

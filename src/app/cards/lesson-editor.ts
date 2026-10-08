@@ -2,7 +2,6 @@ import { Component, ElementRef, OnInit, computed, inject, input, output, signal,
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { TranslationKey } from '../core/i18n/translations';
 import { NavStack, StackEntry } from '../core/services/nav-stack.service';
 import { DateField } from '../core/ui/date/date';
 import { Icon } from '../core/ui/icon/icon';
@@ -17,7 +16,7 @@ import {
   toTimeInput,
 } from '../core/utils/time';
 import { LessonTitleStore } from '../schedule/lesson-title.store';
-import { LessonService, LessonStatus, lessonWindow } from '../schedule/lesson.service';
+import { LESSON_STATUSES, LessonService, LessonStatus, statusKey } from '../schedule/lesson.service';
 import { GroupService } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 import { WhoPicker } from './who-picker';
@@ -127,15 +126,12 @@ export class LessonEditor implements OnInit {
   private readonly snapshot = signal('');
 
   protected readonly statusOptions = computed<SelectOption[]>(() =>
-    (['Scheduled', 'Done', 'Cancelled'] as const).map((s) => ({
-      label: this.i18n.t(`lesson.status.${s}` as TranslationKey),
-      value: s,
-    })),
+    LESSON_STATUSES.map((s) => ({ label: this.i18n.t(statusKey(s)), value: s })),
   );
 
   protected readonly date = computed(() => fromDateInput(this.model().date));
   protected readonly dateLabel = computed(() =>
-    this.date().toLocaleDateString(this.i18n.locale(), { weekday: 'short', month: 'short', day: 'numeric' }),
+    this.i18n.date(this.date(), { weekday: 'short', month: 'short', day: 'numeric' }),
   );
   protected readonly invalid = computed(
     () => timeToMin(this.model().endTime) <= timeToMin(this.model().startTime),
@@ -167,14 +163,8 @@ export class LessonEditor implements OnInit {
         note: lesson.note ?? '',
         status: lesson.status,
       });
-    } else {
-      const startTime = e.time ?? this.blank().startTime;
-      this.model.set({
-        ...this.blank(),
-        date: e.date ?? this.blank().date,
-        startTime,
-        endTime: minToTime(timeToMin(startTime) + 60),
-      });
+    } else if (e.date) {
+      this.model.set({ ...this.blank(), date: e.date });
     }
     this.snapshot.set(JSON.stringify(this.model()));
   }
@@ -217,13 +207,12 @@ export class LessonEditor implements OnInit {
       note: m.note.trim() || null,
       status: m.status,
     };
-    const { from, to } = lessonWindow();
     const title = m.title.trim();
     if (id) {
       this.titles.set(id, title);
-      this.lessons.update(id, input, from, to);
+      this.lessons.update(id, input);
     } else {
-      this.lessons.create(input, from, to, (newId) => this.titles.set(newId, title));
+      this.lessons.create(input, (newId) => this.titles.set(newId, title));
     }
     this.page().close();
   }
@@ -231,8 +220,7 @@ export class LessonEditor implements OnInit {
   protected remove(): void {
     const id = this.entry().id;
     if (!id) return;
-    const { from, to } = lessonWindow();
-    this.lessons.remove(id, from, to);
+    this.lessons.remove(id);
     this.titles.remove(id);
     this.page().close();
   }

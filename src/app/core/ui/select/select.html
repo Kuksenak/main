@@ -1,7 +1,4 @@
 <div class="inline-flex w-auto flex-col gap-1.5">
-  @if (label) {
-    <span class="text-sm opacity-70">{{ label }}</span>
-  }
 
   @if (isMobile()) {
     <!-- Mobile: native select with an iOS-style up/down chevron -->
@@ -34,7 +31,7 @@
   } @else {
     <!-- Desktop: custom iOS-style dropdown via CDK overlay -->
     <button
-      #trigger
+     
       type="button"
       cdkOverlayOrigin
       #origin="cdkOverlayOrigin"

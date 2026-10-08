@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type BrandIconName = 'calendar' | 'people' | 'info' | 'info-plain';
+export type BrandIconName = 'calendar' | 'people' | 'info';
 
 /**
  * Flat multi-color product icons in the logo's colors (Google-product style, no background),
@@ -57,29 +57,25 @@ export type BrandIconName = 'calendar' | 'people' | 'info' | 'info-plain';
           <path d="M5 38a14 12 0 0 1 28 0v0.5a5.5 5.5 0 0 1-5.5 5.5h-17a5.5 5.5 0 0 1-5.5-5.5z" style="fill: var(--brand-blue)" />
         }
         @case ('info') {
-          <!-- Same light page as the calendar (tint, outline, soft shadow), a blue "i" with the
-               orange dot -->
+          <!-- The calendar's tear-off page without the blue header: an "i" with the orange dot -->
           <defs>
             <filter id="brand-info-shadow" x="-20%" y="-20%" width="140%" height="150%">
               <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#1d2b4a" flood-opacity="0.18" />
             </filter>
           </defs>
-          <rect
-            x="5"
-            y="5"
-            width="38"
-            height="38"
-            rx="10"
-            filter="url(#brand-info-shadow)"
-            style="fill: color-mix(in srgb, var(--brand-blue) 6%, white); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
+          <g filter="url(#brand-info-shadow)">
+            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 38%, white)" />
+            <path
+              d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
+              style="fill: color-mix(in srgb, var(--brand-blue) 6%, white); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
+            />
+          </g>
+          <path
+            d="M34 42c0-5 3-9 9-9l-9 9z"
+            style="fill: color-mix(in srgb, var(--brand-blue) 45%, #dfe4ee); stroke: color-mix(in srgb, var(--brand-blue) 60%, white); stroke-width: 0.75; stroke-linejoin: round"
           />
-          <circle cx="24" cy="15" r="3.6" style="fill: var(--brand-orange)" />
-          <rect x="20.5" y="21" width="7" height="16" rx="3.5" style="fill: var(--brand-blue)" />
-        }
-        @case ('info-plain') {
-          <!-- The same "i" without the page: orange dot, blue stem -->
-          <circle cx="24" cy="10" r="4.5" style="fill: var(--brand-orange)" />
-          <rect x="19.5" y="18" width="9" height="24" rx="4.5" style="fill: var(--brand-blue)" />
+          <circle cx="23" cy="13.5" r="3.6" style="fill: var(--brand-orange)" />
+          <rect x="19.5" y="20" width="7" height="16" rx="3.5" style="fill: var(--brand-blue)" />
         }
       }
     </svg>

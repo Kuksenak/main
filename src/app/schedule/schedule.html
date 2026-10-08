@@ -96,8 +96,8 @@
                   <span class="badge">{{ statusKey(lesson.status) | t }}</span>
                 }
                 <div class="text-callout text-right leading-tight tabular-nums">
-                  <p class="font-medium">{{ timeLabel(lesson.startsAt) }}</p>
-                  <p class="opacity-50">{{ endLabel(lesson.startsAt, lesson.durationMinutes) }}</p>
+                  <p class="font-medium">{{ startLabel(lesson) }}</p>
+                  <p class="opacity-50">{{ endLabel(lesson) }}</p>
                 </div>
               </div>
             </button>
