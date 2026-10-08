@@ -5,7 +5,8 @@
 <!-- Mobile: list only (tap opens the card). Desktop: list on the left (calendar width), the
      picked student / group on the right. -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6">
-  <section class="flex min-h-0 w-full flex-col gap-3 desktop:max-w-md desktop:flex-1">
+  <!-- Bottom padding keeps the list clear of the floating button -->
+  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 pb-14 desktop:max-w-md">
     <!-- Search: here on desktop; on mobile the same template sits in the toolbar -->
     <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
 
@@ -15,11 +16,11 @@
       <button type="button" (click)="setTab('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
     </div>
 
-    <!-- List: the card fills down to the bottom and scrolls inside (corners stay put, indicator
-         beside it); bottom padding lets the last row clear the floating button -->
+    <!-- List: the card ends with its last row; when there are more rows than fit it scrolls
+         inside (corners stay put, indicator beside it) -->
     @if (tab() === 'students') {
       @if (visible().length) {
-        <app-scroll-area class="flex-1" viewportClass="card" contentClass="pb-14">
+        <app-scroll-area class="min-h-0 shrink" viewportClass="card">
           @for (s of visible(); track s.id) {
             <!-- Long press: select students to make a group -->
             <button
@@ -27,7 +28,7 @@
               appLongPress
               (longPress)="startSelect(s)"
               (click)="pick(s)"
-              class="list-row w-full py-2.5 text-left"
+              class="list-row w-full py-2 text-left"
             >
               @if (selecting()) {
                 <span class="check" [class.is-on]="checked().has(s.id)">
@@ -51,18 +52,18 @@
           }
         </app-scroll-area>
       } @else {
-        <div class="flex flex-1 items-center justify-center pb-14">
+        <div class="flex flex-1 items-center justify-center">
           <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : 'students.empty') | t }}</p>
         </div>
       }
     } @else {
       @if (visibleGroups().length) {
-        <app-scroll-area class="flex-1" viewportClass="card" contentClass="pb-14">
+        <app-scroll-area class="min-h-0 shrink" viewportClass="card">
           @for (g of visibleGroups(); track g.id) {
             <button
               type="button"
               (click)="pickGroup(g)"
-              class="list-row w-full py-2.5 text-left"
+              class="list-row w-full py-2 text-left"
             >
               <span class="avatar text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
               <p class="min-w-0 flex-1 truncate font-medium" [class.font-bold]="desktop && g.id === selectedGroup()?.id">{{ g.name }}</p>
@@ -74,7 +75,7 @@
           }
         </app-scroll-area>
       } @else {
-        <div class="flex flex-1 items-center justify-center pb-14">
+        <div class="flex flex-1 items-center justify-center">
           <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : 'groups.empty') | t }}</p>
         </div>
       }

@@ -48,13 +48,13 @@
 
   @if (navOpen()) {
     <app-sheet #navSheet [origin]="navBtn" (closed)="navOpen.set(false)">
-      <!-- Sections, one per row with its brand icon; the current one in the accent color.
+      <!-- Sections, one per row with its brand icon; the current one has a check mark.
            No card background or outline — just the rows and the dividers between them. -->
       <div class="flex flex-col">
         @for (item of navItems; track item.path) {
           <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full py-1.5 text-left">
             <app-brand-icon [name]="item.icon" class="size-8" />
-            <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
+            <span class="min-w-0 flex-1 truncate">{{ item.label | t }}</span>
             @if (isActive(item.path)) {
               <app-icon name="check" class="size-5 text-[var(--accent)]" />
             }
