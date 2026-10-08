@@ -63,6 +63,11 @@ jobs:
         run: |
           echo "$PAGES_CNAME" > dist/main/browser/CNAME
 
+      # GitHub Pages has no SPA fallback: unknown paths (/l/:token, /lessons/:id, …) get
+      # 404.html — make it the app, so deep links and shared links open the right page.
+      - name: SPA fallback (404.html)
+        run: cp dist/main/browser/index.html dist/main/browser/404.html
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
