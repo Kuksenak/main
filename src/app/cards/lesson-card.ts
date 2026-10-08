@@ -40,7 +40,7 @@ import { EventList } from './event-list';
       @if (!editing()) {
         <ng-container ngProjectAs="[barEnd]">
           <button #infoBtnMobile type="button" (click)="openInfo(infoBtnMobile)" [attr.aria-label]="'lessons.info' | t" class="icon-btn">
-            <app-icon name="info" class="size-6" />
+            <app-icon name="i" [strokeWidth]="2.6" class="size-6" />
           </button>
           <button type="button" (click)="edit()" [attr.aria-label]="'action.edit' | t" class="icon-btn">
             <app-icon name="pencil" class="size-6" />
@@ -54,7 +54,7 @@ import { EventList } from './event-list';
           <div class="flex items-center gap-3 mobile:hidden">
             <h1 class="min-w-0 flex-1 text-2xl font-semibold">{{ heading() }}</h1>
             <button #infoBtn type="button" (click)="openInfo(infoBtn)" [attr.aria-label]="'lessons.info' | t" class="icon-btn">
-              <app-icon name="info" class="size-5" />
+              <app-icon name="i" [strokeWidth]="2.6" class="size-5" />
             </button>
             <button type="button" (click)="edit()" class="btn-secondary">{{ 'action.edit' | t }}</button>
           </div>
