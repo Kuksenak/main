@@ -57,21 +57,22 @@
           <div class="ios-row h-11 sm:h-9 !py-0">
             <span class="min-w-0 truncate text-[17px] sm:text-[15px]">{{ auth.email() }}</span>
           </div>
-          @if (updates.updateReady()) {
-            <button type="button" (click)="updates.apply()" class="ios-row h-11 sm:h-9 w-full !py-0 text-left">
-              <span class="flex items-center gap-1.5 text-[17px] sm:text-[15px]">
-                Update available
-                <span class="size-2 rounded-full bg-[#34c759]"></span>
-              </span>
-            </button>
-          }
           <div class="ios-row h-11 sm:h-9 !py-0">
             <span class="text-[17px] sm:text-[15px]">Version</span>
             <span class="text-[17px] sm:text-[15px] tabular-nums opacity-50">{{ updates.version }}</span>
           </div>
         </div>
 
-        <button type="button" (click)="logout(sheet)" class="ios-group mt-auto flex h-11 sm:h-9 w-full shrink-0 items-center justify-center text-[17px] sm:text-[15px] font-semibold text-red-500 active:opacity-60">Log out</button>
+        <!-- Actions pinned to the bottom: card-style buttons -->
+        <div class="mt-auto flex flex-col gap-3 sm:gap-2">
+          @if (updates.updateReady()) {
+            <button type="button" (click)="updates.apply()" class="ios-group flex h-11 sm:h-9 w-full shrink-0 items-center justify-center gap-1.5 text-[17px] sm:text-[15px] font-semibold text-[var(--accent)] active:opacity-60">
+              Update available
+              <span class="size-2 rounded-full bg-[#34c759]"></span>
+            </button>
+          }
+          <button type="button" (click)="logout(sheet)" class="ios-group flex h-11 sm:h-9 w-full shrink-0 items-center justify-center text-[17px] sm:text-[15px] font-semibold text-red-500 active:opacity-60">Log out</button>
+        </div>
       </div>
     </app-sheet>
   }

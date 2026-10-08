@@ -109,7 +109,7 @@
 <button
   type="button"
   (click)="today()"
-  class="btn-secondary fixed bottom-[calc(max(0.5rem,env(safe-area-inset-bottom))+0.5rem)] left-4 z-20 !h-12 sm:hidden"
+  class="btn-secondary fixed bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] left-4 z-20 !h-12 sm:hidden"
 >Today</button>
 
 <!-- Add button — same size and right edge as the account avatar in the header -->
@@ -117,7 +117,7 @@
   type="button"
   (click)="openNew()"
   aria-label="Add lesson"
-  class="fixed bottom-[calc(max(0.5rem,env(safe-area-inset-bottom))+0.5rem)] right-4 z-20 flex size-12 sm:size-10 items-center justify-center rounded-full glass-accent active:scale-95 active:opacity-80 transition-transform"
+  class="fixed bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] right-4 z-20 flex size-12 sm:size-10 items-center justify-center rounded-full glass-accent active:scale-95 active:opacity-80 transition-transform"
 >
   <svg viewBox="0 0 24 24" fill="none" class="size-7 sm:size-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
 </button>
