@@ -1,13 +1,13 @@
 import { Injectable, signal } from '@angular/core';
 
 /**
- * A card opened on top of whatever is on screen (event, student, group). Cards open from
+ * A card opened on top of whatever is on screen (event, student, group, lesson). Cards open from
  * anywhere (a list, another card) and stack: "back" closes only the top one, so the card
  * underneath is exactly as it was left — unsaved edits included.
  */
 export interface StackEntry {
   key: number;
-  kind: 'event' | 'student' | 'group';
+  kind: 'event' | 'student' | 'group' | 'lesson';
   id: string | null; // null = new
   date?: string; // new event: its day ('yyyy-MM-dd')
   studentIds?: string[]; // new group: pre-selected members

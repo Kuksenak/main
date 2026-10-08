@@ -7,6 +7,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
+import { LessonService } from '../lessons/lesson.service';
 import { EventService } from '../schedule/event.service';
 import { GroupService } from '../students/group.service';
 import { StudentService } from '../students/student.service';
@@ -34,12 +35,14 @@ export class Layout {
     inject(EventService).ensureLoaded();
     inject(StudentService).ensureLoaded();
     inject(GroupService).ensureLoaded();
+    inject(LessonService).ensureLoaded();
   }
 
   // Sections: desktop tabs and the navigation menu.
   protected readonly navItems: { path: string; label: TranslationKey; icon: BrandIconName }[] = [
     { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
     { path: '/students', label: 'nav.students', icon: 'people' },
+    { path: '/lessons', label: 'nav.lessons', icon: 'book' },
     { path: '/about', label: 'nav.about', icon: 'info' },
   ];
 

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -17,13 +17,21 @@ import {
   toTimeInput,
 } from '../core/utils/time';
 import { EVENT_STATUSES, EventService, EventStatus, statusKey } from '../schedule/event.service';
+import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
-import { InvitePicker, Invitees } from './invite-picker';
+import { PickList, PickSection } from './pick-list';
+
+/** Who an event is for: any number of groups and students. */
+interface Invitees {
+  studentIds: string[];
+  groupIds: string[];
+}
 
 interface Model {
   title: string;
   invitees: Invitees;
+  lessonIds: string[];
   date: string; // yyyy-MM-dd
   startTime: string; // HH:mm
   endTime: string; // HH:mm
@@ -34,7 +42,7 @@ interface Model {
 /** Event card (new or existing), opened on the NavStack. */
 @Component({
   selector: 'app-event-editor',
-  imports: [FormsModule, DateField, Icon, InvitePicker, PageSheet, SelectField, TimeField, TranslatePipe],
+  imports: [FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -63,8 +71,23 @@ interface Model {
               <app-icon name="chevron-right" class="row-chevron" />
             </button>
           }
-          <button #inviteRow type="button" (click)="picking.set(true)" class="list-row w-full text-left text-[var(--accent)]">
+          <button #inviteRow type="button" (click)="picking.set('invite')" class="list-row w-full text-left text-[var(--accent)]">
             <span>{{ 'event.invite' | t }}</span>
+            <app-icon name="plus" class="size-5" />
+          </button>
+        </div>
+
+        <!-- Attached lessons (a tap opens the lesson card), then Attach -->
+        <div class="card">
+          @for (l of attached(); track l.id) {
+            <button type="button" (click)="stack.push({ kind: 'lesson', id: l.id })" class="list-row w-full text-left">
+              <app-icon name="book" class="size-5 text-[var(--accent)]" />
+              <p class="min-w-0 flex-1 truncate">{{ l.title }}</p>
+              <app-icon name="chevron-right" class="row-chevron" />
+            </button>
+          }
+          <button #lessonRow type="button" (click)="picking.set('lessons')" class="list-row w-full text-left text-[var(--accent)]">
+            <span>{{ 'event.attachLesson' | t }}</span>
             <app-icon name="plus" class="size-5" />
           </button>
         </div>
@@ -101,8 +124,27 @@ interface Model {
       </div>
     </app-page-sheet>
 
-    @if (picking()) {
-      <app-invite-picker [value]="m.invitees" (valueChange)="patch({ invitees: $event })" [origin]="inviteOrigin()" (closed)="picking.set(false)" />
+    @switch (picking()) {
+      @case ('invite') {
+        <app-pick-list
+          [title]="'event.invite' | t"
+          [sections]="inviteSections()"
+          [selected]="inviteIds()"
+          (selectedChange)="setInvitees($event)"
+          [origin]="inviteRow"
+          (closed)="picking.set(null)"
+        />
+      }
+      @case ('lessons') {
+        <app-pick-list
+          [title]="'event.lessons' | t"
+          [sections]="lessonSections()"
+          [selected]="m.lessonIds"
+          (selectedChange)="patch({ lessonIds: $event })"
+          [origin]="lessonRow"
+          (closed)="picking.set(null)"
+        />
+      }
     }
   `,
 })
@@ -113,14 +155,13 @@ export class EventEditor implements OnInit {
   private events = inject(EventService);
   private groups = inject(GroupService);
   private students = inject(StudentService);
+  private lessons = inject(LessonService);
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
 
   private readonly page = viewChild.required<PageSheet>('page');
-  private readonly inviteRow = viewChild<ElementRef<HTMLElement>>('inviteRow');
-  protected readonly inviteOrigin = computed(() => this.inviteRow()?.nativeElement ?? null);
 
-  protected readonly picking = signal(false);
+  protected readonly picking = signal<'invite' | 'lessons' | null>(null);
   protected readonly model = signal<Model>(this.blank());
   // Contents when the card opened, to tell whether anything changed.
   private readonly snapshot = signal('');
@@ -143,6 +184,26 @@ export class EventEditor implements OnInit {
       }),
     ].filter((p) => !!p);
   });
+
+  // Picker contents: groups and students (one list of ids, split back on change); lessons.
+  protected readonly inviteSections = computed<PickSection[]>(() => [
+    { key: 'groups.title', items: this.groups.groups().map((g) => ({ id: g.id, name: g.name, color: colorVar(g.color) })) },
+    { key: 'nav.students', items: this.students.students().map((s) => ({ id: s.id, name: s.name })) },
+  ]);
+  protected readonly inviteIds = computed(() => {
+    const { groupIds, studentIds } = this.model().invitees;
+    return [...groupIds, ...studentIds];
+  });
+  protected readonly lessonSections = computed<PickSection[]>(() => [
+    { key: 'nav.lessons', items: this.lessons.lessons().map((l) => ({ id: l.id, name: l.title })) },
+  ]);
+
+  // Attached lessons, in order.
+  protected readonly attached = computed(() =>
+    this.model()
+      .lessonIds.map((id) => this.lessons.byId(id))
+      .filter((l) => !!l),
+  );
 
   protected readonly date = computed(() => fromDateInput(this.model().date));
   protected readonly dateLabel = computed(() =>
@@ -167,6 +228,7 @@ export class EventEditor implements OnInit {
       this.model.set({
         title: event.title ?? '',
         invitees: { studentIds: event.studentIds, groupIds: event.groupIds },
+        lessonIds: event.lessonIds,
         date: toDateInput(start),
         startTime: toTimeInput(start),
         endTime: minToTime(timeToMin(toTimeInput(start)) + event.durationMinutes),
@@ -183,6 +245,7 @@ export class EventEditor implements OnInit {
     return {
       title: '',
       invitees: { studentIds: [], groupIds: [] },
+      lessonIds: [],
       date: toDateInput(new Date()),
       startTime: '18:00',
       endTime: '19:00',
@@ -193,6 +256,11 @@ export class EventEditor implements OnInit {
 
   protected initial(name: string): string {
     return initial(name, this.i18n.locale());
+  }
+
+  protected setInvitees(ids: string[]): void {
+    const isGroup = (id: string) => !!this.groups.byId(id);
+    this.patch({ invitees: { groupIds: ids.filter(isGroup), studentIds: ids.filter((id) => !isGroup(id)) } });
   }
 
   protected patch(p: Partial<Model>): void {
@@ -218,6 +286,7 @@ export class EventEditor implements OnInit {
       title: m.title.trim() || null,
       studentIds: m.invitees.studentIds,
       groupIds: m.invitees.groupIds,
+      lessonIds: m.lessonIds,
       startsAt: new Date(`${m.date}T${m.startTime}`).toISOString(),
       durationMinutes: timeToMin(m.endTime) - timeToMin(m.startTime),
       note: m.note.trim() || null,

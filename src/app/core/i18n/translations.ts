@@ -10,6 +10,7 @@ const en = {
 
   'nav.schedule': 'Schedule',
   'nav.students': 'Students',
+  'nav.lessons': 'Lessons',
   'nav.about': 'About',
   'nav.menu': 'Menu',
 
@@ -69,6 +70,21 @@ const en = {
   'event.status.Scheduled': 'Scheduled',
   'event.status.Done': 'Done',
   'event.status.Cancelled': 'Cancelled',
+  'event.lessons': 'Lessons',
+  'event.attachLesson': 'Attach lesson',
+
+  'lessons.add': 'Add lesson',
+  'lessons.new': 'New Lesson',
+  'lessons.edit': 'Edit Lesson',
+  'lessons.name': 'Title',
+  'lessons.text': 'Text',
+  'lessons.linkLabel': 'Label (optional)',
+  'lessons.addText': 'Add text',
+  'lessons.addLink': 'Add link',
+  'lessons.removeBlock': 'Remove',
+  'lessons.empty': 'No Lessons',
+  'lessons.noContent': 'Nothing here yet',
+  'lessons.selectHint': 'Select a lesson',
 
   'action.save': 'Save',
   'action.cancel': 'Cancel',
@@ -96,6 +112,7 @@ const pl: Dictionary = {
 
   'nav.schedule': 'Plan',
   'nav.students': 'Uczniowie',
+  'nav.lessons': 'Lekcje',
   'nav.about': 'O aplikacji',
   'nav.menu': 'Menu',
 
@@ -155,6 +172,21 @@ const pl: Dictionary = {
   'event.status.Scheduled': 'Zaplanowane',
   'event.status.Done': 'Odbyte',
   'event.status.Cancelled': 'Odwołane',
+  'event.lessons': 'Lekcje',
+  'event.attachLesson': 'Dołącz lekcję',
+
+  'lessons.add': 'Dodaj lekcję',
+  'lessons.new': 'Nowa lekcja',
+  'lessons.edit': 'Edytuj lekcję',
+  'lessons.name': 'Tytuł',
+  'lessons.text': 'Tekst',
+  'lessons.linkLabel': 'Podpis (opcjonalnie)',
+  'lessons.addText': 'Dodaj tekst',
+  'lessons.addLink': 'Dodaj link',
+  'lessons.removeBlock': 'Usuń',
+  'lessons.empty': 'Brak lekcji',
+  'lessons.noContent': 'Na razie pusto',
+  'lessons.selectHint': 'Wybierz lekcję',
 
   'action.save': 'Zapisz',
   'action.cancel': 'Anuluj',
@@ -179,6 +211,7 @@ const fr: Dictionary = {
 
   'nav.schedule': 'Planning',
   'nav.students': 'Élèves',
+  'nav.lessons': 'Cours',
   'nav.about': 'À propos',
   'nav.menu': 'Menu',
 
@@ -238,6 +271,21 @@ const fr: Dictionary = {
   'event.status.Scheduled': 'Prévu',
   'event.status.Done': 'Terminé',
   'event.status.Cancelled': 'Annulé',
+  'event.lessons': 'Cours',
+  'event.attachLesson': 'Joindre un cours',
+
+  'lessons.add': 'Ajouter un cours',
+  'lessons.new': 'Nouveau cours',
+  'lessons.edit': 'Modifier le cours',
+  'lessons.name': 'Titre',
+  'lessons.text': 'Texte',
+  'lessons.linkLabel': 'Libellé (facultatif)',
+  'lessons.addText': 'Ajouter un texte',
+  'lessons.addLink': 'Ajouter un lien',
+  'lessons.removeBlock': 'Supprimer',
+  'lessons.empty': 'Aucun cours',
+  'lessons.noContent': 'Rien pour l’instant',
+  'lessons.selectHint': 'Choisir un cours',
 
   'action.save': 'Enregistrer',
   'action.cancel': 'Annuler',

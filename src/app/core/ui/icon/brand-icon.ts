@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type BrandIconName = 'calendar' | 'people' | 'info';
+export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
 
 /**
  * Flat multi-color product icons in the logo's colors (Google-product style, no background),
@@ -55,6 +55,12 @@ export type BrandIconName = 'calendar' | 'people' | 'info';
           </g>
           <circle cx="19" cy="16" r="7" style="fill: var(--brand-teal)" />
           <path d="M5 38a14 12 0 0 1 28 0v0.5a5.5 5.5 0 0 1-5.5 5.5h-17a5.5 5.5 0 0 1-5.5-5.5z" style="fill: var(--brand-blue)" />
+        }
+        @case ('book') {
+          <!-- Open book: blue and teal pages around the spine, an orange bookmark -->
+          <path d="M5 11.5a2.5 2.5 0 0 1 2.7-2.5c5.6.4 10.6 1.9 15.3 4.5v29C18.3 40 13.3 38.6 7.7 38.2A2.5 2.5 0 0 1 5 35.7z" style="fill: var(--brand-blue)" />
+          <path d="M43 11.5a2.5 2.5 0 0 0-2.7-2.5c-5.6.4-10.6 1.9-15.3 4.5v29c4.7-2.5 9.7-3.9 15.3-4.3A2.5 2.5 0 0 0 43 35.7z" style="fill: var(--brand-teal)" />
+          <path d="M31 10.4v14.6l3.5-2.6 3.5 2.6V9.3c-2.4.2-4.7.6-7 1.1z" style="fill: var(--brand-orange)" />
         }
         @case ('info') {
           <!-- The calendar's tear-off page without the blue header: an "i" with the orange dot -->

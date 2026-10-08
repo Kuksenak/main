@@ -28,6 +28,7 @@ export interface ScheduleEvent {
   title: string | null;
   studentIds: string[]; // invited students …
   groupIds: string[]; // … and groups (each invites its members)
+  lessonIds: string[]; // attached lessons (materials), in order
   startsAt: string;
   durationMinutes: number;
   status: EventStatus;

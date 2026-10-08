@@ -9,7 +9,8 @@ import { EventPeople } from '../schedule/event-people';
 import { EventService, ScheduleEvent, eventEnd, statusKey } from '../schedule/event.service';
 
 /**
- * Events a student is invited to (directly or through a group) or a group is invited to:
+ * Events a student is invited to (directly or through a group), a group is invited to, or a
+ * lesson is attached to:
  * Upcoming soonest first, then Past most recent first, each a collapsible section (Past folded
  * by default). A tap opens the event card on top.
  */
@@ -31,7 +32,7 @@ import { EventService, ScheduleEvent, eventEnd, statusKey } from '../schedule/ev
                 <div class="min-w-0 flex-1 leading-tight">
                   <p class="truncate font-medium" [class.line-through]="e.status === 'Cancelled'">{{ date(e) }}</p>
                   <p class="text-footnote truncate opacity-50">
-                    {{ time(e) }}@if (e.title) { · {{ e.title }} }
+                    {{ time(e) }}@if (lessonId() ? people.label(e) : e.title; as name) { · {{ name }} }
                   </p>
                 </div>
                 @if (e.status !== 'Scheduled') {
@@ -47,9 +48,10 @@ import { EventService, ScheduleEvent, eventEnd, statusKey } from '../schedule/ev
   `,
 })
 export class EventList {
-  /** Whose events: a student's or a group's. */
+  /** Whose events: a student's, a group's or a lesson's. */
   readonly studentId = input<string | null>(null);
   readonly groupId = input<string | null>(null);
+  readonly lessonId = input<string | null>(null);
 
   private events = inject(EventService);
   protected people = inject(EventPeople);
@@ -59,9 +61,13 @@ export class EventList {
   private readonly mine = computed(() => {
     const sid = this.studentId();
     const gid = this.groupId();
+    const lid = this.lessonId();
     return this.events
       .events()
-      .filter((e) => (sid && this.people.invites(e, sid)) || (gid && e.groupIds.includes(gid)));
+      .filter(
+        (e) =>
+          (sid && this.people.invites(e, sid)) || (gid && e.groupIds.includes(gid)) || (lid && e.lessonIds.includes(lid)),
+      );
   });
   private end = (e: ScheduleEvent) => eventEnd(e).getTime();
   protected readonly statusKey = statusKey;
