@@ -31,18 +31,18 @@ export type BrandIconName = 'calendar' | 'people' | 'info';
           >{{ today }}</text>
         }
         @case ('people') {
-          <!-- Two people; the back one is cut around the front one -->
+          <!-- Two people with round shoulders; the back one is cut around the front one -->
           <mask id="brand-people-cut">
             <rect width="48" height="48" fill="#fff" />
-            <circle cx="19" cy="17" r="8.5" fill="#000" />
-            <path d="M3.5 41a15.5 14.5 0 0 1 31 0v0.5a2.5 2.5 0 0 1-2.5 2.5H6a2.5 2.5 0 0 1-2.5-2.5z" fill="#000" />
+            <circle cx="19" cy="16" r="8.5" fill="#000" />
+            <path d="M3.5 38a15.5 13.5 0 0 1 31 0v1a6.5 6.5 0 0 1-6.5 6.5H10a6.5 6.5 0 0 1-6.5-6.5z" fill="#000" />
           </mask>
           <g mask="url(#brand-people-cut)">
-            <circle cx="32" cy="15.5" r="5.5" style="fill: var(--brand-yellow)" />
-            <path d="M22 37a10 10.5 0 0 1 20 0v1a2 2 0 0 1-2 2H24a2 2 0 0 1-2-2z" style="fill: var(--brand-orange)" />
+            <circle cx="32" cy="15" r="5.5" style="fill: var(--brand-yellow)" />
+            <path d="M22 35a10.5 10 0 0 1 21 0v0.5a4.5 4.5 0 0 1-4.5 4.5h-12a4.5 4.5 0 0 1-4.5-4.5z" style="fill: var(--brand-orange)" />
           </g>
-          <circle cx="19" cy="17" r="7" style="fill: var(--brand-teal)" />
-          <path d="M5 41a14 13 0 0 1 28 0a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2z" style="fill: var(--brand-blue)" />
+          <circle cx="19" cy="16" r="7" style="fill: var(--brand-teal)" />
+          <path d="M5 38a14 12 0 0 1 28 0v0.5a5.5 5.5 0 0 1-5.5 5.5h-17a5.5 5.5 0 0 1-5.5-5.5z" style="fill: var(--brand-blue)" />
         }
         @case ('info') {
           <!-- An "i" on a soft round badge -->

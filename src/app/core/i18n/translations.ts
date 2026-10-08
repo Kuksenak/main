@@ -12,7 +12,6 @@ const en = {
   'nav.students': 'Students',
   'nav.about': 'About',
   'nav.menu': 'Menu',
-  'nav.contacts': 'Contacts',
 
   'account.title': 'Account',
   'account.version': 'Version',
@@ -101,7 +100,6 @@ const pl: Dictionary = {
   'nav.students': 'Uczniowie',
   'nav.about': 'O aplikacji',
   'nav.menu': 'Menu',
-  'nav.contacts': 'Kontakty',
 
   'account.title': 'Konto',
   'account.version': 'Wersja',
@@ -187,7 +185,6 @@ const fr: Dictionary = {
   'nav.students': 'Élèves',
   'nav.about': 'À propos',
   'nav.menu': 'Menu',
-  'nav.contacts': 'Contacts',
 
   'account.title': 'Compte',
   'account.version': 'Version',
