@@ -210,15 +210,17 @@
     }
   }
 
-  /* On / off switch (iOS-like): <button role="switch" class="switch" [attr.aria-checked]="on">. */
+  /* On / off switch: <button role="switch" class="switch" [attr.aria-checked]="on">. iOS size on
+     mobile, the smaller macOS size on desktop (fits the shorter rows). */
   .switch {
     @apply relative inline-flex h-[1.9375rem] w-[3.1875rem] shrink-0 rounded-full bg-[var(--fill)]
            transition-colors duration-200
            after:absolute after:left-0.5 after:top-0.5 after:size-[1.6875rem] after:rounded-full
            after:bg-white after:shadow-[0_2px_4px_rgb(0_0_0/0.2)] after:transition-transform
-           after:duration-200;
+           after:duration-200
+           desktop:h-[1.375rem] desktop:w-[2.375rem] desktop:after:size-[1.125rem];
     &[aria-checked='true'] {
-      @apply bg-[var(--success)] after:translate-x-5;
+      @apply bg-[var(--success)] after:translate-x-5 desktop:after:translate-x-4;
     }
     &:active {
       transform: none;
