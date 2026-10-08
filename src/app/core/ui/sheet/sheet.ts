@@ -2,7 +2,7 @@ import { Component, output, signal } from '@angular/core';
 
 /**
  * iOS-style floating bottom sheet (mobile: 8px inset, large continuous corners,
- * reaching up to just under the status bar) / centered dialog (desktop).
+ * half the screen tall, translucent glass) / centered dialog (desktop).
  * Render it with @if; call close() to animate out, then `closed` fires so the
  * parent can drop it. No header — drag the grabber down or tap outside to dismiss.
  */
@@ -18,7 +18,7 @@ import { Component, output, signal } from '@angular/core';
       ></div>
 
       <div
-        class="absolute inset-x-2 bottom-2 top-[calc(env(safe-area-inset-top)+2rem)] flex flex-col overflow-hidden rounded-[44px] [corner-shape:squircle] sheet-panel [animation:sheetUp_380ms_cubic-bezier(0.32,0.72,0,1)] sm:relative sm:inset-auto sm:w-full sm:max-w-sm sm:rounded-2xl sm:shadow-xl"
+        class="absolute inset-x-2 bottom-2 flex h-[50dvh] flex-col overflow-hidden rounded-[44px] [corner-shape:squircle] sheet-panel [animation:sheetUp_380ms_cubic-bezier(0.32,0.72,0,1)] sm:relative sm:inset-auto sm:h-auto sm:w-full sm:max-w-sm sm:rounded-2xl sm:shadow-xl"
         [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
         [style.transition]="dragging() ? 'none' : 'transform 280ms cubic-bezier(0.32,0.72,0,1)'"
       >

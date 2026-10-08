@@ -8,7 +8,7 @@
       @for (item of navItems; track item.path) {
         <a
           [routerLink]="item.path"
-          routerLinkActive="bg-[var(--accent)] text-[var(--accent-fg)]"
+          routerLinkActive="glass-accent"
           class="hidden h-11 items-center rounded-full px-4 text-[17px] font-medium sm:inline-flex"
         >{{ item.label }}</a>
       }
@@ -23,7 +23,7 @@
       aria-label="Account"
       class="relative flex size-11 shrink-0 items-center justify-center rounded-full active:opacity-70"
     >
-      <span class="flex size-11 items-center justify-center rounded-full bg-[var(--accent)] text-[19px] font-semibold uppercase text-[var(--accent-fg)]">{{ initial() }}</span>
+      <span class="glass-accent flex size-11 items-center justify-center rounded-full text-[19px] font-semibold uppercase">{{ initial() }}</span>
       @if (updates.updateReady()) {
         <span class="absolute right-0 top-0 size-3 rounded-full bg-red-500 ring-2 ring-[var(--app-bg)]"></span>
       }

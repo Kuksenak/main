@@ -1,6 +1,7 @@
 import { DatePipe, NgTemplateOutlet } from '@angular/common';
 import {
   AfterViewInit,
+  afterRenderEffect,
   Component,
   computed,
   ElementRef,
@@ -92,6 +93,13 @@ export class Schedule implements AfterViewInit {
   protected readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   private readonly cal = viewChild<ElementRef<HTMLElement>>('cal');
+  private readonly list = viewChild<ElementRef<HTMLElement>>('list');
+
+  // Custom scroll indicator for the events card (top/height in % of the card), null when
+  // everything fits. Brighter while scrolling, like iOS.
+  protected readonly listThumb = signal<{ top: number; height: number } | null>(null);
+  protected readonly listScrolling = signal(false);
+  private listScrollTimer?: ReturnType<typeof setTimeout>;
   protected readonly statusOptions: SelectOption[] = [
     { label: 'Scheduled', value: 'Scheduled' },
     { label: 'Done', value: 'Done' },
@@ -146,6 +154,31 @@ export class Schedule implements AfterViewInit {
     window.addEventListener('scroll', () => {
       if (this.editor() && (window.scrollY || window.scrollX)) window.scrollTo(0, 0);
     });
+  }
+
+  // Recompute the indicator whenever the day's events re-render.
+  private readonly listThumbSync = afterRenderEffect(() => {
+    this.dayLessons();
+    this.updateListThumb();
+  });
+
+  protected onListScroll(): void {
+    this.updateListThumb();
+    this.listScrolling.set(true);
+    clearTimeout(this.listScrollTimer);
+    this.listScrollTimer = setTimeout(() => this.listScrolling.set(false), 800);
+  }
+
+  private updateListThumb(): void {
+    const el = this.list()?.nativeElement;
+    if (!el || el.scrollHeight <= el.clientHeight + 1) {
+      this.listThumb.set(null);
+      return;
+    }
+    const height = Math.max(10, (el.clientHeight / el.scrollHeight) * 100);
+    const maxScroll = el.scrollHeight - el.clientHeight;
+    const top = (el.scrollTop / maxScroll) * (100 - height);
+    this.listThumb.set({ top, height });
   }
 
   ngAfterViewInit(): void {

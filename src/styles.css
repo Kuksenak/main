@@ -6,7 +6,8 @@
 :root {
   --app-bg: #faf9f5;
   --sheet-bg: #f0eee6;
-  --sheet-surface: #fffefb;
+  --sheet-glass: rgb(255 255 255 / 0.55);
+  --sheet-surface: rgb(255 255 255 / 0.75);
   --surface: #fffefb;
   --text: #171717;
   --accent: #007aff;
@@ -16,7 +17,8 @@
 html.dark {
   --app-bg: #262624;
   --sheet-bg: #30302e;
-  --sheet-surface: #3d3d3a;
+  --sheet-glass: rgb(48 48 46 / 0.72);
+  --sheet-surface: rgb(255 255 255 / 0.07);
   --surface: #30302e;
   --text: #f5f5f5;
   --accent: #0a84ff;
@@ -173,11 +175,26 @@ app-about {
   width: 100%;
 }
 
+/* iOS 26 "tinted glass" for prominent (accent) controls: slightly translucent tint,
+   a bright top rim, soft inner shade and off-white label — not a flat fill. */
+@utility glass-accent {
+  color: rgb(255 255 255 / 0.94);
+  background-color: color-mix(in srgb, var(--accent) 88%, transparent);
+  background-image: linear-gradient(180deg, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0) 60%);
+  box-shadow:
+    inset 0 1px 0.5px rgb(255 255 255 / 0.45),
+    inset 0 -1px 1px rgb(0 0 0 / 0.12),
+    0 2px 8px color-mix(in srgb, var(--accent) 30%, transparent);
+  text-shadow: 0 0.5px 1px rgb(0 0 0 / 0.18);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+}
+
 @layer components {
   /* Primary action — accent pill (44pt tall, iOS touch target) */
   .btn-primary {
-    @apply inline-flex h-11 items-center justify-center rounded-full bg-[var(--accent)]
-           px-5 text-[17px] font-semibold text-[var(--accent-fg)] active:opacity-80;
+    @apply glass-accent inline-flex h-11 items-center justify-center rounded-full
+           px-5 text-[17px] font-semibold active:opacity-80;
   }
 
   /* Secondary action — neutral iOS pill */
@@ -196,17 +213,19 @@ app-about {
 
   /* Confirm — accent circle (for a checkmark) */
   .btn-confirm {
-    @apply inline-flex size-11 shrink-0 items-center justify-center rounded-full
-           bg-[var(--accent)] text-[var(--accent-fg)] active:opacity-80;
+    @apply glass-accent inline-flex size-11 shrink-0 items-center justify-center rounded-full
+           active:opacity-80;
   }
 
   /* Bottom-sheet panel: no backdrop dimming, it stands out by its own color,
      a hairline top edge and a soft shadow. Cards inside use the sheet surface. */
   .sheet-panel {
     --surface: var(--sheet-surface);
-    @apply bg-[var(--sheet-bg)] text-[var(--text)]
-           shadow-[0_-1px_0_rgba(0,0,0,0.06),0_-10px_40px_rgba(0,0,0,0.10)]
-           dark:shadow-[0_-1px_0_rgba(255,255,255,0.08),0_-10px_40px_rgba(0,0,0,0.5)];
+    @apply bg-[var(--sheet-glass)] text-[var(--text)]
+           backdrop-blur-[30px] backdrop-saturate-[180%]
+           border-[0.5px] border-white/70 dark:border-white/10
+           shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_0_0_0.5px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.06),0_16px_48px_rgba(0,0,0,0.18)]
+           dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_0.5px_rgba(0,0,0,0.6),0_16px_48px_rgba(0,0,0,0.55)];
   }
 
   /* iOS grouped list container */
@@ -222,13 +241,17 @@ app-about {
   }
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #c4c4c4 transparent;
-}
+/* Standard scrollbar props for Firefox only — in Chrome they take precedence over the
+   ::-webkit-scrollbar rules above and bring back the stepper arrows. */
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #c4c4c4 transparent;
+  }
 
-html.dark * {
-  scrollbar-color: #4a4a4a transparent;
+  html.dark * {
+    scrollbar-color: #4a4a4a transparent;
+  }
 }
 
 ::-webkit-scrollbar {
