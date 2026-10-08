@@ -3,18 +3,19 @@
     <a routerLink="/about" aria-label="About" class="mr-1 hidden shrink-0 active:opacity-70 sm:block">
       <img src="icons/icon-96x96.png" alt="Logo" class="size-8" width="32" height="32" />
     </a>
+    <!-- Desktop tabs; on mobile navigation lives in the ⋯ sheet -->
     <nav class="flex flex-1 items-center gap-1">
-      <a
-        routerLink="/schedule"
-        routerLinkActive="bg-[var(--accent)] text-[var(--accent-fg)]"
-        class="inline-flex h-11 items-center rounded-full px-4 text-[17px] font-medium"
-      >Schedule</a>
-      <a
-        routerLink="/about"
-        routerLinkActive="bg-[var(--accent)] text-[var(--accent-fg)]"
-        class="inline-flex h-11 items-center rounded-full px-4 text-[17px] font-medium"
-      >About</a>
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="bg-[var(--accent)] text-[var(--accent-fg)]"
+          class="hidden h-11 items-center rounded-full px-4 text-[17px] font-medium sm:inline-flex"
+        >{{ item.label }}</a>
+      }
     </nav>
+    <button type="button" (click)="navOpen.set(true)" aria-label="Menu" class="icon-btn !text-current sm:hidden">
+      <svg viewBox="0 0 24 24" fill="currentColor" class="size-5"><circle cx="5" cy="5" r="2" /><circle cx="12" cy="5" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /><circle cx="5" cy="19" r="2" /><circle cx="12" cy="19" r="2" /><circle cx="19" cy="19" r="2" /></svg>
+    </button>
     <!-- Account avatar: first letter of the email; dot when an app update is ready -->
     <button
       type="button"
@@ -31,16 +32,28 @@
 
   <router-outlet></router-outlet>
 
+  @if (navOpen()) {
+    <app-sheet #navSheet (closed)="navOpen.set(false)">
+      <div class="ios-group">
+        @for (item of navItems; track item.path) {
+          <button type="button" (click)="go(item.path, navSheet)" class="ios-row h-11 w-full !py-0 text-left active:opacity-60">
+            <span class="text-[17px]">{{ item.label }}</span>
+            @if (isActive(item.path)) {
+              <svg viewBox="0 0 24 24" fill="none" class="size-5 text-[var(--accent)]" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+            }
+          </button>
+        }
+      </div>
+    </app-sheet>
+  }
+
   @if (accountOpen()) {
     <app-sheet #sheet (closed)="accountOpen.set(false)">
-      <div class="flex flex-col gap-6">
+      <div class="flex min-h-full flex-col gap-6">
         <div class="ios-group">
           <div class="ios-row h-11 !py-0">
             <span class="min-w-0 truncate text-[17px]">{{ auth.email() }}</span>
           </div>
-        </div>
-
-        <div class="ios-group">
           @if (updates.updateReady()) {
             <button type="button" (click)="updates.apply()" class="ios-row h-11 w-full !py-0 text-left active:opacity-60">
               <span class="flex items-center gap-2 text-[17px] font-semibold text-[var(--accent)]">
@@ -56,7 +69,7 @@
           </div>
         </div>
 
-        <button type="button" (click)="logout(sheet)" class="ios-group flex h-11 w-full items-center justify-center text-[17px] font-semibold text-red-500 active:opacity-60">Log out</button>
+        <button type="button" (click)="logout(sheet)" class="ios-group mt-auto flex h-11 w-full shrink-0 items-center justify-center text-[17px] font-semibold text-red-500 active:opacity-60">Log out</button>
       </div>
     </app-sheet>
   }
