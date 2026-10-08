@@ -1,4 +1,5 @@
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
+import { I18nService } from '../../i18n/i18n.service';
 
 export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info';
 
@@ -11,27 +12,33 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info'
 @Component({
   selector: 'app-brand-icon',
   host: { class: 'inline-flex shrink-0', 'aria-hidden': 'true' },
+  styles: `
+    /* iOS-like white app tile: stays white in dark mode, a hairline + soft shadow on white */
+    .brand-tile {
+      fill: #fff;
+      stroke: rgb(0 0 0 / 0.08);
+      stroke-width: 0.75;
+      filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.12));
+    }
+    .brand-weekday {
+      fill: var(--brand-orange);
+      font: 600 8.5px -apple-system, system-ui, 'Segoe UI', sans-serif;
+      letter-spacing: 0.02em;
+    }
+    .brand-date {
+      fill: #1c1c1e;
+      font: 300 25px -apple-system, system-ui, 'Segoe UI', sans-serif;
+      letter-spacing: -0.03em;
+    }
+  `,
   template: `
     <svg viewBox="0 0 48 48" class="size-full">
       @switch (name()) {
         @case ('calendar') {
-          <!-- Tear-off calendar page (iOS-like), fully transparent: its outline, the blue header,
-               a curled corner as if being flipped, today's date -->
-          <path
-            d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
-            style="fill: none; stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
-          />
-          <path d="M12 4h24a7 7 0 0 1 7 7v3H5v-3a7 7 0 0 1 7-7z" style="fill: var(--brand-blue)" />
-          <path
-            d="M34 42c0-5 3-9 9-9l-9 9z"
-            style="fill: color-mix(in srgb, var(--brand-blue) 45%, #dfe4ee); stroke: color-mix(in srgb, var(--brand-blue) 60%, white); stroke-width: 0.75; stroke-linejoin: round"
-          />
-          <text
-            x="24"
-            y="35"
-            text-anchor="middle"
-            style="fill: var(--brand-orange); font: 800 19.5px -apple-system, system-ui, 'Segoe UI', sans-serif; letter-spacing: -0.04em"
-          >{{ today }}</text>
+          <!-- iOS Calendar style: a white rounded square, the weekday in orange, today's date -->
+          <rect x="3" y="3" width="42" height="42" rx="10" class="brand-tile" />
+          <text x="24" y="16" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
+          <text x="24" y="39.5" text-anchor="middle" class="brand-date">{{ today }}</text>
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->
@@ -65,9 +72,10 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info'
           <circle cx="35" cy="37" r="6.5" style="fill: var(--brand-teal)" />
         }
         @case ('info') {
-          <!-- Flat "i": an orange dot over a blue stem -->
-          <circle cx="24" cy="10" r="6" style="fill: var(--brand-orange)" />
-          <rect x="18" y="20" width="12" height="25" rx="6" style="fill: var(--brand-blue)" />
+          <!-- The same white square with an "i": orange dot, blue stem -->
+          <rect x="3" y="3" width="42" height="42" rx="10" class="brand-tile" />
+          <circle cx="24" cy="14.5" r="3.5" style="fill: var(--brand-orange)" />
+          <rect x="20.75" y="21" width="6.5" height="17" rx="3.25" style="fill: var(--brand-blue)" />
         }
       }
     </svg>
@@ -75,6 +83,11 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info'
 })
 export class BrandIcon {
   readonly name = input.required<BrandIconName>();
-  // Calendar icon shows today's date (taken when the icon is created, e.g. each time the menu opens).
+  // Calendar icon shows today's weekday and date (taken when the icon is created, e.g. each
+  // time the menu opens).
   protected readonly today = new Date().getDate();
+  protected readonly weekday = inject(I18nService)
+    .date(new Date(), { weekday: 'short' })
+    .replace('.', '')
+    .toLocaleUpperCase();
 }
