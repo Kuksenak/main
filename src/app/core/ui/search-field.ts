@@ -11,7 +11,7 @@ import { Icon } from './icon/icon';
 @Component({
   selector: 'app-search-field',
   imports: [FormsModule, Icon, TranslatePipe],
-  host: { class: 'block' },
+  host: { class: 'block min-w-0 flex-1' },
   template: `
     <label class="field">
       <app-icon name="search" class="size-5 opacity-40 desktop:size-4" />

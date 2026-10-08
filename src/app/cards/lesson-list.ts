@@ -5,12 +5,11 @@ import { TranslationKey } from '../core/i18n/translations';
 import { NavStack } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { Section } from '../core/ui/section/section';
-import { LessonTitleStore } from '../schedule/lesson-title.store';
 import { Lesson, LessonService, lessonEnd, statusKey } from '../schedule/lesson.service';
 import { GroupService } from '../students/group.service';
 
 /**
- * Lessons of a student or group (lessons store who they're for by name): Upcoming soonest
+ * Lessons of a student or group: Upcoming soonest
  * first, then Past most recent first, each a collapsible section (Past folded by default).
  * A tap opens the lesson card on top.
  */
@@ -32,7 +31,7 @@ import { GroupService } from '../students/group.service';
                 <div class="min-w-0 flex-1 leading-tight">
                   <p class="truncate font-medium" [class.line-through]="l.status === 'Cancelled'">{{ date(l) }}</p>
                   <p class="text-footnote truncate opacity-50">
-                    {{ time(l) }}@if (titles.get(l.id)) { · {{ titles.get(l.id) }} }
+                    {{ time(l) }}@if (l.title) { · {{ l.title }} }
                   </p>
                 </div>
                 @if (l.status !== 'Scheduled') {
@@ -48,15 +47,20 @@ import { GroupService } from '../students/group.service';
   `,
 })
 export class LessonList {
-  readonly who = input.required<string>();
+  /** Whose lessons: a student's or a group's. */
+  readonly studentId = input<string | null>(null);
+  readonly groupId = input<string | null>(null);
 
   private lessons = inject(LessonService);
   private groups = inject(GroupService);
   private i18n = inject(I18nService);
   private stack = inject(NavStack);
-  protected titles = inject(LessonTitleStore);
 
-  private readonly mine = computed(() => this.lessons.lessons().filter((l) => l.studentName === this.who()));
+  private readonly mine = computed(() =>
+    this.lessons
+      .lessons()
+      .filter((l) => (this.studentId() && l.studentId === this.studentId()) || (this.groupId() && l.groupId === this.groupId())),
+  );
   private end = (l: Lesson) => lessonEnd(l).getTime();
   protected readonly statusKey = statusKey;
   protected readonly upcoming = computed(() =>
@@ -83,7 +87,7 @@ export class LessonList {
   }
 
   protected color(l: Lesson): string {
-    return this.groups.lessonColor(l.studentName);
+    return this.groups.lessonColor(l);
   }
 
   protected date(l: Lesson): string {

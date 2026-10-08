@@ -27,7 +27,7 @@
               appLongPress
               (longPress)="startSelect(s)"
               (click)="pick(s)"
-              class="list-row w-full py-2 text-left"
+              class="list-row w-full py-2.5 text-left"
             >
               @if (selecting()) {
                 <span class="check" [class.is-on]="checked().has(s.id)">
@@ -62,7 +62,7 @@
             <button
               type="button"
               (click)="pickGroup(g)"
-              class="list-row w-full py-2 text-left"
+              class="list-row w-full py-2.5 text-left"
             >
               <span class="avatar text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
               <p class="min-w-0 flex-1 truncate font-medium" [class.font-bold]="desktop && g.id === selectedGroup()?.id">{{ g.name }}</p>
@@ -111,7 +111,7 @@
             </div>
           </div>
           <app-student-groups [studentId]="s.id" />
-          <app-lesson-list [who]="s.name" />
+          <app-lesson-list [studentId]="s.id" />
         </app-scroll-area>
       } @else {
         <div class="flex flex-1 items-center justify-center">
@@ -127,7 +127,7 @@
         </div>
         <app-scroll-area class="mt-6 min-h-0 flex-1" contentClass="gap-6 pb-14">
           <app-group-members [studentIds]="g.studentIds" />
-          <app-lesson-list [who]="g.name" />
+          <app-lesson-list [groupId]="g.id" />
         </app-scroll-area>
       } @else {
         <div class="flex flex-1 items-center justify-center">

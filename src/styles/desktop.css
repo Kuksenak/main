@@ -10,7 +10,7 @@
   --control-round: 2.5rem;
   --control-h: 2.25rem;
   --capsule-px: 1rem;
-  --row-h: 2.5rem; /* list rows and card buttons: a bit taller than buttons */
+  --row-h: 2.75rem; /* list rows and card buttons: a bit taller than buttons */
 
   /* Corners: less rounded */
   --radius-capsule: 0.5rem;

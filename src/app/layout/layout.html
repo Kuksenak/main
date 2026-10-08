@@ -18,15 +18,12 @@
         <a
           [routerLink]="item.path"
           routerLinkActive="glass-accent"
-          class="text-body inline-flex h-9 items-center gap-2 rounded-lg pl-2 pr-4 font-medium mobile:hidden"
-        >
-          <app-brand-icon [name]="item.icon" class="size-6" />
-          {{ item.label | t }}
-        </a>
+          class="text-body inline-flex h-9 items-center rounded-lg px-4 font-medium mobile:hidden"
+        >{{ item.label | t }}</a>
       }
     </nav>
     <!-- Navigation menu (mobile; desktop has the tabs) -->
-    <button #navBtn type="button" (click)="navOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn desktop:hidden">
+    <button #navBtn type="button" (click)="navOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
       <app-icon name="grid" class="size-6" />
     </button>
     <!-- Account: first letter of the email; green dot when an app update is ready -->

@@ -10,12 +10,13 @@ import { SearchField } from '../core/ui/search-field';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
 import { GroupService, colorVar } from '../students/group.service';
+import { LessonWho } from '../schedule/lesson.service';
 import { StudentService } from '../students/student.service';
 
 /**
  * Who a lesson is for: search + Groups and Students lists, the current choice checked.
  * Mobile: a page sliding in (it has a search input); desktop: a dropdown under `origin`.
- * Emits the picked name (lessons store who they're for by name), then closes.
+ * Emits the picked student / group, then closes.
  */
 @Component({
   selector: 'app-who-picker',
@@ -31,15 +32,15 @@ import { StudentService } from '../students/student.service';
           <div class="flex flex-col gap-1.5">
             <span class="text-footnote px-4 uppercase opacity-50">{{ sec.key | t }}</span>
             <div class="card">
-              @for (item of sec.items; track item.name) {
-                <button type="button" (click)="pick(item.name)" class="list-row w-full py-2 text-left">
+              @for (item of sec.items; track item.who.studentId ?? item.who.groupId) {
+                <button type="button" (click)="pick(item.who)" class="list-row w-full py-2 text-left">
                   <span
                     class="avatar"
                     [class.text-[var(--accent-fg)]]="!!item.color"
                     [style.background]="item.color"
-                  >{{ initial(item.name) }}</span>
-                  <p class="min-w-0 flex-1 truncate">{{ item.name }}</p>
-                  @if (item.name === value()) {
+                  >{{ initial(item.who.name) }}</span>
+                  <p class="min-w-0 flex-1 truncate">{{ item.who.name }}</p>
+                  @if (isCurrent(item.who)) {
                     <app-icon name="check" class="size-5 text-[var(--accent)]" />
                   }
                 </button>
@@ -75,9 +76,9 @@ import { StudentService } from '../students/student.service';
   `,
 })
 export class WhoPicker {
-  readonly value = input('');
+  readonly value = input<LessonWho | null>(null);
   readonly origin = input<HTMLElement | null>(null);
-  readonly picked = output<string>();
+  readonly picked = output<LessonWho>();
   readonly closed = output<void>();
 
   private groups = inject(GroupService);
@@ -93,15 +94,15 @@ export class WhoPicker {
   protected readonly sections = computed(() => {
     const q = this.query().trim().toLocaleLowerCase();
     const match = (name: string) => !q || name.toLocaleLowerCase().includes(q);
-    const byName = (a: { name: string }, b: { name: string }) =>
-      a.name.localeCompare(b.name, this.i18n.locale());
+    const byName = (a: { who: LessonWho }, b: { who: LessonWho }) =>
+      a.who.name.localeCompare(b.who.name, this.i18n.locale());
     return [
       {
         key: 'groups.title' as const,
         items: this.groups
           .groups()
           .filter((g) => match(g.name))
-          .map((g) => ({ name: g.name, color: colorVar(g.color) as string | null }))
+          .map((g) => ({ who: { studentId: null, groupId: g.id, name: g.name }, color: colorVar(g.color) as string | null }))
           .sort(byName),
       },
       {
@@ -109,7 +110,7 @@ export class WhoPicker {
         items: this.students
           .students()
           .filter((s) => match(s.name))
-          .map((s) => ({ name: s.name, color: null as string | null }))
+          .map((s) => ({ who: { studentId: s.id, groupId: null, name: s.name }, color: null as string | null }))
           .sort(byName),
       },
     ];
@@ -121,8 +122,13 @@ export class WhoPicker {
     return initial(name, this.i18n.locale());
   }
 
-  protected pick(name: string): void {
-    this.picked.emit(name);
+  protected isCurrent(who: LessonWho): boolean {
+    const v = this.value();
+    return !!v && ((!!who.studentId && who.studentId === v.studentId) || (!!who.groupId && who.groupId === v.groupId));
+  }
+
+  protected pick(who: LessonWho): void {
+    this.picked.emit(who);
     this.dropdown()?.close();
     this.page()?.close();
   }

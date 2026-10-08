@@ -84,7 +84,7 @@ interface Model {
         </app-section>
 
         @if (saved(); as g) {
-          <app-lesson-list [who]="g.name" />
+          <app-lesson-list [groupId]="g.id" />
         }
       </div>
     </app-page-sheet>

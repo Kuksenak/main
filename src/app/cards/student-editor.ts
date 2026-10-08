@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
-import { GroupService } from '../students/group.service';
 import { StudentInput, StudentService } from '../students/student.service';
 import { LessonList } from './lesson-list';
 import { StudentGroups } from './related-lists';
@@ -39,7 +38,7 @@ import { StudentGroups } from './related-lists';
 
         @if (saved(); as s) {
           <app-student-groups [studentId]="s.id" />
-          <app-lesson-list [who]="s.name" />
+          <app-lesson-list [studentId]="s.id" />
         }
       </div>
     </app-page-sheet>
@@ -50,7 +49,6 @@ export class StudentEditor implements OnInit {
   readonly closed = output<void>();
 
   private students = inject(StudentService);
-  private groups = inject(GroupService);
   private readonly page = viewChild.required<PageSheet>('page');
 
   protected readonly model = signal<StudentInput>({ name: '', email: '', phone: '' });
@@ -74,7 +72,7 @@ export class StudentEditor implements OnInit {
   protected save(): void {
     if (!this.canSave()) return;
     const m = this.model();
-    const input = { name: m.name.trim(), email: m.email.trim(), phone: m.phone.trim() };
+    const input = { name: m.name.trim(), email: m.email?.trim() || null, phone: m.phone?.trim() || null };
     const id = this.entry().id;
     if (id) this.students.update(id, input);
     else this.students.create(input);
@@ -84,8 +82,7 @@ export class StudentEditor implements OnInit {
   protected remove(): void {
     const id = this.entry().id;
     if (!id) return;
-    this.students.remove(id);
-    this.groups.removeMember(id);
+    this.students.remove(id); // also drops them from their groups (server side)
     this.page().close();
   }
 }

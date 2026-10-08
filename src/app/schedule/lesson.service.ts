@@ -24,7 +24,10 @@ export function lessonWindow(): { from: Date; to: Date } {
 
 export interface Lesson {
   id: string;
-  studentName: string; // who it's for: a student's or a group's name
+  title: string | null;
+  studentId: string | null; // who it's for: a student …
+  groupId: string | null; // … or a group
+  studentName: string; // that student's / group's name (or the saved name for older lessons)
   startsAt: string;
   durationMinutes: number;
   status: LessonStatus;
@@ -32,11 +35,24 @@ export interface Lesson {
 }
 
 export interface LessonInput {
-  studentName: string;
+  title: string | null;
+  studentId: string | null;
+  groupId: string | null;
   startsAt: string;
   durationMinutes: number;
   note: string | null;
   status: LessonStatus;
+}
+
+/** Who a lesson is for: a student or a group (one id set), with its name. */
+export interface LessonWho {
+  studentId: string | null;
+  groupId: string | null;
+  name: string;
+}
+
+export function lessonWho(l: Lesson): LessonWho {
+  return { studentId: l.studentId, groupId: l.groupId, name: l.studentName };
 }
 
 /** When a lesson ends. */
@@ -61,35 +77,32 @@ export class LessonService {
 
   /** Load the lesson window unless something already did. */
   ensureLoaded(): void {
-    if (!this.loaded) this.load();
+    if (!this.loaded) this.reload();
   }
 
-  /** Create a lesson; `onCreated` gets its id (e.g. to store a local title). */
-  create(input: LessonInput, onCreated?: (id: string) => void): void {
+  create(input: LessonInput): void {
     this.http
-      .post<{ id: string }>(this.base, input)
+      .post(this.base, input)
       .pipe(catchError(() => of(null)))
-      .subscribe((res) => {
-        if (res?.id) onCreated?.(res.id);
-        this.load();
-      });
+      .subscribe(() => this.reload());
   }
 
   update(id: string, input: LessonInput): void {
     this.http
       .put(`${this.base}/${id}`, input)
       .pipe(catchError(() => of(null)))
-      .subscribe(() => this.load());
+      .subscribe(() => this.reload());
   }
 
   remove(id: string): void {
     this.http
       .delete(`${this.base}/${id}`)
       .pipe(catchError(() => of(null)))
-      .subscribe(() => this.load());
+      .subscribe(() => this.reload());
   }
 
-  private load(): void {
+  /** (Re)load the lesson window — also after students / groups change (names, links). */
+  reload(): void {
     this.loaded = true;
     this.loadingService.begin();
     const { from, to } = lessonWindow();

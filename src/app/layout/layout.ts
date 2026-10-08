@@ -7,6 +7,9 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
+import { LessonService } from '../schedule/lesson.service';
+import { GroupService } from '../students/group.service';
+import { StudentService } from '../students/student.service';
 import { UpdateService } from '../core/services/update.service';
 import { StackHost } from '../cards/stack-host';
 import { BrandIcon, BrandIconName } from '../core/ui/icon/brand-icon';
@@ -25,6 +28,13 @@ export class Layout {
   protected readonly toolbar = inject(ToolbarService);
   protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
+
+  constructor() {
+    // The signed-in account's data, loaded once for every page and card.
+    inject(LessonService).ensureLoaded();
+    inject(StudentService).ensureLoaded();
+    inject(GroupService).ensureLoaded();
+  }
 
   // Sections: desktop tabs and the navigation menu.
   protected readonly navItems: { path: string; label: TranslationKey; icon: BrandIconName }[] = [

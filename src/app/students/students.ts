@@ -45,7 +45,7 @@ export class Students {
   protected readonly visible = computed(() => {
     const q = this.query().trim().toLocaleLowerCase();
     return [...this.service.students()]
-      .filter((s) => !q || [s.name, s.email, s.phone].some((v) => v.toLocaleLowerCase().includes(q)))
+      .filter((s) => !q || [s.name, s.email, s.phone].some((v) => !!v && v.toLocaleLowerCase().includes(q)))
       .sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale()));
   });
 

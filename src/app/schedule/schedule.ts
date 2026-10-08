@@ -19,7 +19,6 @@ import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { addDays, startOfDay, toDateInput } from '../core/utils/time';
 import { GroupService } from '../students/group.service';
-import { LessonTitleStore } from './lesson-title.store';
 import { LESSON_WEEKS_TOTAL, Lesson, LessonService, lessonEnd, lessonWindow, statusKey } from './lesson.service';
 
 function startOfMonth(d: Date): Date {
@@ -42,7 +41,6 @@ function startOfWeek(d: Date): Date {
 })
 export class Schedule implements AfterViewInit {
   private service = inject(LessonService);
-  private titles = inject(LessonTitleStore);
   private groups = inject(GroupService);
   private stack = inject(NavStack);
   private destroyRef = inject(DestroyRef);
@@ -228,11 +226,11 @@ export class Schedule implements AfterViewInit {
   // for group lessons, else the default calendar color. A Google Calendar integration would
   // add per-calendar colors here.
   protected lessonColor(lesson: Lesson): string {
-    return this.groups.lessonColor(lesson.studentName);
+    return this.groups.lessonColor(lesson);
   }
 
   protected lessonTitle(lesson: Lesson): string {
-    return this.titles.get(lesson.id);
+    return lesson.title ?? '';
   }
 
   protected readonly statusKey = statusKey;

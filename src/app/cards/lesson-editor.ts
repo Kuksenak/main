@@ -15,15 +15,19 @@ import {
   toDateInput,
   toTimeInput,
 } from '../core/utils/time';
-import { LessonTitleStore } from '../schedule/lesson-title.store';
-import { LESSON_STATUSES, LessonService, LessonStatus, statusKey } from '../schedule/lesson.service';
-import { GroupService } from '../students/group.service';
-import { StudentService } from '../students/student.service';
+import {
+  LESSON_STATUSES,
+  LessonService,
+  LessonStatus,
+  LessonWho,
+  lessonWho,
+  statusKey,
+} from '../schedule/lesson.service';
 import { WhoPicker } from './who-picker';
 
 interface Model {
-  title: string; // stored on this device (LessonTitleStore)
-  who: string; // group or student name (lessons store who they're for by name)
+  title: string;
+  who: LessonWho | null; // the student or group it's for
   date: string; // yyyy-MM-dd
   startTime: string; // HH:mm
   endTime: string; // HH:mm
@@ -56,7 +60,7 @@ interface Model {
           <div class="list-row !gap-1">
             <button #whoRow type="button" (click)="picking.set(true)" class="flex min-w-0 flex-1 items-center gap-3 self-stretch text-left">
               <span>{{ 'lesson.who' | t }}</span>
-              <span class="ml-auto truncate" [class.opacity-40]="!m.who">{{ m.who || ('picker.select' | t) }}</span>
+              <span class="ml-auto truncate" [class.opacity-40]="!m.who">{{ m.who?.name || ('picker.select' | t) }}</span>
             </button>
             @if (whoLink(); as link) {
               <button type="button" (click)="stack.push(link)" [attr.aria-label]="'lesson.openStudent' | t" class="icon-plain -mr-2">
@@ -110,9 +114,6 @@ export class LessonEditor implements OnInit {
   readonly closed = output<void>();
 
   private lessons = inject(LessonService);
-  private titles = inject(LessonTitleStore);
-  private groups = inject(GroupService);
-  private students = inject(StudentService);
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
 
@@ -138,15 +139,18 @@ export class LessonEditor implements OnInit {
   );
   protected readonly dirty = computed(() => JSON.stringify(this.model()) !== this.snapshot());
   // Save only a valid lesson for someone that actually differs from what was opened.
-  protected readonly canSave = computed(() => !!this.model().who.trim() && !this.invalid() && this.dirty());
+  // Lessons from before students / groups existed have only a name: pick someone to save.
+  protected readonly canSave = computed(() => {
+    const who = this.model().who;
+    return !!(who?.studentId || who?.groupId) && !this.invalid() && this.dirty();
+  });
 
-  // The group / student card to open from the Who row (null for names typed by hand).
+  // The group / student card to open from the Who row.
   protected readonly whoLink = computed<Omit<StackEntry, 'key'> | null>(() => {
     const who = this.model().who;
-    const group = this.groups.byName(who);
-    if (group) return { kind: 'group', id: group.id };
-    const student = this.students.students().find((s) => s.name === who);
-    return student ? { kind: 'student', id: student.id } : null;
+    if (who?.groupId) return { kind: 'group', id: who.groupId };
+    if (who?.studentId) return { kind: 'student', id: who.studentId };
+    return null;
   });
 
   ngOnInit(): void {
@@ -155,8 +159,8 @@ export class LessonEditor implements OnInit {
     if (lesson) {
       const start = new Date(lesson.startsAt);
       this.model.set({
-        title: this.titles.get(lesson.id),
-        who: lesson.studentName,
+        title: lesson.title ?? '',
+        who: lessonWho(lesson),
         date: toDateInput(start),
         startTime: toTimeInput(start),
         endTime: minToTime(timeToMin(toTimeInput(start)) + lesson.durationMinutes),
@@ -172,7 +176,7 @@ export class LessonEditor implements OnInit {
   private blank(): Model {
     return {
       title: '',
-      who: '',
+      who: null,
       date: toDateInput(new Date()),
       startTime: '18:00',
       endTime: '19:00',
@@ -201,19 +205,16 @@ export class LessonEditor implements OnInit {
     const m = this.model();
     const id = this.entry().id;
     const input = {
-      studentName: m.who.trim(),
+      title: m.title.trim() || null,
+      studentId: m.who?.studentId ?? null,
+      groupId: m.who?.groupId ?? null,
       startsAt: new Date(`${m.date}T${m.startTime}`).toISOString(),
       durationMinutes: timeToMin(m.endTime) - timeToMin(m.startTime),
       note: m.note.trim() || null,
       status: m.status,
     };
-    const title = m.title.trim();
-    if (id) {
-      this.titles.set(id, title);
-      this.lessons.update(id, input);
-    } else {
-      this.lessons.create(input, (newId) => this.titles.set(newId, title));
-    }
+    if (id) this.lessons.update(id, input);
+    else this.lessons.create(input);
     this.page().close();
   }
 
@@ -221,7 +222,6 @@ export class LessonEditor implements OnInit {
     const id = this.entry().id;
     if (!id) return;
     this.lessons.remove(id);
-    this.titles.remove(id);
     this.page().close();
   }
 }
