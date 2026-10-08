@@ -38,7 +38,10 @@ function startOfWeek(d: Date): Date {
   return addDays(x, -((x.getDay() + 6) % 7)); // Monday = 0
 }
 
-/** Continuous calendar + the selected day's lessons. Lessons open as cards on the NavStack. */
+/**
+ * Schedule: continuous week-strip calendar + the selected day's lessons (stacked on mobile,
+ * side by side on desktop). Lessons open as cards on the NavStack.
+ */
 @Component({
   selector: 'app-schedule',
   imports: [Icon, LongPress, ScrollArea, TranslatePipe],
@@ -66,6 +69,7 @@ export class Schedule implements AfterViewInit {
   );
   protected readonly visibleMonth = signal(startOfMonth(new Date()));
 
+
   // Week row height: h-11 on mobile, h-12 on desktop (see the template).
   private rowPx(): number {
     return this.isMobile() ? 44 : 48;
@@ -91,6 +95,23 @@ export class Schedule implements AfterViewInit {
     return map;
   });
 
+  // Next 3 lessons from now (desktop, under the calendar). Cancelled ones are skipped.
+  protected readonly upcoming = computed(() => {
+    const now = Date.now();
+    return this.service
+      .lessons()
+      .filter((l) => l.status !== 'Cancelled' && new Date(l.startsAt).getTime() + l.durationMinutes * 60_000 >= now)
+      .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+      .slice(0, 3);
+  });
+
+  // "Wed, 8 Oct · 18:00–19:00"
+  protected upcomingWhen(l: Lesson): string {
+    const start = new Date(l.startsAt);
+    const day = start.toLocaleDateString(this.i18n.locale(), { weekday: 'short', day: 'numeric', month: 'short' });
+    return `${day} · ${toTimeInput(start)}–${this.endLabel(l.startsAt, l.durationMinutes)}`;
+  }
+
   protected readonly dayLessons = computed(
     () => this.byDay().get(toDateInput(this.selectedDate())) ?? [],
   );
@@ -109,7 +130,7 @@ export class Schedule implements AfterViewInit {
     setTimeout(() => this.scrollToToday());
   }
 
-  // Scroll handler: title follows the month filling the middle of the viewport.
+  // Mobile scroll: title follows the month filling the middle of the viewport.
   protected onCalScroll(el: HTMLElement): void {
     const idx = Math.floor((el.scrollTop + el.clientHeight / 2) / this.rowPx());
     const week = this.allWeeks[Math.max(0, Math.min(this.allWeeks.length - 1, idx))];
@@ -121,29 +142,14 @@ export class Schedule implements AfterViewInit {
     this.scrollToDay(new Date());
   }
 
-  // Show the whole month containing `day`: its first week goes to the top (a month spans at
-  // most 6 weeks, which is what the calendar shows), and that month becomes the active one.
+  // Mobile: show the whole month containing `day` (its first week at the top — a month spans at
+  // most 6 weeks, which is what the calendar shows) and make it the active one.
   private scrollToDay(day: Date): void {
     const month = startOfMonth(day);
     const week = Math.round((startOfWeek(month).getTime() - this.weeksStart.getTime()) / (7 * 86_400_000));
     const el = this.cal()?.nativeElement;
     if (el) el.scrollTop = Math.max(0, Math.min(LESSON_WEEKS_TOTAL, week)) * this.rowPx();
     this.visibleMonth.set(month);
-  }
-
-  // Desktop ‹ ›: scroll to the previous / next month, within the loaded lesson window.
-  protected shiftMonth(delta: number): void {
-    if (!this.canShift(delta)) return;
-    const m = this.visibleMonth();
-    this.scrollToDay(new Date(m.getFullYear(), m.getMonth() + delta, 1));
-  }
-
-  protected canShift(delta: number): boolean {
-    const m = this.visibleMonth();
-    const target = new Date(m.getFullYear(), m.getMonth() + delta, 1);
-    const { from, to } = lessonWindow();
-    const targetEnd = new Date(target.getFullYear(), target.getMonth() + 1, 1);
-    return targetEnd > from && target < to;
   }
 
   protected countFor(day: Date): number {
@@ -179,6 +185,16 @@ export class Schedule implements AfterViewInit {
   protected selectDay(day: Date): void {
     this.selectedDate.set(startOfDay(day));
   }
+
+  // Desktop title above the day's lessons, e.g. "Wednesday, 8 October".
+  protected readonly dayTitle = computed(() => {
+    const s = this.selectedDate().toLocaleDateString(this.i18n.locale(), {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    });
+    return s.charAt(0).toLocaleUpperCase(this.i18n.locale()) + s.slice(1);
+  });
 
   protected today(): void {
     this.selectedDate.set(startOfDay(new Date()));

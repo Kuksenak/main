@@ -217,14 +217,14 @@
 
   /* Navigation launcher tile: colored round icon above a label. Add .is-on for the current one. */
   .nav-tile {
-    @apply flex min-w-0 flex-col items-center gap-2 rounded-[var(--radius-card)] px-1 py-4
+    @apply flex min-w-0 flex-col items-center gap-1.5 rounded-[var(--radius-card)] px-1 py-2.5
            transition-colors active:bg-[var(--highlight)];
     &.is-on {
       @apply bg-[var(--surface)] font-semibold shadow-[var(--shadow-control)];
     }
   }
   .nav-tile-icon {
-    @apply inline-flex size-14 items-center justify-center rounded-full text-[var(--accent-fg)];
+    @apply inline-flex size-11 items-center justify-center rounded-full text-[var(--accent-fg)];
   }
 
   /* Selection circle in lists (select mode, pickers); add .is-on when checked. */

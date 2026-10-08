@@ -11,7 +11,6 @@
 html,
 body {
   margin: 0;
-  height: var(--app-h, 100dvh); /* --app-h: measured in index.html (iOS PWA height bug) */
   overflow: hidden;
   background: var(--app-bg);
   color: var(--text);
@@ -21,6 +20,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* The page is pinned to the window (fixed, inset 0) instead of sized with 100dvh/innerHeight:
+   iOS home-screen apps can launch with a wrong viewport height and leave a blank strip at the
+   bottom until the phone is rotated. App screens use h-full to fill it. */
+html {
+  height: 100%;
+}
+body {
+  position: fixed;
+  inset: 0;
+}
+app-root {
+  display: block;
+  height: 100%;
 }
 
 /* Routed components fill the layout's content area so inner panels can scroll. */

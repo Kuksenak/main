@@ -1,16 +1,10 @@
-<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:items-stretch desktop:gap-6">
-  <!-- Calendar -->
-  <section class="flex min-h-0 w-full shrink-0 flex-col desktop:max-w-md desktop:flex-1">
-    <!-- Month header (desktop; on mobile the month lives in the toolbar): ‹ › jump by month -->
-    <div class="mb-3 flex items-center gap-2 mobile:hidden">
-      <h1 class="mr-auto text-xl font-semibold">{{ monthTitle() }}</h1>
-      <button type="button" (click)="shiftMonth(-1)" [disabled]="!canShift(-1)" [attr.aria-label]="'picker.prevMonth' | t" class="icon-btn disabled:opacity-40">
-        <app-icon name="chevron-left" class="size-5" />
-      </button>
-      <button type="button" (click)="shiftMonth(1)" [disabled]="!canShift(1)" [attr.aria-label]="'picker.nextMonth' | t" class="icon-btn disabled:opacity-40">
-        <app-icon name="chevron-right" class="size-5" />
-      </button>
-      <button type="button" (click)="today()" class="btn-secondary">{{ 'schedule.today' | t }}</button>
+<!-- Calendar + the selected day's lessons: stacked on mobile, side by side on desktop -->
+<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4">
+  <section class="flex w-full shrink-0 flex-col desktop:max-w-md desktop:flex-1">
+    <!-- Month header (desktop; on mobile the month lives in the toolbar) -->
+    <div class="mb-3 flex items-center gap-3 mobile:hidden">
+      <h1 class="text-xl font-semibold">{{ monthTitle() }}</h1>
+      <button type="button" (click)="today()" class="btn-secondary ml-auto">{{ 'schedule.today' | t }}</button>
     </div>
 
     <!-- Weekday row -->
@@ -20,8 +14,8 @@
       }
     </div>
 
-    <!-- Continuous, scrollable week rows, exactly 6 weeks tall (any month fits); days outside
-         the active month are dimmed -->
+    <!-- Continuous, scrollable week rows, 6 weeks tall (any month fits); days outside the active
+         month are dimmed -->
     <div
       #cal
       (scroll)="onCalScroll(cal)"
@@ -54,17 +48,35 @@
         </div>
       }
     </div>
+
+    <!-- Desktop: the next 3 lessons (any day) in the free space under the calendar -->
+    @if (upcoming().length) {
+      <div class="mt-6 flex flex-col gap-1.5 mobile:hidden">
+        <span class="text-footnote px-4 uppercase opacity-50">{{ 'students.upcoming' | t }}</span>
+        <div class="card">
+          @for (l of upcoming(); track l.id) {
+            <button type="button" (click)="openEdit(l)" class="list-row w-full py-2 text-left">
+              <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="lessonColor(l)"></span>
+              <div class="min-w-0 flex-1 leading-tight">
+                <p class="truncate font-medium">{{ lessonTitle(l) || l.studentName }}</p>
+                <p class="text-footnote truncate opacity-50">{{ upcomingWhen(l) }}</p>
+              </div>
+              <app-icon name="chevron-right" class="size-4 opacity-30" />
+            </button>
+          }
+        </div>
+      </div>
+    }
   </section>
 
-  <!-- Selected day events: plain rows on the page background, filling down to the safe area;
-       inner bottom padding lets the last event scroll clear of the floating buttons. The native
-       scrollbar is hidden and a custom indicator is drawn at the right edge. -->
-  <section class="relative flex min-h-0 flex-1 flex-col desktop:flex-1">
+  <!-- Selected day's lessons, down to the bottom; bottom padding clears the floating buttons -->
+  <section class="flex min-h-0 flex-1 flex-col">
+    <h2 class="mb-3 flex h-[var(--control-h)] items-center text-xl font-semibold mobile:hidden">{{ dayTitle() }}</h2>
     <app-scroll-area class="min-h-0 flex-1">
       @if (dayLessons().length) {
         <div class="pb-14">
           @for (lesson of dayLessons(); track lesson.id) {
-            <!-- Calendar color bar · title / student · start over end -->
+            <!-- Calendar color bar · title / who · start over end -->
             <button type="button" (click)="openEdit(lesson)" class="event-row">
               <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="lessonColor(lesson)"></span>
               <div class="min-w-0 flex-1 leading-tight">
@@ -98,8 +110,8 @@
   </section>
 </main>
 
-<!-- Floating controls: Today (mobile) bottom-left, + bottom-right (same size and right edge as
-     the account button in the header) -->
+<!-- Floating controls: Today (mobile) bottom-left, + bottom-right (same size / edge as the
+     account button in the header) -->
 <button type="button" (click)="today()" class="btn-secondary float-bottom left-4 !h-12 desktop:hidden">
   {{ 'schedule.today' | t }}
 </button>

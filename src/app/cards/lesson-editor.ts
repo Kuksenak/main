@@ -167,8 +167,14 @@ export class LessonEditor implements OnInit {
         note: lesson.note ?? '',
         status: lesson.status,
       });
-    } else if (e.date) {
-      this.model.set({ ...this.blank(), date: e.date });
+    } else {
+      const startTime = e.time ?? this.blank().startTime;
+      this.model.set({
+        ...this.blank(),
+        date: e.date ?? this.blank().date,
+        startTime,
+        endTime: minToTime(timeToMin(startTime) + 60),
+      });
     }
     this.snapshot.set(JSON.stringify(this.model()));
   }

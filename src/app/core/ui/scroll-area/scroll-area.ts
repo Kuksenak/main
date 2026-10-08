@@ -1,5 +1,6 @@
 import {
   Component,
+  output,
   DestroyRef,
   ElementRef,
   afterNextRender,
@@ -37,7 +38,7 @@ import {
       }
       <div
         #viewport
-        class="no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain"
+        class="no-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-contain"
         [class]="viewportClass()"
         (scroll)="onScroll()"
       >
@@ -50,6 +51,8 @@ export class ScrollArea {
   readonly viewportClass = input(''); // the scrolling element (e.g. `card`)
   readonly contentClass = input(''); // the content column inside it (e.g. `gap-3`)
   readonly gutter = input(10);
+  /** Fires on every scroll of the area (read positions via `element`). */
+  readonly scrolled = output<HTMLElement>();
 
   private readonly viewport = viewChild.required<ElementRef<HTMLElement>>('viewport');
   private readonly content = viewChild.required<ElementRef<HTMLElement>>('content');
@@ -70,7 +73,13 @@ export class ScrollArea {
     });
   }
 
+  /** The scrolling element — for code that scrolls to / reads positions inside the area. */
+  get element(): HTMLElement {
+    return this.viewport().nativeElement;
+  }
+
   protected onScroll(): void {
+    this.scrolled.emit(this.viewport().nativeElement);
     this.update();
     this.scrolling.set(true);
     clearTimeout(this.timer);
