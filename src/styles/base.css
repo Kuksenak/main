@@ -102,6 +102,9 @@ button:disabled {
   button,
   a[href] {
     -webkit-tap-highlight-color: transparent;
+    /* Long press on a control doesn't select its text or open the copy menu */
+    -webkit-touch-callout: none;
+    user-select: none;
     transition:
       transform 160ms var(--ease-out-quick),
       opacity 160ms ease-out;

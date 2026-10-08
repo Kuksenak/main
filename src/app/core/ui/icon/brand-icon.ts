@@ -57,10 +57,28 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
           <path d="M5 38a14 12 0 0 1 28 0v0.5a5.5 5.5 0 0 1-5.5 5.5h-17a5.5 5.5 0 0 1-5.5-5.5z" style="fill: var(--brand-blue)" />
         }
         @case ('book') {
-          <!-- Open book: blue and teal pages around the spine, an orange bookmark -->
-          <path d="M5 11.5a2.5 2.5 0 0 1 2.7-2.5c5.6.4 10.6 1.9 15.3 4.5v29C18.3 40 13.3 38.6 7.7 38.2A2.5 2.5 0 0 1 5 35.7z" style="fill: var(--brand-blue)" />
-          <path d="M43 11.5a2.5 2.5 0 0 0-2.7-2.5c-5.6.4-10.6 1.9-15.3 4.5v29c4.7-2.5 9.7-3.9 15.3-4.3A2.5 2.5 0 0 0 43 35.7z" style="fill: var(--brand-teal)" />
-          <path d="M31 10.4v14.6l3.5-2.6 3.5 2.6V9.3c-2.4.2-4.7.6-7 1.1z" style="fill: var(--brand-orange)" />
+          <!-- A lesson page: the calendar's tear-off paper with an orange heading and lines of
+               text (blue, teal) -->
+          <defs>
+            <filter id="brand-book-shadow" x="-20%" y="-20%" width="140%" height="150%">
+              <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#1d2b4a" flood-opacity="0.18" />
+            </filter>
+          </defs>
+          <g filter="url(#brand-book-shadow)">
+            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 38%, white)" />
+            <path
+              d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
+              style="fill: color-mix(in srgb, var(--brand-blue) 6%, white); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
+            />
+          </g>
+          <path
+            d="M34 42c0-5 3-9 9-9l-9 9z"
+            style="fill: color-mix(in srgb, var(--brand-blue) 45%, #dfe4ee); stroke: color-mix(in srgb, var(--brand-blue) 60%, white); stroke-width: 0.75; stroke-linejoin: round"
+          />
+          <rect x="11" y="10.5" width="18" height="5" rx="2.5" style="fill: var(--brand-orange)" />
+          <rect x="11" y="19.5" width="26" height="3.5" rx="1.75" style="fill: var(--brand-blue)" />
+          <rect x="11" y="26" width="26" height="3.5" rx="1.75" style="fill: var(--brand-teal)" />
+          <rect x="11" y="32.5" width="17" height="3.5" rx="1.75" style="fill: var(--brand-blue)" />
         }
         @case ('info') {
           <!-- The calendar's tear-off page without the blue header: an "i" with the orange dot -->

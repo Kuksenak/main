@@ -9,7 +9,7 @@
            tabs live in the ⋯ sheet -->
       @if (toolbar.content(); as content) {
         <!-- Fields in the toolbar match the round buttons next to them -->
-        <div class="flex min-w-0 flex-1 items-center gap-1 desktop:hidden [&_.field]:h-[var(--control-round)] [&_.field]:rounded-full"><ng-container [ngTemplateOutlet]="content" /></div>
+        <div class="flex min-w-0 flex-1 items-center gap-1 desktop:hidden [&_app-search-field]:flex-1 [&_.field]:h-[var(--control-round)] [&_.field]:rounded-full"><ng-container [ngTemplateOutlet]="content" /></div>
       } @else {
         <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
       }
@@ -49,12 +49,13 @@
   @if (navOpen()) {
     <app-sheet #navSheet [origin]="navBtn" (closed)="navOpen.set(false)">
       <!-- Sections, one per row with its brand icon; the current one has a check mark.
-           No card background or outline — just the rows and the dividers between them. -->
-      <div class="flex flex-col">
+           No card background or outline — just the rows and the dividers between them; the
+           rows reach closer to the sheet's edges; no highlight on tap. -->
+      <div class="-mx-3 flex flex-col">
         @for (item of navItems; track item.path) {
-          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full py-1.5 text-left">
-            <app-brand-icon [name]="item.icon" class="size-8" />
-            <span class="min-w-0 flex-1 truncate">{{ item.label | t }}</span>
+          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full py-1.5 text-left ![--sep-left:4.25rem] active:!bg-transparent">
+            <app-brand-icon [name]="item.icon" class="size-10" />
+            <span class="min-w-0 flex-1 truncate text-[1.1875rem]">{{ item.label | t }}</span>
             @if (isActive(item.path)) {
               <app-icon name="check" class="size-5 text-[var(--accent)]" />
             }
