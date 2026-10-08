@@ -89,7 +89,7 @@
         <div class="flex flex-col">
           @for (item of navItems; track item.path) {
             <button type="button" (click)="go(item.path, navSheet)" class="menu-row">
-              <app-brand-icon [name]="item.icon" class="size-9" />
+              <app-brand-icon [name]="item.icon === 'info' ? 'info-plain' : item.icon" class="size-9" />
               <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
               @if (isActive(item.path)) {
                 <app-icon name="check" class="size-5 text-[var(--accent)]" />
@@ -105,16 +105,12 @@
     <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
       <div class="flex flex-1 flex-col gap-6 desktop:gap-3">
         <div class="card">
-          <!-- 5 taps on the email: version + screen diagnostics (hidden; for support / layout bugs) -->
+          <!-- 5 taps on the email show the app version (hidden; for support) -->
           <button type="button" (click)="versionTap()" class="list-row w-full text-left">
             <span class="min-w-0 truncate">{{ auth.email() }}</span>
           </button>
-          @if (diagnostics(); as d) {
-            <div class="list-row">
-              <span>{{ 'account.version' | t }}</span>
-              <span class="tabular-nums opacity-50">{{ updates.version }}</span>
-            </div>
-            <div class="list-row text-footnote py-2 font-mono opacity-60">{{ d }}</div>
+          @if (showVersion()) {
+            <div class="list-row text-footnote tabular-nums opacity-50">{{ updates.version }}</div>
           }
         </div>
 

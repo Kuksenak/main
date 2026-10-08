@@ -14,7 +14,6 @@ const en = {
   'nav.menu': 'Menu',
 
   'account.title': 'Account',
-  'account.version': 'Version',
   'account.language': 'Language',
   'account.update': 'Update',
   'account.logout': 'Log out',
@@ -102,7 +101,6 @@ const pl: Dictionary = {
   'nav.menu': 'Menu',
 
   'account.title': 'Konto',
-  'account.version': 'Wersja',
   'account.language': 'Język',
   'account.update': 'Aktualizuj',
   'account.logout': 'Wyloguj się',
@@ -187,7 +185,6 @@ const fr: Dictionary = {
   'nav.menu': 'Menu',
 
   'account.title': 'Compte',
-  'account.version': 'Version',
   'account.language': 'Langue',
   'account.update': 'Mettre à jour',
   'account.logout': 'Se déconnecter',

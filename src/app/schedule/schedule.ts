@@ -52,6 +52,7 @@ export class Schedule implements AfterViewInit {
   private titles = inject(LessonTitleStore);
   private groups = inject(GroupService);
   private stack = inject(NavStack);
+  private destroyRef = inject(DestroyRef);
   private i18n = inject(I18nService);
 
   protected readonly isMobile = inject(DeviceDetectionService).isMobile;
@@ -102,8 +103,23 @@ export class Schedule implements AfterViewInit {
       .lessons()
       .filter((l) => l.status !== 'Cancelled' && new Date(l.startsAt).getTime() + l.durationMinutes * 60_000 >= now)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-      .slice(0, 3);
+      .slice(0, this.upcomingFit());
   });
+
+  // How many Upcoming rows fit under the calendar (desktop): measured from the free space.
+  private readonly upcomingFit = signal(3);
+  private readonly upcomingBox = viewChild<ElementRef<HTMLElement>>('upcomingBox');
+  private readonly upcomingHead = viewChild<ElementRef<HTMLElement>>('upcomingHead');
+  private static readonly UPCOMING_ROW_PX = 56; // two-line list row (py-2) incl. divider
+
+  private measureUpcoming(): void {
+    const box = this.upcomingBox()?.nativeElement;
+    if (!box) return;
+    const row = box.querySelector<HTMLElement>('.list-row')?.offsetHeight || Schedule.UPCOMING_ROW_PX;
+    const head = (this.upcomingHead()?.nativeElement.offsetHeight ?? 18) + 6; // title + gap
+    const fit = Math.max(1, Math.floor((box.clientHeight - head) / row));
+    if (fit !== this.upcomingFit()) this.upcomingFit.set(fit);
+  }
 
   // Upcoming → select that lesson's day and bring its month into view.
   protected showDay(l: Lesson): void {
@@ -127,12 +143,20 @@ export class Schedule implements AfterViewInit {
     // Show the visible month in the mobile toolbar while this page is open.
     const toolbar = inject(ToolbarService);
     effect(() => toolbar.title.set(this.monthTitle()));
-    inject(DestroyRef).onDestroy(() => toolbar.title.set(''));
+    this.destroyRef.onDestroy(() => toolbar.title.set(''));
 
     this.service.ensureLoaded();
   }
 
   ngAfterViewInit(): void {
+    // Re-measure the Upcoming space whenever the layout resizes.
+    const box = this.upcomingBox()?.nativeElement;
+    if (box) {
+      const ro = new ResizeObserver(() => this.measureUpcoming());
+      ro.observe(box);
+      this.destroyRef.onDestroy(() => ro.disconnect());
+    }
+
     // Start on the current month.
     setTimeout(() => this.scrollToToday());
   }

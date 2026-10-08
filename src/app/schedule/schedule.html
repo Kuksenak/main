@@ -1,6 +1,6 @@
 <!-- Calendar + the selected day's lessons: stacked on mobile, side by side on desktop -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4">
-  <section class="flex w-full shrink-0 flex-col desktop:max-w-md desktop:flex-1">
+  <section class="flex w-full shrink-0 flex-col desktop:min-h-0 desktop:max-w-md desktop:flex-1">
     <!-- Month header (desktop; on mobile the month lives in the toolbar) -->
     <div class="mb-3 flex items-center gap-3 mobile:hidden">
       <h1 class="text-xl font-semibold">{{ monthTitle() }}</h1>
@@ -49,10 +49,11 @@
       }
     </div>
 
-    <!-- Desktop: the next 3 lessons (any day) in the free space under the calendar -->
+    <!-- Desktop: the next lessons (any day) filling the free space under the calendar — as many
+         whole rows as fit (measured, see upcomingFit) -->
+    <div #upcomingBox class="mt-6 flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden mobile:hidden">
     @if (upcoming().length) {
-      <div class="mt-6 flex flex-col gap-1.5 mobile:hidden">
-        <span class="text-footnote px-4 uppercase opacity-50">{{ 'students.upcoming' | t }}</span>
+        <span #upcomingHead class="text-footnote px-4 uppercase opacity-50">{{ 'students.upcoming' | t }}</span>
         <div class="card">
           @for (l of upcoming(); track l.id) {
             <!-- Picks that lesson's day in the calendar (its lessons then show on the right) -->
@@ -66,8 +67,8 @@
             </button>
           }
         </div>
-      </div>
     }
+    </div>
   </section>
 
   <!-- Selected day's lessons, down to the bottom; bottom padding clears the floating buttons -->

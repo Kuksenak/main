@@ -42,33 +42,14 @@ export class Layout {
   protected readonly accountOpen = signal(false);
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
 
-  // Hidden version + screen diagnostics: tap the email 5 times.
-  protected readonly diagnostics = signal<string | null>(null);
+  // Hidden app version: tap the email 5 times (again to hide).
+  protected readonly showVersion = signal(false);
   private versionTaps = 0;
 
   protected versionTap(): void {
     if (++this.versionTaps < 5) return;
     this.versionTaps = 0;
-    if (this.diagnostics()) return this.diagnostics.set(null);
-    const probe = document.createElement('div');
-    probe.style.cssText =
-      'position:fixed;top:0;height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);visibility:hidden';
-    document.body.appendChild(probe);
-    const cs = getComputedStyle(probe);
-    const vv = window.visualViewport;
-    const standalone = matchMedia('(display-mode: standalone)').matches || (navigator as { standalone?: boolean }).standalone;
-    this.diagnostics.set(
-      [
-        `inner ${innerWidth}×${innerHeight}`,
-        `vv ${vv ? `${Math.round(vv.width)}×${Math.round(vv.height)} @${Math.round(vv.offsetTop)}` : '—'}`,
-        `screen ${screen.width}×${screen.height}`,
-        `dvh ${probe.offsetHeight}`,
-        `body ${document.body.offsetHeight}`,
-        `safe ${cs.paddingTop}/${cs.paddingBottom}`,
-        `${standalone ? 'standalone' : 'browser'} dpr ${devicePixelRatio}`,
-      ].join(' · '),
-    );
-    probe.remove();
+    this.showVersion.update((v) => !v);
   }
 
   protected isActive(path: string): boolean {

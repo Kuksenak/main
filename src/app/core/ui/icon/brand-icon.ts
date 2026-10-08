@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type BrandIconName = 'calendar' | 'people' | 'info';
+export type BrandIconName = 'calendar' | 'people' | 'info' | 'info-plain';
 
 /**
  * Flat multi-color product icons in the logo's colors (Google-product style, no background),
@@ -57,10 +57,29 @@ export type BrandIconName = 'calendar' | 'people' | 'info';
           <path d="M5 38a14 12 0 0 1 28 0v0.5a5.5 5.5 0 0 1-5.5 5.5h-17a5.5 5.5 0 0 1-5.5-5.5z" style="fill: var(--brand-blue)" />
         }
         @case ('info') {
-          <!-- An "i" on a soft round badge -->
-          <circle cx="24" cy="24" r="19" style="fill: color-mix(in srgb, var(--brand-teal) 18%, transparent)" />
+          <!-- Same light page as the calendar (tint, outline, soft shadow), a blue "i" with the
+               orange dot -->
+          <defs>
+            <filter id="brand-info-shadow" x="-20%" y="-20%" width="140%" height="150%">
+              <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#1d2b4a" flood-opacity="0.18" />
+            </filter>
+          </defs>
+          <rect
+            x="5"
+            y="5"
+            width="38"
+            height="38"
+            rx="10"
+            filter="url(#brand-info-shadow)"
+            style="fill: color-mix(in srgb, var(--brand-blue) 6%, white); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
+          />
           <circle cx="24" cy="15" r="3.6" style="fill: var(--brand-orange)" />
-          <rect x="20.5" y="21.5" width="7" height="15" rx="3.5" style="fill: var(--brand-teal)" />
+          <rect x="20.5" y="21" width="7" height="16" rx="3.5" style="fill: var(--brand-blue)" />
+        }
+        @case ('info-plain') {
+          <!-- The same "i" without the page: orange dot, blue stem -->
+          <circle cx="24" cy="10" r="4.5" style="fill: var(--brand-orange)" />
+          <rect x="19.5" y="18" width="9" height="24" rx="4.5" style="fill: var(--brand-blue)" />
         }
       }
     </svg>
