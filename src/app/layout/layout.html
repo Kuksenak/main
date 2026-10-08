@@ -16,7 +16,7 @@
       }
     </nav>
     <button type="button" (click)="navOpen.set(true)" aria-label="Menu" class="icon-btn !text-current sm:hidden">
-      <svg viewBox="0 0 24 24" fill="currentColor" class="size-5"><circle cx="5" cy="5" r="2" /><circle cx="12" cy="5" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /><circle cx="5" cy="19" r="2" /><circle cx="12" cy="19" r="2" /><circle cx="19" cy="19" r="2" /></svg>
+      <svg viewBox="0 0 24 24" fill="currentColor" class="size-6"><circle cx="5" cy="5" r="2" /><circle cx="12" cy="5" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /><circle cx="5" cy="19" r="2" /><circle cx="12" cy="19" r="2" /><circle cx="19" cy="19" r="2" /></svg>
     </button>
     <!-- Account avatar: first letter of the email; dot when an app update is ready -->
     <button
@@ -26,7 +26,7 @@
       aria-label="Account"
       class="relative flex size-12 shrink-0 items-center justify-center rounded-full active:opacity-70"
     >
-      <span class="glass-accent flex size-12 items-center justify-center rounded-full text-[19px] font-semibold uppercase">{{ initial() }}</span>
+      <span class="glass-accent flex size-12 items-center justify-center rounded-full text-[21px] font-semibold uppercase">{{ initial() }}</span>
       @if (updates.updateReady()) {
         <span class="absolute right-0 top-0 size-3 rounded-full bg-red-500 ring-2 ring-[var(--app-bg)]"></span>
       }
