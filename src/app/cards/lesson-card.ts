@@ -6,6 +6,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { Toggle } from '../core/ui/toggle';
 import { LessonContent } from '../lessons/lesson-content';
 import { LessonForm, cleanLesson, lessonValid } from '../lessons/lesson-form';
 import { LessonInput, LessonService, shareUrl } from '../lessons/lesson.service';
@@ -20,7 +21,7 @@ import { EventList } from './event-list';
  */
 @Component({
   selector: 'app-lesson-card',
-  imports: [EventList, Icon, LessonContent, LessonForm, PageSheet, TranslatePipe],
+  imports: [EventList, Icon, LessonContent, LessonForm, PageSheet, Toggle, TranslatePipe],
   template: `
     <app-page-sheet
       #page
@@ -59,14 +60,7 @@ import { EventList } from './event-list';
             <div class="card">
               <div class="list-row">
                 <span>{{ 'lessons.public' | t }}</span>
-                <button
-                  type="button"
-                  role="switch"
-                  class="switch"
-                  [attr.aria-checked]="!!l.shareToken"
-                  [attr.aria-label]="'lessons.public' | t"
-                  (click)="setPublic(!l.shareToken)"
-                ></button>
+                <app-toggle [checked]="!!l.shareToken" (checkedChange)="setPublic($event)" [attr.aria-label]="'lessons.public' | t" />
               </div>
             </div>
             <p class="text-footnote px-4 opacity-50">{{ 'lessons.publicHint' | t }}</p>
