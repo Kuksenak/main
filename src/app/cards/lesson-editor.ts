@@ -61,7 +61,7 @@ interface Model {
             </button>
             @if (whoLink(); as link) {
               <button type="button" (click)="stack.push(link)" [attr.aria-label]="'lesson.openStudent' | t" class="icon-plain -mr-2">
-                <app-icon name="chevron-right" class="size-5" />
+                <app-icon name="chevron-right" class="row-chevron !opacity-100" />
               </button>
             } @else {
               <app-icon name="chevrons-up-down" class="size-5 opacity-40" />

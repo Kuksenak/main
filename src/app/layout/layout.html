@@ -22,9 +22,15 @@
         >{{ item.label | t }}</a>
       }
     </nav>
-    <!-- Navigation launcher (also on desktop for now, to compare with the tabs) -->
-    <button #navBtn type="button" (click)="navOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn">
+    <!-- Navigation menus, three styles side by side to compare (TEMP: keep one) -->
+    <button #navTilesBtn type="button" (click)="navOpen.set('tiles')" [attr.aria-label]="'nav.menu' | t" class="icon-btn">
       <app-icon name="grid" class="size-6" />
+    </button>
+    <button #navBtn type="button" (click)="navOpen.set('icons')" [attr.aria-label]="'nav.menu' | t" class="icon-btn">
+      <app-icon name="list" class="size-6" />
+    </button>
+    <button #navListBtn type="button" (click)="navOpen.set('list')" [attr.aria-label]="'nav.menu' | t" class="icon-btn">
+      <app-icon name="menu" class="size-6" />
     </button>
     <!-- Account: first letter of the email; green dot when an app update is ready -->
     <button
@@ -47,19 +53,51 @@
   <app-stack-host />
 
   @if (navOpen()) {
-    <app-sheet #navSheet [origin]="navBtn" (closed)="navOpen.set(false)">
-      <!-- Sections: one row each with its brand icon; the current one in the accent color -->
-      <div class="card">
-        @for (item of navItems; track item.path) {
-          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full py-1.5 text-left">
-            <app-brand-icon [name]="item.icon" class="size-8" />
-            <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
-            @if (isActive(item.path)) {
-              <app-icon name="check" class="size-5 text-[var(--accent)]" />
-            }
-          </button>
-        }
-      </div>
+    <app-sheet
+      #navSheet
+      [origin]="navOpen() === 'list' ? navListBtn : navOpen() === 'tiles' ? navTilesBtn : navBtn"
+      (closed)="navOpen.set(null)"
+    >
+      @if (navOpen() === 'tiles') {
+        <!-- Tiles: icon above label, no borders or backgrounds; the current one's label is blue -->
+        <div class="grid grid-cols-3 gap-2">
+          @for (item of navItems; track item.path) {
+            <button type="button" (click)="go(item.path, navSheet)" class="nav-tile">
+              <app-brand-icon [name]="item.icon" class="size-11" />
+              <span class="text-footnote w-full truncate text-center" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
+            </button>
+          }
+        </div>
+      } @else if (navOpen() === 'list') {
+        <!-- Like the account menu: text rows in cards, About in its own block -->
+        <div class="flex flex-col gap-2">
+          @for (group of [mainNav, infoNav]; track $index) {
+            <div class="card">
+              @for (item of group; track item.path) {
+                <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full text-left">
+                  <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
+                  @if (isActive(item.path)) {
+                    <app-icon name="check" class="size-5 text-[var(--accent)]" />
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- Borderless rows with the brand icons; the current one in the accent color -->
+        <div class="flex flex-col">
+          @for (item of navItems; track item.path) {
+            <button type="button" (click)="go(item.path, navSheet)" class="menu-row">
+              <app-brand-icon [name]="item.icon" class="size-9" />
+              <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
+              @if (isActive(item.path)) {
+                <app-icon name="check" class="size-5 text-[var(--accent)]" />
+              }
+            </button>
+          }
+        </div>
+      }
     </app-sheet>
   }
 
@@ -67,15 +105,15 @@
     <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
       <div class="flex flex-1 flex-col gap-6 desktop:gap-3">
         <div class="card">
-          <div class="list-row">
-            <span class="min-w-0 truncate">{{ auth.email() }}</span>
-          </div>
-          <!-- 5 taps: screen diagnostics (viewport / safe-area numbers for layout bugs) -->
+          <!-- 5 taps on the email: version + screen diagnostics (hidden; for support / layout bugs) -->
           <button type="button" (click)="versionTap()" class="list-row w-full text-left">
-            <span>{{ 'account.version' | t }}</span>
-            <span class="tabular-nums opacity-50">{{ updates.version }}</span>
+            <span class="min-w-0 truncate">{{ auth.email() }}</span>
           </button>
           @if (diagnostics(); as d) {
+            <div class="list-row">
+              <span>{{ 'account.version' | t }}</span>
+              <span class="tabular-nums opacity-50">{{ updates.version }}</span>
+            </div>
             <div class="list-row text-footnote py-2 font-mono opacity-60">{{ d }}</div>
           }
         </div>

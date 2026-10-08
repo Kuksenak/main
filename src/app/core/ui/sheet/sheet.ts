@@ -5,8 +5,8 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
 
 /**
  * Layout for menus (info and actions, no inputs):
- * - mobile: floating bottom sheet (0.5rem inset, large continuous corners, at least half the
- *   screen and growing with its content up to 90%, translucent glass); drag the grabber down
+ * - mobile: floating bottom sheet (0.5rem inset, large continuous corners, sized to its
+ *   content up to 90% of the screen, translucent glass); drag the grabber down
  *   or tap outside to dismiss;
  * - desktop: a dropdown anchored under `origin` via CDK overlay, or a centered dialog when
  *   no origin is given.
@@ -46,7 +46,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         ></div>
 
         <div
-          class="absolute inset-x-2 bottom-2 flex max-h-[calc(var(--app-h,100dvh)*0.9)] min-h-[calc(var(--app-h,100dvh)*0.5)] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[2.75rem] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:max-h-[calc(var(--app-h,100dvh)*0.9)] desktop:min-h-0 desktop:w-full desktop:max-w-sm"
+          class="absolute inset-x-2 bottom-2 flex max-h-[calc(var(--app-h,100dvh)*0.9)] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[2.75rem] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:max-h-[calc(var(--app-h,100dvh)*0.9)] desktop:w-full desktop:max-w-sm"
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"

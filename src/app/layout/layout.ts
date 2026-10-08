@@ -26,18 +26,23 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
-  // Sections: desktop tabs and the launcher tiles (flat brand-colored product icons).
+  // Sections: desktop tabs and both navigation menus.
   protected readonly navItems: { path: string; label: TranslationKey; icon: BrandIconName }[] = [
     { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
     { path: '/students', label: 'nav.students', icon: 'people' },
     { path: '/about', label: 'nav.about', icon: 'info' },
   ];
+  // Plain menu: sections, then About in its own block.
+  protected readonly mainNav = this.navItems.filter((i) => i.path !== '/about');
+  protected readonly infoNav = this.navItems.filter((i) => i.path === '/about');
 
-  protected readonly navOpen = signal(false);
+  // Which navigation menu is open: tiles, borderless rows with icons, or plain text rows like
+  // the account menu (three styles to compare).
+  protected readonly navOpen = signal<'tiles' | 'icons' | 'list' | null>(null);
   protected readonly accountOpen = signal(false);
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
 
-  // Hidden screen diagnostics: tap Version 5 times.
+  // Hidden version + screen diagnostics: tap the email 5 times.
   protected readonly diagnostics = signal<string | null>(null);
   private versionTaps = 0;
 

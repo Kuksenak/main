@@ -38,7 +38,7 @@ import { GroupService } from '../students/group.service';
                 @if (l.status !== 'Scheduled') {
                   <span class="badge">{{ statusKey(l) | t }}</span>
                 }
-                <app-icon name="chevron-right" class="size-4 opacity-30" />
+                <app-icon name="chevron-right" class="row-chevron" />
               </button>
             }
           </div>

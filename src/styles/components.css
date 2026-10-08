@@ -151,6 +151,24 @@
     --sep-left: 6.25rem; /* padding + 1.5rem check + gap + avatar + gap */
   }
 
+  /* Navigation tile: icon above a label, no border or background (highlight only while pressed). */
+  .nav-tile {
+    @apply flex min-w-0 flex-col items-center gap-2 rounded-2xl px-1 py-2.5 transition-colors
+           active:bg-[var(--highlight)] desktop:hover:bg-[var(--highlight)];
+  }
+
+  /* Borderless menu row (icon + label), highlighted only while pressed. */
+  .menu-row {
+    @apply text-body flex min-h-[var(--row-h)] w-full items-center gap-3 rounded-[var(--radius-card)] px-2 py-1.5
+           text-left transition-colors active:bg-[var(--highlight)];
+  }
+
+  /* Chevron at the end of a tappable row and on collapsible section headers — one size
+     everywhere. */
+  .row-chevron {
+    @apply size-5 shrink-0 opacity-30;
+  }
+
   /* Thin vertical bar in a lesson's calendar color (set its background). */
   .color-bar {
     @apply w-1 shrink-0 self-stretch rounded-full;

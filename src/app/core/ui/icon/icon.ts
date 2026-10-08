@@ -8,6 +8,8 @@ export type IconName =
   | 'chevron-right'
   | 'chevrons-up-down'
   | 'grid'
+  | 'list'
+  | 'menu'
   | 'search'
   | 'person'
   | 'people'
@@ -37,6 +39,8 @@ export type IconName =
       @switch (name()) {
         @case ('plus') { <path d="M12 5v14M5 12h14" /> }
         @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
+        @case ('list') { <path d="M8 6.5h12M8 12h12M8 17.5h12" /><circle cx="4" cy="6.5" r="1.1" /><circle cx="4" cy="12" r="1.1" /><circle cx="4" cy="17.5" r="1.1" /> }
+        @case ('menu') { <path d="M4 7h16M4 12h16M4 17h16" /> }
         @case ('close') { <path d="M18 6 6 18M6 6l12 12" /> }
         @case ('people') { <circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6" /> }
         @case ('calendar') { <rect x="3.5" y="5" width="17" height="15.5" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /> }

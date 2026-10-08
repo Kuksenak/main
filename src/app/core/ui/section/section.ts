@@ -20,7 +20,7 @@ const STORAGE_KEY = 'sections';
       @if (count() !== null) {
         <span class="tabular-nums">· {{ count() }}</span>
       }
-      <app-icon name="chevron-right" class="ml-auto size-4 transition-transform duration-200" [class.rotate-90]="open()" />
+      <app-icon name="chevron-right" class="row-chevron ml-auto !opacity-100 transition-transform duration-200" [class.rotate-90]="open()" />
     </button>
     @if (open()) {
       <ng-content />

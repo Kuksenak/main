@@ -39,7 +39,7 @@ export type BrandIconName = 'calendar' | 'people' | 'info';
             x="24"
             y="35"
             text-anchor="middle"
-            style="fill: #111; font: 800 19.5px -apple-system, system-ui, 'Segoe UI', sans-serif; letter-spacing: -0.04em"
+            style="fill: var(--brand-orange); font: 800 19.5px -apple-system, system-ui, 'Segoe UI', sans-serif; letter-spacing: -0.04em"
           >{{ today }}</text>
         }
         @case ('people') {

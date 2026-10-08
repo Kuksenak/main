@@ -20,7 +20,7 @@ import { Student, StudentService } from '../students/student.service';
             <button type="button" (click)="stack.push({ kind: 'group', id: g.id })" class="list-row w-full text-left">
               <span class="dot size-2.5" [style.background]="colorVar(g.color)"></span>
               <p class="min-w-0 flex-1 truncate">{{ g.name }}</p>
-              <app-icon name="chevron-right" class="size-4 opacity-30" />
+              <app-icon name="chevron-right" class="row-chevron" />
             </button>
           }
         </div>
@@ -50,7 +50,7 @@ export class StudentGroups {
           <button type="button" (click)="stack.push({ kind: 'student', id: s.id })" class="list-row w-full py-2 text-left">
             <span class="avatar">{{ initial(s.name) }}</span>
             <p class="min-w-0 flex-1 truncate">{{ s.name }}</p>
-            <app-icon name="chevron-right" class="size-4 opacity-30" />
+            <app-icon name="chevron-right" class="row-chevron" />
           </button>
         } @empty {
           <p class="list-row opacity-40">—</p>
