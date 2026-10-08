@@ -1,4 +1,3 @@
-import { DatePipe, formatDate, NgTemplateOutlet } from '@angular/common';
 import {
   AfterViewInit,
   afterRenderEffect,
@@ -8,14 +7,18 @@ import {
   effect,
   ElementRef,
   inject,
-  LOCALE_ID,
   signal,
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { I18nService } from '../core/i18n/i18n.service';
+import { TranslatePipe } from '../core/i18n/t.pipe';
+import { TranslationKey } from '../core/i18n/translations';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { DateField } from '../core/ui/date/date';
+import { Icon } from '../core/ui/icon/icon';
+import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
 import { Lesson, LessonService, LessonStatus } from './lesson.service';
@@ -53,12 +56,6 @@ function startOfMonth(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), 1);
 }
 
-function startOfGrid(d: Date): Date {
-  const first = startOfMonth(d);
-  const day = (first.getDay() + 6) % 7; // Monday = 0
-  return addDays(first, -day);
-}
-
 function startOfWeek(d: Date): Date {
   const x = startOfDay(d);
   const day = (x.getDay() + 6) % 7; // Monday = 0
@@ -69,10 +66,6 @@ function addDays(d: Date, n: number): Date {
   const x = new Date(d);
   x.setDate(x.getDate() + n);
   return x;
-}
-
-function addMonths(d: Date, n: number): Date {
-  return new Date(d.getFullYear(), d.getMonth() + n, 1);
 }
 
 function toDateInput(d: Date): string {
@@ -87,28 +80,31 @@ function toTimeInput(d: Date): string {
 
 @Component({
   selector: 'app-schedule',
-  imports: [FormsModule, DatePipe, NgTemplateOutlet, TimeField, SelectField, DateField],
+  imports: [FormsModule, TimeField, SelectField, DateField, Icon, PageSheet, TranslatePipe],
   templateUrl: './schedule.html',
 })
 export class Schedule implements AfterViewInit {
   private service = inject(LessonService);
+  private i18n = inject(I18nService);
 
   protected readonly isMobile = inject(DeviceDetectionService).isMobile;
-  protected readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  protected readonly weekdays = this.i18n.weekdays;
 
   private readonly cal = viewChild<ElementRef<HTMLElement>>('cal');
   private readonly list = viewChild<ElementRef<HTMLElement>>('list');
+  private readonly page = viewChild(PageSheet);
 
-  // Custom scroll indicator for the events card (top/height in % of the card), null when
-  // everything fits. Brighter while scrolling, like iOS.
+  // Custom scroll indicator for the events list (top/height in % of the list), null when
+  // everything fits. Brighter while scrolling.
   protected readonly listThumb = signal<{ top: number; height: number } | null>(null);
   protected readonly listScrolling = signal(false);
   private listScrollTimer?: ReturnType<typeof setTimeout>;
-  protected readonly statusOptions: SelectOption[] = [
-    { label: 'Scheduled', value: 'Scheduled' },
-    { label: 'Done', value: 'Done' },
-    { label: 'Cancelled', value: 'Cancelled' },
-  ];
+  protected readonly statusOptions = computed<SelectOption[]>(() =>
+    (['Scheduled', 'Done', 'Cancelled'] as const).map((s) => ({
+      label: this.i18n.t(this.statusKey(s)),
+      value: s,
+    })),
+  );
 
   protected readonly selectedDate = signal(startOfDay(new Date()));
 
@@ -132,9 +128,14 @@ export class Schedule implements AfterViewInit {
 
   protected readonly editor = signal<EditorModel | null>(null);
 
-  protected readonly sheetClosing = signal(false);
-  // Editor renders as a solid centered dialog on desktop (Tailwind `sm`).
-  protected readonly isDesktop = window.matchMedia('(min-width: 40rem)').matches;
+  // Month title, e.g. "October 2026" / "Październik 2026" (capitalized for every language).
+  protected readonly monthTitle = computed(() => {
+    const s = this.visibleMonth().toLocaleDateString(this.i18n.locale(), {
+      month: 'long',
+      year: 'numeric',
+    });
+    return s.charAt(0).toLocaleUpperCase(this.i18n.locale()) + s.slice(1);
+  });
 
   // Lessons grouped by day key for O(1) cell lookup.
   private readonly byDay = computed(() => {
@@ -154,8 +155,7 @@ export class Schedule implements AfterViewInit {
   constructor() {
     // Show the visible month in the mobile toolbar while this page is open.
     const toolbar = inject(ToolbarService);
-    const locale = inject(LOCALE_ID);
-    effect(() => toolbar.title.set(formatDate(this.visibleMonth(), 'MMMM yyyy', locale)));
+    effect(() => toolbar.title.set(this.monthTitle()));
     inject(DestroyRef).onDestroy(() => toolbar.title.set(''));
 
     // Load lessons for the whole scrollable window once.
@@ -222,7 +222,6 @@ export class Schedule implements AfterViewInit {
     return this.byDay().get(toDateInput(day))?.length ?? 0;
   }
 
-  // Indicator width: a single dot for one event, a longer oval for several (capped at 5).
   // Indicator under a day with events: a dot for one, a longer dash per extra event (capped at 5).
   protected dotWidth(day: Date): number {
     const n = Math.min(this.countFor(day), 5);
@@ -233,12 +232,6 @@ export class Schedule implements AfterViewInit {
   protected dayColor(day: Date): string {
     const first = this.byDay().get(toDateInput(day))?.[0];
     return first ? this.lessonColor(first) : 'var(--calendar-default)';
-  }
-
-  // Month label for a week when it contains the 1st (inline divider in the scroll).
-  protected monthStart(week: Date[]): string | null {
-    const first = week.find((d) => d.getDate() === 1);
-    return first ? first.toLocaleDateString(undefined, { month: 'short' }) : null;
   }
 
   // Dim days outside the month currently shown in the title.
@@ -317,7 +310,7 @@ export class Schedule implements AfterViewInit {
 
   protected dateLabel(key: string): string {
     const [y, mo, d] = key.split('-').map(Number);
-    return new Date(y, mo - 1, d).toLocaleDateString(undefined, {
+    return new Date(y, mo - 1, d).toLocaleDateString(this.i18n.locale(), {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -353,18 +346,17 @@ export class Schedule implements AfterViewInit {
     return 'var(--calendar-default)';
   }
 
+  protected statusKey(status: LessonStatus): TranslationKey {
+    return `lesson.status.${status}`;
+  }
+
   protected isInvalid(m: EditorModel): boolean {
     return timeToMin(m.endTime) <= timeToMin(m.startTime);
   }
 
+  // Animates the page sheet out; its (closed) output then clears the editor.
   protected closeEditor(): void {
-    if (this.editor() === null || this.sheetClosing()) return;
-    // Slide the page out to the right, then remove it.
-    this.sheetClosing.set(true);
-    setTimeout(() => {
-      this.editor.set(null);
-      this.sheetClosing.set(false);
-    }, 240);
+    this.page()?.close();
   }
 
   protected save(): void {

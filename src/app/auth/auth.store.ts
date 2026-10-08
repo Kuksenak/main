@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, finalize, Observable, of, switchMap, tap, timeout } from 'rxjs';
 import { environment } from '@environments/environment';
 
@@ -15,6 +16,7 @@ const REFRESH_TIMEOUT_MS = 5000;
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   private _user = signal<UserProfile | null>(null);
   private _accessToken = signal<string | null>(null);
@@ -51,13 +53,15 @@ export class AuthStore {
     window.location.href = `${environment.apiUrl}/signin/google`;
   }
 
+  // Drop the session locally right away and go to the login page (nothing stays visible),
+  // then tell the server to clear its refresh cookie.
   logout(): void {
+    this._user.set(null);
+    this._accessToken.set(null);
+    this.router.navigateByUrl('/login');
     this.http
       .post(`${environment.apiUrl}/signout`, {}, { withCredentials: true })
       .pipe(catchError(() => of(null)))
-      .subscribe(() => {
-        this._user.set(null);
-        this._accessToken.set(null);
-      });
+      .subscribe();
   }
 }

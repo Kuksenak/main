@@ -1,0 +1,84 @@
+/* Design tokens — every color, shadow and easing used by the app lives here.
+   Templates reference these (bg-[var(--surface)], text-[var(--danger)], …), never raw colors. */
+
+:root {
+  /* Surfaces */
+  --app-bg: #faf9f5;
+  --surface: #fffefb; /* cards; re-pointed inside sheets/dialogs */
+  --card: #fffefb; /* solid card color (desktop dialogs) */
+  --dialog-bg: #f5f4ef; /* desktop dialogs: solid, glass over the backdrop turns muddy */
+  --sheet-glass: rgb(255 255 255 / 0.55); /* mobile bottom sheet */
+  --sheet-surface: rgb(255 255 255 / 0.75); /* cards inside the glass sheet */
+  --glass-neutral: rgb(255 255 255 / 0.8); /* neutral glass buttons */
+
+  /* Text */
+  --text: #171717;
+  --text-secondary: color-mix(in srgb, var(--text) 50%, transparent);
+
+  /* Brand & semantic */
+  --accent: #3478f6;
+  --accent-fg: #ffffff;
+  --success: #34c759;
+  --danger: #ff3b30;
+  /* Default calendar color (event bars, calendar dots): pale accent, adapts to theme. */
+  --calendar-default: color-mix(in srgb, var(--accent) 45%, var(--app-bg));
+
+  /* Fills & lines */
+  --fill: rgb(0 0 0 / 0.04); /* input chips */
+  --fill-strong: rgb(0 0 0 / 0.06); /* badges */
+  --highlight: rgb(0 0 0 / 0.05); /* hover / pressed rows */
+  --separator: rgb(0 0 0 / 0.08);
+  --grabber: rgb(0 0 0 / 0.2);
+  --scroll-thumb: rgb(0 0 0 / 0.25);
+  --backdrop: rgb(0 0 0 / 0.3); /* desktop dialogs only */
+
+  /* Shadows */
+  --shadow-control: 0 2px 14px rgb(0 0 0 / 0.1);
+  --shadow-accent: 0 2px 12px rgb(0 0 0 / 0.12);
+  --shadow-popover: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 8px 30px rgb(0 0 0 / 0.12);
+  --shadow-dialog: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 24px 64px rgb(0 0 0 / 0.22);
+  --shadow-sheet: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 0.5px rgb(0 0 0 / 0.08),
+    0 2px 6px rgb(0 0 0 / 0.06), 0 16px 48px rgb(0 0 0 / 0.18);
+  --rim-accent: inset 0 1px 0.5px rgb(255 255 255 / 0.55), inset 0 0 0 0.5px rgb(255 255 255 / 0.2);
+  --rim-neutral: inset 0 0 0 1px rgb(255 255 255 / 0.9);
+  --sheet-border: rgb(255 255 255 / 0.7);
+
+  /* Motion */
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-quick: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Floating controls sit just above the home indicator. */
+  --float-bottom: max(0.75rem, calc(env(safe-area-inset-bottom) - 0.25rem));
+}
+
+html.dark {
+  --app-bg: #262624;
+  --surface: #30302e;
+  --card: #30302e;
+  --dialog-bg: #262624;
+  --sheet-glass: rgb(48 48 46 / 0.72);
+  --sheet-surface: rgb(255 255 255 / 0.07);
+  --glass-neutral: rgb(72 72 74 / 0.7);
+
+  --text: #f5f5f5;
+
+  --success: #30d158;
+  --danger: #ff453a;
+
+  --fill: rgb(255 255 255 / 0.06);
+  --fill-strong: rgb(255 255 255 / 0.1);
+  --highlight: rgb(255 255 255 / 0.08);
+  --separator: rgb(255 255 255 / 0.1);
+  --grabber: rgb(255 255 255 / 0.25);
+  --scroll-thumb: rgb(255 255 255 / 0.3);
+
+  --shadow-control: 0 2px 14px rgb(0 0 0 / 0.4);
+  --shadow-accent: 0 2px 12px rgb(0 0 0 / 0.35);
+  --shadow-popover: 0 0 0 0.5px rgb(255 255 255 / 0.06), 0 8px 30px rgb(0 0 0 / 0.5);
+  --shadow-dialog: 0 0 0 0.5px rgb(255 255 255 / 0.08), 0 24px 64px rgb(0 0 0 / 0.6);
+  --shadow-sheet: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 0.5px rgb(0 0 0 / 0.6),
+    0 16px 48px rgb(0 0 0 / 0.55);
+  --rim-accent: inset 0 1px 0.5px rgb(255 255 255 / 0.35), inset 0 0 0 0.5px rgb(255 255 255 / 0.12);
+  --rim-neutral: 0 0 #0000;
+  --sheet-border: rgb(255 255 255 / 0.1);
+}

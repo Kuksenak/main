@@ -1,17 +1,16 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
-
-const DESKTOP = '(min-width: 40rem)'; // Tailwind `sm`
+import { DeviceDetectionService } from '../../services/device-detection.service';
 
 /**
- * One menu surface, two presentations:
- * - mobile: iOS-style floating bottom sheet (8px inset, large continuous corners,
- *   half the screen tall, translucent glass); drag the grabber down or tap outside;
- * - desktop: a dropdown anchored under `origin` via CDK overlay (like the pickers),
- *   or a centered dialog when no origin is given.
- * Render it with @if; call close() to animate out, then `closed` fires so the
- * parent can drop it.
+ * Layout for menus (info and actions, no inputs):
+ * - mobile: floating bottom sheet (8px inset, large continuous corners, half the screen,
+ *   translucent glass); drag the grabber down or tap outside to dismiss;
+ * - desktop: a dropdown anchored under `origin` via CDK overlay, or a centered dialog when
+ *   no origin is given.
+ * Forms use <app-page-sheet> instead.
+ * Render it with @if; call close() to animate out, then `closed` fires.
  */
 @Component({
   selector: 'app-sheet',
@@ -30,37 +29,37 @@ const DESKTOP = '(min-width: 40rem)'; // Tailwind `sm`
         (backdropClick)="close()"
         (detach)="close()"
       >
-        <div class="dialog-panel w-72 origin-top-right !rounded-[14px] p-3 [animation:dropdownIn_160ms_cubic-bezier(0.2,0,0,1)]">
+        <div class="dialog-panel w-72 origin-top-right !rounded-[14px] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]">
           <ng-container [ngTemplateOutlet]="content" />
         </div>
       </ng-template>
     } @else {
-      <div class="fixed inset-0 z-40 sm:flex sm:items-center sm:justify-center sm:p-4">
+      <div class="fixed inset-0 z-40 desktop:flex desktop:items-center desktop:justify-center desktop:p-4">
         <div
-          class="absolute inset-0 [animation:fadeIn_280ms_ease-out] sm:bg-black/30"
+          class="absolute inset-0 [animation:fadeIn_280ms_ease-out] desktop:bg-[var(--backdrop)]"
           [style.opacity]="closing() ? 0 : null"
           [style.transition]="'opacity 240ms ease-out'"
           (click)="close()"
         ></div>
 
         <div
-          class="absolute inset-x-2 bottom-2 flex h-[50dvh] flex-col overflow-hidden max-sm:rounded-[44px] max-sm:[corner-shape:squircle] [animation:sheetUp_380ms_cubic-bezier(0.32,0.72,0,1)] sm:relative sm:inset-auto sm:h-auto sm:w-full sm:max-w-sm"
+          class="absolute inset-x-2 bottom-2 flex h-[50dvh] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[44px] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:h-auto desktop:w-full desktop:max-w-sm"
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
-          [style.transition]="dragging() ? 'none' : 'transform 280ms cubic-bezier(0.32,0.72,0,1)'"
+          [style.transition]="dragging() ? 'none' : 'transform 280ms var(--ease-ios)'"
         >
           <div
-            class="shrink-0 touch-none px-4 pb-4 pt-2.5 sm:pb-0 sm:pt-4"
+            class="shrink-0 touch-none px-4 pb-4 pt-2.5 desktop:pb-0 desktop:pt-4"
             (touchstart)="dragStart($event)"
             (touchmove)="dragMove($event)"
             (touchend)="dragEnd()"
             (touchcancel)="dragEnd()"
           >
-            <div class="mx-auto h-[5px] w-9 rounded-full bg-black/20 dark:bg-white/25 sm:hidden"></div>
+            <div class="grabber desktop:hidden"></div>
           </div>
 
-          <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 sm:px-4 sm:pb-4">
+          <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 desktop:px-4 desktop:pb-4">
             <ng-container [ngTemplateOutlet]="content" />
           </div>
         </div>
@@ -73,8 +72,7 @@ export class Sheet {
   readonly origin = input<HTMLElement | null>(null);
   readonly closed = output<void>();
 
-  // Sheet on mobile, dropdown/dialog on desktop (read once — the menu is short-lived).
-  protected readonly desktop = window.matchMedia(DESKTOP).matches;
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
 
   // Under the anchor, right-aligned; flips above when there's no room below.
   protected readonly positions: ConnectedPosition[] = [

@@ -1,0 +1,102 @@
+/* Document-level defaults: page, scrollbars, press feedback, cursors. */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/assets/fonts/InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--app-bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Inter', sans-serif;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Routed components fill the layout's content area so inner panels can scroll. */
+app-schedule,
+app-about {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+/* Thin scrollbars without stepper arrows. WebKit uses the pseudo-elements; the standard
+   properties are Firefox-only because in Chrome they override the pseudo-elements and
+   bring the arrows back. */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 999px;
+}
+@supports (-moz-appearance: none) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) transparent;
+  }
+}
+
+/* Hide the native scrollbar on a scroll area (custom indicator or none). */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Pointer cursor on anything clickable (Tailwind v4 drops it from buttons). */
+button:not(:disabled),
+a[href],
+[role='button'],
+label,
+summary,
+select {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+
+/* Press feedback (in the base layer so utilities still win): no grey tap flash, a quick
+   shrink that springs back. List rows get the grey cell highlight instead.
+   iOS Safari needs a touchstart listener for :active — see index.html. */
+@layer base {
+  button,
+  a[href] {
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform 160ms var(--ease-out-quick),
+      opacity 160ms ease-out;
+  }
+  button:not(:disabled):active {
+    transform: scale(0.94);
+  }
+  button.list-row:active,
+  button.event-row:active {
+    transform: none;
+    opacity: 1;
+    background-color: var(--highlight);
+  }
+}

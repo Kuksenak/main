@@ -1,0 +1,165 @@
+/* Reusable building blocks. Sizes — mobile: round 48, capsule/row 44 / desktop: round 40,
+   capsule/row 36. Colors always come from tokens.css. */
+
+/* ---- Typography (one step smaller on desktop) ---- */
+@utility text-body {
+  font-size: 17px;
+  @variant desktop {
+    font-size: 15px;
+  }
+}
+@utility text-callout {
+  font-size: 15px;
+  @variant desktop {
+    font-size: 13px;
+  }
+}
+@utility text-footnote {
+  font-size: 13px;
+}
+@utility text-caption {
+  font-size: 11px;
+}
+
+/* ---- Materials (glass buttons, matched against native iOS 26 screenshots) ---- */
+
+/* Prominent (accent) control: flat tint, top-weighted glass rim, see-through white label. */
+@utility glass-accent {
+  color: rgb(255 255 255 / 0.85);
+  background-color: var(--accent);
+  box-shadow: var(--rim-accent), var(--shadow-accent);
+}
+
+/* Neutral glass control (back, close, menu, Today): frosted, soft wide shadow, white rim. */
+@utility glass-neutral {
+  color: var(--text);
+  background-color: var(--glass-neutral);
+  box-shadow: var(--rim-neutral), var(--shadow-control);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+@layer components {
+  /* ---- Buttons ---- */
+
+  /* Primary action — accent capsule */
+  .btn-primary {
+    @apply glass-accent text-body inline-flex h-11 items-center justify-center rounded-full px-5
+           font-semibold active:opacity-80 disabled:opacity-40
+           desktop:h-9 desktop:rounded-lg desktop:px-4;
+  }
+
+  /* Secondary action — neutral glass capsule */
+  .btn-secondary {
+    @apply glass-neutral text-body inline-flex h-11 items-center justify-center rounded-full px-5
+           font-medium active:opacity-70
+           desktop:h-9 desktop:rounded-lg desktop:px-4;
+  }
+
+  /* Round icon button — neutral glass */
+  .icon-btn {
+    @apply glass-neutral inline-flex size-12 shrink-0 items-center justify-center rounded-full
+           active:opacity-70 desktop:size-10;
+  }
+
+  /* Round icon button — accent (✓, +, avatar) */
+  .btn-confirm {
+    @apply glass-accent inline-flex size-12 shrink-0 items-center justify-center rounded-full
+           active:opacity-80 desktop:size-10;
+  }
+
+  /* Full-width card-style action (Delete, Log out, Update) */
+  .card-btn {
+    @apply text-body flex h-11 w-full shrink-0 items-center justify-center gap-1.5 overflow-hidden
+           rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--surface)] font-semibold
+           active:opacity-60 desktop:h-9 desktop:rounded-[10px];
+  }
+
+  /* Floating control pinned above the home indicator (combine with left-4 / right-4). */
+  .float-bottom {
+    @apply fixed bottom-[var(--float-bottom)] z-20;
+  }
+
+  /* ---- Surfaces ---- */
+
+  /* Mobile bottom sheet: translucent glass, no backdrop dimming. */
+  .sheet-panel {
+    --surface: var(--sheet-surface);
+    @apply border-[0.5px] border-[var(--sheet-border)] bg-[var(--sheet-glass)] text-[var(--text)]
+           shadow-[var(--shadow-sheet)] backdrop-blur-[30px] backdrop-saturate-[180%];
+  }
+
+  /* Desktop dialog: solid, modest corners (16px around 10px cards). */
+  .dialog-panel {
+    --surface: var(--card);
+    @apply rounded-2xl border-0 bg-[var(--dialog-bg)] text-[var(--text)] shadow-[var(--shadow-dialog)]
+           backdrop-blur-none;
+  }
+
+  /* Desktop dropdown surface (pickers). */
+  .popover-panel {
+    @apply origin-top overflow-hidden rounded-xl bg-[var(--surface)] shadow-[var(--shadow-popover)]
+           [animation:dropdownIn_160ms_var(--ease-out-quick)];
+  }
+
+  /* Drag handle at the top of a bottom sheet. */
+  .grabber {
+    @apply mx-auto h-[5px] w-9 rounded-full bg-[var(--grabber)];
+  }
+
+  /* ---- Lists ---- */
+
+  /* Grouped list container */
+  .card {
+    @apply overflow-hidden rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--surface)]
+           desktop:rounded-[10px];
+  }
+
+  /* Single-line row inside a card, hairline divider between rows */
+  .list-row {
+    @apply text-body flex min-h-11 items-center justify-between gap-3 border-b border-[var(--separator)]
+           px-4 last:border-b-0 desktop:min-h-9;
+  }
+
+  /* Event row on the page background: inset hairline from the text, none under the last. */
+  .event-row {
+    @apply relative flex w-full items-center gap-3 py-2 pr-3 text-left
+           after:absolute after:bottom-0 after:left-4 after:right-0 after:h-px after:bg-[var(--separator)]
+           last:after:hidden;
+  }
+
+  /* ---- Small pieces ---- */
+
+  /* Input chip: date / time / select triggers (native inputs on mobile, buttons on desktop). */
+  .chip {
+    @apply text-body inline-flex w-auto appearance-none items-center whitespace-nowrap rounded-lg border-0
+           bg-[var(--fill)] px-2.5 py-1 text-left text-current tabular-nums [font-family:inherit]
+           focus:outline-none disabled:opacity-40
+           desktop:rounded-md desktop:transition-colors desktop:hover:bg-[var(--highlight)];
+  }
+
+  /* Option inside a popover list (pickers). */
+  .option {
+    @apply transition-[transform,background-color] hover:bg-[var(--highlight)] active:scale-[0.96];
+  }
+  .option-selected {
+    @apply bg-[var(--accent)] font-semibold text-[var(--accent-fg)] hover:bg-[var(--accent)];
+  }
+  .option-current {
+    @apply font-semibold text-[var(--accent)];
+  }
+
+  .badge {
+    @apply text-caption rounded-full bg-[var(--fill-strong)] px-2 py-0.5 font-semibold opacity-60;
+  }
+
+  .dot {
+    @apply size-2 shrink-0 rounded-full;
+  }
+
+  /* Custom scroll indicator drawn outside a scroll area. */
+  .scroll-indicator {
+    @apply pointer-events-none absolute w-[3px] rounded-full bg-[var(--scroll-thumb)]
+           transition-opacity duration-300;
+  }
+}

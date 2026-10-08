@@ -1,6 +1,6 @@
 @if (!auth.initialized()) {
   <main class="min-h-dvh flex items-center justify-center text-[var(--text)]">
-    <p class="text-sm opacity-40">Loading…</p>
+    <p class="text-sm opacity-40">{{ 'app.loading' | t }}</p>
   </main>
 } @else {
   <router-outlet></router-outlet>

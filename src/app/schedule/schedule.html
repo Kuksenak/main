@@ -1,18 +1,16 @@
-<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 lg:flex-row lg:items-stretch lg:gap-6">
+<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:items-stretch desktop:gap-6">
   <!-- Calendar -->
-  <section class="flex min-h-0 w-full shrink-0 flex-col lg:max-w-md lg:flex-1">
+  <section class="flex min-h-0 w-full shrink-0 flex-col desktop:max-w-md desktop:flex-1">
     <!-- Month header (desktop; on mobile the month lives in the toolbar) -->
-    <div class="mb-3 hidden items-center gap-3 sm:flex">
-      <h1 class="text-xl font-semibold">{{ visibleMonth() | date: 'MMMM yyyy' }}</h1>
-      <div class="ml-auto flex items-center gap-2">
-        <button type="button" (click)="today()" class="btn-secondary">Today</button>
-      </div>
+    <div class="mb-3 flex items-center gap-3 mobile:hidden">
+      <h1 class="text-xl font-semibold">{{ monthTitle() }}</h1>
+      <button type="button" (click)="today()" class="btn-secondary ml-auto">{{ 'schedule.today' | t }}</button>
     </div>
 
     <!-- Weekday row -->
     <div class="grid grid-cols-7 pb-1">
-      @for (wd of weekdays; track wd) {
-        <span class="flex items-center justify-center text-[15px] font-medium uppercase opacity-40 lg:text-[12px]">{{ wd }}</span>
+      @for (wd of weekdays(); track $index) {
+        <span class="flex items-center justify-center text-[15px] font-medium uppercase opacity-40 desktop:text-[12px]">{{ wd }}</span>
       }
     </div>
 
@@ -20,22 +18,22 @@
     <div
       #cal
       (scroll)="onCalScroll(cal)"
-      class="no-scrollbar h-[16.5rem] snap-y snap-proximity overflow-y-auto overscroll-contain lg:h-auto lg:min-h-0 lg:flex-1"
+      class="no-scrollbar h-[16.5rem] snap-y snap-proximity overflow-y-auto overscroll-contain desktop:h-auto desktop:min-h-0 desktop:flex-1"
     >
       @for (week of allWeeks; track week[0].getTime()) {
-        <div class="grid h-11 snap-start grid-cols-7 border-b border-black/[0.06] last:border-b-0 dark:border-white/[0.08] lg:h-12">
+        <div class="grid h-11 snap-start grid-cols-7 border-b border-[var(--separator)] last:border-b-0 desktop:h-12">
           @for (day of week; track day.getTime()) {
             <button
               type="button"
               (click)="selectDay(day)"
-              class="flex flex-col items-center gap-0.5 pt-1 active:opacity-60 lg:gap-1.5 lg:pt-1.5"
+              class="flex flex-col items-center gap-0.5 pt-1 active:opacity-60 desktop:gap-1.5 desktop:pt-1.5"
               [style.opacity]="inMonth(day) ? null : '0.35'"
             >
               <span
-                class="flex size-8 items-center justify-center rounded-full text-[16px] font-semibold tabular-nums lg:size-7 lg:text-[14px]"
+                class="flex size-8 items-center justify-center rounded-full text-[16px] font-semibold tabular-nums desktop:size-7 desktop:text-[14px]"
                 [style.background]="isSelected(day) ? 'var(--accent)' : null"
                 [style.color]="isSelected(day) ? 'var(--accent-fg)' : (isToday(day) ? 'var(--accent)' : null)"
-              >{{ day | date: 'd' }}</span>
+              >{{ day.getDate() }}</span>
               <span class="flex h-1 items-center justify-center">
                 @if (countFor(day) > 0) {
                   <span class="h-1 rounded-full" [style.width.px]="dotWidth(day)" [style.background]="dayColor(day)"></span>
@@ -48,168 +46,122 @@
     </div>
   </section>
 
-  <!-- Selected day events -->
-  <section class="flex min-h-0 flex-1 flex-col lg:flex-1">
-
-    <!-- Events list: plain rows on the page background (no card), filling down to the safe
-         area; inner bottom padding lets the last event scroll clear of the floating + button.
-         The native scrollbar is hidden and an iOS-style indicator is drawn at the right edge. -->
-    <div class="relative flex min-h-0 flex-1 flex-col">
+  <!-- Selected day events: plain rows on the page background, filling down to the safe area;
+       inner bottom padding lets the last event scroll clear of the floating buttons. The native
+       scrollbar is hidden and a custom indicator is drawn at the right edge. -->
+  <section class="relative flex min-h-0 flex-1 flex-col desktop:flex-1">
     @if (listThumb(); as t) {
       <div
-        class="pointer-events-none absolute -right-2.5 w-[3px] rounded-full bg-black/25 transition-opacity duration-300 dark:bg-white/30"
+        class="scroll-indicator -right-2.5"
         [style.top.%]="t.top"
         [style.height.%]="t.height"
         [style.opacity]="listScrolling() ? 1 : 0.5"
       ></div>
     }
     <div #list (scroll)="onListScroll()" class="no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
-    @if (dayLessons().length) {
-      <div class="pb-14">
-        @for (lesson of dayLessons(); track lesson.id) {
-          <!-- iOS Calendar-style row: calendar color bar, title (and note) on the left, start over
-               end on the right. Hairline dividers start at the text; none under the last row. -->
-          <button
-            type="button"
-            (click)="openEdit(lesson)"
-            class="ios-row relative w-full !justify-start !border-b-0 !pl-0 !pr-3 !py-2 text-left after:absolute after:bottom-0 after:left-4 after:right-0 after:h-px after:bg-black/[0.08] last:after:hidden dark:after:bg-white/[0.1]"
-          >
-            <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="lessonColor(lesson)"></span>
-            <div class="min-w-0 flex-1 leading-tight">
-              <p class="truncate text-[17px] font-medium lg:text-[15px]"
-                 [style.text-decoration]="lesson.status === 'Cancelled' ? 'line-through' : null"
-                 [style.opacity]="lesson.status === 'Scheduled' ? null : '0.5'">{{ lesson.studentName }}</p>
-              @if (lesson.note) {
-                <p class="truncate text-[13px] opacity-50">{{ lesson.note }}</p>
-              }
-            </div>
-            <div class="flex shrink-0 items-center gap-3">
-              @if (lesson.status !== 'Scheduled') {
-                <span class="rounded-full bg-black/[0.06] px-2 py-0.5 text-[11px] font-semibold opacity-60 dark:bg-white/10">{{ lesson.status }}</span>
-              }
-              <div class="text-right text-[15px] leading-tight tabular-nums lg:text-[13px]">
-                <p class="font-medium">{{ timeLabel(lesson.startsAt) }}</p>
-                <p class="font-normal opacity-50">{{ endLabel(lesson.startsAt, lesson.durationMinutes) }}</p>
+      @if (dayLessons().length) {
+        <div class="pb-14">
+          @for (lesson of dayLessons(); track lesson.id) {
+            <!-- Calendar color bar · title (and note) · start over end -->
+            <button type="button" (click)="openEdit(lesson)" class="event-row">
+              <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="lessonColor(lesson)"></span>
+              <div class="min-w-0 flex-1 leading-tight">
+                <p
+                  class="text-body truncate font-medium"
+                  [class.line-through]="lesson.status === 'Cancelled'"
+                  [class.opacity-50]="lesson.status !== 'Scheduled'"
+                >{{ lesson.studentName }}</p>
+                @if (lesson.note) {
+                  <p class="text-footnote truncate opacity-50">{{ lesson.note }}</p>
+                }
               </div>
-            </div>
-          </button>
-        }
-      </div>
-    } @else {
-      <div class="flex flex-1 items-center justify-center pb-14">
-        <p class="text-[17px] opacity-40 lg:text-[15px]">No Events</p>
-      </div>
-    }
-    </div>
+              <div class="flex shrink-0 items-center gap-3">
+                @if (lesson.status !== 'Scheduled') {
+                  <span class="badge">{{ statusKey(lesson.status) | t }}</span>
+                }
+                <div class="text-callout text-right leading-tight tabular-nums">
+                  <p class="font-medium">{{ timeLabel(lesson.startsAt) }}</p>
+                  <p class="opacity-50">{{ endLabel(lesson.startsAt, lesson.durationMinutes) }}</p>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="flex flex-1 items-center justify-center pb-14">
+          <p class="text-body opacity-40">{{ 'schedule.noEvents' | t }}</p>
+        </div>
+      }
     </div>
   </section>
 </main>
 
-<!-- Today (mobile) — floating bottom-left, level with the + button -->
-<button
-  type="button"
-  (click)="today()"
-  class="btn-secondary fixed bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] left-4 z-20 !h-12 sm:hidden"
->Today</button>
-
-<!-- Add button — same size and right edge as the account avatar in the header -->
-<button
-  type="button"
-  (click)="openNew()"
-  aria-label="Add lesson"
-  class="fixed bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] right-4 z-20 flex size-12 sm:size-10 items-center justify-center rounded-full glass-accent active:scale-95 active:opacity-80 transition-transform"
->
-  <svg viewBox="0 0 24 24" fill="none" class="size-7 sm:size-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+<!-- Floating controls: Today (mobile) bottom-left, + bottom-right (same size and right edge as
+     the account button in the header) -->
+<button type="button" (click)="today()" class="btn-secondary float-bottom left-4 !h-12 desktop:hidden">
+  {{ 'schedule.today' | t }}
+</button>
+<button type="button" (click)="openNew()" [attr.aria-label]="'schedule.addLesson' | t" class="btn-confirm float-bottom right-4">
+  <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
 </button>
 
-<!-- Editor modal -->
+<!-- Lesson editor (form → page sheet) -->
 @if (editor(); as m) {
-  <!-- Forms open as a full-screen side page (slides in from the right) so the keyboard never
-       fights a sheet; info-only menus use the bottom <app-sheet>. Desktop: centered dialog. -->
-  <div class="fixed inset-0 z-30 sm:flex sm:items-center sm:justify-center sm:bg-black/30 sm:p-4" (click)="closeEditor()">
-    <div
-      class="flex h-full w-full flex-col text-[var(--text)] max-sm:bg-[var(--app-bg)] [animation:pageInRight_360ms_cubic-bezier(0.2,0,0,1)] sm:h-auto sm:max-h-[calc(100dvh-2rem)] sm:max-w-md sm:p-4"
-      [class.dialog-panel]="isDesktop"
-      [style.transform]="sheetClosing() ? 'translateX(100%)' : null"
-      [style.transition]="sheetClosing() ? 'transform 240ms cubic-bezier(0.2,0,0,1)' : null"
-      (click)="$event.stopPropagation()"
+  <app-page-sheet [title]="(m.id ? 'lesson.edit' : 'lesson.new') | t" (closed)="editor.set(null)">
+    <!-- Mobile top bar: back (✕ once edited) · ✓ (blue when valid and changed) -->
+    <button
+      leading
+      type="button"
+      (click)="closeEditor()"
+      [attr.aria-label]="(isDirty(m) ? 'action.discard' : 'action.back') | t"
+      class="icon-btn relative"
     >
-      <!-- Mobile top bar: back (✕ once edited) / title / ✓ — 16px side inset like the cards, 48pt controls -->
-      <div class="relative flex shrink-0 items-center gap-2 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] sm:hidden">
-        <button type="button" (click)="closeEditor()" [attr.aria-label]="isDirty(m) ? 'Discard' : 'Back'" class="icon-btn relative !text-current">
-          @if (isDirty(m)) {
-            <svg viewBox="0 0 24 24" fill="none" class="size-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
-          } @else {
-            <svg viewBox="0 0 24 24" fill="none" class="-ml-0.5 size-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
-          }
-        </button>
-        <span class="pointer-events-none absolute inset-x-0 text-center text-[17px] font-semibold">{{ m.id ? 'Edit Lesson' : 'New Lesson' }}</span>
-        <!-- Save: blue ✓ when the form is valid and changed, grey and disabled otherwise -->
-        <button
-          type="button"
-          (click)="save()"
-          [disabled]="!canSave(m)"
-          aria-label="Save"
-          class="relative ml-auto"
-          [class.btn-confirm]="canSave(m)"
-          [class.icon-btn]="!canSave(m)"
-          [class.opacity-40]="!canSave(m)"
-        >
-          <svg viewBox="0 0 24 24" fill="none" class="size-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7" /></svg>
-        </button>
-      </div>
+      @if (isDirty(m)) {
+        <app-icon name="close" class="size-6" />
+      } @else {
+        <app-icon name="chevron-left" class="-ml-0.5 size-7" />
+      }
+    </button>
+    <button
+      trailing
+      type="button"
+      (click)="save()"
+      [disabled]="!canSave(m)"
+      [attr.aria-label]="'action.save' | t"
+      [class.btn-confirm]="canSave(m)"
+      [class.icon-btn]="!canSave(m)"
+      [class.opacity-40]="!canSave(m)"
+    >
+      <app-icon name="check" [strokeWidth]="2" class="size-7" />
+    </button>
 
-      <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 sm:flex-initial sm:px-0 sm:pb-0 sm:pt-0">
-        <ng-container [ngTemplateOutlet]="fieldsTpl" />
-        @if (m.id) {
-          <button type="button" (click)="remove()" class="ios-group mt-6 flex h-11 w-full items-center justify-center text-[17px] font-semibold text-red-500 active:opacity-60 sm:hidden">Delete</button>
-        }
-      </div>
-
-      <!-- Desktop footer -->
-      <div class="mt-4 hidden items-center gap-2 sm:flex">
-        @if (m.id) {
-          <button type="button" (click)="remove()" class="btn-secondary !text-red-500">Delete</button>
-        }
-        <div class="ml-auto flex gap-2">
-          <button type="button" (click)="closeEditor()" class="btn-secondary">Cancel</button>
-          <button type="button" (click)="save()" [disabled]="!canSave(m)" class="btn-primary disabled:opacity-40">Save</button>
-        </div>
-      </div>
-    </div>
-  </div>
-}
-
-<!-- Shared editor fields -->
-<ng-template #fieldsTpl>
-  @if (editor(); as m) {
     <div class="flex flex-col gap-6">
-      <div class="ios-group">
-        <div class="ios-row h-11 !py-0 sm:h-9">
+      <div class="card">
+        <div class="list-row">
           <input
             name="studentName"
             [(ngModel)]="m.studentName"
             type="text"
-            placeholder="Student name *"
+            [placeholder]="'lesson.studentName' | t"
             autocomplete="off"
-            class="w-full bg-transparent text-[17px] outline-none placeholder:opacity-40 lg:text-[15px]"
+            class="w-full bg-transparent outline-none placeholder:opacity-40"
           />
         </div>
-        <div class="ios-row !py-3 lg:!py-2">
+        <div class="list-row py-3 desktop:py-2">
           <textarea
             name="note"
             [(ngModel)]="m.note"
             rows="2"
-            placeholder="Note"
+            [placeholder]="'lesson.note' | t"
             autocomplete="off"
-            class="w-full resize-y bg-transparent text-[17px] leading-snug outline-none placeholder:opacity-40 lg:text-[15px]"
+            class="w-full resize-y bg-transparent leading-snug outline-none placeholder:opacity-40"
           ></textarea>
         </div>
       </div>
 
-      <div class="ios-group">
-        <div class="ios-row h-11 !py-0 sm:h-9">
-          <span class="text-[17px] lg:text-[15px]">Starts</span>
+      <div class="card">
+        <div class="list-row">
+          <span>{{ 'lesson.starts' | t }}</span>
           <div class="ml-auto flex items-center gap-2">
             @if (m.id) {
               <app-date
@@ -218,7 +170,7 @@
                 [ngModelOptions]="{ standalone: true }"
               />
             } @else {
-              <span class="text-[17px] opacity-60 lg:text-[15px]">{{ dateLabel(m.date) }}</span>
+              <span class="opacity-60">{{ dateLabel(m.date) }}</span>
             }
             <app-time
               [ngModel]="m.startTime"
@@ -227,13 +179,10 @@
             />
           </div>
         </div>
-        <div class="ios-row h-11 !py-0 sm:h-9">
-          <span class="text-[17px] lg:text-[15px]">Ends</span>
+        <div class="list-row">
+          <span>{{ 'lesson.ends' | t }}</span>
           <div class="ml-auto flex items-center gap-2">
-            <span
-              class="text-[17px] opacity-60 lg:text-[15px]"
-              [class.line-through]="isInvalid(m)"
-            >{{ dateLabel(m.date) }}</span>
+            <span class="opacity-60" [class.line-through]="isInvalid(m)">{{ dateLabel(m.date) }}</span>
             <app-time
               [ngModel]="m.endTime"
               (ngModelChange)="onEndChange(m, $event)"
@@ -242,19 +191,31 @@
           </div>
         </div>
         @if (m.id) {
-          <div class="ios-row h-11 !py-0 sm:h-9">
-            <span class="text-[17px] lg:text-[15px]">Status</span>
-            <div class="ml-auto">
-              <app-select
-                [options]="statusOptions"
-                [ngModel]="m.status"
-                (ngModelChange)="m.status = $event"
-                [ngModelOptions]="{ standalone: true }"
-              />
-            </div>
+          <div class="list-row">
+            <span>{{ 'lesson.status' | t }}</span>
+            <app-select
+              class="ml-auto"
+              [options]="statusOptions()"
+              [ngModel]="m.status"
+              (ngModelChange)="m.status = $event"
+              [ngModelOptions]="{ standalone: true }"
+            />
           </div>
         }
       </div>
+
+      @if (m.id) {
+        <button type="button" (click)="remove()" class="card-btn text-[var(--danger)] desktop:hidden">{{ 'action.delete' | t }}</button>
+      }
     </div>
-  }
-</ng-template>
+
+    <!-- Desktop footer -->
+    <div footer class="flex w-full items-center gap-2">
+      @if (m.id) {
+        <button type="button" (click)="remove()" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+      }
+      <button type="button" (click)="closeEditor()" class="btn-secondary ml-auto">{{ 'action.cancel' | t }}</button>
+      <button type="button" (click)="save()" [disabled]="!canSave(m)" class="btn-primary">{{ 'action.save' | t }}</button>
+    </div>
+  </app-page-sheet>
+}

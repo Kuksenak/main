@@ -10,15 +10,16 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { I18nService } from '../../i18n/i18n.service';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 
 function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-const CLS_SELECTED = 'bg-[var(--accent)] text-white font-semibold';
-const CLS_CURRENT = 'text-[var(--accent)] font-semibold hover:bg-black/5 dark:hover:bg-white/10';
-const CLS_PLAIN = 'hover:bg-black/5 dark:hover:bg-white/10';
+const CLS_SELECTED = 'option option-selected';
+const CLS_CURRENT = 'option option-current';
+const CLS_PLAIN = 'option';
 
 @Component({
   selector: 'app-time',
@@ -34,11 +35,12 @@ const CLS_PLAIN = 'hover:bg-black/5 dark:hover:bg-white/10';
 })
 export class TimeField implements ControlValueAccessor {
   @Input() label = '';
-  @Input() placeholder = 'Select time…';
+  @Input() placeholder = ''; // defaults to the translated 'Select time…'
   @Input() disabled = false;
   @Input() minuteStep = 5;
 
   private deviceService = inject(DeviceDetectionService);
+  private i18n = inject(I18nService);
 
   @ViewChild('hourCol') private hourCol?: ElementRef<HTMLElement>;
   @ViewChild('minuteCol') private minuteCol?: ElementRef<HTMLElement>;
@@ -102,11 +104,11 @@ export class TimeField implements ControlValueAccessor {
 
   readonly triggerLabel = computed(() => {
     const v = this.value();
-    if (!v) return this.placeholder;
+    if (!v) return this.placeholder || this.i18n.t('picker.selectTime');
     const [h, m] = v.split(':').map(Number);
     const d = new Date();
     d.setHours(h, m, 0, 0);
-    return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleTimeString(this.i18n.locale(), { hour: '2-digit', minute: '2-digit' });
   });
 
   // Desktop picker

@@ -1,7 +1,9 @@
 import { Component, Input, computed, forwardRef, inject, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { I18nService } from '../../i18n/i18n.service';
 import { DeviceDetectionService } from '../../services/device-detection.service';
+import { Icon } from '../icon/icon';
 
 export interface SelectOption {
   label: string;
@@ -10,7 +12,7 @@ export interface SelectOption {
 
 @Component({
   selector: 'app-select',
-  imports: [OverlayModule],
+  imports: [OverlayModule, Icon],
   templateUrl: './select.html',
   providers: [
     {
@@ -22,11 +24,12 @@ export interface SelectOption {
 })
 export class SelectField implements ControlValueAccessor {
   @Input() label = '';
-  @Input() placeholder = 'Select…';
+  @Input() placeholder = ''; // defaults to the translated 'Select…'
   @Input() disabled = false;
   @Input() options: SelectOption[] = [];
 
   private deviceService = inject(DeviceDetectionService);
+  private i18n = inject(I18nService);
   isMobile = this.deviceService.isMobile;
 
   readonly value = signal<string | number | null>(null);
@@ -38,7 +41,7 @@ export class SelectField implements ControlValueAccessor {
   readonly triggerLabel = computed(() => {
     const v = this.value();
     const opt = this.options.find((o) => o.value === v);
-    return opt ? opt.label : this.placeholder;
+    return opt ? opt.label : this.placeholder || this.i18n.t('picker.select');
   });
 
   toggle(): void {

@@ -1,34 +1,35 @@
+@if (auth.isAuthenticated()) {
 <div class="flex h-dvh flex-col overflow-hidden text-[var(--text)]">
   <header class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
-    <a routerLink="/about" aria-label="About" class="mr-1 hidden shrink-0 active:opacity-70 sm:block">
-      <img src="icons/icon-96x96.png" alt="Logo" class="size-8" width="32" height="32" />
+    <a routerLink="/about" [attr.aria-label]="'nav.about' | t" class="mr-1 shrink-0 active:opacity-70 mobile:hidden">
+      <img src="icons/icon-96x96.png" [alt]="'app.name' | t" class="size-8" width="32" height="32" />
     </a>
-    <!-- Desktop tabs; on mobile navigation lives in the ⋯ sheet -->
     <nav class="flex min-w-0 flex-1 items-center gap-1">
-      <!-- Mobile: the current page's title (e.g. month on Schedule) -->
-      <span class="truncate text-xl font-semibold sm:hidden">{{ toolbar.title() }}</span>
+      <!-- Mobile: the current page's title (e.g. month on Schedule); tabs live in the ⋯ sheet -->
+      <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
+      <!-- Desktop tabs -->
       @for (item of navItems; track item.path) {
         <a
           [routerLink]="item.path"
           routerLinkActive="glass-accent"
-          class="hidden h-9 items-center rounded-lg px-4 text-[15px] font-medium sm:inline-flex"
-        >{{ item.label }}</a>
+          class="text-body inline-flex h-9 items-center rounded-lg px-4 font-medium mobile:hidden"
+        >{{ item.label | t }}</a>
       }
     </nav>
-    <button type="button" (click)="navOpen.set(true)" aria-label="Menu" class="icon-btn !text-current sm:hidden">
-      <svg viewBox="0 0 24 24" fill="currentColor" class="size-6"><circle cx="5" cy="5" r="2" /><circle cx="12" cy="5" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /><circle cx="5" cy="19" r="2" /><circle cx="12" cy="19" r="2" /><circle cx="19" cy="19" r="2" /></svg>
+    <button type="button" (click)="navOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn desktop:hidden">
+      <app-icon name="grid" class="size-6" />
     </button>
-    <!-- Account avatar: first letter of the email; dot when an app update is ready -->
+    <!-- Account: first letter of the email; green dot when an app update is ready -->
     <button
       #avatarBtn
       type="button"
       (click)="accountOpen.set(true)"
-      aria-label="Account"
-      class="relative flex size-12 shrink-0 items-center justify-center rounded-full active:opacity-70 sm:size-10"
+      [attr.aria-label]="'account.title' | t"
+      class="btn-confirm relative text-[21px] font-semibold uppercase desktop:text-[17px]"
     >
-      <span class="glass-accent flex size-12 items-center justify-center rounded-full text-[21px] font-semibold uppercase sm:size-10 sm:text-[17px]">{{ initial() }}</span>
+      {{ initial() }}
       @if (updates.updateReady()) {
-        <span class="absolute right-0 top-0 size-3 rounded-full bg-[#34c759] ring-2 ring-[var(--app-bg)]"></span>
+        <span class="dot absolute right-0 top-0 size-3 bg-[var(--success)] ring-2 ring-[var(--app-bg)]"></span>
       }
     </button>
   </header>
@@ -37,12 +38,12 @@
 
   @if (navOpen()) {
     <app-sheet #navSheet (closed)="navOpen.set(false)">
-      <div class="ios-group">
+      <div class="card">
         @for (item of navItems; track item.path) {
-          <button type="button" (click)="go(item.path, navSheet)" class="ios-row h-11 sm:h-9 w-full !py-0 text-left">
-            <span class="text-[17px] sm:text-[15px]">{{ item.label }}</span>
+          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full text-left">
+            <span>{{ item.label | t }}</span>
             @if (isActive(item.path)) {
-              <svg viewBox="0 0 24 24" fill="none" class="size-5 text-[var(--accent)]" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7" /></svg>
+              <app-icon name="check" class="size-5 text-[var(--accent)]" />
             }
           </button>
         }
@@ -52,26 +53,41 @@
 
   @if (accountOpen()) {
     <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
-      <div class="flex min-h-full flex-col gap-6 sm:gap-3">
-        <div class="ios-group">
-          <div class="ios-row h-11 sm:h-9 !py-0">
-            <span class="min-w-0 truncate text-[17px] sm:text-[15px]">{{ auth.email() }}</span>
+      <div class="flex min-h-full flex-col gap-6 desktop:gap-3">
+        <div class="card">
+          <div class="list-row">
+            <span class="min-w-0 truncate">{{ auth.email() }}</span>
           </div>
-          <div class="ios-row h-11 sm:h-9 !py-0">
-            <span class="text-[17px] sm:text-[15px]">Version</span>
-            <span class="text-[17px] sm:text-[15px] tabular-nums opacity-50">{{ updates.version }}</span>
+          <div class="list-row">
+            <span>{{ 'account.version' | t }}</span>
+            <span class="tabular-nums opacity-50">{{ updates.version }}</span>
           </div>
         </div>
 
-        <!-- Actions pinned to the bottom: card-style buttons -->
-        <div class="mt-auto flex flex-col gap-3 sm:gap-2">
+        <!-- Language -->
+        <div class="flex flex-col gap-1.5">
+          <span class="text-footnote px-4 uppercase opacity-50">{{ 'account.language' | t }}</span>
+          <div class="card">
+            @for (lang of i18n.languages; track lang.code) {
+              <button type="button" (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
+                <span>{{ lang.label }}</span>
+                @if (i18n.lang() === lang.code) {
+                  <app-icon name="check" class="size-5 text-[var(--accent)]" />
+                }
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Actions pinned to the bottom -->
+        <div class="mt-auto flex flex-col gap-3 desktop:gap-2">
           @if (updates.updateReady()) {
-            <button type="button" (click)="updates.apply()" class="ios-group flex h-11 sm:h-9 w-full shrink-0 items-center justify-center gap-1.5 text-[17px] sm:text-[15px] font-semibold text-[var(--accent)] active:opacity-60">
-              Update available
-              <span class="size-2 rounded-full bg-[#34c759]"></span>
+            <button type="button" (click)="updates.apply()" class="card-btn text-[var(--accent)]">
+              {{ 'account.updateAvailable' | t }}
+              <span class="dot bg-[var(--success)]"></span>
             </button>
           }
-          <button type="button" (click)="logout(sheet)" class="ios-group flex h-11 sm:h-9 w-full shrink-0 items-center justify-center text-[17px] sm:text-[15px] font-semibold text-red-500 active:opacity-60">Log out</button>
+          <button type="button" (click)="logout()" class="card-btn text-[var(--danger)]">{{ 'account.logout' | t }}</button>
         </div>
       </div>
     </app-sheet>
@@ -84,3 +100,4 @@
     }
   </div>
 </div>
+}

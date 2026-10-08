@@ -1,14 +1,18 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
+import { I18nService } from '../core/i18n/i18n.service';
+import { TranslatePipe } from '../core/i18n/t.pipe';
+import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { UpdateService } from '../core/services/update.service';
+import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Sheet],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Sheet, Icon, TranslatePipe],
   templateUrl: './layout.html',
 })
 export class Layout {
@@ -16,11 +20,12 @@ export class Layout {
   protected readonly loading = inject(LoadingService);
   protected readonly updates = inject(UpdateService);
   protected readonly toolbar = inject(ToolbarService);
+  protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
-  protected readonly navItems = [
-    { path: '/schedule', label: 'Schedule' },
-    { path: '/about', label: 'About' },
+  protected readonly navItems: { path: string; label: TranslationKey }[] = [
+    { path: '/schedule', label: 'nav.schedule' },
+    { path: '/about', label: 'nav.about' },
   ];
 
   protected readonly navOpen = signal(false);
@@ -41,8 +46,8 @@ export class Layout {
     this.router.navigateByUrl(path);
   }
 
-  protected logout(sheet: Sheet): void {
-    sheet.close();
+  // Logging out leaves the app (AuthStore redirects to /login and this layout un-renders).
+  protected logout(): void {
     this.auth.logout();
   }
 }

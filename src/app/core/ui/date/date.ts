@@ -1,7 +1,10 @@
 import { Component, Input, computed, forwardRef, inject, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { I18nService } from '../../i18n/i18n.service';
+import { TranslatePipe } from '../../i18n/t.pipe';
 import { DeviceDetectionService } from '../../services/device-detection.service';
+import { Icon } from '../icon/icon';
 
 interface DayCell {
   date: Date;
@@ -14,7 +17,7 @@ function startOfMonth(d: Date): Date {
 
 @Component({
   selector: 'app-date',
-  imports: [OverlayModule],
+  imports: [OverlayModule, Icon, TranslatePipe],
   templateUrl: './date.html',
   providers: [
     {
@@ -26,10 +29,11 @@ function startOfMonth(d: Date): Date {
 })
 export class DateField implements ControlValueAccessor {
   @Input() label = '';
-  @Input() placeholder = 'Select date…';
+  @Input() placeholder = ''; // defaults to the translated 'Select date…'
   @Input() disabled = false;
 
   private deviceService = inject(DeviceDetectionService);
+  private i18n = inject(I18nService);
 
   isMobile = this.deviceService.isMobile;
 
@@ -39,7 +43,7 @@ export class DateField implements ControlValueAccessor {
 
   private readonly today = new Date();
 
-  readonly weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  readonly weekdays = this.i18n.weekdays;
 
   private onChange: (value: Date | null) => void = () => {};
   private onTouched: () => void = () => {};
@@ -47,12 +51,12 @@ export class DateField implements ControlValueAccessor {
   readonly triggerLabel = computed(() => {
     const v = this.value();
     return v
-      ? v.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
-      : this.placeholder;
+      ? v.toLocaleDateString(this.i18n.locale(), { day: 'numeric', month: 'short', year: 'numeric' })
+      : this.placeholder || this.i18n.t('picker.selectDate');
   });
 
   readonly monthLabel = computed(() =>
-    this.view().toLocaleDateString(undefined, { month: 'long', year: 'numeric' }),
+    this.view().toLocaleDateString(this.i18n.locale(), { month: 'long', year: 'numeric' }),
   );
 
   readonly weeks = computed<DayCell[][]>(() => {
