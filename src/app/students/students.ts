@@ -9,15 +9,16 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
-import { SelectField, SelectOption } from '../core/ui/select/select';
-import { SwipeRow } from '../core/ui/swipe-row/swipe-row';
-import { STUDENT_LEVELS, Student, StudentInput, StudentService } from './student.service';
+import { Student, StudentInput, StudentService } from './student.service';
 
 interface EditorModel extends StudentInput {
   id: string | null;
@@ -25,7 +26,7 @@ interface EditorModel extends StudentInput {
 
 @Component({
   selector: 'app-students',
-  imports: [FormsModule, NgTemplateOutlet, Icon, PageSheet, SelectField, SwipeRow, TranslatePipe],
+  imports: [FormsModule, NgTemplateOutlet, Icon, PageSheet, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -35,6 +36,7 @@ export class Students {
   private readonly search = viewChild<TemplateRef<unknown>>('search');
 
   protected readonly query = signal('');
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
 
   // Alphabetical, filtered by name / email / phone.
   protected readonly visible = computed(() => {
@@ -44,7 +46,12 @@ export class Students {
       .sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale()));
   });
 
-  protected readonly levelOptions: SelectOption[] = STUDENT_LEVELS.map((l) => ({ label: l, value: l }));
+  // Desktop details pane: the picked student, else the first one in the list.
+  private readonly selectedId = signal<string | null>(null);
+  protected readonly selected = computed<Student | null>(() => {
+    const list = this.visible();
+    return list.find((s) => s.id === this.selectedId()) ?? list.at(0) ?? null;
+  });
 
   protected readonly editor = signal<EditorModel | null>(null);
   // Snapshot of the editor when it opened, to tell whether anything was changed.
@@ -55,14 +62,30 @@ export class Students {
     const toolbar = inject(ToolbarService);
     effect(() => toolbar.content.set(this.search() ?? null));
     inject(DestroyRef).onDestroy(() => toolbar.content.set(null));
+
+    // Deep link from elsewhere (e.g. a lesson): /students?id=<studentId>
+    inject(ActivatedRoute)
+      .queryParamMap.pipe(takeUntilDestroyed())
+      .subscribe((params) => {
+        const student = this.service.students().find((s) => s.id === params.get('id'));
+        if (!student) return;
+        this.query.set('');
+        this.pick(student);
+      });
   }
 
   protected initial(name: string): string {
     return name.trim().charAt(0).toLocaleUpperCase(this.i18n.locale());
   }
 
+  // Row tap: desktop shows the details pane, mobile opens the editor.
+  protected pick(s: Student): void {
+    if (this.desktop) this.selectedId.set(s.id);
+    else this.openEdit(s);
+  }
+
   protected openNew(): void {
-    this.open({ id: null, name: '', email: '', phone: '', level: 'A1', note: '' });
+    this.open({ id: null, name: '', email: '', phone: '' });
   }
 
   protected openEdit(s: Student): void {
@@ -95,17 +118,10 @@ export class Students {
       name: m.name.trim(),
       email: m.email.trim(),
       phone: m.phone.trim(),
-      level: m.level,
-      note: m.note.trim(),
     };
     if (m.id) this.service.update(m.id, input);
     else this.service.create(input);
     this.closeEditor();
-  }
-
-  // Swipe-to-delete from the list.
-  protected removeStudent(s: Student): void {
-    this.service.remove(s.id);
   }
 
   protected remove(): void {

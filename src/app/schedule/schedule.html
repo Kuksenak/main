@@ -62,8 +62,7 @@
       @if (dayLessons().length) {
         <div class="pb-14">
           @for (lesson of dayLessons(); track lesson.id) {
-            <!-- Calendar color bar · title / student · start over end; swipe left to delete -->
-            <app-swipe-row (delete)="removeLesson(lesson)" [label]="'action.delete' | t">
+            <!-- Calendar color bar · title / student · start over end -->
             <button type="button" (click)="openEdit(lesson)" class="event-row">
               <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="lessonColor(lesson)"></span>
               <div class="min-w-0 flex-1 leading-tight">
@@ -86,7 +85,6 @@
                 </div>
               </div>
             </button>
-            </app-swipe-row>
           }
         </div>
       } @else {
@@ -158,6 +156,12 @@
             (ngModelChange)="m.studentName = $event ?? ''"
             [ngModelOptions]="{ standalone: true }"
           />
+          <!-- Open this student's card -->
+          @if (studentId(m.studentName); as id) {
+            <button type="button" (click)="openStudent(id)" [attr.aria-label]="'lesson.openStudent' | t" class="icon-plain -mr-2">
+              <app-icon name="chevron-right" class="size-5" />
+            </button>
+          }
         </div>
       </div>
 

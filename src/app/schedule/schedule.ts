@@ -11,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -19,7 +20,6 @@ import { ToolbarService } from '../core/services/toolbar.service';
 import { DateField } from '../core/ui/date/date';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
-import { SwipeRow } from '../core/ui/swipe-row/swipe-row';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
 import { StudentService } from '../students/student.service';
@@ -84,13 +84,14 @@ function toTimeInput(d: Date): string {
 
 @Component({
   selector: 'app-schedule',
-  imports: [FormsModule, TimeField, SelectField, DateField, Icon, PageSheet, SwipeRow, TranslatePipe],
+  imports: [FormsModule, TimeField, SelectField, DateField, Icon, PageSheet, TranslatePipe],
   templateUrl: './schedule.html',
 })
 export class Schedule implements AfterViewInit {
   private service = inject(LessonService);
   private titles = inject(LessonTitleStore);
   private students = inject(StudentService);
+  private router = inject(Router);
   private i18n = inject(I18nService);
 
   protected readonly isMobile = inject(DeviceDetectionService).isMobile;
@@ -366,6 +367,17 @@ export class Schedule implements AfterViewInit {
     return 'var(--calendar-default)';
   }
 
+  // Id of the student with this name in the students list (null for names typed by hand).
+  protected studentId(name: string): string | null {
+    return this.students.students().find((s) => s.name === name)?.id ?? null;
+  }
+
+  // Leave the editor and show that student's card.
+  protected openStudent(id: string): void {
+    this.closeEditor();
+    this.router.navigate(['/students'], { queryParams: { id } });
+  }
+
   protected lessonTitle(lesson: Lesson): string {
     return this.titles.get(lesson.id);
   }
@@ -405,13 +417,6 @@ export class Schedule implements AfterViewInit {
       this.service.create(input, from, to, (id) => this.titles.set(id, title));
     }
     this.closeEditor();
-  }
-
-  // Swipe-to-delete from the list.
-  protected removeLesson(lesson: Lesson): void {
-    const { from, to } = this.loadRange();
-    this.service.remove(lesson.id, from, to);
-    this.titles.remove(lesson.id);
   }
 
   protected remove(): void {
