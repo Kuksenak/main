@@ -9,7 +9,7 @@
            tabs live in the ⋯ sheet -->
       @if (toolbar.content(); as content) {
         <!-- Fields in the toolbar match the round buttons next to them -->
-        <div class="flex min-w-0 flex-1 desktop:hidden [&_.field]:h-[var(--control-round)] [&_.field]:rounded-full"><ng-container [ngTemplateOutlet]="content" /></div>
+        <div class="flex min-w-0 flex-1 items-center gap-1 desktop:hidden [&_.field]:h-[var(--control-round)] [&_.field]:rounded-full"><ng-container [ngTemplateOutlet]="content" /></div>
       } @else {
         <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
       }
@@ -43,7 +43,7 @@
 
   <router-outlet></router-outlet>
 
-  <!-- Cards (event / student / group / lesson) opened over any page; back closes only the top one -->
+  <!-- Cards (event / student / group) opened over any page; back closes only the top one -->
   <app-stack-host />
 
   @if (navOpen()) {

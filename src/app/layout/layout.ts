@@ -62,7 +62,7 @@ export class Layout {
 
   protected isActive(path: string): boolean {
     return this.router.isActive(path, {
-      paths: 'exact',
+      paths: 'subset',
       queryParams: 'ignored',
       fragment: 'ignored',
       matrixParams: 'ignored',

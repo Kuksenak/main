@@ -75,7 +75,6 @@ const en = {
 
   'lessons.add': 'Add lesson',
   'lessons.new': 'New Lesson',
-  'lessons.edit': 'Edit Lesson',
   'lessons.name': 'Title',
   'lessons.text': 'Text',
   'lessons.linkLabel': 'Label (optional)',
@@ -84,7 +83,7 @@ const en = {
   'lessons.removeBlock': 'Remove',
   'lessons.empty': 'No Lessons',
   'lessons.noContent': 'Nothing here yet',
-  'lessons.selectHint': 'Select a lesson',
+  'lessons.notFound': 'Lesson not found',
 
   'action.save': 'Save',
   'action.cancel': 'Cancel',
@@ -177,7 +176,6 @@ const pl: Dictionary = {
 
   'lessons.add': 'Dodaj lekcję',
   'lessons.new': 'Nowa lekcja',
-  'lessons.edit': 'Edytuj lekcję',
   'lessons.name': 'Tytuł',
   'lessons.text': 'Tekst',
   'lessons.linkLabel': 'Podpis (opcjonalnie)',
@@ -186,7 +184,7 @@ const pl: Dictionary = {
   'lessons.removeBlock': 'Usuń',
   'lessons.empty': 'Brak lekcji',
   'lessons.noContent': 'Na razie pusto',
-  'lessons.selectHint': 'Wybierz lekcję',
+  'lessons.notFound': 'Nie znaleziono lekcji',
 
   'action.save': 'Zapisz',
   'action.cancel': 'Anuluj',
@@ -276,7 +274,6 @@ const fr: Dictionary = {
 
   'lessons.add': 'Ajouter un cours',
   'lessons.new': 'Nouveau cours',
-  'lessons.edit': 'Modifier le cours',
   'lessons.name': 'Titre',
   'lessons.text': 'Texte',
   'lessons.linkLabel': 'Libellé (facultatif)',
@@ -285,7 +282,7 @@ const fr: Dictionary = {
   'lessons.removeBlock': 'Supprimer',
   'lessons.empty': 'Aucun cours',
   'lessons.noContent': 'Rien pour l’instant',
-  'lessons.selectHint': 'Choisir un cours',
+  'lessons.notFound': 'Cours introuvable',
 
   'action.save': 'Enregistrer',
   'action.cancel': 'Annuler',
