@@ -8,6 +8,7 @@ import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { Toggle } from '../core/ui/toggle';
+import { DemoQuiz } from '../lessons/demo-quiz';
 import { LessonContent } from '../lessons/lesson-content';
 import { LessonForm, cleanLesson, lessonValid } from '../lessons/lesson-form';
 import { LessonInput, LessonService, shareUrl } from '../lessons/lesson.service';
@@ -22,7 +23,7 @@ import { EventList } from './event-list';
  */
 @Component({
   selector: 'app-lesson-card',
-  imports: [EventList, Icon, LessonContent, LessonForm, PageSheet, Sheet, Toggle, TranslatePipe],
+  imports: [DemoQuiz, EventList, Icon, LessonContent, LessonForm, PageSheet, Sheet, Toggle, TranslatePipe],
   template: `
     <app-page-sheet
       #page
@@ -64,6 +65,7 @@ import { EventList } from './event-list';
           <app-lesson-form [(value)]="draft" />
         } @else if (lesson(); as l) {
           <app-lesson-content [blocks]="l.blocks" />
+          <app-demo-quiz />
         }
       </div>
     </app-page-sheet>

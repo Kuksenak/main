@@ -87,6 +87,15 @@ const en = {
   'lessons.copy': 'Copy link',
   'lessons.public': 'Public link',
   'lessons.info': 'Details',
+  'quiz.title': 'Test',
+  'quiz.example': 'example',
+  'quiz.check': 'Check',
+  'quiz.score': 'Score',
+  'quiz.retry': 'Try again',
+
+  'shared.askName': 'What’s your name? Your answers will be saved under it.',
+  'shared.name': 'Your name',
+  'shared.continue': 'Continue',
   'lessons.publicHint': 'Anyone with the link can view this lesson, no sign-in needed.',
 
   'action.save': 'Save',
@@ -192,6 +201,15 @@ const pl: Dictionary = {
   'lessons.copy': 'Kopiuj link',
   'lessons.public': 'Link publiczny',
   'lessons.info': 'Szczegóły',
+  'quiz.title': 'Test',
+  'quiz.example': 'przykład',
+  'quiz.check': 'Sprawdź',
+  'quiz.score': 'Wynik',
+  'quiz.retry': 'Jeszcze raz',
+
+  'shared.askName': 'Jak masz na imię? Pod nim zapiszemy Twoje odpowiedzi.',
+  'shared.name': 'Twoje imię',
+  'shared.continue': 'Dalej',
   'lessons.publicHint': 'Każdy, kto ma link, zobaczy tę lekcję bez logowania.',
 
   'action.save': 'Zapisz',
@@ -294,6 +312,15 @@ const fr: Dictionary = {
   'lessons.copy': 'Copier le lien',
   'lessons.public': 'Lien public',
   'lessons.info': 'Détails',
+  'quiz.title': 'Test',
+  'quiz.example': 'exemple',
+  'quiz.check': 'Vérifier',
+  'quiz.score': 'Score',
+  'quiz.retry': 'Recommencer',
+
+  'shared.askName': 'Comment vous appelez-vous ? Vos réponses seront enregistrées sous ce nom.',
+  'shared.name': 'Votre prénom',
+  'shared.continue': 'Continuer',
   'lessons.publicHint': 'Toute personne disposant du lien peut voir ce cours, sans connexion.',
 
   'action.save': 'Enregistrer',

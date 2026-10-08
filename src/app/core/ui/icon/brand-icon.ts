@@ -15,11 +15,23 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
     <svg viewBox="0 0 48 48" class="size-full">
       @switch (name()) {
         @case ('calendar') {
-          <!-- Flat calendar: a blue header bar over a grid of days, today in orange -->
-          <rect x="4" y="5" width="40" height="9" rx="4.5" style="fill: var(--brand-blue)" />
-          @for (d of calendarDays; track $index) {
-            <rect [attr.x]="d.x" [attr.y]="d.y" width="7.75" height="7.75" rx="2.5" [style.fill]="d.color" />
-          }
+          <!-- Tear-off calendar page (iOS-like), fully transparent: its outline, the blue header,
+               a curled corner as if being flipped, today's date -->
+          <path
+            d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
+            style="fill: none; stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
+          />
+          <path d="M12 4h24a7 7 0 0 1 7 7v3H5v-3a7 7 0 0 1 7-7z" style="fill: var(--brand-blue)" />
+          <path
+            d="M34 42c0-5 3-9 9-9l-9 9z"
+            style="fill: color-mix(in srgb, var(--brand-blue) 45%, #dfe4ee); stroke: color-mix(in srgb, var(--brand-blue) 60%, white); stroke-width: 0.75; stroke-linejoin: round"
+          />
+          <text
+            x="24"
+            y="35"
+            text-anchor="middle"
+            style="fill: var(--brand-orange); font: 800 19.5px -apple-system, system-ui, 'Segoe UI', sans-serif; letter-spacing: -0.04em"
+          >{{ today }}</text>
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->
@@ -54,17 +66,6 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
 })
 export class BrandIcon {
   readonly name = input.required<BrandIconName>();
-  // Calendar: 4 × 3 days; one is today (orange), one more highlighted (yellow).
-  protected readonly calendarDays = [0, 1, 2].flatMap((row) =>
-    [0, 1, 2, 3].map((col) => ({
-      x: 4 + col * 10.75,
-      y: 19 + row * 9.25,
-      color:
-        row === 1 && col === 2
-          ? 'var(--brand-orange)'
-          : row === 2 && col === 0
-            ? 'var(--brand-yellow)'
-            : 'var(--brand-teal)',
-    })),
-  );
+  // Calendar icon shows today's date (taken when the icon is created, e.g. each time the menu opens).
+  protected readonly today = new Date().getDate();
 }
