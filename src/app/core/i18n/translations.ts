@@ -11,6 +11,7 @@ const en = {
   'nav.schedule': 'Schedule',
   'nav.students': 'Students',
   'nav.lessons': 'Lessons',
+  'nav.settings': 'Settings',
   'nav.about': 'About',
 
   'account.title': 'Account',
@@ -125,6 +126,7 @@ const pl: Dictionary = {
   'nav.schedule': 'Plan',
   'nav.students': 'Uczniowie',
   'nav.lessons': 'Lekcje',
+  'nav.settings': 'Ustawienia',
   'nav.about': 'O aplikacji',
 
   'account.title': 'Konto',
@@ -236,6 +238,7 @@ const fr: Dictionary = {
   'nav.schedule': 'Planning',
   'nav.students': 'Élèves',
   'nav.lessons': 'Cours',
+  'nav.settings': 'Réglages',
   'nav.about': 'À propos',
 
   'account.title': 'Compte',

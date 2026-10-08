@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
+export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info';
 
 /**
  * Flat multi-color product icons in the logo's colors (Google-product style, no background),
@@ -54,6 +54,15 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
           <rect x="4" y="18" width="40" height="6.5" rx="3.25" style="fill: var(--brand-blue)" />
           <rect x="4" y="28" width="40" height="6.5" rx="3.25" style="fill: var(--brand-teal)" />
           <rect x="4" y="38" width="27" height="6.5" rx="3.25" style="fill: var(--brand-blue)" />
+        }
+        @case ('settings') {
+          <!-- Three sliders: colored tracks, each with its knob -->
+          <rect x="4" y="8.5" width="40" height="5" rx="2.5" style="fill: var(--brand-blue)" />
+          <circle cx="31" cy="11" r="6.5" style="fill: var(--brand-orange)" />
+          <rect x="4" y="21.5" width="40" height="5" rx="2.5" style="fill: var(--brand-teal)" />
+          <circle cx="15" cy="24" r="6.5" style="fill: var(--brand-blue)" />
+          <rect x="4" y="34.5" width="40" height="5" rx="2.5" style="fill: var(--brand-yellow)" />
+          <circle cx="35" cy="37" r="6.5" style="fill: var(--brand-teal)" />
         }
         @case ('info') {
           <!-- Flat "i": an orange dot over a blue stem -->

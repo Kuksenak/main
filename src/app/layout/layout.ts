@@ -2,7 +2,6 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
-import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
@@ -27,7 +26,6 @@ export class Layout {
   protected readonly loading = inject(LoadingService);
   protected readonly updates = inject(UpdateService);
   protected readonly toolbar = inject(ToolbarService);
-  protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
   constructor() {
@@ -43,6 +41,7 @@ export class Layout {
     { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
     { path: '/students', label: 'nav.students', icon: 'people' },
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
+    { path: '/settings', label: 'nav.settings', icon: 'settings' },
     { path: '/about', label: 'nav.about', icon: 'info' },
   ];
 
