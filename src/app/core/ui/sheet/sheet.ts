@@ -5,8 +5,9 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
 
 /**
  * Layout for menus (info and actions, no inputs):
- * - mobile: floating bottom sheet (8px inset, large continuous corners, half the screen,
- *   translucent glass); drag the grabber down or tap outside to dismiss;
+ * - mobile: floating bottom sheet (0.5rem inset, large continuous corners, at least half the
+ *   screen and growing with its content up to 80%, translucent glass); drag the grabber down
+ *   or tap outside to dismiss;
  * - desktop: a dropdown anchored under `origin` via CDK overlay, or a centered dialog when
  *   no origin is given.
  * Forms use <app-page-sheet> instead.
@@ -29,7 +30,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         (backdropClick)="close()"
         (detach)="close()"
       >
-        <div class="dialog-panel w-72 origin-top-right !rounded-[14px] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]">
+        <div class="dialog-panel w-72 origin-top-right !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]">
           <ng-container [ngTemplateOutlet]="content" />
         </div>
       </ng-template>
@@ -43,7 +44,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         ></div>
 
         <div
-          class="absolute inset-x-2 bottom-2 flex h-[50dvh] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[44px] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:h-auto desktop:w-full desktop:max-w-sm"
+          class="absolute inset-x-2 bottom-2 flex max-h-[80dvh] min-h-[50dvh] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[2.75rem] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:min-h-0 desktop:w-full desktop:max-w-sm"
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
@@ -59,7 +60,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
             <div class="grabber desktop:hidden"></div>
           </div>
 
-          <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 desktop:px-4 desktop:pb-4">
+          <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-2 desktop:px-4 desktop:pb-4">
             <ng-container [ngTemplateOutlet]="content" />
           </div>
         </div>

@@ -1,0 +1,19 @@
+/* Mobile-only stylesheet: loaded by index.html when data-device="mobile" (desktop devices
+   never download it). Device-specific sizes are tokens consumed by components.css. */
+
+:root {
+  /* Typography */
+  --text-body: 1.0625rem; /* 17px */
+  --text-callout: 0.9375rem; /* 15px */
+
+  /* Controls: round buttons 48, capsules and list rows 44 */
+  --control-round: 3rem;
+  --control-h: 2.75rem;
+  --capsule-px: 1.25rem;
+  --row-h: 2.75rem; /* list rows and card buttons */
+
+  /* Corners */
+  --radius-capsule: 9999px;
+  --radius-card: 1rem;
+  --radius-chip: 0.5rem;
+}

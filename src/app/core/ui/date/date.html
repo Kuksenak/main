@@ -35,7 +35,7 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <div class="popover-panel mt-1.5 w-[300px] p-3">
+      <div class="popover-panel mt-1.5 w-75 p-3">
 
         <!-- Header: month nav -->
         <div class="flex items-center justify-between mb-2">
@@ -43,7 +43,7 @@
             class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--highlight)] transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]">
             <app-icon name="chevron-left" [strokeWidth]="2.5" class="size-4 opacity-70" />
           </button>
-          <span class="text-[15px] font-semibold text-balance">{{ monthLabel() }}</span>
+          <span class="text-subhead font-semibold text-balance">{{ monthLabel() }}</span>
           <button type="button" (click)="nextMonth()" [attr.aria-label]="'picker.nextMonth' | t"
             class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[var(--highlight)] transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]">
             <app-icon name="chevron-right" [strokeWidth]="2.5" class="size-4 opacity-70" />
@@ -65,7 +65,7 @@
                 <button
                   type="button"
                   (click)="selectDay(cell)"
-                  class="w-10 h-10 rounded-full text-[15px] tabular-nums flex items-center justify-center transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
+                  class="w-10 h-10 rounded-full text-subhead tabular-nums flex items-center justify-center transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
                   [class.opacity-30]="!cell.inMonth"
                   [class]="isSelected(cell.date)
                     ? 'option-selected'

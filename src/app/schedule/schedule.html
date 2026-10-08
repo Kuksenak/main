@@ -10,7 +10,7 @@
     <!-- Weekday row -->
     <div class="grid grid-cols-7 pb-1">
       @for (wd of weekdays(); track $index) {
-        <span class="flex items-center justify-center text-[15px] font-medium uppercase opacity-40 desktop:text-[12px]">{{ wd }}</span>
+        <span class="text-subhead flex items-center justify-center font-medium uppercase opacity-40 desktop:text-xs">{{ wd }}</span>
       }
     </div>
 
@@ -30,7 +30,7 @@
               [style.opacity]="inMonth(day) ? null : '0.35'"
             >
               <span
-                class="flex size-8 items-center justify-center rounded-full text-[16px] font-semibold tabular-nums desktop:size-7 desktop:text-[14px]"
+                class="flex size-8 items-center justify-center rounded-full text-base font-semibold tabular-nums desktop:size-7 desktop:text-sm"
                 [style.background]="isSelected(day) ? 'var(--accent)' : null"
                 [style.color]="isSelected(day) ? 'var(--accent-fg)' : (isToday(day) ? 'var(--accent)' : null)"
               >{{ day.getDate() }}</span>

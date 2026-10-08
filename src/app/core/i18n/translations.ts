@@ -14,11 +14,15 @@ const en = {
   'account.title': 'Account',
   'account.version': 'Version',
   'account.language': 'Language',
-  'account.updateAvailable': 'Update available',
+  'account.update': 'Update',
   'account.logout': 'Log out',
 
-  'login.welcome': 'Welcome',
-  'login.google': 'Log in with Google',
+  'login.google': 'Continue with Google',
+  'login.apple': 'Continue with Apple',
+  'login.legalPrefix': 'By continuing, you agree to our',
+  'login.terms': 'Terms of Service',
+  'login.and': 'and',
+  'login.privacy': 'Privacy Policy',
 
   'about.description':
     'A lightweight scheduling app for teachers — plan lessons, track students and keep your week organized.',
@@ -65,11 +69,15 @@ const pl: Dictionary = {
   'account.title': 'Konto',
   'account.version': 'Wersja',
   'account.language': 'Język',
-  'account.updateAvailable': 'Dostępna aktualizacja',
+  'account.update': 'Aktualizuj',
   'account.logout': 'Wyloguj się',
 
-  'login.welcome': 'Witaj',
-  'login.google': 'Zaloguj się przez Google',
+  'login.google': 'Kontynuuj z Google',
+  'login.apple': 'Kontynuuj z Apple',
+  'login.legalPrefix': 'Kontynuując, akceptujesz',
+  'login.terms': 'Regulamin',
+  'login.and': 'oraz',
+  'login.privacy': 'Politykę prywatności',
 
   'about.description':
     'Prosta aplikacja do planowania dla nauczycieli — planuj lekcje, śledź uczniów i miej porządek w tygodniu.',
@@ -113,11 +121,15 @@ const fr: Dictionary = {
   'account.title': 'Compte',
   'account.version': 'Version',
   'account.language': 'Langue',
-  'account.updateAvailable': 'Mise à jour disponible',
+  'account.update': 'Mettre à jour',
   'account.logout': 'Se déconnecter',
 
-  'login.welcome': 'Bienvenue',
-  'login.google': 'Se connecter avec Google',
+  'login.google': 'Continuer avec Google',
+  'login.apple': 'Continuer avec Apple',
+  'login.legalPrefix': 'En continuant, vous acceptez nos',
+  'login.terms': 'Conditions d’utilisation',
+  'login.and': 'et notre',
+  'login.privacy': 'Politique de confidentialité',
 
   'about.description':
     'Une application de planification légère pour les enseignants — planifiez vos cours, suivez vos élèves et organisez votre semaine.',

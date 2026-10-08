@@ -23,7 +23,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
       >
-        <!-- Mobile top bar — 16px side inset like the cards, 48pt controls -->
+        <!-- Mobile top bar: same side inset as the cards, round controls -->
         <div class="relative flex shrink-0 items-center gap-2 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] desktop:hidden">
           <ng-content select="[leading]" />
           <span class="text-body pointer-events-none absolute inset-x-0 text-center font-semibold">{{ title() }}</span>

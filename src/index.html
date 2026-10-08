@@ -34,6 +34,10 @@
                    navigator.maxTouchPoints > 0;
       document.documentElement.dataset.device = mobile ? 'mobile' : 'desktop';
 
+      // Load only this device's stylesheet (separate non-injected bundles from angular.json).
+      // document.write keeps it parser-inserted, so it blocks first paint like a normal <link>.
+      document.write('<link rel="stylesheet" href="' + (mobile ? 'styles-mobile.css' : 'styles-desktop.css') + '">');
+
       // iOS Safari only applies :active styles once a touchstart listener exists.
       document.addEventListener('touchstart', function () {}, { passive: true });
     })();

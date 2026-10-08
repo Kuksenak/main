@@ -42,12 +42,12 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <div class="popover-panel mt-1.5 min-w-[160px] p-1">
+      <div class="popover-panel mt-1.5 min-w-40 p-1">
         @for (opt of options; track opt.value) {
           <button
             type="button"
             (click)="select(opt)"
-            class="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-[15px] text-left transition-[transform,background-color] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
+            class="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-subhead text-left transition-[transform,background-color] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
             [class]="isSelected(opt)
               ? 'option-selected'
               : 'option'"

@@ -1,24 +1,21 @@
-/* Reusable building blocks. Sizes — mobile: round 48, capsule/row 44 / desktop: round 40,
-   capsule/row 36. Colors always come from tokens.css. */
+/* Reusable building blocks. Colors come from tokens.css; sizes and corners that differ per
+   device (--control-*, --radius-*, --text-*) come from mobile.css / desktop.css. */
 
-/* ---- Typography (one step smaller on desktop) ---- */
+/* ---- Typography (sizes come from the device stylesheet) ---- */
 @utility text-body {
-  font-size: 17px;
-  @variant desktop {
-    font-size: 15px;
-  }
+  font-size: var(--text-body);
 }
 @utility text-callout {
-  font-size: 15px;
-  @variant desktop {
-    font-size: 13px;
-  }
+  font-size: var(--text-callout);
+}
+@utility text-subhead {
+  font-size: 0.9375rem; /* 15px */
 }
 @utility text-footnote {
-  font-size: 13px;
+  font-size: 0.8125rem; /* 13px */
 }
 @utility text-caption {
-  font-size: 11px;
+  font-size: 0.6875rem; /* 11px */
 }
 
 /* ---- Materials (glass buttons, matched against native iOS 26 screenshots) ---- */
@@ -44,35 +41,41 @@
 
   /* Primary action — accent capsule */
   .btn-primary {
-    @apply glass-accent text-body inline-flex h-11 items-center justify-center rounded-full px-5
-           font-semibold active:opacity-80 disabled:opacity-40
-           desktop:h-9 desktop:rounded-lg desktop:px-4;
+    @apply glass-accent text-body inline-flex h-[var(--control-h)] items-center justify-center
+           rounded-[var(--radius-capsule)] px-[var(--capsule-px)] font-semibold
+           active:opacity-80 disabled:opacity-40;
   }
 
   /* Secondary action — neutral glass capsule */
   .btn-secondary {
-    @apply glass-neutral text-body inline-flex h-11 items-center justify-center rounded-full px-5
-           font-medium active:opacity-70
-           desktop:h-9 desktop:rounded-lg desktop:px-4;
+    @apply glass-neutral text-body inline-flex h-[var(--control-h)] items-center justify-center
+           rounded-[var(--radius-capsule)] px-[var(--capsule-px)] font-medium active:opacity-70;
+  }
+
+  /* Strong neutral action: black (white in dark theme), e.g. sign-in buttons */
+  .btn-strong {
+    @apply text-body inline-flex h-[var(--control-h)] items-center justify-center gap-2
+           rounded-[var(--radius-capsule)] bg-[var(--strong-bg)] px-[var(--capsule-px)] font-semibold
+           text-[var(--strong-fg)] active:opacity-80 disabled:opacity-40;
   }
 
   /* Round icon button — neutral glass */
   .icon-btn {
-    @apply glass-neutral inline-flex size-12 shrink-0 items-center justify-center rounded-full
-           active:opacity-70 desktop:size-10;
+    @apply glass-neutral inline-flex size-[var(--control-round)] shrink-0 items-center justify-center
+           rounded-full active:opacity-70;
   }
 
   /* Round icon button — accent (✓, +, avatar) */
   .btn-confirm {
-    @apply glass-accent inline-flex size-12 shrink-0 items-center justify-center rounded-full
-           active:opacity-80 desktop:size-10;
+    @apply glass-accent inline-flex size-[var(--control-round)] shrink-0 items-center justify-center
+           rounded-full active:opacity-80;
   }
 
   /* Full-width card-style action (Delete, Log out, Update) */
   .card-btn {
-    @apply text-body flex h-11 w-full shrink-0 items-center justify-center gap-1.5 overflow-hidden
-           rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--surface)] font-semibold
-           active:opacity-60 desktop:h-9 desktop:rounded-[10px];
+    @apply text-body flex h-[var(--row-h)] w-full shrink-0 items-center justify-center gap-1.5
+           overflow-hidden rounded-[var(--radius-card)] border-[0.5px] border-[var(--separator)]
+           bg-[var(--surface)] font-semibold active:opacity-60;
   }
 
   /* Floating control pinned above the home indicator (combine with left-4 / right-4). */
@@ -89,7 +92,7 @@
            shadow-[var(--shadow-sheet)] backdrop-blur-[30px] backdrop-saturate-[180%];
   }
 
-  /* Desktop dialog: solid, modest corners (16px around 10px cards). */
+  /* Desktop dialog: solid, modest corners around the cards. */
   .dialog-panel {
     --surface: var(--card);
     @apply rounded-2xl border-0 bg-[var(--dialog-bg)] text-[var(--text)] shadow-[var(--shadow-dialog)]
@@ -104,21 +107,21 @@
 
   /* Drag handle at the top of a bottom sheet. */
   .grabber {
-    @apply mx-auto h-[5px] w-9 rounded-full bg-[var(--grabber)];
+    @apply mx-auto h-1.25 w-9 rounded-full bg-[var(--grabber)];
   }
 
   /* ---- Lists ---- */
 
   /* Grouped list container */
   .card {
-    @apply overflow-hidden rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--surface)]
-           desktop:rounded-[10px];
+    @apply overflow-hidden rounded-[var(--radius-card)] border-[0.5px] border-[var(--separator)]
+           bg-[var(--surface)];
   }
 
   /* Single-line row inside a card, hairline divider between rows */
   .list-row {
-    @apply text-body flex min-h-11 items-center justify-between gap-3 border-b border-[var(--separator)]
-           px-4 last:border-b-0 desktop:min-h-9;
+    @apply text-body flex min-h-[var(--row-h)] items-center justify-between gap-3 border-b
+           border-[var(--separator)] px-4 last:border-b-0;
   }
 
   /* Event row on the page background: inset hairline from the text, none under the last. */
@@ -132,10 +135,9 @@
 
   /* Input chip: date / time / select triggers (native inputs on mobile, buttons on desktop). */
   .chip {
-    @apply text-body inline-flex w-auto appearance-none items-center whitespace-nowrap rounded-lg border-0
-           bg-[var(--fill)] px-2.5 py-1 text-left text-current tabular-nums [font-family:inherit]
-           focus:outline-none disabled:opacity-40
-           desktop:rounded-md desktop:transition-colors desktop:hover:bg-[var(--highlight)];
+    @apply text-body inline-flex w-auto appearance-none items-center whitespace-nowrap
+           rounded-[var(--radius-chip)] border-0 bg-[var(--fill)] px-2.5 py-1 text-left text-current
+           tabular-nums transition-colors [font-family:inherit] focus:outline-none disabled:opacity-40;
   }
 
   /* Option inside a popover list (pickers). */
@@ -159,7 +161,7 @@
 
   /* Custom scroll indicator drawn outside a scroll area. */
   .scroll-indicator {
-    @apply pointer-events-none absolute w-[3px] rounded-full bg-[var(--scroll-thumb)]
+    @apply pointer-events-none absolute w-0.75 rounded-full bg-[var(--scroll-thumb)]
            transition-opacity duration-300;
   }
 }

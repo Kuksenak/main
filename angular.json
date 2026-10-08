@@ -37,7 +37,9 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              { "input": "src/styles/mobile.css", "bundleName": "styles-mobile", "inject": false },
+              { "input": "src/styles/desktop.css", "bundleName": "styles-desktop", "inject": false }
             ]
           },
           "configurations": {
