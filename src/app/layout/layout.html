@@ -51,7 +51,7 @@
       <!-- Sections: one row each with its brand icon; the current one in the accent color -->
       <div class="card">
         @for (item of navItems; track item.path) {
-          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full py-2 text-left">
+          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full py-1.5 text-left">
             <app-brand-icon [name]="item.icon" class="size-8" />
             <span class="min-w-0 flex-1 truncate" [class.font-semibold]="isActive(item.path)" [class.text-[var(--accent)]]="isActive(item.path)">{{ item.label | t }}</span>
             @if (isActive(item.path)) {

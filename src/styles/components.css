@@ -126,16 +126,40 @@
            bg-[var(--surface)];
   }
 
-  /* Single-line row inside a card, hairline divider between rows */
+  /* Row inside a card. Hairline divider between rows, iOS-style: it starts at the text (after a
+     leading avatar / icon / dot / color bar / check), stops short of the right edge, and is
+     hidden under the last row. */
   .list-row {
-    @apply text-body flex min-h-[var(--row-h)] items-center justify-between gap-3 border-b
-           border-[var(--separator)] px-4 last:border-b-0;
+    --sep-left: 1rem;
+    @apply text-body relative flex min-h-[var(--row-h)] items-center justify-between gap-3 px-4
+           after:absolute after:bottom-0 after:left-[var(--sep-left)] after:right-4 after:h-px
+           after:bg-[var(--separator)] last:after:hidden;
+  }
+  .list-row:has(> .color-bar) {
+    --sep-left: 2rem; /* 1rem padding + 0.25rem bar + 0.75rem gap */
+  }
+  .list-row:has(> .dot:first-child) {
+    --sep-left: 2.375rem; /* padding + 0.625rem dot + gap */
+  }
+  .list-row:has(> app-brand-icon) {
+    --sep-left: 3.75rem; /* padding + 2rem icon + gap */
+  }
+  .list-row:has(.avatar) {
+    --sep-left: 4rem; /* padding + 2.25rem avatar + gap */
+  }
+  .list-row:has(> .check) {
+    --sep-left: 6.25rem; /* padding + 1.5rem check + gap + avatar + gap */
+  }
+
+  /* Thin vertical bar in a lesson's calendar color (set its background). */
+  .color-bar {
+    @apply w-1 shrink-0 self-stretch rounded-full;
   }
 
   /* Event row on the page background: inset hairline from the text, none under the last. */
   .event-row {
     @apply relative flex w-full items-center gap-3 py-2 pr-3 text-left
-           after:absolute after:bottom-0 after:left-4 after:right-0 after:h-px after:bg-[var(--separator)]
+           after:absolute after:bottom-0 after:left-4 after:right-3 after:h-px after:bg-[var(--separator)]
            last:after:hidden;
   }
 

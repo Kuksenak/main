@@ -55,8 +55,9 @@
         <span class="text-footnote px-4 uppercase opacity-50">{{ 'students.upcoming' | t }}</span>
         <div class="card">
           @for (l of upcoming(); track l.id) {
-            <button type="button" (click)="openEdit(l)" class="list-row w-full py-2 text-left">
-              <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="lessonColor(l)"></span>
+            <!-- Picks that lesson's day in the calendar (its lessons then show on the right) -->
+            <button type="button" (click)="showDay(l)" class="list-row w-full py-2 text-left">
+              <span class="color-bar" [style.background]="lessonColor(l)"></span>
               <div class="min-w-0 flex-1 leading-tight">
                 <p class="truncate font-medium">{{ lessonTitle(l) || l.studentName }}</p>
                 <p class="text-footnote truncate opacity-50">{{ upcomingWhen(l) }}</p>
@@ -78,7 +79,7 @@
           @for (lesson of dayLessons(); track lesson.id) {
             <!-- Calendar color bar · title / who · start over end -->
             <button type="button" (click)="openEdit(lesson)" class="event-row">
-              <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="lessonColor(lesson)"></span>
+              <span class="color-bar" [style.background]="lessonColor(lesson)"></span>
               <div class="min-w-0 flex-1 leading-tight">
                 <p
                   class="text-body truncate font-medium"

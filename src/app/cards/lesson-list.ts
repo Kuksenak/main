@@ -28,7 +28,7 @@ import { GroupService } from '../students/group.service';
           <div class="card">
             @for (l of g.items; track l.id) {
               <button type="button" (click)="open(l)" class="list-row w-full py-2 text-left">
-                <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="color(l)"></span>
+                <span class="color-bar" [style.background]="color(l)"></span>
                 <div class="min-w-0 flex-1 leading-tight">
                   <p class="truncate font-medium" [class.line-through]="l.status === 'Cancelled'">{{ date(l) }}</p>
                   <p class="text-footnote truncate opacity-50">

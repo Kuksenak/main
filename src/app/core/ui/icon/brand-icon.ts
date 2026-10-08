@@ -15,19 +15,31 @@ export type BrandIconName = 'calendar' | 'people' | 'info';
     <svg viewBox="0 0 48 48" class="size-full">
       @switch (name()) {
         @case ('calendar') {
-          <!-- Google-Calendar style: white page, frame in the four brand colors, folded corner,
-               today's date in the middle -->
-          <path d="M11 5h26a6 6 0 0 1 6 6v23l-9 9H11a6 6 0 0 1-6-6V11a6 6 0 0 1 6-6z" fill="#fff" />
-          <path d="M11 5h26a6 6 0 0 1 6 6v2H5v-2a6 6 0 0 1 6-6z" style="fill: var(--brand-blue)" />
-          <path d="M5 13h7v22H5z" style="fill: var(--brand-teal)" />
-          <path d="M5 35h29v8H11a6 6 0 0 1-6-6z" style="fill: var(--brand-yellow)" />
-          <path d="M36 13h7v21h-7z" style="fill: var(--brand-orange)" />
-          <path d="M34 34h9l-9 9z" style="fill: color-mix(in srgb, var(--brand-orange) 70%, black)" />
+          <!-- Tear-off calendar page (iOS-like): the next page peeking below, blue header, a
+               curled corner as if being flipped, today's date. Light blue tint, outline and a
+               soft shadow keep it visible on white. -->
+          <defs>
+            <filter id="brand-cal-shadow" x="-20%" y="-20%" width="140%" height="150%">
+              <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#1d2b4a" flood-opacity="0.18" />
+            </filter>
+          </defs>
+          <g filter="url(#brand-cal-shadow)">
+            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 38%, white)" />
+            <path
+              d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
+              style="fill: color-mix(in srgb, var(--brand-blue) 6%, white); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
+            />
+          </g>
+          <path d="M12 4h24a7 7 0 0 1 7 7v3H5v-3a7 7 0 0 1 7-7z" style="fill: var(--brand-blue)" />
+          <path
+            d="M34 42c0-5 3-9 9-9l-9 9z"
+            style="fill: color-mix(in srgb, var(--brand-blue) 45%, #dfe4ee); stroke: color-mix(in srgb, var(--brand-blue) 60%, white); stroke-width: 0.75; stroke-linejoin: round"
+          />
           <text
             x="24"
-            y="31.5"
+            y="35"
             text-anchor="middle"
-            style="fill: var(--brand-blue); font: 700 18px -apple-system, system-ui, 'Segoe UI', sans-serif; letter-spacing: -0.04em"
+            style="fill: #111; font: 800 19.5px -apple-system, system-ui, 'Segoe UI', sans-serif; letter-spacing: -0.04em"
           >{{ today }}</text>
         }
         @case ('people') {

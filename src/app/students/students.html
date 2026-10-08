@@ -42,7 +42,6 @@
               (longPress)="startSelect(s)"
               (click)="pick(s)"
               class="list-row w-full py-2 text-left"
-              [class.bg-[var(--highlight)]]="desktop && !selecting() && s.id === selected()?.id"
             >
               @if (selecting()) {
                 <span class="check" [class.is-on]="checked().has(s.id)">
@@ -53,7 +52,8 @@
               }
               <span class="avatar">{{ initial(s.name) }}</span>
               <div class="min-w-0 flex-1 leading-tight">
-                <p class="truncate font-medium">{{ s.name }}</p>
+                <!-- Desktop: the student shown on the right is bold (no background change) -->
+                <p class="truncate font-medium" [class.font-bold]="desktop && !selecting() && s.id === selected()?.id">{{ s.name }}</p>
                 @if (s.email || s.phone) {
                   <p class="text-footnote truncate opacity-50">{{ s.email || s.phone }}</p>
                 }
@@ -77,10 +77,9 @@
               type="button"
               (click)="pickGroup(g)"
               class="list-row w-full py-2 text-left"
-              [class.bg-[var(--highlight)]]="desktop && g.id === selectedGroup()?.id"
             >
               <span class="avatar text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
-              <p class="min-w-0 flex-1 truncate font-medium">{{ g.name }}</p>
+              <p class="min-w-0 flex-1 truncate font-medium" [class.font-bold]="desktop && g.id === selectedGroup()?.id">{{ g.name }}</p>
               <span class="text-footnote flex items-center gap-1 tabular-nums opacity-50">
                 <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
               </span>

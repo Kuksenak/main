@@ -105,6 +105,13 @@ export class Schedule implements AfterViewInit {
       .slice(0, 3);
   });
 
+  // Upcoming → select that lesson's day and bring its month into view.
+  protected showDay(l: Lesson): void {
+    const day = startOfDay(new Date(l.startsAt));
+    this.selectDay(day);
+    this.scrollToDay(day);
+  }
+
   // "Wed, 8 Oct · 18:00–19:00"
   protected upcomingWhen(l: Lesson): string {
     const start = new Date(l.startsAt);
