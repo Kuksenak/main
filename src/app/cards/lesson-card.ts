@@ -40,13 +40,7 @@ import { EventList } from './event-list';
         @if (!editing()) {
           <div class="flex items-center gap-3">
             <h1 class="min-w-0 flex-1 text-2xl font-semibold mobile:hidden">{{ heading() }}</h1>
-            <!-- Public lessons: copy the link -->
-            @if (lesson()?.shareToken; as token) {
-              <button type="button" (click)="copy(token)" [attr.aria-label]="'lessons.copy' | t" class="icon-btn mobile:ml-auto">
-                <app-icon [name]="copied() ? 'check' : 'copy'" class="size-5" />
-              </button>
-            }
-            <button type="button" (click)="edit()" class="btn-secondary" [class.mobile:ml-auto]="!lesson()?.shareToken">{{ 'action.edit' | t }}</button>
+            <button type="button" (click)="edit()" class="btn-secondary mobile:ml-auto">{{ 'action.edit' | t }}</button>
           </div>
         }
 
@@ -55,11 +49,16 @@ import { EventList } from './event-list';
         } @else if (lesson(); as l) {
           <app-lesson-content [blocks]="l.blocks" />
 
-          <!-- Public: anyone with the link can read it, no sign-in -->
+          <!-- Public: anyone with the link can read it, no sign-in; while on, ⧉ copies the link -->
           <div class="flex flex-col gap-1.5">
             <div class="card">
               <div class="list-row">
-                <span>{{ 'lessons.public' | t }}</span>
+                <span class="flex-1">{{ 'lessons.public' | t }}</span>
+                @if (l.shareToken; as token) {
+                  <button type="button" (click)="copy(token)" [attr.aria-label]="'lessons.copy' | t" class="icon-plain text-[var(--accent)]">
+                    <app-icon [name]="copied() ? 'check' : 'copy'" class="size-5" />
+                  </button>
+                }
                 <app-toggle [checked]="!!l.shareToken" (checkedChange)="setPublic($event)" [attr.aria-label]="'lessons.public' | t" />
               </div>
             </div>
