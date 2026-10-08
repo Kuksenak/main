@@ -45,7 +45,8 @@ const en = {
 
   'lesson.new': 'New Lesson',
   'lesson.edit': 'Edit Lesson',
-  'lesson.studentName': 'Student name *',
+  'lesson.title': 'Title',
+  'lesson.student': 'Student',
   'lesson.note': 'Note',
   'lesson.starts': 'Starts',
   'lesson.ends': 'Ends',
@@ -112,7 +113,8 @@ const pl: Dictionary = {
 
   'lesson.new': 'Nowa lekcja',
   'lesson.edit': 'Edytuj lekcję',
-  'lesson.studentName': 'Imię ucznia *',
+  'lesson.title': 'Tytuł',
+  'lesson.student': 'Uczeń',
   'lesson.note': 'Notatka',
   'lesson.starts': 'Początek',
   'lesson.ends': 'Koniec',
@@ -176,7 +178,8 @@ const fr: Dictionary = {
 
   'lesson.new': 'Nouveau cours',
   'lesson.edit': 'Modifier le cours',
-  'lesson.studentName': 'Nom de l’élève *',
+  'lesson.title': 'Titre',
+  'lesson.student': 'Élève',
   'lesson.note': 'Note',
   'lesson.starts': 'Début',
   'lesson.ends': 'Fin',

@@ -44,11 +44,14 @@ export class LessonService {
       .subscribe((res) => this._lessons.set(res.lessons ?? []));
   }
 
-  create(input: LessonInput, from: Date, to: Date): void {
+  create(input: LessonInput, from: Date, to: Date, onCreated?: (id: string) => void): void {
     this.http
-      .post(this.base, input)
+      .post<{ id: string }>(this.base, input)
       .pipe(catchError(() => of(null)))
-      .subscribe(() => this.load(from, to));
+      .subscribe((res) => {
+        if (res?.id) onCreated?.(res.id);
+        this.load(from, to);
+      });
   }
 
   update(id: string, input: LessonInput, from: Date, to: Date): void {

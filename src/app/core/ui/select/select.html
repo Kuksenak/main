@@ -12,6 +12,9 @@
       (change)="onNativeChange($event)"
       class="chip pr-8"
     >
+      @if (value() === null) {
+        <option value="" disabled selected>{{ triggerLabel() }}</option>
+      }
       @for (opt of options; track opt.value) {
         <option [value]="opt.value">{{ opt.label }}</option>
       }
@@ -42,7 +45,7 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <div class="popover-panel mt-1.5 min-w-40 p-1">
+      <div class="popover-panel mt-1.5 max-h-72 min-w-40 overflow-y-auto p-1">
         @for (opt of options; track opt.value) {
           <button
             type="button"

@@ -9,6 +9,7 @@ export type IconName =
   | 'chevrons-up-down'
   | 'grid'
   | 'search'
+  | 'trash'
   | 'google'
   | 'apple';
 
@@ -33,6 +34,7 @@ export type IconName =
         @case ('plus') { <path d="M12 5v14M5 12h14" /> }
         @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
         @case ('close') { <path d="M18 6 6 18M6 6l12 12" /> }
+        @case ('trash') { <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" /> }
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }

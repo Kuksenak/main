@@ -23,6 +23,8 @@
   --strong-bg: #000000; /* black buttons (sign-in) */
   --strong-fg: #ffffff;
   --danger: #ff3b30;
+  --danger-fg: #ffffff;
+  --danger-soft: color-mix(in srgb, var(--danger) 16%, var(--app-bg)); /* pale red fill */
   /* Default calendar color (event bars, calendar dots): pale accent, adapts to theme. */
   --calendar-default: color-mix(in srgb, var(--accent) 45%, var(--app-bg));
 
@@ -69,6 +71,7 @@ html.dark {
   --strong-bg: #ffffff;
   --strong-fg: #000000;
   --danger: #ff453a;
+  --danger-soft: color-mix(in srgb, var(--danger) 22%, var(--app-bg));
 
   --fill: rgb(255 255 255 / 0.06);
   --fill-strong: rgb(255 255 255 / 0.1);

@@ -19,13 +19,17 @@ import { ToolbarService } from '../core/services/toolbar.service';
 import { DateField } from '../core/ui/date/date';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { SwipeRow } from '../core/ui/swipe-row/swipe-row';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
+import { StudentService } from '../students/student.service';
+import { LessonTitleStore } from './lesson-title.store';
 import { Lesson, LessonService, LessonStatus } from './lesson.service';
 
 interface EditorModel {
   id: string | null;
-  studentName: string;
+  title: string; // stored on this device (LessonTitleStore)
+  studentName: string; // picked from the students list
   date: string; // yyyy-MM-dd (display only)
   startTime: string; // HH:mm
   endTime: string; // HH:mm
@@ -80,11 +84,13 @@ function toTimeInput(d: Date): string {
 
 @Component({
   selector: 'app-schedule',
-  imports: [FormsModule, TimeField, SelectField, DateField, Icon, PageSheet, TranslatePipe],
+  imports: [FormsModule, TimeField, SelectField, DateField, Icon, PageSheet, SwipeRow, TranslatePipe],
   templateUrl: './schedule.html',
 })
 export class Schedule implements AfterViewInit {
   private service = inject(LessonService);
+  private titles = inject(LessonTitleStore);
+  private students = inject(StudentService);
   private i18n = inject(I18nService);
 
   protected readonly isMobile = inject(DeviceDetectionService).isMobile;
@@ -127,6 +133,18 @@ export class Schedule implements AfterViewInit {
   }
 
   protected readonly editor = signal<EditorModel | null>(null);
+
+  // Student picker: everyone in the students list, plus the lesson's current name if it isn't
+  // there (older lessons typed by hand).
+  protected readonly studentOptions = computed<SelectOption[]>(() => {
+    const names = this.students
+      .students()
+      .map((s) => s.name)
+      .sort((a, b) => a.localeCompare(b, this.i18n.locale()));
+    const current = this.editor()?.studentName;
+    if (current && !names.includes(current)) names.unshift(current);
+    return names.map((n) => ({ label: n, value: n }));
+  });
 
   // Month title, e.g. "October 2026" / "Październik 2026" (capitalized for every language).
   protected readonly monthTitle = computed(() => {
@@ -269,6 +287,7 @@ export class Schedule implements AfterViewInit {
     const d = this.selectedDate();
     this.editor.set({
       id: null,
+      title: '',
       studentName: '',
       date: toDateInput(d),
       startTime: '18:00',
@@ -283,6 +302,7 @@ export class Schedule implements AfterViewInit {
     const start = new Date(lesson.startsAt);
     this.editor.set({
       id: lesson.id,
+      title: this.titles.get(lesson.id),
       studentName: lesson.studentName,
       date: toDateInput(start),
       startTime: toTimeInput(start),
@@ -346,6 +366,10 @@ export class Schedule implements AfterViewInit {
     return 'var(--calendar-default)';
   }
 
+  protected lessonTitle(lesson: Lesson): string {
+    return this.titles.get(lesson.id);
+  }
+
   protected statusKey(status: LessonStatus): TranslationKey {
     return `lesson.status.${status}`;
   }
@@ -373,12 +397,21 @@ export class Schedule implements AfterViewInit {
     };
 
     const { from, to } = this.loadRange();
+    const title = m.title.trim();
     if (m.id) {
+      this.titles.set(m.id, title);
       this.service.update(m.id, input, from, to);
     } else {
-      this.service.create(input, from, to);
+      this.service.create(input, from, to, (id) => this.titles.set(id, title));
     }
     this.closeEditor();
+  }
+
+  // Swipe-to-delete from the list.
+  protected removeLesson(lesson: Lesson): void {
+    const { from, to } = this.loadRange();
+    this.service.remove(lesson.id, from, to);
+    this.titles.remove(lesson.id);
   }
 
   protected remove(): void {
@@ -386,6 +419,7 @@ export class Schedule implements AfterViewInit {
     if (!m?.id) return;
     const { from, to } = this.loadRange();
     this.service.remove(m.id, from, to);
+    this.titles.remove(m.id);
     this.closeEditor();
   }
 }

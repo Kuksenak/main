@@ -131,6 +131,24 @@
            last:after:hidden;
   }
 
+  /* Gap revealed behind a swiped row (app-swipe-row) and its round delete button. */
+  .swipe-action {
+    @apply absolute inset-y-0 right-0 flex items-center justify-center overflow-hidden;
+  }
+  .swipe-delete {
+    @apply inline-flex size-[var(--control-round)] shrink-0 items-center justify-center rounded-full
+           bg-[var(--danger-soft)] text-[var(--danger)];
+  }
+
+  /* Rows wrapped in app-swipe-row are each their wrapper's last child, so the
+     "no divider under the last row" rules key off the wrapper instead. */
+  app-swipe-row:not(:last-child) .list-row {
+    border-bottom-width: 1px;
+  }
+  app-swipe-row:not(:last-child) .event-row::after {
+    display: block;
+  }
+
   /* ---- Small pieces ---- */
 
   /* Input chip: date / time / select triggers (native inputs on mobile, buttons on desktop). */

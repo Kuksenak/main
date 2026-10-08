@@ -1,8 +1,4 @@
-<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:mx-auto desktop:max-w-2xl">
-  <!-- Title (desktop; on mobile it lives in the toolbar) -->
-  <h1 class="text-xl font-semibold mobile:hidden">{{ 'nav.students' | t }}</h1>
-
-  <!-- Search -->
+<ng-template #search>
   <label class="field">
     <app-icon name="search" class="size-4 opacity-40" />
     <input
@@ -13,11 +9,17 @@
       autocomplete="off"
     />
   </label>
+</ng-template>
+
+<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:mx-auto desktop:max-w-2xl">
+  <!-- Search: here on desktop; on mobile the same template sits in the toolbar -->
+  <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
 
   <!-- List: the card itself scrolls, so its corners stay put; bottom padding clears the + button -->
   @if (visible().length) {
     <div class="card min-h-0 shrink overflow-y-auto overscroll-contain">
       @for (s of visible(); track s.id) {
+        <app-swipe-row (delete)="removeStudent(s)" [label]="'action.delete' | t">
         <button type="button" (click)="openEdit(s)" class="list-row w-full py-2 text-left">
           <span class="avatar">{{ initial(s.name) }}</span>
           <div class="min-w-0 flex-1 leading-tight">
@@ -29,6 +31,7 @@
           <span class="badge">{{ s.level }}</span>
           <app-icon name="chevron-right" class="size-4 opacity-30" />
         </button>
+        </app-swipe-row>
       }
     </div>
     <div class="h-14 shrink-0"></div>

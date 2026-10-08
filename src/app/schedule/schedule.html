@@ -62,7 +62,8 @@
       @if (dayLessons().length) {
         <div class="pb-14">
           @for (lesson of dayLessons(); track lesson.id) {
-            <!-- Calendar color bar · title (and note) · start over end -->
+            <!-- Calendar color bar · title / student · start over end; swipe left to delete -->
+            <app-swipe-row (delete)="removeLesson(lesson)" [label]="'action.delete' | t">
             <button type="button" (click)="openEdit(lesson)" class="event-row">
               <span class="w-1 shrink-0 self-stretch rounded-full" [style.background]="lessonColor(lesson)"></span>
               <div class="min-w-0 flex-1 leading-tight">
@@ -70,9 +71,9 @@
                   class="text-body truncate font-medium"
                   [class.line-through]="lesson.status === 'Cancelled'"
                   [class.opacity-50]="lesson.status !== 'Scheduled'"
-                >{{ lesson.studentName }}</p>
-                @if (lesson.note) {
-                  <p class="text-footnote truncate opacity-50">{{ lesson.note }}</p>
+                >{{ lessonTitle(lesson) || lesson.studentName }}</p>
+                @if (lessonTitle(lesson) ? lesson.studentName : lesson.note; as sub) {
+                  <p class="text-footnote truncate opacity-50">{{ sub }}</p>
                 }
               </div>
               <div class="flex shrink-0 items-center gap-3">
@@ -85,6 +86,7 @@
                 </div>
               </div>
             </button>
+            </app-swipe-row>
           }
         </div>
       } @else {
@@ -139,14 +141,27 @@
       <div class="card">
         <div class="list-row">
           <input
-            name="studentName"
-            [(ngModel)]="m.studentName"
+            name="title"
+            [(ngModel)]="m.title"
             type="text"
-            [placeholder]="'lesson.studentName' | t"
+            [placeholder]="'lesson.title' | t"
             autocomplete="off"
             class="row-input"
           />
         </div>
+        <div class="list-row">
+          <span>{{ 'lesson.student' | t }}</span>
+          <app-select
+            class="ml-auto"
+            [options]="studentOptions()"
+            [ngModel]="m.studentName || null"
+            (ngModelChange)="m.studentName = $event ?? ''"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </div>
+      </div>
+
+      <div class="card">
         <div class="list-row py-3 desktop:py-2">
           <textarea
             name="note"

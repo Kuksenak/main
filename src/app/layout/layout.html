@@ -5,8 +5,14 @@
       <img src="icons/icon-96x96.png" [alt]="'app.name' | t" class="size-8" width="32" height="32" />
     </a>
     <nav class="flex min-w-0 flex-1 items-center gap-1">
-      <!-- Mobile: the current page's title (e.g. month on Schedule); tabs live in the ⋯ sheet -->
-      <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
+      <!-- Mobile: the current page's toolbar content or title (e.g. month on Schedule);
+           tabs live in the ⋯ sheet -->
+      @if (toolbar.content(); as content) {
+        <!-- Fields in the toolbar match the round buttons next to them -->
+        <div class="flex min-w-0 flex-1 desktop:hidden [&_.field]:h-[var(--control-round)] [&_.field]:rounded-full"><ng-container [ngTemplateOutlet]="content" /></div>
+      } @else {
+        <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
+      }
       <!-- Desktop tabs -->
       @for (item of navItems; track item.path) {
         <a

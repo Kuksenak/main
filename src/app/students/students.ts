@@ -1,4 +1,14 @@
-import { Component, DestroyRef, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import {
+  Component,
+  DestroyRef,
+  TemplateRef,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -6,6 +16,7 @@ import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { SelectField, SelectOption } from '../core/ui/select/select';
+import { SwipeRow } from '../core/ui/swipe-row/swipe-row';
 import { STUDENT_LEVELS, Student, StudentInput, StudentService } from './student.service';
 
 interface EditorModel extends StudentInput {
@@ -14,13 +25,14 @@ interface EditorModel extends StudentInput {
 
 @Component({
   selector: 'app-students',
-  imports: [FormsModule, Icon, PageSheet, SelectField, TranslatePipe],
+  imports: [FormsModule, NgTemplateOutlet, Icon, PageSheet, SelectField, SwipeRow, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
   private service = inject(StudentService);
   private i18n = inject(I18nService);
   private readonly page = viewChild(PageSheet);
+  private readonly search = viewChild<TemplateRef<unknown>>('search');
 
   protected readonly query = signal('');
 
@@ -39,10 +51,10 @@ export class Students {
   private editorSnapshot = '';
 
   constructor() {
-    // Page title in the mobile toolbar.
+    // Mobile toolbar: the search field instead of a title.
     const toolbar = inject(ToolbarService);
-    effect(() => toolbar.title.set(this.i18n.t('nav.students')));
-    inject(DestroyRef).onDestroy(() => toolbar.title.set(''));
+    effect(() => toolbar.content.set(this.search() ?? null));
+    inject(DestroyRef).onDestroy(() => toolbar.content.set(null));
   }
 
   protected initial(name: string): string {
@@ -89,6 +101,11 @@ export class Students {
     if (m.id) this.service.update(m.id, input);
     else this.service.create(input);
     this.closeEditor();
+  }
+
+  // Swipe-to-delete from the list.
+  protected removeStudent(s: Student): void {
+    this.service.remove(s.id);
   }
 
   protected remove(): void {
