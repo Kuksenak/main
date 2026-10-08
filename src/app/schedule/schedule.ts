@@ -223,9 +223,16 @@ export class Schedule implements AfterViewInit {
   }
 
   // Indicator width: a single dot for one event, a longer oval for several (capped at 5).
+  // Indicator under a day with events: a dot for one, a longer dash per extra event (capped at 5).
   protected dotWidth(day: Date): number {
     const n = Math.min(this.countFor(day), 5);
     return n <= 1 ? 4 : 4 + (n - 1) * 4;
+  }
+
+  // Dash color: the calendar color of the day's first event.
+  protected dayColor(day: Date): string {
+    const first = this.byDay().get(toDateInput(day))?.[0];
+    return first ? this.lessonColor(first) : 'var(--calendar-default)';
   }
 
   // Month label for a week when it contains the 1st (inline divider in the scroll).
@@ -276,6 +283,7 @@ export class Schedule implements AfterViewInit {
       note: '',
       status: 'Scheduled',
     });
+    this.editorSnapshot = JSON.stringify(this.editor());
   }
 
   protected openEdit(lesson: Lesson): void {
@@ -289,6 +297,7 @@ export class Schedule implements AfterViewInit {
       note: lesson.note ?? '',
       status: lesson.status,
     });
+    this.editorSnapshot = JSON.stringify(this.editor());
   }
 
   // Stable Date reference for the <app-date> picker (edit mode), recomputed only
@@ -326,6 +335,23 @@ export class Schedule implements AfterViewInit {
     m.endTime = value;
   }
 
+  // Snapshot of the editor when it opened, to tell whether anything was changed.
+  private editorSnapshot = '';
+
+  protected isDirty(m: EditorModel): boolean {
+    return JSON.stringify(m) !== this.editorSnapshot;
+  }
+
+  protected canSave(m: EditorModel): boolean {
+    return !!m.studentName.trim() && !this.isInvalid(m);
+  }
+
+  // Color of the calendar a lesson belongs to (bar on the left of each row). One calendar
+  // for now; a Google Calendar integration would give each calendar its own color.
+  protected lessonColor(_lesson: Lesson): string {
+    return 'var(--calendar-default)';
+  }
+
   protected isInvalid(m: EditorModel): boolean {
     return timeToMin(m.endTime) <= timeToMin(m.startTime);
   }
@@ -342,7 +368,7 @@ export class Schedule implements AfterViewInit {
 
   protected save(): void {
     const m = this.editor();
-    if (!m || !m.studentName.trim() || this.isInvalid(m)) return;
+    if (!m || !this.canSave(m)) return;
 
     const startsAt = new Date(`${m.date}T${m.startTime}`).toISOString();
     const input = {
