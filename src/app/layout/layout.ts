@@ -46,7 +46,6 @@ export class Layout {
     { path: '/about', label: 'nav.about', icon: 'info' },
   ];
 
-  protected readonly navOpen = signal(false);
   protected readonly accountOpen = signal(false);
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
 

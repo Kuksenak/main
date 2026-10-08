@@ -12,9 +12,9 @@ const en = {
   'nav.students': 'Students',
   'nav.lessons': 'Lessons',
   'nav.about': 'About',
-  'nav.menu': 'Menu',
 
   'account.title': 'Account',
+  'account.pages': 'Pages',
   'account.language': 'Language',
   'account.update': 'Update',
   'account.logout': 'Log out',
@@ -116,9 +116,9 @@ const pl: Dictionary = {
   'nav.students': 'Uczniowie',
   'nav.lessons': 'Lekcje',
   'nav.about': 'O aplikacji',
-  'nav.menu': 'Menu',
 
   'account.title': 'Konto',
+  'account.pages': 'Strony',
   'account.language': 'Język',
   'account.update': 'Aktualizuj',
   'account.logout': 'Wyloguj się',
@@ -217,9 +217,9 @@ const fr: Dictionary = {
   'nav.students': 'Élèves',
   'nav.lessons': 'Cours',
   'nav.about': 'À propos',
-  'nav.menu': 'Menu',
 
   'account.title': 'Compte',
+  'account.pages': 'Pages',
   'account.language': 'Langue',
   'account.update': 'Mettre à jour',
   'account.logout': 'Se déconnecter',

@@ -22,11 +22,8 @@
         >{{ item.label | t }}</a>
       }
     </nav>
-    <!-- Navigation menu (mobile; desktop has the tabs) -->
-    <button #navBtn type="button" (click)="navOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
-      <app-icon name="grid" class="size-6" />
-    </button>
-    <!-- Account: first letter of the email; green dot when an app update is ready -->
+    <!-- Account (and, on mobile, the pages): first letter of the email; green dot when an app
+         update is ready -->
     <button
       #avatarBtn
       type="button"
@@ -46,25 +43,6 @@
   <!-- Cards (event / student / group / lesson) opened over any page; back closes only the top one -->
   <app-stack-host />
 
-  @if (navOpen()) {
-    <app-sheet #navSheet [origin]="navBtn" (closed)="navOpen.set(false)">
-      <!-- Sections, one per row with its brand icon; the current one has a check mark.
-           No card background or outline — just the rows and the dividers between them; the
-           rows reach closer to the sheet's edges; no highlight on tap. -->
-      <div class="-mx-3 flex flex-col">
-        @for (item of navItems; track item.path) {
-          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full py-1.5 text-left ![--sep-left:4.25rem] active:!bg-transparent">
-            <app-brand-icon [name]="item.icon" class="size-10" />
-            <span class="min-w-0 flex-1 truncate text-[1.1875rem]">{{ item.label | t }}</span>
-            @if (isActive(item.path)) {
-              <app-icon name="check" class="size-5 text-[var(--accent)]" />
-            }
-          </button>
-        }
-      </div>
-    </app-sheet>
-  }
-
   @if (accountOpen()) {
     <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
       <div class="flex flex-1 flex-col gap-6 desktop:gap-3">
@@ -76,6 +54,22 @@
           @if (showVersion()) {
             <div class="list-row text-footnote tabular-nums opacity-50">{{ updates.version }}</div>
           }
+        </div>
+
+        <!-- Pages (mobile; desktop has the tabs): brand icon, the current one checked -->
+        <div class="flex flex-col gap-1.5 desktop:hidden">
+          <span class="text-footnote px-4 uppercase opacity-50">{{ 'account.pages' | t }}</span>
+          <div class="card">
+            @for (item of navItems; track item.path) {
+              <button type="button" (click)="go(item.path, sheet)" class="list-row w-full py-1.5 text-left active:!bg-transparent">
+                <app-brand-icon [name]="item.icon" class="size-8" />
+                <span class="min-w-0 flex-1 truncate">{{ item.label | t }}</span>
+                @if (isActive(item.path)) {
+                  <app-icon name="check" class="size-5 text-[var(--accent)]" />
+                }
+              </button>
+            }
+          </div>
         </div>
 
         <!-- Language -->
