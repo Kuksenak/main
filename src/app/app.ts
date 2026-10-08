@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthStore } from './auth/auth.store';
 import { TranslatePipe } from './core/i18n/t.pipe';
+import { Icon } from './core/ui/icon/icon';
 import { UpdateService } from './core/services/update.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TranslatePipe],
+  imports: [RouterOutlet, Icon, TranslatePipe],
   templateUrl: './app.html',
 })
 export class App {

@@ -1,6 +1,14 @@
 /* Reusable building blocks. Colors come from tokens.css; sizes and corners that differ per
    device (--control-*, --radius-*, --text-*) come from mobile.css / desktop.css. */
 
+/* Full app height: the measured window height (see index.html), dvh as a fallback. */
+@utility h-app {
+  height: var(--app-h, 100dvh);
+}
+@utility min-h-app {
+  min-height: var(--app-h, 100dvh);
+}
+
 /* ---- Typography (sizes come from the device stylesheet) ---- */
 @utility text-body {
   font-size: var(--text-body);
@@ -131,6 +139,17 @@
            last:after:hidden;
   }
 
+  /* Full-screen "rotate to portrait" notice, shown only on phones held in landscape. */
+  .rotate-hint {
+    @apply fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-3 bg-[var(--app-bg)]
+           px-8 text-center text-[var(--text)];
+  }
+  @media (orientation: landscape) and (max-height: 32rem) {
+    [data-device='mobile'] .rotate-hint {
+      display: flex;
+    }
+  }
+
   /* ---- Small pieces ---- */
 
   /* Input chip: date / time / select triggers (native inputs on mobile, buttons on desktop). */
@@ -188,6 +207,24 @@
     & > button[aria-pressed='true'] {
       @apply bg-[var(--surface)] font-semibold opacity-100 shadow-[var(--shadow-control)];
     }
+  }
+
+  /* Header of a collapsible list section (app-section): title · count · chevron. */
+  .section-header {
+    @apply text-footnote flex w-full items-center gap-1.5 px-4 text-left uppercase opacity-50
+           active:opacity-30;
+  }
+
+  /* Navigation launcher tile: colored round icon above a label. Add .is-on for the current one. */
+  .nav-tile {
+    @apply flex min-w-0 flex-col items-center gap-2 rounded-[var(--radius-card)] px-1 py-4
+           transition-colors active:bg-[var(--highlight)];
+    &.is-on {
+      @apply bg-[var(--surface)] font-semibold shadow-[var(--shadow-control)];
+    }
+  }
+  .nav-tile-icon {
+    @apply inline-flex size-14 items-center justify-center rounded-full text-[var(--accent-fg)];
   }
 
   /* Selection circle in lists (select mode, pickers); add .is-on when checked. */

@@ -46,7 +46,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         ></div>
 
         <div
-          class="absolute inset-x-2 bottom-2 flex max-h-[90dvh] min-h-[50dvh] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[2.75rem] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:max-h-[90dvh] desktop:min-h-0 desktop:w-full desktop:max-w-sm"
+          class="absolute inset-x-2 bottom-2 flex max-h-[calc(var(--app-h,100dvh)*0.9)] min-h-[calc(var(--app-h,100dvh)*0.5)] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[2.75rem] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:max-h-[calc(var(--app-h,100dvh)*0.9)] desktop:min-h-0 desktop:w-full desktop:max-w-sm"
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"

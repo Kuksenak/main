@@ -9,7 +9,7 @@ import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { UpdateService } from '../core/services/update.service';
 import { StackHost } from '../cards/stack-host';
-import { Icon } from '../core/ui/icon/icon';
+import { Icon, IconName } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
 
 @Component({
@@ -25,10 +25,11 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
-  protected readonly navItems: { path: string; label: TranslationKey }[] = [
-    { path: '/schedule', label: 'nav.schedule' },
-    { path: '/students', label: 'nav.students' },
-    { path: '/about', label: 'nav.about' },
+  // Sections: desktop tabs and the mobile launcher tiles (icon on a colored circle).
+  protected readonly navItems: { path: string; label: TranslationKey; icon: IconName; color: string }[] = [
+    { path: '/schedule', label: 'nav.schedule', icon: 'calendar', color: 'var(--accent)' },
+    { path: '/students', label: 'nav.students', icon: 'people', color: 'var(--palette-teal)' },
+    { path: '/about', label: 'nav.about', icon: 'info', color: 'var(--palette-purple)' },
   ];
 
   protected readonly navOpen = signal(false);

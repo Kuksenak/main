@@ -6,6 +6,7 @@ import { NavStack, StackEntry } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { Section } from '../core/ui/section/section';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
 import { GROUP_COLORS, GroupColor, GroupService, colorVar } from '../students/group.service';
@@ -21,7 +22,7 @@ interface Model {
 /** Group card (new or existing), opened on the NavStack: name, color, members, lessons. */
 @Component({
   selector: 'app-group-editor',
-  imports: [FormsModule, Icon, LessonList, PageSheet, ScrollArea, Sheet, TranslatePipe],
+  imports: [FormsModule, Icon, LessonList, PageSheet, ScrollArea, Section, Sheet, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -59,8 +60,7 @@ interface Model {
         </div>
 
         <!-- Members: tap opens the student card on top, × removes from the group -->
-        <div class="flex flex-col gap-1.5">
-          <span class="text-footnote px-4 uppercase opacity-50">{{ 'groups.members' | t }}</span>
+        <app-section [title]="'groups.members' | t" [count]="members().length" key="members">
           <div class="card">
             @for (s of members(); track s.id) {
               <div class="list-row py-2">
@@ -80,7 +80,7 @@ interface Model {
               </span>
             </button>
           </div>
-        </div>
+        </app-section>
 
         @if (saved(); as g) {
           <app-lesson-list [who]="g.name" />

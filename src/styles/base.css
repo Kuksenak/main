@@ -11,7 +11,7 @@
 html,
 body {
   margin: 0;
-  height: 100dvh;
+  height: var(--app-h, 100dvh); /* --app-h: measured in index.html (iOS PWA height bug) */
   overflow: hidden;
   background: var(--app-bg);
   color: var(--text);

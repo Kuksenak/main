@@ -1,5 +1,5 @@
 @if (auth.isAuthenticated()) {
-<div class="flex h-dvh flex-col overflow-hidden text-[var(--text)]">
+<div class="flex h-app flex-col overflow-hidden text-[var(--text)]">
   <header class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
     <a routerLink="/about" [attr.aria-label]="'nav.about' | t" class="mr-1 shrink-0 active:opacity-70 mobile:hidden">
       <img src="logo.png" [alt]="'app.name' | t" class="size-8" width="32" height="32" />
@@ -47,13 +47,14 @@
 
   @if (navOpen()) {
     <app-sheet #navSheet (closed)="navOpen.set(false)">
-      <div class="card">
+      <!-- Launcher tiles, 3 per row; the current section is highlighted -->
+      <div class="grid grid-cols-3 gap-2">
         @for (item of navItems; track item.path) {
-          <button type="button" (click)="go(item.path, navSheet)" class="list-row w-full text-left">
-            <span>{{ item.label | t }}</span>
-            @if (isActive(item.path)) {
-              <app-icon name="check" class="size-5 text-[var(--accent)]" />
-            }
+          <button type="button" (click)="go(item.path, navSheet)" class="nav-tile" [class.is-on]="isActive(item.path)">
+            <span class="nav-tile-icon" [style.background]="item.color">
+              <app-icon [name]="item.icon" class="size-6" />
+            </span>
+            <span class="text-footnote truncate">{{ item.label | t }}</span>
           </button>
         }
       </div>

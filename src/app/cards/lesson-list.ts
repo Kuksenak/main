@@ -4,17 +4,19 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { NavStack } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
+import { Section } from '../core/ui/section/section';
 import { LessonTitleStore } from '../schedule/lesson-title.store';
 import { Lesson, LessonService } from '../schedule/lesson.service';
 import { GroupService } from '../students/group.service';
 
 /**
  * Lessons of a student or group (lessons store who they're for by name): Upcoming soonest
- * first, then Past most recent first. A tap opens the lesson card on top.
+ * first, then Past most recent first, each a collapsible section (Past folded by default).
+ * A tap opens the lesson card on top.
  */
 @Component({
   selector: 'app-lesson-list',
-  imports: [Icon, TranslatePipe],
+  imports: [Icon, Section, TranslatePipe],
   host: { class: 'flex flex-col gap-6' },
   template: `
     @if (!upcoming().length && !past().length) {
@@ -22,8 +24,7 @@ import { GroupService } from '../students/group.service';
     }
     @for (g of sections(); track g.key) {
       @if (g.items.length) {
-        <div class="flex flex-col gap-1.5">
-          <span class="text-footnote px-4 uppercase opacity-50">{{ g.key | t }}</span>
+        <app-section [title]="g.key | t" [count]="g.items.length" [key]="g.key" [initiallyOpen]="g.open">
           <div class="card">
             @for (l of g.items; track l.id) {
               <button type="button" (click)="open(l)" class="list-row w-full py-2 text-left">
@@ -41,7 +42,7 @@ import { GroupService } from '../students/group.service';
               </button>
             }
           </div>
-        </div>
+        </app-section>
       }
     }
   `,
@@ -68,8 +69,8 @@ export class LessonList {
       .sort((a, b) => b.startsAt.localeCompare(a.startsAt)),
   );
   protected readonly sections = computed(() => [
-    { key: 'students.upcoming' as TranslationKey, items: this.upcoming() },
-    { key: 'students.past' as TranslationKey, items: this.past() },
+    { key: 'students.upcoming' as TranslationKey, items: this.upcoming(), open: true },
+    { key: 'students.past' as TranslationKey, items: this.past(), open: false },
   ]);
 
   constructor() {

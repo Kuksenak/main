@@ -29,11 +29,11 @@
       <button type="button" (click)="setTab('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
     </div>
 
-    <!-- List: the card itself scrolls (corners stay put), indicator beside it; the spacer clears
-         the floating button -->
+    <!-- List: the card fills down to the bottom and scrolls inside (corners stay put, indicator
+         beside it); bottom padding lets the last row clear the floating button -->
     @if (tab() === 'students') {
       @if (visible().length) {
-        <app-scroll-area class="shrink" viewportClass="card">
+        <app-scroll-area class="flex-1" viewportClass="card" contentClass="pb-14">
           @for (s of visible(); track s.id) {
             <!-- Long press: select students to make a group -->
             <button
@@ -64,7 +64,6 @@
             </button>
           }
         </app-scroll-area>
-        <div class="h-14 shrink-0"></div>
       } @else {
         <div class="flex flex-1 items-center justify-center pb-14">
           <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : 'students.empty') | t }}</p>
@@ -72,7 +71,7 @@
       }
     } @else {
       @if (visibleGroups().length) {
-        <app-scroll-area class="shrink" viewportClass="card">
+        <app-scroll-area class="flex-1" viewportClass="card" contentClass="pb-14">
           @for (g of visibleGroups(); track g.id) {
             <button
               type="button"
@@ -89,7 +88,6 @@
             </button>
           }
         </app-scroll-area>
-        <div class="h-14 shrink-0"></div>
       } @else {
         <div class="flex flex-1 items-center justify-center pb-14">
           <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : 'groups.empty') | t }}</p>

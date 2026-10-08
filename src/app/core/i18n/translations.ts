@@ -6,6 +6,7 @@
 const en = {
   'app.name': 'Language Tutor',
   'app.loading': 'Loading…',
+  'app.rotate': 'Turn your phone upright',
 
   'nav.schedule': 'Schedule',
   'nav.students': 'Students',
@@ -93,6 +94,7 @@ export type Dictionary = Record<TranslationKey, string>;
 const pl: Dictionary = {
   'app.name': 'Language Tutor',
   'app.loading': 'Ładowanie…',
+  'app.rotate': 'Obróć telefon pionowo',
 
   'nav.schedule': 'Plan',
   'nav.students': 'Uczniowie',
@@ -177,6 +179,7 @@ const pl: Dictionary = {
 const fr: Dictionary = {
   'app.name': 'Language Tutor',
   'app.loading': 'Chargement…',
+  'app.rotate': 'Tournez votre téléphone à la verticale',
 
   'nav.schedule': 'Planning',
   'nav.students': 'Élèves',

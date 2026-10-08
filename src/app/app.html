@@ -1,8 +1,14 @@
 @if (!auth.initialized()) {
-  <main class="min-h-dvh flex items-center justify-center text-[var(--text)]">
+  <main class="min-h-app flex items-center justify-center text-[var(--text)]">
     <p class="text-sm opacity-40">{{ 'app.loading' | t }}</p>
   </main>
 } @else {
   <router-outlet></router-outlet>
 }
+
+<!-- Phones in landscape: the app is portrait-only (see index.html) -->
+<div class="rotate-hint">
+  <app-icon name="rotate" class="size-10 opacity-60" />
+  <p class="text-body font-medium">{{ 'app.rotate' | t }}</p>
+</div>
 

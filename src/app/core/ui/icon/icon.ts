@@ -10,6 +10,10 @@ export type IconName =
   | 'grid'
   | 'search'
   | 'person'
+  | 'people'
+  | 'calendar'
+  | 'info'
+  | 'rotate'
   | 'google'
   | 'apple';
 
@@ -34,6 +38,10 @@ export type IconName =
         @case ('plus') { <path d="M12 5v14M5 12h14" /> }
         @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
         @case ('close') { <path d="M18 6 6 18M6 6l12 12" /> }
+        @case ('people') { <circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6" /> }
+        @case ('calendar') { <rect x="3.5" y="5" width="17" height="15.5" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /> }
+        @case ('info') { <circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" /> }
+        @case ('rotate') { <rect x="7" y="2.5" width="10" height="19" rx="2.5" /><path d="M2.5 9a8 8 0 0 0 3 6.3M21.5 15a8 8 0 0 0-3-6.3" /> }
         @case ('person') { <circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /> }
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
