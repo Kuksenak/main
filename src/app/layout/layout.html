@@ -20,6 +20,7 @@
     </button>
     <!-- Account avatar: first letter of the email; dot when an app update is ready -->
     <button
+      #avatarBtn
       type="button"
       (click)="accountOpen.set(true)"
       aria-label="Account"
@@ -50,8 +51,8 @@
   }
 
   @if (accountOpen()) {
-    <app-sheet #sheet (closed)="accountOpen.set(false)">
-      <div class="flex min-h-full flex-col gap-6">
+    <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
+      <div class="flex min-h-full flex-col gap-6 sm:gap-2">
         <div class="ios-group">
           <div class="ios-row h-11 !py-0">
             <span class="min-w-0 truncate text-[17px]">{{ auth.email() }}</span>

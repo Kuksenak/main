@@ -201,6 +201,16 @@
               (ngModelChange)="onStartChange(m, $event)"
               [ngModelOptions]="{ standalone: true }"
             />
+            @if (!m.id) {
+              <!-- TEMP: same as the floating + button, to compare with the native time control -->
+              <button
+                type="button"
+                aria-label="Add"
+                class="flex size-11 shrink-0 items-center justify-center rounded-full glass-accent active:scale-95 active:opacity-80 transition-transform"
+              >
+                <svg viewBox="0 0 24 24" fill="none" class="size-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+              </button>
+            }
           </div>
         </div>
         <div class="ios-row !py-1.5 lg:!py-1">
