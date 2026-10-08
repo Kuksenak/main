@@ -25,11 +25,11 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
-  // Sections: desktop tabs and the mobile launcher tiles (icon on a colored circle).
+  // Sections: desktop tabs and the launcher tiles (colored with the logo's colors).
   protected readonly navItems: { path: string; label: TranslationKey; icon: IconName; color: string }[] = [
-    { path: '/schedule', label: 'nav.schedule', icon: 'calendar', color: 'var(--accent)' },
-    { path: '/students', label: 'nav.students', icon: 'people', color: 'var(--palette-teal)' },
-    { path: '/about', label: 'nav.about', icon: 'info', color: 'var(--palette-purple)' },
+    { path: '/schedule', label: 'nav.schedule', icon: 'calendar', color: 'var(--brand-purple)' },
+    { path: '/students', label: 'nav.students', icon: 'people', color: 'var(--brand-teal)' },
+    { path: '/about', label: 'nav.about', icon: 'info', color: 'var(--brand-yellow)' },
   ];
 
   protected readonly navOpen = signal(false);

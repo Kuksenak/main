@@ -20,17 +20,23 @@
   --accent: #3478f6;
   --accent-fg: #ffffff;
   --success: #34c759;
-  --warning: #fd763c; /* the logo's orange */
+  --warning: var(--brand-orange); /* the logo's orange */
   --strong-bg: #000000; /* black buttons (sign-in) */
   --strong-fg: #ffffff;
   --danger: var(--warning); /* destructive actions use the logo's orange too */
+  /* Brand: the logo's colors (navigation tiles; the warning orange is the logo's too) */
+  --brand-purple: #823bee;
+  --brand-orange: #fd7d49;
+  --brand-teal: #09c1d5;
+  --brand-yellow: #febd1d;
+
   /* Group colors (calendar bars, dots, swatches) */
   /* (no blue / orange: those are the accent and the warning color) */
-  --palette-teal: #07bbcc;
+  --palette-teal: var(--brand-teal);
   --palette-green: #34c759;
-  --palette-yellow: #fdb315;
+  --palette-yellow: var(--brand-yellow);
   --palette-pink: #ff5fa2;
-  --palette-purple: #8e5cf2;
+  --palette-purple: var(--brand-purple);
   --palette-indigo: #5856d6;
 
   /* Default calendar color (event bars, calendar dots): pale accent, adapts to theme. */

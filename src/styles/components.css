@@ -1,7 +1,7 @@
 /* Reusable building blocks. Colors come from tokens.css; sizes and corners that differ per
    device (--control-*, --radius-*, --text-*) come from mobile.css / desktop.css. */
 
-/* Full app height: the measured window height (see index.html), dvh as a fallback. */
+/* Full app height (--app-h: see base.css). */
 @utility h-app {
   height: var(--app-h, 100dvh);
 }
