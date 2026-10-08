@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, input, model, output, signal } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
@@ -10,16 +10,21 @@ import { SearchField } from '../core/ui/search-field';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
 import { GroupService, colorVar } from '../students/group.service';
-import { LessonWho } from '../schedule/lesson.service';
 import { StudentService } from '../students/student.service';
 
+/** Who an event is for: any number of groups and students. */
+export interface Invitees {
+  studentIds: string[];
+  groupIds: string[];
+}
+
 /**
- * Who a lesson is for: search + Groups and Students lists, the current choice checked.
- * Mobile: a page sliding in (it has a search input); desktop: a dropdown under `origin`.
- * Emits the picked student / group, then closes.
+ * Invite to an event: search + Groups and Students lists; a tap checks / unchecks (applied
+ * right away, two-way bound `value`). Mobile: a page sliding in (it has a search input);
+ * desktop: a dropdown under `origin`.
  */
 @Component({
-  selector: 'app-who-picker',
+  selector: 'app-invite-picker',
   imports: [NgTemplateOutlet, Icon, PageSheet, ScrollArea, SearchField, Sheet, TranslatePipe],
   template: `
     <ng-template #search>
@@ -32,15 +37,15 @@ import { StudentService } from '../students/student.service';
           <div class="flex flex-col gap-1.5">
             <span class="text-footnote px-4 uppercase opacity-50">{{ sec.key | t }}</span>
             <div class="card">
-              @for (item of sec.items; track item.who.studentId ?? item.who.groupId) {
-                <button type="button" (click)="pick(item.who)" class="list-row w-full py-2 text-left">
+              @for (item of sec.items; track item.id) {
+                <button type="button" (click)="toggle(item.kind, item.id)" class="list-row w-full py-2 text-left">
                   <span
                     class="avatar"
                     [class.text-[var(--accent-fg)]]="!!item.color"
                     [style.background]="item.color"
-                  >{{ initial(item.who.name) }}</span>
-                  <p class="min-w-0 flex-1 truncate">{{ item.who.name }}</p>
-                  @if (isCurrent(item.who)) {
+                  >{{ initial(item.name) }}</span>
+                  <p class="min-w-0 flex-1 truncate">{{ item.name }}</p>
+                  @if (item.on) {
                     <app-icon name="check" class="size-5 text-[var(--accent)]" />
                   }
                 </button>
@@ -55,7 +60,7 @@ import { StudentService } from '../students/student.service';
     </ng-template>
 
     @if (desktop) {
-      <app-sheet #dropdown [origin]="origin()" (closed)="closed.emit()">
+      <app-sheet [origin]="origin()" (closed)="closed.emit()">
         <div class="flex flex-col gap-3">
           <ng-container [ngTemplateOutlet]="search" />
           <app-scroll-area class="max-h-80" contentClass="gap-3">
@@ -64,7 +69,7 @@ import { StudentService } from '../students/student.service';
         </div>
       </app-sheet>
     } @else {
-      <app-page-sheet #page [title]="'lesson.who' | t" [actions]="false" [scroll]="false" (closed)="closed.emit()">
+      <app-page-sheet [title]="'event.invite' | t" [actions]="false" [scroll]="false" (closed)="closed.emit()">
         <div class="flex min-h-0 flex-1 flex-col gap-4">
           <ng-container [ngTemplateOutlet]="search" />
           <app-scroll-area class="min-h-0 flex-1" contentClass="gap-6">
@@ -75,10 +80,9 @@ import { StudentService } from '../students/student.service';
     }
   `,
 })
-export class WhoPicker {
-  readonly value = input<LessonWho | null>(null);
+export class InvitePicker {
+  readonly value = model.required<Invitees>();
   readonly origin = input<HTMLElement | null>(null);
-  readonly picked = output<LessonWho>();
   readonly closed = output<void>();
 
   private groups = inject(GroupService);
@@ -86,23 +90,26 @@ export class WhoPicker {
   private i18n = inject(I18nService);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
 
-  private readonly dropdown = viewChild<Sheet>('dropdown');
-  private readonly page = viewChild<PageSheet>('page');
-
   protected readonly query = signal('');
 
   protected readonly sections = computed(() => {
     const q = this.query().trim().toLocaleLowerCase();
     const match = (name: string) => !q || name.toLocaleLowerCase().includes(q);
-    const byName = (a: { who: LessonWho }, b: { who: LessonWho }) =>
-      a.who.name.localeCompare(b.who.name, this.i18n.locale());
+    const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, this.i18n.locale());
+    const v = this.value();
     return [
       {
         key: 'groups.title' as const,
         items: this.groups
           .groups()
           .filter((g) => match(g.name))
-          .map((g) => ({ who: { studentId: null, groupId: g.id, name: g.name }, color: colorVar(g.color) as string | null }))
+          .map((g) => ({
+            kind: 'group' as const,
+            id: g.id,
+            name: g.name,
+            color: colorVar(g.color) as string | null,
+            on: v.groupIds.includes(g.id),
+          }))
           .sort(byName),
       },
       {
@@ -110,7 +117,13 @@ export class WhoPicker {
         items: this.students
           .students()
           .filter((s) => match(s.name))
-          .map((s) => ({ who: { studentId: s.id, groupId: null, name: s.name }, color: null as string | null }))
+          .map((s) => ({
+            kind: 'student' as const,
+            id: s.id,
+            name: s.name,
+            color: null as string | null,
+            on: v.studentIds.includes(s.id),
+          }))
           .sort(byName),
       },
     ];
@@ -122,14 +135,10 @@ export class WhoPicker {
     return initial(name, this.i18n.locale());
   }
 
-  protected isCurrent(who: LessonWho): boolean {
-    const v = this.value();
-    return !!v && ((!!who.studentId && who.studentId === v.studentId) || (!!who.groupId && who.groupId === v.groupId));
-  }
-
-  protected pick(who: LessonWho): void {
-    this.picked.emit(who);
-    this.dropdown()?.close();
-    this.page()?.close();
+  protected toggle(kind: 'student' | 'group', id: string): void {
+    const flip = (ids: string[]) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]);
+    this.value.update((v) =>
+      kind === 'group' ? { ...v, groupIds: flip(v.groupIds) } : { ...v, studentIds: flip(v.studentIds) },
+    );
   }
 }

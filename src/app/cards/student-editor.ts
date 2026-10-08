@@ -4,13 +4,13 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { StudentInput, StudentService } from '../students/student.service';
-import { LessonList } from './lesson-list';
+import { EventList } from './event-list';
 import { StudentGroups } from './related-lists';
 
-/** Student card (new or existing), opened on the NavStack: contacts, groups, lessons. */
+/** Student card (new or existing), opened on the NavStack: contacts, groups, events. */
 @Component({
   selector: 'app-student-editor',
-  imports: [FormsModule, LessonList, PageSheet, StudentGroups, TranslatePipe],
+  imports: [FormsModule, EventList, PageSheet, StudentGroups, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -38,7 +38,7 @@ import { StudentGroups } from './related-lists';
 
         @if (saved(); as s) {
           <app-student-groups [studentId]="s.id" />
-          <app-lesson-list [studentId]="s.id" />
+          <app-event-list [studentId]="s.id" />
         }
       </div>
     </app-page-sheet>
@@ -54,7 +54,7 @@ export class StudentEditor implements OnInit {
   protected readonly model = signal<StudentInput>({ name: '', email: '', phone: '' });
   private readonly snapshot = signal(''); // contents when opened, to tell whether anything changed
 
-  // The stored student (existing cards only) — its groups and lessons are listed below.
+  // The stored student (existing cards only) — its groups and events are listed below.
   protected readonly saved = computed(() => this.students.students().find((s) => s.id === this.entry().id) ?? null);
   protected readonly dirty = computed(() => JSON.stringify(this.model()) !== this.snapshot());
   protected readonly canSave = computed(() => !!this.model().name.trim() && this.dirty());

@@ -1,7 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { GroupMembers, StudentGroups } from '../cards/related-lists';
-import { LessonList } from '../cards/lesson-list';
+import { EventList } from '../cards/event-list';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
@@ -25,7 +25,7 @@ type Tab = 'students' | 'groups';
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, GroupMembers, Icon, LessonList, LongPress, ScrollArea, SearchField, StudentGroups, TranslatePipe],
+  imports: [NgTemplateOutlet, GroupMembers, Icon, EventList, LongPress, ScrollArea, SearchField, StudentGroups, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {

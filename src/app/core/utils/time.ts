@@ -1,4 +1,4 @@
-// Small date/time helpers shared by the calendar and the lesson editor.
+// Small date/time helpers shared by the calendar and the event editor.
 
 const pad = (n: number) => `${n}`.padStart(2, '0');
 

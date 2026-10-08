@@ -1,4 +1,4 @@
-<!-- Calendar + the selected day's lessons: stacked on mobile, side by side on desktop -->
+<!-- Calendar + the selected day's events: stacked on mobile, side by side on desktop -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4">
   <section class="flex w-full shrink-0 flex-col desktop:min-h-0 desktop:max-w-md desktop:flex-1">
     <!-- Month header (desktop; on mobile the month lives in the toolbar) -->
@@ -24,7 +24,7 @@
       @for (week of allWeeks; track week[0].getTime()) {
         <div class="grid h-11 snap-start grid-cols-7 border-b border-[var(--separator)] last:border-b-0 desktop:h-12">
           @for (day of week; track day.getTime()) {
-            <!-- Tap selects the day; long press creates a lesson on it -->
+            <!-- Tap selects the day; long press creates a event on it -->
             <button
               type="button"
               appLongPress
@@ -49,18 +49,18 @@
       }
     </div>
 
-    <!-- Desktop: the next lessons (any day) filling the free space under the calendar — as many
+    <!-- Desktop: the next events (any day) filling the free space under the calendar — as many
          whole rows as fit (measured, see upcomingFit) -->
     <div #upcomingBox class="mt-6 flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden mobile:hidden">
     @if (upcoming().length) {
         <span #upcomingHead class="text-footnote px-4 uppercase opacity-50">{{ 'students.upcoming' | t }}</span>
         <div class="card">
           @for (l of upcoming(); track l.id) {
-            <!-- Picks that lesson's day in the calendar (its lessons then show on the right) -->
+            <!-- Picks that event's day in the calendar (its events then show on the right) -->
             <button type="button" (click)="showDay(l)" class="list-row w-full py-2 text-left">
-              <span class="color-bar" [style.background]="lessonColor(l)"></span>
+              <span class="color-bar" [style.background]="people.color(l)"></span>
               <div class="min-w-0 flex-1 leading-tight">
-                <p class="truncate font-medium">{{ lessonTitle(l) || l.studentName }}</p>
+                <p class="truncate font-medium">{{ people.label(l) }}</p>
                 <p class="text-footnote truncate opacity-50">{{ upcomingWhen(l) }}</p>
               </div>
               <app-icon name="chevron-right" class="row-chevron" />
@@ -71,33 +71,33 @@
     </div>
   </section>
 
-  <!-- Selected day's lessons, down to the bottom; bottom padding clears the floating buttons -->
+  <!-- Selected day's events, down to the bottom; bottom padding clears the floating buttons -->
   <section class="flex min-h-0 flex-1 flex-col">
     <h2 class="mb-3 flex h-[var(--control-h)] items-center text-xl font-semibold mobile:hidden">{{ dayTitle() }}</h2>
     <app-scroll-area class="min-h-0 flex-1">
-      @if (dayLessons().length) {
+      @if (dayEvents().length) {
         <div class="pb-14">
-          @for (lesson of dayLessons(); track lesson.id) {
+          @for (event of dayEvents(); track event.id) {
             <!-- Calendar color bar · title / who · start over end -->
-            <button type="button" (click)="openEdit(lesson)" class="event-row">
-              <span class="color-bar" [style.background]="lessonColor(lesson)"></span>
+            <button type="button" (click)="openEdit(event)" class="event-row">
+              <span class="color-bar" [style.background]="people.color(event)"></span>
               <div class="min-w-0 flex-1 leading-tight">
                 <p
                   class="text-body truncate font-medium"
-                  [class.line-through]="lesson.status === 'Cancelled'"
-                  [class.opacity-50]="lesson.status !== 'Scheduled'"
-                >{{ lessonTitle(lesson) || lesson.studentName }}</p>
-                @if (lessonTitle(lesson) ? lesson.studentName : lesson.note; as sub) {
+                  [class.line-through]="event.status === 'Cancelled'"
+                  [class.opacity-50]="event.status !== 'Scheduled'"
+                >{{ people.label(event) }}</p>
+                @if (people.subtitle(event); as sub) {
                   <p class="text-footnote truncate opacity-50">{{ sub }}</p>
                 }
               </div>
               <div class="flex shrink-0 items-center gap-3">
-                @if (lesson.status !== 'Scheduled') {
-                  <span class="badge">{{ statusKey(lesson.status) | t }}</span>
+                @if (event.status !== 'Scheduled') {
+                  <span class="badge">{{ statusKey(event.status) | t }}</span>
                 }
                 <div class="text-callout text-right leading-tight tabular-nums">
-                  <p class="font-medium">{{ startLabel(lesson) }}</p>
-                  <p class="opacity-50">{{ endLabel(lesson) }}</p>
+                  <p class="font-medium">{{ startLabel(event) }}</p>
+                  <p class="opacity-50">{{ endLabel(event) }}</p>
                 </div>
               </div>
             </button>
@@ -117,6 +117,6 @@
 <button type="button" (click)="today()" class="btn-secondary float-bottom left-4 !h-12 desktop:hidden">
   {{ 'schedule.today' | t }}
 </button>
-<button type="button" (click)="openNew()" [attr.aria-label]="'schedule.addLesson' | t" class="btn-confirm float-bottom right-4">
+<button type="button" (click)="openNew()" [attr.aria-label]="'schedule.addEvent' | t" class="btn-confirm float-bottom right-4">
   <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
 </button>

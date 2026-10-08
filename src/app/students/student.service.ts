@@ -1,6 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { ResourceStore } from '../core/services/resource-store';
-import { LessonService } from '../schedule/lesson.service';
+import { EventService } from '../schedule/event.service';
 import { GroupService } from './group.service';
 
 export interface Student {
@@ -20,7 +20,7 @@ export interface StudentInput {
 @Injectable({ providedIn: 'root' })
 export class StudentService extends ResourceStore<Student, StudentInput> {
   private groups = inject(GroupService);
-  private lessons = inject(LessonService);
+  private events = inject(EventService);
 
   readonly students = computed(() => this.items());
 
@@ -28,9 +28,9 @@ export class StudentService extends ResourceStore<Student, StudentInput> {
     super('students', 'students');
   }
 
-  // Deleting a student drops them from groups; renaming changes how their lessons are named.
+  // A deleted student leaves their groups and is uninvited from events.
   protected override afterChange(): void {
     this.groups.reload();
-    this.lessons.reload();
+    this.events.reload();
   }
 }

@@ -112,7 +112,7 @@
             </div>
           </div>
           <app-student-groups [studentId]="s.id" />
-          <app-lesson-list [studentId]="s.id" />
+          <app-event-list [studentId]="s.id" />
         </app-scroll-area>
       } @else {
         <div class="flex flex-1 items-center justify-center">
@@ -128,7 +128,7 @@
         </div>
         <app-scroll-area class="mt-6 min-h-0 flex-1" contentClass="gap-6 pb-14">
           <app-group-members [studentIds]="g.studentIds" />
-          <app-lesson-list [groupId]="g.id" />
+          <app-event-list [groupId]="g.id" />
         </app-scroll-area>
       } @else {
         <div class="flex flex-1 items-center justify-center">

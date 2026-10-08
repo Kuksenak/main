@@ -18,8 +18,8 @@ import { Icon } from '../core/ui/icon/icon';
 import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { addDays, startOfDay, toDateInput } from '../core/utils/time';
-import { GroupService } from '../students/group.service';
-import { LESSON_WEEKS_TOTAL, Lesson, LessonService, lessonEnd, lessonWindow, statusKey } from './lesson.service';
+import { EventPeople } from './event-people';
+import { EVENT_WEEKS_TOTAL, ScheduleEvent, EventService, eventEnd, eventWindow, statusKey } from './event.service';
 
 function startOfMonth(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -31,8 +31,8 @@ function startOfWeek(d: Date): Date {
 }
 
 /**
- * Schedule: continuous week-strip calendar + the selected day's lessons (stacked on mobile,
- * side by side on desktop). Lessons open as cards on the NavStack.
+ * Schedule: continuous week-strip calendar + the selected day's events (stacked on mobile,
+ * side by side on desktop). Events open as cards on the NavStack.
  */
 @Component({
   selector: 'app-schedule',
@@ -40,8 +40,8 @@ function startOfWeek(d: Date): Date {
   templateUrl: './schedule.html',
 })
 export class Schedule implements AfterViewInit {
-  private service = inject(LessonService);
-  private groups = inject(GroupService);
+  private service = inject(EventService);
+  protected people = inject(EventPeople);
   private stack = inject(NavStack);
   private destroyRef = inject(DestroyRef);
   private i18n = inject(I18nService);
@@ -53,10 +53,10 @@ export class Schedule implements AfterViewInit {
 
   protected readonly selectedDate = signal(startOfDay(new Date()));
 
-  // Continuous calendar: the lesson load window, one row per week. The title follows whichever
+  // Continuous calendar: the event load window, one row per week. The title follows whichever
   // month fills the middle of the viewport.
-  private readonly weeksStart = lessonWindow().from;
-  protected readonly allWeeks: Date[][] = Array.from({ length: LESSON_WEEKS_TOTAL }, (_, w) =>
+  private readonly weeksStart = eventWindow().from;
+  protected readonly allWeeks: Date[][] = Array.from({ length: EVENT_WEEKS_TOTAL }, (_, w) =>
     Array.from({ length: 7 }, (_, d) => addDays(this.weeksStart, w * 7 + d)),
   );
   protected readonly visibleMonth = signal(startOfMonth(new Date()));
@@ -72,10 +72,10 @@ export class Schedule implements AfterViewInit {
     this.i18n.capitalize(this.i18n.date(this.visibleMonth(), { month: 'long', year: 'numeric' })),
   );
 
-  // Lessons grouped by day key for O(1) cell lookup.
+  // Events grouped by day key for O(1) cell lookup.
   private readonly byDay = computed(() => {
-    const map = new Map<string, Lesson[]>();
-    for (const l of this.service.lessons()) {
+    const map = new Map<string, ScheduleEvent[]>();
+    for (const l of this.service.events()) {
       const key = toDateInput(new Date(l.startsAt));
       (map.get(key) ?? map.set(key, []).get(key)!).push(l);
     }
@@ -83,12 +83,12 @@ export class Schedule implements AfterViewInit {
     return map;
   });
 
-  // Next 3 lessons from now (desktop, under the calendar). Cancelled ones are skipped.
+  // Next 3 events from now (desktop, under the calendar). Cancelled ones are skipped.
   protected readonly upcoming = computed(() => {
     const now = Date.now();
     return this.service
-      .lessons()
-      .filter((l) => l.status !== 'Cancelled' && lessonEnd(l).getTime() >= now)
+      .events()
+      .filter((l) => l.status !== 'Cancelled' && eventEnd(l).getTime() >= now)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
       .slice(0, this.upcomingFit());
   });
@@ -108,21 +108,21 @@ export class Schedule implements AfterViewInit {
     if (fit !== this.upcomingFit()) this.upcomingFit.set(fit);
   }
 
-  // Upcoming → select that lesson's day and bring its month into view.
-  protected showDay(l: Lesson): void {
+  // Upcoming → select that event's day and bring its month into view.
+  protected showDay(l: ScheduleEvent): void {
     const day = startOfDay(new Date(l.startsAt));
     this.selectDay(day);
     this.scrollToDay(day);
   }
 
   // "Wed, 8 Oct · 18:00–19:00"
-  protected upcomingWhen(l: Lesson): string {
+  protected upcomingWhen(l: ScheduleEvent): string {
     const start = new Date(l.startsAt);
     const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
-    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(lessonEnd(l))}`;
+    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(l))}`;
   }
 
-  protected readonly dayLessons = computed(
+  protected readonly dayEvents = computed(
     () => this.byDay().get(toDateInput(this.selectedDate())) ?? [],
   );
 
@@ -166,7 +166,7 @@ export class Schedule implements AfterViewInit {
     const month = startOfMonth(day);
     const week = Math.round((startOfWeek(month).getTime() - this.weeksStart.getTime()) / (7 * 86_400_000));
     const el = this.cal()?.nativeElement;
-    if (el) el.scrollTop = Math.max(0, Math.min(LESSON_WEEKS_TOTAL, week)) * this.rowPx();
+    if (el) el.scrollTop = Math.max(0, Math.min(EVENT_WEEKS_TOTAL, week)) * this.rowPx();
     this.visibleMonth.set(month);
   }
 
@@ -183,7 +183,7 @@ export class Schedule implements AfterViewInit {
   // Dash color: the calendar color of the day's first event.
   protected dayColor(day: Date): string {
     const first = this.byDay().get(toDateInput(day))?.[0];
-    return first ? this.lessonColor(first) : 'var(--calendar-default)';
+    return first ? this.people.color(first) : 'var(--calendar-default)';
   }
 
   // Dim days outside the month currently shown in the title.
@@ -204,7 +204,7 @@ export class Schedule implements AfterViewInit {
     this.selectedDate.set(startOfDay(day));
   }
 
-  // Desktop title above the day's lessons, e.g. "Wednesday, 8 October".
+  // Desktop title above the day's events, e.g. "Wednesday, 8 October".
   protected readonly dayTitle = computed(() =>
     this.i18n.capitalize(this.i18n.date(this.selectedDate(), { weekday: 'long', day: 'numeric', month: 'long' })),
   );
@@ -214,38 +214,28 @@ export class Schedule implements AfterViewInit {
     this.scrollToToday();
   }
 
-  protected startLabel(l: Lesson): string {
+  protected startLabel(l: ScheduleEvent): string {
     return this.i18n.time(new Date(l.startsAt));
   }
 
-  protected endLabel(l: Lesson): string {
-    return this.i18n.time(lessonEnd(l));
+  protected endLabel(l: ScheduleEvent): string {
+    return this.i18n.time(eventEnd(l));
   }
 
-  // Calendar color of a lesson (bar on the left of each row, calendar dots): the group's color
-  // for group lessons, else the default calendar color. A Google Calendar integration would
-  // add per-calendar colors here.
-  protected lessonColor(lesson: Lesson): string {
-    return this.groups.lessonColor(lesson);
-  }
-
-  protected lessonTitle(lesson: Lesson): string {
-    return lesson.title ?? '';
-  }
 
   protected readonly statusKey = statusKey;
 
   protected openNew(): void {
-    this.stack.push({ kind: 'lesson', id: null, date: toDateInput(this.selectedDate()) });
+    this.stack.push({ kind: 'event', id: null, date: toDateInput(this.selectedDate()) });
   }
 
-  // Long press on a day: select it and start a new lesson there.
+  // Long press on a day: select it and start a new event there.
   protected newOn(day: Date): void {
     this.selectDay(day);
     this.openNew();
   }
 
-  protected openEdit(lesson: Lesson): void {
-    this.stack.push({ kind: 'lesson', id: lesson.id });
+  protected openEdit(event: ScheduleEvent): void {
+    this.stack.push({ kind: 'event', id: event.id });
   }
 }

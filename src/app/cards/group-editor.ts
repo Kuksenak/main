@@ -12,7 +12,7 @@ import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
 import { GROUP_COLORS, GroupColor, GroupService, colorVar } from '../students/group.service';
 import { Student, StudentService } from '../students/student.service';
-import { LessonList } from './lesson-list';
+import { EventList } from './event-list';
 
 interface Model {
   name: string;
@@ -20,10 +20,10 @@ interface Model {
   studentIds: string[];
 }
 
-/** Group card (new or existing), opened on the NavStack: name, color, members, lessons. */
+/** Group card (new or existing), opened on the NavStack: name, color, members, events. */
 @Component({
   selector: 'app-group-editor',
-  imports: [FormsModule, Icon, LessonList, PageSheet, ScrollArea, SearchField, Section, Sheet, TranslatePipe],
+  imports: [FormsModule, Icon, EventList, PageSheet, ScrollArea, SearchField, Section, Sheet, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -84,7 +84,7 @@ interface Model {
         </app-section>
 
         @if (saved(); as g) {
-          <app-lesson-list [groupId]="g.id" />
+          <app-event-list [groupId]="g.id" />
         }
       </div>
     </app-page-sheet>

@@ -1,6 +1,6 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { ResourceStore } from '../core/services/resource-store';
-import { Lesson, LessonService } from '../schedule/lesson.service';
+import { EventService } from '../schedule/event.service';
 
 // Group colors: keys into the palette tokens (--palette-*) in tokens.css.
 export const GROUP_COLORS = ['teal', 'green', 'yellow', 'pink', 'purple', 'indigo'] as const;
@@ -22,7 +22,7 @@ export function colorVar(color: GroupColor): string {
 /** The account's student groups (API: /groups). */
 @Injectable({ providedIn: 'root' })
 export class GroupService extends ResourceStore<Group, GroupInput> {
-  private lessons = inject(LessonService);
+  private events = inject(EventService);
 
   readonly groups = computed(() => this.items());
 
@@ -30,14 +30,8 @@ export class GroupService extends ResourceStore<Group, GroupInput> {
     super('groups', 'groups');
   }
 
-  /** Calendar color of a lesson: its group's color, else the default calendar color. */
-  lessonColor(lesson: Lesson): string {
-    const group = this.byId(lesson.groupId);
-    return group ? colorVar(group.color) : 'var(--calendar-default)';
-  }
-
-  // Renaming / deleting a group changes how its lessons are named.
+  // A deleted group is uninvited from its events.
   protected override afterChange(): void {
-    this.lessons.reload();
+    this.events.reload();
   }
 }

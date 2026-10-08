@@ -149,7 +149,7 @@
     @apply size-5 shrink-0 opacity-30;
   }
 
-  /* Thin vertical bar in a lesson's calendar color (set its background). */
+  /* Thin vertical bar in an event's calendar color (set its background). */
   .color-bar {
     @apply w-1 shrink-0 self-stretch rounded-full;
   }

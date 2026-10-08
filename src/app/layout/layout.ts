@@ -7,7 +7,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
-import { LessonService } from '../schedule/lesson.service';
+import { EventService } from '../schedule/event.service';
 import { GroupService } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 import { UpdateService } from '../core/services/update.service';
@@ -31,7 +31,7 @@ export class Layout {
 
   constructor() {
     // The signed-in account's data, loaded once for every page and card.
-    inject(LessonService).ensureLoaded();
+    inject(EventService).ensureLoaded();
     inject(StudentService).ensureLoaded();
     inject(GroupService).ensureLoaded();
   }
