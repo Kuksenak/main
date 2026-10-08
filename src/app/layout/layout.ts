@@ -9,12 +9,13 @@ import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { UpdateService } from '../core/services/update.service';
 import { StackHost } from '../cards/stack-host';
-import { Icon, IconName } from '../core/ui/icon/icon';
+import { BrandIcon, BrandIconName } from '../core/ui/icon/brand-icon';
+import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, StackHost, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, StackHost, TranslatePipe],
   templateUrl: './layout.html',
 })
 export class Layout {
@@ -25,11 +26,11 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
-  // Sections: desktop tabs and the launcher tiles (colored with the logo's colors).
-  protected readonly navItems: { path: string; label: TranslationKey; icon: IconName; color: string }[] = [
-    { path: '/schedule', label: 'nav.schedule', icon: 'calendar', color: 'var(--brand-purple)' },
-    { path: '/students', label: 'nav.students', icon: 'people', color: 'var(--brand-teal)' },
-    { path: '/about', label: 'nav.about', icon: 'info', color: 'var(--brand-yellow)' },
+  // Sections: desktop tabs and the launcher tiles (flat brand-colored product icons).
+  protected readonly navItems: { path: string; label: TranslationKey; icon: BrandIconName }[] = [
+    { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
+    { path: '/students', label: 'nav.students', icon: 'people' },
+    { path: '/about', label: 'nav.about', icon: 'info' },
   ];
 
   protected readonly navOpen = signal(false);

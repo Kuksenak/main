@@ -38,12 +38,6 @@
       // document.write keeps it parser-inserted, so it blocks first paint like a normal <link>.
       document.write('<link rel="stylesheet" href="' + (mobile ? 'styles-mobile.css' : 'styles-desktop.css') + '">');
 
-      // Portrait only: lock where the browser allows it (installed PWA on Android). iOS can't
-      // lock — the app shows a "rotate your phone" overlay in landscape instead (app.html).
-      if (mobile && screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('portrait').catch(function () {});
-      }
-
       // iOS Safari only applies :active styles once a touchstart listener exists.
       document.addEventListener('touchstart', function () {}, { passive: true });
     })();

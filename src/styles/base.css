@@ -22,17 +22,11 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* App height (--app-h): 100dvh in the browser (follows Safari's collapsing toolbars); in the
-   installed app (standalone) a static 100vh — there are no toolbars, and iOS sometimes launches
-   home-screen apps with a too-small 100dvh, leaving a blank strip at the bottom until the phone
-   is rotated. */
+/* App height (--app-h). Phones are portrait-only by CSS (a "rotate" notice in landscape) —
+   don't call screen.orientation.lock(): on iOS home-screen apps it shrinks the launch viewport
+   by the bottom safe area (a blank strip until the phone is rotated). */
 :root {
   --app-h: 100dvh;
-}
-@media (display-mode: standalone) {
-  :root {
-    --app-h: 100vh;
-  }
 }
 html,
 body {

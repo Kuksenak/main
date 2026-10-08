@@ -49,15 +49,18 @@
   @if (navOpen()) {
     <app-sheet #navSheet [origin]="navBtn" (closed)="navOpen.set(false)">
       <!-- Launcher tiles, 3 per row; the current section is highlighted -->
-      <div class="grid grid-cols-3 gap-1">
+      <div class="grid grid-cols-3 gap-3">
         @for (item of navItems; track item.path) {
           <button type="button" (click)="go(item.path, navSheet)" class="nav-tile" [class.is-on]="isActive(item.path)">
-            <span class="nav-tile-icon" [style.--c]="item.color">
-              <app-icon [name]="item.icon" [strokeWidth]="2" class="size-6" />
-            </span>
+            <app-brand-icon [name]="item.icon" class="size-11" />
             <span class="text-footnote w-full truncate text-center">{{ item.label | t }}</span>
           </button>
         }
+        <!-- TEMP placeholder tile: Google's Contacts icon as a style reference (no action) -->
+        <button type="button" class="nav-tile">
+          <img src="https://www.gstatic.com/images/branding/product/1x/contacts_2022_48dp.png" alt="" class="size-11" width="44" height="44" />
+          <span class="text-footnote w-full truncate text-center">{{ 'nav.contacts' | t }}</span>
+        </button>
       </div>
     </app-sheet>
   }

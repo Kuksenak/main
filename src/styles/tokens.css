@@ -24,8 +24,9 @@
   --strong-bg: #000000; /* black buttons (sign-in) */
   --strong-fg: #ffffff;
   --danger: var(--warning); /* destructive actions use the logo's orange too */
-  /* Brand: the logo's colors (navigation tiles; the warning orange is the logo's too) */
-  --brand-purple: #823bee;
+  /* Brand: the logo's colors — the app blue plus orange, teal, yellow (logo, navigation icons;
+     the warning orange is the logo's too) */
+  --brand-blue: var(--accent);
   --brand-orange: #fd7d49;
   --brand-teal: #09c1d5;
   --brand-yellow: #febd1d;
@@ -36,7 +37,7 @@
   --palette-green: #34c759;
   --palette-yellow: var(--brand-yellow);
   --palette-pink: #ff5fa2;
-  --palette-purple: var(--brand-purple);
+  --palette-purple: #823bee;
   --palette-indigo: #5856d6;
 
   /* Default calendar color (event bars, calendar dots): pale accent, adapts to theme. */
