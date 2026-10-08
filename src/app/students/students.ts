@@ -11,13 +11,16 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { LessonTitleStore } from '../schedule/lesson-title.store';
+import { Lesson, LessonService, LessonStatus } from '../schedule/lesson.service';
+import { TranslationKey } from '../core/i18n/translations';
 import { Student, StudentInput, StudentService } from './student.service';
 
 interface EditorModel extends StudentInput {
@@ -35,7 +38,13 @@ export class Students {
   private readonly page = viewChild(PageSheet);
   private readonly search = viewChild<TemplateRef<unknown>>('search');
 
+  private router = inject(Router);
+  private lessons = inject(LessonService);
+  private titles = inject(LessonTitleStore);
+
   protected readonly query = signal('');
+  // Lesson to return to when the student was opened from it (/students?fromLesson=<id>).
+  protected readonly returnLessonId = signal<string | null>(null);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
 
   // Alphabetical, filtered by name / email / phone.
@@ -63,10 +72,14 @@ export class Students {
     effect(() => toolbar.content.set(this.search() ?? null));
     inject(DestroyRef).onDestroy(() => toolbar.content.set(null));
 
+    // The student cards list their lessons.
+    this.lessons.ensureLoaded();
+
     // Deep link from elsewhere (e.g. a lesson): /students?id=<studentId>
     inject(ActivatedRoute)
       .queryParamMap.pipe(takeUntilDestroyed())
       .subscribe((params) => {
+        this.returnLessonId.set(params.get('fromLesson'));
         const student = this.service.students().find((s) => s.id === params.get('id'));
         if (!student) return;
         this.query.set('');
@@ -104,6 +117,65 @@ export class Students {
   // Save is enabled only for a named student that actually differs from what was opened.
   protected canSave(m: EditorModel): boolean {
     return !!m.name.trim() && this.isDirty(m);
+  }
+
+  // A student's lessons (matched by name — lessons store the student's name): upcoming soonest
+  // first, then past most recent first.
+  protected studentLessons(s: Student): { upcoming: Lesson[]; past: Lesson[] } {
+    const now = Date.now();
+    const mine = this.lessons.lessons().filter((l) => l.studentName === s.name);
+    const end = (l: Lesson) => new Date(l.startsAt).getTime() + l.durationMinutes * 60_000;
+    return {
+      upcoming: mine.filter((l) => end(l) >= now).sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
+      past: mine.filter((l) => end(l) < now).sort((a, b) => b.startsAt.localeCompare(a.startsAt)),
+    };
+  }
+
+  protected lessonDate(l: Lesson): string {
+    return new Date(l.startsAt).toLocaleDateString(this.i18n.locale(), {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    });
+  }
+
+  protected lessonTime(l: Lesson): string {
+    const start = new Date(l.startsAt);
+    const end = new Date(start.getTime() + l.durationMinutes * 60_000);
+    const fmt = (d: Date) =>
+      d.toLocaleTimeString(this.i18n.locale(), { hour: '2-digit', minute: '2-digit' });
+    return `${fmt(start)}–${fmt(end)}`;
+  }
+
+  protected lessonTitle(l: Lesson): string {
+    return this.titles.get(l.id);
+  }
+
+  protected studentById(id: string): Student | null {
+    return this.service.students().find((s) => s.id === id) ?? null;
+  }
+
+  protected statusKey(status: LessonStatus): TranslationKey {
+    return `lesson.status.${status}`;
+  }
+
+  // Open a lesson in the schedule (leaving any student editor without bouncing back).
+  protected openLesson(l: Lesson): void {
+    this.returnLessonId.set(null);
+    this.editor.set(null);
+    this.router.navigate(['/schedule'], { queryParams: { lesson: l.id } });
+  }
+
+  // Editor gone: if the student was opened from a lesson, go back to that lesson.
+  protected onEditorClosed(): void {
+    this.editor.set(null);
+    if (this.returnLessonId()) this.backToLesson();
+  }
+
+  protected backToLesson(): void {
+    const lesson = this.returnLessonId();
+    this.returnLessonId.set(null);
+    this.router.navigate(['/schedule'], { queryParams: { lesson } });
   }
 
   // Animates the page sheet out; its (closed) output then clears the editor.

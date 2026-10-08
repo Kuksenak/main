@@ -6,6 +6,20 @@ import { LoadingService } from '../core/services/loading.service';
 
 export type LessonStatus = 'Scheduled' | 'Done' | 'Cancelled';
 
+// Lessons are loaded for a window around today: 26 weeks back, 53 weeks in total, starting
+// on a Monday. The schedule's scrollable calendar covers exactly this window.
+export const LESSON_WEEKS_BEFORE = 26;
+export const LESSON_WEEKS_TOTAL = 53;
+
+export function lessonWindow(): { from: Date; to: Date } {
+  const from = new Date();
+  from.setHours(0, 0, 0, 0);
+  from.setDate(from.getDate() - ((from.getDay() + 6) % 7) - LESSON_WEEKS_BEFORE * 7);
+  const to = new Date(from);
+  to.setDate(to.getDate() + LESSON_WEEKS_TOTAL * 7);
+  return { from, to };
+}
+
 export interface Lesson {
   id: string;
   studentName: string;
@@ -31,8 +45,17 @@ export class LessonService {
 
   private _lessons = signal<Lesson[]>([]);
   readonly lessons = this._lessons.asReadonly();
+  private loaded = false;
+
+  /** Load the default window unless something already did (e.g. the schedule). */
+  ensureLoaded(): void {
+    if (this.loaded) return;
+    const { from, to } = lessonWindow();
+    this.load(from, to);
+  }
 
   load(from: Date, to: Date): void {
+    this.loaded = true;
     this.loadingService.begin();
     const params = { from: from.toISOString(), to: to.toISOString() };
     this.http

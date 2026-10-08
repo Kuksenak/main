@@ -1,6 +1,6 @@
 <ng-template #search>
   <label class="field">
-    <app-icon name="search" class="size-4 opacity-40" />
+    <app-icon name="search" class="size-5 opacity-40 desktop:size-4" />
     <input
       type="search"
       [ngModel]="query()"
@@ -10,7 +10,7 @@
     />
     @if (query()) {
       <button type="button" (click)="query.set('')" [attr.aria-label]="'action.clear' | t" class="icon-plain -mr-1">
-        <app-icon name="close" [strokeWidth]="2.2" class="size-4" />
+        <app-icon name="close" [strokeWidth]="2.2" class="size-5 desktop:size-4" />
       </button>
     }
   </label>
@@ -56,6 +56,12 @@
   <!-- Desktop details -->
   <section class="flex min-h-0 flex-1 flex-col mobile:hidden desktop:flex-1">
     @if (selected(); as s) {
+      @if (returnLessonId()) {
+        <button type="button" (click)="backToLesson()" class="btn-secondary mb-4 self-start pl-2">
+          <app-icon name="chevron-left" class="size-5" />
+          {{ 'lesson.back' | t }}
+        </button>
+      }
       <div class="flex items-center gap-4">
         <!-- Same size as the account button in the header -->
         <span class="avatar size-[var(--control-round)] text-xl desktop:text-base">{{ initial(s.name) }}</span>
@@ -81,6 +87,10 @@
           }
         </div>
       </div>
+
+      <div class="mt-6 flex min-h-0 flex-col gap-6 overflow-y-auto pb-14">
+        <ng-container [ngTemplateOutlet]="lessonsTpl" [ngTemplateOutletContext]="{ $implicit: s }" />
+      </div>
     } @else {
       <div class="flex flex-1 items-center justify-center">
         <p class="text-body opacity-40">{{ 'students.selectHint' | t }}</p>
@@ -95,7 +105,7 @@
 
 <!-- Student editor (form → page sheet) -->
 @if (editor(); as m) {
-  <app-page-sheet [title]="(m.id ? 'students.edit' : 'students.new') | t" (closed)="editor.set(null)">
+  <app-page-sheet [title]="(m.id ? 'students.edit' : 'students.new') | t" (closed)="onEditorClosed()">
     <!-- Mobile top bar: back (✕ once edited) · ✓ (blue when valid and changed) -->
     <button
       leading
@@ -136,6 +146,12 @@
         </div>
       </div>
 
+      @if (m.id && studentById(m.id); as s) {
+        <div class="flex flex-col gap-6 desktop:hidden">
+          <ng-container [ngTemplateOutlet]="lessonsTpl" [ngTemplateOutletContext]="{ $implicit: s }" />
+        </div>
+      }
+
       @if (m.id) {
         <button type="button" (click)="remove()" class="card-btn text-[var(--danger)] desktop:hidden">{{ 'action.delete' | t }}</button>
       }
@@ -151,3 +167,35 @@
     </div>
   </app-page-sheet>
 }
+
+<!-- A student's lessons (desktop details pane and the mobile student card) -->
+<ng-template #lessonsTpl let-s>
+  @let groups = studentLessons(s);
+  @if (!groups.upcoming.length && !groups.past.length) {
+    <p class="text-footnote px-4 opacity-50">{{ 'students.noLessons' | t }}</p>
+  }
+  @for (g of [{ key: 'students.upcoming', items: groups.upcoming }, { key: 'students.past', items: groups.past }]; track g.key) {
+    @if (g.items.length) {
+      <div class="flex flex-col gap-1.5">
+        <span class="text-footnote px-4 uppercase opacity-50">{{ $any(g.key) | t }}</span>
+        <div class="card">
+          @for (l of g.items; track l.id) {
+            <button type="button" (click)="openLesson(l)" class="list-row w-full py-2 text-left">
+              <span class="w-1 shrink-0 self-stretch rounded-full bg-[var(--calendar-default)]"></span>
+              <div class="min-w-0 flex-1 leading-tight">
+                <p class="truncate font-medium" [class.line-through]="l.status === 'Cancelled'">{{ lessonDate(l) }}</p>
+                <p class="text-footnote truncate opacity-50">
+                  {{ lessonTime(l) }}@if (lessonTitle(l)) { · {{ lessonTitle(l) }} }
+                </p>
+              </div>
+              @if (l.status !== 'Scheduled') {
+                <span class="badge">{{ statusKey(l.status) | t }}</span>
+              }
+              <app-icon name="chevron-right" class="size-4 opacity-30" />
+            </button>
+          }
+        </div>
+      </div>
+    }
+  }
+</ng-template>

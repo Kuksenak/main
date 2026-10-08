@@ -8,10 +8,12 @@ import {
   ElementRef,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -24,7 +26,14 @@ import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
 import { StudentService } from '../students/student.service';
 import { LessonTitleStore } from './lesson-title.store';
-import { Lesson, LessonService, LessonStatus } from './lesson.service';
+import {
+  LESSON_WEEKS_BEFORE,
+  LESSON_WEEKS_TOTAL,
+  Lesson,
+  LessonService,
+  LessonStatus,
+  lessonWindow,
+} from './lesson.service';
 
 interface EditorModel {
   id: string | null;
@@ -117,12 +126,9 @@ export class Schedule implements AfterViewInit {
 
   // Continuous calendar: a long window of weeks the user scrolls through. The
   // title follows whichever month fills the middle of the viewport.
-  private static readonly WEEKS_BEFORE = 26;
-  private static readonly WEEKS_TOTAL = 53;
-  private readonly weeksStart = addDays(
-    startOfWeek(new Date()),
-    -Schedule.WEEKS_BEFORE * 7,
-  );
+  private static readonly WEEKS_BEFORE = LESSON_WEEKS_BEFORE;
+  private static readonly WEEKS_TOTAL = LESSON_WEEKS_TOTAL;
+  private readonly weeksStart = lessonWindow().from;
   protected readonly allWeeks: Date[][] = Array.from(
     { length: Schedule.WEEKS_TOTAL },
     (_, w) => Array.from({ length: 7 }, (_, d) => addDays(this.weeksStart, w * 7 + d)),
@@ -134,6 +140,7 @@ export class Schedule implements AfterViewInit {
   }
 
   protected readonly editor = signal<EditorModel | null>(null);
+  private readonly pendingLessonId = signal<string | null>(null);
 
   // Student picker: everyone in the students list, plus the lesson's current name if it isn't
   // there (older lessons typed by hand).
@@ -180,6 +187,25 @@ export class Schedule implements AfterViewInit {
     // Load lessons for the whole scrollable window once.
     this.service.load(this.weeksStart, addDays(this.weeksStart, Schedule.WEEKS_TOTAL * 7));
 
+    // Deep link back into a lesson (e.g. returning from its student's card):
+    // /schedule?lesson=<id> — opens it once the lessons have loaded.
+    inject(ActivatedRoute)
+      .queryParamMap.pipe(takeUntilDestroyed())
+      .subscribe((params) => this.pendingLessonId.set(params.get('lesson')));
+    effect(() => {
+      const id = this.pendingLessonId();
+      const lesson = id ? this.service.lessons().find((l) => l.id === id) : undefined;
+      if (!lesson) return;
+      untracked(() => {
+        this.pendingLessonId.set(null);
+        const day = startOfDay(new Date(lesson.startsAt));
+        this.selectedDate.set(day);
+        this.scrollToDay(day);
+        this.openEdit(lesson);
+        this.router.navigate([], { queryParams: {}, replaceUrl: true });
+      });
+    });
+
     // Keep the editor sheet pinned: iOS scrolls the document to reveal a focused
     // field even with overflow hidden — snap it back so the sheet never shifts.
     window.addEventListener('scroll', () => {
@@ -213,8 +239,11 @@ export class Schedule implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Start scrolled to the current week.
-    setTimeout(() => this.scrollToToday());
+    // Start scrolled to the current week (unless a deep-linked lesson already placed it).
+    setTimeout(() => {
+      if (this.editor()) this.scrollToDay(this.selectedDate());
+      else if (!this.pendingLessonId()) this.scrollToToday();
+    });
   }
 
   private loadRange(): { from: Date; to: Date } {
@@ -232,9 +261,19 @@ export class Schedule implements AfterViewInit {
   }
 
   protected scrollToToday(): void {
+    this.scrollToDay(new Date());
+  }
+
+  // Show the whole month containing `day`: its first week goes to the top (a month spans at
+  // most 6 weeks, which is what the calendar shows), and that month becomes the active one.
+  private scrollToDay(day: Date): void {
+    const month = startOfMonth(day);
+    const week = Math.round(
+      (startOfWeek(month).getTime() - this.weeksStart.getTime()) / (7 * 86_400_000),
+    );
     const el = this.cal()?.nativeElement;
-    if (el) el.scrollTop = Schedule.WEEKS_BEFORE * this.rowPx();
-    this.visibleMonth.set(startOfMonth(new Date()));
+    if (el) el.scrollTop = week * this.rowPx();
+    this.visibleMonth.set(month);
   }
 
   protected countFor(day: Date): number {
@@ -372,10 +411,12 @@ export class Schedule implements AfterViewInit {
     return this.students.students().find((s) => s.name === name)?.id ?? null;
   }
 
-  // Leave the editor and show that student's card.
+  // Leave the editor and show that student's card; a saved lesson is passed along so the
+  // student page can come back to it.
   protected openStudent(id: string): void {
+    const fromLesson = this.editor()?.id ?? undefined;
     this.closeEditor();
-    this.router.navigate(['/students'], { queryParams: { id } });
+    this.router.navigate(['/students'], { queryParams: { id, fromLesson } });
   }
 
   protected lessonTitle(lesson: Lesson): string {
