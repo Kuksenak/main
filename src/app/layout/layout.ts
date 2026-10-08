@@ -25,6 +25,7 @@ export class Layout {
 
   protected readonly navItems: { path: string; label: TranslationKey }[] = [
     { path: '/schedule', label: 'nav.schedule' },
+    { path: '/students', label: 'nav.students' },
     { path: '/about', label: 'nav.about' },
   ];
 

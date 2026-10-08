@@ -4,6 +4,7 @@ import { authGuard, guestGuard } from './auth/auth.guard';
 import { Layout } from './layout/layout';
 import { Login } from './login/login';
 import { Schedule } from './schedule/schedule';
+import { Students } from './students/students';
 
 export const routes: Routes = [
   { path: 'login', component: Login, canActivate: [guestGuard] },
@@ -13,6 +14,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'schedule', component: Schedule },
+      { path: 'students', component: Students },
       { path: 'about', component: About },
       { path: '', pathMatch: 'full', redirectTo: 'schedule' },
     ],

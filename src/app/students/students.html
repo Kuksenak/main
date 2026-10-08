@@ -1,0 +1,122 @@
+<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:mx-auto desktop:max-w-2xl">
+  <!-- Title (desktop; on mobile it lives in the toolbar) -->
+  <h1 class="text-xl font-semibold mobile:hidden">{{ 'nav.students' | t }}</h1>
+
+  <!-- Search -->
+  <label class="field">
+    <app-icon name="search" class="size-4 opacity-40" />
+    <input
+      type="search"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event)"
+      [placeholder]="'students.search' | t"
+      autocomplete="off"
+    />
+  </label>
+
+  <!-- List: the card itself scrolls, so its corners stay put; bottom padding clears the + button -->
+  @if (visible().length) {
+    <div class="card min-h-0 shrink overflow-y-auto overscroll-contain">
+      @for (s of visible(); track s.id) {
+        <button type="button" (click)="openEdit(s)" class="list-row w-full py-2 text-left">
+          <span class="avatar">{{ initial(s.name) }}</span>
+          <div class="min-w-0 flex-1 leading-tight">
+            <p class="truncate font-medium">{{ s.name }}</p>
+            @if (s.email || s.phone) {
+              <p class="text-footnote truncate opacity-50">{{ s.email || s.phone }}</p>
+            }
+          </div>
+          <span class="badge">{{ s.level }}</span>
+          <app-icon name="chevron-right" class="size-4 opacity-30" />
+        </button>
+      }
+    </div>
+    <div class="h-14 shrink-0"></div>
+  } @else {
+    <div class="flex flex-1 items-center justify-center pb-14">
+      <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : 'students.empty') | t }}</p>
+    </div>
+  }
+</main>
+
+<button type="button" (click)="openNew()" [attr.aria-label]="'students.add' | t" class="btn-confirm float-bottom right-4">
+  <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
+</button>
+
+<!-- Student editor (form → page sheet) -->
+@if (editor(); as m) {
+  <app-page-sheet [title]="(m.id ? 'students.edit' : 'students.new') | t" (closed)="editor.set(null)">
+    <!-- Mobile top bar: back (✕ once edited) · ✓ (blue when valid and changed) -->
+    <button
+      leading
+      type="button"
+      (click)="closeEditor()"
+      [attr.aria-label]="(isDirty(m) ? 'action.discard' : 'action.back') | t"
+      class="icon-btn relative"
+    >
+      @if (isDirty(m)) {
+        <app-icon name="close" class="size-6" />
+      } @else {
+        <app-icon name="chevron-left" class="-ml-0.5 size-7" />
+      }
+    </button>
+    <button
+      trailing
+      type="button"
+      (click)="save()"
+      [disabled]="!canSave(m)"
+      [attr.aria-label]="'action.save' | t"
+      [class.btn-confirm]="canSave(m)"
+      [class.icon-btn]="!canSave(m)"
+      [class.opacity-40]="!canSave(m)"
+    >
+      <app-icon name="check" [strokeWidth]="2" class="size-7" />
+    </button>
+
+    <div class="flex flex-col gap-6">
+      <div class="card">
+        <div class="list-row">
+          <input name="name" [(ngModel)]="m.name" type="text" [placeholder]="'students.name' | t" autocomplete="off" class="row-input" />
+        </div>
+        <div class="list-row">
+          <input name="email" [(ngModel)]="m.email" type="email" inputmode="email" [placeholder]="'students.email' | t" autocomplete="off" class="row-input" />
+        </div>
+        <div class="list-row">
+          <input name="phone" [(ngModel)]="m.phone" type="tel" inputmode="tel" [placeholder]="'students.phone' | t" autocomplete="off" class="row-input" />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="list-row">
+          <span>{{ 'students.level' | t }}</span>
+          <app-select
+            class="ml-auto"
+            [options]="levelOptions"
+            [ngModel]="m.level"
+            (ngModelChange)="m.level = $event"
+            [ngModelOptions]="{ standalone: true }"
+          />
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="list-row py-3 desktop:py-2">
+          <textarea name="note" [(ngModel)]="m.note" rows="3" [placeholder]="'lesson.note' | t" autocomplete="off" class="row-input resize-y leading-snug"></textarea>
+        </div>
+      </div>
+
+      @if (m.id) {
+        <button type="button" (click)="remove()" class="card-btn text-[var(--danger)] desktop:hidden">{{ 'action.delete' | t }}</button>
+      }
+    </div>
+
+    <!-- Desktop footer -->
+    <div footer class="flex w-full items-center gap-2">
+      @if (m.id) {
+        <button type="button" (click)="remove()" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+      }
+      <button type="button" (click)="closeEditor()" class="btn-secondary ml-auto">{{ 'action.cancel' | t }}</button>
+      <button type="button" (click)="save()" [disabled]="!canSave(m)" class="btn-primary">{{ 'action.save' | t }}</button>
+    </div>
+  </app-page-sheet>
+}

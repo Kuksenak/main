@@ -8,6 +8,7 @@ const en = {
   'app.loading': 'Loading…',
 
   'nav.schedule': 'Schedule',
+  'nav.students': 'Students',
   'nav.about': 'About',
   'nav.menu': 'Menu',
 
@@ -30,6 +31,17 @@ const en = {
   'schedule.today': 'Today',
   'schedule.addLesson': 'Add lesson',
   'schedule.noEvents': 'No Events',
+
+  'students.search': 'Search',
+  'students.add': 'Add student',
+  'students.new': 'New Student',
+  'students.edit': 'Edit Student',
+  'students.name': 'Name *',
+  'students.email': 'Email',
+  'students.phone': 'Phone',
+  'students.level': 'Level',
+  'students.empty': 'No Students',
+  'students.notFound': 'Nothing found',
 
   'lesson.new': 'New Lesson',
   'lesson.edit': 'Edit Lesson',
@@ -63,6 +75,7 @@ const pl: Dictionary = {
   'app.loading': 'Ładowanie…',
 
   'nav.schedule': 'Plan',
+  'nav.students': 'Uczniowie',
   'nav.about': 'O aplikacji',
   'nav.menu': 'Menu',
 
@@ -85,6 +98,17 @@ const pl: Dictionary = {
   'schedule.today': 'Dziś',
   'schedule.addLesson': 'Dodaj lekcję',
   'schedule.noEvents': 'Brak wydarzeń',
+
+  'students.search': 'Szukaj',
+  'students.add': 'Dodaj ucznia',
+  'students.new': 'Nowy uczeń',
+  'students.edit': 'Edytuj ucznia',
+  'students.name': 'Imię i nazwisko *',
+  'students.email': 'E-mail',
+  'students.phone': 'Telefon',
+  'students.level': 'Poziom',
+  'students.empty': 'Brak uczniów',
+  'students.notFound': 'Nic nie znaleziono',
 
   'lesson.new': 'Nowa lekcja',
   'lesson.edit': 'Edytuj lekcję',
@@ -115,6 +139,7 @@ const fr: Dictionary = {
   'app.loading': 'Chargement…',
 
   'nav.schedule': 'Planning',
+  'nav.students': 'Élèves',
   'nav.about': 'À propos',
   'nav.menu': 'Menu',
 
@@ -137,6 +162,17 @@ const fr: Dictionary = {
   'schedule.today': 'Aujourd’hui',
   'schedule.addLesson': 'Ajouter un cours',
   'schedule.noEvents': 'Aucun événement',
+
+  'students.search': 'Rechercher',
+  'students.add': 'Ajouter un élève',
+  'students.new': 'Nouvel élève',
+  'students.edit': 'Modifier l’élève',
+  'students.name': 'Nom *',
+  'students.email': 'E-mail',
+  'students.phone': 'Téléphone',
+  'students.level': 'Niveau',
+  'students.empty': 'Aucun élève',
+  'students.notFound': 'Aucun résultat',
 
   'lesson.new': 'Nouveau cours',
   'lesson.edit': 'Modifier le cours',

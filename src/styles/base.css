@@ -25,6 +25,7 @@ body {
 
 /* Routed components fill the layout's content area so inner panels can scroll. */
 app-schedule,
+app-students,
 app-about {
   display: flex;
   flex: 1 1 auto;

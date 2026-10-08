@@ -151,6 +151,27 @@
     @apply font-semibold text-[var(--accent)];
   }
 
+  /* Standalone input (search): filled, card corners, leading icon. Wrap: <label class="field">. */
+  .field {
+    @apply text-body flex h-[var(--row-h)] w-full shrink-0 cursor-text items-center gap-2
+           rounded-[var(--radius-card)] bg-[var(--fill)] px-3;
+    & > input {
+      @apply min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-40
+             [&::-webkit-search-cancel-button]:appearance-none;
+    }
+  }
+
+  /* Bare input/textarea filling a list row (forms inside cards). */
+  .row-input {
+    @apply w-full bg-transparent outline-none placeholder:opacity-40;
+  }
+
+  /* Round initial (people lists). */
+  .avatar {
+    @apply text-callout inline-flex size-9 shrink-0 items-center justify-center rounded-full
+           bg-[var(--fill-strong)] font-semibold;
+  }
+
   .badge {
     @apply text-caption rounded-full bg-[var(--fill-strong)] px-2 py-0.5 font-semibold opacity-60;
   }
