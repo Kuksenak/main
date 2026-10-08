@@ -150,6 +150,28 @@ html.dark *::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.25);
 }
 
+/* Press feedback for every button: no grey tap flash, a quick iOS-like shrink that
+   springs back on release. */
+@layer base {
+  button,
+  a[href] {
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 160ms cubic-bezier(0.2, 0, 0, 1), opacity 160ms ease-out;
+  }
+  button:not(:disabled):active {
+    transform: scale(0.94);
+  }
+  /* List rows don't shrink — they get the iOS grey cell highlight instead. */
+  button.ios-row:active {
+    transform: none;
+    opacity: 1;
+    background-color: rgb(0 0 0 / 0.05);
+  }
+  html.dark button.ios-row:active {
+    background-color: rgb(255 255 255 / 0.08);
+  }
+}
+
 /* Pointer cursor on anything clickable (Tailwind v4 drops it from buttons). */
 button:not(:disabled),
 a[href],

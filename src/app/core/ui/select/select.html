@@ -10,7 +10,7 @@
       [value]="value() ?? ''"
       [disabled]="disabled"
       (change)="onNativeChange($event)"
-      class="appearance-none border-0 py-1.5 pl-3 pr-9 rounded-lg text-current bg-black/[0.04] dark:bg-white/[0.06] text-[17px] [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
+      class="appearance-none border-0 py-1 pl-2.5 pr-8 rounded-lg text-current bg-black/[0.04] dark:bg-white/[0.06] text-[17px] [font-family:-apple-system,BlinkMacSystemFont,'SF_Pro_Text',system-ui,sans-serif] focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40"
     >
       @for (opt of options; track opt.value) {
         <option [value]="opt.value">{{ opt.label }}</option>
@@ -32,7 +32,7 @@
       #origin="cdkOverlayOrigin"
       [disabled]="disabled"
       (click)="toggle()"
-      class="inline-flex w-auto items-center gap-2 px-3 py-2 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+      class="inline-flex w-auto items-center gap-2 px-2.5 py-1 rounded-lg bg-black/[0.04] dark:bg-white/[0.06] text-[15px] text-left whitespace-nowrap focus:outline-none [-webkit-tap-highlight-color:transparent] disabled:opacity-40 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
     >
       <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
       <svg viewBox="0 0 24 24" fill="none" class="pointer-events-none size-5 shrink-0" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

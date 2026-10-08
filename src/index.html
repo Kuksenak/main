@@ -33,6 +33,9 @@
                    'ontouchstart' in window ||
                    navigator.maxTouchPoints > 0;
       document.documentElement.dataset.device = mobile ? 'mobile' : 'desktop';
+
+      // iOS Safari only applies :active styles once a touchstart listener exists.
+      document.addEventListener('touchstart', function () {}, { passive: true });
     })();
   </script>
 </head>
