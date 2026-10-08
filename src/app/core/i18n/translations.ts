@@ -86,6 +86,7 @@ const en = {
   'lessons.notFound': 'Lesson not found',
   'lessons.copy': 'Copy link',
   'lessons.public': 'Public link',
+  'lessons.info': 'Details',
   'lessons.publicHint': 'Anyone with the link can view this lesson, no sign-in needed.',
 
   'action.save': 'Save',
@@ -190,6 +191,7 @@ const pl: Dictionary = {
   'lessons.notFound': 'Nie znaleziono lekcji',
   'lessons.copy': 'Kopiuj link',
   'lessons.public': 'Link publiczny',
+  'lessons.info': 'Szczegóły',
   'lessons.publicHint': 'Każdy, kto ma link, zobaczy tę lekcję bez logowania.',
 
   'action.save': 'Zapisz',
@@ -291,6 +293,7 @@ const fr: Dictionary = {
   'lessons.notFound': 'Cours introuvable',
   'lessons.copy': 'Copier le lien',
   'lessons.public': 'Lien public',
+  'lessons.info': 'Détails',
   'lessons.publicHint': 'Toute personne disposant du lien peut voir ce cours, sans connexion.',
 
   'action.save': 'Enregistrer',

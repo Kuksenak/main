@@ -16,6 +16,8 @@ import { ScrollArea } from '../scroll-area/scroll-area';
  * - mobile top bar: back (✕ once `dirty`) · title · ✓ (blue when `canSave`); Delete at the end
  *   of the content when `deletable`;
  * - desktop footer: Delete (when `deletable`) · Cancel · Save.
+ * Without `actions`, round buttons marked `barEnd` go to the right of the mobile top bar:
+ *   <button barEnd class="icon-btn">…</button> (several, or inside @if: <ng-container ngProjectAs="[barEnd]">)
  * Menus without inputs use <app-sheet> instead.
  * Render it with @if; call close() to animate out, then `closed` fires.
  */
@@ -66,6 +68,8 @@ import { ScrollArea } from '../scroll-area/scroll-area';
             >
               <app-icon name="check" [strokeWidth]="2" class="size-7" />
             </button>
+          } @else {
+            <div class="relative ml-auto flex items-center gap-2"><ng-content select="[barEnd]" /></div>
           }
         </div>
 

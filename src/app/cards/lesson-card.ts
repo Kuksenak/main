@@ -6,6 +6,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { Sheet } from '../core/ui/sheet/sheet';
 import { Toggle } from '../core/ui/toggle';
 import { LessonContent } from '../lessons/lesson-content';
 import { LessonForm, cleanLesson, lessonValid } from '../lessons/lesson-form';
@@ -13,15 +14,15 @@ import { LessonInput, LessonService, shareUrl } from '../lessons/lesson.service'
 import { EventList } from './event-list';
 
 /**
- * A lesson, opened on the NavStack nearly full-screen (minimal margins): read as a whole —
- * content, then the events it's attached to — and edited in place (Edit → the form instead of
- * the content; Save returns to reading). A new lesson (id null) starts in the form.
+ * A lesson, opened on the NavStack nearly full-screen (minimal margins): its content, edited in
+ * place (Edit → the form instead of the content; Save returns to reading). ⓘ opens a sheet with
+ * the public link switch and the events using the lesson. A new lesson (id null) starts in the form.
  * Opened from its link (/lessons/:id, see Lessons) it follows the URL: closing goes back to
  * /lessons, and leaving that URL (browser back) closes it.
  */
 @Component({
   selector: 'app-lesson-card',
-  imports: [EventList, Icon, LessonContent, LessonForm, PageSheet, Toggle, TranslatePipe],
+  imports: [EventList, Icon, LessonContent, LessonForm, PageSheet, Sheet, Toggle, TranslatePipe],
   template: `
     <app-page-sheet
       #page
@@ -35,12 +36,27 @@ import { EventList } from './event-list';
       (delete)="remove()"
       (closed)="onClosed()"
     >
+      <!-- Mobile top bar (reading): ⓘ and Edit, round -->
+      @if (!editing()) {
+        <ng-container ngProjectAs="[barEnd]">
+          <button #infoBtnMobile type="button" (click)="openInfo(infoBtnMobile)" [attr.aria-label]="'lessons.info' | t" class="icon-btn">
+            <app-icon name="info" class="size-6" />
+          </button>
+          <button type="button" (click)="edit()" [attr.aria-label]="'action.edit' | t" class="icon-btn">
+            <app-icon name="pencil" class="size-6" />
+          </button>
+        </ng-container>
+      }
+
       <div class="flex flex-col gap-6">
-        <!-- Title (desktop; mobile has it in the top bar) and Edit while reading -->
+        <!-- Desktop: the title with ⓘ and Edit while reading -->
         @if (!editing()) {
-          <div class="flex items-center gap-3">
-            <h1 class="min-w-0 flex-1 text-2xl font-semibold mobile:hidden">{{ heading() }}</h1>
-            <button type="button" (click)="edit()" class="btn-secondary mobile:ml-auto">{{ 'action.edit' | t }}</button>
+          <div class="flex items-center gap-3 mobile:hidden">
+            <h1 class="min-w-0 flex-1 text-2xl font-semibold">{{ heading() }}</h1>
+            <button #infoBtn type="button" (click)="openInfo(infoBtn)" [attr.aria-label]="'lessons.info' | t" class="icon-btn">
+              <app-icon name="info" class="size-5" />
+            </button>
+            <button type="button" (click)="edit()" class="btn-secondary">{{ 'action.edit' | t }}</button>
           </div>
         }
 
@@ -48,27 +64,34 @@ import { EventList } from './event-list';
           <app-lesson-form [(value)]="draft" />
         } @else if (lesson(); as l) {
           <app-lesson-content [blocks]="l.blocks" />
-
-          <!-- Public: anyone with the link can read it, no sign-in; while on, ⧉ copies the link -->
-          <div class="flex flex-col gap-1.5">
-            <div class="card">
-              <div class="list-row">
-                <span class="flex-1">{{ 'lessons.public' | t }}</span>
-                @if (l.shareToken; as token) {
-                  <button type="button" (click)="copy(token)" [attr.aria-label]="'lessons.copy' | t" class="icon-plain text-[var(--accent)]">
-                    <app-icon [name]="copied() ? 'check' : 'copy'" class="size-5" />
-                  </button>
-                }
-                <app-toggle [checked]="!!l.shareToken" (checkedChange)="setPublic($event)" [attr.aria-label]="'lessons.public' | t" />
-              </div>
-            </div>
-            <p class="text-footnote px-4 opacity-50">{{ 'lessons.publicHint' | t }}</p>
-          </div>
-
-          <app-event-list [lessonId]="l.id" />
         }
       </div>
     </app-page-sheet>
+
+    <!-- ⓘ: public link (switch; ⧉ copies it while on) and the events using this lesson -->
+    @if (infoOrigin(); as origin) {
+      @if (lesson(); as l) {
+        <app-sheet [origin]="origin" (closed)="infoOrigin.set(null)">
+          <div class="flex flex-col gap-6 desktop:gap-4">
+            <div class="flex flex-col gap-1.5">
+              <div class="card">
+                <div class="list-row">
+                  <span class="flex-1">{{ 'lessons.public' | t }}</span>
+                  @if (l.shareToken; as token) {
+                    <button type="button" (click)="copy(token)" [attr.aria-label]="'lessons.copy' | t" class="icon-plain !text-[var(--text)]">
+                      <app-icon [name]="copied() ? 'check' : 'copy'" class="size-6" />
+                    </button>
+                  }
+                  <app-toggle [checked]="!!l.shareToken" (checkedChange)="setPublic($event)" [attr.aria-label]="'lessons.public' | t" />
+                </div>
+              </div>
+              <p class="text-footnote px-4 opacity-50">{{ 'lessons.publicHint' | t }}</p>
+            </div>
+            <app-event-list [lessonId]="l.id" />
+          </div>
+        </app-sheet>
+      }
+    }
   `,
 })
 export class LessonCard implements OnInit {
@@ -120,6 +143,12 @@ export class LessonCard implements OnInit {
   }
 
   protected readonly copied = signal(false);
+  // The ⓘ sheet, open under this button.
+  protected readonly infoOrigin = signal<HTMLElement | null>(null);
+
+  protected openInfo(origin: HTMLElement): void {
+    this.infoOrigin.set(origin);
+  }
 
   protected setPublic(on: boolean): void {
     const id = this.id();

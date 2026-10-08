@@ -4,8 +4,8 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
 
 /**
  * Flat multi-color product icons in the logo's colors (Google-product style, no background),
- * for the navigation launcher. Colors come from the --brand-* tokens; gaps between shapes are
- * real cut-outs (masks), so they work on any background. Size it from the host:
+ * for the navigation. Colors come from the --brand-* tokens; gaps between shapes are real
+ * cut-outs (masks) or plain gaps, so they work on any background. Size it from the host:
  * `<app-brand-icon name="calendar" class="size-11" />`.
  */
 @Component({
@@ -15,32 +15,11 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
     <svg viewBox="0 0 48 48" class="size-full">
       @switch (name()) {
         @case ('calendar') {
-          <!-- Tear-off calendar page (iOS-like): the next page peeking below, blue header, a
-               curled corner as if being flipped, today's date. Light blue tint, outline and a
-               soft shadow keep it visible on white. -->
-          <defs>
-            <filter id="brand-cal-shadow" x="-20%" y="-20%" width="140%" height="150%">
-              <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#1d2b4a" flood-opacity="0.18" />
-            </filter>
-          </defs>
-          <g filter="url(#brand-cal-shadow)">
-            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 22%, transparent)" />
-            <path
-              d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
-              style="fill: color-mix(in srgb, white 25%, transparent); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
-            />
-          </g>
-          <path d="M12 4h24a7 7 0 0 1 7 7v3H5v-3a7 7 0 0 1 7-7z" style="fill: var(--brand-blue)" />
-          <path
-            d="M34 42c0-5 3-9 9-9l-9 9z"
-            style="fill: color-mix(in srgb, var(--brand-blue) 45%, #dfe4ee); stroke: color-mix(in srgb, var(--brand-blue) 60%, white); stroke-width: 0.75; stroke-linejoin: round"
-          />
-          <text
-            x="24"
-            y="35"
-            text-anchor="middle"
-            style="fill: var(--brand-orange); font: 800 19.5px -apple-system, system-ui, 'Segoe UI', sans-serif; letter-spacing: -0.04em"
-          >{{ today }}</text>
+          <!-- Flat calendar: a blue header bar over a grid of days, today in orange -->
+          <rect x="4" y="5" width="40" height="9" rx="4.5" style="fill: var(--brand-blue)" />
+          @for (d of calendarDays; track $index) {
+            <rect [attr.x]="d.x" [attr.y]="d.y" width="7.75" height="7.75" rx="2.5" [style.fill]="d.color" />
+          }
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->
@@ -65,25 +44,9 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
           <rect x="4" y="38" width="27" height="6.5" rx="3.25" style="fill: var(--brand-blue)" />
         }
         @case ('info') {
-          <!-- The calendar's tear-off page without the blue header: an "i" with the orange dot -->
-          <defs>
-            <filter id="brand-info-shadow" x="-20%" y="-20%" width="140%" height="150%">
-              <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#1d2b4a" flood-opacity="0.18" />
-            </filter>
-          </defs>
-          <g filter="url(#brand-info-shadow)">
-            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 22%, transparent)" />
-            <path
-              d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
-              style="fill: color-mix(in srgb, white 25%, transparent); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
-            />
-          </g>
-          <path
-            d="M34 42c0-5 3-9 9-9l-9 9z"
-            style="fill: color-mix(in srgb, var(--brand-blue) 45%, #dfe4ee); stroke: color-mix(in srgb, var(--brand-blue) 60%, white); stroke-width: 0.75; stroke-linejoin: round"
-          />
-          <circle cx="23" cy="13.5" r="3.6" style="fill: var(--brand-orange)" />
-          <rect x="19.5" y="20" width="7" height="16" rx="3.5" style="fill: var(--brand-blue)" />
+          <!-- Flat "i": an orange dot over a blue stem -->
+          <circle cx="24" cy="10" r="6" style="fill: var(--brand-orange)" />
+          <rect x="18" y="20" width="12" height="25" rx="6" style="fill: var(--brand-blue)" />
         }
       }
     </svg>
@@ -91,6 +54,17 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
 })
 export class BrandIcon {
   readonly name = input.required<BrandIconName>();
-  // Calendar icon shows today's date (taken when the icon is created, e.g. each time the menu opens).
-  protected readonly today = new Date().getDate();
+  // Calendar: 4 × 3 days; one is today (orange), one more highlighted (yellow).
+  protected readonly calendarDays = [0, 1, 2].flatMap((row) =>
+    [0, 1, 2, 3].map((col) => ({
+      x: 4 + col * 10.75,
+      y: 19 + row * 9.25,
+      color:
+        row === 1 && col === 2
+          ? 'var(--brand-orange)'
+          : row === 2 && col === 0
+            ? 'var(--brand-yellow)'
+            : 'var(--brand-teal)',
+    })),
+  );
 }
