@@ -50,7 +50,7 @@
 
   <!-- Selected day events -->
   <section class="flex min-h-0 flex-1 flex-col lg:flex-1">
-    <div class="mb-1.5 flex h-11 shrink-0 items-center">
+    <div class="mb-1.5 flex h-12 shrink-0 items-center sm:h-10">
       <h2 class="text-xl font-semibold">{{ selectedDate() | date: 'EEEE, MMM d' }}</h2>
       <button type="button" (click)="today()" class="btn-secondary ml-auto sm:hidden">Today</button>
     </div>
@@ -108,9 +108,9 @@
   type="button"
   (click)="openNew()"
   aria-label="Add lesson"
-  class="fixed bottom-[calc(max(0.5rem,env(safe-area-inset-bottom))+0.5rem)] right-6 z-20 flex size-12 items-center justify-center rounded-full glass-accent active:scale-95 active:opacity-80 transition-transform"
+  class="fixed bottom-[calc(max(0.5rem,env(safe-area-inset-bottom))+0.5rem)] right-6 z-20 flex size-12 sm:size-10 items-center justify-center rounded-full glass-accent active:scale-95 active:opacity-80 transition-transform"
 >
-  <svg viewBox="0 0 24 24" fill="none" class="size-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+  <svg viewBox="0 0 24 24" fill="none" class="size-7 sm:size-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
 </button>
 
 <!-- Editor modal -->
@@ -165,9 +165,9 @@
         <button
           type="button"
           aria-label="Add"
-          class="flex size-12 shrink-0 items-center justify-center rounded-full glass-accent active:scale-95 active:opacity-80 transition-transform"
+          class="flex size-12 shrink-0 items-center justify-center rounded-full glass-accent sm:size-10 active:scale-95 active:opacity-80 transition-transform"
         >
-          <svg viewBox="0 0 24 24" fill="none" class="size-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+          <svg viewBox="0 0 24 24" fill="none" class="size-7 sm:size-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
         </button>
         </div>
       }

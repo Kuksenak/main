@@ -217,28 +217,32 @@ app-about {
 }
 
 @layer components {
-  /* Primary action — accent capsule, 48pt like iOS 26 glass buttons */
+  /* Sizes: mobile — round 48, capsule 44 / desktop — round 40, capsule 36. */
+
+  /* Primary action — accent capsule */
   .btn-primary {
-    @apply glass-accent inline-flex h-12 items-center justify-center rounded-full
-           px-5 text-[17px] font-semibold active:opacity-80;
+    @apply glass-accent inline-flex h-11 items-center justify-center rounded-full
+           px-5 text-[17px] font-semibold active:opacity-80
+           sm:h-9 sm:px-4 sm:text-[15px];
   }
 
   /* Secondary action — neutral iOS pill */
   .btn-secondary {
-    @apply glass-neutral inline-flex h-12 items-center justify-center rounded-full
-           px-5 text-[17px] font-medium active:opacity-70;
+    @apply glass-neutral inline-flex h-11 items-center justify-center rounded-full
+           px-5 text-[17px] font-medium active:opacity-70
+           sm:h-9 sm:px-4 sm:text-[15px];
   }
 
   /* Icon button — translucent grey circle */
   .icon-btn {
     @apply glass-neutral inline-flex size-12 shrink-0 items-center justify-center rounded-full
-           active:opacity-70;
+           active:opacity-70 sm:size-10;
   }
 
   /* Confirm — accent circle (for a checkmark) */
   .btn-confirm {
     @apply glass-accent inline-flex size-12 shrink-0 items-center justify-center rounded-full
-           active:opacity-80;
+           active:opacity-80 sm:size-10;
   }
 
   /* Bottom-sheet panel: no backdrop dimming, it stands out by its own color,
