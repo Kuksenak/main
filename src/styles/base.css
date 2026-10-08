@@ -41,7 +41,6 @@ app-root {
 app-schedule,
 app-students,
 app-lessons,
-app-lesson-view,
 app-about {
   display: flex;
   flex: 1 1 auto;

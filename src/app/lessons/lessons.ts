@@ -1,7 +1,10 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { map } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
+import { NavStack } from '../core/services/nav-stack.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
@@ -10,12 +13,12 @@ import { SearchField } from '../core/ui/search-field';
 import { Lesson, LessonService } from './lesson.service';
 
 /**
- * The lesson library: search (mobile: in the toolbar) and the list; a tap opens the lesson's
- * own page, + opens a new one there.
+ * The lesson library: search (mobile: in the toolbar) and the list; a tap opens the lesson
+ * (nearly full-screen card) at its own link, /lessons/:id, so it can be shared; + starts a new one.
  */
 @Component({
   selector: 'app-lessons',
-  imports: [NgTemplateOutlet, Icon, RouterLink, ScrollArea, SearchField, TranslatePipe],
+  imports: [NgTemplateOutlet, Icon, ScrollArea, SearchField, TranslatePipe],
   template: `
     <ng-template #search>
       <app-search-field [(value)]="query" />
@@ -29,7 +32,7 @@ import { Lesson, LessonService } from './lesson.service';
         @if (visible().length) {
           <app-scroll-area class="min-h-0 shrink" viewportClass="card">
             @for (l of visible(); track l.id) {
-              <a [routerLink]="['/lessons', l.id]" class="list-row w-full py-2">
+              <button type="button" (click)="router.navigate(['/lessons', l.id])" class="list-row w-full py-2 text-left">
                 <div class="min-w-0 flex-1 leading-tight">
                   <p class="truncate font-medium">{{ l.title }}</p>
                   @if (summary(l); as s) {
@@ -37,7 +40,7 @@ import { Lesson, LessonService } from './lesson.service';
                   }
                 </div>
                 <app-icon name="chevron-right" class="row-chevron" />
-              </a>
+              </button>
             }
           </app-scroll-area>
         } @else {
@@ -48,14 +51,17 @@ import { Lesson, LessonService } from './lesson.service';
       </section>
     </main>
 
-    <a routerLink="/lessons/new" [attr.aria-label]="'lessons.add' | t" class="btn-confirm float-bottom right-4">
+    <button type="button" (click)="stack.push({ kind: 'lesson', id: null })" [attr.aria-label]="'lessons.add' | t" class="btn-confirm float-bottom right-4">
       <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
-    </a>
+    </button>
   `,
 })
 export class Lessons {
   private service = inject(LessonService);
   private i18n = inject(I18nService);
+  protected stack = inject(NavStack);
+  protected router = inject(Router);
+  private readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
   private readonly search = viewChild<TemplateRef<unknown>>('search');
 
   protected readonly query = signal('');
@@ -70,6 +76,15 @@ export class Lessons {
   });
 
   constructor() {
+    // /lessons/:id → that lesson's card on top (unless it's open already).
+    effect(() => {
+      const id = this.linkedId();
+      if (!id) return;
+      untracked(() => {
+        if (!this.stack.entries().some((e) => e.kind === 'lesson' && e.id === id)) this.stack.push({ kind: 'lesson', id });
+      });
+    });
+
     // Mobile toolbar: the search field instead of a title.
     const toolbar = inject(ToolbarService);
     effect(() => toolbar.content.set(this.search() ?? null));

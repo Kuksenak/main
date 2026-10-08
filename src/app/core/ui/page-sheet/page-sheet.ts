@@ -8,7 +8,8 @@ import { ScrollArea } from '../scroll-area/scroll-area';
 /**
  * Layout for forms and other screens with inputs:
  * - mobile: full-screen page sliding in from the right, so the keyboard never fights a sheet;
- * - desktop: centered solid dialog, capped to the viewport.
+ * - desktop: centered solid dialog, capped to the viewport (`wide`: nearly the whole window,
+ *   for reading — e.g. a lesson).
  * Several can be open at once (cards stacked by NavStack): each slides in over the previous.
  *
  * With `actions` (default) it renders the editor chrome:
@@ -24,11 +25,15 @@ import { ScrollArea } from '../scroll-area/scroll-area';
   template: `
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:bg-[var(--backdrop)] desktop:p-4"
+      [class.desktop:!p-2]="wide()"
       (click)="close()"
     >
       <div
         class="flex h-full w-full flex-col text-[var(--text)] [animation:pageInRight_360ms_var(--ease-out-quick)] mobile:bg-[var(--app-bg)] desktop:h-auto desktop:max-h-[calc(var(--app-h,100dvh)-2rem)] desktop:max-w-md desktop:p-4"
         [class.dialog-panel]="desktop"
+        [class.desktop:!h-full]="wide()"
+        [class.desktop:!max-h-none]="wide()"
+        [class.desktop:!max-w-none]="wide()"
         [style.transform]="closing() ? 'translateX(100%)' : null"
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
@@ -108,6 +113,7 @@ export class PageSheet {
   readonly dirty = input(false);
   readonly canSave = input(false);
   readonly deletable = input(false);
+  readonly wide = input(false);
 
   readonly save = output<void>();
   readonly delete = output<void>();
