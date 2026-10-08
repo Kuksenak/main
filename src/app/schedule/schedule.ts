@@ -342,8 +342,9 @@ export class Schedule implements AfterViewInit {
     return JSON.stringify(m) !== this.editorSnapshot;
   }
 
+  // Save is enabled only for a valid form that actually differs from what was opened.
   protected canSave(m: EditorModel): boolean {
-    return !!m.studentName.trim() && !this.isInvalid(m);
+    return !!m.studentName.trim() && !this.isInvalid(m) && this.isDirty(m);
   }
 
   // Color of the calendar a lesson belongs to (bar on the left of each row). One calendar
