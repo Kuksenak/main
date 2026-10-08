@@ -5,6 +5,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { NavStack, StackEntry } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
 import { GROUP_COLORS, GroupColor, GroupService, colorVar } from '../students/group.service';
@@ -20,7 +21,7 @@ interface Model {
 /** Group card (new or existing), opened on the NavStack: name, color, members, lessons. */
 @Component({
   selector: 'app-group-editor',
-  imports: [FormsModule, Icon, LessonList, PageSheet, Sheet, TranslatePipe],
+  imports: [FormsModule, Icon, LessonList, PageSheet, ScrollArea, Sheet, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -48,6 +49,7 @@ interface Model {
                   class="swatch"
                   [class.is-on]="m.color === c"
                   [style.background]="colorVar(c)"
+                  [style.color]="colorVar(c)"
                   [attr.aria-label]="c"
                   [attr.aria-pressed]="m.color === c"
                 ></button>
@@ -89,9 +91,18 @@ interface Model {
     <!-- Member picker: every student with a check -->
     @if (pickingMembers()) {
       <app-sheet #memberSheet (closed)="pickingMembers.set(false)">
-        <div class="flex flex-col gap-3">
-          <div class="card">
-            @for (s of allStudents(); track s.id) {
+        <div class="flex min-h-0 flex-1 flex-col gap-3">
+          <label class="field">
+            <app-icon name="search" class="size-5 opacity-40 desktop:size-4" />
+            <input type="search" [ngModel]="memberQuery()" (ngModelChange)="memberQuery.set($event)" [placeholder]="'students.search' | t" autocomplete="off" />
+            @if (memberQuery()) {
+              <button type="button" (click)="memberQuery.set('')" [attr.aria-label]="'action.clear' | t" class="icon-plain -mr-1">
+                <app-icon name="close" [strokeWidth]="2.2" class="size-5 desktop:size-4" />
+              </button>
+            }
+          </label>
+          <app-scroll-area class="min-h-0 shrink" viewportClass="card">
+            @for (s of pickerStudents(); track s.id) {
               <button type="button" (click)="toggle(s.id)" class="list-row w-full py-2 text-left">
                 <span class="check" [class.is-on]="m.studentIds.includes(s.id)">
                   @if (m.studentIds.includes(s.id)) {
@@ -102,8 +113,8 @@ interface Model {
                 <p class="min-w-0 flex-1 truncate">{{ s.name }}</p>
               </button>
             }
-          </div>
-          <button type="button" (click)="memberSheet.close()" class="btn-primary w-full">{{ 'action.done' | t }}</button>
+          </app-scroll-area>
+          <button type="button" (click)="memberSheet.close()" class="btn-primary mt-auto w-full shrink-0">{{ 'action.done' | t }}</button>
         </div>
       </app-sheet>
     }
@@ -122,8 +133,9 @@ export class GroupEditor implements OnInit {
   protected readonly colors = GROUP_COLORS;
   protected readonly colorVar = colorVar;
   protected readonly pickingMembers = signal(false);
+  protected readonly memberQuery = signal('');
 
-  protected readonly model = signal<Model>({ name: '', color: 'blue', studentIds: [] });
+  protected readonly model = signal<Model>({ name: '', color: GROUP_COLORS[0], studentIds: [] });
   private readonly snapshot = signal(''); // contents when opened, to tell whether anything changed
 
   protected readonly saved = computed(() => this.groups.groups().find((g) => g.id === this.entry().id) ?? null);
@@ -132,6 +144,10 @@ export class GroupEditor implements OnInit {
 
   private readonly byName = (a: Student, b: Student) => a.name.localeCompare(b.name, this.i18n.locale());
   protected readonly allStudents = computed(() => [...this.students.students()].sort(this.byName));
+  protected readonly pickerStudents = computed(() => {
+    const q = this.memberQuery().trim().toLocaleLowerCase();
+    return this.allStudents().filter((s) => !q || s.name.toLocaleLowerCase().includes(q));
+  });
   protected readonly members = computed(() =>
     this.allStudents().filter((s) => this.model().studentIds.includes(s.id)),
   );
@@ -146,7 +162,10 @@ export class GroupEditor implements OnInit {
       // unsaved, so a group made from a selection can be saved right after naming it.
       const used = new Set(this.groups.groups().map((x) => x.color));
       const color = GROUP_COLORS.find((c) => !used.has(c)) ?? GROUP_COLORS[0];
-      this.model.set({ name: '', color, studentIds: this.entry().studentIds ?? [] });
+      const studentIds = this.entry().studentIds ?? [];
+      this.model.set({ name: '', color, studentIds });
+      // A brand-new empty group starts by picking its members.
+      if (!studentIds.length) this.pickingMembers.set(true);
     }
   }
 

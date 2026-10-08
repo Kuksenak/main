@@ -1,7 +1,9 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '../../i18n/t.pipe';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 import { Icon } from '../icon/icon';
+import { ScrollArea } from '../scroll-area/scroll-area';
 
 /**
  * Layout for forms and other screens with inputs:
@@ -18,7 +20,7 @@ import { Icon } from '../icon/icon';
  */
 @Component({
   selector: 'app-page-sheet',
-  imports: [Icon, TranslatePipe],
+  imports: [Icon, NgTemplateOutlet, ScrollArea, TranslatePipe],
   template: `
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:bg-[var(--backdrop)] desktop:p-4"
@@ -62,14 +64,26 @@ import { Icon } from '../icon/icon';
           }
         </div>
 
-        <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 desktop:flex-initial desktop:px-0 desktop:pb-0 desktop:pt-0">
+        <ng-template #body>
           <ng-content />
           @if (actions() && deletable()) {
             <button type="button" (click)="delete.emit()" class="card-btn mt-6 text-[var(--danger)] desktop:hidden">
               {{ 'action.delete' | t }}
             </button>
           }
-        </div>
+        </ng-template>
+        @if (scroll()) {
+          <app-scroll-area
+            class="min-h-0 flex-1 px-4 desktop:flex-initial desktop:px-0"
+            contentClass="pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 desktop:pb-0 desktop:pt-0"
+          >
+            <ng-container [ngTemplateOutlet]="body" />
+          </app-scroll-area>
+        } @else {
+          <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 desktop:px-0 desktop:pb-0 desktop:pt-0">
+            <ng-container [ngTemplateOutlet]="body" />
+          </div>
+        }
 
         @if (actions()) {
           <!-- Desktop footer -->
@@ -88,6 +102,9 @@ import { Icon } from '../icon/icon';
 export class PageSheet {
   readonly title = input('');
   readonly actions = input(true); // editor chrome (✓ / Save / Delete); false for pickers
+  // The body scrolls as a whole (app-scroll-area); false when the content pins parts (a search)
+  // and scrolls its own list.
+  readonly scroll = input(true);
   readonly dirty = input(false);
   readonly canSave = input(false);
   readonly deletable = input(false);

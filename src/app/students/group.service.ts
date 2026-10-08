@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 
 // Group colors: keys into the palette tokens (--palette-*) in tokens.css.
-export const GROUP_COLORS = ['blue', 'orange', 'teal', 'yellow', 'purple', 'green', 'pink'] as const;
+export const GROUP_COLORS = ['teal', 'green', 'yellow', 'pink', 'purple', 'indigo'] as const;
 export type GroupColor = (typeof GROUP_COLORS)[number];
 
 export interface Group {
@@ -15,8 +15,8 @@ export type GroupInput = Omit<Group, 'id'>;
 
 // Fake data until the backend has a groups API.
 const FAKE_GROUPS: Group[] = [
-  { id: 'g1', name: 'B1 Evening', color: 'blue', studentIds: ['s1', 's4', 's6'] },
-  { id: 'g2', name: 'Conversation Club', color: 'orange', studentIds: ['s2', 's3', 's7'] },
+  { id: 'g1', name: 'B1 Evening', color: 'teal', studentIds: ['s1', 's4', 's6'] },
+  { id: 'g2', name: 'Conversation Club', color: 'purple', studentIds: ['s2', 's3', 's7'] },
 ];
 
 export function colorVar(color: GroupColor): string {

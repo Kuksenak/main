@@ -17,28 +17,32 @@ import {
  *
  * `viewportClass` styles the scrolling element itself (e.g. `card`, so its rounded corners stay
  * put while the content scrolls inside); the content is a full-height flex column (extend it
- * with `contentClass`); `gutter` is how far outside the edge the thumb sits.
+ * with `contentClass`); `gutter` is how far outside the content edge the thumb sits — keep the
+ * default so it's the same everywhere. Padding on the host is the room the thumb sits in.
  */
 @Component({
   selector: 'app-scroll-area',
-  host: { class: 'relative flex min-h-0 flex-col' },
+  host: { class: 'flex min-h-0 flex-col' },
   template: `
-    @if (thumb(); as t) {
+    <!-- Positioning box = the content edge, so padding on the host leaves room for the thumb -->
+    <div class="relative flex min-h-0 flex-1 flex-col">
+      @if (thumb(); as t) {
+        <div
+          class="scroll-indicator"
+          [style.right.px]="-gutter()"
+          [style.top.%]="t.top"
+          [style.height.%]="t.height"
+          [style.opacity]="scrolling() ? 1 : 0.5"
+        ></div>
+      }
       <div
-        class="scroll-indicator"
-        [style.right.px]="-gutter()"
-        [style.top.%]="t.top"
-        [style.height.%]="t.height"
-        [style.opacity]="scrolling() ? 1 : 0.5"
-      ></div>
-    }
-    <div
-      #viewport
-      class="no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain"
-      [class]="viewportClass()"
-      (scroll)="onScroll()"
-    >
-      <div #content class="flex min-h-full flex-col" [class]="contentClass()"><ng-content /></div>
+        #viewport
+        class="no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain"
+        [class]="viewportClass()"
+        (scroll)="onScroll()"
+      >
+        <div #content class="flex min-h-full flex-col" [class]="contentClass()"><ng-content /></div>
+      </div>
     </div>
   `,
 })

@@ -56,7 +56,6 @@ const en = {
   'groups.addMembers': 'Add students',
   'groups.empty': 'No Groups',
   'groups.selectHint': 'Select a group',
-  'groups.select': 'Select',
   'groups.create': 'Create group',
 
   'lesson.new': 'New Lesson',
@@ -144,7 +143,6 @@ const pl: Dictionary = {
   'groups.addMembers': 'Dodaj uczniów',
   'groups.empty': 'Brak grup',
   'groups.selectHint': 'Wybierz grupę',
-  'groups.select': 'Wybierz',
   'groups.create': 'Utwórz grupę',
 
   'lesson.new': 'Nowa lekcja',
@@ -229,7 +227,6 @@ const fr: Dictionary = {
   'groups.addMembers': 'Ajouter des élèves',
   'groups.empty': 'Aucun groupe',
   'groups.selectHint': 'Sélectionnez un groupe',
-  'groups.select': 'Sélectionner',
   'groups.create': 'Créer un groupe',
 
   'lesson.new': 'Nouveau cours',

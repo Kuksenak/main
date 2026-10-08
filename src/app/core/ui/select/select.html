@@ -57,7 +57,7 @@
     >
       <!-- overflow-visible: the scroll indicator sits just outside the panel -->
       <div class="popover-panel mt-1.5 min-w-40 !overflow-visible p-1">
-        <app-scroll-area class="max-h-72" [gutter]="12">
+        <app-scroll-area class="max-h-72">
         @for (sec of sections(); track $index) {
           @if (sec.label) {
             <div class="text-footnote px-3 pb-1 pt-2 uppercase opacity-50">{{ sec.label }}</div>

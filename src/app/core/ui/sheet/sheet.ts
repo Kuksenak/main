@@ -6,10 +6,12 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
 /**
  * Layout for menus (info and actions, no inputs):
  * - mobile: floating bottom sheet (0.5rem inset, large continuous corners, at least half the
- *   screen and growing with its content up to 80%, translucent glass); drag the grabber down
+ *   screen and growing with its content up to 90%, translucent glass); drag the grabber down
  *   or tap outside to dismiss;
  * - desktop: a dropdown anchored under `origin` via CDK overlay, or a centered dialog when
  *   no origin is given.
+ * The content area is a flex column: give a list `min-h-0 flex-1` (e.g. an app-scroll-area)
+ * to scroll just that list while headers / buttons around it stay put.
  * Forms use <app-page-sheet> instead.
  * Render it with @if; call close() to animate out, then `closed` fires.
  */
@@ -44,7 +46,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         ></div>
 
         <div
-          class="absolute inset-x-2 bottom-2 flex max-h-[80dvh] min-h-[50dvh] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[2.75rem] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:min-h-0 desktop:w-full desktop:max-w-sm"
+          class="absolute inset-x-2 bottom-2 flex max-h-[90dvh] min-h-[50dvh] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[2.75rem] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:max-h-[90dvh] desktop:min-h-0 desktop:w-full desktop:max-w-sm"
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"

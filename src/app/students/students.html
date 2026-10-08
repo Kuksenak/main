@@ -23,17 +23,10 @@
     <!-- Search: here on desktop; on mobile the same template sits in the toolbar -->
     <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
 
-    <!-- Students | Groups · Select -->
-    <div class="flex items-center gap-2">
-      <div class="segmented flex-1">
-        <button type="button" (click)="setTab('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
-        <button type="button" (click)="setTab('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
-      </div>
-      @if (tab() === 'students') {
-        <button type="button" (click)="toggleSelect()" class="btn-secondary">
-          {{ (selecting() ? 'action.cancel' : 'groups.select') | t }}
-        </button>
-      }
+    <!-- Students | Groups -->
+    <div class="segmented">
+      <button type="button" (click)="setTab('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
+      <button type="button" (click)="setTab('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
     </div>
 
     <!-- List: the card itself scrolls (corners stay put), indicator beside it; the spacer clears
@@ -42,8 +35,11 @@
       @if (visible().length) {
         <app-scroll-area class="shrink" viewportClass="card">
           @for (s of visible(); track s.id) {
+            <!-- Long press: select students to make a group -->
             <button
               type="button"
+              appLongPress
+              (longPress)="startSelect(s)"
               (click)="pick(s)"
               class="list-row w-full py-2 text-left"
               [class.bg-[var(--highlight)]]="desktop && !selecting() && s.id === selected()?.id"
@@ -159,16 +155,14 @@
   </section>
 </main>
 
-<!-- Floating action: + (new student / group), or Create group while selecting students -->
+<!-- Floating actions: + (new student / group), or Cancel · Create group while selecting students -->
 @if (selecting()) {
-  <button
-    type="button"
-    (click)="createGroupFromSelection()"
-    [disabled]="!checked().size"
-    class="btn-primary float-bottom left-1/2 !h-12 -translate-x-1/2 shadow-[var(--shadow-control)]"
-  >
-    {{ 'groups.create' | t }}@if (checked().size) { ({{ checked().size }}) }
-  </button>
+  <div class="float-bottom inset-x-4 flex items-center gap-2 desktop:left-auto desktop:w-md">
+    <button type="button" (click)="cancelSelect()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
+    <button type="button" (click)="createGroupFromSelection()" [disabled]="!checked().size" class="btn-primary flex-1 disabled:!opacity-50">
+      {{ 'groups.create' | t }}@if (checked().size) { ({{ checked().size }}) }
+    </button>
+  </div>
 } @else {
   <button
     type="button"

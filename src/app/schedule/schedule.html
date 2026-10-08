@@ -1,10 +1,16 @@
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:items-stretch desktop:gap-6">
   <!-- Calendar -->
   <section class="flex min-h-0 w-full shrink-0 flex-col desktop:max-w-md desktop:flex-1">
-    <!-- Month header (desktop; on mobile the month lives in the toolbar) -->
-    <div class="mb-3 flex items-center gap-3 mobile:hidden">
-      <h1 class="text-xl font-semibold">{{ monthTitle() }}</h1>
-      <button type="button" (click)="today()" class="btn-secondary ml-auto">{{ 'schedule.today' | t }}</button>
+    <!-- Month header (desktop; on mobile the month lives in the toolbar): ‹ › jump by month -->
+    <div class="mb-3 flex items-center gap-2 mobile:hidden">
+      <h1 class="mr-auto text-xl font-semibold">{{ monthTitle() }}</h1>
+      <button type="button" (click)="shiftMonth(-1)" [disabled]="!canShift(-1)" [attr.aria-label]="'picker.prevMonth' | t" class="icon-btn disabled:opacity-40">
+        <app-icon name="chevron-left" class="size-5" />
+      </button>
+      <button type="button" (click)="shiftMonth(1)" [disabled]="!canShift(1)" [attr.aria-label]="'picker.nextMonth' | t" class="icon-btn disabled:opacity-40">
+        <app-icon name="chevron-right" class="size-5" />
+      </button>
+      <button type="button" (click)="today()" class="btn-secondary">{{ 'schedule.today' | t }}</button>
     </div>
 
     <!-- Weekday row -->
@@ -14,17 +20,21 @@
       }
     </div>
 
-    <!-- Continuous, scrollable week rows -->
+    <!-- Continuous, scrollable week rows, exactly 6 weeks tall (any month fits); days outside
+         the active month are dimmed -->
     <div
       #cal
       (scroll)="onCalScroll(cal)"
-      class="no-scrollbar h-[16.5rem] snap-y snap-proximity overflow-y-auto overscroll-contain desktop:h-auto desktop:min-h-0 desktop:flex-1"
+      class="no-scrollbar h-[16.5rem] snap-y snap-proximity overflow-y-auto overscroll-contain desktop:h-[18rem]"
     >
       @for (week of allWeeks; track week[0].getTime()) {
         <div class="grid h-11 snap-start grid-cols-7 border-b border-[var(--separator)] last:border-b-0 desktop:h-12">
           @for (day of week; track day.getTime()) {
+            <!-- Tap selects the day; long press creates a lesson on it -->
             <button
               type="button"
+              appLongPress
+              (longPress)="newOn(day)"
               (click)="selectDay(day)"
               class="flex flex-col items-center gap-0.5 pt-1 active:opacity-60 desktop:gap-1.5 desktop:pt-1.5"
               [style.opacity]="inMonth(day) ? null : '0.35'"

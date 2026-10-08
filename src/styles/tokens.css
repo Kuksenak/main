@@ -25,13 +25,13 @@
   --strong-fg: #ffffff;
   --danger: var(--warning); /* destructive actions use the logo's orange too */
   /* Group colors (calendar bars, dots, swatches) */
-  --palette-blue: var(--accent);
-  --palette-orange: #fd763c;
+  /* (no blue / orange: those are the accent and the warning color) */
   --palette-teal: #07bbcc;
-  --palette-yellow: #fdb315;
-  --palette-purple: #8e5cf2;
   --palette-green: #34c759;
+  --palette-yellow: #fdb315;
   --palette-pink: #ff5fa2;
+  --palette-purple: #8e5cf2;
+  --palette-indigo: #5856d6;
 
   /* Default calendar color (event bars, calendar dots): pale accent, adapts to theme. */
   --calendar-default: color-mix(in srgb, var(--accent) 45%, var(--app-bg));

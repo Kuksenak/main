@@ -199,11 +199,12 @@
     }
   }
 
-  /* Color choice; add .is-on for the selected one. */
+  /* Color choice; add .is-on for the selected one (a ring in its own color — set `color`
+     to the swatch color). */
   .swatch {
     @apply inline-flex size-8 shrink-0 rounded-full;
     &.is-on {
-      @apply ring-2 ring-[var(--text)] ring-offset-2 ring-offset-[var(--surface)];
+      @apply ring-2 ring-current ring-offset-2 ring-offset-[var(--surface)];
     }
   }
 
@@ -217,7 +218,7 @@
 
   /* Custom scroll indicator drawn outside a scroll area. */
   .scroll-indicator {
-    @apply pointer-events-none absolute w-0.75 rounded-full bg-[var(--scroll-thumb)]
+    @apply pointer-events-none absolute w-1 rounded-full bg-[var(--scroll-thumb)]
            transition-opacity duration-300;
   }
 }

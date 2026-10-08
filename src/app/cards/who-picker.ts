@@ -77,10 +77,12 @@ import { StudentService } from '../students/student.service';
         </div>
       </app-sheet>
     } @else {
-      <app-page-sheet #page [title]="'lesson.who' | t" [actions]="false" (closed)="closed.emit()">
-        <div class="flex flex-col gap-6">
+      <app-page-sheet #page [title]="'lesson.who' | t" [actions]="false" [scroll]="false" (closed)="closed.emit()">
+        <div class="flex min-h-0 flex-1 flex-col gap-4">
           <ng-container [ngTemplateOutlet]="search" />
-          <ng-container [ngTemplateOutlet]="lists" />
+          <app-scroll-area class="min-h-0 flex-1" contentClass="gap-6">
+            <ng-container [ngTemplateOutlet]="lists" />
+          </app-scroll-area>
         </div>
       </app-page-sheet>
     }

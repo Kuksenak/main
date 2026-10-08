@@ -9,6 +9,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { NavStack } from '../core/services/nav-stack.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
+import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { initial } from '../core/utils/text';
 import { Group, GroupService, colorVar } from './group.service';
@@ -19,12 +20,12 @@ type Tab = 'students' | 'groups';
 /**
  * Students and groups. Tabs switch the list (the search filters whichever is shown). Mobile:
  * a tap opens the card on the NavStack. Desktop: the picked item's details show on the right;
- * Edit and the links in it open cards on the stack. Groups are created from the Groups tab (+)
- * or by selecting students (Select → check → Create group).
+ * Edit and the links in it open cards on the stack. Groups are created from the Groups tab (+,
+ * which opens the member picker right away) or by long-pressing a student to select several.
  */
 @Component({
   selector: 'app-students',
-  imports: [FormsModule, NgTemplateOutlet, GroupMembers, Icon, LessonList, ScrollArea, StudentGroups, TranslatePipe],
+  imports: [FormsModule, NgTemplateOutlet, GroupMembers, Icon, LessonList, LongPress, ScrollArea, StudentGroups, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -104,14 +105,15 @@ export class Students {
     this.stack.push({ kind: this.tab() === 'groups' ? 'group' : 'student', id: null });
   }
 
-  // ---- Select mode ----
+  // ---- Select mode (entered by long-pressing a student) ----
 
-  protected toggleSelect(): void {
-    if (this.selecting()) this.cancelSelect();
-    else this.selecting.set(true);
+  protected startSelect(s: Student): void {
+    if (this.selecting()) return;
+    this.selecting.set(true);
+    this.checked.set(new Set([s.id]));
   }
 
-  private cancelSelect(): void {
+  protected cancelSelect(): void {
     this.selecting.set(false);
     this.checked.set(new Set());
   }

@@ -16,6 +16,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { NavStack } from '../core/services/nav-stack.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
+import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { addDays, startOfDay, toDateInput, toTimeInput } from '../core/utils/time';
 import { GroupService } from '../students/group.service';
@@ -40,7 +41,7 @@ function startOfWeek(d: Date): Date {
 /** Continuous calendar + the selected day's lessons. Lessons open as cards on the NavStack. */
 @Component({
   selector: 'app-schedule',
-  imports: [Icon, ScrollArea, TranslatePipe],
+  imports: [Icon, LongPress, ScrollArea, TranslatePipe],
   templateUrl: './schedule.html',
 })
 export class Schedule implements AfterViewInit {
@@ -65,6 +66,7 @@ export class Schedule implements AfterViewInit {
   );
   protected readonly visibleMonth = signal(startOfMonth(new Date()));
 
+  // Week row height: h-11 on mobile, h-12 on desktop (see the template).
   private rowPx(): number {
     return this.isMobile() ? 44 : 48;
   }
@@ -127,6 +129,21 @@ export class Schedule implements AfterViewInit {
     const el = this.cal()?.nativeElement;
     if (el) el.scrollTop = Math.max(0, Math.min(LESSON_WEEKS_TOTAL, week)) * this.rowPx();
     this.visibleMonth.set(month);
+  }
+
+  // Desktop ‹ ›: scroll to the previous / next month, within the loaded lesson window.
+  protected shiftMonth(delta: number): void {
+    if (!this.canShift(delta)) return;
+    const m = this.visibleMonth();
+    this.scrollToDay(new Date(m.getFullYear(), m.getMonth() + delta, 1));
+  }
+
+  protected canShift(delta: number): boolean {
+    const m = this.visibleMonth();
+    const target = new Date(m.getFullYear(), m.getMonth() + delta, 1);
+    const { from, to } = lessonWindow();
+    const targetEnd = new Date(target.getFullYear(), target.getMonth() + 1, 1);
+    return targetEnd > from && target < to;
   }
 
   protected countFor(day: Date): number {
@@ -193,6 +210,12 @@ export class Schedule implements AfterViewInit {
 
   protected openNew(): void {
     this.stack.push({ kind: 'lesson', id: null, date: toDateInput(this.selectedDate()) });
+  }
+
+  // Long press on a day: select it and start a new lesson there.
+  protected newOn(day: Date): void {
+    this.selectDay(day);
+    this.openNew();
   }
 
   protected openEdit(lesson: Lesson): void {
