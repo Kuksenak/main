@@ -24,10 +24,10 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
             </filter>
           </defs>
           <g filter="url(#brand-cal-shadow)">
-            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 38%, white)" />
+            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 22%, transparent)" />
             <path
               d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
-              style="fill: color-mix(in srgb, var(--brand-blue) 6%, white); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
+              style="fill: color-mix(in srgb, white 25%, transparent); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
             />
           </g>
           <path d="M12 4h24a7 7 0 0 1 7 7v3H5v-3a7 7 0 0 1 7-7z" style="fill: var(--brand-blue)" />
@@ -72,10 +72,10 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'info';
             </filter>
           </defs>
           <g filter="url(#brand-info-shadow)">
-            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 38%, white)" />
+            <rect x="7" y="9" width="36" height="35" rx="7" style="fill: color-mix(in srgb, var(--brand-blue) 22%, transparent)" />
             <path
               d="M12 4h24a7 7 0 0 1 7 7v22l-9 9H12a7 7 0 0 1-7-7V11a7 7 0 0 1 7-7z"
-              style="fill: color-mix(in srgb, var(--brand-blue) 6%, white); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
+              style="fill: color-mix(in srgb, white 25%, transparent); stroke: color-mix(in srgb, var(--brand-blue) 45%, white); stroke-width: 1"
             />
           </g>
           <path
