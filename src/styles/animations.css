@@ -30,3 +30,15 @@
   0% { transform: translateX(-120%); }
   100% { transform: translateX(320%); }
 }
+
+/* A menu unfolding from its button: grows from a bit smaller and fades in. */
+@keyframes menuIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

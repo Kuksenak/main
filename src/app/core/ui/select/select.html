@@ -31,9 +31,26 @@
   >
     @if (isMobile()) {
       <!-- Phone: like iOS's own pickers — their panel color, big rounded corners, large text,
-           the check on the left of the chosen one -->
-      <div class="min-w-60 overflow-hidden rounded-[1.75rem] bg-[var(--picker-bg)] p-1.5 text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:dropdownIn_160ms_var(--ease-out-quick)]">
-        <app-scroll-area class="max-h-[min(60vh,26rem)]">
+           the check on the left of the chosen one, the others grayer. Unfolds softly from the
+           chip. Short lists follow the finger (iOS menus): a highlight slides under the item
+           being touched, and lifting the finger picks it. -->
+      <div
+        class="min-w-60 origin-top overflow-hidden rounded-[1.75rem] bg-[var(--picker-bg)] p-1.5 text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:menuIn_280ms_var(--ease-out-quick)]"
+        [class.touch-none]="dragPick()"
+        (touchstart)="onTouch($event)"
+        (touchmove)="onTouch($event)"
+        (touchend)="onTouchEnd($event)"
+        (touchcancel)="hover.set(null)"
+      >
+        <app-scroll-area class="max-h-[min(60vh,26rem)]" contentClass="relative">
+          <!-- The highlight that slides to the touched item -->
+          @if (hover(); as h) {
+            <div
+              class="pointer-events-none absolute inset-x-0 rounded-[1.25rem] bg-[var(--highlight)] transition-[top] duration-150 ease-out"
+              [style.top.px]="h.top"
+              [style.height.px]="h.height"
+            ></div>
+          }
           @for (sec of sections(); track $index) {
             @if (sec.label) {
               <div class="text-footnote px-4 pb-1 pt-2 opacity-50">{{ sec.label }}</div>
@@ -41,8 +58,11 @@
             @for (opt of sec.options; track opt.value) {
               <button
                 type="button"
+                data-option
+                [attr.data-value]="opt.value"
                 (click)="select(opt)"
-                class="flex h-12 w-full items-center gap-2 rounded-[1.25rem] pl-3 pr-5 text-left text-[1.1875rem] active:bg-[var(--highlight)] active:![transform:none]"
+                class="relative flex h-12 w-full items-center gap-2 rounded-[1.25rem] pl-3 pr-5 text-left text-[1.1875rem] active:![transform:none]"
+                [class.text-[var(--text-secondary)]]="!isSelected(opt)"
               >
                 <span class="flex w-6 shrink-0 justify-center">
                   @if (isSelected(opt)) {

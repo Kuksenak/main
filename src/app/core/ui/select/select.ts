@@ -71,6 +71,33 @@ export class SelectField implements ControlValueAccessor {
     this.onTouched();
   }
 
+  // Phone menu: the item under the finger (its box, for the sliding highlight). Short lists only
+  // — long ones need the finger to scroll.
+  readonly hover = signal<{ value: string; top: number; height: number } | null>(null);
+  readonly dragPick = computed(() => this.options.length <= 8);
+
+  onTouch(e: TouchEvent): void {
+    if (!this.dragPick()) return;
+    const t = e.touches[0];
+    const el = (document.elementFromPoint(t.clientX, t.clientY) as HTMLElement | null)?.closest<HTMLElement>('[data-option]');
+    if (!el) {
+      this.hover.set(null);
+      return;
+    }
+    this.hover.set({ value: el.dataset['value'] ?? '', top: el.offsetTop, height: el.offsetHeight });
+  }
+
+  // Lifting the finger on an item picks it (and the tap's own click is skipped).
+  onTouchEnd(e: TouchEvent): void {
+    const h = this.hover();
+    this.hover.set(null);
+    if (!this.dragPick() || !h) return;
+    const opt = this.options.find((o) => String(o.value) === h.value);
+    if (!opt) return;
+    e.preventDefault();
+    this.select(opt);
+  }
+
   select(opt: SelectOption): void {
     this.setValue(opt.value);
     this.isOpen.set(false);
