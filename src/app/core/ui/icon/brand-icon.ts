@@ -38,7 +38,7 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
       letter-spacing: 0.02em;
     }
     .brand-date {
-      fill: #fff;
+      fill: var(--brand-orange);
       font: 700 21px -apple-system, system-ui, 'Segoe UI', sans-serif;
       letter-spacing: -0.04em;
     }
@@ -47,17 +47,15 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
     <svg viewBox="0 0 48 48" class="size-full">
       @switch (name()) {
         @case ('calendar') {
-          <!-- A colorful tear-off page (the logo's colors, like the other section icons): a blue
-               page, a teal band with the weekday, the corner curling up in yellow; today's date in
-               white -->
+          <!-- A calendar page: a blue band with the weekday, a white page with today's date in orange -->
           <mask id="brand-cal-shape">
-            <path d="M10 3h28a7 7 0 0 1 7 7v25L35 45H10a7 7 0 0 1-7-7V10a7 7 0 0 1 7-7z" fill="#fff" />
+            <rect x="3" y="3" width="42" height="42" rx="8" fill="#fff" />
           </mask>
           <g mask="url(#brand-cal-shape)">
-            <rect width="48" height="48" style="fill: var(--brand-blue)" />
-            <rect width="48" height="16" style="fill: var(--brand-teal)" />
+            <rect width="48" height="48" fill="#fff" />
+            <rect width="48" height="16" style="fill: var(--brand-blue)" />
           </g>
-          <path d="M35 45c0-5.5 4-10 10-10l-10 10z" style="fill: var(--brand-yellow)" />
+          <rect x="3" y="3" width="42" height="42" rx="8" fill="none" style="stroke: rgb(0 0 0 / 0.08); stroke-width: 0.75" />
           <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
           <text x="24" y="38" text-anchor="middle" class="brand-date">{{ today }}</text>
         }
