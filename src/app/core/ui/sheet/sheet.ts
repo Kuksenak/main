@@ -35,7 +35,11 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         (detach)="close()"
       >
         <!-- Kept inside the window: pushed back in, and never taller than it (then it scrolls) -->
-        <div class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-1rem)] w-72 origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]">
+        <div
+          class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-1rem)] origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
+          [class.w-72]="!wide()"
+          [class.w-96]="wide()"
+        >
           <ng-container [ngTemplateOutlet]="content" />
         </div>
       </ng-template>
@@ -76,6 +80,8 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
 export class Sheet {
   /** Desktop anchor: the button that opened the menu. */
   readonly origin = input<HTMLElement | null>(null);
+  /** Desktop dropdown: wider (24rem instead of 18rem). */
+  readonly wide = input(false);
   readonly closed = output<void>();
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
