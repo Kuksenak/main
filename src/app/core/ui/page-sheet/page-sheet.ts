@@ -62,7 +62,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
           @if (actions()) {
             <button
               type="button"
-              (click)="save.emit()"
+              (click)="onSave($event)"
               [disabled]="!canSave()"
               [attr.aria-label]="'action.save' | t"
               class="relative ml-auto"
@@ -80,7 +80,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         <ng-template #body>
           <ng-content />
           @if (actions() && deletable()) {
-            <button type="button" (click)="onDelete()" class="card-btn mt-6 text-[var(--danger)] desktop:hidden">
+            <button type="button" (click)="onDelete($event)" class="card-btn mt-6 text-[var(--danger)] desktop:hidden">
               {{ 'action.delete' | t }}
             </button>
           }
@@ -102,10 +102,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
           <!-- Desktop footer -->
           <div class="mt-4 flex items-center gap-2 mobile:hidden">
             @if (deletable()) {
-              <button type="button" (click)="onDelete()" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+              <button type="button" (click)="onDelete($event)" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
             }
             <!-- No Cancel: a click outside the card closes it -->
-            <button type="button" (click)="save.emit()" [disabled]="!canSave()" class="btn-primary ml-auto">{{ 'action.save' | t }}</button>
+            <button type="button" (click)="onSave($event)" [disabled]="!canSave()" class="btn-primary ml-auto">{{ 'action.save' | t }}</button>
           </div>
         }
       </div>
@@ -113,7 +113,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
 
     <!-- Delete asks first -->
     @if (askDelete()) {
-      <app-confirm-delete (confirmed)="delete.emit()" (closed)="askDelete.set(false)" />
+      <app-confirm-delete [origin]="actionOrigin()" (confirmed)="delete.emit()" (closed)="askDelete.set(false)" />
     }
   `,
 })
@@ -152,7 +152,16 @@ export class PageSheet {
     inject(DestroyRef).onDestroy(() => window.removeEventListener('scroll', pin));
   }
 
-  protected onDelete(): void {
+  /** The Save / Delete button last pressed (questions about it open next to it). */
+  readonly actionOrigin = signal<HTMLElement | null>(null);
+
+  protected onSave(e: Event): void {
+    this.actionOrigin.set(e.currentTarget as HTMLElement);
+    this.save.emit();
+  }
+
+  protected onDelete(e: Event): void {
+    this.actionOrigin.set(e.currentTarget as HTMLElement);
     if (this.confirmDelete()) this.askDelete.set(true);
     else this.delete.emit();
   }

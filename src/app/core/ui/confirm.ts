@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '../i18n/t.pipe';
 import { TranslationKey } from '../i18n/translations';
 import { DeviceDetectionService } from '../services/device-detection.service';
@@ -10,9 +10,9 @@ export interface ActionChoice {
 }
 
 /**
- * A question with a few answers, iOS style: on mobile an action sheet (the message and the
- * answers in one rounded group, a separate bold Cancel below; no dimming — it would tint the
- * toolbar); on desktop an alert (title, message, Cancel and the answers under a hairline).
+ * A question with a few answers, iOS style: on mobile a small menu next to the button that asked
+ * (no dimming — it would tint the toolbar); on desktop an alert (title, message, Cancel and the
+ * answers under a hairline).
  * A click outside cancels. Render it with @if; `chosen` fires with the answer's value, `closed`
  * once it's gone either way.
  */
@@ -45,24 +45,23 @@ export interface ActionChoice {
           </div>
         </div>
       } @else {
+        <!-- Mobile: a small menu right by the button that asked (above it when it's low on the
+             screen); the question and the answers in one font, no dividers; a tap outside cancels -->
         <div
           role="alertdialog"
-          class="flex w-full flex-col gap-2 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] transition-transform duration-200 [animation:sheetUp_300ms_var(--ease-ios)]"
-          [class.translate-y-full]="closing()"
+          class="fixed flex w-64 flex-col overflow-hidden rounded-2xl bg-[color-mix(in_srgb,var(--dialog-bg)_94%,transparent)] p-1.5 text-[var(--text)] shadow-[var(--shadow-dialog)] backdrop-blur-xl transition-[opacity,scale] duration-200 [animation:dropdownIn_200ms_var(--ease-out-quick)]"
+          [style.top.px]="place().top"
+          [style.bottom.px]="place().bottom"
+          [style.right.px]="place().right"
+          [class.origin-bottom-right]="place().bottom !== null"
+          [class.origin-top-right]="place().top !== null"
+          [class.scale-95]="closing()"
           (click)="$event.stopPropagation()"
         >
-          <div class="overflow-hidden rounded-[0.875rem] bg-[color-mix(in_srgb,var(--dialog-bg)_94%,transparent)] text-center shadow-[var(--shadow-dialog)] backdrop-blur-xl">
-            <div class="flex flex-col gap-0.5 px-4 py-3.5">
-              <p class="text-footnote font-semibold opacity-60">{{ title() | t }}</p>
-              @if (message(); as msg) {
-                <p class="text-footnote opacity-60">{{ msg | t }}</p>
-              }
-            </div>
-            @for (c of choices(); track c.value) {
-              <button type="button" (click)="choose(c.value)" class="h-14 w-full border-t border-[var(--separator)] text-[1.25rem] active:bg-[var(--highlight)] active:![transform:none]" [class.text-[var(--danger)]]="c.danger" [class.text-[var(--accent)]]="!c.danger">{{ c.label | t }}</button>
-            }
-          </div>
-          <button type="button" (click)="close()" class="h-14 w-full rounded-[0.875rem] bg-[var(--dialog-bg)] text-[1.25rem] font-semibold text-[var(--accent)] shadow-[var(--shadow-dialog)] active:bg-[var(--highlight)] active:![transform:none]">{{ 'action.cancel' | t }}</button>
+          <p class="text-body px-3 pb-1 pt-2 opacity-50">{{ (message() ?? title()) | t }}</p>
+          @for (c of choices(); track c.value) {
+            <button type="button" (click)="choose(c.value)" class="text-body rounded-xl px-3 py-2.5 text-left active:bg-[var(--highlight)] active:![transform:none]" [class.text-[var(--danger)]]="c.danger">{{ c.label | t }}</button>
+          }
         </div>
       }
     </div>
@@ -72,11 +71,27 @@ export class ActionSheet {
   readonly title = input.required<TranslationKey>();
   readonly message = input<TranslationKey | null>(null);
   readonly choices = input.required<ActionChoice[]>();
+  /** Mobile: the button that asked — the menu opens next to it (else at the bottom right). */
+  readonly origin = input<HTMLElement | null>(null);
   readonly chosen = output<string>();
   readonly closed = output<void>();
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly closing = signal(false);
+
+  // Where the mobile menu goes: right-aligned with the button, below it when it's in the upper
+  // half of the screen, above it otherwise.
+  protected readonly place = computed(() => {
+    const el = this.origin();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    if (!el) return { top: null, bottom: 16, right: 16 };
+    const r = el.getBoundingClientRect();
+    const right = Math.max(8, Math.min(vw - r.right, vw - 8 - 256));
+    return r.top > vh / 2
+      ? { top: null, bottom: vh - r.top + 8, right }
+      : { top: r.bottom + 8, bottom: null, right };
+  });
 
   protected choose(value: string): void {
     this.chosen.emit(value);
@@ -99,12 +114,14 @@ export class ActionSheet {
       title="confirm.deleteTitle"
       message="confirm.deleteText"
       [choices]="choices"
+      [origin]="origin()"
       (chosen)="confirmed.emit()"
       (closed)="closed.emit()"
     />
   `,
 })
 export class ConfirmDelete {
+  readonly origin = input<HTMLElement | null>(null);
   readonly confirmed = output<void>();
   readonly closed = output<void>();
 

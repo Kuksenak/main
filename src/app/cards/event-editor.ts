@@ -185,6 +185,7 @@ interface Model {
       <app-action-sheet
         title="series.title"
         [choices]="ask === 'save' ? saveChoices : deleteChoices"
+        [origin]="page.actionOrigin()"
         (chosen)="seriesChosen(ask, $event)"
         (closed)="askSeries.set(null)"
       />
