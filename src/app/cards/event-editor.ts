@@ -8,6 +8,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { NavStack, StackEntry } from '../core/services/nav-stack.service';
 import { DateField } from '../core/ui/date/date';
 import { Icon } from '../core/ui/icon/icon';
+import { ActionChoice, ActionSheet } from '../core/ui/confirm';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
@@ -19,7 +20,7 @@ import {
   toDateInput,
   toTimeInput,
 } from '../core/utils/time';
-import { EVENT_STATUSES, EventRepeat, EventService, EventStatus, statusKey } from '../schedule/event.service';
+import { EVENT_STATUSES, EventInput, EventRepeat, EventService, EventStatus, statusKey } from '../schedule/event.service';
 import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
@@ -49,7 +50,7 @@ interface Model {
 /** Event card (new or existing), opened on the NavStack. */
 @Component({
   selector: 'app-event-editor',
-  imports: [FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -59,6 +60,7 @@ interface Model {
       [dirty]="dirty()"
       [canSave]="canSave()"
       [deletable]="!!entry().id"
+      [confirmDelete]="!series()"
       (save)="save()"
       (delete)="remove()"
       (closed)="closed.emit()"
@@ -177,6 +179,16 @@ interface Model {
       </div>
       </div>
     </app-page-sheet>
+
+    <!-- A repeating event: this one only, or the whole series? -->
+    @if (askSeries(); as ask) {
+      <app-action-sheet
+        title="series.title"
+        [choices]="ask === 'save' ? saveChoices : deleteChoices"
+        (chosen)="seriesChosen(ask, $event)"
+        (closed)="askSeries.set(null)"
+      />
+    }
 
     @switch (picking()) {
       @case ('invite') {
@@ -361,11 +373,31 @@ export class EventEditor implements OnInit {
     return named && !this.invalid() && this.dirty();
   });
 
-  ngOnInit(): void {
+  // The opened event; for a series, the repeat that was opened (its start).
+  private readonly opened = computed(() => {
     const e = this.entry();
-    const event = e.id ? this.events.events().find((x) => x.id === e.id) : undefined;
+    if (!e.id) return undefined;
+    const all = this.events.events().filter((x) => x.id === e.id);
+    return all.find((x) => x.startsAt === e.at) ?? all[0];
+  });
+  // A saved repeating event (asks "this one or all?" on save and delete).
+  protected readonly series = computed(() => !!this.opened() && this.opened()!.repeat !== 'Never');
+  private repeatSnapshot = '';
+
+  protected readonly askSeries = signal<'save' | 'delete' | null>(null);
+  protected readonly saveChoices: ActionChoice[] = [
+    { value: 'this', label: 'series.saveThis' },
+    { value: 'all', label: 'series.saveAll' },
+  ];
+  protected readonly deleteChoices: ActionChoice[] = [
+    { value: 'this', label: 'series.deleteThis', danger: true },
+    { value: 'all', label: 'series.deleteAll', danger: true },
+  ];
+
+  ngOnInit(): void {
+    const event = this.opened();
     if (event) {
-      const start = new Date(event.seriesStartsAt ?? event.startsAt); // a repeat edits the whole series
+      const start = new Date(event.startsAt); // this repeat's own date and time
       this.model.set({
         repeat: event.repeat ?? 'Never',
         repeatInterval: event.repeatInterval ?? 1,
@@ -380,12 +412,14 @@ export class EventEditor implements OnInit {
         note: event.note ?? '',
         status: event.status,
       });
-    } else if (e.date) {
-      this.model.set({ ...this.blank(), date: e.date });
+    } else if (this.entry().date) {
+      this.model.set({ ...this.blank(), date: this.entry().date! });
     }
     // A stored rule that matches no preset opens as Custom.
     if (this.preset() === 'custom') this.model.update((m) => ({ ...m, repeatCustom: true }));
     this.snapshot.set(JSON.stringify(this.model()));
+    const m = this.model();
+    this.repeatSnapshot = JSON.stringify([m.repeat, m.repeatInterval, m.repeatUntil]);
   }
 
   private blank(): Model {
@@ -451,7 +485,7 @@ export class EventEditor implements OnInit {
     if (!this.canSave()) return;
     const m = this.model();
     const id = this.entry().id;
-    const input = {
+    const input: EventInput = {
       title: m.title.trim() || null,
       repeat: m.repeat,
       repeatInterval: m.repeat === 'Never' ? 1 : m.repeatInterval,
@@ -465,14 +499,52 @@ export class EventEditor implements OnInit {
       note: m.note.trim() || null,
       status: m.status,
     };
-    if (id) this.events.update(id, input);
-    else this.events.create(input);
+    if (!id) this.events.create(input);
+    else if (!this.series()) this.events.update(id, input);
+    else if (this.repeatChanged()) this.saveSeries(input); // a new rule is for the whole series
+    else {
+      this.pendingInput = input;
+      this.askSeries.set('save');
+      return;
+    }
+    this.page().close();
+  }
+
+  private pendingInput: EventInput | null = null;
+
+  private repeatChanged(): boolean {
+    const m = this.model();
+    return JSON.stringify([m.repeat, m.repeatInterval, m.repeatUntil]) !== this.repeatSnapshot;
+  }
+
+  // The whole series: its first start moves by as much as this repeat was moved.
+  private saveSeries(input: EventInput): void {
+    const event = this.opened()!;
+    const shift = new Date(input.startsAt).getTime() - new Date(event.startsAt).getTime();
+    const startsAt = new Date(new Date(event.seriesStartsAt ?? event.startsAt).getTime() + shift).toISOString();
+    this.events.update(event.id, { ...input, startsAt });
+  }
+
+  protected seriesChosen(ask: 'save' | 'delete', choice: string): void {
+    const event = this.opened()!;
+    if (ask === 'save') {
+      const input = this.pendingInput!;
+      if (choice === 'all') this.saveSeries(input);
+      else this.events.occurrence(event.id, event.startsAt, { ...input, repeat: 'Never', repeatInterval: 1, repeatUntil: null });
+    } else {
+      if (choice === 'all') this.events.remove(event.id);
+      else this.events.occurrence(event.id, event.startsAt, null);
+    }
     this.page().close();
   }
 
   protected remove(): void {
     const id = this.entry().id;
     if (!id) return;
+    if (this.series()) {
+      this.askSeries.set('delete');
+      return;
+    }
     this.events.remove(id);
     this.page().close();
   }

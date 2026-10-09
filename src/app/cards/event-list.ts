@@ -88,7 +88,7 @@ export class EventList {
   ]);
 
   protected open(e: ScheduleEvent): void {
-    this.stack.push({ kind: 'event', id: e.id });
+    this.stack.push({ kind: 'event', id: e.id, at: e.startsAt });
   }
 
   protected date(e: ScheduleEvent): string {

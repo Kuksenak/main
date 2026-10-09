@@ -10,6 +10,7 @@ export interface StackEntry {
   kind: 'event' | 'student' | 'group' | 'lesson';
   id: string | null; // null = new
   date?: string; // new event: its day ('yyyy-MM-dd')
+  at?: string; // a repeating event: which repeat was opened (its start)
   studentIds?: string[]; // new group: pre-selected members
   readOnly?: boolean; // opened from another card: just for reading, no links out of it
 }

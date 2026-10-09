@@ -237,6 +237,6 @@ export class Schedule implements AfterViewInit {
   }
 
   protected openEdit(event: ScheduleEvent): void {
-    this.stack.push({ kind: 'event', id: event.id });
+    this.stack.push({ kind: 'event', id: event.id, at: event.startsAt });
   }
 }

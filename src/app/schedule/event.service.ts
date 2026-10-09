@@ -90,6 +90,14 @@ export class EventService {
       .subscribe(() => this.reload());
   }
 
+  /** One repeat of a series: `change` saves it as its own event, null just takes it out. */
+  occurrence(id: string, at: string, change: EventInput | null): void {
+    this.http
+      .post(`${this.base}/${id}/occurrence`, { at, change })
+      .pipe(catchError(() => of(null)))
+      .subscribe(() => this.reload());
+  }
+
   remove(id: string): void {
     this.http
       .delete(`${this.base}/${id}`)

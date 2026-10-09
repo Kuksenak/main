@@ -80,7 +80,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         <ng-template #body>
           <ng-content />
           @if (actions() && deletable()) {
-            <button type="button" (click)="askDelete.set(true)" class="card-btn mt-6 text-[var(--danger)] desktop:hidden">
+            <button type="button" (click)="onDelete()" class="card-btn mt-6 text-[var(--danger)] desktop:hidden">
               {{ 'action.delete' | t }}
             </button>
           }
@@ -102,7 +102,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
           <!-- Desktop footer -->
           <div class="mt-4 flex items-center gap-2 mobile:hidden">
             @if (deletable()) {
-              <button type="button" (click)="askDelete.set(true)" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+              <button type="button" (click)="onDelete()" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
             }
             <!-- No Cancel: a click outside the card closes it -->
             <button type="button" (click)="save.emit()" [disabled]="!canSave()" class="btn-primary ml-auto">{{ 'action.save' | t }}</button>
@@ -130,6 +130,8 @@ export class PageSheet {
   // false: back / ✕ / Cancel / a click outside emit `cancel` and leave the page open (e.g. a
   // card that leaves its edit mode instead of closing).
   readonly cancelCloses = input(true);
+  // false: Delete emits `delete` right away (the card asks its own question, e.g. for a series).
+  readonly confirmDelete = input(true);
 
   readonly save = output<void>();
   readonly delete = output<void>();
@@ -148,6 +150,11 @@ export class PageSheet {
     };
     window.addEventListener('scroll', pin);
     inject(DestroyRef).onDestroy(() => window.removeEventListener('scroll', pin));
+  }
+
+  protected onDelete(): void {
+    if (this.confirmDelete()) this.askDelete.set(true);
+    else this.delete.emit();
   }
 
   protected back(): void {
