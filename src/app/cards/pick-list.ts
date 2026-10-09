@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input, model, output, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, input, model, output, signal } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -90,7 +90,7 @@ export interface PickSection {
     }
   `,
 })
-export class PickList {
+export class PickList implements OnInit {
   readonly title = input(''); // mobile page title
   readonly sections = input.required<PickSection[]>();
   readonly selected = model.required<string[]>();
@@ -102,14 +102,24 @@ export class PickList {
 
   protected readonly query = signal('');
 
-  // Each section filtered by the search, alphabetical.
+  // What was chosen when the list opened: those go first. (Not the live choice — rows would jump
+  // under the finger as they're checked.)
+  private readonly chosenAtOpen = signal(new Set<string>());
+
+  ngOnInit(): void {
+    this.chosenAtOpen.set(new Set(this.selected()));
+  }
+
+  // Each section filtered by the search: the chosen ones alphabetically, then the rest alphabetically.
   protected readonly visible = computed(() => {
     const q = this.query().trim().toLocaleLowerCase();
+    const chosen = this.chosenAtOpen();
+    const locale = this.i18n.locale();
     return this.sections().map((sec) => ({
       key: sec.key,
       items: sec.items
         .filter((i) => !q || i.name.toLocaleLowerCase().includes(q))
-        .sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale())),
+        .sort((a, b) => Number(chosen.has(b.id)) - Number(chosen.has(a.id)) || a.name.localeCompare(b.name, locale)),
     }));
   });
 
