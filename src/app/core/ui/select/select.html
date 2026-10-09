@@ -87,15 +87,18 @@
           <button
             type="button"
             (click)="select(opt)"
-            class="w-full flex items-center justify-between gap-3 px-3 py-1.5 rounded-md text-subhead text-left transition-[transform,background-color] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
+            class="w-full flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-md text-subhead text-left transition-[transform,background-color] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
             [class]="isSelected(opt)
               ? 'option-selected'
               : 'option'"
           >
+            <!-- Dropdowns: the check on the left (lists in cards have it on the right) -->
+            <span class="flex w-4 shrink-0 justify-center">
+              @if (isSelected(opt)) {
+                <app-icon name="check" [strokeWidth]="2.5" class="size-4" />
+              }
+            </span>
             <span>{{ opt.label }}</span>
-            @if (isSelected(opt)) {
-              <app-icon name="check" [strokeWidth]="2.5" class="size-4" />
-            }
           </button>
         }
         }
