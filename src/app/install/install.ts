@@ -33,8 +33,8 @@ interface Guide {
         <div class="card">
           @for (s of g.steps; track $index) {
             <div class="list-row !items-start gap-3 py-3">
-              <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--chip-ios)]">
-                <app-icon [name]="s.icon" class="size-6" />
+              <span class="flex size-12 shrink-0 items-center justify-center rounded-[0.875rem] bg-[var(--chip-ios)] text-[var(--text-secondary)]">
+                <app-icon [name]="s.icon" [strokeWidth]="1.5" class="size-7" />
               </span>
               <p class="min-w-0 flex-1 self-center text-[1.0625rem] leading-snug">
                 <span class="font-semibold tabular-nums opacity-40">{{ $index + 1 }}.</span>
