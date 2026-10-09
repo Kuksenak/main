@@ -63,7 +63,8 @@
   <!-- A page row in a menu: no tap highlight, the label turns bold while pressed; the current
        page checked (in the pages menu only, not Settings / About) -->
   <ng-template #pageRow let-item let-sheet="sheet" let-check="check">
-    <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full text-left active:!bg-transparent">
+    <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full py-1.5 text-left active:!bg-transparent">
+      <app-brand-icon [name]="item.icon" class="size-8" />
       <span class="min-w-0 flex-1 truncate group-active:font-semibold">{{ item.label | t }}</span>
       @if (check && isActive(item.path)) {
         <app-icon name="check" class="size-5 text-[var(--accent)]" />

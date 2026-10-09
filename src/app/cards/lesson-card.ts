@@ -24,7 +24,6 @@ import { LessonState } from '../lessons/lesson-state';
     <app-page-sheet
       #page
       [wide]="true"
-      [title]="s.heading()"
       [actions]="s.editing()"
       [dirty]="s.editing() && s.dirty()"
       [canSave]="s.canSave()"
