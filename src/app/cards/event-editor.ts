@@ -387,7 +387,7 @@ export class EventEditor implements OnInit {
   protected readonly askSeries = signal<'save' | 'delete' | null>(null);
   protected readonly saveChoices: ActionChoice[] = [
     { value: 'this', label: 'series.saveThis' },
-    { value: 'all', label: 'series.saveAll' },
+    { value: 'following', label: 'series.saveFollowing' },
   ];
   protected readonly deleteChoices: ActionChoice[] = [
     { value: 'this', label: 'series.deleteThis', danger: true },
@@ -529,7 +529,7 @@ export class EventEditor implements OnInit {
     const event = this.opened()!;
     if (ask === 'save') {
       const input = this.pendingInput!;
-      if (choice === 'all') this.saveSeries(input);
+      if (choice === 'following') this.events.occurrence(event.id, event.startsAt, input, true); // a new series from here
       else this.events.occurrence(event.id, event.startsAt, { ...input, repeat: 'Never', repeatInterval: 1, repeatUntil: null });
     } else {
       this.events.occurrence(event.id, event.startsAt, null, choice === 'following');

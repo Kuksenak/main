@@ -91,8 +91,8 @@ export class EventService {
   }
 
   /**
-   * One repeat of a series: `change` saves it as its own event; null takes it out — with
-   * `following`, it and all later ones.
+   * One repeat of a series — with `following`, it and all later ones: `change` saves them as a new
+   * event (a new series from here when following), null deletes them.
    */
   occurrence(id: string, at: string, change: EventInput | null, following = false): void {
     this.http
