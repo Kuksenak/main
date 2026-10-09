@@ -78,7 +78,7 @@
     <h2 class="mb-3 flex h-[var(--control-h)] items-center text-xl font-semibold mobile:hidden">{{ dayTitle() }}</h2>
     <app-scroll-area class="min-h-0 flex-1">
       @if (dayEvents().length) {
-        <!-- Today: past events grayed out, the one going on now in red -->
+        <!-- Past events grayed out; the one going on now in orange (title and time) -->
         <div #dayList class="pb-14">
           @for (event of dayEvents(); track event.id) {
             <!-- Calendar color bar · title / who · start over end -->
@@ -95,7 +95,7 @@
                   class="text-body truncate font-medium"
                   [class.line-through]="event.status === 'Cancelled'"
                   [class.opacity-50]="event.status !== 'Scheduled'"
-                  [class.text-[var(--now)]]="timing(event) === 'now'"
+                  [class.text-[var(--warning)]]="timing(event) === 'now'"
                 >{{ people.label(event) }}@if (event.lessonIds.length && !people.subtitle(event)) {<app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}</p>
                 <!-- 📎 lessons attached: before the students (after the title when there are none) -->
                 @if (people.subtitle(event); as sub) {
@@ -106,7 +106,7 @@
                 @if (event.status !== 'Scheduled') {
                   <span class="badge">{{ statusKey(event.status) | t }}</span>
                 }
-                <div class="text-callout text-right leading-tight tabular-nums">
+                <div class="text-callout text-right leading-tight tabular-nums" [class.text-[var(--warning)]]="timing(event) === 'now'">
                   <p class="font-medium">{{ startLabel(event) }}</p>
                   <p class="opacity-50">{{ endLabel(event) }}</p>
                 </div>

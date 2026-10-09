@@ -129,9 +129,8 @@ export class Schedule implements AfterViewInit {
   // The time, ticking every minute — for today's past / ongoing events.
   private readonly now = signal(Date.now());
 
-  // Only today's list shows it; other days' events all look the same.
+  // Any day: what has ended is past (grayed), what's going on is "now" (orange).
   protected timing(e: ScheduleEvent): 'past' | 'now' | 'later' {
-    if (toDateInput(this.selectedDate()) !== toDateInput(new Date(this.now()))) return 'later';
     const now = this.now();
     if (eventEnd(e).getTime() <= now) return 'past';
     return new Date(e.startsAt).getTime() <= now ? 'now' : 'later';
