@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, ElementRef, afterNextRender, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '../../i18n/t.pipe';
 import { DeviceDetectionService } from '../../services/device-detection.service';
+import { LayerStack } from '../../services/layer-stack.service';
 import { ActionChoice, ActionSheet, ConfirmDelete } from '../confirm';
 import { Icon } from '../icon/icon';
 import { ScrollArea } from '../scroll-area/scroll-area';
@@ -28,7 +29,8 @@ import { ScrollArea } from '../scroll-area/scroll-area';
   imports: [ActionSheet, ConfirmDelete, Icon, NgTemplateOutlet, ScrollArea, TranslatePipe],
   template: `
     <div
-      class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:bg-[var(--backdrop)] desktop:p-4"
+      class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:p-4"
+      [class.desktop:bg-[var(--backdrop)]]="!overPage"
       [class.desktop:!p-2]="wide()"
       (click)="back(null)"
     >
@@ -42,6 +44,13 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
       >
+        <!-- Desktop: dimmed while something is open over it (instead of the whole window darkening) -->
+        @if (desktop) {
+          <div
+            class="pointer-events-none absolute inset-0 z-20 rounded-[inherit] bg-[var(--backdrop)] transition-opacity duration-200"
+            [class.opacity-0]="!covered()"
+          ></div>
+        }
         <!-- Mobile top bar: same side inset as the cards, round controls. It floats over the
              content (which scrolls under it), fading from the page color to transparent; only
              its buttons take taps. -->
@@ -158,7 +167,13 @@ export class PageSheet {
 
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
+  private readonly layers = inject(LayerStack);
+  private readonly layer = this.layers.add(true);
+  protected readonly covered = this.layers.covered(this.layer);
+  protected readonly overPage = this.layers.overPage(this.layer); // the page is already dimmed
+
   constructor() {
+    inject(DestroyRef).onDestroy(() => this.layers.remove(this.layer));
     // Desktop editors (with actions) start with the cursor in their first field, once they've
     // slid in (not on phones: the keyboard would cover the card).
     afterNextRender(() => {

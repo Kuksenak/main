@@ -1,7 +1,8 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { DeviceDetectionService } from '../../services/device-detection.service';
+import { LayerStack } from '../../services/layer-stack.service';
 
 /**
  * Layout for menus (info and actions, no inputs):
@@ -30,7 +31,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         [cdkConnectedOverlayPush]="true"
         [cdkConnectedOverlayViewportMargin]="24"
         [cdkConnectedOverlayHasBackdrop]="true"
-        [cdkConnectedOverlayBackdropClass]="overDialog ? 'backdrop-dim' : 'cdk-overlay-transparent-backdrop'"
+        cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
         (backdropClick)="close()"
         (detach)="close()"
       >
@@ -46,7 +47,8 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
     } @else {
       <div class="fixed inset-0 z-40 desktop:flex desktop:items-center desktop:justify-center desktop:p-4">
         <div
-          class="absolute inset-0 [animation:fadeIn_280ms_ease-out] desktop:bg-[var(--backdrop)]"
+          class="absolute inset-0 [animation:fadeIn_280ms_ease-out]"
+          [class.desktop:bg-[var(--backdrop)]]="!overDialog"
           [style.opacity]="closing() ? 0 : null"
           [style.transition]="'opacity 340ms ease-out'"
           (click)="close()"
@@ -85,8 +87,14 @@ export class Sheet {
   readonly closed = output<void>();
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
-  // Opened from a dialog (a card): the dialog dims under the dropdown.
-  protected readonly overDialog = !!document.querySelector('app-page-sheet');
+  // Desktop: a layer over the cards (the card under it dims itself; no extra window dimming).
+  private readonly layers = inject(LayerStack);
+  private readonly layer = this.desktop ? this.layers.add(false) : 0;
+  protected readonly overDialog = this.desktop && this.layers.overPage(this.layer);
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.layer && this.layers.remove(this.layer));
+  }
 
   // Under the anchor, right-aligned; flips above when there's no room below.
   protected readonly positions: ConnectedPosition[] = [

@@ -1,4 +1,5 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
+import { LayerStack } from '../services/layer-stack.service';
 import { DeviceDetectionService } from '../services/device-detection.service';
 import { TranslatePipe } from '../i18n/t.pipe';
 import { TranslationKey } from '../i18n/translations';
@@ -23,7 +24,6 @@ export interface ActionChoice {
     <div
       class="fixed inset-0 z-50 flex transition-opacity duration-200 [animation:fadeIn_200ms_ease-out]"
       [class.opacity-0]="closing()"
-      [class.bg-[var(--backdrop)]]="desktop && overDialog"
       (click)="close()"
     >
       @if (desktop) {
@@ -92,8 +92,13 @@ export class ActionSheet {
 
   protected readonly closing = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
-  // Desktop, asked from a dialog (a card): the dialog dims under the question.
-  protected readonly overDialog = !!document.querySelector('app-page-sheet');
+  // Desktop: a layer over the cards (the card under it dims itself).
+  private readonly layers = inject(LayerStack);
+  private readonly layer = this.desktop ? this.layers.add(false) : 0;
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.layer && this.layers.remove(this.layer));
+  }
 
   // Where the panel goes: over the button that asked, centered on it horizontally — growing down
   // from its top when it's in the upper half of the screen, up from its bottom otherwise.
