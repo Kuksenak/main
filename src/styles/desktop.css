@@ -21,8 +21,9 @@
 /* Desktop text in Inter (variable, bundled in assets/fonts): the same look and in-between
    weights like 450 on every computer — the system fonts (SF Pro, Segoe UI Variable) can't be
    shipped with the app. Phones keep the system font. */
-html,
-body {
+html:root,
+html:root body {
+  /* Doubled-up selectors: styles.css loads after this file and would win otherwise */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   font-feature-settings: 'cv11', 'ss01';
 }
