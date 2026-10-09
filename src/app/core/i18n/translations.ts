@@ -76,7 +76,7 @@ const en = {
   'event.materials': 'Materials',
   'event.type.Event': 'Event',
   'event.type.Class': 'Class',
-  'event.attachLesson': 'Attach lesson',
+  'event.attachLesson': 'Attach',
 
   'lessons.add': 'Add lesson',
   'lessons.new': 'New Lesson',
@@ -199,7 +199,7 @@ const pl: Dictionary = {
   'event.materials': 'Materiały',
   'event.type.Event': 'Wydarzenie',
   'event.type.Class': 'Zajęcia',
-  'event.attachLesson': 'Dołącz lekcję',
+  'event.attachLesson': 'Dołącz',
 
   'lessons.add': 'Dodaj lekcję',
   'lessons.new': 'Nowa lekcja',
@@ -319,7 +319,7 @@ const fr: Dictionary = {
   'event.materials': 'Supports',
   'event.type.Event': 'Événement',
   'event.type.Class': 'Cours',
-  'event.attachLesson': 'Joindre un cours',
+  'event.attachLesson': 'Joindre',
 
   'lessons.add': 'Ajouter un cours',
   'lessons.new': 'Nouveau cours',
