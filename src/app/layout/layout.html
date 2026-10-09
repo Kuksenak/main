@@ -62,7 +62,7 @@
 
   <!-- A page row in a menu: no tap highlight; the current
        page checked (in the pages menu only, not Settings / About) -->
-  <ng-template #pageRow let-item let-sheet="sheet" let-check="check">
+  <ng-template #pageRow let-item let-sheet="sheet" let-check="check" let-chevron="chevron">
     <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full py-2.5 text-left active:!bg-transparent">
       @if (item.icon) {
         <app-brand-icon [name]="item.icon" class="size-8" />
@@ -70,6 +70,9 @@
       <span class="min-w-0 flex-1 truncate">{{ item.label | t }}</span>
       @if (check && isActive(item.path)) {
         <app-icon name="check" class="size-5 text-[var(--accent)]" />
+      }
+      @if (chevron) {
+        <app-icon name="chevron-right" class="row-chevron" />
       }
     </button>
   </ng-template>
@@ -96,6 +99,10 @@
           @if (showVersion()) {
             <div class="list-row text-footnote tabular-nums opacity-50">{{ updates.version }}</div>
           }
+          <!-- About, in the same card as the email -->
+          @for (item of accountItems; track item.path) {
+            <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: sheet, chevron: true }" />
+          }
         </div>
 
         <!-- The language, right here under the email -->
@@ -113,12 +120,6 @@
           </div>
         </div>
 
-        <!-- About -->
-        <div class="card">
-          @for (item of accountItems; track item.path) {
-            <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: sheet }" />
-          }
-        </div>
 
         <!-- Actions pinned to the bottom -->
         <div class="mt-auto flex flex-col gap-3 desktop:gap-2">
