@@ -3,6 +3,7 @@ import { Component, DestroyRef, inject, input, output, signal } from '@angular/c
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 import { LayerStack } from '../../services/layer-stack.service';
+import { InstallService } from '../../services/install.service';
 
 /**
  * Layout for menus (info and actions, no inputs):
@@ -58,6 +59,7 @@ import { LayerStack } from '../../services/layer-stack.service';
           class="absolute inset-x-2 bottom-2 flex max-h-[calc(var(--app-h,100dvh)*0.9)] flex-col overflow-hidden [animation:sheetUp_380ms_var(--ease-ios)] mobile:rounded-[2.75rem] mobile:[corner-shape:squircle] desktop:relative desktop:inset-auto desktop:max-h-[calc(var(--app-h,100dvh)*0.9)] desktop:w-full desktop:max-w-sm"
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
+          [class.!bottom-6]="inBrowser"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
           [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
         >
@@ -87,6 +89,8 @@ export class Sheet {
   readonly closed = output<void>();
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  // A phone's browser (not the installed app): a bit higher, clear of its bottom bar.
+  protected readonly inBrowser = !this.desktop && !inject(InstallService).standalone;
   // Desktop: a layer over the cards (the card under it dims itself; no extra window dimming).
   private readonly layers = inject(LayerStack);
   private readonly layer = this.desktop ? this.layers.add(false) : 0;
