@@ -93,12 +93,17 @@ export class Sheet {
     { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 8 },
     { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -8 },
   ];
-  // Beside the origin: to its right (e.g. next to a card), else its left, else below / above.
-  protected readonly sidePositions: ConnectedPosition[] = [
-    { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top', offsetX: 12 },
-    { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top', offsetX: -12 },
-    ...this.positions,
-  ];
+  // Beside the origin: to its right (e.g. next to a card), else its left — top-aligned with it,
+  // centered on it or bottom-aligned, whichever fits; only then below / above.
+  protected readonly sidePositions: ConnectedPosition[] = (['end', 'start'] as const).flatMap((side) =>
+    (['top', 'center', 'bottom'] as const).map((y): ConnectedPosition => ({
+      originX: side,
+      originY: y,
+      overlayX: side === 'end' ? ('start' as const) : ('end' as const),
+      overlayY: y,
+      offsetX: side === 'end' ? 12 : -12,
+    })),
+  ).concat(this.positions);
 
   protected readonly closing = signal(false);
   protected readonly dragY = signal(0);
