@@ -23,7 +23,7 @@
 /* Prominent (accent) control: flat tint, top-weighted glass rim, see-through white label. */
 @utility glass-accent {
   color: var(--accent-label, rgb(255 255 255 / 0.85));
-  background-color: var(--accent);
+  background-color: var(--accent-btn, var(--accent));
   box-shadow: var(--rim-accent), var(--shadow-accent);
 }
 

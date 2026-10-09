@@ -18,22 +18,61 @@
   --radius-chip: 0.375rem;
 }
 
-/* Buttons: crisp on desktop — solid, no blur and no shadow, just a hairline edge (instead of
-   the frosted glass used on phones); labels on accent buttons fully white. */
+/* Desktop controls, Claude-like: flat and crisp — no glass, blur or shadows.
+   - primary (accent) buttons: solid black (white in dark theme);
+   - icon buttons: just the icon, a soft background on hover;
+   - secondary buttons, Edit and search fields: white with a hairline border;
+   - segmented controls: a gray track, the chosen item white with a hairline border. */
 :root {
   --glass-blur: none;
-  --glass-neutral: #ffffff;
-  --rim-neutral: inset 0 0 0 1px rgb(0 0 0 / 0.14);
+  --glass-neutral: var(--surface);
+  --rim-neutral: inset 0 0 0 1px var(--control-border);
   --shadow-control: 0 0 #0000;
   --rim-accent: 0 0 #0000;
   --shadow-accent: 0 0 #0000;
-  --accent-label: #ffffff;
+  --accent-btn: var(--strong-bg);
+  --accent-label: var(--strong-fg);
+  --control-border: rgb(0 0 0 / 0.15);
 }
 html.dark {
-  --glass-neutral: #3a3a3c;
-  --rim-neutral: inset 0 0 0 1px rgb(255 255 255 / 0.14);
-  --shadow-control: 0 0 #0000;
-  --shadow-accent: 0 0 #0000;
+  --control-border: rgb(255 255 255 / 0.15);
+}
+
+.icon-btn,
+.btn-group {
+  background-color: transparent;
+  box-shadow: none;
+}
+.icon-btn:hover,
+.btn-group > button:hover {
+  background-color: var(--highlight);
+}
+.btn-secondary:hover,
+.btn-white:hover {
+  background-color: color-mix(in srgb, var(--surface) 92%, var(--text));
+}
+.btn-white {
+  background-color: var(--surface);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--control-border);
+}
+
+.field {
+  background-color: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--control-border);
+}
+
+.segmented {
+  background-color: color-mix(in srgb, var(--text) 6%, transparent);
+  border-radius: var(--radius-capsule);
+  & > button {
+    border-radius: calc(var(--radius-capsule) - 0.125rem);
+    font-weight: 400;
+  }
+  & > button[aria-pressed='true'] {
+    font-weight: 500;
+    box-shadow: inset 0 0 0 1px var(--control-border);
+  }
 }
 
 /* Pointer hover feedback (touch devices have no hover). */
