@@ -43,7 +43,7 @@ interface Model {
   date: string; // yyyy-MM-dd
   startTime: string; // HH:mm
   endTime: string; // HH:mm
-  note: string;
+  note: string; // no longer edited here; an existing note is kept as is
   status: EventStatus;
 }
 
@@ -126,11 +126,6 @@ interface Model {
           }
         </div>
 
-        <div class="card">
-          <div class="list-row py-3 desktop:py-2">
-            <textarea name="note" [ngModel]="m.note" (ngModelChange)="patch({ note: $event })" rows="2" [placeholder]="'event.note' | t" autocomplete="off" class="row-input resize-y leading-snug"></textarea>
-          </div>
-        </div>
 
         <!-- Participants (no caption): groups and students (a tap opens their card on top), then Invite -->
         <div class="flex flex-col gap-1.5">

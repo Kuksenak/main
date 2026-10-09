@@ -22,9 +22,9 @@ export class EventPeople {
     return e.title || this.names(e).join(', ');
   }
 
-  /** Under the label: who it's for when there's a title, else the note. */
+  /** Under the label: who it's for, when there's a title above it. */
   subtitle(e: ScheduleEvent): string {
-    return (e.title && this.names(e).join(', ')) || e.note || '';
+    return (e.title && this.names(e).join(', ')) || '';
   }
 
   /** Calendar color: the first invited group's color, else the default calendar color. */
