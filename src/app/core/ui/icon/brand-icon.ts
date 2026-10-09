@@ -39,7 +39,7 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
     }
     .brand-date {
       fill: #1c1c1e;
-      font: 600 23px -apple-system, system-ui, 'Segoe UI', sans-serif;
+      font: 800 22px -apple-system, system-ui, 'Segoe UI', sans-serif; /* heavy, like the old paper icon's */
       letter-spacing: -0.04em;
     }
   `,
@@ -50,7 +50,7 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
           <!-- iOS Calendar style: a white rounded square, the weekday in orange, today's date -->
           <rect x="3" y="3" width="42" height="42" rx="10" class="brand-tile" />
           <text x="24" y="16.5" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
-          <text x="24" y="37" text-anchor="middle" class="brand-date">{{ today }}</text>
+          <text x="24" y="36" text-anchor="middle" class="brand-date">{{ today }}</text>
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->
