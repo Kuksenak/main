@@ -60,7 +60,7 @@
             <button type="button" (click)="showDay(l)" class="list-row w-full py-2 text-left">
               <span class="color-bar" [style.background]="people.color(l)"></span>
               <div class="min-w-0 flex-1 leading-tight">
-                <p class="truncate font-medium">@if (l.lessonIds.length) {<app-icon name="paperclip" class="mr-1 inline size-4 rotate-45 align-[-2px] opacity-50" />}{{ people.label(l) }}</p>
+                <p class="truncate font-medium"><app-icon name="paperclip" class="mr-1 inline size-4 rotate-45 align-[-2px] opacity-50" [class.invisible]="!l.lessonIds.length" />{{ people.label(l) }}</p>
                 <p class="text-footnote truncate opacity-50">{{ upcomingWhen(l) }}</p>
               </div>
               <app-icon name="chevron-right" class="row-chevron" />
@@ -86,7 +86,7 @@
                   class="text-body truncate font-medium"
                   [class.line-through]="event.status === 'Cancelled'"
                   [class.opacity-50]="event.status !== 'Scheduled'"
-                ><!-- 📎 when lessons are attached -->@if (event.lessonIds.length) {<app-icon name="paperclip" class="mr-1 inline size-4 rotate-45 align-[-2px] opacity-50" />}{{ people.label(event) }}</p>
+                ><!-- 📎 when lessons are attached; the space is kept for all, so titles line up --><app-icon name="paperclip" class="mr-1 inline size-4 rotate-45 align-[-2px] opacity-50" [class.invisible]="!event.lessonIds.length" />{{ people.label(event) }}</p>
                 @if (people.subtitle(event); as sub) {
                   <p class="text-footnote truncate opacity-50">{{ sub }}</p>
                 }
