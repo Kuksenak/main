@@ -25,10 +25,6 @@ interface Guide {
       <div class="mx-auto flex w-full max-w-xl flex-col gap-8">
       <div class="flex flex-col gap-3">
         <p class="text-[1.0625rem] leading-relaxed opacity-70">{{ 'install.intro' | t }}</p>
-        <!-- Chrome / Edge / Android: their own install dialog, right from here — a regular-size button under the text -->
-        @if (install.canPrompt()) {
-          <button type="button" (click)="install.prompt()" class="btn-primary self-start">{{ 'install.button' | t }}</button>
-        }
       </div>
 
       @if (guide; as g) {
@@ -42,6 +38,10 @@ interface Guide {
               <p class="min-w-0 flex-1 self-center text-[1.0625rem] leading-snug">
                 <span class="font-semibold tabular-nums opacity-40">{{ $index + 1 }}.</span>
                 {{ s.text | t }}
+                <!-- Chrome / Edge / Android: their own install dialog, right from the first step -->
+                @if ($first && install.canPrompt()) {
+                  <button type="button" (click)="install.prompt()" class="inline font-medium text-[var(--accent)] active:opacity-60">{{ 'install.button' | t }}</button>
+                }
               </p>
             </div>
           }
