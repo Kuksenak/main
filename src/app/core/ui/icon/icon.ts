@@ -73,5 +73,5 @@ export type IconName =
 })
 export class Icon {
   readonly name = input.required<IconName>();
-  readonly strokeWidth = input(1.8);
+  readonly strokeWidth = input(2);
 }

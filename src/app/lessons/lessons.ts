@@ -52,7 +52,7 @@ import { Lesson, LessonService } from './lesson.service';
     </main>
 
     <button type="button" (click)="stack.push({ kind: 'lesson', id: null })" [attr.aria-label]="'lessons.add' | t" class="btn-confirm float-bottom right-4">
-      <app-icon name="plus" [strokeWidth]="1.8" class="size-7 desktop:size-6" />
+      <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
     </button>
   `,
 })

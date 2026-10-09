@@ -66,7 +66,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
               [class.icon-btn]="!canSave()"
               [class.opacity-40]="!canSave()"
             >
-              <app-icon name="check" [strokeWidth]="1.8" class="size-7" />
+              <app-icon name="check" [strokeWidth]="2" class="size-7" />
             </button>
           } @else {
             <div class="relative ml-auto flex items-center gap-2"><ng-content select="[barEnd]" /></div>
