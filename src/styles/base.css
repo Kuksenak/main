@@ -119,4 +119,10 @@ button:disabled {
     opacity: 1;
     background-color: var(--highlight);
   }
+  /* A pressed row is highlighted edge to edge (iOS): the hairlines above and below it hide, so
+     no inset divider cuts across the highlight. */
+  button.list-row:active::after,
+  .list-row:has(+ button.list-row:active)::after {
+    opacity: 0;
+  }
 }
