@@ -23,7 +23,8 @@
    - icon buttons: just the icon, a soft background on hover;
    - secondary buttons, Edit and search fields: white with a hairline border;
    - segmented controls: a gray track, the chosen item white with a hairline border. */
-:root {
+/* Doubled selectors: styles.css (tokens) loads after this file and would win otherwise. */
+:root:root {
   --glass-blur: none;
   --glass-neutral: var(--surface);
   --rim-neutral: inset 0 0 0 1px var(--control-border);
@@ -33,7 +34,7 @@
   --accent-label: #ffffff;
   --control-border: rgb(0 0 0 / 0.15);
 }
-html.dark {
+html.dark:root {
   --control-border: rgb(255 255 255 / 0.15);
 }
 
