@@ -57,8 +57,9 @@ import { Lesson, LessonService } from './lesson.service';
       </section>
     </main>
 
-    <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="btn-confirm float-bottom right-4">
-      <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
+    <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4">
+      <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
+    <span class="fab-label">{{ 'action.add' | t }}</span>
     </button>
     }
   `,

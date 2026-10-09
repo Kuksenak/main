@@ -2,7 +2,9 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
+import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
@@ -47,6 +49,8 @@ export class Layout {
     { path: '/about', label: 'nav.about' },
   ];
   protected readonly menuOpen = signal(false);
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  protected readonly i18n = inject(I18nService);
 
   protected readonly accountOpen = signal(false);
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));

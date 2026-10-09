@@ -65,6 +65,17 @@
            rounded-full active:opacity-70;
   }
 
+  /* The page's + (new event / student / lesson): a round accent button floating at the bottom
+     on mobile; on desktop a "+ Add" button. Put the label in <span class="fab-label">. */
+  .fab {
+    @apply glass-accent inline-flex size-[var(--control-round)] shrink-0 items-center justify-center gap-1.5
+           rounded-full active:opacity-80 desktop:size-auto desktop:h-[var(--control-h)] desktop:rounded-[var(--radius-capsule)]
+           desktop:px-3 desktop:font-medium;
+    & .fab-label {
+      @apply text-body mobile:hidden;
+    }
+  }
+
   /* White button with dark text (e.g. a lesson's Edit): on mobile a capsule as tall as the round
      buttons, on desktop shaped like the other buttons there */
   .btn-white {

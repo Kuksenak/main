@@ -117,6 +117,7 @@
 <button type="button" (click)="today()" class="btn-secondary float-bottom left-4 !h-12 desktop:hidden">
   {{ 'schedule.today' | t }}
 </button>
-<button type="button" (click)="openNew()" [attr.aria-label]="'schedule.addEvent' | t" class="btn-confirm float-bottom right-4">
-  <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
+<button type="button" (click)="openNew()" [attr.aria-label]="'schedule.addEvent' | t" class="fab float-bottom right-4">
+  <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
+    <span class="fab-label">{{ 'action.add' | t }}</span>
 </button>
