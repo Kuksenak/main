@@ -75,7 +75,11 @@ export interface PickSection {
         </div>
       </app-sheet>
     } @else {
-      <app-page-sheet [title]="title()" [actions]="false" [scroll]="false" (closed)="closed.emit()">
+      <app-page-sheet #page [title]="title()" [actions]="false" [scroll]="false" (closed)="closed.emit()">
+        <!-- ✓ just closes: each tap already applies -->
+        <button barEnd type="button" (click)="page.close()" [attr.aria-label]="'action.done' | t" class="btn-confirm">
+          <app-icon name="check" [strokeWidth]="2" class="size-7" />
+        </button>
         <div class="flex min-h-0 flex-1 flex-col gap-4">
           <ng-container [ngTemplateOutlet]="search" />
           <app-scroll-area class="min-h-0 flex-1" contentClass="gap-6">

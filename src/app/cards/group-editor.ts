@@ -5,14 +5,12 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { NavStack, StackEntry } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
-import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
-import { SearchField } from '../core/ui/search-field';
 import { Section } from '../core/ui/section/section';
-import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
 import { GROUP_COLORS, GroupColor, GroupService, colorVar } from '../students/group.service';
 import { Student, StudentService } from '../students/student.service';
 import { EventList } from './event-list';
+import { PickList, PickSection } from './pick-list';
 
 interface Model {
   name: string;
@@ -23,7 +21,7 @@ interface Model {
 /** Group card (new or existing), opened on the NavStack: name, color, members, events. */
 @Component({
   selector: 'app-group-editor',
-  imports: [FormsModule, Icon, EventList, PageSheet, ScrollArea, SearchField, Section, Sheet, TranslatePipe],
+  imports: [FormsModule, Icon, EventList, PageSheet, PickList, Section, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -75,7 +73,7 @@ interface Model {
                 </button>
               </div>
             }
-            <button type="button" (click)="pickingMembers.set(true)" class="edit-only list-row w-full text-left text-[var(--accent)]">
+            <button #addMembersRow type="button" (click)="pickingMembers.set(true)" class="edit-only list-row w-full text-left text-[var(--accent)]">
               <span class="flex items-center gap-2 font-medium">
                 <app-icon name="plus" class="size-5" />
                 {{ 'groups.addMembers' | t }}
@@ -93,25 +91,16 @@ interface Model {
 
     <!-- Member picker: every student with a check -->
     @if (pickingMembers()) {
-      <app-sheet #memberSheet (closed)="pickingMembers.set(false)">
-        <div class="flex min-h-0 flex-1 flex-col gap-3">
-          <app-search-field [(value)]="memberQuery" />
-          <app-scroll-area class="min-h-0 shrink" viewportClass="card">
-            @for (s of pickerStudents(); track s.id) {
-              <button type="button" (click)="toggle(s.id)" class="list-row w-full py-2 text-left">
-                <span class="check" [class.is-on]="m.studentIds.includes(s.id)">
-                  @if (m.studentIds.includes(s.id)) {
-                    <app-icon name="check" [strokeWidth]="3" class="size-3.5" />
-                  }
-                </span>
-                <span class="avatar">{{ initial(s.name) }}</span>
-                <p class="min-w-0 flex-1 truncate">{{ s.name }}</p>
-              </button>
-            }
-          </app-scroll-area>
-          <button type="button" (click)="memberSheet.close()" class="btn-primary mt-auto w-full shrink-0">{{ 'action.done' | t }}</button>
-        </div>
-      </app-sheet>
+      <!-- The same picker as an event's Invite: a page on phones (‹ and ✓ at the top), a dropdown
+           under Add members on desktop -->
+      <app-pick-list
+        [title]="'groups.members' | t"
+        [sections]="memberSections()"
+        [selected]="m.studentIds"
+        (selectedChange)="patch({ studentIds: $event })"
+        [origin]="addMembersRow"
+        (closed)="pickingMembers.set(false)"
+      />
     }
   `,
 })
@@ -130,7 +119,6 @@ export class GroupEditor implements OnInit {
   protected readonly colors = GROUP_COLORS;
   protected readonly colorVar = colorVar;
   protected readonly pickingMembers = signal(false);
-  protected readonly memberQuery = signal('');
 
   protected readonly model = signal<Model>({ name: '', color: GROUP_COLORS[0], studentIds: [] });
   private readonly snapshot = signal(''); // contents when opened, to tell whether anything changed
@@ -141,10 +129,9 @@ export class GroupEditor implements OnInit {
 
   private readonly byName = (a: Student, b: Student) => a.name.localeCompare(b.name, this.i18n.locale());
   protected readonly allStudents = computed(() => [...this.students.students()].sort(this.byName));
-  protected readonly pickerStudents = computed(() => {
-    const q = this.memberQuery().trim().toLocaleLowerCase();
-    return this.allStudents().filter((s) => !q || s.name.toLocaleLowerCase().includes(q));
-  });
+  protected readonly memberSections = computed<PickSection[]>(() => [
+    { key: 'nav.students', items: this.allStudents().map((s) => ({ id: s.id, name: s.name })) },
+  ]);
   protected readonly members = computed(() =>
     this.allStudents().filter((s) => this.model().studentIds.includes(s.id)),
   );
