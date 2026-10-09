@@ -33,8 +33,8 @@ const en = {
   'about.description':
     'A lightweight scheduling app for teachers — plan lessons, track students and keep your week organized.',
 
-  'install.intro':
-    'Install the app: it gets its own icon and opens full screen, like any other app. No app store, and it updates by itself.',
+  'install.intro': 'Install the app: it gets its own icon and opens full screen, like any other app.',
+  'install.intro2': 'No app store, and it updates by itself.',
   'install.clickHere': 'Or click here.',
   'install.tapHere': 'Or tap here.',
   'install.ios.1': 'Tap Share — the square with an arrow.',
@@ -197,8 +197,8 @@ const pl: Dictionary = {
   'about.description':
     'Prosta aplikacja do planowania dla nauczycieli — planuj lekcje, śledź uczniów i miej porządek w tygodniu.',
 
-  'install.intro':
-    'Zainstaluj aplikację: dostanie własną ikonę i otworzy się na pełnym ekranie, jak każda inna. Bez sklepu, aktualizuje się sama.',
+  'install.intro': 'Zainstaluj aplikację: dostanie własną ikonę i otworzy się na pełnym ekranie, jak każda inna.',
+  'install.intro2': 'Bez sklepu, aktualizuje się sama.',
   'install.clickHere': 'Albo kliknij tutaj.',
   'install.tapHere': 'Albo stuknij tutaj.',
   'install.ios.1': 'Stuknij Udostępnij — kwadrat ze strzałką.',
@@ -358,8 +358,8 @@ const fr: Dictionary = {
   'about.description':
     'Une application de planification légère pour les enseignants — planifiez vos cours, suivez vos élèves et organisez votre semaine.',
 
-  'install.intro':
-    'Installez l’app : elle a sa propre icône et s’ouvre en plein écran, comme les autres. Sans store, elle se met à jour toute seule.',
+  'install.intro': 'Installez l’app : elle a sa propre icône et s’ouvre en plein écran, comme les autres.',
+  'install.intro2': 'Sans store, elle se met à jour toute seule.',
   'install.clickHere': 'Ou cliquez ici.',
   'install.tapHere': 'Ou touchez ici.',
   'install.ios.1': 'Touchez Partager — le carré avec une flèche.',
