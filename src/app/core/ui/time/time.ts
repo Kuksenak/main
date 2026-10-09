@@ -17,10 +17,6 @@ function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-const CLS_SELECTED = 'option option-selected';
-const CLS_CURRENT = 'option option-current';
-const CLS_PLAIN = 'option';
-
 @Component({
   selector: 'app-time',
   imports: [OverlayModule],
@@ -34,10 +30,9 @@ const CLS_PLAIN = 'option';
   ],
 })
 export class TimeField implements ControlValueAccessor {
-  // Below the field, else above it (when there's no room below) — never pushed around, which
-  // looped with the card's scroll.
-  // Centered on the chip (iOS): the chosen time, scrolled to the columns' middle, lands right
-  // under the pointer. Near the window's edge: below / above the chip instead.
+  // Centered on the chip (iOS): the band with the chosen time lands right under the pointer.
+  // Near the window's edge: below / above the chip instead (never pushed around, which looped
+  // with the card's scroll).
   protected readonly positions: ConnectedPosition[] = [
     { originX: 'center', originY: 'center', overlayX: 'center', overlayY: 'center' },
     { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 6 },
@@ -85,14 +80,39 @@ export class TimeField implements ControlValueAccessor {
     return out;
   });
 
-  // Keep the scroll position within the middle copies for a seamless loop.
-  onColScroll(el: HTMLElement): void {
-    const block = el.scrollHeight / this.loopCount;
-    if (block <= 0) return;
-    if (el.scrollTop < block) {
-      el.scrollTop += block;
-    } else if (el.scrollTop > block * (this.loopCount - 1)) {
-      el.scrollTop -= block;
+  // Wheels: rows of ROW px, the column padded so any row can sit in the middle band — the row
+  // there is index scrollTop / ROW.
+  private static readonly ROW = 32;
+  readonly centerH = signal<number | null>(null);
+  readonly centerM = signal<number | null>(null);
+  private settle: Record<'h' | 'm', ReturnType<typeof setTimeout> | undefined> = { h: undefined, m: undefined };
+
+  onColScroll(el: HTMLElement, col: 'h' | 'm'): void {
+    // Keep within the middle copies for a seamless loop (a whole block: the same row stays put).
+    const block = (el.children.length / this.loopCount) * TimeField.ROW;
+    if (block > 0) {
+      if (el.scrollTop < block) el.scrollTop += block;
+      else if (el.scrollTop > block * (this.loopCount - 1)) el.scrollTop -= block;
+    }
+    const index = Math.round(el.scrollTop / TimeField.ROW);
+    (col === 'h' ? this.centerH : this.centerM).set(index);
+    // Once it stops: what's in the band is the time.
+    clearTimeout(this.settle[col]);
+    this.settle[col] = setTimeout(() => this.pick(col, index), 140);
+  }
+
+  /** A click on a row: roll it into the band (picked when it stops there). */
+  scrollTo(el: HTMLElement, index: number): void {
+    el.scrollTo({ top: index * TimeField.ROW, behavior: 'smooth' });
+  }
+
+  private pick(col: 'h' | 'm', index: number): void {
+    if (col === 'h') {
+      const h = this.loopHours()[index];
+      if (h !== undefined && h !== this.activeHour()) this.selectHour(h);
+    } else {
+      const m = this.loopMinutes()[index];
+      if (m !== undefined && m !== this.activeMinute()) this.selectMinute(m);
     }
   }
 
@@ -183,18 +203,6 @@ export class TimeField implements ControlValueAccessor {
     this.setValue(`${pad(this.selectedHour() ?? this.now().getHours())}:${pad(m)}`);
   }
 
-  hourClass(h: number): string {
-    if (this.selectedHour() === h) return CLS_SELECTED;
-    if (h === this.now().getHours()) return CLS_CURRENT;
-    return CLS_PLAIN;
-  }
-
-  minuteClass(m: number): string {
-    if (this.selectedMinute() === m) return CLS_SELECTED;
-    if (m === this.currentStepMinute()) return CLS_CURRENT;
-    return CLS_PLAIN;
-  }
-
   // Mobile native input
   onNativeChange(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -215,11 +223,12 @@ export class TimeField implements ControlValueAccessor {
 
   private scrollActiveIntoView(col?: HTMLElement) {
     if (!col) return;
-    const actives = col.querySelectorAll<HTMLElement>('[data-active]');
+    const rows = Array.from(col.children);
+    const actives = rows.filter((r) => r.hasAttribute('data-active'));
     if (!actives.length) return;
-    // Center the active item from a middle copy so there's room to loop both ways.
-    const active = actives[Math.floor(actives.length / 2)];
-    col.scrollTop = active.offsetTop - col.clientHeight / 2 + active.clientHeight / 2;
+    // Into the band, from a middle copy so there's room to loop both ways.
+    const index = rows.indexOf(actives[Math.floor(actives.length / 2)]);
+    col.scrollTop = index * TimeField.ROW;
   }
 
   private setValue(v: string | null) {

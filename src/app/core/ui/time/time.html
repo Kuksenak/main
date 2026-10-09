@@ -35,34 +35,36 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <!-- Two narrow columns, edges fading out (they loop), no scrollbars -->
-      <div class="popover-panel w-max px-3 py-1"><!-- as wide as the columns; 12px around, like the calendar (the columns add 8px top / bottom) -->
-
-        <div class="flex gap-1">
+      <!-- iOS wheels: a fixed blue band across the middle; the hours / minutes scroll under it
+           (snapping row by row) and whatever stops in the band is the time. Columns loop, their
+           edges fade out, no scrollbars. 12px around, like the calendar. -->
+      <div class="popover-panel relative w-max p-3">
+        <div class="pointer-events-none absolute inset-x-3 top-1/2 h-8 -translate-y-1/2 rounded-md bg-[var(--accent)]"></div>
+        <div class="relative flex gap-2">
           <!-- Hours -->
-          <div #hourCol (scroll)="onColScroll(hourCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-px overflow-y-auto py-2 [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
+          <div #hourCol (scroll)="onColScroll(hourCol, 'h')" class="no-scrollbar flex h-56 w-16 snap-y snap-mandatory flex-col overflow-y-auto py-24 [mask-image:linear-gradient(transparent,black_30%,black_70%,transparent)]">
             @for (h of loopHours(); track $index) {
               <button
                 type="button"
-                (click)="selectHour(h)"
+                (click)="scrollTo(hourCol, $index)"
                 [attr.data-active]="activeHour() === h ? '' : null"
-                class="w-11 rounded-md py-1 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
-                [class]="hourClass(h)"
+                class="h-8 w-full shrink-0 snap-center text-center text-[0.9375rem] tabular-nums transition-colors duration-100 [-webkit-tap-highlight-color:transparent] active:![transform:none]"
+                [class.text-[var(--accent-fg)]]="centerH() === $index"
+                [class.font-medium]="centerH() === $index"
               >{{ h.toString().padStart(2, '0') }}</button>
             }
           </div>
 
-          <div class="my-3 w-px bg-[var(--separator)]"></div>
-
           <!-- Minutes -->
-          <div #minuteCol (scroll)="onColScroll(minuteCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-px overflow-y-auto py-2 [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
+          <div #minuteCol (scroll)="onColScroll(minuteCol, 'm')" class="no-scrollbar flex h-56 w-16 snap-y snap-mandatory flex-col overflow-y-auto py-24 [mask-image:linear-gradient(transparent,black_30%,black_70%,transparent)]">
             @for (m of loopMinutes(); track $index) {
               <button
                 type="button"
-                (click)="selectMinute(m)"
+                (click)="scrollTo(minuteCol, $index)"
                 [attr.data-active]="activeMinute() === m ? '' : null"
-                class="w-11 rounded-md py-1 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
-                [class]="minuteClass(m)"
+                class="h-8 w-full shrink-0 snap-center text-center text-[0.9375rem] tabular-nums transition-colors duration-100 [-webkit-tap-highlight-color:transparent] active:![transform:none]"
+                [class.text-[var(--accent-fg)]]="centerM() === $index"
+                [class.font-medium]="centerM() === $index"
               >{{ m.toString().padStart(2, '0') }}</button>
             }
           </div>
