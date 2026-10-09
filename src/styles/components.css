@@ -172,12 +172,11 @@
            last:after:hidden;
   }
 
-  /* Full-screen "rotate to portrait" notice, shown only on phones held in landscape: the app
-     stays visible behind it, blurred. */
+  /* Full-screen "rotate to portrait" notice, shown only on phones held in landscape: no
+     background of its own — just the app behind it, blurred. */
   .rotate-hint {
-    @apply fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-3
-           bg-[color-mix(in_srgb,var(--app-bg)_55%,transparent)] px-8 text-center text-[var(--text)]
-           backdrop-blur-xl;
+    @apply fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-3 px-8 text-center
+           text-[var(--text)] backdrop-blur-xl;
   }
   @media (orientation: landscape) and (max-height: 32rem) {
     [data-device='mobile'] .rotate-hint {
