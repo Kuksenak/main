@@ -18,7 +18,7 @@ import {
   toDateInput,
   toTimeInput,
 } from '../core/utils/time';
-import { EVENT_STATUSES, EventService, EventStatus, statusKey } from '../schedule/event.service';
+import { EVENT_STATUSES, EVENT_TYPES, EventService, EventStatus, EventType, statusKey } from '../schedule/event.service';
 import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
@@ -31,6 +31,7 @@ interface Invitees {
 }
 
 interface Model {
+  type: EventType;
   title: string;
   invitees: Invitees;
   lessonIds: string[];
@@ -58,13 +59,23 @@ interface Model {
       (closed)="closed.emit()"
     >
       <div class="flex flex-col gap-6">
+        <!-- Event | Class: only a class has participants and materials -->
+        <div class="segmented">
+          @for (t of types; track t) {
+            <button type="button" (click)="patch({ type: t })" [attr.aria-pressed]="m.type === t">{{ typeKey(t) | t }}</button>
+          }
+        </div>
+
         <div class="card">
           <div class="list-row">
             <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="row-input" />
           </div>
         </div>
 
-        <!-- Invited groups and students (a tap opens their card on top), then Invite -->
+        @if (m.type === 'Class') {
+        <!-- Participants: groups and students (a tap opens their card on top), then Invite -->
+        <div class="flex flex-col gap-1.5">
+        <span class="text-footnote px-4 uppercase opacity-50">{{ 'event.participants' | t }}</span>
         <div class="card">
           @for (p of invited(); track p.id) {
             <button type="button" (click)="stack.push({ kind: p.kind, id: p.id })" class="list-row w-full py-2 text-left">
@@ -73,14 +84,17 @@ interface Model {
               <app-icon name="chevron-right" class="row-chevron" />
             </button>
           }
-          <button #inviteRow type="button" (click)="picking.set('invite')" class="list-row w-full text-left text-[var(--accent)]">
+          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" class="list-row w-full text-left text-[var(--accent)]">
             <span>{{ 'event.invite' | t }}</span>
             <app-icon name="plus" class="size-5" />
           </button>
         </div>
+        </div>
 
-        <!-- Attached lessons (a tap opens the lesson: a card on top on mobile, its page on
-             desktop), then Attach -->
+        <!-- Materials: attached lessons (a tap opens the lesson: a card on top on mobile, its
+             page on desktop), then Attach -->
+        <div class="flex flex-col gap-1.5">
+        <span class="text-footnote px-4 uppercase opacity-50">{{ 'event.materials' | t }}</span>
         <div class="card">
           @for (l of attached(); track l.id) {
             <button type="button" (click)="openLesson(l.id)" class="list-row w-full text-left">
@@ -88,11 +102,13 @@ interface Model {
               <app-icon name="chevron-right" class="row-chevron" />
             </button>
           }
-          <button #lessonRow type="button" (click)="picking.set('lessons')" class="list-row w-full text-left text-[var(--accent)]">
+          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" class="list-row w-full text-left text-[var(--accent)]">
             <span>{{ 'event.attachLesson' | t }}</span>
             <app-icon name="plus" class="size-5" />
           </button>
         </div>
+        </div>
+        }
 
         <div class="card">
           <div class="list-row">
@@ -133,7 +149,7 @@ interface Model {
           [sections]="inviteSections()"
           [selected]="inviteIds()"
           (selectedChange)="setInvitees($event)"
-          [origin]="inviteRow"
+          [origin]="pickOrigin()"
           (closed)="picking.set(null)"
         />
       }
@@ -143,7 +159,7 @@ interface Model {
           [sections]="lessonSections()"
           [selected]="m.lessonIds"
           (selectedChange)="patch({ lessonIds: $event })"
-          [origin]="lessonRow"
+          [origin]="pickOrigin()"
           (closed)="picking.set(null)"
         />
       }
@@ -166,6 +182,12 @@ export class EventEditor implements OnInit {
   private readonly page = viewChild.required<PageSheet>('page');
 
   protected readonly picking = signal<'invite' | 'lessons' | null>(null);
+  protected readonly pickOrigin = signal<HTMLElement | null>(null); // the row it opened from
+
+  protected openPicker(kind: 'invite' | 'lessons', origin: HTMLElement): void {
+    this.pickOrigin.set(origin);
+    this.picking.set(kind);
+  }
   protected readonly model = signal<Model>(this.blank());
   // Contents when the card opened, to tell whether anything changed.
   private readonly snapshot = signal('');
@@ -218,9 +240,16 @@ export class EventEditor implements OnInit {
   );
   protected readonly dirty = computed(() => JSON.stringify(this.model()) !== this.snapshot());
   // Save a valid event with a title or someone invited, that differs from what was opened.
+  protected readonly types = EVENT_TYPES;
+  protected typeKey(t: EventType) {
+    return `event.type.${t}` as const;
+  }
+
+  // An event needs a title; a class, a title or someone invited.
   protected readonly canSave = computed(() => {
     const m = this.model();
-    const named = !!m.title.trim() || !!m.invitees.studentIds.length || !!m.invitees.groupIds.length;
+    const invited = m.type === 'Class' && (!!m.invitees.studentIds.length || !!m.invitees.groupIds.length);
+    const named = !!m.title.trim() || invited;
     return named && !this.invalid() && this.dirty();
   });
 
@@ -230,6 +259,7 @@ export class EventEditor implements OnInit {
     if (event) {
       const start = new Date(event.startsAt);
       this.model.set({
+        type: event.type,
         title: event.title ?? '',
         invitees: { studentIds: event.studentIds, groupIds: event.groupIds },
         lessonIds: event.lessonIds,
@@ -247,6 +277,7 @@ export class EventEditor implements OnInit {
 
   private blank(): Model {
     return {
+      type: 'Class',
       title: '',
       invitees: { studentIds: [], groupIds: [] },
       lessonIds: [],
@@ -295,11 +326,13 @@ export class EventEditor implements OnInit {
     if (!this.canSave()) return;
     const m = this.model();
     const id = this.entry().id;
+    const isClass = m.type === 'Class';
     const input = {
+      type: m.type,
       title: m.title.trim() || null,
-      studentIds: m.invitees.studentIds,
-      groupIds: m.invitees.groupIds,
-      lessonIds: m.lessonIds,
+      studentIds: isClass ? m.invitees.studentIds : [],
+      groupIds: isClass ? m.invitees.groupIds : [],
+      lessonIds: isClass ? m.lessonIds : [],
       startsAt: new Date(`${m.date}T${m.startTime}`).toISOString(),
       durationMinutes: timeToMin(m.endTime) - timeToMin(m.startTime),
       note: m.note.trim() || null,

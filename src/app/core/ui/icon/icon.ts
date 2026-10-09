@@ -18,6 +18,10 @@ export type IconName =
   | 'copy'
   | 'i'
   | 'grid'
+  | 'heading'
+  | 'image'
+  | 'video'
+  | 'checklist'
   | 'compose'
   | 'google'
   | 'apple';
@@ -60,6 +64,10 @@ export type IconName =
             }
           }
         }
+        @case ('heading') { <path d="M6 5v14M18 5v14M6 12h12" /> }
+        @case ('image') { <rect x="3.5" y="4.5" width="17" height="15" rx="3" /><circle cx="9" cy="10" r="1.75" /><path d="m4 17 5-4.5 4 3.5 3-2.5 4 3.5" /> }
+        @case ('video') { <rect x="3.5" y="5.5" width="13" height="13" rx="3" /><path d="m16.5 10 4-2.5v9l-4-2.5" /> }
+        @case ('checklist') { <path d="m4 6.5 1.5 1.5L8 5.5M4 13.5 5.5 15 8 12.5M11 7h9M11 14h9M11 19h6" /> }
         @case ('person') { <circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /> }
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }

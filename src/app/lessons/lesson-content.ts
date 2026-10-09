@@ -3,7 +3,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { LessonBlock } from './lesson.service';
 
-/** A lesson's content as read: texts as paragraphs, links as rows opening in a new tab. */
+/** A lesson's content as read: headings, texts as paragraphs, links as rows opening in a new tab. */
 @Component({
   selector: 'app-lesson-content',
   imports: [Icon, TranslatePipe],
@@ -19,6 +19,8 @@ import { LessonBlock } from './lesson.service';
           </div>
           <app-icon name="chevron-right" class="row-chevron" />
         </a>
+      } @else if (b.kind === 'heading') {
+        <h2 class="px-1 pt-2 text-xl font-semibold">{{ b.text }}</h2>
       } @else {
         <p class="text-body whitespace-pre-wrap px-1 leading-relaxed">{{ b.text }}</p>
       }

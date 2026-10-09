@@ -5,9 +5,9 @@ import { catchError, of } from 'rxjs';
 import { ResourceStore } from '../core/services/resource-store';
 import { EventService } from '../schedule/event.service';
 
-export type LessonBlockKind = 'text' | 'link';
+export type LessonBlockKind = 'heading' | 'text' | 'link';
 
-/** One piece of a lesson: a text, or a link (url, with an optional label in `text`). */
+/** One piece of a lesson: a heading, a text, or a link (url, with an optional label in `text`). */
 export interface LessonBlock {
   kind: LessonBlockKind;
   text: string | null;

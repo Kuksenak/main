@@ -6,6 +6,10 @@ import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
 
 export type EventStatus = 'Scheduled' | 'Done' | 'Cancelled';
+
+/** A plain event (time + title) or a class (with participants and materials). */
+export type EventType = 'Event' | 'Class';
+export const EVENT_TYPES: EventType[] = ['Event', 'Class'];
 export const EVENT_STATUSES: EventStatus[] = ['Scheduled', 'Done', 'Cancelled'];
 
 // Events are loaded for a window around today: 26 weeks back, 53 weeks in total, starting
@@ -25,6 +29,7 @@ export function eventWindow(): { from: Date; to: Date } {
 /** A scheduled event (class, meeting, …) and who is invited. */
 export interface ScheduleEvent {
   id: string;
+  type: EventType;
   title: string | null;
   studentIds: string[]; // invited students …
   groupIds: string[]; // … and groups (each invites its members)
