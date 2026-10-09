@@ -60,8 +60,7 @@
 
     <ng-template
       cdkConnectedOverlay
-      [cdkConnectedOverlayPush]="true"
-      [cdkConnectedOverlayViewportMargin]="8"
+      [cdkConnectedOverlayPositions]="positions"
       [cdkConnectedOverlayOrigin]="origin"
       [cdkConnectedOverlayOpen]="isOpen()"
       [cdkConnectedOverlayHasBackdrop]="true"
@@ -70,8 +69,8 @@
       (detach)="close()"
     >
       <!-- overflow-visible: the scroll indicator sits just outside the panel -->
-      <div class="popover-panel mt-1.5 min-w-40 !overflow-visible p-1">
-        <app-scroll-area class="max-h-72">
+      <div class="popover-panel min-w-40 !overflow-visible p-1">
+        <app-scroll-area class="max-h-72" contentClass="gap-0.5">
         @for (sec of sections(); track $index) {
           @if (sec.label) {
             <div class="text-footnote px-3 pb-1 pt-2 opacity-50">{{ sec.label }}</div>
@@ -80,7 +79,7 @@
           <button
             type="button"
             (click)="select(opt)"
-            class="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-subhead text-left transition-[transform,background-color] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
+            class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-subhead text-left transition-[transform,background-color] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
             [class]="isSelected(opt)
               ? 'option-selected'
               : 'option'"

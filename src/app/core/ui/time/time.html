@@ -26,8 +26,7 @@
 
     <ng-template
       cdkConnectedOverlay
-      [cdkConnectedOverlayPush]="true"
-      [cdkConnectedOverlayViewportMargin]="8"
+      [cdkConnectedOverlayPositions]="positions"
       [cdkConnectedOverlayOrigin]="origin"
       [cdkConnectedOverlayOpen]="isOpen()"
       [cdkConnectedOverlayHasBackdrop]="true"
@@ -37,7 +36,7 @@
       (detach)="close()"
     >
       <!-- Two narrow columns, edges fading out (they loop), no scrollbars -->
-      <div class="popover-panel mt-1.5 w-40 px-3 py-2">
+      <div class="popover-panel w-40 px-3 py-2">
 
         <div class="flex gap-2">
           <!-- Hours -->

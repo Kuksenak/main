@@ -16,7 +16,8 @@ import { ScrollArea } from '../scroll-area/scroll-area';
  * With `actions` (default) it renders the editor chrome:
  * - mobile top bar: back (✕ once `dirty`) · title · ✓ (blue when `canSave`); Delete at the end
  *   of the content when `deletable`;
- * - desktop footer: Delete (when `deletable`) · Cancel · Save. Delete asks to confirm first.
+ * - desktop footer: Delete (when `deletable`) · Save (a click outside closes). Delete asks to
+ *   confirm first.
  * Without `actions`, round buttons marked `barEnd` go to the right of the mobile top bar:
  *   <button barEnd class="icon-btn">…</button> (several, or inside @if: <ng-container ngProjectAs="[barEnd]">)
  * Menus without inputs use <app-sheet> instead.
@@ -103,8 +104,8 @@ import { ScrollArea } from '../scroll-area/scroll-area';
             @if (deletable()) {
               <button type="button" (click)="askDelete.set(true)" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
             }
-            <button type="button" (click)="back()" class="btn-secondary ml-auto">{{ 'action.cancel' | t }}</button>
-            <button type="button" (click)="save.emit()" [disabled]="!canSave()" class="btn-primary">{{ 'action.save' | t }}</button>
+            <!-- No Cancel: a click outside the card closes it -->
+            <button type="button" (click)="save.emit()" [disabled]="!canSave()" class="btn-primary ml-auto">{{ 'action.save' | t }}</button>
           </div>
         }
       </div>
