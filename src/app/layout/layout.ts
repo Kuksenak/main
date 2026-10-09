@@ -14,13 +14,14 @@ import { GroupService } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 import { UpdateService } from '../core/services/update.service';
 import { StackHost } from '../cards/stack-host';
+import { FingerPick } from '../core/ui/finger-pick';
 import { BrandIcon, BrandIconName } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, StackHost, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, FingerPick, StackHost, TranslatePipe],
   templateUrl: './layout.html',
 })
 export class Layout {
