@@ -129,6 +129,15 @@
 
   /* ---- Surfaces ---- */
 
+  /* Glass popup (iOS 26 material): see-through tint over a strong blur, a light edge and a deep
+     shadow — menus and confirms on phones. */
+  .glass-panel {
+    @apply border-[0.5px] border-[var(--glass-edge)] bg-[var(--glass-panel)]
+           shadow-[0_12px_40px_rgb(0_0_0/0.35),0_2px_8px_rgb(0_0_0/0.15)];
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    backdrop-filter: blur(30px) saturate(180%);
+  }
+
   /* Mobile bottom sheet: translucent glass, no backdrop dimming. */
   .sheet-panel {
     --surface: var(--sheet-surface);

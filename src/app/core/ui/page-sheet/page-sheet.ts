@@ -145,9 +145,10 @@ export class PageSheet {
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
   constructor() {
-    // Editors (with actions) start with the cursor in their first field, once they've slid in.
+    // Desktop editors (with actions) start with the cursor in their first field, once they've
+    // slid in (not on phones: the keyboard would cover the card).
     afterNextRender(() => {
-      if (!this.actions()) return;
+      if (!this.actions() || !this.desktop) return;
       setTimeout(() => {
         const field = this.host.nativeElement.querySelector<HTMLElement>(
           '.read-only, input:not([type=hidden]):not([type=checkbox]):not([disabled]), textarea:not([disabled])',

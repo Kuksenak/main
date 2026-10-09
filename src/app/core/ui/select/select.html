@@ -21,7 +21,7 @@
 
   <ng-template
     cdkConnectedOverlay
-    [cdkConnectedOverlayPositions]="positions"
+    [cdkConnectedOverlayPositions]="isMobile() ? phonePositions : positions"
     [cdkConnectedOverlayOrigin]="origin"
     [cdkConnectedOverlayOpen]="isOpen()"
     [cdkConnectedOverlayHasBackdrop]="true"
@@ -35,7 +35,7 @@
            chip. Short lists follow the finger (iOS menus): a highlight slides under the item
            being touched, and lifting the finger picks it. -->
       <div
-        class="min-w-60 origin-top overflow-hidden rounded-[1.75rem] bg-[var(--picker-bg)] p-1.5 text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:menuIn_280ms_var(--ease-out-quick)]"
+        class="glass-panel min-w-60 origin-top overflow-hidden rounded-[1.75rem] p-1.5 text-[var(--text)] [animation:menuIn_280ms_var(--ease-out-quick)]"
         [class.touch-none]="dragPick()"
         (touchstart)="onTouch($event)"
         (touchmove)="onTouch($event)"

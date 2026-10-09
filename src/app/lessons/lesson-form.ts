@@ -1,5 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, afterNextRender, model, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, afterNextRender, inject, model, signal, viewChild } from '@angular/core';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -143,10 +144,13 @@ export function cleanLesson(l: LessonInput): LessonInput {
 export class LessonForm {
   readonly value = model.required<LessonInput>();
 
-  // Editing starts in the title.
+  // Editing starts in the title (desktop; on phones the keyboard would cover the form).
   private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
   constructor() {
-    afterNextRender(() => this.titleInput()?.nativeElement.focus({ preventScroll: true }));
+    const desktop = !inject(DeviceDetectionService).isMobile();
+    afterNextRender(() => {
+      if (desktop) this.titleInput()?.nativeElement.focus({ preventScroll: true });
+    });
   }
 
   protected readonly badLink = badLink;

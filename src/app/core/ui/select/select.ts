@@ -39,6 +39,13 @@ export class SelectField implements ControlValueAccessor {
     { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -6 },
   ];
 
+  // Phones (iOS menus): over the chip, right-aligned with it — growing down from its top, or up
+  // from its bottom when there's no room below.
+  protected readonly phonePositions: ConnectedPosition[] = [
+    { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'top', offsetY: -6 },
+    { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'bottom', offsetY: 6 },
+  ];
+
   @Input() disabled = false;
   @Input() options: SelectOption[] = [];
   /** The whole surrounding row (nearest positioned ancestor, e.g. a .list-row) opens the select. */
@@ -76,19 +83,31 @@ export class SelectField implements ControlValueAccessor {
   readonly hover = signal<{ value: string; top: number; height: number } | null>(null);
   readonly dragPick = computed(() => this.options.length <= 8);
 
+  // At most once per frame, and only when the finger reaches another item.
+  private touchFrame = 0;
+  private touchPoint: { x: number; y: number } | null = null;
+
   onTouch(e: TouchEvent): void {
     if (!this.dragPick()) return;
     const t = e.touches[0];
-    const el = (document.elementFromPoint(t.clientX, t.clientY) as HTMLElement | null)?.closest<HTMLElement>('[data-option]');
-    if (!el) {
-      this.hover.set(null);
-      return;
-    }
-    this.hover.set({ value: el.dataset['value'] ?? '', top: el.offsetTop, height: el.offsetHeight });
+    this.touchPoint = { x: t.clientX, y: t.clientY };
+    if (this.touchFrame) return;
+    this.touchFrame = requestAnimationFrame(() => {
+      this.touchFrame = 0;
+      const p = this.touchPoint;
+      if (!p) return;
+      const el = (document.elementFromPoint(p.x, p.y) as HTMLElement | null)?.closest<HTMLElement>('[data-option]');
+      const value = el?.dataset['value'] ?? null;
+      if (value === (this.hover()?.value ?? null)) return;
+      this.hover.set(el ? { value: value!, top: el.offsetTop, height: el.offsetHeight } : null);
+    });
   }
 
   // Lifting the finger on an item picks it (and the tap's own click is skipped).
   onTouchEnd(e: TouchEvent): void {
+    cancelAnimationFrame(this.touchFrame);
+    this.touchFrame = 0;
+    this.touchPoint = null;
     const h = this.hover();
     this.hover.set(null);
     if (!this.dragPick() || !h) return;

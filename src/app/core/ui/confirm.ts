@@ -56,7 +56,7 @@ export interface ActionChoice {
              screen): the question, then each answer as a centered button; a tap outside cancels -->
         <div
           role="alertdialog"
-          class="fixed flex w-72 flex-col gap-1.5 rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-2 text-[var(--text)] shadow-[0_8px_30px_rgb(0_0_0/0.18)] transition-[opacity,scale] duration-200 [animation:dropdownIn_200ms_var(--ease-out-quick)]"
+          class="glass-panel fixed flex w-72 flex-col gap-1.5 rounded-[1.75rem] p-2 text-[var(--text)] transition-[opacity,scale] duration-200 [animation:menuIn_280ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
           [style.right.px]="place().right"
@@ -70,7 +70,7 @@ export interface ActionChoice {
             <button
               type="button"
               (click)="choose(c.value)"
-              class="h-12 rounded-xl bg-[var(--fill)] text-center text-[1.125rem] font-medium active:opacity-70 active:![transform:none]"
+              class="h-12 rounded-[1.25rem] bg-[color-mix(in_srgb,var(--text)_10%,transparent)] text-center text-[1.125rem] font-medium active:opacity-70 active:![transform:none]"
               [class.text-[var(--danger)]]="c.danger"
               [class.text-[var(--accent)]]="c.accent"
             >{{ c.label | t }}</button>

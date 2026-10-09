@@ -1,5 +1,4 @@
 import { Injectable, signal } from '@angular/core';
-import { openKeyboardNow } from '../utils/keyboard';
 
 /**
  * A card opened on top of whatever is on screen (event, student, group, lesson). Cards open from
@@ -27,9 +26,6 @@ export class NavStack {
    * already open further down, go back to it instead.
    */
   push(entry: Omit<StackEntry, 'key'>): void {
-    // A new item on a phone: open the keyboard right away, within the tap (iOS needs that);
-    // the card's first field takes the focus when it's in.
-    if (!entry.id && document.documentElement.dataset['device'] === 'mobile') openKeyboardNow();
 
     this.entries.update((list) => {
       const i = entry.id ? list.findIndex((e) => e.kind === entry.kind && e.id === entry.id) : -1;
