@@ -275,7 +275,7 @@ export class EventEditor implements OnInit {
     if (event) {
       const start = new Date(event.startsAt);
       this.model.set({
-        type: event.type,
+        type: event.type ?? 'Class', // servers before event types send none
         title: event.title ?? '',
         invitees: { studentIds: event.studentIds, groupIds: event.groupIds },
         lessonIds: event.lessonIds,
