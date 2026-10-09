@@ -65,7 +65,7 @@
   <ng-template #pageRow let-item let-sheet="sheet" let-check="check" let-chevron="chevron">
     <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full py-2.5 text-left active:!bg-transparent">
       @if (item.icon) {
-        <app-brand-icon [name]="item.icon" class="size-10" />
+        <app-brand-icon [name]="item.icon" class="size-9" />
       }
       <!-- leading-none: the label sits on the icon's middle -->
       <span class="min-w-0 flex-1 truncate leading-none">{{ item.label | t }}</span>
@@ -81,7 +81,7 @@
   @if (menuOpen()) {
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
       <!-- Just the rows: no card background, outline or dividers; larger labels -->
-      <div class="no-dividers press-bold -mx-3 flex flex-col [&_.list-row]:!py-3.5 [&_.list-row]:!text-[1.1875rem]">
+      <div class="no-dividers press-bold -mx-3 flex flex-col [&_.list-row]:!py-3 [&_.list-row]:!text-[1.125rem]">
         @for (item of navItems; track item.path) {
           <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet, check: true }" />
         }
