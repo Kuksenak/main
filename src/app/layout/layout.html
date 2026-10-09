@@ -61,11 +61,11 @@
   <app-stack-host />
 
   <!-- A page row in a menu: no tap highlight, the label turns bold while pressed; the current
-       page checked -->
-  <ng-template #pageRow let-item let-sheet="sheet">
+       page checked (in the pages menu only, not Settings / About) -->
+  <ng-template #pageRow let-item let-sheet="sheet" let-check="check">
     <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full text-left active:!bg-transparent">
       <span class="min-w-0 flex-1 truncate group-active:font-semibold">{{ item.label | t }}</span>
-      @if (isActive(item.path)) {
+      @if (check && isActive(item.path)) {
         <app-icon name="check" class="size-5 text-[var(--accent)]" />
       }
     </button>
@@ -75,7 +75,7 @@
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
       <div class="card">
         @for (item of navItems; track item.path) {
-          <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet }" />
+          <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet, check: true }" />
         }
       </div>
     </app-sheet>
