@@ -50,8 +50,9 @@ export class Layout {
   ];
   protected readonly menuOpen = signal(false);
 
-  // Pages menu: the tapped tile shows a running bar while its page opens; the menu closes once
-  // the page is there (at least a short moment, so the bar is seen).
+  // Pages menu: the tapped tile shows a running bar while its page opens (and so does the global
+  // one at the bottom); the menu closes once the page is there (at least a short moment, so the
+  // bar is seen).
   protected readonly opening = signal<string | null>(null);
 
   protected goFromMenu(path: string, sheet: Sheet): void {
@@ -61,9 +62,11 @@ export class Layout {
       return;
     }
     this.opening.set(path);
+    this.loading.begin();
     const shown = new Promise((r) => setTimeout(r, 450));
     Promise.all([this.router.navigateByUrl(path), shown]).finally(() => {
       sheet.close();
+      this.loading.end();
       setTimeout(() => this.opening.set(null), 400);
     });
   }
