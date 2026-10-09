@@ -247,6 +247,12 @@
     [data-device='mobile'] .rotate-hint {
       display: flex;
     }
+    /* Nothing else shows meanwhile — Safari can paint blurred (backdrop-filter) layers such as
+       the menu sheet above higher ones, so hiding beats out-ranking them. */
+    [data-device='mobile'] app-root > :not(.rotate-hint),
+    [data-device='mobile'] .cdk-overlay-container {
+      visibility: hidden;
+    }
   }
   /* Only phones held sideways get the notice (max-height 32rem): a foldable opened up or an
      iPad has a much taller screen and keeps the normal layout in any orientation. */
