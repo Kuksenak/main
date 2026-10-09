@@ -126,6 +126,12 @@ export class Schedule implements AfterViewInit {
     () => this.byDay().get(toDateInput(this.selectedDate())) ?? [],
   );
 
+  // Any of the day's events repeating / with lessons: their rows keep a column for those marks,
+  // so the titles stay lined up.
+  protected readonly dayHasMarks = computed(() =>
+    this.dayEvents().some((e) => e.repeat !== 'Never' || e.lessonIds.length),
+  );
+
   // The time, ticking every minute — for today's past / ongoing events.
   private readonly now = signal(Date.now());
 
