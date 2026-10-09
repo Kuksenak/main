@@ -24,7 +24,6 @@ interface Guide {
     <main class="min-h-0 w-full flex-1 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
       <div class="mx-auto flex w-full max-w-xl flex-col gap-8">
       <div class="flex flex-col gap-3">
-        <h1 class="text-[1.75rem] font-bold leading-tight">{{ 'nav.install' | t }}</h1>
         <p class="text-[1.0625rem] leading-relaxed opacity-70">{{ 'install.intro' | t }}</p>
         <!-- Chrome / Edge / Android: their own install dialog, right from here -->
         @if (install.canPrompt()) {

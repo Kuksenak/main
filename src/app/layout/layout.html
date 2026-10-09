@@ -31,7 +31,7 @@
     </button>
     <!-- Account. Mobile: the first letter of the email in the round accent button (like +).
          Desktop: a gray pill — the name (else the email) and ▾.
-         Green dot when an app update is ready, or in the browser (it can be installed). -->
+         Green dot when an app update is ready. -->
     <button
       #avatarBtn
       type="button"
@@ -48,7 +48,7 @@
       } @else {
         <span class="text-[1.375rem] font-medium uppercase">{{ initial() }}</span>
       }
-      @if (updates.updateReady() || !install.standalone) {
+      @if (updates.updateReady()) {
         <span class="dot absolute right-0 top-0 size-3 bg-[var(--success)] ring-2 ring-[var(--app-bg)]"></span>
       }
     </button>
