@@ -53,7 +53,7 @@
          whole rows as fit (measured, see upcomingFit) -->
     <div #upcomingBox class="mt-6 flex min-h-0 flex-1 flex-col gap-1.5 overflow-hidden mobile:hidden">
     @if (upcoming().length) {
-        <span #upcomingHead class="text-footnote px-4 uppercase opacity-50">{{ 'students.upcoming' | t }}</span>
+        <span #upcomingHead class="text-footnote px-4 opacity-50">{{ 'students.upcoming' | t }}</span>
         <div class="card">
           @for (l of upcoming(); track l.id) {
             <!-- Picks that event's day in the calendar (its events then show on the right) -->

@@ -4,7 +4,7 @@ import { Icon } from '../icon/icon';
 const STORAGE_KEY = 'sections';
 
 /**
- * Collapsible list section: a small uppercase header (title · count · chevron) above its
+ * Collapsible list section: a small gray header (title · count · chevron) above its
  * content. Tapping the header folds it. With `key`, the open/closed state is remembered on this
  * device per key (e.g. every "Past" list stays folded once you fold one).
  *

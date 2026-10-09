@@ -74,7 +74,7 @@
         <app-scroll-area class="max-h-72">
         @for (sec of sections(); track $index) {
           @if (sec.label) {
-            <div class="text-footnote px-3 pb-1 pt-2 uppercase opacity-50">{{ sec.label }}</div>
+            <div class="text-footnote px-3 pb-1 pt-2 opacity-50">{{ sec.label }}</div>
           }
           @for (opt of sec.options; track opt.value) {
           <button

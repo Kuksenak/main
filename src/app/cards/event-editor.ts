@@ -61,11 +61,9 @@ interface Model {
     >
       <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-6">
-        <!-- Type, picked from a list like the language (Class / Event); only a class has
+        <!-- Class / Event, picked from a list like the language; only a class has
              participants and materials -->
-        <div class="flex flex-col gap-1.5">
-          <span class="text-footnote px-4 uppercase opacity-50">{{ 'event.type' | t }}</span>
-          <div class="card">
+        <div class="card">
             @for (t of types; track t) {
               <button type="button" (click)="patch({ type: t })" class="list-row w-full text-left">
                 <span>{{ typeKey(t) | t }}</span>
@@ -74,7 +72,6 @@ interface Model {
                 }
               </button>
             }
-          </div>
         </div>
 
         <div class="card">
@@ -86,7 +83,7 @@ interface Model {
         @if (m.type === 'Class') {
         <!-- Participants: groups and students (a tap opens their card on top), then Invite -->
         <div class="flex flex-col gap-1.5">
-        <span class="text-footnote px-4 uppercase opacity-50">{{ 'event.participants' | t }}</span>
+        <span class="text-footnote px-4 opacity-50">{{ 'event.participants' | t }}</span>
         <div class="card">
           <!-- A row opens the card; × takes them out of the event -->
           @for (p of invited(); track p.id) {
@@ -111,7 +108,7 @@ interface Model {
         <!-- Materials: attached lessons (a tap opens the lesson: a card on top on mobile, its
              page on desktop), then Attach -->
         <div class="flex flex-col gap-1.5">
-        <span class="text-footnote px-4 uppercase opacity-50">{{ 'event.materials' | t }}</span>
+        <span class="text-footnote px-4 opacity-50">{{ 'event.materials' | t }}</span>
         <div class="card">
           @for (l of attached(); track l.id) {
             <div class="list-row !gap-1">

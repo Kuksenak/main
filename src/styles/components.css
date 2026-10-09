@@ -301,7 +301,7 @@
 
   /* Header of a collapsible list section (app-section): title · count · chevron. */
   .section-header {
-    @apply text-footnote flex w-full items-center gap-1.5 px-4 text-left uppercase opacity-50
+    @apply text-footnote flex w-full items-center gap-1.5 px-4 text-left opacity-50
            active:opacity-30;
   }
 
