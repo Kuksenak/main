@@ -6,7 +6,8 @@ import { TranslationKey } from '../i18n/translations';
 export interface ActionChoice {
   value: string;
   label: TranslationKey;
-  danger?: boolean;
+  danger?: boolean; // label in the danger color
+  accent?: boolean; // label in the accent color (the main answer)
 }
 
 /**
@@ -45,6 +46,7 @@ export interface ActionChoice {
                 type="button"
                 (click)="choose(c.value)"
                 [class]="c.danger ? 'btn-danger' : 'btn-secondary'"
+                [class.!text-[var(--accent)]]="c.accent"
               >{{ c.label | t }}</button>
             }
           </div>
@@ -70,6 +72,7 @@ export interface ActionChoice {
               (click)="choose(c.value)"
               class="h-12 rounded-xl bg-[var(--fill)] text-center text-[1.125rem] font-medium active:opacity-70 active:![transform:none]"
               [class.text-[var(--danger)]]="c.danger"
+              [class.text-[var(--accent)]]="c.accent"
             >{{ c.label | t }}</button>
           }
         </div>
