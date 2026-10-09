@@ -94,29 +94,25 @@
           }
         </div>
 
-        <!-- Desktop: the settings (language) right here; mobile: Settings is a page -->
-        @if (desktop) {
-          <div class="flex flex-col gap-1.5">
-            <span class="text-footnote opacity-50">{{ 'account.language' | t }}</span>
-            <div class="card">
-              @for (lang of i18n.languages; track lang.code) {
-                <button type="button" (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
-                  <span>{{ lang.label }}</span>
-                  @if (i18n.lang() === lang.code) {
-                    <app-icon name="check" class="size-5 text-[var(--accent)]" />
-                  }
-                </button>
-              }
-            </div>
+        <!-- The language, right here under the email -->
+        <div class="flex flex-col gap-1.5">
+          <span class="text-footnote opacity-50">{{ 'account.language' | t }}</span>
+          <div class="card">
+            @for (lang of i18n.languages; track lang.code) {
+              <button type="button" (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
+                <span>{{ lang.label }}</span>
+                @if (i18n.lang() === lang.code) {
+                  <app-icon name="check" class="size-5 text-[var(--accent)]" />
+                }
+              </button>
+            }
           </div>
-        }
+        </div>
 
-        <!-- Settings (mobile) and About -->
+        <!-- About -->
         <div class="card">
           @for (item of accountItems; track item.path) {
-            @if (!(desktop && item.path === '/settings')) {
-              <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: sheet }" />
-            }
+            <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: sheet }" />
           }
         </div>
 

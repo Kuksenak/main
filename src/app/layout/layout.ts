@@ -45,7 +45,6 @@ export class Layout {
   ];
   // Under the account button.
   protected readonly accountItems: { path: string; label: TranslationKey }[] = [
-    { path: '/settings', label: 'nav.settings' },
     { path: '/about', label: 'nav.about' },
   ];
   protected readonly menuOpen = signal(false);
