@@ -73,7 +73,7 @@ interface Model {
                 </button>
               </div>
             }
-            <button #addMembersRow type="button" (click)="pickingMembers.set(true)" class="edit-only list-row w-full text-left text-[var(--accent)]">
+            <button #addMembersRow type="button" (click)="pickingMembers.set(true)" [disabled]="!allStudents().length" class="edit-only list-row w-full text-left text-[var(--accent)] disabled:!text-[var(--text-secondary)] disabled:opacity-60">
               <span class="flex items-center gap-2 font-medium">
                 <app-icon name="plus" class="size-5" />
                 {{ 'groups.addMembers' | t }}

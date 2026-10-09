@@ -141,7 +141,8 @@ interface Model {
               </button>
             </div>
           }
-          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" class="edit-only list-row w-full text-left text-[var(--accent)]">
+          <!-- Gray when there's no one at all to invite -->
+          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" [disabled]="isEmpty(inviteSections())" class="edit-only list-row w-full text-left text-[var(--accent)] disabled:!text-[var(--text-secondary)] disabled:opacity-60">
             <span>{{ 'event.invite' | t }}</span>
             <!-- In the same box as the rows' ×, so they line up -->
             <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
@@ -163,7 +164,8 @@ interface Model {
               </button>
             </div>
           }
-          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" class="edit-only list-row w-full text-left text-[var(--accent)]">
+          <!-- Gray when there are no lessons yet -->
+          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" [disabled]="isEmpty(lessonSections())" class="edit-only list-row w-full text-left text-[var(--accent)] disabled:!text-[var(--text-secondary)] disabled:opacity-60">
             <span>{{ 'event.attachLesson' | t }}</span>
             <!-- In the same box as the rows' ×, so they line up -->
             <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
@@ -261,6 +263,11 @@ export class EventEditor implements OnInit {
     { key: 'groups.title', items: this.groups.groups().map((g) => ({ id: g.id, name: g.name, color: colorVar(g.color) })) },
     { key: 'nav.students', items: this.students.students().map((s) => ({ id: s.id, name: s.name })) },
   ]);
+  // Nothing to pick from at all (the pickers also take people / lessons out, so "all already
+  // chosen" still opens them).
+  protected isEmpty(sections: PickSection[]): boolean {
+    return sections.every((s) => !s.items.length);
+  }
   protected readonly inviteIds = computed(() => {
     const { groupIds, studentIds } = this.model().invitees;
     return [...groupIds, ...studentIds];
