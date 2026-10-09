@@ -12,7 +12,7 @@ export interface ActionChoice {
 /**
  * A question with a few answers, next to the button that asked (no dimming — on mobile it would
  * tint the toolbar). Mobile: the answers as big centered buttons. Desktop: a small dialog with
- * Cancel and the answers as regular buttons. A click outside cancels. Render it with @if; `chosen` fires with the answer's value, `closed`
+ * the answers as regular buttons. A click outside cancels. Render it with @if; `chosen` fires with the answer's value, `closed`
  * once it's gone either way.
  */
 @Component({
@@ -25,8 +25,8 @@ export interface ActionChoice {
       (click)="close()"
     >
       @if (desktop) {
-        <!-- Desktop: a small dialog by the button — the text, then Cancel and the answers as
-             regular buttons across its width -->
+        <!-- Desktop: a small dialog by the button — the text, then the answers as regular buttons
+             across its width (no Cancel: a click outside cancels) -->
         <div
           role="alertdialog"
           class="fixed flex w-80 flex-col gap-3 rounded-xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-4 text-[var(--text)] shadow-[var(--shadow-dialog)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
@@ -38,20 +38,14 @@ export interface ActionChoice {
         >
           <!-- Just the explanation when there is one ("This can't be undone"), else the question -->
           <p class="text-body text-center">{{ (message() ?? title()) | t }}</p>
-          <!-- Buttons across the full width, labels centered: one answer → Cancel | answer, more → a column -->
-          <div class="grid gap-2" [class.grid-cols-2]="choices().length === 1">
-            @if (choices().length === 1) {
-              <button type="button" (click)="close()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
-            }
+          <!-- The answers across the full width, labels centered; a click outside cancels -->
+          <div class="grid gap-2">
             @for (c of choices(); track c.value) {
               <button
                 type="button"
                 (click)="choose(c.value)"
                 [class]="c.danger ? 'btn-danger' : 'btn-secondary'"
               >{{ c.label | t }}</button>
-            }
-            @if (choices().length > 1) {
-              <button type="button" (click)="close()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
             }
           </div>
         </div>
