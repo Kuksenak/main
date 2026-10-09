@@ -46,8 +46,8 @@ export class Layout {
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
   ];
   // Under the account button.
-  protected readonly accountItems: { path: string; label: TranslationKey; icon: BrandIconName }[] = [
-    { path: '/about', label: 'nav.about', icon: 'info' },
+  protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName }[] = [
+    { path: '/about', label: 'nav.about' },
   ];
   protected readonly menuOpen = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
