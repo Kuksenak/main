@@ -84,7 +84,8 @@
          Google's app launcher (~108 × 100pt tiles, 40pt icons, 16pt names); the current page's
          tile is highlighted -->
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
-      <div class="grid grid-cols-3">
+      <!-- A gap between tiles so a highlighted one and a hovered one never merge -->
+      <div class="grid grid-cols-3 gap-1.5">
         @for (item of navItems; track item.path) {
           <button
             type="button"
