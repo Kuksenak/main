@@ -11,7 +11,8 @@
     <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
 
     <!-- Students | Groups -->
-    <div class="segmented">
+    <!-- A bit bigger than other switches: it is the page's main choice -->
+    <div class="segmented desktop:!h-9 desktop:!text-[0.9375rem] desktop:[&>button]:!px-4">
       <button type="button" (click)="setTab('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
       <button type="button" (click)="setTab('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
     </div>
