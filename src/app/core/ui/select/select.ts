@@ -129,7 +129,19 @@ export class SelectField implements ControlValueAccessor {
     this.select(opt);
   }
 
+  // After a pick the menu is gone, but the touch's click still lands — on whatever is now under
+  // the finger (e.g. a card's Invite row). Swallow that one click.
+  private swallowNextClick(): void {
+    const stop = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    document.addEventListener('click', stop, { capture: true, once: true });
+    setTimeout(() => document.removeEventListener('click', stop, { capture: true }), 500);
+  }
+
   select(opt: SelectOption): void {
+    if (this.isMobile()) this.swallowNextClick();
     this.setValue(opt.value);
     this.isOpen.set(false);
   }
