@@ -8,8 +8,6 @@ import { Icon, IconName } from '../core/ui/icon/icon';
 type Platform = 'ios' | 'android' | 'mac' | 'computer';
 
 interface Guide {
-  title: TranslationKey;
-  icon: IconName;
   steps: { icon: IconName; text: TranslationKey }[];
 }
 
@@ -30,7 +28,7 @@ interface Guide {
         <p class="text-[1.0625rem] leading-relaxed opacity-70">{{ 'install.intro' | t }}</p>
         <!-- Chrome / Edge / Android: their own install dialog, right from here -->
         @if (install.canPrompt()) {
-          <button type="button" (click)="install.prompt()" class="btn-primary mt-1 self-start">
+          <button type="button" (click)="install.prompt()" class="btn-secondary mt-1 self-start">
             <app-icon name="install" class="size-5" />
             {{ 'install.button' | t }}
           </button>
@@ -39,25 +37,19 @@ interface Guide {
 
       @if (guide; as g) {
         <!-- Numbered steps, each with the icon to look for -->
-        <section class="flex flex-col gap-2">
-          <h2 class="flex items-center gap-2 text-[1.25rem] font-semibold">
-            <app-icon [name]="g.icon" class="size-6 opacity-60" />
-            {{ g.title | t }}
-          </h2>
-          <div class="card">
-            @for (s of g.steps; track $index) {
-              <div class="list-row !items-start gap-3 py-3">
-                <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--chip-ios)] text-[var(--accent)]">
-                  <app-icon [name]="s.icon" class="size-6" />
-                </span>
-                <p class="min-w-0 flex-1 self-center text-[1.0625rem] leading-snug">
-                  <span class="font-semibold tabular-nums opacity-40">{{ $index + 1 }}.</span>
-                  {{ s.text | t }}
-                </p>
-              </div>
-            }
-          </div>
-        </section>
+        <div class="card">
+          @for (s of g.steps; track $index) {
+            <div class="list-row !items-start gap-3 py-3">
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--chip-ios)]">
+                <app-icon [name]="s.icon" class="size-6" />
+              </span>
+              <p class="min-w-0 flex-1 self-center text-[1.0625rem] leading-snug">
+                <span class="font-semibold tabular-nums opacity-40">{{ $index + 1 }}.</span>
+                {{ s.text | t }}
+              </p>
+            </div>
+          }
+        </div>
       } @else {
         <div class="card">
           <p class="list-row py-3 text-[1.0625rem] leading-snug">{{ 'install.unsupported' | t }}</p>
@@ -72,8 +64,6 @@ export class Install {
 
   private static readonly guides: Record<Platform, Guide> = {
     ios: {
-      title: 'install.ios',
-      icon: 'phone',
       steps: [
         { icon: 'share', text: 'install.ios.1' },
         { icon: 'plus-square', text: 'install.ios.2' },
@@ -81,8 +71,6 @@ export class Install {
       ],
     },
     android: {
-      title: 'install.android',
-      icon: 'phone',
       steps: [
         { icon: 'dots-vertical', text: 'install.android.1' },
         { icon: 'install', text: 'install.android.2' },
@@ -90,8 +78,6 @@ export class Install {
       ],
     },
     mac: {
-      title: 'install.mac',
-      icon: 'monitor',
       steps: [
         { icon: 'share', text: 'install.mac.1' },
         { icon: 'plus-square', text: 'install.mac.2' },
@@ -99,8 +85,6 @@ export class Install {
       ],
     },
     computer: {
-      title: 'install.computer',
-      icon: 'monitor',
       steps: [
         { icon: 'install', text: 'install.computer.1' },
         { icon: 'dots-vertical', text: 'install.computer.2' },
