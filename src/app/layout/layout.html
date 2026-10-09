@@ -1,7 +1,7 @@
 @if (auth.isAuthenticated()) {
 <div class="flex h-full flex-col overflow-hidden text-[var(--text)]">
   <header class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
-    <nav class="flex min-w-0 flex-1 items-center gap-1">
+    <nav class="flex min-w-0 flex-1 items-center gap-1 desktop:gap-2">
       <!-- Mobile: the current page's toolbar content or title (e.g. month on Schedule);
            tabs live in the ⋯ sheet -->
       @if (toolbar.content(); as content) {
@@ -20,8 +20,8 @@
         <a
           [routerLink]="item.path"
           routerLinkActive="bg-[color-mix(in_srgb,var(--text)_6%,transparent)]"
-          class="nav-tab text-body inline-flex h-10 items-center gap-2 rounded-lg pl-2 pr-4 font-medium hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)] mobile:hidden"
-        ><app-brand-icon [name]="item.icon" class="size-7" />{{ item.label | t }}</a>
+          class="nav-tab text-body inline-flex h-9 items-center gap-2 rounded-lg pl-1.5 pr-3.5 font-medium hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)] mobile:hidden"
+        ><app-brand-icon [name]="item.icon" class="size-6" />{{ item.label | t }}</a>
       }
     </nav>
     <!-- Pages menu (phones; desktop has the tabs) -->
