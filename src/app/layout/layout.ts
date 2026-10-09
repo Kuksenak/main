@@ -12,13 +12,12 @@ import { GroupService } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 import { UpdateService } from '../core/services/update.service';
 import { StackHost } from '../cards/stack-host';
-import { BrandIcon, BrandIconName } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, StackHost, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, StackHost, TranslatePipe],
   templateUrl: './layout.html',
 })
 export class Layout {
@@ -37,14 +36,13 @@ export class Layout {
   }
 
   // Sections: desktop tabs and the navigation menu.
-  protected readonly navItems: { path: string; label: TranslationKey; icon: BrandIconName }[] = [
-    { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
-    { path: '/students', label: 'nav.students', icon: 'people' },
-    { path: '/lessons', label: 'nav.lessons', icon: 'book' },
-    { path: '/about', label: 'nav.about', icon: 'info' },
+  protected readonly navItems: { path: string; label: TranslationKey }[] = [
+    { path: '/schedule', label: 'nav.schedule' },
+    { path: '/students', label: 'nav.students' },
+    { path: '/lessons', label: 'nav.lessons' },
+    { path: '/settings', label: 'nav.settings' },
+    { path: '/about', label: 'nav.about' },
   ];
-  // Settings: its own block in the account menu (not a tab).
-  protected readonly settingsItem = { path: '/settings', label: 'nav.settings' as TranslationKey, icon: 'settings' as BrandIconName };
 
   protected readonly accountOpen = signal(false);
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));

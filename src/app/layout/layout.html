@@ -56,24 +56,16 @@
           }
         </div>
 
-        <!-- Pages (mobile; desktop has the tabs), then Settings on its own: brand icon, the
-             current one checked -->
-        <ng-template #pageRow let-item>
-          <button type="button" (click)="go(item.path, sheet)" class="list-row w-full py-1.5 text-left active:!bg-transparent">
-            <app-brand-icon [name]="item.icon" class="size-8" />
-            <span class="min-w-0 flex-1 truncate">{{ item.label | t }}</span>
-            @if (isActive(item.path)) {
-              <app-icon name="check" class="size-5 text-[var(--accent)]" />
-            }
-          </button>
-        </ng-template>
+        <!-- Pages (mobile; desktop has the tabs), the current one checked -->
         <div class="card desktop:hidden">
           @for (item of navItems; track item.path) {
-            <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item }" />
+            <button type="button" (click)="go(item.path, sheet)" class="list-row w-full text-left active:!bg-transparent">
+              <span class="min-w-0 flex-1 truncate">{{ item.label | t }}</span>
+              @if (isActive(item.path)) {
+                <app-icon name="check" class="size-5 text-[var(--accent)]" />
+              }
+            </button>
           }
-        </div>
-        <div class="card">
-          <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: settingsItem }" />
         </div>
 
         <!-- Actions pinned to the bottom -->

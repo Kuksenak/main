@@ -28,7 +28,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:bg-[var(--backdrop)] desktop:p-4"
       [class.desktop:!p-2]="wide()"
-      (click)="close()"
+      (click)="back()"
     >
       <div
         class="flex h-full w-full flex-col text-[var(--text)] [animation:pageInRight_360ms_var(--ease-out-quick)] mobile:bg-[var(--app-bg)] desktop:h-auto desktop:max-h-[calc(var(--app-h,100dvh)-2rem)] desktop:max-w-md desktop:p-4"
@@ -44,7 +44,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         <div class="relative flex shrink-0 items-center gap-2 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] desktop:hidden">
           <button
             type="button"
-            (click)="close()"
+            (click)="back()"
             [attr.aria-label]="(dirty() ? 'action.discard' : 'action.back') | t"
             class="icon-btn relative"
           >
@@ -100,7 +100,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
             @if (deletable()) {
               <button type="button" (click)="delete.emit()" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
             }
-            <button type="button" (click)="close()" class="btn-secondary ml-auto">{{ 'action.cancel' | t }}</button>
+            <button type="button" (click)="back()" class="btn-secondary ml-auto">{{ 'action.cancel' | t }}</button>
             <button type="button" (click)="save.emit()" [disabled]="!canSave()" class="btn-primary">{{ 'action.save' | t }}</button>
           </div>
         }
@@ -118,10 +118,14 @@ export class PageSheet {
   readonly canSave = input(false);
   readonly deletable = input(false);
   readonly wide = input(false);
+  // false: back / ✕ / Cancel / a click outside emit `cancel` and leave the page open (e.g. a
+  // card that leaves its edit mode instead of closing).
+  readonly cancelCloses = input(true);
 
   readonly save = output<void>();
   readonly delete = output<void>();
   readonly closed = output<void>();
+  readonly cancel = output<void>();
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly closing = signal(false);
@@ -134,6 +138,11 @@ export class PageSheet {
     };
     window.addEventListener('scroll', pin);
     inject(DestroyRef).onDestroy(() => window.removeEventListener('scroll', pin));
+  }
+
+  protected back(): void {
+    if (this.cancelCloses()) this.close();
+    else this.cancel.emit();
   }
 
   close(): void {

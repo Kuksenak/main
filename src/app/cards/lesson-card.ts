@@ -16,7 +16,7 @@ import { EventList } from './event-list';
 
 /**
  * A lesson, opened on the NavStack nearly full-screen (minimal margins): its content, edited in
- * place (Edit → the form instead of the content; Save returns to reading). ⓘ opens a sheet with
+ * place (Edit → the form instead of the content; Save, Cancel or back return to reading). ⓘ opens a sheet with
  * the public link switch and the events using the lesson. A new lesson (id null) starts in the form.
  * Opened from its link (/lessons/:id, see Lessons) it follows the URL: closing goes back to
  * /lessons, and leaving that URL (browser back) closes it.
@@ -33,6 +33,8 @@ import { EventList } from './event-list';
       [dirty]="editing() && dirty()"
       [canSave]="canSave()"
       [deletable]="editing() && !!id()"
+      [cancelCloses]="!editing() || !id()"
+      (cancel)="editRequested.set(false)"
       (save)="save()"
       (delete)="remove()"
       (closed)="onClosed()"
@@ -116,7 +118,7 @@ export class LessonCard implements OnInit {
   protected readonly lesson = computed(() => this.lessons.byId(this.id()));
 
   // Editing: from the start for a new lesson; the draft and what it started from.
-  private readonly editRequested = signal(false);
+  protected readonly editRequested = signal(false);
   protected readonly editing = computed(() => !this.id() || this.editRequested());
   protected readonly draft = signal<LessonInput>({ title: '', blocks: [] });
   private readonly snapshot = signal(JSON.stringify(this.draft()));
