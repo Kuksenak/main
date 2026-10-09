@@ -381,3 +381,10 @@
            transition-opacity duration-300;
   }
 }
+
+/* Dark: cards stand out by their gray on the black page — no outline (as on phones, where the
+   hairline all but vanishes; a 1px desktop pixel made it a visible border). */
+html.dark .card,
+html.dark .card-btn {
+  border-color: transparent;
+}
