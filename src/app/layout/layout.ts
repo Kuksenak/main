@@ -29,6 +29,7 @@ export class Layout {
   protected readonly loading = inject(LoadingService);
   protected readonly updates = inject(UpdateService);
   protected readonly toolbar = inject(ToolbarService);
+  protected readonly install = inject(InstallService);
   private readonly router = inject(Router);
 
   constructor() {
@@ -46,15 +47,14 @@ export class Layout {
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
   ];
   // Under the account button. Install: only in the browser (not once it's the installed app).
-  protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName }[] = [
+  protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName; dot?: boolean }[] = [
     { path: '/about', label: 'nav.about' },
-    ...(inject(InstallService).standalone ? [] : [{ path: '/install', label: 'nav.install' as TranslationKey }]),
+    ...(this.install.standalone ? [] : [{ path: '/install', label: 'nav.install' as TranslationKey, dot: true }]),
   ];
   protected readonly menuOpen = signal(false);
 
-  // Pages menu: the tapped tile shows a running bar while its page opens (and so does the global
-  // one at the bottom); the menu closes once the page is there (at least a short moment, so the
-  // bar is seen).
+  // Pages menu: the global loading bar at the bottom runs while the tapped page opens; the menu
+  // closes once the page is there (at least a short moment, so the bar is seen).
   protected readonly opening = signal<string | null>(null);
 
   protected goFromMenu(path: string, sheet: Sheet): void {

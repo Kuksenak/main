@@ -13,7 +13,7 @@ const en = {
   'nav.lessons': 'Lessons',
   'nav.settings': 'Settings',
   'nav.about': 'About',
-  'nav.install': 'Install app',
+  'nav.install': 'Install',
   'nav.menu': 'Menu',
 
   'account.title': 'Account',
@@ -169,7 +169,7 @@ const pl: Dictionary = {
   'nav.lessons': 'Lekcje',
   'nav.settings': 'Ustawienia',
   'nav.about': 'O aplikacji',
-  'nav.install': 'Zainstaluj aplikację',
+  'nav.install': 'Zainstaluj',
   'nav.menu': 'Menu',
 
   'account.title': 'Konto',
@@ -322,7 +322,7 @@ const fr: Dictionary = {
   'nav.lessons': 'Cours',
   'nav.settings': 'Réglages',
   'nav.about': 'À propos',
-  'nav.install': 'Installer l’app',
+  'nav.install': 'Installer',
   'nav.menu': 'Menu',
 
   'account.title': 'Compte',

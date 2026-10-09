@@ -31,7 +31,7 @@
     </button>
     <!-- Account. Mobile: the first letter of the email in the round accent button (like +).
          Desktop: a gray pill — the name (else the email) and ▾.
-         Green dot when an app update is ready. -->
+         Green dot when an app update is ready, or in the browser (it can be installed). -->
     <button
       #avatarBtn
       type="button"
@@ -48,7 +48,7 @@
       } @else {
         <span class="text-[1.375rem] font-medium uppercase">{{ initial() }}</span>
       }
-      @if (updates.updateReady()) {
+      @if (updates.updateReady() || !install.standalone) {
         <span class="dot absolute right-0 top-0 size-3 bg-[var(--success)] ring-2 ring-[var(--app-bg)]"></span>
       }
     </button>
@@ -68,6 +68,10 @@
       }
       <!-- leading-none: the label sits on the icon's middle -->
       <span class="min-w-0 flex-1 truncate leading-none">{{ item.label | t }}</span>
+      <!-- Green dot: something to do there (Install) -->
+      @if (item.dot) {
+        <span class="dot size-2.5 shrink-0 bg-[var(--success)]"></span>
+      }
       @if (check && isActive(item.path)) {
         <app-icon name="check" class="size-5 text-[var(--accent)]" />
       }
@@ -98,12 +102,6 @@
             >
               <app-brand-icon [name]="item.icon" class="size-12 desktop:size-10" />
               <span class="max-w-full truncate text-[0.9375rem] leading-tight desktop:text-[0.8125rem]">{{ item.label | t }}</span>
-              <!-- While its page opens: a small running bar under the name -->
-              <span class="h-0.5 w-10 overflow-hidden rounded-full" [class.invisible]="opening() !== item.path">
-                @if (opening() === item.path) {
-                  <span class="block h-full w-2/5 rounded-full bg-[var(--accent)] [animation:loadingBar_1.1s_ease-in-out_infinite]"></span>
-                }
-              </span>
             </span>
           </button>
         }
