@@ -21,7 +21,7 @@
 
   <ng-template
     cdkConnectedOverlay
-    [cdkConnectedOverlayPositions]="isMobile() ? phonePositions : positions"
+    [cdkConnectedOverlayPositions]="isMobile() ? phonePositions() : positions"
     [cdkConnectedOverlayOrigin]="origin"
     [cdkConnectedOverlayOpen]="isOpen()"
     [cdkConnectedOverlayHasBackdrop]="true"

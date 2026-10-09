@@ -39,12 +39,21 @@ export class SelectField implements ControlValueAccessor {
     { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -6 },
   ];
 
-  // Phones (iOS menus): over the chip, right-aligned with it — growing down from its top, or up
-  // from its bottom when there's no room below.
-  protected readonly phonePositions: ConnectedPosition[] = [
-    { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'top', offsetY: -6 },
-    { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'bottom', offsetY: 6 },
-  ];
+  // Phones (iOS pop-up menus): over the chip, right-aligned with it, with the chosen item right
+  // on the chip's middle line; if that doesn't fit the screen, growing down from the chip's top,
+  // else up from its bottom. (Rows are 44px under a 6px padding — see the template.)
+  // Worked out once on opening (a fresh array on every check would keep re-placing the menu).
+  protected readonly phonePositions = signal<ConnectedPosition[]>([]);
+
+  private placePhoneMenu(): void {
+    const i = Math.max(0, this.options.findIndex((o) => o.value === this.value()));
+    const toChosenMiddle = 6 + i * 44 + 22;
+    this.phonePositions.set([
+      { originX: 'end', originY: 'center', overlayX: 'end', overlayY: 'top', offsetY: -toChosenMiddle },
+      { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'top', offsetY: -6 },
+      { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'bottom', offsetY: 6 },
+    ]);
+  }
 
   @Input() disabled = false;
   @Input() options: SelectOption[] = [];
@@ -69,6 +78,7 @@ export class SelectField implements ControlValueAccessor {
 
   toggle(): void {
     if (this.disabled) return;
+    if (!this.isOpen() && this.isMobile()) this.placePhoneMenu();
     this.isOpen.update((open) => !open);
   }
 
