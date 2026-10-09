@@ -30,12 +30,12 @@
     (detach)="close()"
   >
     @if (isMobile()) {
-      <!-- Phone: like iOS's own pickers — their panel color, big rounded corners, large text,
+      <!-- Phone: like iOS's own date / time pickers — their solid panel color, big rounded corners, large text,
            the check on the left of the chosen one, the others grayer. Unfolds softly from the
            chip. Short lists follow the finger (iOS menus): a highlight slides under the item
            being touched, and lifting the finger picks it. -->
       <div
-        class="glass-panel min-w-60 origin-top overflow-hidden rounded-[1.75rem] p-1.5 text-[var(--text)] [animation:menuIn_280ms_var(--ease-out-quick)]"
+        class="min-w-60 origin-top overflow-hidden rounded-[1.75rem] bg-[var(--picker-bg)] p-1.5 text-[var(--text)] shadow-[0_12px_40px_rgb(0_0_0/0.35),0_2px_8px_rgb(0_0_0/0.15)] [animation:menuIn_280ms_var(--ease-out-quick)]"
         [class.touch-none]="dragPick()"
         (touchstart)="onTouch($event)"
         (touchmove)="onTouch($event)"
