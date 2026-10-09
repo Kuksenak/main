@@ -195,6 +195,11 @@
     }
   }
 
+  /* Menus without dividers between their rows (<div class="no-dividers">). */
+  .no-dividers .list-row::after {
+    display: none;
+  }
+
   /* Row inside a card. Hairline divider between rows, iOS-style: it starts at the text (after a
      leading avatar / icon / dot / color bar / check), stops short of the right edge, and is
      hidden under the last row. */
