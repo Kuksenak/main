@@ -115,6 +115,12 @@ a[href]:active {
   font-size: 0.875rem;
   font-weight: 400;
 }
+/* Every other button label regular too (card buttons, header tabs, dialog actions) */
+.card-btn,
+.nav-tab,
+[role='alertdialog'] button {
+  font-weight: 400 !important;
+}
 
 /* Pointer hover feedback (touch devices have no hover). */
 .chip:not(:disabled):hover {
