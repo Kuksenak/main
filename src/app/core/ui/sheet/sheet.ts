@@ -28,7 +28,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         [cdkConnectedOverlayOpen]="!closing()"
         [cdkConnectedOverlayPositions]="positions"
         [cdkConnectedOverlayPush]="true"
-        [cdkConnectedOverlayViewportMargin]="8"
+        [cdkConnectedOverlayViewportMargin]="24"
         [cdkConnectedOverlayHasBackdrop]="true"
         cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
         (backdropClick)="close()"
@@ -36,7 +36,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
       >
         <!-- Kept inside the window: pushed back in, and never taller than it (then it scrolls) -->
         <div
-          class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-1rem)] origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
+          class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-3rem)] origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [class.w-72]="!wide()"
           [class.w-96]="wide()"
         >
