@@ -28,7 +28,7 @@
       }
     </nav>
     <!-- Pages menu (mobile; desktop has the tabs) -->
-    <button #menuBtn type="button" (click)="openMenu(menuBtn)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
+    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
       <app-icon name="grid" class="size-6" />
     </button>
     <!-- Account. Mobile: the first letter of the email in the round accent button (like +).
@@ -78,33 +78,25 @@
     </button>
   </ng-template>
 
-  @if (menuOpen(); as pos) {
-    <!-- Pages menu, like Google's app launcher: a panel under the menu button, a grid of big
-         section icons with their names; the current page's tile is highlighted. A tap outside
-         closes it. -->
-    <div class="fixed inset-0 z-40" (click)="menuOpen.set(null)">
-      <div
-        class="fixed w-[min(20.5rem,calc(100vw-1.5rem))] origin-top-right rounded-[1.75rem] border-[0.5px] border-[var(--separator)] bg-[var(--card)] p-3.5 text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:menuIn_220ms_var(--ease-out-quick)]"
-        [style.top.px]="pos.top"
-        [style.right.px]="pos.right"
-        (click)="$event.stopPropagation()"
-      >
-        <!-- Sizes from Google's launcher (~108 × 100pt tiles, 40pt icons, 16pt names) -->
-        <div class="grid grid-cols-3">
-          @for (item of navItems; track item.path) {
-            <button
-              type="button"
-              (click)="goTo(item.path)"
-              class="flex h-[6.25rem] min-w-0 flex-col items-center justify-center gap-3 rounded-2xl px-1.5 active:bg-[var(--highlight)] active:![transform:none]"
-              [class.bg-[var(--highlight)]]="isActive(item.path)"
-            >
-              <app-brand-icon [name]="item.icon" class="size-10" />
-              <span class="max-w-full truncate text-base leading-tight">{{ item.label | t }}</span>
-            </button>
-          }
-        </div>
+  @if (menuOpen()) {
+    <!-- Pages menu: the bottom sheet, with a grid of big section icons and their names like
+         Google's app launcher (~108 × 100pt tiles, 40pt icons, 16pt names); the current page's
+         tile is highlighted -->
+    <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
+      <div class="grid grid-cols-3">
+        @for (item of navItems; track item.path) {
+          <button
+            type="button"
+            (click)="go(item.path, menuSheet)"
+            class="flex h-[6.25rem] min-w-0 flex-col items-center justify-center gap-3 rounded-2xl px-1.5 active:bg-[var(--highlight)] active:![transform:none]"
+            [class.bg-[var(--highlight)]]="isActive(item.path)"
+          >
+            <app-brand-icon [name]="item.icon" class="size-10" />
+            <span class="max-w-full truncate text-base leading-tight">{{ item.label | t }}</span>
+          </button>
+        }
       </div>
-    </div>
+    </app-sheet>
   }
 
   @if (accountOpen()) {
