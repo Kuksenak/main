@@ -48,7 +48,18 @@ export class Layout {
   protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName }[] = [
     { path: '/about', label: 'nav.about' },
   ];
-  protected readonly menuOpen = signal(false);
+  // The pages menu, open under the menu button (its place on screen), or null.
+  protected readonly menuOpen = signal<{ top: number; right: number } | null>(null);
+
+  protected openMenu(button: HTMLElement): void {
+    const r = button.getBoundingClientRect();
+    this.menuOpen.set({ top: r.bottom + 8, right: Math.max(8, window.innerWidth - r.right) });
+  }
+
+  protected goTo(path: string): void {
+    this.menuOpen.set(null);
+    this.router.navigateByUrl(path);
+  }
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly i18n = inject(I18nService);
 

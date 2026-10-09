@@ -28,7 +28,7 @@
       }
     </nav>
     <!-- Pages menu (mobile; desktop has the tabs) -->
-    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
+    <button #menuBtn type="button" (click)="openMenu(menuBtn)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
       <app-icon name="grid" class="size-6" />
     </button>
     <!-- Account. Mobile: the first letter of the email in the round accent button (like +).
@@ -78,15 +78,32 @@
     </button>
   </ng-template>
 
-  @if (menuOpen()) {
-    <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
-      <!-- Just the rows and the dividers between them (from the label on): no card background or outline; larger labels -->
-      <div class="press-bold -mx-3 flex flex-col [&_.list-row]:!py-2 [&_.list-row]:!text-[1.125rem] [&_.list-row]:![--sep-left:4rem]">
-        @for (item of navItems; track item.path) {
-          <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet, check: true }" />
-        }
+  @if (menuOpen(); as pos) {
+    <!-- Pages menu, like Google's app launcher: a panel under the menu button, a grid of big
+         section icons with their names; the current page's tile is highlighted. A tap outside
+         closes it. -->
+    <div class="fixed inset-0 z-40" (click)="menuOpen.set(null)">
+      <div
+        class="fixed w-[min(21rem,calc(100vw-1rem))] origin-top-right rounded-[1.75rem] border-[0.5px] border-[var(--separator)] bg-[var(--card)] p-2 text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:menuIn_220ms_var(--ease-out-quick)]"
+        [style.top.px]="pos.top"
+        [style.right.px]="pos.right"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="grid grid-cols-3 gap-1">
+          @for (item of navItems; track item.path) {
+            <button
+              type="button"
+              (click)="goTo(item.path)"
+              class="flex min-w-0 flex-col items-center gap-2 rounded-2xl px-2 pb-3 pt-4 active:bg-[var(--highlight)] active:![transform:none]"
+              [class.bg-[var(--highlight)]]="isActive(item.path)"
+            >
+              <app-brand-icon [name]="item.icon" class="size-12" />
+              <span class="max-w-full truncate text-[0.9375rem]">{{ item.label | t }}</span>
+            </button>
+          }
+        </div>
       </div>
-    </app-sheet>
+    </div>
   }
 
   @if (accountOpen()) {
