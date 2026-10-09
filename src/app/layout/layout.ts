@@ -76,9 +76,11 @@ export class Layout {
     });
   }
 
+  // Close the menu first and switch pages once it's mostly gone — doing both at once made the
+  // sheet's slide stutter.
   protected go(path: string, sheet: Sheet): void {
     sheet.close();
-    this.router.navigateByUrl(path);
+    setTimeout(() => this.router.navigateByUrl(path), 180);
   }
 
   // Toolbar ‹: the previous page, or Schedule when the app was opened right here.
