@@ -110,9 +110,10 @@ a[href]:active {
 .btn-primary,
 .btn-secondary,
 .btn-white,
-.fab {
+.fab,
+.account-pill {
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 /* Pointer hover feedback (touch devices have no hover). */
