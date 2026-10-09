@@ -44,11 +44,14 @@
     >
       @if (desktop) {
         <span class="max-w-56 truncate">{{ userName() }}</span>
+        @if (updates.updateReady() || !install.standalone) {
+          <span class="dot size-2 shrink-0 bg-[var(--success)]"></span>
+        }
         <app-icon name="chevron-down" class="size-4 opacity-50" />
       } @else {
         <span class="text-[1.375rem] font-medium uppercase">{{ initial() }}</span>
       }
-      @if (updates.updateReady() || !install.standalone) {
+      @if (!desktop && (updates.updateReady() || !install.standalone)) {
         <span class="dot absolute right-0 top-0 size-3 bg-[var(--success)] ring-2 ring-[var(--app-bg)]"></span>
       }
     </button>
@@ -67,11 +70,13 @@
         <app-brand-icon [name]="item.icon" class="size-9" />
       }
       <!-- leading-none: the label sits on the icon's middle -->
-      <span class="min-w-0 flex-1 truncate leading-none">{{ item.label | t }}</span>
-      <!-- Green dot: something to do there (Install) -->
-      @if (item.dot) {
-        <span class="dot size-2.5 shrink-0 bg-[var(--success)]"></span>
-      }
+      <span class="flex min-w-0 flex-1 items-center gap-2">
+        <span class="min-w-0 truncate leading-none">{{ item.label | t }}</span>
+        <!-- Green dot right after the word: something to do there (Install) -->
+        @if (item.dot) {
+          <span class="dot size-2.5 shrink-0 bg-[var(--success)]"></span>
+        }
+      </span>
       @if (check && isActive(item.path)) {
         <app-icon name="check" class="size-5 text-[var(--accent)]" />
       }
@@ -145,8 +150,7 @@
         <!-- Actions pinned to the bottom -->
         <div class="mt-auto flex flex-col gap-3 desktop:gap-2">
           @if (updates.updateReady()) {
-            <!-- Green, like the dot on the account button -->
-            <button type="button" (click)="updates.apply()" class="card-btn text-[var(--success)]">
+            <button type="button" (click)="updates.apply()" class="card-btn text-[var(--accent)]">
               {{ 'account.update' | t }}
             </button>
           }
