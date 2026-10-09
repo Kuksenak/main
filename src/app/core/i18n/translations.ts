@@ -17,6 +17,7 @@ const en = {
 
   'account.title': 'Account',
   'account.language': 'Language',
+  'settings.languageHint': 'The language of the app.',
   'account.update': 'Update',
   'account.logout': 'Log out',
 
@@ -145,6 +146,7 @@ const pl: Dictionary = {
 
   'account.title': 'Konto',
   'account.language': 'Język',
+  'settings.languageHint': 'Język aplikacji.',
   'account.update': 'Aktualizuj',
   'account.logout': 'Wyloguj się',
 
@@ -270,6 +272,7 @@ const fr: Dictionary = {
 
   'account.title': 'Compte',
   'account.language': 'Langue',
+  'settings.languageHint': 'La langue de l’application.',
   'account.update': 'Mettre à jour',
   'account.logout': 'Se déconnecter',
 

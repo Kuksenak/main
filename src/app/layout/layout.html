@@ -96,16 +96,11 @@
 
         <!-- Desktop: the settings (language) right here; mobile: Settings is a page -->
         @if (desktop) {
-          <div class="flex flex-col gap-1.5">
-            <span class="text-footnote px-4 uppercase opacity-50">{{ 'account.language' | t }}</span>
-            <div class="card">
+          <div class="flex flex-col gap-1.5 px-1">
+            <span class="text-footnote opacity-50">{{ 'account.language' | t }}</span>
+            <div class="segmented">
               @for (lang of i18n.languages; track lang.code) {
-                <button type="button" (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
-                  <span>{{ lang.label }}</span>
-                  @if (i18n.lang() === lang.code) {
-                    <app-icon name="check" class="size-5 text-[var(--accent)]" />
-                  }
-                </button>
+                <button type="button" (click)="i18n.setLang(lang.code)" [attr.aria-pressed]="i18n.lang() === lang.code">{{ lang.label }}</button>
               }
             </div>
           </div>
