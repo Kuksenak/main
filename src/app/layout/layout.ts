@@ -41,9 +41,10 @@ export class Layout {
     { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
     { path: '/students', label: 'nav.students', icon: 'people' },
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
-    { path: '/settings', label: 'nav.settings', icon: 'settings' },
     { path: '/about', label: 'nav.about', icon: 'info' },
   ];
+  // Settings: its own block in the account menu (not a tab).
+  protected readonly settingsItem = { path: '/settings', label: 'nav.settings' as TranslationKey, icon: 'settings' as BrandIconName };
 
   protected readonly accountOpen = signal(false);
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));

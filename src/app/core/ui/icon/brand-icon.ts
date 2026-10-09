@@ -9,6 +9,18 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info'
  * cut-outs (masks) or plain gaps, so they work on any background. Size it from the host:
  * `<app-brand-icon name="calendar" class="size-11" />`.
  */
+/** Gear outline: `teeth` teeth between radius `inner` (root) and `outer` (tip). */
+function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: number): string {
+  const step = (2 * Math.PI) / teeth;
+  const pt = (r: number, a: number) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
+  const parts: string[] = [];
+  for (let i = 0; i < teeth; i++) {
+    const a = i * step - Math.PI / 2;
+    parts.push(pt(inner, a - step * 0.3), pt(outer, a - step * 0.16), pt(outer, a + step * 0.16), pt(inner, a + step * 0.3));
+  }
+  return `M${parts.join('L')}Z`;
+}
+
 @Component({
   selector: 'app-brand-icon',
   host: { class: 'inline-flex shrink-0', 'aria-hidden': 'true' },
@@ -24,6 +36,10 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info'
       fill: var(--brand-orange);
       font: 600 8.5px -apple-system, system-ui, 'Segoe UI', sans-serif;
       letter-spacing: 0.02em;
+    }
+    .brand-letter {
+      fill: var(--brand-blue);
+      font: 700 30px Georgia, 'Times New Roman', serif;
     }
     .brand-date {
       fill: #1c1c1e;
@@ -63,19 +79,22 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info'
           <rect x="4" y="38" width="27" height="6.5" rx="3.25" style="fill: var(--brand-blue)" />
         }
         @case ('settings') {
-          <!-- Three sliders: colored tracks, each with its knob -->
-          <rect x="4" y="8.5" width="40" height="5" rx="2.5" style="fill: var(--brand-blue)" />
-          <circle cx="31" cy="11" r="6.5" style="fill: var(--brand-orange)" />
-          <rect x="4" y="21.5" width="40" height="5" rx="2.5" style="fill: var(--brand-teal)" />
-          <circle cx="15" cy="24" r="6.5" style="fill: var(--brand-blue)" />
-          <rect x="4" y="34.5" width="40" height="5" rx="2.5" style="fill: var(--brand-yellow)" />
-          <circle cx="35" cy="37" r="6.5" style="fill: var(--brand-teal)" />
+          <!-- A blue gear with a see-through hub and an orange axle -->
+          <mask id="brand-gear-hub">
+            <rect width="48" height="48" fill="#fff" />
+            <circle cx="24" cy="24" r="8.5" fill="#000" />
+          </mask>
+          <path
+            [attr.d]="gear"
+            mask="url(#brand-gear-hub)"
+            style="fill: var(--brand-blue); stroke: var(--brand-blue); stroke-width: 2.5; stroke-linejoin: round"
+          />
+          <circle cx="24" cy="24" r="4.5" style="fill: var(--brand-orange)" />
         }
         @case ('info') {
-          <!-- The same white square with an "i": orange dot, blue stem -->
+          <!-- The calendar's white tile with a typeset "i" in blue -->
           <rect x="3" y="3" width="42" height="42" rx="10" class="brand-tile" />
-          <circle cx="24" cy="13.5" r="4.75" style="fill: var(--brand-orange)" />
-          <rect x="19.25" y="21" width="9.5" height="18" rx="4.75" style="fill: var(--brand-blue)" />
+          <text x="24" y="36" text-anchor="middle" class="brand-letter">i</text>
         }
       }
     </svg>
@@ -86,6 +105,8 @@ export class BrandIcon {
   // Calendar icon shows today's weekday and date (taken when the icon is created, e.g. each
   // time the menu opens).
   protected readonly today = new Date().getDate();
+  // Settings: an 8-tooth gear outline, centered (teeth slightly narrower at the tip).
+  protected readonly gear = gearPath(24, 24, 20, 15, 8);
   protected readonly weekday = inject(I18nService)
     .date(new Date(), { weekday: 'short' })
     .replace('.', '')

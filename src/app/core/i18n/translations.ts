@@ -15,7 +15,6 @@ const en = {
   'nav.about': 'About',
 
   'account.title': 'Account',
-  'account.pages': 'Pages',
   'account.language': 'Language',
   'account.update': 'Update',
   'account.logout': 'Log out',
@@ -130,7 +129,6 @@ const pl: Dictionary = {
   'nav.about': 'O aplikacji',
 
   'account.title': 'Konto',
-  'account.pages': 'Strony',
   'account.language': 'Język',
   'account.update': 'Aktualizuj',
   'account.logout': 'Wyloguj się',
@@ -242,7 +240,6 @@ const fr: Dictionary = {
   'nav.about': 'À propos',
 
   'account.title': 'Compte',
-  'account.pages': 'Pages',
   'account.language': 'Langue',
   'account.update': 'Mettre à jour',
   'account.logout': 'Se déconnecter',
