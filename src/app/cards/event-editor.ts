@@ -61,26 +61,12 @@ interface Model {
     >
       <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-6">
-        <!-- Class / Event (only a class has participants and materials): a switch on desktop,
-             a list with a check on mobile -->
-        @if (desktop) {
-          <div class="segmented">
-            @for (t of types; track t) {
-              <button type="button" (click)="patch({ type: t })" [attr.aria-pressed]="m.type === t">{{ typeKey(t) | t }}</button>
-            }
-          </div>
-        } @else {
-          <div class="card">
-            @for (t of types; track t) {
-              <button type="button" (click)="patch({ type: t })" class="list-row w-full text-left">
-                <span>{{ typeKey(t) | t }}</span>
-                @if (m.type === t) {
-                  <app-icon name="check" class="size-5 text-[var(--accent)]" />
-                }
-              </button>
-            }
-          </div>
-        }
+        <!-- Class | Event (only a class has participants and materials) -->
+        <div class="segmented">
+          @for (t of types; track t) {
+            <button type="button" (click)="patch({ type: t })" [attr.aria-pressed]="m.type === t">{{ typeKey(t) | t }}</button>
+          }
+        </div>
 
         <div class="card">
           <div class="list-row">
@@ -206,7 +192,6 @@ export class EventEditor implements OnInit {
   private lessons = inject(LessonService);
   private router = inject(Router);
   private device = inject(DeviceDetectionService);
-  protected readonly desktop = !this.device.isMobile();
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
 
