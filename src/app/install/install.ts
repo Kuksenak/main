@@ -3,7 +3,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { InstallService } from '../core/services/install.service';
 import { ToolbarService } from '../core/services/toolbar.service';
-import { IconName } from '../core/ui/icon/icon';
+import { Icon, IconName } from '../core/ui/icon/icon';
 
 type Platform = 'ios' | 'android' | 'mac' | 'computer';
 
@@ -19,7 +19,7 @@ interface Guide {
  */
 @Component({
   selector: 'app-install',
-  imports: [TranslatePipe],
+  imports: [Icon, TranslatePipe],
   template: `
     <!-- Scrolls on its own (the layout doesn't) -->
     <main class="min-h-0 w-full flex-1 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
@@ -29,11 +29,13 @@ interface Guide {
       </div>
 
       @if (guide; as g) {
-        <!-- Numbered steps, plain text (each keeps its icon in the data, not shown for now) -->
+        <!-- The steps, each with the icon to look for (no numbers) -->
         <div class="card">
           @for (s of g.steps; track $index) {
-            <p class="list-row text-body leading-snug">
-              <span class="w-4 shrink-0 tabular-nums opacity-40">{{ $index + 1 }}</span>
+            <p class="list-row gap-3 py-2.5 text-body leading-snug">
+              <span class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[var(--chip-ios)] text-[var(--text-secondary)]">
+                <app-icon [name]="s.icon" [strokeWidth]="1.5" class="size-6" />
+              </span>
               <span class="min-w-0 flex-1">
                 {{ s.text | t }}
                 <!-- Chrome / Edge / Android: their own install dialog, right from the first step -->
