@@ -27,8 +27,8 @@
         >{{ item.label | t }}</a>
       }
     </nav>
-    <!-- Pages menu (mobile; desktop has the tabs) -->
-    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
+    <!-- Pages menu: a bottom sheet on phones, a dropdown under the button on desktop -->
+    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0">
       <app-icon name="grid" class="size-6" />
     </button>
     <!-- Account. Mobile: the first letter of the email in the round accent button (like +).
