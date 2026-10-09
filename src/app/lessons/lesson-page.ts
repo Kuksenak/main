@@ -45,7 +45,7 @@ import { LessonState } from './lesson-state';
             <app-lesson-info [lesson]="l" />
           }
           @if (s.id()) {
-            <button type="button" (click)="askDelete.set(true)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+            <button #deleteBtn type="button" (click)="askDelete.set(deleteBtn)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
           }
         } @else if (s.lesson(); as l) {
           <app-lesson-content [blocks]="l.blocks" />
@@ -56,8 +56,8 @@ import { LessonState } from './lesson-state';
       </app-scroll-area>
     </main>
 
-    @if (askDelete()) {
-      <app-confirm-delete (confirmed)="remove()" (closed)="askDelete.set(false)" />
+    @if (askDelete(); as origin) {
+      <app-confirm-delete [origin]="origin" (confirmed)="remove()" (closed)="askDelete.set(null)" />
     }
   `,
 })
@@ -67,7 +67,7 @@ export class LessonPage {
 
   protected readonly s = new LessonState(() => this.lessonId());
   private router = inject(Router);
-  protected readonly askDelete = signal(false);
+  protected readonly askDelete = signal<HTMLElement | null>(null); // the Delete button, while asking
 
   protected cancel(): void {
     if (this.s.id()) this.s.cancelEdit();

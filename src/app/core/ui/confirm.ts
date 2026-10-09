@@ -1,7 +1,6 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '../i18n/t.pipe';
 import { TranslationKey } from '../i18n/translations';
-import { DeviceDetectionService } from '../services/device-detection.service';
 
 export interface ActionChoice {
   value: string;
@@ -10,9 +9,8 @@ export interface ActionChoice {
 }
 
 /**
- * A question with a few answers, iOS style: on mobile a small menu next to the button that asked
- * (no dimming — it would tint the toolbar); on desktop an alert (title, message, Cancel and the
- * answers under a hairline).
+ * A question with a few answers: a small panel next to the button that asked (no dimming — on
+ * mobile it would tint the toolbar), the answers as centered buttons; a click outside cancels.
  * A click outside cancels. Render it with @if; `chosen` fires with the answer's value, `closed`
  * once it's gone either way.
  */
@@ -22,53 +20,33 @@ export interface ActionChoice {
   template: `
     <div
       class="fixed inset-0 z-50 flex transition-opacity duration-200 [animation:fadeIn_200ms_ease-out]"
-      [class.items-end]="!desktop"
-      [class.items-center]="desktop"
-      [class.justify-center]="desktop"
-      [class.bg-black/35]="desktop"
       [class.opacity-0]="closing()"
       (click)="close()"
     >
-      @if (desktop) {
-        <div role="alertdialog" class="w-[17rem] overflow-hidden rounded-2xl bg-[var(--dialog-bg)] text-center text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:dropdownIn_200ms_var(--ease-out-quick)]" (click)="$event.stopPropagation()">
-          <div class="flex flex-col gap-1 px-4 pb-4 pt-5">
-            <p class="text-body font-semibold">{{ title() | t }}</p>
-            @if (message(); as msg) {
-              <p class="text-footnote opacity-70">{{ msg | t }}</p>
-            }
-          </div>
-          <div class="flex flex-col">
-            @for (c of choices(); track c.value) {
-              <button type="button" (click)="choose(c.value)" class="text-body h-11 border-t border-[var(--separator)] hover:bg-[var(--highlight)] active:![transform:none]" [class.text-[var(--danger)]]="c.danger" [class.text-[var(--accent)]]="!c.danger">{{ c.label | t }}</button>
-            }
-            <button type="button" (click)="close()" class="text-body h-11 border-t border-[var(--separator)] font-semibold text-[var(--accent)] hover:bg-[var(--highlight)] active:![transform:none]">{{ 'action.cancel' | t }}</button>
-          </div>
-        </div>
-      } @else {
-        <!-- Mobile: a small panel right by the button that asked (above it when it's low on the
-             screen): the question, then each answer as a centered button; a tap outside cancels -->
-        <div
-          role="alertdialog"
-          class="fixed flex w-72 flex-col gap-1.5 rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-2 text-[var(--text)] shadow-[0_8px_30px_rgb(0_0_0/0.18)] transition-[opacity,scale] duration-200 [animation:dropdownIn_200ms_var(--ease-out-quick)]"
-          [style.top.px]="place().top"
-          [style.bottom.px]="place().bottom"
-          [style.right.px]="place().right"
-          [class.origin-bottom-right]="place().bottom !== null"
-          [class.origin-top-right]="place().top !== null"
-          [class.scale-95]="closing()"
-          (click)="$event.stopPropagation()"
-        >
-          <p class="text-body px-2 pb-1 pt-1.5 text-center opacity-60">{{ (message() ?? title()) | t }}</p>
-          @for (c of choices(); track c.value) {
-            <button
-              type="button"
-              (click)="choose(c.value)"
-              class="h-12 rounded-xl bg-[var(--fill)] text-center text-[1.125rem] font-medium active:opacity-70 active:![transform:none]"
-              [class.text-[var(--danger)]]="c.danger"
-            >{{ c.label | t }}</button>
-          }
-        </div>
-      }
+      <!-- A small panel right by the button that asked (above it when it's low on the screen):
+           the question, then each answer as a centered button; a tap outside cancels. Smaller
+           on desktop. -->
+      <div
+        role="alertdialog"
+        class="fixed flex w-72 flex-col gap-1.5 rounded-2xl desktop:w-64 desktop:gap-1 desktop:rounded-xl desktop:p-1.5 border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-2 text-[var(--text)] shadow-[0_8px_30px_rgb(0_0_0/0.18)] transition-[opacity,scale] duration-200 [animation:dropdownIn_200ms_var(--ease-out-quick)]"
+        [style.top.px]="place().top"
+        [style.bottom.px]="place().bottom"
+        [style.right.px]="place().right"
+        [class.origin-bottom-right]="place().bottom !== null"
+        [class.origin-top-right]="place().top !== null"
+        [class.scale-95]="closing()"
+        (click)="$event.stopPropagation()"
+      >
+        <p class="text-body px-2 pb-1 pt-1.5 text-center opacity-60">{{ (message() ?? title()) | t }}</p>
+        @for (c of choices(); track c.value) {
+          <button
+            type="button"
+            (click)="choose(c.value)"
+            class="h-12 rounded-xl bg-[var(--fill)] text-center text-[1.125rem] font-medium desktop:h-9 desktop:rounded-lg desktop:text-[var(--text-body)] desktop:hover:bg-[var(--highlight)] active:opacity-70 active:![transform:none]"
+            [class.text-[var(--danger)]]="c.danger"
+          >{{ c.label | t }}</button>
+        }
+      </div>
     </div>
   `,
 })
@@ -81,7 +59,6 @@ export class ActionSheet {
   readonly chosen = output<string>();
   readonly closed = output<void>();
 
-  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly closing = signal(false);
 
   // Where the mobile menu goes: right-aligned with the button, below it when it's in the upper
