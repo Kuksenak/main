@@ -68,9 +68,8 @@ interface Model {
           </div>
         </div>
 
-        <!-- Participants: groups and students (a tap opens their card on top), then Invite -->
+        <!-- Participants (no caption): groups and students (a tap opens their card on top), then Invite -->
         <div class="flex flex-col gap-1.5">
-        <span class="text-footnote opacity-50">{{ 'event.participants' | t }}</span>
         <div class="card">
           <!-- A row opens the card; × takes them out of the event -->
           @for (p of invited(); track p.id) {
@@ -92,10 +91,9 @@ interface Model {
         </div>
         </div>
 
-        <!-- Files: attached lessons (a tap opens the lesson: a card on top on mobile, its
+        <!-- Files (no caption): attached lessons (a tap opens the lesson: a card on top on mobile, its
              page on desktop), then Attach -->
         <div class="flex flex-col gap-1.5">
-        <span class="text-footnote opacity-50">{{ 'event.files' | t }}</span>
         <div class="card">
           @for (l of attached(); track l.id) {
             <div class="list-row !gap-1">
