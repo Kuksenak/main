@@ -1,74 +1,62 @@
 <div class="inline-flex w-auto flex-col gap-1.5">
+  <!-- The chip (value + ⇅), opening our own dropdown on both phones and desktop -->
+  <button
+    type="button"
+    cdkOverlayOrigin
+    #origin="cdkOverlayOrigin"
+    [disabled]="disabled"
+    (click)="toggle()"
+    class="chip gap-2"
+    [class.!bg-transparent]="stretch"
+    [class.!pr-0]="stretch"
+  >
+    <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
+    <app-icon name="chevrons-up-down" class="size-5 shrink-0" />
+  </button>
 
-  @if (isMobile()) {
-    <!-- Mobile: native select with an iOS-style up/down chevron -->
-    <div class="inline-flex items-center" [class.relative]="!stretch">
-    <!-- stretch: the (invisible) native select covers the whole row; a chip shows the value -->
-    @if (stretch) {
-      <span class="chip pointer-events-none !bg-transparent pr-8">{{ triggerLabel() }}</span>
-    }
-    <select
-      [value]="value() ?? ''"
-      [disabled]="disabled"
-      (change)="onNativeChange($event)"
-      class="chip pr-8"
-      [class.absolute]="stretch"
-      [class.inset-0]="stretch"
-      [class.!h-full]="stretch"
-      [class.!w-full]="stretch"
-      [class.opacity-0]="stretch"
-    >
-      @if (value() === null) {
-        <option value="" disabled selected>{{ triggerLabel() }}</option>
-      }
-      @for (sec of sections(); track $index) {
-        @if (sec.label) {
-          <optgroup [label]="sec.label">
-            @for (opt of sec.options; track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
+  <!-- stretch: the whole row opens it too -->
+  @if (stretch) {
+    <button type="button" tabindex="-1" aria-hidden="true" (click)="toggle()" [disabled]="disabled" class="absolute inset-0 cursor-pointer active:!scale-100"></button>
+  }
+
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayPositions]="positions"
+    [cdkConnectedOverlayOrigin]="origin"
+    [cdkConnectedOverlayOpen]="isOpen()"
+    [cdkConnectedOverlayHasBackdrop]="true"
+    cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+    (backdropClick)="close()"
+    (detach)="close()"
+  >
+    @if (isMobile()) {
+      <!-- Phone: like iOS's own pickers — their panel color, big rounded corners, large text,
+           the check on the left of the chosen one -->
+      <div class="min-w-60 overflow-hidden rounded-[1.75rem] bg-[var(--picker-bg)] p-1.5 text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:dropdownIn_160ms_var(--ease-out-quick)]">
+        <app-scroll-area class="max-h-[min(60vh,26rem)]">
+          @for (sec of sections(); track $index) {
+            @if (sec.label) {
+              <div class="text-footnote px-4 pb-1 pt-2 opacity-50">{{ sec.label }}</div>
             }
-          </optgroup>
-        } @else {
-          @for (opt of sec.options; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
+            @for (opt of sec.options; track opt.value) {
+              <button
+                type="button"
+                (click)="select(opt)"
+                class="flex h-12 w-full items-center gap-2 rounded-[1.25rem] pl-3 pr-5 text-left text-[1.1875rem] active:bg-[var(--highlight)] active:![transform:none]"
+              >
+                <span class="flex w-6 shrink-0 justify-center">
+                  @if (isSelected(opt)) {
+                    <app-icon name="check" [strokeWidth]="2.4" class="size-5" />
+                  }
+                </span>
+                <span class="min-w-0 flex-1 truncate">{{ opt.label }}</span>
+              </button>
+            }
           }
-        }
-      }
-    </select>
-    <app-icon name="chevrons-up-down" class="pointer-events-none absolute right-2 size-5" [class.!right-6]="stretch" />
-    </div>
-  } @else {
-    <!-- Desktop: custom iOS-style dropdown via CDK overlay -->
-    <button
-     
-      type="button"
-      cdkOverlayOrigin
-      #origin="cdkOverlayOrigin"
-      [disabled]="disabled"
-      (click)="toggle()"
-      class="chip gap-2"
-      [class.!bg-transparent]="stretch"
-      [class.!pr-0]="stretch"
-    >
-      <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
-      <app-icon name="chevrons-up-down" class="size-5" />
-    </button>
-
-    @if (stretch) {
-      <button type="button" tabindex="-1" aria-hidden="true" (click)="toggle()" [disabled]="disabled" class="absolute inset-0 cursor-pointer active:!scale-100"></button>
-    }
-
-    <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayPositions]="positions"
-      [cdkConnectedOverlayOrigin]="origin"
-      [cdkConnectedOverlayOpen]="isOpen()"
-      [cdkConnectedOverlayHasBackdrop]="true"
-      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
-      (backdropClick)="close()"
-      (detach)="close()"
-    >
-      <!-- overflow-visible: the scroll indicator sits just outside the panel -->
+        </app-scroll-area>
+      </div>
+    } @else {
+      <!-- Desktop: a compact dropdown; overflow-visible: the scroll indicator sits just outside -->
       <div class="popover-panel min-w-40 !overflow-visible p-1">
         <app-scroll-area class="max-h-72" contentClass="gap-0.5">
         @for (sec of sections(); track $index) {
@@ -93,6 +81,6 @@
         }
         </app-scroll-area>
       </div>
-    </ng-template>
-  }
+    }
+  </ng-template>
 </div>

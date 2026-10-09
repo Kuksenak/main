@@ -91,13 +91,6 @@ export class SelectField implements ControlValueAccessor {
     return this.value() === opt.value;
   }
 
-  // Mobile native select
-  onNativeChange(event: Event): void {
-    const raw = (event.target as HTMLSelectElement).value;
-    const opt = this.options.find((o) => String(o.value) === raw);
-    this.setValue(opt ? opt.value : null);
-  }
-
   private setValue(v: string | number | null): void {
     this.value.set(v);
     this.onChange(v);
