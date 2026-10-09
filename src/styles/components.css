@@ -267,10 +267,10 @@
     @apply font-semibold text-[var(--accent)];
   }
 
-  /* Standalone input (search): filled, card corners, leading icon. Wrap: <label class="field">. */
+  /* Standalone input (search): the cards' color and corners, leading icon. Wrap: <label class="field">. */
   .field {
     @apply text-body flex h-[var(--row-h)] w-full shrink-0 cursor-text items-center gap-2
-           rounded-[var(--radius-card)] bg-[var(--fill)] px-3;
+           rounded-[var(--radius-card)] bg-[var(--surface)] px-3;
     & > input {
       @apply min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-40
              [&::-webkit-search-cancel-button]:appearance-none;
