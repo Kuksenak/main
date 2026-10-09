@@ -26,7 +26,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         cdkConnectedOverlay
         [cdkConnectedOverlayOrigin]="origin()!"
         [cdkConnectedOverlayOpen]="!closing()"
-        [cdkConnectedOverlayPositions]="positions"
+        [cdkConnectedOverlayPositions]="side() ? sidePositions : positions"
         [cdkConnectedOverlayPush]="true"
         [cdkConnectedOverlayViewportMargin]="8"
         [cdkConnectedOverlayHasBackdrop]="true"
@@ -80,6 +80,8 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
 export class Sheet {
   /** Desktop anchor: the button that opened the menu. */
   readonly origin = input<HTMLElement | null>(null);
+  /** Desktop dropdown: beside the origin (right, else left) instead of below it. */
+  readonly side = input(false);
   /** Desktop dropdown: wider (24rem instead of 18rem). */
   readonly wide = input(false);
   readonly closed = output<void>();
@@ -90,6 +92,12 @@ export class Sheet {
   protected readonly positions: ConnectedPosition[] = [
     { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 8 },
     { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -8 },
+  ];
+  // Beside the origin: to its right (e.g. next to a card), else its left, else below / above.
+  protected readonly sidePositions: ConnectedPosition[] = [
+    { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top', offsetX: 12 },
+    { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top', offsetX: -12 },
+    ...this.positions,
   ];
 
   protected readonly closing = signal(false);

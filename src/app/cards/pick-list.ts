@@ -66,7 +66,8 @@ export interface PickSection {
     </ng-template>
 
     @if (desktop) {
-      <app-sheet [origin]="origin()" (closed)="closed.emit()">
+      <!-- Beside the row it opened from (next to the card), not over it -->
+      <app-sheet [origin]="origin()" [side]="true" (closed)="closed.emit()">
         <div class="flex min-h-0 flex-col gap-3">
           <ng-container [ngTemplateOutlet]="search" />
           <app-scroll-area class="max-h-80 min-h-0" contentClass="gap-3">
