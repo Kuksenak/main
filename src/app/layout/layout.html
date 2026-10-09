@@ -100,9 +100,9 @@
         <!-- The language, right here under the email -->
         <div class="flex flex-col gap-1.5">
           <span class="text-footnote opacity-50">{{ 'account.language' | t }}</span>
-          <div class="card">
+          <div appFingerPick class="card">
             @for (lang of i18n.languages; track lang.code) {
-              <button type="button" (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
+              <button type="button" data-pick (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
                 <span>{{ lang.label }}</span>
                 @if (i18n.lang() === lang.code) {
                   <app-icon name="check" class="size-5 text-[var(--accent)]" />
@@ -113,7 +113,7 @@
         </div>
 
         <!-- About -->
-        <div class="card">
+        <div appFingerPick class="card">
           @for (item of accountItems; track item.path) {
             <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: sheet }" />
           }

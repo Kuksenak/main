@@ -4,6 +4,8 @@ import { Directive, ElementRef, OnDestroy, inject } from '@angular/core';
  * iOS-menu touch: while a finger moves over the container, a highlight slides under the item
  * it's on (items are `[data-pick]`), and lifting the finger picks that item (its click). A plain
  * tap still works as usual. `<div appFingerPick>…<button data-pick>…</button>…</div>`
+ * For menus that don't scroll — in a scrolling list the finger's drag is a scroll, and lifting it
+ * mustn't pick anything. Cheap: work happens only while touching, at most once per frame.
  */
 @Directive({
   selector: '[appFingerPick]',
