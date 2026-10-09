@@ -19,6 +19,7 @@ export type IconName =
   | 'i'
   | 'grid'
   | 'heading'
+  | 'grip'
   | 'image'
   | 'video'
   | 'checklist'
@@ -62,6 +63,11 @@ export type IconName =
             @for (x of [5, 12, 19]; track x) {
               <circle [attr.cx]="x" [attr.cy]="y" r="2" fill="currentColor" stroke="none" />
             }
+          }
+        }
+        @case ('grip') {
+          @for (y of [6, 12, 18]; track y) {
+            <circle cx="9" [attr.cy]="y" r="1.5" fill="currentColor" stroke="none" /><circle cx="15" [attr.cy]="y" r="1.5" fill="currentColor" stroke="none" />
           }
         }
         @case ('heading') { <path d="M6 5v14M18 5v14M6 12h12" /> }

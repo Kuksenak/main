@@ -1,4 +1,4 @@
-import { NgTemplateOutlet } from '@angular/common';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, model, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -41,11 +41,11 @@ export function cleanLesson(l: LessonInput): LessonInput {
 
 /**
  * Editing a lesson in place: title, then the blocks (headings, texts, links; × removes one).
- * A + between blocks (or Add block at the end) opens the list of kinds to insert there.
+ * Add block (at the end) opens the list of kinds; blocks are reordered by dragging their handle.
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [FormsModule, Icon, NgTemplateOutlet, Sheet, TranslatePipe],
+  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, Sheet, TranslatePipe],
   host: { class: 'flex flex-col gap-6' },
   template: `
     @let m = value();
@@ -55,24 +55,15 @@ export function cleanLesson(l: LessonInput): LessonInput {
       </div>
     </div>
 
-    <!-- Blocks, each followed by a + that inserts a new one right there (the first + is before
-         them all) -->
-    <ng-template #insert let-at>
-      <div class="group/ins relative -my-3 flex h-6 items-center justify-center">
-        <span class="absolute inset-x-4 h-px bg-[var(--separator)] opacity-0 transition-opacity group-hover/ins:opacity-100"></span>
-        <button #plus type="button" (click)="openAdd(at, plus)" [attr.aria-label]="'lessons.add' | t" class="relative flex size-6 items-center justify-center rounded-full bg-[var(--fill)] text-[var(--text-secondary)] active:opacity-60">
-          <app-icon name="plus" class="size-4" />
-        </button>
-      </div>
-    </ng-template>
-
-    @if (m.blocks.length) {
-      <ng-container [ngTemplateOutlet]="insert" [ngTemplateOutletContext]="{ $implicit: 0 }" />
-    }
+    <!-- Blocks, reordered by dragging their handle -->
+    <div cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="move($event)" class="flex flex-col gap-6">
     @for (b of m.blocks; track $index; let i = $index) {
-      <div class="card">
+      <div cdkDrag class="card">
         @if (b.kind === 'link') {
           <div class="list-row">
+            <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center self-stretch text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
+              <app-icon name="grip" class="size-5" />
+            </span>
             <app-icon name="link" class="size-5 opacity-40" />
             <input
               [ngModel]="b.url"
@@ -93,6 +84,9 @@ export function cleanLesson(l: LessonInput): LessonInput {
           </div>
         } @else if (b.kind === 'heading') {
           <div class="list-row">
+            <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center self-stretch text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
+              <app-icon name="grip" class="size-5" />
+            </span>
             <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.heading' | t" autocomplete="off" class="row-input text-xl font-semibold" />
             <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
               <app-icon name="close" class="size-5" />
@@ -100,6 +94,9 @@ export function cleanLesson(l: LessonInput): LessonInput {
           </div>
         } @else {
           <div class="list-row items-start py-3 desktop:py-2">
+            <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center pt-0.5 text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
+              <app-icon name="grip" class="size-5" />
+            </span>
             <textarea
               [ngModel]="b.text"
               (ngModelChange)="setBlock(i, { text: $event })"
@@ -113,10 +110,8 @@ export function cleanLesson(l: LessonInput): LessonInput {
           </div>
         }
       </div>
-      @if (i < m.blocks.length - 1) {
-        <ng-container [ngTemplateOutlet]="insert" [ngTemplateOutletContext]="{ $implicit: i + 1 }" />
-      }
     }
+    </div>
 
     <!-- Add at the end -->
     <button #addBtn type="button" (click)="openAdd(m.blocks.length, addBtn)" class="card-btn gap-2 text-[var(--accent)]">
@@ -173,6 +168,15 @@ export class LessonForm {
   // The add menu: where the new block goes, and the + it opened from.
   private insertAt = 0;
   protected readonly addOrigin = signal<HTMLElement | null>(null);
+
+  protected move(e: CdkDragDrop<unknown>): void {
+    if (e.previousIndex === e.currentIndex) return;
+    this.value.update((m) => {
+      const blocks = [...m.blocks];
+      moveItemInArray(blocks, e.previousIndex, e.currentIndex);
+      return { ...m, blocks };
+    });
+  }
 
   protected openAdd(at: number, origin: HTMLElement): void {
     this.insertAt = at;

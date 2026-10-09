@@ -151,6 +151,17 @@
     }
   }
 
+  /* Dragging a card (lesson blocks): it lifts with a shadow; the gap it leaves stays visible. */
+  .cdk-drag-preview {
+    @apply shadow-[var(--shadow-popover)];
+  }
+  .cdk-drag-placeholder {
+    @apply opacity-30;
+  }
+  .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+    transition: transform 200ms var(--ease-out-quick);
+  }
+
   /* Row inside a card. Hairline divider between rows, iOS-style: it starts at the text (after a
      leading avatar / icon / dot / color bar / check), stops short of the right edge, and is
      hidden under the last row. */

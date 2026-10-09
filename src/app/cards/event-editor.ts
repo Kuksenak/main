@@ -61,7 +61,7 @@ interface Model {
     >
       <fieldset [disabled]="readOnly()" class="contents">
       <div class="flex flex-col gap-6">
-        <!-- Event | Class: only a class has participants and materials -->
+        <!-- Class | Event: only a class has participants and materials -->
         <div class="segmented">
           @for (t of types; track t) {
             <button type="button" (click)="patch({ type: t })" [attr.aria-pressed]="m.type === t">{{ typeKey(t) | t }}</button>

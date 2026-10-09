@@ -9,7 +9,7 @@ export type EventStatus = 'Scheduled' | 'Done' | 'Cancelled';
 
 /** A plain event (time + title) or a class (with participants and materials). */
 export type EventType = 'Event' | 'Class';
-export const EVENT_TYPES: EventType[] = ['Event', 'Class'];
+export const EVENT_TYPES: EventType[] = ['Class', 'Event'];
 export const EVENT_STATUSES: EventStatus[] = ['Scheduled', 'Done', 'Cancelled'];
 
 // Events are loaded for a window around today: 26 weeks back, 53 weeks in total, starting
