@@ -1,13 +1,6 @@
 @if (auth.isAuthenticated()) {
 <div class="flex h-full flex-col overflow-hidden text-[var(--text)]">
   <header class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
-    <!-- Desktop: the current section at the start, like Google's product name -->
-    @if (currentItem(); as cur) {
-      <div class="mr-4 flex shrink-0 items-center gap-2 mobile:hidden">
-        <app-brand-icon [name]="cur.icon" class="size-9" />
-        <span class="text-lg font-semibold">{{ cur.label | t }}</span>
-      </div>
-    }
     <nav class="flex min-w-0 flex-1 items-center gap-1">
       <!-- Mobile: the current page's toolbar content or title (e.g. month on Schedule);
            tabs live in the ⋯ sheet -->

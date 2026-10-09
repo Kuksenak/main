@@ -1,8 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -51,19 +49,6 @@ export class Layout {
     { path: '/about', label: 'nav.about' },
   ];
   protected readonly menuOpen = signal(false);
-
-  // The section being shown (desktop header, next to the logo).
-  private readonly url = toSignal(
-    this.router.events.pipe(
-      filter((e) => e instanceof NavigationEnd),
-      map(() => this.router.url),
-    ),
-    { initialValue: this.router.url },
-  );
-  protected readonly currentItem = computed(() => {
-    const url = this.url();
-    return this.navItems.find((i) => url === i.path || url.startsWith(i.path + '/')) ?? null;
-  });
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly i18n = inject(I18nService);
 
