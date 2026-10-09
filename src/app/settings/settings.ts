@@ -1,4 +1,4 @@
-import { Component, DestroyRef, effect, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ToolbarService } from '../core/services/toolbar.service';
@@ -30,13 +30,9 @@ export class Settings {
   protected readonly i18n = inject(I18nService);
 
   constructor() {
-    // Mobile toolbar: ‹ and the page title.
+    // Mobile toolbar: just ‹ (no title).
     const toolbar = inject(ToolbarService);
-    effect(() => toolbar.title.set(this.i18n.t('nav.settings')));
     toolbar.back.set(true);
-    inject(DestroyRef).onDestroy(() => {
-      toolbar.title.set('');
-      toolbar.back.set(false);
-    });
+    inject(DestroyRef).onDestroy(() => toolbar.back.set(false));
   }
 }
