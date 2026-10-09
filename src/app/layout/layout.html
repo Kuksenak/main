@@ -82,7 +82,7 @@
   }
 
   @if (accountOpen()) {
-    <app-sheet #sheet [origin]="avatarBtn" [wide]="true" (closed)="accountOpen.set(false)">
+    <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
       <div class="flex flex-1 flex-col gap-3 desktop:gap-2">
         <div class="card">
           <!-- 5 taps on the email show the app version (hidden; for support) -->
@@ -96,11 +96,16 @@
 
         <!-- Desktop: the settings (language) right here; mobile: Settings is a page -->
         @if (desktop) {
-          <div class="flex items-center justify-between gap-3 px-1">
-            <span class="text-body">{{ 'account.language' | t }}</span>
-            <div class="segmented">
+          <div class="flex flex-col gap-1.5">
+            <span class="text-footnote px-4 uppercase opacity-50">{{ 'account.language' | t }}</span>
+            <div class="card">
               @for (lang of i18n.languages; track lang.code) {
-                <button type="button" (click)="i18n.setLang(lang.code)" [attr.aria-pressed]="i18n.lang() === lang.code">{{ lang.label }}</button>
+                <button type="button" (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
+                  <span>{{ lang.label }}</span>
+                  @if (i18n.lang() === lang.code) {
+                    <app-icon name="check" class="size-5 text-[var(--accent)]" />
+                  }
+                </button>
               }
             </div>
           </div>
