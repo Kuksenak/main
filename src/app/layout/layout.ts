@@ -47,9 +47,9 @@ export class Layout {
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
   ];
   // Under the account button. Install: only in the browser (not once it's the installed app).
-  protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName; dot?: boolean }[] = [
+  protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName }[] = [
     { path: '/about', label: 'nav.about' },
-    ...(this.install.standalone ? [] : [{ path: '/install', label: 'nav.install' as TranslationKey, dot: true }]),
+    ...(this.install.standalone ? [] : [{ path: '/install', label: 'nav.install' as TranslationKey }]),
   ];
   protected readonly menuOpen = signal(false);
 

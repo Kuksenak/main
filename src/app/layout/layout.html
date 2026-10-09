@@ -70,13 +70,7 @@
         <app-brand-icon [name]="item.icon" class="size-9" />
       }
       <!-- leading-none: the label sits on the icon's middle -->
-      <span class="flex min-w-0 flex-1 items-center gap-2">
-        <span class="min-w-0 truncate leading-none">{{ item.label | t }}</span>
-        <!-- Green dot right after the word: something to do there (Install) -->
-        @if (item.dot) {
-          <span class="dot size-2.5 shrink-0 bg-[var(--success)]"></span>
-        }
-      </span>
+      <span class="min-w-0 flex-1 truncate leading-none">{{ item.label | t }}</span>
       @if (check && isActive(item.path)) {
         <app-icon name="check" class="size-5 text-[var(--accent)]" />
       }
