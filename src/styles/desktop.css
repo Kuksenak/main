@@ -102,6 +102,10 @@ html.dark:root {
   background-color: var(--surface);
   box-shadow: inset 0 0 0 1px var(--control-border);
 }
+/* Dark: no outline (like the cards) — the gray field stands out on its own */
+html.dark .field {
+  box-shadow: none;
+}
 
 .segmented {
   /* Like Claude's settings switches: a gray track as wide as its items; the chosen one white
@@ -127,6 +131,14 @@ html.dark:root {
     color: var(--text);
     font-weight: 450;
     box-shadow: inset 0 0 0 1px var(--control-border);
+  }
+}
+/* Dark: no hairline — iOS's grays instead (the track like a card, the chosen one lighter) */
+html.dark .segmented {
+  background-color: var(--surface);
+  & > button[aria-pressed='true'] {
+    background-color: #3a3a3c;
+    box-shadow: none;
   }
 }
 
