@@ -7,10 +7,12 @@
       <button type="button" (click)="today()" class="btn-secondary ml-auto">{{ 'schedule.today' | t }}</button>
     </div>
 
-    <!-- Weekday row -->
-    <div class="grid grid-cols-7 pb-1">
+    <!-- Weekday row. Phone sizes as in iOS Calendar's month view: edge to edge, 13px weekdays,
+         51px weeks with full-width hairlines, the date (20px) in a 30px circle, the event marks
+         below it -->
+    <div class="grid grid-cols-7 pb-1 mobile:-mx-4 mobile:border-b mobile:border-[var(--separator)]">
       @for (wd of weekdays(); track $index) {
-        <span class="text-subhead flex items-center justify-center font-medium uppercase opacity-40 desktop:text-xs">{{ wd }}</span>
+        <span class="flex items-center justify-center font-medium uppercase opacity-40 mobile:text-[0.8125rem] desktop:text-xs">{{ wd }}</span>
       }
     </div>
 
@@ -19,10 +21,10 @@
     <div
       #cal
       (scroll)="onCalScroll(cal)"
-      class="no-scrollbar h-[16.5rem] snap-y snap-proximity overflow-y-auto overscroll-contain desktop:h-[18rem]"
+      class="no-scrollbar h-[19.125rem] snap-y snap-proximity overflow-y-auto overscroll-contain mobile:-mx-4 desktop:h-[18rem]"
     >
       @for (week of allWeeks; track week[0].getTime()) {
-        <div class="grid h-11 snap-start grid-cols-7 border-b border-[var(--separator)] last:border-b-0 desktop:h-12">
+        <div class="grid h-[3.1875rem] snap-start grid-cols-7 border-b border-[var(--separator)] last:border-b-0 desktop:h-12">
           @for (day of week; track day.getTime()) {
             <!-- Tap selects the day; long press creates a event on it -->
             <button
@@ -30,11 +32,11 @@
               appLongPress
               (longPress)="newOn(day)"
               (click)="selectDay(day)"
-              class="flex flex-col items-center gap-0.5 pt-1 active:opacity-60 desktop:gap-1.5 desktop:pt-1.5"
+              class="flex flex-col items-center gap-1 pt-1 active:opacity-60 desktop:gap-1.5 desktop:pt-1.5"
               [style.opacity]="inMonth(day) ? null : '0.35'"
             >
               <span
-                class="flex size-8 items-center justify-center rounded-full text-base font-semibold tabular-nums desktop:size-7 desktop:text-sm"
+                class="flex size-[1.875rem] items-center justify-center rounded-full text-[1.25rem] font-semibold tabular-nums desktop:size-7 desktop:text-sm"
                 [style.background]="isSelected(day) ? 'var(--accent)' : null"
                 [style.color]="isSelected(day) ? 'var(--accent-fg)' : (isToday(day) ? 'var(--accent)' : null)"
               >{{ day.getDate() }}</span>

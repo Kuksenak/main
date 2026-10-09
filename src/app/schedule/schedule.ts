@@ -62,9 +62,9 @@ export class Schedule implements AfterViewInit {
   protected readonly visibleMonth = signal(startOfMonth(new Date()));
 
 
-  // Week row height: h-11 on mobile, h-12 on desktop (see the template).
+  // Week row height: 51px on mobile (iOS Calendar), h-12 on desktop (see the template).
   private rowPx(): number {
-    return this.isMobile() ? 44 : 48;
+    return this.isMobile() ? 51 : 48;
   }
 
   // Month title, e.g. "October 2026" / "Październik 2026" (capitalized for every language).
