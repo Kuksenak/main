@@ -1,5 +1,4 @@
-import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
-import { LayerStack } from '../services/layer-stack.service';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { DeviceDetectionService } from '../services/device-detection.service';
 import { TranslatePipe } from '../i18n/t.pipe';
 import { TranslationKey } from '../i18n/translations';
@@ -92,13 +91,7 @@ export class ActionSheet {
 
   protected readonly closing = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
-  // Desktop: a layer over the cards (the card under it dims itself).
-  private readonly layers = inject(LayerStack);
-  private readonly layer = this.desktop ? this.layers.add(false) : 0;
-
-  constructor() {
-    inject(DestroyRef).onDestroy(() => this.layer && this.layers.remove(this.layer));
-  }
+  // No dimming under it (a quick question right on the button; the card stays as it is).
 
   // Where the panel goes: over the button that asked, centered on it horizontally — growing down
   // from its top when it's in the upper half of the screen, up from its bottom otherwise.
