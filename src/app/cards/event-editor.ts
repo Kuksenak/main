@@ -135,9 +135,18 @@ interface Model {
             <app-toggle [checked]="m.repeat !== 'Never'" (checkedChange)="patch({ repeat: $event ? 'Weekly' : 'Never' })" />
           </div>
           @if (m.repeat !== 'Never') {
+            <!-- Two ways to pick how often, side by side for now (to choose one): a select … -->
             <div class="list-row">
               <span>{{ 'event.repeatHow' | t }}</span>
               <app-select class="ml-auto" stretch [options]="repeatOptions()" [ngModel]="m.repeat" (ngModelChange)="patch({ repeat: $event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+            <!-- … and tabs -->
+            <div class="list-row">
+              <div class="segmented w-full">
+                @for (r of repeats; track r) {
+                  <button type="button" (click)="patch({ repeat: r })" [attr.aria-pressed]="m.repeat === r">{{ repeatShort(r) | t }}</button>
+                }
+              </div>
             </div>
           }
           @if (entry().id) {
@@ -260,6 +269,11 @@ export class EventEditor implements OnInit {
   protected readonly repeatOptions = computed<SelectOption[]>(() =>
     EVENT_REPEATS.map((r) => ({ label: this.i18n.t(`event.repeat.${r}`), value: r })),
   );
+
+  protected readonly repeats = EVENT_REPEATS;
+  protected repeatShort(r: EventRepeat) {
+    return `event.repeatShort.${r}` as const;
+  }
 
   // An event needs a title or someone invited.
   protected readonly canSave = computed(() => {
