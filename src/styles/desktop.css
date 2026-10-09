@@ -107,19 +107,19 @@ a[href]:active {
 .btn-white:active {
   background-color: color-mix(in srgb, var(--text) 14%, transparent);
 }
+/* Button and toolbar labels (Claude-like): 14px, weight 433 — between regular and medium */
 .btn-primary,
 .btn-secondary,
 .btn-white,
 .fab,
-.account-pill {
+.account-pill,
+.nav-tab {
   font-size: 0.875rem;
-  font-weight: 400;
+  font-weight: 433.3 !important;
 }
-/* Every other button label regular too (card buttons, header tabs, dialog actions) */
 .card-btn,
-.nav-tab,
 [role='alertdialog'] button {
-  font-weight: 400 !important;
+  font-weight: 433.3 !important;
 }
 
 /* Pointer hover feedback (touch devices have no hover). */
