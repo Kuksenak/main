@@ -33,13 +33,13 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
       filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.12));
     }
     .brand-weekday {
-      fill: var(--brand-orange);
+      fill: var(--brand-blue);
       font: 600 8.5px -apple-system, system-ui, 'Segoe UI', sans-serif;
       letter-spacing: 0.02em;
     }
     .brand-date {
-      fill: #1c1c1e;
-      font: 800 22px -apple-system, system-ui, 'Segoe UI', sans-serif; /* heavy, like the old paper icon's */
+      fill: var(--brand-orange);
+      font: 800 22px -apple-system, system-ui, 'Segoe UI', sans-serif; /* heavy and orange, like the old paper icon's */
       letter-spacing: -0.04em;
     }
   `,
@@ -47,7 +47,7 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
     <svg viewBox="0 0 48 48" class="size-full">
       @switch (name()) {
         @case ('calendar') {
-          <!-- iOS Calendar style: a white rounded square, the weekday in orange, today's date -->
+          <!-- iOS Calendar style: a white rounded square, the weekday in blue, today's date heavy and orange (like the old paper icon) -->
           <rect x="3" y="3" width="42" height="42" rx="10" class="brand-tile" />
           <text x="24" y="16.5" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
           <text x="24" y="36" text-anchor="middle" class="brand-date">{{ today }}</text>
