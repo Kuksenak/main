@@ -4,6 +4,13 @@
     <a routerLink="/about" [attr.aria-label]="'nav.about' | t" class="mr-1 shrink-0 active:opacity-70 mobile:hidden">
       <img src="logo.png" [alt]="'app.name' | t" class="size-8" width="32" height="32" />
     </a>
+    <!-- Desktop: the current section next to the logo, like Google's product name -->
+    @if (currentItem(); as cur) {
+      <div class="mr-4 flex shrink-0 items-center gap-2 mobile:hidden">
+        <app-brand-icon [name]="cur.icon" class="size-7" />
+        <span class="text-lg font-semibold">{{ cur.label | t }}</span>
+      </div>
+    }
     <nav class="flex min-w-0 flex-1 items-center gap-1">
       <!-- Mobile: the current page's toolbar content or title (e.g. month on Schedule);
            tabs live in the ⋯ sheet -->
@@ -18,17 +25,17 @@
         }
         <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
       }
-      <!-- Desktop tabs -->
+      <!-- Desktop tabs, each with its section icon -->
       @for (item of navItems; track item.path) {
         <a
           [routerLink]="item.path"
           routerLinkActive="glass-accent"
-          class="nav-tab text-body inline-flex h-9 items-center rounded-lg px-4 font-medium mobile:hidden"
-        >{{ item.label | t }}</a>
+          class="nav-tab text-body inline-flex h-9 items-center gap-2 rounded-lg pl-2.5 pr-4 font-medium mobile:hidden"
+        ><app-brand-icon [name]="item.icon" class="size-5" />{{ item.label | t }}</a>
       }
     </nav>
-    <!-- Pages menu: a bottom sheet on phones, a dropdown under the button on desktop -->
-    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:size-[var(--control-h)] desktop:!bg-[color-mix(in_srgb,var(--text)_6%,transparent)] desktop:hover:!bg-[color-mix(in_srgb,var(--text)_10%,transparent)]">
+    <!-- Pages menu (phones; desktop has the tabs) -->
+    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
       <!-- Desktop: in the account button's style (gray fill, same height), smaller dots -->
       <app-icon name="grid" class="size-6 desktop:size-4" />
     </button>
