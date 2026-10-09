@@ -3,7 +3,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { InstallService } from '../core/services/install.service';
 import { ToolbarService } from '../core/services/toolbar.service';
-import { Icon, IconName } from '../core/ui/icon/icon';
+import { IconName } from '../core/ui/icon/icon';
 
 type Platform = 'ios' | 'android' | 'mac' | 'computer';
 
@@ -19,37 +19,34 @@ interface Guide {
  */
 @Component({
   selector: 'app-install',
-  imports: [Icon, TranslatePipe],
+  imports: [TranslatePipe],
   template: `
     <!-- Scrolls on its own (the layout doesn't) -->
     <main class="min-h-0 w-full flex-1 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
       <div class="mx-auto flex w-full max-w-xl flex-col gap-8">
       <div class="flex flex-col gap-3">
-        <p class="text-[1.0625rem] leading-relaxed opacity-70">{{ 'install.intro' | t }}</p>
+        <p class="text-body leading-relaxed opacity-70">{{ 'install.intro' | t }}</p>
       </div>
 
       @if (guide; as g) {
-        <!-- Numbered steps, each with the icon to look for -->
+        <!-- Numbered steps, plain text (each keeps its icon in the data, not shown for now) -->
         <div class="card">
           @for (s of g.steps; track $index) {
-            <div class="list-row !items-start gap-3 py-3">
-              <span class="flex size-12 shrink-0 items-center justify-center rounded-[0.875rem] bg-[var(--chip-ios)] text-[var(--text-secondary)]">
-                <app-icon [name]="s.icon" [strokeWidth]="1.5" class="size-7" />
-              </span>
-              <p class="min-w-0 flex-1 self-center text-[1.0625rem] leading-snug">
-                <span class="font-semibold tabular-nums opacity-40">{{ $index + 1 }}.</span>
+            <p class="list-row text-body leading-snug">
+              <span class="w-4 shrink-0 tabular-nums opacity-40">{{ $index + 1 }}</span>
+              <span class="min-w-0 flex-1">
                 {{ s.text | t }}
                 <!-- Chrome / Edge / Android: their own install dialog, right from the first step -->
                 @if ($first && install.canPrompt()) {
                   <button type="button" (click)="install.prompt()" class="inline font-medium text-[var(--accent)] active:opacity-60">{{ (g.here ?? 'install.clickHere') | t }}</button>
                 }
-              </p>
-            </div>
+              </span>
+            </p>
           }
         </div>
       } @else {
         <div class="card">
-          <p class="list-row py-3 text-[1.0625rem] leading-snug">{{ 'install.unsupported' | t }}</p>
+          <p class="list-row text-body leading-snug">{{ 'install.unsupported' | t }}</p>
         </div>
       }
       </div>
