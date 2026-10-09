@@ -65,9 +65,10 @@
   <ng-template #pageRow let-item let-sheet="sheet" let-check="check" let-chevron="chevron">
     <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full py-2.5 text-left active:!bg-transparent">
       @if (item.icon) {
-        <app-brand-icon [name]="item.icon" class="size-8" />
+        <app-brand-icon [name]="item.icon" class="size-10" />
       }
-      <span class="min-w-0 flex-1 truncate">{{ item.label | t }}</span>
+      <!-- leading-none: the label sits on the icon's middle -->
+      <span class="min-w-0 flex-1 truncate leading-none">{{ item.label | t }}</span>
       @if (check && isActive(item.path)) {
         <app-icon name="check" class="size-5 text-[var(--accent)]" />
       }
