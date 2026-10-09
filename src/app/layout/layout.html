@@ -60,10 +60,10 @@
   <!-- Cards (event / student / group / lesson) opened over any page; back closes only the top one -->
   <app-stack-host />
 
-  <!-- A page row in a menu: the highlight follows the finger (FingerPick); the current
+  <!-- A page row in a menu: no tap highlight; the current
        page checked (in the pages menu only, not Settings / About) -->
   <ng-template #pageRow let-item let-sheet="sheet" let-check="check">
-    <button type="button" data-pick (click)="go(item.path, sheet)" class="group list-row w-full py-2.5 text-left active:!bg-transparent">
+    <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full py-2.5 text-left active:!bg-transparent">
       @if (item.icon) {
         <app-brand-icon [name]="item.icon" class="size-8" />
       }
@@ -76,9 +76,8 @@
 
   @if (menuOpen()) {
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
-      <!-- Just the rows and the dividers between them: no card background or outline; the
-           highlight follows the finger (lifting picks), like the select menu -->
-      <div appFingerPick class="no-dividers -mx-3 flex flex-col">
+      <!-- Just the rows: no card background, outline or dividers -->
+      <div class="no-dividers -mx-3 flex flex-col">
         @for (item of navItems; track item.path) {
           <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet, check: true }" />
         }
@@ -102,9 +101,9 @@
         <!-- The language, right here under the email -->
         <div class="flex flex-col gap-1.5">
           <span class="text-footnote opacity-50">{{ 'account.language' | t }}</span>
-          <div appFingerPick class="no-dividers card">
+          <div class="no-dividers card">
             @for (lang of i18n.languages; track lang.code) {
-              <button type="button" data-pick (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
+              <button type="button" (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
                 <span>{{ lang.label }}</span>
                 @if (i18n.lang() === lang.code) {
                   <app-icon name="check" class="size-5 text-[var(--accent)]" />
@@ -115,7 +114,7 @@
         </div>
 
         <!-- About -->
-        <div appFingerPick class="card">
+        <div class="card">
           @for (item of accountItems; track item.path) {
             <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: sheet }" />
           }
