@@ -86,9 +86,10 @@
                   class="text-body truncate font-medium"
                   [class.line-through]="event.status === 'Cancelled'"
                   [class.opacity-50]="event.status !== 'Scheduled'"
-                >{{ people.label(event) }}@if (event.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}</p>
+                >{{ people.label(event) }}@if (event.lessonIds.length && !people.subtitle(event)) {<app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}</p>
+                <!-- 📎 lessons attached: after the students line (after the title when there's none) -->
                 @if (people.subtitle(event); as sub) {
-                  <p class="text-footnote truncate opacity-50">{{ sub }}</p>
+                  <p class="text-footnote truncate opacity-50">{{ sub }}@if (event.lessonIds.length) {<app-icon name="paperclip" class="ml-1 inline size-3.5 rotate-45 align-[-2px]" />}</p>
                 }
               </div>
               <div class="flex shrink-0 items-center gap-3">
