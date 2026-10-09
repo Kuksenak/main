@@ -10,8 +10,8 @@ import { LessonInfo } from './lesson-info';
 import { LessonState } from './lesson-state';
 
 /**
- * A lesson as a desktop page (/lessons/:id; /lessons/new starts one), full width: back to the
- * library, the title with Edit; edited in place (Cancel · Save in the header; the public link
+ * A lesson as a desktop page (/lessons/:id; /lessons/new starts one), full width: a round back
+ * button, the title and Edit in one row; edited in place (Cancel · Save in the header; the public link
  * switch, the events using it and Delete below the form). Mobile opens lessons as cards instead (LessonCard).
  */
 @Component({
@@ -21,11 +21,12 @@ import { LessonState } from './lesson-state';
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
       <app-scroll-area class="min-h-0 flex-1" contentClass="gap-6 pb-10">
-        <div class="flex flex-col gap-3">
-          <a routerLink="/lessons" class="text-body -ml-1 flex items-center gap-1 self-start text-[var(--accent)] active:opacity-70">
-            <app-icon name="chevron-left" class="size-5" />{{ 'nav.lessons' | t }}
-          </a>
+        <!-- One row: ‹ (back to the library) · title · Edit, or Cancel · Save while editing -->
+        <div class="flex flex-col">
           <div class="flex items-center gap-3">
+            <a routerLink="/lessons" [attr.aria-label]="'action.back' | t" class="icon-btn">
+              <app-icon name="chevron-left" class="-ml-0.5 size-6" />
+            </a>
             <h1 class="min-w-0 flex-1 truncate text-2xl font-semibold">{{ s.heading() }}</h1>
             @if (s.editing()) {
               <button type="button" (click)="cancel()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
