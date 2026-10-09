@@ -22,6 +22,7 @@ const en = {
   'account.logout': 'Log out',
 
   'login.google': 'Continue with Google',
+  'login.unavailable': 'The server is unavailable right now. Please try again in a few minutes.',
   'login.apple': 'Continue with Apple',
   'login.legalPrefix': 'By continuing, you agree to our',
   'login.terms': 'Terms of Service',
@@ -169,6 +170,7 @@ const pl: Dictionary = {
   'account.logout': 'Wyloguj się',
 
   'login.google': 'Kontynuuj z Google',
+  'login.unavailable': 'Serwer jest teraz niedostępny. Spróbuj ponownie za kilka minut.',
   'login.apple': 'Kontynuuj z Apple',
   'login.legalPrefix': 'Kontynuując, akceptujesz',
   'login.terms': 'Regulamin',
@@ -313,6 +315,7 @@ const fr: Dictionary = {
   'account.logout': 'Se déconnecter',
 
   'login.google': 'Continuer avec Google',
+  'login.unavailable': 'Le serveur est indisponible pour le moment. Réessayez dans quelques minutes.',
   'login.apple': 'Continuer avec Apple',
   'login.legalPrefix': 'En continuant, vous acceptez nos',
   'login.terms': 'Conditions d’utilisation',

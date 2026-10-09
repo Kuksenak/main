@@ -54,8 +54,26 @@ export class AuthStore {
       );
   }
 
-  login(): void {
-    window.location.href = `${environment.apiUrl}/signin/google`;
+  /** Set when sign-in couldn't start because the API is down (shown on the login page). */
+  readonly loginError = signal(false);
+  readonly loggingIn = signal(false);
+
+  /**
+   * Sign in with Google — but first check the API answers (GET /ping, 5 s), so a server that's
+   * down shows our own message instead of the host's error page.
+   */
+  async login(): Promise<void> {
+    if (this.loggingIn()) return;
+    this.loggingIn.set(true);
+    this.loginError.set(false);
+    try {
+      const res = await fetch(`${environment.apiUrl}/ping`, { signal: AbortSignal.timeout(5000) });
+      if (!res.ok) throw new Error(`ping ${res.status}`);
+      window.location.href = `${environment.apiUrl}/signin/google`;
+    } catch {
+      this.loginError.set(true);
+      this.loggingIn.set(false);
+    }
   }
 
   // Drop the session locally right away and go to the login page (nothing stays visible),
