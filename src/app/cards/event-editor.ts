@@ -296,9 +296,10 @@ export class EventEditor implements OnInit {
     if (m.repeatCustom) return 'custom';
     return EventEditor.PRESETS.find((p) => p.repeat === m.repeat && p.interval === m.repeatInterval)?.key ?? 'custom';
   });
+  // Custom is hidden for now: offered only for an event that already repeats that way.
   protected readonly presetOptions = computed<SelectOption[]>(() => [
     ...EventEditor.PRESETS.map((p) => ({ label: this.i18n.t(`event.repeat.${p.key}` as TranslationKey), value: p.key })),
-    { label: this.i18n.t('event.repeat.custom'), value: 'custom' },
+    ...(this.preset() === 'custom' ? [{ label: this.i18n.t('event.repeat.custom'), value: 'custom' }] : []),
   ]);
   // Custom is "every N days": "1 day", "2 days" … (plural forms per language).
   protected readonly intervalOptions = computed<SelectOption[]>(() => {
