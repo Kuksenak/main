@@ -1,9 +1,8 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
-import { Sheet } from '../core/ui/sheet/sheet';
 import { DemoQuiz } from './demo-quiz';
 import { LessonContent } from './lesson-content';
 import { LessonForm } from './lesson-form';
@@ -12,12 +11,12 @@ import { LessonState } from './lesson-state';
 
 /**
  * A lesson as a desktop page (/lessons/:id; /lessons/new starts one), full width: back to the
- * library, the title with ⓘ and Edit; edited in place (Cancel · Save in the header, Delete
- * below the form). Mobile opens lessons as cards instead (LessonCard).
+ * library, the title with Edit; edited in place (Cancel · Save in the header; the public link
+ * switch, the events using it and Delete below the form). Mobile opens lessons as cards instead (LessonCard).
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [DemoQuiz, Icon, LessonContent, LessonForm, LessonInfo, RouterLink, ScrollArea, Sheet, TranslatePipe],
+  imports: [DemoQuiz, Icon, LessonContent, LessonForm, LessonInfo, RouterLink, ScrollArea, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -32,20 +31,17 @@ import { LessonState } from './lesson-state';
               <button type="button" (click)="cancel()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
               <button type="button" (click)="save()" [disabled]="!s.canSave()" class="btn-primary">{{ 'action.save' | t }}</button>
             } @else if (s.lesson()) {
-              <div class="btn-group">
-                <button #infoBtn type="button" (click)="infoOrigin.set(infoBtn)" [attr.aria-label]="'lessons.info' | t">
-                  <app-icon name="i" class="size-5" />
-                </button>
-                <button type="button" (click)="s.edit()" [attr.aria-label]="'action.edit' | t">
-                  <app-icon name="compose" class="size-5" />
-                </button>
-              </div>
+              <button type="button" (click)="s.edit()" class="btn-white">{{ 'action.edit' | t }}</button>
             }
           </div>
         </div>
 
         @if (s.editing()) {
           <app-lesson-form [(value)]="s.draft" />
+          <!-- Public link and the events using the lesson -->
+          @if (s.lesson(); as l) {
+            <app-lesson-info [lesson]="l" />
+          }
           @if (s.id()) {
             <button type="button" (click)="remove()" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
           }
@@ -57,14 +53,6 @@ import { LessonState } from './lesson-state';
         }
       </app-scroll-area>
     </main>
-
-    @if (infoOrigin(); as origin) {
-      @if (s.lesson(); as l) {
-        <app-sheet [origin]="origin" (closed)="infoOrigin.set(null)">
-          <app-lesson-info [lesson]="l" />
-        </app-sheet>
-      }
-    }
   `,
 })
 export class LessonPage {
@@ -73,7 +61,6 @@ export class LessonPage {
 
   protected readonly s = new LessonState(() => this.lessonId());
   private router = inject(Router);
-  protected readonly infoOrigin = signal<HTMLElement | null>(null);
 
   protected cancel(): void {
     if (this.s.id()) this.s.cancelEdit();

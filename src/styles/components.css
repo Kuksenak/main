@@ -65,6 +65,12 @@
            rounded-full active:opacity-70;
   }
 
+  /* White capsule with dark text (e.g. a lesson's Edit), the same height as the round buttons */
+  .btn-white {
+    @apply text-body inline-flex h-[var(--control-round)] shrink-0 items-center justify-center rounded-full
+           bg-white px-4 font-medium text-[#1c1c1e] shadow-[var(--shadow-popover)] active:opacity-70;
+  }
+
   /* Several icon buttons in one glass capsule (iOS toolbar group):
      <div class="btn-group"><button>…</button><button>…</button></div> */
   .btn-group {
