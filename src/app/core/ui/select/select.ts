@@ -129,15 +129,21 @@ export class SelectField implements ControlValueAccessor {
     this.select(opt);
   }
 
-  // After a pick the menu is gone, but the touch's click still lands — on whatever is now under
-  // the finger (e.g. a card's Invite row). Swallow that one click.
+  // After a pick the menu is gone, but the touch's leftovers (click, pointer / mouse events)
+  // still land — on whatever is now under the finger (e.g. a card's Invite row). An invisible
+  // shield over everything takes them for a moment.
   private swallowNextClick(): void {
+    const shield = document.createElement('div');
+    shield.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:transparent';
     const stop = (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
     };
-    document.addEventListener('click', stop, { capture: true, once: true });
-    setTimeout(() => document.removeEventListener('click', stop, { capture: true }), 500);
+    for (const type of ['click', 'pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchstart', 'touchend']) {
+      shield.addEventListener(type, stop, { capture: true });
+    }
+    document.body.appendChild(shield);
+    setTimeout(() => shield.remove(), 450);
   }
 
   select(opt: SelectOption): void {
