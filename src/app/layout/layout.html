@@ -74,7 +74,8 @@
 
   @if (menuOpen()) {
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
-      <div class="card">
+      <!-- Just the rows and the dividers between them: no card background or outline -->
+      <div class="-mx-3 flex flex-col">
         @for (item of navItems; track item.path) {
           <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet, check: true }" />
         }
