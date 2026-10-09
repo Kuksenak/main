@@ -31,7 +31,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
       (click)="back()"
     >
       <div
-        class="flex h-full w-full flex-col text-[var(--text)] [animation:pageInRight_360ms_var(--ease-out-quick)] mobile:bg-[var(--app-bg)] desktop:h-auto desktop:max-h-[calc(var(--app-h,100dvh)-2rem)] desktop:max-w-md desktop:p-4"
+        class="relative flex h-full w-full flex-col text-[var(--text)] [animation:pageInRight_360ms_var(--ease-out-quick)] mobile:bg-[var(--app-bg)] desktop:h-auto desktop:max-h-[calc(var(--app-h,100dvh)-2rem)] desktop:max-w-md desktop:p-4"
         [class.dialog-panel]="desktop"
         [class.desktop:!h-full]="wide()"
         [class.desktop:!max-h-none]="wide()"
@@ -40,8 +40,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
       >
-        <!-- Mobile top bar: same side inset as the cards, round controls -->
-        <div class="relative flex shrink-0 items-center gap-2 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] desktop:hidden">
+        <!-- Mobile top bar: same side inset as the cards, round controls. It floats over the
+             content (which scrolls under it), fading from the page color to transparent; only
+             its buttons take taps. -->
+        <div class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-[linear-gradient(to_bottom,var(--app-bg)_40%,transparent)] px-4 pb-5 pt-[calc(env(safe-area-inset-top)+0.5rem)] desktop:hidden [&_button]:pointer-events-auto">
           <button
             type="button"
             (click)="back()"
@@ -84,12 +86,12 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         @if (scroll()) {
           <app-scroll-area
             class="min-h-0 flex-1 px-4 desktop:flex-initial desktop:px-0"
-            contentClass="pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 desktop:pb-0 desktop:pt-0"
+            contentClass="pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:pb-0 desktop:pt-0"
           >
             <ng-container [ngTemplateOutlet]="body" />
           </app-scroll-area>
         } @else {
-          <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-1 desktop:px-0 desktop:pb-0 desktop:pt-0">
+          <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:px-0 desktop:pb-0 desktop:pt-0">
             <ng-container [ngTemplateOutlet]="body" />
           </div>
         }
