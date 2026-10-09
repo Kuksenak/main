@@ -30,7 +30,7 @@ export interface ActionChoice {
              across its width (no Cancel: a click outside cancels) -->
         <div
           role="alertdialog"
-          class="fixed flex w-70 flex-col gap-3 rounded-xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-4 text-[var(--text)] shadow-[var(--shadow-dialog)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
+          class="fixed flex w-70 flex-col gap-3 rounded-xl bg-[var(--dialog-bg)] p-4 text-[var(--text)] shadow-[var(--shadow-dialog)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
           [style.left.px]="place().left"
