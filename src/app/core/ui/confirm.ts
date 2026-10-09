@@ -45,11 +45,11 @@ export interface ActionChoice {
           </div>
         </div>
       } @else {
-        <!-- Mobile: a small menu right by the button that asked (above it when it's low on the
-             screen); the question and the answers in one font, no dividers; a tap outside cancels -->
+        <!-- Mobile: a small panel right by the button that asked (above it when it's low on the
+             screen): the question, then each answer as a centered button; a tap outside cancels -->
         <div
           role="alertdialog"
-          class="fixed flex w-64 flex-col overflow-hidden rounded-2xl bg-[color-mix(in_srgb,var(--dialog-bg)_94%,transparent)] p-1.5 text-[var(--text)] shadow-[var(--shadow-dialog)] backdrop-blur-xl transition-[opacity,scale] duration-200 [animation:dropdownIn_200ms_var(--ease-out-quick)]"
+          class="fixed flex w-64 flex-col gap-1.5 rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-2 text-[var(--text)] shadow-[0_8px_30px_rgb(0_0_0/0.18)] transition-[opacity,scale] duration-200 [animation:dropdownIn_200ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
           [style.right.px]="place().right"
@@ -58,9 +58,14 @@ export interface ActionChoice {
           [class.scale-95]="closing()"
           (click)="$event.stopPropagation()"
         >
-          <p class="text-body px-3 pb-1 pt-2 opacity-50">{{ (message() ?? title()) | t }}</p>
+          <p class="text-footnote px-2 pb-1 pt-1.5 text-center opacity-60">{{ (message() ?? title()) | t }}</p>
           @for (c of choices(); track c.value) {
-            <button type="button" (click)="choose(c.value)" class="text-body rounded-xl px-3 py-2.5 text-left active:bg-[var(--highlight)] active:![transform:none]" [class.text-[var(--danger)]]="c.danger">{{ c.label | t }}</button>
+            <button
+              type="button"
+              (click)="choose(c.value)"
+              class="text-body h-11 rounded-xl bg-[var(--fill)] text-center font-medium active:opacity-70 active:![transform:none]"
+              [class.text-[var(--danger)]]="c.danger"
+            >{{ c.label | t }}</button>
           }
         </div>
       }
