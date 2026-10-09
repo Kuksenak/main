@@ -1,7 +1,9 @@
 import { Component, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { NavStack, StackEntry } from '../core/services/nav-stack.service';
 import { DateField } from '../core/ui/date/date';
 import { Icon } from '../core/ui/icon/icon';
@@ -77,10 +79,11 @@ interface Model {
           </button>
         </div>
 
-        <!-- Attached lessons (a tap opens the lesson on top), then Attach -->
+        <!-- Attached lessons (a tap opens the lesson: a card on top on mobile, its page on
+             desktop), then Attach -->
         <div class="card">
           @for (l of attached(); track l.id) {
-            <button type="button" (click)="stack.push({ kind: 'lesson', id: l.id })" class="list-row w-full text-left">
+            <button type="button" (click)="openLesson(l.id)" class="list-row w-full text-left">
               <p class="min-w-0 flex-1 truncate">{{ l.title }}</p>
               <app-icon name="chevron-right" class="row-chevron" />
             </button>
@@ -155,6 +158,8 @@ export class EventEditor implements OnInit {
   private groups = inject(GroupService);
   private students = inject(StudentService);
   private lessons = inject(LessonService);
+  private router = inject(Router);
+  private device = inject(DeviceDetectionService);
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
 
@@ -255,6 +260,15 @@ export class EventEditor implements OnInit {
 
   protected initial(name: string): string {
     return initial(name, this.i18n.locale());
+  }
+
+  protected openLesson(id: string): void {
+    if (this.device.isMobile()) {
+      this.stack.push({ kind: 'lesson', id });
+    } else {
+      this.stack.clear();
+      this.router.navigate(['/lessons', id]);
+    }
   }
 
   protected setInvitees(ids: string[]): void {

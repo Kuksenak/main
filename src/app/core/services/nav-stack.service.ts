@@ -18,8 +18,21 @@ export class NavStack {
   private nextKey = 1;
   readonly entries = signal<StackEntry[]>([]);
 
+  /**
+   * Open a card on top — or, if that same card (kind + id) is already open further down, go
+   * back to it (the cards above it close), so following links never loops
+   * (event → student → the same event …).
+   */
   push(entry: Omit<StackEntry, 'key'>): void {
-    this.entries.update((list) => [...list, { ...entry, key: this.nextKey++ }]);
+    this.entries.update((list) => {
+      const i = entry.id ? list.findIndex((e) => e.kind === entry.kind && e.id === entry.id) : -1;
+      return i >= 0 ? list.slice(0, i + 1) : [...list, { ...entry, key: this.nextKey++ }];
+    });
+  }
+
+  /** Close every card at once (e.g. leaving for another page). */
+  clear(): void {
+    this.entries.set([]);
   }
 
   /** Remove a card (after its close animation). */

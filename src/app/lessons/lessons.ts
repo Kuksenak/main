@@ -4,26 +4,32 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { NavStack } from '../core/services/nav-stack.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { SearchField } from '../core/ui/search-field';
+import { LessonPage } from './lesson-page';
 import { Lesson, LessonService } from './lesson.service';
 
 /**
- * The lesson library: search (mobile: in the toolbar) and the list; a tap opens the lesson
- * (nearly full-screen card) at its own link, /lessons/:id, so it can be shared; + starts a new one.
+ * The lesson library: search (mobile: in the toolbar) and the list; a tap opens the lesson at
+ * its own link, /lessons/:id, so it can be shared — desktop: as a page (LessonPage) in place of
+ * the list; mobile: as a full-screen card over it. + starts a new one.
  */
 @Component({
   selector: 'app-lessons',
-  imports: [NgTemplateOutlet, Icon, ScrollArea, SearchField, TranslatePipe],
+  imports: [NgTemplateOutlet, Icon, LessonPage, ScrollArea, SearchField, TranslatePipe],
   template: `
     <ng-template #search>
       <app-search-field [(value)]="query" />
     </ng-template>
 
+    @if (desktop && linkedId()) {
+      <app-lesson-page [lessonId]="linkedId() === 'new' ? null : linkedId()!" />
+    } @else {
     <!-- Bottom padding keeps the list clear of the floating button -->
     <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1">
       <section class="flex min-h-0 w-full flex-1 flex-col gap-3 pb-14">
@@ -51,9 +57,10 @@ import { Lesson, LessonService } from './lesson.service';
       </section>
     </main>
 
-    <button type="button" (click)="stack.push({ kind: 'lesson', id: null })" [attr.aria-label]="'lessons.add' | t" class="btn-confirm float-bottom right-4">
+    <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="btn-confirm float-bottom right-4">
       <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-6" />
     </button>
+    }
   `,
 })
 export class Lessons {
@@ -61,7 +68,8 @@ export class Lessons {
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
   protected router = inject(Router);
-  private readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  protected readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
   private readonly search = viewChild<TemplateRef<unknown>>('search');
 
   protected readonly query = signal('');
@@ -76,10 +84,10 @@ export class Lessons {
   });
 
   constructor() {
-    // /lessons/:id → that lesson's card on top (unless it's open already).
+    // Mobile: /lessons/:id → that lesson's card on top (unless it's open already).
     effect(() => {
       const id = this.linkedId();
-      if (!id) return;
+      if (!id || id === 'new' || this.desktop) return;
       untracked(() => {
         if (!this.stack.entries().some((e) => e.kind === 'lesson' && e.id === id)) this.stack.push({ kind: 'lesson', id });
       });
@@ -89,6 +97,11 @@ export class Lessons {
     const toolbar = inject(ToolbarService);
     effect(() => toolbar.content.set(this.search() ?? null));
     inject(DestroyRef).onDestroy(() => toolbar.content.set(null));
+  }
+
+  protected add(): void {
+    if (this.desktop) this.router.navigate(['/lessons', 'new']);
+    else this.stack.push({ kind: 'lesson', id: null });
   }
 
   // Under the title: the start of the first text, else the first link.
