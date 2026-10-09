@@ -85,14 +85,15 @@
       <!-- A gap between tiles so a highlighted one and a hovered one never merge -->
       <div class="grid grid-cols-3 gap-1.5">
         @for (item of navItems; track item.path) {
-          <!-- The highlight hugs the icon and name (not the whole tile) and fades in / out -->
+          <!-- The highlight: a square under the icon and name, ~88pt like Google's (not the whole
+               column), fading in / out -->
           <button
             type="button"
             (click)="go(item.path, menuSheet)"
             class="group flex h-[6.25rem] min-w-0 items-center justify-center active:![transform:none] desktop:h-20"
           >
             <span
-              class="flex min-w-0 max-w-full flex-col items-center gap-2 rounded-2xl px-3 py-2 transition-colors duration-200 group-active:bg-[var(--highlight)] desktop:gap-1.5 desktop:rounded-xl desktop:group-hover:bg-[var(--highlight)]"
+              class="flex size-[5.5rem] min-w-0 max-w-full flex-col items-center justify-center gap-2 rounded-2xl px-1 transition-colors duration-200 group-active:bg-[var(--highlight)] desktop:size-[4.5rem] desktop:gap-1.5 desktop:rounded-xl desktop:group-hover:bg-[var(--highlight)]"
               [class.bg-[var(--highlight)]]="isActive(item.path)"
             >
               <app-brand-icon [name]="item.icon" class="size-12 desktop:size-10" />
