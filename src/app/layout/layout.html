@@ -79,8 +79,8 @@
 
   @if (menuOpen()) {
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
-      <!-- Just the rows: no card background, outline or dividers -->
-      <div class="no-dividers -mx-3 flex flex-col">
+      <!-- Just the rows: no card background, outline or dividers; larger labels -->
+      <div class="no-dividers -mx-3 flex flex-col [&_.list-row]:!text-[1.1875rem]">
         @for (item of navItems; track item.path) {
           <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet, check: true }" />
         }
@@ -108,7 +108,7 @@
         <!-- The language, right here under the email -->
         <div class="flex flex-col gap-1.5">
           <span class="text-footnote opacity-50">{{ 'account.language' | t }}</span>
-          <div class="no-dividers card">
+          <div class="card">
             @for (lang of i18n.languages; track lang.code) {
               <button type="button" (click)="i18n.setLang(lang.code)" class="list-row w-full text-left">
                 <span>{{ lang.label }}</span>
