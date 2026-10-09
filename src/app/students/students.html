@@ -5,8 +5,9 @@
 <!-- Mobile: list only (tap opens the card). Desktop: list on the left (calendar width), the
      picked student / group on the right. -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6">
-  <!-- Bottom padding keeps the list clear of the floating button -->
-  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 pb-14 desktop:max-w-md">
+  <!-- Bottom padding keeps the list clear of the floating button (mobile; on desktop the
+       button floats over the details pane, so the list runs to the bottom) -->
+  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 pb-14 desktop:max-w-md desktop:pb-0">
     <!-- Search: here on desktop; on mobile the same template sits in the toolbar -->
     <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
 
