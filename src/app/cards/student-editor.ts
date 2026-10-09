@@ -24,7 +24,7 @@ import { StudentGroups } from './related-lists';
       (delete)="remove()"
       (closed)="closed.emit()"
     >
-      <fieldset [disabled]="readOnly()" class="contents">
+      <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-6">
         <div class="card">
           <div class="list-row">
@@ -43,7 +43,7 @@ import { StudentGroups } from './related-lists';
           <app-event-list [studentId]="s.id" />
         }
       </div>
-      </fieldset>
+      </div>
     </app-page-sheet>
   `,
 })

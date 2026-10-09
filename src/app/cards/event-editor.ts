@@ -59,7 +59,7 @@ interface Model {
       (delete)="remove()"
       (closed)="closed.emit()"
     >
-      <fieldset [disabled]="readOnly()" class="contents">
+      <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-6">
         <!-- Class | Event: only a class has participants and materials -->
         <div class="segmented">
@@ -153,7 +153,7 @@ interface Model {
           </div>
         </div>
       </div>
-      </fieldset>
+      </div>
     </app-page-sheet>
 
     @switch (picking()) {

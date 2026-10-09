@@ -37,7 +37,7 @@ interface Model {
       (delete)="remove()"
       (closed)="closed.emit()"
     >
-      <fieldset [disabled]="readOnly()" class="contents">
+      <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-6">
         <div class="card">
           <div class="list-row">
@@ -89,7 +89,7 @@ interface Model {
           <app-event-list [groupId]="g.id" />
         }
       </div>
-      </fieldset>
+      </div>
     </app-page-sheet>
 
     <!-- Member picker: every student with a check -->
