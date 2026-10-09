@@ -9,7 +9,7 @@ export type EventStatus = 'Scheduled' | 'Done' | 'Cancelled';
 
 /** How an event repeats (from its first start, with no end). */
 export type EventRepeat = 'Never' | 'Daily' | 'Weekly' | 'Biweekly' | 'Monthly';
-export const EVENT_REPEATS: EventRepeat[] = ['Daily', 'Weekly', 'Biweekly', 'Monthly'];
+export const EVENT_REPEATS: EventRepeat[] = ['Daily', 'Weekly', 'Monthly']; // choices (Biweekly still understood)
 export const EVENT_STATUSES: EventStatus[] = ['Scheduled', 'Done', 'Cancelled'];
 
 // Events are loaded for a window around today: 26 weeks back, 53 weeks in total, starting
