@@ -36,7 +36,10 @@ const CLS_PLAIN = 'option';
 export class TimeField implements ControlValueAccessor {
   // Below the field, else above it (when there's no room below) — never pushed around, which
   // looped with the card's scroll.
+  // Centered on the chip (iOS): the chosen time, scrolled to the columns' middle, lands right
+  // under the pointer. Near the window's edge: below / above the chip instead.
   protected readonly positions: ConnectedPosition[] = [
+    { originX: 'center', originY: 'center', overlayX: 'center', overlayY: 'center' },
     { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 6 },
     { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -6 },
     { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 6 },
