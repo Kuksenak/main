@@ -80,7 +80,7 @@
 html.dark {
   --app-bg: #000000;
   --surface: #1c1c1e;
-  --card: #1c1c1e;
+  --card: #2c2c2e; /* cards inside dialogs: a step lighter than the #1c1c1e dialog (iOS elevated) */
   --dialog-bg: #1c1c1e;
   --sheet-glass: rgb(28 28 30 / 0.78);
   --sheet-surface: rgb(255 255 255 / 0.07);
