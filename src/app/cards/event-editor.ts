@@ -20,7 +20,7 @@ import {
   toDateInput,
   toTimeInput,
 } from '../core/utils/time';
-import { EVENT_STATUSES, EventInput, EventRepeat, EventService, EventStatus, statusKey } from '../schedule/event.service';
+import { EventInput, EventRepeat, EventService, EventStatus } from '../schedule/event.service';
 import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
@@ -88,17 +88,8 @@ interface Model {
               <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
-          @if (entry().id) {
-            <div class="list-row">
-              <span>{{ 'event.status' | t }}</span>
-              <app-select class="ml-auto" stretch [options]="statusOptions()" [ngModel]="m.status" (ngModelChange)="patch({ status: $event })" [ngModelOptions]="{ standalone: true }" />
-            </div>
-          }
-        </div>
-
-        <!-- Repeat (iOS-like): Never / every day, week, 2 weeks, month, year / Custom (every N
-             days); then when it ends -->
-        <div class="card">
+          <!-- Repeat (iOS-like), in the same card: Never / every day, week, 2 weeks, month, year /
+               Custom (every N days); then when it ends -->
           <div class="list-row">
             <span>{{ 'event.repeat' | t }}</span>
             <app-select class="ml-auto" stretch [options]="presetOptions()" [ngModel]="preset()" (ngModelChange)="setPreset($event)" [ngModelOptions]="{ standalone: true }" />
@@ -238,10 +229,6 @@ export class EventEditor implements OnInit {
   protected readonly model = signal<Model>(this.blank());
   // Contents when the card opened, to tell whether anything changed.
   private readonly snapshot = signal('');
-
-  protected readonly statusOptions = computed<SelectOption[]>(() =>
-    EVENT_STATUSES.map((s) => ({ label: this.i18n.t(statusKey(s)), value: s })),
-  );
 
   // Invited groups, then students, each with its name and color.
   protected readonly invited = computed(() => {
