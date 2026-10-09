@@ -12,7 +12,6 @@ export type IconName =
   | 'people'
   | 'calendar'
   | 'info'
-  | 'i'
   | 'book'
   | 'link'
   | 'text'
@@ -44,13 +43,12 @@ export type IconName =
         @case ('close') { <path d="M18 6 6 18M6 6l12 12" /> }
         @case ('people') { <circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6" /> }
         @case ('calendar') { <rect x="3.5" y="5" width="17" height="15.5" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /> }
-        @case ('i') { <path d="M12 10.5V18M12 6v.5" /> }
         @case ('info') { <circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" /> }
         @case ('book') { <path d="M12 6.5C10 5 7 4.5 3.5 4.5v14c3.5 0 6.5.5 8.5 2 2-1.5 5-2 8.5-2v-14c-3.5 0-6.5.5-8.5 2zM12 6.5v14" /> }
         @case ('link') { <path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" /> }
         @case ('text') { <path d="M5 6h14M5 10h14M5 14h14M5 18h9" /> }
         @case ('copy') { <rect x="8.5" y="8.5" width="12" height="12" rx="2.5" /><path d="M15.5 8.5v-2a2.5 2.5 0 0 0-2.5-2.5H6a2.5 2.5 0 0 0-2.5 2.5v7A2.5 2.5 0 0 0 6 16h2.5" /> }
-        @case ('pencil') { <path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z" /><path d="m13.5 6.5 4 4" /> }
+        @case ('pencil') { <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7.5 18.5 3.5 19.5l1-4z" /><path d="m14.5 5.5 3 3" /> }
         @case ('person') { <circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /> }
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }

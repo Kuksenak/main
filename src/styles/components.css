@@ -65,6 +65,16 @@
            rounded-full active:opacity-70;
   }
 
+  /* Several icon buttons in one glass capsule (iOS toolbar group):
+     <div class="btn-group"><button>…</button><button>…</button></div> */
+  .btn-group {
+    @apply glass-neutral inline-flex h-[var(--control-round)] shrink-0 items-center rounded-full px-1;
+    & > button {
+      @apply inline-flex h-full w-[calc(var(--control-round)-0.25rem)] items-center justify-center
+             rounded-full active:opacity-60;
+    }
+  }
+
   /* Round icon button — accent (✓, +, avatar) */
   .btn-confirm {
     @apply glass-accent inline-flex size-[var(--control-round)] shrink-0 items-center justify-center

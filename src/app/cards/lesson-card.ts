@@ -37,16 +37,16 @@ import { EventList } from './event-list';
       (delete)="remove()"
       (closed)="onClosed()"
     >
-      <!-- Mobile top bar (reading): ⓘ and Edit, round -->
+      <!-- Mobile top bar (reading): ⓘ and Edit in one glass capsule -->
       @if (!editing()) {
-        <ng-container ngProjectAs="[barEnd]">
-          <button #infoBtnMobile type="button" (click)="openInfo(infoBtnMobile)" [attr.aria-label]="'lessons.info' | t" class="icon-btn">
-            <app-icon name="i" [strokeWidth]="2.6" class="size-6" />
+        <div barEnd class="btn-group">
+          <button #infoBtnMobile type="button" (click)="openInfo(infoBtnMobile)" [attr.aria-label]="'lessons.info' | t">
+            <app-icon name="info" [strokeWidth]="2" class="size-6" />
           </button>
-          <button type="button" (click)="edit()" [attr.aria-label]="'action.edit' | t" class="icon-btn">
-            <app-icon name="pencil" class="size-6" />
+          <button type="button" (click)="edit()" [attr.aria-label]="'action.edit' | t">
+            <app-icon name="pencil" [strokeWidth]="2" class="size-[1.375rem]" />
           </button>
-        </ng-container>
+        </div>
       }
 
       <div class="flex flex-col gap-6">
@@ -54,10 +54,14 @@ import { EventList } from './event-list';
         @if (!editing()) {
           <div class="flex items-center gap-3 mobile:hidden">
             <h1 class="min-w-0 flex-1 text-2xl font-semibold">{{ heading() }}</h1>
-            <button #infoBtn type="button" (click)="openInfo(infoBtn)" [attr.aria-label]="'lessons.info' | t" class="icon-btn">
-              <app-icon name="i" [strokeWidth]="2.6" class="size-5" />
-            </button>
-            <button type="button" (click)="edit()" class="btn-secondary">{{ 'action.edit' | t }}</button>
+            <div class="btn-group">
+              <button #infoBtn type="button" (click)="openInfo(infoBtn)" [attr.aria-label]="'lessons.info' | t">
+                <app-icon name="info" [strokeWidth]="2" class="size-5" />
+              </button>
+              <button type="button" (click)="edit()" [attr.aria-label]="'action.edit' | t">
+                <app-icon name="pencil" [strokeWidth]="2" class="size-[1.125rem]" />
+              </button>
+            </div>
           </div>
         }
 

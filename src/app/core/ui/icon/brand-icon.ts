@@ -74,8 +74,8 @@ export type BrandIconName = 'calendar' | 'people' | 'book' | 'settings' | 'info'
         @case ('info') {
           <!-- The same white square with an "i": orange dot, blue stem -->
           <rect x="3" y="3" width="42" height="42" rx="10" class="brand-tile" />
-          <circle cx="24" cy="14.5" r="3.5" style="fill: var(--brand-orange)" />
-          <rect x="20.75" y="21" width="6.5" height="17" rx="3.25" style="fill: var(--brand-blue)" />
+          <circle cx="24" cy="13.5" r="4.75" style="fill: var(--brand-orange)" />
+          <rect x="19.25" y="21" width="9.5" height="18" rx="4.75" style="fill: var(--brand-blue)" />
         }
       }
     </svg>
