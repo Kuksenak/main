@@ -90,10 +90,13 @@ export class EventService {
       .subscribe(() => this.reload());
   }
 
-  /** One repeat of a series: `change` saves it as its own event, null just takes it out. */
-  occurrence(id: string, at: string, change: EventInput | null): void {
+  /**
+   * One repeat of a series: `change` saves it as its own event; null takes it out — with
+   * `following`, it and all later ones.
+   */
+  occurrence(id: string, at: string, change: EventInput | null, following = false): void {
     this.http
-      .post(`${this.base}/${id}/occurrence`, { at, change })
+      .post(`${this.base}/${id}/occurrence`, { at, change, following })
       .pipe(catchError(() => of(null)))
       .subscribe(() => this.reload());
   }

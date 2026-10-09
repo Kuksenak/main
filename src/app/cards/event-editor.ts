@@ -391,7 +391,7 @@ export class EventEditor implements OnInit {
   ];
   protected readonly deleteChoices: ActionChoice[] = [
     { value: 'this', label: 'series.deleteThis', danger: true },
-    { value: 'all', label: 'series.deleteAll', danger: true },
+    { value: 'following', label: 'series.deleteFollowing', danger: true },
   ];
 
   ngOnInit(): void {
@@ -532,8 +532,7 @@ export class EventEditor implements OnInit {
       if (choice === 'all') this.saveSeries(input);
       else this.events.occurrence(event.id, event.startsAt, { ...input, repeat: 'Never', repeatInterval: 1, repeatUntil: null });
     } else {
-      if (choice === 'all') this.events.remove(event.id);
-      else this.events.occurrence(event.id, event.startsAt, null);
+      this.events.occurrence(event.id, event.startsAt, null, choice === 'following');
     }
     this.page().close();
   }
