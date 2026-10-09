@@ -382,7 +382,7 @@ export class EventEditor implements OnInit {
 
   protected readonly askSeries = signal<'save' | 'delete' | null>(null);
   protected readonly saveChoices: ActionChoice[] = [
-    { value: 'this', label: 'series.saveThis' },
+    { value: 'this', label: 'series.saveThis', accent: true },
     { value: 'following', label: 'series.saveFollowing', accent: true },
   ];
   protected readonly deleteChoices: ActionChoice[] = [
