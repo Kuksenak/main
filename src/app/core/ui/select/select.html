@@ -5,7 +5,7 @@
     <div class="inline-flex items-center" [class.relative]="!stretch">
     <!-- stretch: the (invisible) native select covers the whole row; a chip shows the value -->
     @if (stretch) {
-      <span class="chip pointer-events-none pr-8">{{ triggerLabel() }}</span>
+      <span class="chip pointer-events-none !bg-transparent pr-8">{{ triggerLabel() }}</span>
     }
     <select
       [value]="value() ?? ''"
@@ -47,6 +47,8 @@
       [disabled]="disabled"
       (click)="toggle()"
       class="chip gap-2"
+      [class.!bg-transparent]="stretch"
+      [class.!pr-0]="stretch"
     >
       <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
       <app-icon name="chevrons-up-down" class="size-5" />
