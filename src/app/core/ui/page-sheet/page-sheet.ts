@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, afterNextRender, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '../../i18n/t.pipe';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 import { ConfirmDelete } from '../confirm';
@@ -142,7 +142,20 @@ export class PageSheet {
   protected readonly closing = signal(false);
   protected readonly askDelete = signal(false);
 
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+
   constructor() {
+    // Editors (with actions) start with the cursor in their first field, once they've slid in.
+    afterNextRender(() => {
+      if (!this.actions()) return;
+      setTimeout(() => {
+        const field = this.host.nativeElement.querySelector<HTMLElement>(
+          '.read-only, input:not([type=hidden]):not([type=checkbox]):not([disabled]), textarea:not([disabled])',
+        );
+        if (field && !field.classList.contains('read-only')) field.focus({ preventScroll: true });
+      }, 380);
+    });
+
     // Keep the page pinned: iOS scrolls the document to reveal a focused field even with
     // overflow hidden — snap it back so the sheet never shifts.
     const pin = () => {

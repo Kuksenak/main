@@ -1,5 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, model, signal } from '@angular/core';
+import { Component, ElementRef, afterNextRender, model, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -51,7 +51,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
     @let m = value();
     <div class="card">
       <div class="list-row">
-        <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'lessons.name' | t" autocomplete="off" class="row-input font-semibold" />
+        <input #titleInput name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'lessons.name' | t" autocomplete="off" class="row-input font-semibold" />
       </div>
     </div>
 
@@ -142,6 +142,12 @@ export function cleanLesson(l: LessonInput): LessonInput {
 })
 export class LessonForm {
   readonly value = model.required<LessonInput>();
+
+  // Editing starts in the title.
+  private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
+  constructor() {
+    afterNextRender(() => this.titleInput()?.nativeElement.focus({ preventScroll: true }));
+  }
 
   protected readonly badLink = badLink;
 
