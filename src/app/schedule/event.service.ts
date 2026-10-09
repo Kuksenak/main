@@ -40,6 +40,7 @@ export interface ScheduleEvent {
   note: string | null;
   repeat: EventRepeat;
   repeatInterval: number;
+  repeatUntil: string | null; // no repeats after this (end of that day); null = forever
   seriesStartsAt: string; // a repeating event comes once per day it falls on; this is its first start
 }
 

@@ -36,6 +36,7 @@ interface Model {
   repeat: EventRepeat;
   repeatInterval: number;
   repeatCustom: boolean; // the Custom choice is open (frequency + every N)
+  repeatUntil: string | null; // yyyy-MM-dd, the last day repeats may fall on; null = forever
   invitees: Invitees;
   lessonIds: string[];
   date: string; // yyyy-MM-dd
@@ -110,6 +111,19 @@ interface Model {
               <span>{{ 'event.every' | t }}</span>
               <app-select class="ml-auto" stretch [options]="intervalOptions()" [ngModel]="m.repeatInterval" (ngModelChange)="patch({ repeatInterval: +$event })" [ngModelOptions]="{ standalone: true }" />
             </div>
+          }
+          <!-- End repeat: never, or on a date -->
+          @if (m.repeat !== 'Never') {
+            <div class="list-row">
+              <span>{{ 'event.endRepeat' | t }}</span>
+              <app-select class="ml-auto" stretch [options]="endOptions()" [ngModel]="m.repeatUntil ? 'date' : 'never'" (ngModelChange)="setEnd($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+            @if (m.repeatUntil; as until) {
+              <div class="list-row">
+                <span>{{ 'event.endDate' | t }}</span>
+                <app-date class="ml-auto" [ngModel]="toDate(until)" (ngModelChange)="setUntil($event)" [ngModelOptions]="{ standalone: true }" />
+              </div>
+            }
           }
         </div>
 
@@ -310,13 +324,40 @@ export class EventEditor implements OnInit {
       return;
     }
     const p = EventEditor.PRESETS.find((x) => x.key === key)!;
-    this.patch({ repeat: p.repeat, repeatInterval: p.interval, repeatCustom: false });
+    this.patch({
+      repeat: p.repeat,
+      repeatInterval: p.interval,
+      repeatCustom: false,
+      ...(p.repeat === 'Never' ? { repeatUntil: null } : {}),
+    });
   }
 
+  // A new unit starts again from "every 1".
   protected setFrequency(repeat: EventRepeat): void {
-    const max = repeat === 'Never' ? 1 : EventEditor.MAX[repeat];
-    this.patch({ repeat, repeatInterval: Math.min(this.model().repeatInterval, max) });
+    this.patch({ repeat, repeatInterval: 1 });
   }
+
+  protected readonly endOptions = computed<SelectOption[]>(() => [
+    { label: this.i18n.t('event.endRepeat.never'), value: 'never' },
+    { label: this.i18n.t('event.endRepeat.onDate'), value: 'date' },
+  ]);
+
+  // On a date: a month after the event's day to start with.
+  protected setEnd(value: string): void {
+    if (value !== 'date') {
+      this.patch({ repeatUntil: null });
+      return;
+    }
+    const d = fromDateInput(this.model().date);
+    d.setMonth(d.getMonth() + 1);
+    this.patch({ repeatUntil: toDateInput(d) });
+  }
+
+  protected setUntil(date: Date | null): void {
+    if (date) this.patch({ repeatUntil: toDateInput(date) });
+  }
+
+  protected readonly toDate = fromDateInput;
 
   // An event needs a title or someone invited.
   protected readonly canSave = computed(() => {
@@ -335,6 +376,7 @@ export class EventEditor implements OnInit {
         repeat: event.repeat ?? 'Never',
         repeatInterval: event.repeatInterval ?? 1,
         repeatCustom: false,
+        repeatUntil: event.repeatUntil ? toDateInput(new Date(event.repeatUntil)) : null,
         title: event.title ?? '',
         invitees: { studentIds: event.studentIds, groupIds: event.groupIds },
         lessonIds: event.lessonIds,
@@ -357,6 +399,7 @@ export class EventEditor implements OnInit {
       repeat: 'Never',
       repeatInterval: 1,
       repeatCustom: false,
+      repeatUntil: null,
       title: '',
       invitees: { studentIds: [], groupIds: [] },
       lessonIds: [],
@@ -418,6 +461,8 @@ export class EventEditor implements OnInit {
       title: m.title.trim() || null,
       repeat: m.repeat,
       repeatInterval: m.repeat === 'Never' ? 1 : m.repeatInterval,
+      // the end of that day, local time
+      repeatUntil: m.repeat !== 'Never' && m.repeatUntil ? new Date(`${m.repeatUntil}T23:59:59.999`).toISOString() : null,
       studentIds: m.invitees.studentIds,
       groupIds: m.invitees.groupIds,
       lessonIds: m.lessonIds,
