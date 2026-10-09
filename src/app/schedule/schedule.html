@@ -55,7 +55,7 @@
     @if (upcoming().length) {
         <span #upcomingHead class="text-footnote opacity-50">{{ 'students.upcoming' | t }}</span>
         <div class="card">
-          @for (l of upcoming(); track l.id) {
+          @for (l of upcoming(); track key(l)) {
             <!-- Picks that event's day in the calendar (its events then show on the right) -->
             <button type="button" (click)="showDay(l)" class="list-row w-full py-2 text-left">
               <span class="color-bar" [style.background]="people.color(l)"></span>

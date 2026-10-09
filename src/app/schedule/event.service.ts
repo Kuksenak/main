@@ -7,9 +7,9 @@ import { LoadingService } from '../core/services/loading.service';
 
 export type EventStatus = 'Scheduled' | 'Done' | 'Cancelled';
 
-/** A plain event (time + title) or a class (with participants and materials). */
-export type EventType = 'Event' | 'Class';
-export const EVENT_TYPES: EventType[] = ['Class', 'Event'];
+/** How an event repeats (from its first start, with no end). */
+export type EventRepeat = 'Never' | 'Daily' | 'Weekly' | 'Biweekly' | 'Monthly';
+export const EVENT_REPEATS: EventRepeat[] = ['Daily', 'Weekly', 'Biweekly', 'Monthly'];
 export const EVENT_STATUSES: EventStatus[] = ['Scheduled', 'Done', 'Cancelled'];
 
 // Events are loaded for a window around today: 26 weeks back, 53 weeks in total, starting
@@ -29,7 +29,6 @@ export function eventWindow(): { from: Date; to: Date } {
 /** A scheduled event (class, meeting, …) and who is invited. */
 export interface ScheduleEvent {
   id: string;
-  type: EventType;
   title: string | null;
   studentIds: string[]; // invited students …
   groupIds: string[]; // … and groups (each invites its members)
@@ -38,9 +37,16 @@ export interface ScheduleEvent {
   durationMinutes: number;
   status: EventStatus;
   note: string | null;
+  repeat: EventRepeat;
+  seriesStartsAt: string; // a repeating event comes once per day it falls on; this is its first start
 }
 
-export type EventInput = Omit<ScheduleEvent, 'id'>;
+export type EventInput = Omit<ScheduleEvent, 'id' | 'seriesStartsAt'>;
+
+/** Telling occurrences of a repeating event apart (same id, own start). */
+export function occurrenceKey(e: ScheduleEvent): string {
+  return `${e.id}@${e.startsAt}`;
+}
 
 /** When an event ends. */
 export function eventEnd(e: ScheduleEvent): Date {

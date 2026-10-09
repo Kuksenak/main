@@ -19,7 +19,7 @@ import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { addDays, startOfDay, toDateInput } from '../core/utils/time';
 import { EventPeople } from './event-people';
-import { EVENT_WEEKS_TOTAL, ScheduleEvent, EventService, eventEnd, eventWindow, statusKey } from './event.service';
+import { EVENT_WEEKS_TOTAL, ScheduleEvent, EventService, eventEnd, eventWindow, occurrenceKey, statusKey } from './event.service';
 
 function startOfMonth(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), 1);
@@ -224,6 +224,7 @@ export class Schedule implements AfterViewInit {
 
 
   protected readonly statusKey = statusKey;
+  protected readonly key = occurrenceKey;
 
   protected openNew(): void {
     this.stack.push({ kind: 'event', id: null, date: toDateInput(this.selectedDate()) });

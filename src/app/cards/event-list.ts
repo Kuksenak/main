@@ -6,7 +6,7 @@ import { NavStack } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { Section } from '../core/ui/section/section';
 import { EventPeople } from '../schedule/event-people';
-import { EventService, ScheduleEvent, eventEnd, statusKey } from '../schedule/event.service';
+import { EventService, ScheduleEvent, eventEnd, occurrenceKey, statusKey } from '../schedule/event.service';
 
 /**
  * Events a student is invited to (directly or through a group), a group is invited to, or a
@@ -26,7 +26,7 @@ import { EventService, ScheduleEvent, eventEnd, statusKey } from '../schedule/ev
       @if (g.items.length) {
         <app-section [title]="g.key | t" [count]="g.items.length" [key]="g.key" [initiallyOpen]="g.open">
           <div class="card">
-            @for (e of g.items; track e.id) {
+            @for (e of g.items; track key(e)) {
               <button type="button" (click)="open(e)" class="list-row w-full py-2 text-left">
                 <span class="color-bar" [style.background]="people.color(e)"></span>
                 <div class="min-w-0 flex-1 leading-tight">
@@ -71,6 +71,7 @@ export class EventList {
   });
   private end = (e: ScheduleEvent) => eventEnd(e).getTime();
   protected readonly statusKey = statusKey;
+  protected readonly key = occurrenceKey;
   protected readonly upcoming = computed(() =>
     this.mine()
       .filter((e) => this.end(e) >= Date.now())

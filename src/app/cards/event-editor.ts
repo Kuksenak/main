@@ -10,6 +10,7 @@ import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
+import { Toggle } from '../core/ui/toggle';
 import { initial } from '../core/utils/text';
 import {
   fromDateInput,
@@ -18,7 +19,7 @@ import {
   toDateInput,
   toTimeInput,
 } from '../core/utils/time';
-import { EVENT_STATUSES, EVENT_TYPES, EventService, EventStatus, EventType, statusKey } from '../schedule/event.service';
+import { EVENT_REPEATS, EVENT_STATUSES, EventRepeat, EventService, EventStatus, statusKey } from '../schedule/event.service';
 import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
@@ -31,8 +32,8 @@ interface Invitees {
 }
 
 interface Model {
-  type: EventType;
   title: string;
+  repeat: EventRepeat;
   invitees: Invitees;
   lessonIds: string[];
   date: string; // yyyy-MM-dd
@@ -45,7 +46,7 @@ interface Model {
 /** Event card (new or existing), opened on the NavStack. */
 @Component({
   selector: 'app-event-editor',
-  imports: [FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, Toggle, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -61,20 +62,12 @@ interface Model {
     >
       <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-6">
-        <!-- Class | Event (only a class has participants and materials) -->
-        <div class="segmented">
-          @for (t of types; track t) {
-            <button type="button" (click)="patch({ type: t })" [attr.aria-pressed]="m.type === t">{{ typeKey(t) | t }}</button>
-          }
-        </div>
-
         <div class="card">
           <div class="list-row">
             <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="row-input" />
           </div>
         </div>
 
-        @if (m.type === 'Class') {
         <!-- Participants: groups and students (a tap opens their card on top), then Invite -->
         <div class="flex flex-col gap-1.5">
         <span class="text-footnote opacity-50">{{ 'event.participants' | t }}</span>
@@ -99,10 +92,10 @@ interface Model {
         </div>
         </div>
 
-        <!-- Materials: attached lessons (a tap opens the lesson: a card on top on mobile, its
+        <!-- Files: attached lessons (a tap opens the lesson: a card on top on mobile, its
              page on desktop), then Attach -->
         <div class="flex flex-col gap-1.5">
-        <span class="text-footnote opacity-50">{{ 'event.materials' | t }}</span>
+        <span class="text-footnote opacity-50">{{ 'event.files' | t }}</span>
         <div class="card">
           @for (l of attached(); track l.id) {
             <div class="list-row !gap-1">
@@ -121,7 +114,6 @@ interface Model {
           </button>
         </div>
         </div>
-        }
 
         <div class="card">
           <div class="list-row">
@@ -139,6 +131,17 @@ interface Model {
               <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
+          <!-- Repeat: on → how often -->
+          <div class="list-row">
+            <span>{{ 'event.repeat' | t }}</span>
+            <app-toggle [checked]="m.repeat !== 'Never'" (checkedChange)="patch({ repeat: $event ? 'Weekly' : 'Never' })" />
+          </div>
+          @if (m.repeat !== 'Never') {
+            <div class="list-row">
+              <span>{{ 'event.repeatHow' | t }}</span>
+              <app-select class="ml-auto" stretch [options]="repeatOptions()" [ngModel]="m.repeat" (ngModelChange)="patch({ repeat: $event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          }
           @if (entry().id) {
             <div class="list-row">
               <span>{{ 'event.status' | t }}</span>
@@ -256,15 +259,14 @@ export class EventEditor implements OnInit {
   );
   protected readonly dirty = computed(() => JSON.stringify(this.model()) !== this.snapshot());
   // Save a valid event with a title or someone invited, that differs from what was opened.
-  protected readonly types = EVENT_TYPES;
-  protected typeKey(t: EventType) {
-    return `event.type.${t}` as const;
-  }
+  protected readonly repeatOptions = computed<SelectOption[]>(() =>
+    EVENT_REPEATS.map((r) => ({ label: this.i18n.t(`event.repeat.${r}`), value: r })),
+  );
 
-  // An event needs a title; a class, a title or someone invited.
+  // An event needs a title or someone invited.
   protected readonly canSave = computed(() => {
     const m = this.model();
-    const invited = m.type === 'Class' && (!!m.invitees.studentIds.length || !!m.invitees.groupIds.length);
+    const invited = !!m.invitees.studentIds.length || !!m.invitees.groupIds.length;
     const named = !!m.title.trim() || invited;
     return named && !this.invalid() && this.dirty();
   });
@@ -273,9 +275,9 @@ export class EventEditor implements OnInit {
     const e = this.entry();
     const event = e.id ? this.events.events().find((x) => x.id === e.id) : undefined;
     if (event) {
-      const start = new Date(event.startsAt);
+      const start = new Date(event.seriesStartsAt ?? event.startsAt); // a repeat edits the whole series
       this.model.set({
-        type: event.type ?? 'Class', // servers before event types send none
+        repeat: event.repeat ?? 'Never',
         title: event.title ?? '',
         invitees: { studentIds: event.studentIds, groupIds: event.groupIds },
         lessonIds: event.lessonIds,
@@ -293,7 +295,7 @@ export class EventEditor implements OnInit {
 
   private blank(): Model {
     return {
-      type: 'Class',
+      repeat: 'Never',
       title: '',
       invitees: { studentIds: [], groupIds: [] },
       lessonIds: [],
@@ -351,13 +353,12 @@ export class EventEditor implements OnInit {
     if (!this.canSave()) return;
     const m = this.model();
     const id = this.entry().id;
-    const isClass = m.type === 'Class';
     const input = {
-      type: m.type,
       title: m.title.trim() || null,
-      studentIds: isClass ? m.invitees.studentIds : [],
-      groupIds: isClass ? m.invitees.groupIds : [],
-      lessonIds: isClass ? m.lessonIds : [],
+      repeat: m.repeat,
+      studentIds: m.invitees.studentIds,
+      groupIds: m.invitees.groupIds,
+      lessonIds: m.lessonIds,
       startsAt: new Date(`${m.date}T${m.startTime}`).toISOString(),
       durationMinutes: timeToMin(m.endTime) - timeToMin(m.startTime),
       note: m.note.trim() || null,
