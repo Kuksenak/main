@@ -19,7 +19,7 @@
 }
 
 /* Desktop controls, Claude-like: flat and crisp — no glass, blur or shadows.
-   - primary (accent) buttons: solid black (white in dark theme);
+   - primary (accent) buttons: flat accent blue, white label;
    - icon buttons: just the icon, a soft background on hover;
    - secondary buttons, Edit and search fields: white with a hairline border;
    - segmented controls: a gray track, the chosen item white with a hairline border. */
@@ -30,8 +30,7 @@
   --shadow-control: 0 0 #0000;
   --rim-accent: 0 0 #0000;
   --shadow-accent: 0 0 #0000;
-  --accent-btn: var(--strong-bg);
-  --accent-label: var(--strong-fg);
+  --accent-label: #ffffff;
   --control-border: rgb(0 0 0 / 0.15);
 }
 html.dark {
