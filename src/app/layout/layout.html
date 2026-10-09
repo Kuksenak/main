@@ -32,7 +32,7 @@
       <app-icon name="grid" class="size-6" />
     </button>
     <!-- Account. Mobile: the first letter of the email in the round accent button (like +).
-         Desktop: a gray pill — small round avatar, the name (email before @), ▾.
+         Desktop: a gray pill — the name (else the email) and ▾.
          Green dot when an app update is ready. -->
     <button
       #avatarBtn
@@ -44,8 +44,7 @@
       [class.account-pill]="desktop"
     >
       @if (desktop) {
-        <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--surface)] text-xs font-semibold uppercase">{{ initial() }}</span>
-        <span class="max-w-40 truncate">{{ userName() }}</span>
+        <span class="max-w-56 truncate">{{ userName() }}</span>
         <app-icon name="chevron-down" class="size-4 opacity-50" />
       } @else {
         <span class="text-[1.375rem] font-medium uppercase">{{ initial() }}</span>

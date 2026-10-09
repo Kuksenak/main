@@ -76,10 +76,10 @@
     }
   }
 
-  /* Desktop account button: gray pill with a small avatar, the name and ▾ */
+  /* Desktop account button: gray pill with the name and ▾ */
   .account-pill {
     @apply text-body inline-flex h-[var(--control-h)] shrink-0 items-center gap-2 rounded-[var(--radius-capsule)]
-           bg-[color-mix(in_srgb,var(--text)_6%,transparent)] pl-1.5 pr-2.5 font-medium
+           bg-[color-mix(in_srgb,var(--text)_6%,transparent)] pl-3 pr-2.5 font-medium
            hover:bg-[color-mix(in_srgb,var(--text)_10%,transparent)];
   }
 

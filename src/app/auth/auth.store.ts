@@ -27,6 +27,11 @@ export class AuthStore {
   readonly initialized = this._initialized.asReadonly();
   readonly isAuthenticated = computed(() => this._user() !== null);
   readonly email = computed(() => this._user()?.email ?? null);
+  /** First + last name, when the account has one. */
+  readonly name = computed(() => {
+    const u = this._user();
+    return [u?.firstName, u?.lastName].filter((p) => !!p?.trim()).join(' ') || null;
+  });
 
   setAccessToken(token: string): void {
     this._accessToken.set(token);
