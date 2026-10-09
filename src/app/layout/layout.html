@@ -88,11 +88,11 @@
           <button
             type="button"
             (click)="go(item.path, menuSheet)"
-            class="flex h-[6.25rem] min-w-0 flex-col items-center justify-center gap-3 rounded-2xl px-1.5 active:bg-[var(--highlight)] active:![transform:none]"
+            class="flex h-[6.25rem] min-w-0 flex-col items-center justify-center gap-3 rounded-2xl px-1.5 active:bg-[var(--highlight)] active:![transform:none] desktop:h-20 desktop:gap-2 desktop:rounded-xl desktop:hover:bg-[var(--highlight)]"
             [class.bg-[var(--highlight)]]="isActive(item.path)"
           >
-            <app-brand-icon [name]="item.icon" class="size-10" />
-            <span class="max-w-full truncate text-base leading-tight">{{ item.label | t }}</span>
+            <app-brand-icon [name]="item.icon" class="size-10 desktop:size-8" />
+            <span class="max-w-full truncate text-base leading-tight desktop:text-[0.8125rem]">{{ item.label | t }}</span>
           </button>
         }
       </div>
