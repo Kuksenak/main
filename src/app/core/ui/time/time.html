@@ -46,7 +46,7 @@
                 type="button"
                 (click)="selectHour(h)"
                 [attr.data-active]="activeHour() === h ? '' : null"
-                class="w-11 rounded-md py-1.5 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
+                class="w-14 rounded-md py-1.5 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
                 [class]="hourClass(h)"
               >{{ h.toString().padStart(2, '0') }}</button>
             }
@@ -61,7 +61,7 @@
                 type="button"
                 (click)="selectMinute(m)"
                 [attr.data-active]="activeMinute() === m ? '' : null"
-                class="w-11 rounded-md py-1.5 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
+                class="w-14 rounded-md py-1.5 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
                 [class]="minuteClass(m)"
               >{{ m.toString().padStart(2, '0') }}</button>
             }
