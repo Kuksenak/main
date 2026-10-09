@@ -62,7 +62,7 @@
             <button type="button" (click)="showDay(l)" class="list-row w-full py-2 text-left">
               <span class="color-bar" [style.background]="people.color(l)"></span>
               <div class="min-w-0 flex-1 leading-tight">
-                <p class="truncate font-medium">{{ people.label(l) }}@if (l.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}</p>
+                <p class="truncate font-medium">{{ people.label(l) }}@if (l.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}@if (l.repeat !== 'Never') {<app-icon name="repeat" class="ml-1.5 inline size-4 align-[-2px] opacity-50" />}</p>
                 <p class="text-footnote truncate opacity-50">{{ upcomingWhen(l) }}</p>
               </div>
               <app-icon name="chevron-right" class="row-chevron" />
@@ -96,10 +96,10 @@
                   [class.line-through]="event.status === 'Cancelled'"
                   [class.opacity-50]="event.status !== 'Scheduled'"
                   [class.text-[var(--warning)]]="timing(event) === 'now'"
-                >{{ people.label(event) }}@if (event.lessonIds.length && !people.subtitle(event)) {<app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}</p>
-                <!-- 📎 lessons attached: before the students (after the title when there are none) -->
+                >{{ people.label(event) }}@if (event.lessonIds.length && !people.subtitle(event)) {<app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}@if (event.repeat !== 'Never' && !people.subtitle(event)) {<app-icon name="repeat" class="ml-1.5 inline size-4 align-[-2px] opacity-50" />}</p>
+                <!-- ⟲ repeating, 📎 lessons attached: before the students (after the title when there are none) -->
                 @if (people.subtitle(event); as sub) {
-                  <p class="text-footnote truncate opacity-50">@if (event.lessonIds.length) {<app-icon name="paperclip" class="mr-1 inline size-3.5 rotate-45 align-[-2px]" />}{{ sub }}</p>
+                  <p class="text-footnote truncate opacity-50">@if (event.repeat !== 'Never') {<app-icon name="repeat" class="mr-1 inline size-3.5 align-[-2px]" />}@if (event.lessonIds.length) {<app-icon name="paperclip" class="mr-1 inline size-3.5 rotate-45 align-[-2px]" />}{{ sub }}</p>
                 }
               </div>
               <div class="flex shrink-0 items-center gap-3">
