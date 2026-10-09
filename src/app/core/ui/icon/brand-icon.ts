@@ -37,10 +37,6 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
       font: 600 8.5px -apple-system, system-ui, 'Segoe UI', sans-serif;
       letter-spacing: 0.02em;
     }
-    .brand-letter {
-      fill: var(--brand-blue);
-      font: 700 30px Georgia, 'Times New Roman', serif;
-    }
     .brand-date {
       fill: #1c1c1e;
       font: 600 23px -apple-system, system-ui, 'Segoe UI', sans-serif;
@@ -92,9 +88,9 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
           <circle cx="24" cy="24" r="4.5" style="fill: var(--brand-orange)" />
         }
         @case ('info') {
-          <!-- The calendar's white tile with a typeset "i" in blue -->
-          <rect x="3" y="3" width="42" height="42" rx="10" class="brand-tile" />
-          <text x="24" y="36" text-anchor="middle" class="brand-letter">i</text>
+          <!-- Just an "i", flat: an orange dot over a blue stem -->
+          <circle cx="24" cy="10.5" r="5.5" style="fill: var(--brand-orange)" />
+          <rect x="18.5" y="20" width="11" height="24" rx="5.5" style="fill: var(--brand-blue)" />
         }
       }
     </svg>
