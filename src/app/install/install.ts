@@ -9,6 +9,7 @@ type Platform = 'ios' | 'android' | 'mac' | 'computer';
 
 interface Guide {
   steps: { icon: IconName; text: TranslationKey }[];
+  here?: TranslationKey; // the install link's text ("Or tap / click here")
 }
 
 /**
@@ -40,7 +41,7 @@ interface Guide {
                 {{ s.text | t }}
                 <!-- Chrome / Edge / Android: their own install dialog, right from the first step -->
                 @if ($first && install.canPrompt()) {
-                  <button type="button" (click)="install.prompt()" class="inline font-medium text-[var(--accent)] active:opacity-60">{{ 'install.button' | t }}</button>
+                  <button type="button" (click)="install.prompt()" class="inline font-medium text-[var(--accent)] active:opacity-60">{{ (g.here ?? 'install.clickHere') | t }}</button>
                 }
               </p>
             </div>
@@ -67,6 +68,7 @@ export class Install {
       ],
     },
     android: {
+      here: 'install.tapHere',
       steps: [
         { icon: 'dots-vertical', text: 'install.android.1' },
         { icon: 'install', text: 'install.android.2' },

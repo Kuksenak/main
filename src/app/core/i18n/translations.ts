@@ -35,7 +35,8 @@ const en = {
 
   'install.intro':
     'Keep the app one tap away: it gets its own icon and opens full screen, without the browser around it. No app store, and updates arrive on their own.',
-  'install.button': 'Or install it right here.',
+  'install.clickHere': 'Or click here.',
+  'install.tapHere': 'Or tap here.',
   'install.ios.1': 'Tap the Share button — a square with an arrow.',
   'install.ios.2': 'Scroll down and tap “Add to Home Screen”.',
   'install.ios.3': 'Tap Add — the icon appears on your Home Screen.',
@@ -197,7 +198,8 @@ const pl: Dictionary = {
 
   'install.intro':
     'Miej aplikację pod ręką: dostaje własną ikonę i otwiera się na pełnym ekranie, bez przeglądarki dookoła. Bez sklepu, a aktualizacje przychodzą same.',
-  'install.button': 'Albo zainstaluj od razu tutaj.',
+  'install.clickHere': 'Albo kliknij tutaj.',
+  'install.tapHere': 'Albo stuknij tutaj.',
   'install.ios.1': 'Stuknij przycisk Udostępnij — kwadrat ze strzałką.',
   'install.ios.2': 'Przewiń w dół i stuknij „Do ekranu początkowego”.',
   'install.ios.3': 'Stuknij Dodaj — ikona pojawi się na ekranie początkowym.',
@@ -356,7 +358,8 @@ const fr: Dictionary = {
 
   'install.intro':
     'Gardez l’app à portée de main : elle a sa propre icône et s’ouvre en plein écran, sans le navigateur autour. Pas de store, et les mises à jour arrivent toutes seules.',
-  'install.button': 'Ou installez-la directement ici.',
+  'install.clickHere': 'Ou cliquez ici.',
+  'install.tapHere': 'Ou touchez ici.',
   'install.ios.1': 'Touchez le bouton Partager — un carré avec une flèche.',
   'install.ios.2': 'Faites défiler et touchez « Sur l’écran d’accueil ».',
   'install.ios.3': 'Touchez Ajouter — l’icône apparaît sur l’écran d’accueil.',
