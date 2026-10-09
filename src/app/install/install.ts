@@ -63,6 +63,7 @@ export class Install {
     ios: {
       steps: [
         { icon: 'share', text: 'install.ios.1' },
+        { icon: 'ellipsis', text: 'install.ios.more' },
         { icon: 'plus-square', text: 'install.ios.2' },
         { icon: 'check', text: 'install.ios.3' },
       ],
