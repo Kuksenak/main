@@ -30,9 +30,13 @@ export class Settings {
   protected readonly i18n = inject(I18nService);
 
   constructor() {
-    // Mobile toolbar: the page title.
+    // Mobile toolbar: ‹ and the page title.
     const toolbar = inject(ToolbarService);
     effect(() => toolbar.title.set(this.i18n.t('nav.settings')));
-    inject(DestroyRef).onDestroy(() => toolbar.title.set(''));
+    toolbar.back.set(true);
+    inject(DestroyRef).onDestroy(() => {
+      toolbar.title.set('');
+      toolbar.back.set(false);
+    });
   }
 }

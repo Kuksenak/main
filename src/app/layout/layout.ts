@@ -75,6 +75,12 @@ export class Layout {
     this.router.navigateByUrl(path);
   }
 
+  // Toolbar ‹: the previous page, or Schedule when the app was opened right here.
+  protected back(): void {
+    if (history.length > 1) history.back();
+    else this.router.navigateByUrl('/schedule');
+  }
+
   // Logging out leaves the app (AuthStore redirects to /login and this layout un-renders).
   protected logout(): void {
     this.auth.logout();

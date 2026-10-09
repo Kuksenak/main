@@ -11,6 +11,11 @@
         <!-- Fields in the toolbar match the round buttons next to them -->
         <div class="flex min-w-0 flex-1 items-center gap-1 desktop:hidden [&_app-search-field]:flex-1 [&_.field]:h-[var(--control-round)] [&_.field]:rounded-full"><ng-container [ngTemplateOutlet]="content" /></div>
       } @else {
+        @if (toolbar.back()) {
+          <button type="button" (click)="back()" [attr.aria-label]="'action.back' | t" class="icon-btn mr-1 shrink-0 desktop:hidden">
+            <app-icon name="chevron-left" class="-ml-0.5 size-7" />
+          </button>
+        }
         <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
       }
       <!-- Desktop tabs -->
