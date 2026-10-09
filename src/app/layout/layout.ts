@@ -54,6 +54,8 @@ export class Layout {
 
   protected readonly accountOpen = signal(false);
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
+  // Desktop account button: the email's name part.
+  protected readonly userName = computed(() => (this.auth.email() ?? '').split('@')[0]);
 
   // Hidden app version: tap the email 5 times (again to hide).
   protected readonly showVersion = signal(false);

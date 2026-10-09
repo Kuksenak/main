@@ -7,6 +7,7 @@ export type IconName =
   | 'chevron-left'
   | 'chevron-right'
   | 'chevrons-up-down'
+  | 'chevron-down'
   | 'search'
   | 'person'
   | 'people'
@@ -78,6 +79,7 @@ export type IconName =
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
+        @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
         @case ('chevrons-up-down') { <path d="M8.5 9.5 12 6l3.5 3.5M8.5 14.5 12 18l3.5-3.5" /> }
         <!-- Brand marks: filled; Google keeps its brand colors, Apple uses currentColor -->
         @case ('google') {

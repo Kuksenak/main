@@ -31,16 +31,25 @@
     <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
       <app-icon name="grid" class="size-6" />
     </button>
-    <!-- Account: first letter of the email (same round accent button as +); green dot when an
-         app update is ready -->
+    <!-- Account. Mobile: the first letter of the email in the round accent button (like +).
+         Desktop: a gray pill — small round avatar, the name (email before @), ▾.
+         Green dot when an app update is ready. -->
     <button
       #avatarBtn
       type="button"
       (click)="accountOpen.set(true)"
       [attr.aria-label]="'account.title' | t"
-      class="btn-confirm relative text-[1.375rem] font-medium uppercase desktop:text-base"
+      class="relative"
+      [class.btn-confirm]="!desktop"
+      [class.account-pill]="desktop"
     >
-      {{ initial() }}
+      @if (desktop) {
+        <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--surface)] text-xs font-semibold uppercase">{{ initial() }}</span>
+        <span class="max-w-40 truncate">{{ userName() }}</span>
+        <app-icon name="chevron-down" class="size-4 opacity-50" />
+      } @else {
+        <span class="text-[1.375rem] font-medium uppercase">{{ initial() }}</span>
+      }
       @if (updates.updateReady()) {
         <span class="dot absolute right-0 top-0 size-3 bg-[var(--success)] ring-2 ring-[var(--app-bg)]"></span>
       }
