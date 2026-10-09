@@ -26,7 +26,7 @@
       function apply(isDark) {
         document.documentElement.classList.toggle('dark', isDark);
         var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', isDark ? '#262624' : '#faf9f5');
+        if (meta) meta.setAttribute('content', isDark ? '#000000' : '#faf9f5');
       }
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });

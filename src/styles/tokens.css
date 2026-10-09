@@ -72,14 +72,15 @@
   --float-bottom: max(0.75rem, calc(env(safe-area-inset-bottom) - 0.25rem));
 }
 
+/* Dark: iOS-like — a black page, cards and dialogs in the system's dark grays */
 html.dark {
-  --app-bg: #262624;
-  --surface: #30302e;
-  --card: #30302e;
-  --dialog-bg: #262624;
-  --sheet-glass: rgb(48 48 46 / 0.72);
+  --app-bg: #000000;
+  --surface: #1c1c1e;
+  --card: #1c1c1e;
+  --dialog-bg: #1c1c1e;
+  --sheet-glass: rgb(28 28 30 / 0.78);
   --sheet-surface: rgb(255 255 255 / 0.07);
-  --glass-neutral: rgb(72 72 74 / 0.7);
+  --glass-neutral: rgb(58 58 60 / 0.72);
 
   --text: #f5f5f5;
 
