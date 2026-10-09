@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, ElementRef, afterNextRender, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '../../i18n/t.pipe';
 import { DeviceDetectionService } from '../../services/device-detection.service';
-import { ConfirmDelete } from '../confirm';
+import { ActionChoice, ActionSheet, ConfirmDelete } from '../confirm';
 import { Icon } from '../icon/icon';
 import { ScrollArea } from '../scroll-area/scroll-area';
 
@@ -25,12 +25,12 @@ import { ScrollArea } from '../scroll-area/scroll-area';
  */
 @Component({
   selector: 'app-page-sheet',
-  imports: [ConfirmDelete, Icon, NgTemplateOutlet, ScrollArea, TranslatePipe],
+  imports: [ActionSheet, ConfirmDelete, Icon, NgTemplateOutlet, ScrollArea, TranslatePipe],
   template: `
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:bg-[var(--backdrop)] desktop:p-4"
       [class.desktop:!p-2]="wide()"
-      (click)="back()"
+      (click)="back(null)"
     >
       <div
         class="relative flex h-full w-full flex-col text-[var(--text)] [animation:pageInRight_360ms_var(--ease-out-quick)] mobile:bg-[var(--app-bg)] desktop:h-auto desktop:max-h-[calc(var(--app-h,100dvh)-2rem)] desktop:max-w-md desktop:p-4"
@@ -48,7 +48,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         <div class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-[linear-gradient(to_bottom,var(--app-bg)_40%,transparent)] px-4 pb-5 pt-[calc(env(safe-area-inset-top)+0.5rem)] desktop:hidden [&_button]:pointer-events-auto">
           <button
             type="button"
-            (click)="back()"
+            (click)="back($event.currentTarget)"
             [attr.aria-label]="(dirty() ? 'action.discard' : 'action.back') | t"
             class="icon-btn relative"
           >
@@ -115,6 +115,17 @@ import { ScrollArea } from '../scroll-area/scroll-area';
     @if (askDelete()) {
       <app-confirm-delete [origin]="actionOrigin()" (confirmed)="delete.emit()" (closed)="askDelete.set(false)" />
     }
+
+    <!-- Leaving with unsaved changes asks first (iOS: "Discard Changes") -->
+    @if (askDiscard()) {
+      <app-action-sheet
+        title="confirm.discardTitle"
+        [choices]="discardChoices"
+        [origin]="discardOrigin()"
+        (chosen)="leave()"
+        (closed)="askDiscard.set(false)"
+      />
+    }
   `,
 })
 export class PageSheet {
@@ -141,6 +152,9 @@ export class PageSheet {
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly closing = signal(false);
   protected readonly askDelete = signal(false);
+  protected readonly askDiscard = signal(false);
+  protected readonly discardOrigin = signal<HTMLElement | null>(null);
+  protected readonly discardChoices: ActionChoice[] = [{ value: 'discard', label: 'confirm.discardChanges', danger: true }];
 
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
 
@@ -180,7 +194,16 @@ export class PageSheet {
     else this.delete.emit();
   }
 
-  protected back(): void {
+  // back / ✕ / a click outside: with unsaved changes, asks before throwing them away.
+  protected back(origin: EventTarget | null): void {
+    if (this.closing() || this.askDiscard()) return;
+    if (this.dirty()) {
+      this.discardOrigin.set(origin as HTMLElement | null);
+      this.askDiscard.set(true);
+    } else this.leave();
+  }
+
+  protected leave(): void {
     if (this.cancelCloses()) this.close();
     else this.cancel.emit();
   }

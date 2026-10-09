@@ -99,7 +99,7 @@ export class ActionSheet {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     const width = this.desktop ? 320 : 288;
-    if (!el) return { top: null, bottom: 16, left: vw - 16 - width };
+    if (!el) return { top: vh / 2 - 80, bottom: null, left: (vw - width) / 2 }; // no button: mid-screen
     const r = el.getBoundingClientRect();
     const left = Math.max(8, Math.min(r.left + r.width / 2 - width / 2, vw - 8 - width));
     return r.top > vh / 2
