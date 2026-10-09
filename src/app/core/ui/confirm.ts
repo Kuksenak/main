@@ -92,8 +92,8 @@ export class ActionSheet {
   protected readonly closing = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
 
-  // Where the mobile menu goes: right-aligned with the button, below it when it's in the upper
-  // half of the screen, above it otherwise.
+  // Where the panel goes: over the button that asked (iOS), right-aligned with it — growing down
+  // from its top when it's in the upper half of the screen, up from its bottom otherwise.
   protected readonly place = computed(() => {
     const el = this.origin();
     const vw = window.innerWidth;
@@ -103,8 +103,8 @@ export class ActionSheet {
     const width = this.desktop ? 320 : 288;
     const right = Math.max(8, Math.min(vw - r.right, vw - 8 - width));
     return r.top > vh / 2
-      ? { top: null, bottom: vh - r.top + 8, right }
-      : { top: r.bottom + 8, bottom: null, right };
+      ? { top: null, bottom: vh - r.bottom, right }
+      : { top: r.top, bottom: null, right };
   });
 
   protected choose(value: string): void {

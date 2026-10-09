@@ -126,6 +126,30 @@ export class Schedule implements AfterViewInit {
     () => this.byDay().get(toDateInput(this.selectedDate())) ?? [],
   );
 
+  // The time, ticking every minute — for today's past / ongoing events.
+  private readonly now = signal(Date.now());
+
+  // Only today's list shows it; other days' events all look the same.
+  protected timing(e: ScheduleEvent): 'past' | 'now' | 'later' {
+    if (toDateInput(this.selectedDate()) !== toDateInput(new Date(this.now()))) return 'later';
+    const now = this.now();
+    if (eventEnd(e).getTime() <= now) return 'past';
+    return new Date(e.startsAt).getTime() <= now ? 'now' : 'later';
+  }
+
+  // Today's list scrolls so the current event (going on, else the next) is second from the top.
+  private readonly dayList = viewChild<ElementRef<HTMLElement>>('dayList');
+
+  private scrollToCurrent(): void {
+    const list = this.dayList()?.nativeElement;
+    const rows = list ? Array.from(list.children) as HTMLElement[] : [];
+    const current = rows.find((r) => r.hasAttribute('data-now'));
+    const viewport = list?.parentElement?.parentElement; // the scroll area's viewport
+    if (!current || !viewport) return;
+    const i = rows.indexOf(current);
+    viewport.scrollTop = i > 0 ? rows[i - 1].offsetTop : 0;
+  }
+
   constructor() {
     // Show the visible month in the mobile toolbar while this page is open.
     const toolbar = inject(ToolbarService);
@@ -146,6 +170,15 @@ export class Schedule implements AfterViewInit {
 
     // Start on the current month.
     setTimeout(() => this.scrollToToday());
+
+    const tick = setInterval(() => this.now.set(Date.now()), 60_000);
+    this.destroyRef.onDestroy(() => clearInterval(tick));
+
+    // Selecting today (or its events loading): bring the current event into view.
+    effect(() => {
+      const isToday = toDateInput(this.selectedDate()) === toDateInput(new Date());
+      if (isToday && this.dayEvents().length) setTimeout(() => this.scrollToCurrent());
+    });
   }
 
   // Mobile scroll: title follows the month filling the middle of the viewport.

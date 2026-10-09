@@ -408,13 +408,21 @@ export class EventEditor implements OnInit {
         status: event.status,
       });
     } else if (this.entry().date) {
-      this.model.set({ ...this.blank(), date: this.entry().date! });
+      this.model.set({ ...this.blank(), date: this.entry().date!, ...EventEditor.defaultTimes(this.entry().date!) });
     }
     // A stored rule that matches no preset opens as Custom.
     if (this.preset() === 'custom') this.model.update((m) => ({ ...m, repeatCustom: true }));
     this.snapshot.set(JSON.stringify(this.model()));
     const m = this.model();
     this.repeatSnapshot = JSON.stringify([m.repeat, m.repeatInterval, m.repeatUntil]);
+  }
+
+  // A new event's hour: today from now (rounded up to 5 minutes), any other day from 9:00.
+  private static defaultTimes(date: string): { startTime: string; endTime: string } {
+    if (date !== toDateInput(new Date())) return { startTime: '09:00', endTime: '10:00' };
+    const now = new Date();
+    const start = Math.min(Math.ceil((now.getHours() * 60 + now.getMinutes()) / 5) * 5, 23 * 60);
+    return { startTime: minToTime(start), endTime: minToTime(Math.min(start + 60, 23 * 60 + 55)) };
   }
 
   private blank(): Model {
@@ -427,8 +435,7 @@ export class EventEditor implements OnInit {
       invitees: { studentIds: [], groupIds: [] },
       lessonIds: [],
       date: toDateInput(new Date()),
-      startTime: '18:00',
-      endTime: '19:00',
+      ...EventEditor.defaultTimes(toDateInput(new Date())),
       note: '',
       status: 'Scheduled',
     };
