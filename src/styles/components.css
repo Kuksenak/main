@@ -22,7 +22,7 @@
 
 /* Prominent (accent) control: flat tint, top-weighted glass rim, see-through white label. */
 @utility glass-accent {
-  color: rgb(255 255 255 / 0.85);
+  color: var(--accent-label, rgb(255 255 255 / 0.85));
   background-color: var(--accent);
   box-shadow: var(--rim-accent), var(--shadow-accent);
 }
@@ -32,8 +32,8 @@
   color: var(--text);
   background-color: var(--glass-neutral);
   box-shadow: var(--rim-neutral), var(--shadow-control);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: var(--glass-blur, blur(20px) saturate(180%));
+  backdrop-filter: var(--glass-blur, blur(20px) saturate(180%));
 }
 
 @layer components {
