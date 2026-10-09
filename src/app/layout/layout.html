@@ -80,8 +80,8 @@
 
   @if (menuOpen()) {
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
-      <!-- Just the rows: no card background, outline or dividers; larger labels -->
-      <div class="no-dividers press-bold -mx-3 flex flex-col [&_.list-row]:!py-3 [&_.list-row]:!text-[1.125rem]">
+      <!-- Just the rows and the dividers between them (from the label on): no card background or outline; larger labels -->
+      <div class="press-bold -mx-3 flex flex-col [&_.list-row]:!py-3 [&_.list-row]:!text-[1.125rem] [&_.list-row]:![--sep-left:4rem]">
         @for (item of navItems; track item.path) {
           <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet, check: true }" />
         }

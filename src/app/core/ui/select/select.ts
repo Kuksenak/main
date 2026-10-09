@@ -1,4 +1,4 @@
-import { Component, Input, booleanAttribute, computed, forwardRef, inject, signal } from '@angular/core';
+import { Component, ElementRef, Input, booleanAttribute, computed, forwardRef, inject, signal, viewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { I18nService } from '../../i18n/i18n.service';
@@ -39,21 +39,23 @@ export class SelectField implements ControlValueAccessor {
     { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -6 },
   ];
 
-  // Phones (iOS pop-up menus): over the chip, right-aligned with it, with the chosen item right
-  // on the chip's middle line; if that doesn't fit the screen, growing down from the chip's top,
-  // else up from its bottom. (Rows are 44px under a 6px padding — see the template.)
+  // Phones: right-aligned with the chip and covering it but for a quarter of its height — growing
+  // down (the chip's top quarter shows) when there's room below, else up (its bottom quarter).
   // Worked out once on opening (a fresh array on every check would keep re-placing the menu).
   protected readonly phonePositions = signal<ConnectedPosition[]>([]);
 
   private placePhoneMenu(): void {
-    const i = Math.max(0, this.options.findIndex((o) => o.value === this.value()));
-    const toChosenMiddle = 6 + i * 44 + 22;
-    this.phonePositions.set([
-      { originX: 'end', originY: 'center', overlayX: 'end', overlayY: 'top', offsetY: -toChosenMiddle },
-      { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'top', offsetY: -6 },
-      { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'bottom', offsetY: 6 },
-    ]);
+    const chip = this.chip()?.nativeElement;
+    const h = chip?.offsetHeight ?? 36;
+    const r = chip?.getBoundingClientRect();
+    const roomBelow = r ? window.innerHeight - r.top : Infinity;
+    const roomAbove = r ? r.bottom : 0;
+    const down: ConnectedPosition = { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'top', offsetY: h / 4 };
+    const up: ConnectedPosition = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'bottom', offsetY: -h / 4 };
+    this.phonePositions.set(roomBelow >= roomAbove ? [down, up] : [up, down]);
   }
+
+  private readonly chip = viewChild<ElementRef<HTMLElement>>('chip');
 
   @Input() disabled = false;
   @Input() options: SelectOption[] = [];

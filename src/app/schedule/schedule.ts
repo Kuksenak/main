@@ -142,12 +142,18 @@ export class Schedule implements AfterViewInit {
 
   private scrollToCurrent(): void {
     const list = this.dayList()?.nativeElement;
-    const rows = list ? Array.from(list.children) as HTMLElement[] : [];
+    const rows = list ? (Array.from(list.children) as HTMLElement[]) : [];
     const current = rows.find((r) => r.hasAttribute('data-now'));
-    const viewport = list?.parentElement?.parentElement; // the scroll area's viewport
-    if (!current || !viewport) return;
+    if (!list || !current) return;
+    // The element that actually scrolls: the nearest ancestor with overflowing, scrollable content.
+    let viewport: HTMLElement | null = list.parentElement;
+    while (viewport && !(viewport.scrollHeight > viewport.clientHeight && /auto|scroll/.test(getComputedStyle(viewport).overflowY))) {
+      viewport = viewport.parentElement;
+    }
+    if (!viewport) return;
     const i = rows.indexOf(current);
-    viewport.scrollTop = i > 0 ? rows[i - 1].offsetTop : 0;
+    const target = i > 0 ? rows[i - 1] : current;
+    viewport.scrollTop += target.getBoundingClientRect().top - viewport.getBoundingClientRect().top;
   }
 
   constructor() {
@@ -177,7 +183,7 @@ export class Schedule implements AfterViewInit {
     // Selecting today (or its events loading): bring the current event into view.
     effect(() => {
       const isToday = toDateInput(this.selectedDate()) === toDateInput(new Date());
-      if (isToday && this.dayEvents().length) setTimeout(() => this.scrollToCurrent());
+      if (isToday && this.dayEvents().length) setTimeout(() => requestAnimationFrame(() => this.scrollToCurrent()), 50);
     });
   }
 

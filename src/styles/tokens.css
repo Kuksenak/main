@@ -45,7 +45,8 @@
 
   /* Fills & lines */
   --fill: rgb(0 0 0 / 0.04); /* input chips */
-  --chip-ios: rgb(118 118 128 / 0.12); /* iOS tertiarySystemFill: date / time chips on phones */
+  --chip-ios: rgb(118 118 128 / 0.12);
+  --now: #ff3b30; /* iOS red: what's going on right now */ /* iOS tertiarySystemFill: date / time chips on phones */
   --picker-bg: #ffffff; /* iOS picker panels (date / time) — our select matches them on phones */
   --glass-panel: rgb(250 250 250 / 0.72); /* glass popups (menus, confirms) over a blur, like iOS 26 */
   --glass-edge: rgb(255 255 255 / 0.6);
@@ -95,6 +96,7 @@ html.dark {
 
   --fill: rgb(255 255 255 / 0.06);
   --chip-ios: rgb(118 118 128 / 0.24);
+  --now: #ff453a;
   --picker-bg: linear-gradient(to bottom, rgb(38 39 38), rgb(36 37 36) 65%, rgb(32 33 32)); /* the iOS time picker panel on a black page (sampled on a grid): flat, darkening only near the bottom */
   --glass-panel: rgb(48 48 52 / 0.66);
   --glass-edge: rgb(255 255 255 / 0.14);

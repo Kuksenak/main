@@ -33,7 +33,7 @@ export interface ActionChoice {
           class="fixed flex w-80 flex-col gap-3 rounded-xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-4 text-[var(--text)] shadow-[var(--shadow-dialog)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
-          [style.right.px]="place().right"
+          [style.left.px]="place().left"
           [class.scale-95]="closing()"
           (click)="$event.stopPropagation()"
         >
@@ -59,9 +59,9 @@ export interface ActionChoice {
           class="glass-panel fixed flex w-72 flex-col gap-1.5 rounded-[1.75rem] p-2 text-[var(--text)] transition-[opacity,scale] duration-200 [animation:menuIn_280ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
-          [style.right.px]="place().right"
-          [class.origin-bottom-right]="place().bottom !== null"
-          [class.origin-top-right]="place().top !== null"
+          [style.left.px]="place().left"
+          [class.origin-bottom]="place().bottom !== null"
+          [class.origin-top]="place().top !== null"
           [class.scale-95]="closing()"
           (click)="$event.stopPropagation()"
         >
@@ -92,19 +92,19 @@ export class ActionSheet {
   protected readonly closing = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
 
-  // Where the panel goes: over the button that asked (iOS), right-aligned with it — growing down
+  // Where the panel goes: over the button that asked, centered on it horizontally — growing down
   // from its top when it's in the upper half of the screen, up from its bottom otherwise.
   protected readonly place = computed(() => {
     const el = this.origin();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    if (!el) return { top: null, bottom: 16, right: 16 };
-    const r = el.getBoundingClientRect();
     const width = this.desktop ? 320 : 288;
-    const right = Math.max(8, Math.min(vw - r.right, vw - 8 - width));
+    if (!el) return { top: null, bottom: 16, left: vw - 16 - width };
+    const r = el.getBoundingClientRect();
+    const left = Math.max(8, Math.min(r.left + r.width / 2 - width / 2, vw - 8 - width));
     return r.top > vh / 2
-      ? { top: null, bottom: vh - r.bottom, right }
-      : { top: r.top, bottom: null, right };
+      ? { top: null, bottom: vh - r.bottom, left }
+      : { top: r.top, bottom: null, left };
   });
 
   protected choose(value: string): void {
