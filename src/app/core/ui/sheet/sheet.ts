@@ -48,7 +48,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         <div
           class="absolute inset-0 [animation:fadeIn_280ms_ease-out] desktop:bg-[var(--backdrop)]"
           [style.opacity]="closing() ? 0 : null"
-          [style.transition]="'opacity 240ms ease-out'"
+          [style.transition]="'opacity 340ms ease-out'"
           (click)="close()"
         ></div>
 
@@ -57,7 +57,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
-          [style.transition]="dragging() ? 'none' : 'transform 280ms var(--ease-ios)'"
+          [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
         >
           <div
             class="shrink-0 touch-none px-4 pb-4 pt-2.5 desktop:pb-0 desktop:pt-4"
@@ -103,7 +103,8 @@ export class Sheet {
     this.closing.set(true);
     // The dropdown just disappears; the sheet/dialog slides out first.
     const anchored = this.desktop && this.origin();
-    setTimeout(() => this.closed.emit(), anchored ? 0 : 240);
+    // Only once the slide-away has fully played (cutting it short looked jumpy).
+    setTimeout(() => this.closed.emit(), anchored ? 0 : 380);
   }
 
   protected dragStart(e: TouchEvent): void {

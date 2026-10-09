@@ -80,7 +80,7 @@ export class Layout {
   // sheet's slide stutter.
   protected go(path: string, sheet: Sheet): void {
     sheet.close();
-    setTimeout(() => this.router.navigateByUrl(path), 180);
+    setTimeout(() => this.router.navigateByUrl(path), 300);
   }
 
   // Toolbar ‹: the previous page, or Schedule when the app was opened right here.
