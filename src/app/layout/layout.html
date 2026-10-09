@@ -84,21 +84,22 @@
          closes it. -->
     <div class="fixed inset-0 z-40" (click)="menuOpen.set(null)">
       <div
-        class="fixed w-[min(21rem,calc(100vw-1rem))] origin-top-right rounded-[1.75rem] border-[0.5px] border-[var(--separator)] bg-[var(--card)] p-2 text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:menuIn_220ms_var(--ease-out-quick)]"
+        class="fixed w-[min(20.5rem,calc(100vw-1.5rem))] origin-top-right rounded-[1.75rem] border-[0.5px] border-[var(--separator)] bg-[var(--card)] p-3.5 text-[var(--text)] shadow-[var(--shadow-dialog)] [animation:menuIn_220ms_var(--ease-out-quick)]"
         [style.top.px]="pos.top"
         [style.right.px]="pos.right"
         (click)="$event.stopPropagation()"
       >
-        <div class="grid grid-cols-3 gap-1">
+        <!-- Sizes from Google's launcher (~108 × 100pt tiles, 40pt icons, 16pt names) -->
+        <div class="grid grid-cols-3">
           @for (item of navItems; track item.path) {
             <button
               type="button"
               (click)="goTo(item.path)"
-              class="flex min-w-0 flex-col items-center gap-2 rounded-2xl px-2 pb-3 pt-4 active:bg-[var(--highlight)] active:![transform:none]"
+              class="flex h-[6.25rem] min-w-0 flex-col items-center justify-center gap-3 rounded-2xl px-1.5 active:bg-[var(--highlight)] active:![transform:none]"
               [class.bg-[var(--highlight)]]="isActive(item.path)"
             >
-              <app-brand-icon [name]="item.icon" class="size-12" />
-              <span class="max-w-full truncate text-[0.9375rem]">{{ item.label | t }}</span>
+              <app-brand-icon [name]="item.icon" class="size-10" />
+              <span class="max-w-full truncate text-base leading-tight">{{ item.label | t }}</span>
             </button>
           }
         </div>
