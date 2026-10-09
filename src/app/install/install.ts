@@ -25,14 +25,13 @@ interface Guide {
       <div class="mx-auto flex w-full max-w-xl flex-col gap-8">
       <div class="flex flex-col gap-3">
         <p class="text-[1.0625rem] leading-relaxed opacity-70">{{ 'install.intro' | t }}</p>
-        <!-- Chrome / Edge / Android: their own install dialog, right from here -->
-        @if (install.canPrompt()) {
-          <button type="button" (click)="install.prompt()" class="btn-secondary mt-1 self-start">
-            <app-icon name="install" class="size-5" />
-            {{ 'install.button' | t }}
-          </button>
-        }
       </div>
+
+      <!-- Chrome / Edge / Android: their own install dialog, right from here (a card button, like
+           Update in the account menu) -->
+      @if (install.canPrompt()) {
+        <button type="button" (click)="install.prompt()" class="card-btn -mt-2 text-[var(--accent)]">{{ 'install.button' | t }}</button>
+      }
 
       @if (guide; as g) {
         <!-- Numbered steps, each with the icon to look for -->
