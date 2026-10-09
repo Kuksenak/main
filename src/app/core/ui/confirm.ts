@@ -30,7 +30,7 @@ export interface ActionChoice {
              across its width (no Cancel: a click outside cancels) -->
         <div
           role="alertdialog"
-          class="fixed flex w-80 flex-col gap-3 rounded-xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-4 text-[var(--text)] shadow-[var(--shadow-dialog)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
+          class="fixed flex w-72 flex-col gap-3 rounded-xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-4 text-[var(--text)] shadow-[var(--shadow-dialog)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
           [style.left.px]="place().left"
@@ -38,7 +38,7 @@ export interface ActionChoice {
           (click)="$event.stopPropagation()"
         >
           <!-- Just the explanation when there is one ("This can't be undone"), else the question -->
-          <p class="text-body text-center">{{ (message() ?? title()) | t }}</p>
+          <p class="text-body text-balance text-center">{{ (message() ?? title()) | t }}</p>
           <!-- The answers across the full width, labels centered; a click outside cancels -->
           <div class="grid gap-2">
             @for (c of choices(); track c.value) {
@@ -56,7 +56,7 @@ export interface ActionChoice {
              screen): the question, then each answer as a centered button; a tap outside cancels -->
         <div
           role="alertdialog"
-          class="glass-panel fixed flex w-72 flex-col gap-1.5 rounded-[1.75rem] p-2 text-[var(--text)] transition-[opacity,scale] duration-200 [animation:menuIn_280ms_var(--ease-out-quick)]"
+          class="glass-panel fixed flex w-64 flex-col gap-1.5 rounded-[1.75rem] p-2 text-[var(--text)] transition-[opacity,scale] duration-200 [animation:menuIn_280ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
           [style.left.px]="place().left"
@@ -65,7 +65,7 @@ export interface ActionChoice {
           [class.scale-95]="closing()"
           (click)="$event.stopPropagation()"
         >
-          <p class="text-body px-2 pb-1 pt-1.5 text-center opacity-60">{{ (message() ?? title()) | t }}</p>
+          <p class="text-body text-balance px-2 pb-1 pt-1.5 text-center opacity-60">{{ (message() ?? title()) | t }}</p>
           @for (c of choices(); track c.value) {
             <button
               type="button"
@@ -98,7 +98,7 @@ export class ActionSheet {
     const el = this.origin();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const width = this.desktop ? 320 : 288;
+    const width = this.desktop ? 288 : 256;
     if (!el) return { top: vh / 2 - 80, bottom: null, left: (vw - width) / 2 }; // no button: mid-screen
     const r = el.getBoundingClientRect();
     const left = Math.max(8, Math.min(r.left + r.width / 2 - width / 2, vw - 8 - width));
