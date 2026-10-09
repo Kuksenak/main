@@ -7,9 +7,10 @@ import { LoadingService } from '../core/services/loading.service';
 
 export type EventStatus = 'Scheduled' | 'Done' | 'Cancelled';
 
-/** How an event repeats (from its first start, with no end). */
-export type EventRepeat = 'Never' | 'Daily' | 'Weekly' | 'Biweekly' | 'Monthly';
-export const EVENT_REPEATS: EventRepeat[] = ['Daily', 'Weekly', 'Monthly']; // choices (Biweekly still understood)
+/** How often an event repeats — every `repeatInterval` days / weeks / months / years (from its
+ * first start, with no end). */
+export type EventRepeat = 'Never' | 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
+export const REPEAT_FREQUENCIES: Exclude<EventRepeat, 'Never'>[] = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
 export const EVENT_STATUSES: EventStatus[] = ['Scheduled', 'Done', 'Cancelled'];
 
 // Events are loaded for a window around today: 26 weeks back, 53 weeks in total, starting
@@ -38,6 +39,7 @@ export interface ScheduleEvent {
   status: EventStatus;
   note: string | null;
   repeat: EventRepeat;
+  repeatInterval: number;
   seriesStartsAt: string; // a repeating event comes once per day it falls on; this is its first start
 }
 

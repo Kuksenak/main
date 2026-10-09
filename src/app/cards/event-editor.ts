@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { TranslationKey } from '../core/i18n/translations';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { NavStack, StackEntry } from '../core/services/nav-stack.service';
 import { DateField } from '../core/ui/date/date';
@@ -10,7 +11,6 @@ import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
-import { Toggle } from '../core/ui/toggle';
 import { initial } from '../core/utils/text';
 import {
   fromDateInput,
@@ -19,7 +19,7 @@ import {
   toDateInput,
   toTimeInput,
 } from '../core/utils/time';
-import { EVENT_REPEATS, EVENT_STATUSES, EventRepeat, EventService, EventStatus, statusKey } from '../schedule/event.service';
+import { EVENT_STATUSES, EventRepeat, EventService, EventStatus, REPEAT_FREQUENCIES, statusKey } from '../schedule/event.service';
 import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
@@ -34,6 +34,8 @@ interface Invitees {
 interface Model {
   title: string;
   repeat: EventRepeat;
+  repeatInterval: number;
+  repeatCustom: boolean; // the Custom choice is open (frequency + every N)
   invitees: Invitees;
   lessonIds: string[];
   date: string; // yyyy-MM-dd
@@ -46,7 +48,7 @@ interface Model {
 /** Event card (new or existing), opened on the NavStack. */
 @Component({
   selector: 'app-event-editor',
-  imports: [FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, Toggle, TranslatePipe],
+  imports: [FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -65,6 +67,55 @@ interface Model {
         <div class="card">
           <div class="list-row">
             <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="row-input" />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="list-row">
+            <span>{{ 'event.starts' | t }}</span>
+            <div class="ml-auto flex items-center gap-2">
+              <app-date [ngModel]="date()" (ngModelChange)="setDate($event)" [ngModelOptions]="{ standalone: true }" />
+              <app-time [ngModel]="m.startTime" (ngModelChange)="onStartChange($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          <div class="list-row">
+            <span>{{ 'event.ends' | t }}</span>
+            <div class="ml-auto flex items-center gap-2">
+              <!-- End before start: warning orange -->
+              <span [class.opacity-60]="!invalid()" [class.text-[var(--warning)]]="invalid()" [class.line-through]="invalid()">{{ dateLabel() }}</span>
+              <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          @if (entry().id) {
+            <div class="list-row">
+              <span>{{ 'event.status' | t }}</span>
+              <app-select class="ml-auto" stretch [options]="statusOptions()" [ngModel]="m.status" (ngModelChange)="patch({ status: $event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          }
+        </div>
+
+        <!-- Repeat (iOS-like): Never / every day, week, 2 weeks, month, year / Custom; Custom adds
+             the frequency and "every N days / weeks …" -->
+        <div class="card">
+          <div class="list-row">
+            <span>{{ 'event.repeat' | t }}</span>
+            <app-select class="ml-auto" stretch [options]="presetOptions()" [ngModel]="preset()" (ngModelChange)="setPreset($event)" [ngModelOptions]="{ standalone: true }" />
+          </div>
+          @if (m.repeatCustom) {
+            <div class="list-row">
+              <span>{{ 'event.frequency' | t }}</span>
+              <app-select class="ml-auto" stretch [options]="frequencyOptions()" [ngModel]="m.repeat" (ngModelChange)="setFrequency($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+            <div class="list-row">
+              <span>{{ 'event.every' | t }}</span>
+              <app-select class="ml-auto" stretch [options]="intervalOptions()" [ngModel]="m.repeatInterval" (ngModelChange)="patch({ repeatInterval: +$event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          }
+        </div>
+
+        <div class="card">
+          <div class="list-row py-3 desktop:py-2">
+            <textarea name="note" [ngModel]="m.note" (ngModelChange)="patch({ note: $event })" rows="2" [placeholder]="'event.note' | t" autocomplete="off" class="row-input resize-y leading-snug"></textarea>
           </div>
         </div>
 
@@ -111,57 +162,6 @@ interface Model {
             <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
           </button>
         </div>
-        </div>
-
-        <div class="card">
-          <div class="list-row">
-            <span>{{ 'event.starts' | t }}</span>
-            <div class="ml-auto flex items-center gap-2">
-              <app-date [ngModel]="date()" (ngModelChange)="setDate($event)" [ngModelOptions]="{ standalone: true }" />
-              <app-time [ngModel]="m.startTime" (ngModelChange)="onStartChange($event)" [ngModelOptions]="{ standalone: true }" />
-            </div>
-          </div>
-          <div class="list-row">
-            <span>{{ 'event.ends' | t }}</span>
-            <div class="ml-auto flex items-center gap-2">
-              <!-- End before start: warning orange -->
-              <span [class.opacity-60]="!invalid()" [class.text-[var(--warning)]]="invalid()" [class.line-through]="invalid()">{{ dateLabel() }}</span>
-              <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
-            </div>
-          </div>
-          <!-- Repeat: on → how often. The whole row (a label) flips the switch. -->
-          <label class="list-row cursor-pointer">
-            <span>{{ 'event.repeat' | t }}</span>
-            <app-toggle [checked]="m.repeat !== 'Never'" (checkedChange)="patch({ repeat: $event ? 'Weekly' : 'Never' })" />
-          </label>
-          @if (m.repeat !== 'Never') {
-            <!-- Two ways to pick how often, side by side for now (to choose one): a select … -->
-            <div class="list-row">
-              <span>{{ 'event.repeatHow' | t }}</span>
-              <app-select class="ml-auto" stretch [options]="repeatOptions()" [ngModel]="m.repeat" (ngModelChange)="patch({ repeat: $event })" [ngModelOptions]="{ standalone: true }" />
-            </div>
-            <!-- … and tabs, compact on the right like the time -->
-            <div class="list-row">
-              <span class="min-w-0 truncate">{{ 'event.repeatHow' | t }}</span>
-              <div class="segmented ml-auto !h-8 w-auto shrink-0 text-footnote [&>button]:flex-none [&>button]:px-3 desktop:!h-8">
-                @for (r of repeats; track r) {
-                  <button type="button" (click)="patch({ repeat: r })" [attr.aria-pressed]="m.repeat === r">{{ repeatShort(r) | t }}</button>
-                }
-              </div>
-            </div>
-          }
-          @if (entry().id) {
-            <div class="list-row">
-              <span>{{ 'event.status' | t }}</span>
-              <app-select class="ml-auto" stretch [options]="statusOptions()" [ngModel]="m.status" (ngModelChange)="patch({ status: $event })" [ngModelOptions]="{ standalone: true }" />
-            </div>
-          }
-        </div>
-
-        <div class="card">
-          <div class="list-row py-3 desktop:py-2">
-            <textarea name="note" [ngModel]="m.note" (ngModelChange)="patch({ note: $event })" rows="2" [placeholder]="'event.note' | t" autocomplete="off" class="row-input resize-y leading-snug"></textarea>
-          </div>
         </div>
       </div>
       </div>
@@ -267,13 +267,55 @@ export class EventEditor implements OnInit {
   );
   protected readonly dirty = computed(() => JSON.stringify(this.model()) !== this.snapshot());
   // Save a valid event with a title or someone invited, that differs from what was opened.
-  protected readonly repeatOptions = computed<SelectOption[]>(() =>
-    EVENT_REPEATS.map((r) => ({ label: this.i18n.t(`event.repeat.${r}`), value: r })),
-  );
+  // Repeat presets (iOS-like) over frequency + interval; anything else is Custom.
+  private static readonly PRESETS: { key: string; repeat: EventRepeat; interval: number }[] = [
+    { key: 'never', repeat: 'Never', interval: 1 },
+    { key: 'day', repeat: 'Daily', interval: 1 },
+    { key: 'week', repeat: 'Weekly', interval: 1 },
+    { key: 'twoWeeks', repeat: 'Weekly', interval: 2 },
+    { key: 'month', repeat: 'Monthly', interval: 1 },
+    { key: 'year', repeat: 'Yearly', interval: 1 },
+  ];
+  // How many of each unit "every N" offers.
+  private static readonly MAX: Record<Exclude<EventRepeat, 'Never'>, number> = { Daily: 365, Weekly: 52, Monthly: 12, Yearly: 10 };
 
-  protected readonly repeats = EVENT_REPEATS;
-  protected repeatShort(r: EventRepeat) {
-    return `event.repeatShort.${r}` as const;
+  protected readonly preset = computed(() => {
+    const m = this.model();
+    if (m.repeatCustom) return 'custom';
+    return EventEditor.PRESETS.find((p) => p.repeat === m.repeat && p.interval === m.repeatInterval)?.key ?? 'custom';
+  });
+  protected readonly presetOptions = computed<SelectOption[]>(() => [
+    ...EventEditor.PRESETS.map((p) => ({ label: this.i18n.t(`event.repeat.${p.key}` as TranslationKey), value: p.key })),
+    { label: this.i18n.t('event.repeat.custom'), value: 'custom' },
+  ]);
+  protected readonly frequencyOptions = computed<SelectOption[]>(() =>
+    REPEAT_FREQUENCIES.map((f) => ({ label: this.i18n.t(`event.frequency.${f}`), value: f })),
+  );
+  // "1 day", "2 days" … in the frequency's unit (plural forms per language).
+  protected readonly intervalOptions = computed<SelectOption[]>(() => {
+    const unit = this.model().repeat;
+    if (unit === 'Never') return [];
+    const rules = new Intl.PluralRules(this.i18n.locale());
+    return Array.from({ length: EventEditor.MAX[unit] }, (_, i) => {
+      const n = i + 1;
+      const form = rules.select(n) as 'one' | 'few' | 'many' | 'other';
+      return { label: `${n} ${this.i18n.t(`event.unit.${unit}.${form}` as TranslationKey)}`, value: n };
+    });
+  });
+
+  protected setPreset(key: string): void {
+    if (key === 'custom') {
+      const m = this.model();
+      this.patch({ repeatCustom: true, repeat: m.repeat === 'Never' ? 'Daily' : m.repeat });
+      return;
+    }
+    const p = EventEditor.PRESETS.find((x) => x.key === key)!;
+    this.patch({ repeat: p.repeat, repeatInterval: p.interval, repeatCustom: false });
+  }
+
+  protected setFrequency(repeat: EventRepeat): void {
+    const max = repeat === 'Never' ? 1 : EventEditor.MAX[repeat];
+    this.patch({ repeat, repeatInterval: Math.min(this.model().repeatInterval, max) });
   }
 
   // An event needs a title or someone invited.
@@ -291,6 +333,8 @@ export class EventEditor implements OnInit {
       const start = new Date(event.seriesStartsAt ?? event.startsAt); // a repeat edits the whole series
       this.model.set({
         repeat: event.repeat ?? 'Never',
+        repeatInterval: event.repeatInterval ?? 1,
+        repeatCustom: false,
         title: event.title ?? '',
         invitees: { studentIds: event.studentIds, groupIds: event.groupIds },
         lessonIds: event.lessonIds,
@@ -303,12 +347,16 @@ export class EventEditor implements OnInit {
     } else if (e.date) {
       this.model.set({ ...this.blank(), date: e.date });
     }
+    // A stored rule that matches no preset opens as Custom.
+    if (this.preset() === 'custom') this.model.update((m) => ({ ...m, repeatCustom: true }));
     this.snapshot.set(JSON.stringify(this.model()));
   }
 
   private blank(): Model {
     return {
       repeat: 'Never',
+      repeatInterval: 1,
+      repeatCustom: false,
       title: '',
       invitees: { studentIds: [], groupIds: [] },
       lessonIds: [],
@@ -369,6 +417,7 @@ export class EventEditor implements OnInit {
     const input = {
       title: m.title.trim() || null,
       repeat: m.repeat,
+      repeatInterval: m.repeat === 'Never' ? 1 : m.repeatInterval,
       studentIds: m.invitees.studentIds,
       groupIds: m.invitees.groupIds,
       lessonIds: m.lessonIds,
