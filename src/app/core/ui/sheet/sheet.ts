@@ -27,12 +27,15 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         [cdkConnectedOverlayOrigin]="origin()!"
         [cdkConnectedOverlayOpen]="!closing()"
         [cdkConnectedOverlayPositions]="positions"
+        [cdkConnectedOverlayPush]="true"
+        [cdkConnectedOverlayViewportMargin]="8"
         [cdkConnectedOverlayHasBackdrop]="true"
         cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
         (backdropClick)="close()"
         (detach)="close()"
       >
-        <div class="dialog-panel w-72 origin-top-right !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]">
+        <!-- Kept inside the window: pushed back in, and never taller than it (then it scrolls) -->
+        <div class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-1rem)] w-72 origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]">
           <ng-container [ngTemplateOutlet]="content" />
         </div>
       </ng-template>

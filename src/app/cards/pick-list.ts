@@ -67,9 +67,9 @@ export interface PickSection {
 
     @if (desktop) {
       <app-sheet [origin]="origin()" (closed)="closed.emit()">
-        <div class="flex flex-col gap-3">
+        <div class="flex min-h-0 flex-col gap-3">
           <ng-container [ngTemplateOutlet]="search" />
-          <app-scroll-area class="max-h-80" contentClass="gap-3">
+          <app-scroll-area class="max-h-80 min-h-0" contentClass="gap-3">
             <ng-container [ngTemplateOutlet]="lists" />
           </app-scroll-area>
         </div>
