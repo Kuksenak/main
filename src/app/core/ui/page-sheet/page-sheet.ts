@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '../../i18n/t.pipe';
 import { DeviceDetectionService } from '../../services/device-detection.service';
+import { ConfirmDelete } from '../confirm';
 import { Icon } from '../icon/icon';
 import { ScrollArea } from '../scroll-area/scroll-area';
 
@@ -15,7 +16,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
  * With `actions` (default) it renders the editor chrome:
  * - mobile top bar: back (✕ once `dirty`) · title · ✓ (blue when `canSave`); Delete at the end
  *   of the content when `deletable`;
- * - desktop footer: Delete (when `deletable`) · Cancel · Save.
+ * - desktop footer: Delete (when `deletable`) · Cancel · Save. Delete asks to confirm first.
  * Without `actions`, round buttons marked `barEnd` go to the right of the mobile top bar:
  *   <button barEnd class="icon-btn">…</button> (several, or inside @if: <ng-container ngProjectAs="[barEnd]">)
  * Menus without inputs use <app-sheet> instead.
@@ -23,7 +24,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
  */
 @Component({
   selector: 'app-page-sheet',
-  imports: [Icon, NgTemplateOutlet, ScrollArea, TranslatePipe],
+  imports: [ConfirmDelete, Icon, NgTemplateOutlet, ScrollArea, TranslatePipe],
   template: `
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:bg-[var(--backdrop)] desktop:p-4"
@@ -78,7 +79,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         <ng-template #body>
           <ng-content />
           @if (actions() && deletable()) {
-            <button type="button" (click)="delete.emit()" class="card-btn mt-6 text-[var(--danger)] desktop:hidden">
+            <button type="button" (click)="askDelete.set(true)" class="card-btn mt-6 text-[var(--danger)] desktop:hidden">
               {{ 'action.delete' | t }}
             </button>
           }
@@ -100,7 +101,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
           <!-- Desktop footer -->
           <div class="mt-4 flex items-center gap-2 mobile:hidden">
             @if (deletable()) {
-              <button type="button" (click)="delete.emit()" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+              <button type="button" (click)="askDelete.set(true)" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
             }
             <button type="button" (click)="back()" class="btn-secondary ml-auto">{{ 'action.cancel' | t }}</button>
             <button type="button" (click)="save.emit()" [disabled]="!canSave()" class="btn-primary">{{ 'action.save' | t }}</button>
@@ -108,6 +109,11 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         }
       </div>
     </div>
+
+    <!-- Delete asks first -->
+    @if (askDelete()) {
+      <app-confirm-delete (confirmed)="delete.emit()" (closed)="askDelete.set(false)" />
+    }
   `,
 })
 export class PageSheet {
@@ -131,6 +137,7 @@ export class PageSheet {
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly closing = signal(false);
+  protected readonly askDelete = signal(false);
 
   constructor() {
     // Keep the page pinned: iOS scrolls the document to reveal a focused field even with

@@ -1,6 +1,7 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { ConfirmDelete } from '../core/ui/confirm';
 import { Icon } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { DemoQuiz } from './demo-quiz';
@@ -16,7 +17,7 @@ import { LessonState } from './lesson-state';
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [DemoQuiz, Icon, LessonContent, LessonForm, LessonInfo, RouterLink, ScrollArea, TranslatePipe],
+  imports: [ConfirmDelete, DemoQuiz, Icon, LessonContent, LessonForm, LessonInfo, RouterLink, ScrollArea, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -44,7 +45,7 @@ import { LessonState } from './lesson-state';
             <app-lesson-info [lesson]="l" />
           }
           @if (s.id()) {
-            <button type="button" (click)="remove()" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+            <button type="button" (click)="askDelete.set(true)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
           }
         } @else if (s.lesson(); as l) {
           <app-lesson-content [blocks]="l.blocks" />
@@ -54,6 +55,10 @@ import { LessonState } from './lesson-state';
         }
       </app-scroll-area>
     </main>
+
+    @if (askDelete()) {
+      <app-confirm-delete (confirmed)="remove()" (closed)="askDelete.set(false)" />
+    }
   `,
 })
 export class LessonPage {
@@ -62,6 +67,7 @@ export class LessonPage {
 
   protected readonly s = new LessonState(() => this.lessonId());
   private router = inject(Router);
+  protected readonly askDelete = signal(false);
 
   protected cancel(): void {
     if (this.s.id()) this.s.cancelEdit();
