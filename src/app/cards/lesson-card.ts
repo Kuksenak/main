@@ -41,11 +41,9 @@ import { EventList } from './event-list';
       @if (!editing()) {
         <div barEnd class="btn-group">
           <button #infoBtnMobile type="button" (click)="openInfo(infoBtnMobile)" [attr.aria-label]="'lessons.info' | t">
-            <app-icon name="info" [strokeWidth]="2" class="size-6" />
+            <app-icon name="i" [strokeWidth]="3" class="size-6" />
           </button>
-          <button type="button" (click)="edit()" [attr.aria-label]="'action.edit' | t">
-            <app-icon name="pencil" [strokeWidth]="2" class="size-[1.375rem]" />
-          </button>
+          <button type="button" (click)="edit()" class="!w-auto px-3 font-medium">{{ 'action.edit' | t }}</button>
         </div>
       }
 
@@ -56,11 +54,9 @@ import { EventList } from './event-list';
             <h1 class="min-w-0 flex-1 text-2xl font-semibold">{{ heading() }}</h1>
             <div class="btn-group">
               <button #infoBtn type="button" (click)="openInfo(infoBtn)" [attr.aria-label]="'lessons.info' | t">
-                <app-icon name="info" [strokeWidth]="2" class="size-5" />
+                <app-icon name="i" [strokeWidth]="3" class="size-5" />
               </button>
-              <button type="button" (click)="edit()" [attr.aria-label]="'action.edit' | t">
-                <app-icon name="pencil" [strokeWidth]="2" class="size-[1.125rem]" />
-              </button>
+              <button type="button" (click)="edit()" class="!w-auto px-3 font-medium">{{ 'action.edit' | t }}</button>
             </div>
           </div>
         }

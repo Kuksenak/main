@@ -16,7 +16,7 @@ export type IconName =
   | 'link'
   | 'text'
   | 'copy'
-  | 'pencil'
+  | 'i'
   | 'google'
   | 'apple';
 
@@ -48,7 +48,7 @@ export type IconName =
         @case ('link') { <path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" /> }
         @case ('text') { <path d="M5 6h14M5 10h14M5 14h14M5 18h9" /> }
         @case ('copy') { <rect x="8.5" y="8.5" width="12" height="12" rx="2.5" /><path d="M15.5 8.5v-2a2.5 2.5 0 0 0-2.5-2.5H6a2.5 2.5 0 0 0-2.5 2.5v7A2.5 2.5 0 0 0 6 16h2.5" /> }
-        @case ('pencil') { <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7.5 18.5 3.5 19.5l1-4z" /><path d="m14.5 5.5 3 3" /> }
+        @case ('i') { <path d="M12 10.5v8M12 5.5v.5" /> }
         @case ('person') { <circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /> }
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
