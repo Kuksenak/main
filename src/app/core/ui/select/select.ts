@@ -129,27 +129,23 @@ export class SelectField implements ControlValueAccessor {
     this.select(opt);
   }
 
-  // After a pick the menu is gone, but the touch's leftovers (click, pointer / mouse events)
-  // still land — on whatever is now under the finger (e.g. a card's Invite row). An invisible
-  // shield over everything takes them for a moment.
-  private swallowNextClick(): void {
-    const shield = document.createElement('div');
-    shield.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:transparent';
-    const stop = (e: Event) => {
-      e.preventDefault();
-      e.stopPropagation();
-    };
-    for (const type of ['click', 'pointerdown', 'pointerup', 'mousedown', 'mouseup', 'touchstart', 'touchend']) {
-      shield.addEventListener(type, stop, { capture: true });
-    }
-    document.body.appendChild(shield);
-    setTimeout(() => shield.remove(), 450);
-  }
+  // Phones: after a pick the menu stays a moment, fading out, before it's removed — the touch's
+  // leftover events (click, pointer, the native date / time inputs' own taps) land on the menu
+  // and its backdrop instead of on whatever is underneath.
+  readonly leaving = signal(false);
 
   select(opt: SelectOption): void {
-    if (this.isMobile()) this.swallowNextClick();
+    if (this.leaving()) return;
     this.setValue(opt.value);
-    this.isOpen.set(false);
+    if (!this.isMobile()) {
+      this.isOpen.set(false);
+      return;
+    }
+    this.leaving.set(true);
+    setTimeout(() => {
+      this.isOpen.set(false);
+      this.leaving.set(false);
+    }, 320);
   }
 
   // Options split into consecutive runs by `section`.

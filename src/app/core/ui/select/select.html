@@ -36,7 +36,8 @@
            chip. Short lists follow the finger (iOS menus): a highlight slides under the item
            being touched, and lifting the finger picks it. -->
       <div
-        class="min-w-60 origin-top overflow-hidden rounded-[1.75rem] [background:var(--picker-bg)] p-1.5 text-[var(--text)] shadow-[0_12px_40px_rgb(0_0_0/0.35),0_2px_8px_rgb(0_0_0/0.15)] [animation:menuIn_280ms_var(--ease-out-quick)]"
+        [class.opacity-0]="leaving()"
+        class="min-w-60 origin-top overflow-hidden rounded-[1.75rem] transition-opacity duration-300 [background:var(--picker-bg)] p-1.5 text-[var(--text)] shadow-[0_12px_40px_rgb(0_0_0/0.35),0_2px_8px_rgb(0_0_0/0.15)] [animation:menuIn_280ms_var(--ease-out-quick)]"
         [class.touch-none]="dragPick()"
         (touchstart)="onTouch($event)"
         (touchmove)="onTouch($event)"
