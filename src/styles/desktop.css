@@ -70,6 +70,8 @@ html:root body {
 }
 html.dark:root {
   --control-border: rgb(255 255 255 / 0.15);
+  /* Gray buttons (Today, Cancel…): on black a few % of white vanishes — iOS's grays */
+  --glass-neutral: #2c2c2e;
 }
 
 .icon-btn,
@@ -151,6 +153,14 @@ a[href]:active {
 .btn-secondary:active,
 .btn-white:active {
   background-color: color-mix(in srgb, var(--text) 14%, transparent);
+}
+html.dark .btn-secondary:hover,
+html.dark .btn-white:hover {
+  background-color: #3a3a3c;
+}
+html.dark .btn-secondary:active,
+html.dark .btn-white:active {
+  background-color: #48484a;
 }
 /* Button and toolbar labels (Claude-like): the body size (like an event's title field), weight 450 */
 .btn-primary,
