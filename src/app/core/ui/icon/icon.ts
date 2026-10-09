@@ -28,7 +28,13 @@ export type IconName =
   | 'checklist'
   | 'compose'
   | 'google'
-  | 'apple';
+  | 'apple'
+  | 'share'
+  | 'plus-square'
+  | 'dots-vertical'
+  | 'install'
+  | 'phone'
+  | 'monitor';
 
 /**
  * All app icons in one place (24×24 stroke icons, currentColor). Size it from the host:
@@ -85,6 +91,13 @@ export type IconName =
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
         @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
         @case ('chevrons-up-down') { <path d="M8.5 9.5 12 6l3.5 3.5M8.5 14.5 12 18l3.5-3.5" /> }
+        <!-- Installing: Safari's Share and "Add to Home Screen", Chrome's ⋮ and install marks, devices -->
+        @case ('share') { <path d="M12 3v12M8 6.5 12 2.5l4 4" /><path d="M8.5 10H7a2.5 2.5 0 0 0-2.5 2.5v6A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5v-6A2.5 2.5 0 0 0 17 10h-1.5" /> }
+        @case ('plus-square') { <rect x="3.5" y="3.5" width="17" height="17" rx="4" /><path d="M12 8v8M8 12h8" /> }
+        @case ('dots-vertical') { <circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" /><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none" /> }
+        @case ('install') { <rect x="2.5" y="4" width="19" height="13" rx="2.5" /><path d="M8 21h8M12 7.5v6M9.5 11 12 13.5 14.5 11" /> }
+        @case ('phone') { <rect x="6" y="2.5" width="12" height="19" rx="3" /><path d="M10.5 18.5h3" /> }
+        @case ('monitor') { <rect x="2.5" y="4" width="19" height="13" rx="2.5" /><path d="M8 21h8M12 17v4" /> }
         <!-- Brand marks: filled; Google keeps its brand colors, Apple uses currentColor -->
         @case ('google') {
           <path stroke="none" fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" />

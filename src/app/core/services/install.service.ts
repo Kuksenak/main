@@ -20,6 +20,12 @@ export class InstallService {
   readonly canPrompt = signal(false);
 
   constructor() {
+    // Offered before the app started (see main.ts)
+    const early = (window as Window & { installPrompt?: Event }).installPrompt;
+    if (early && !this.standalone) {
+      this.deferred = early as InstallPrompt;
+      this.canPrompt.set(true);
+    }
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault(); // no mini-infobar: our Install button shows it
       this.deferred = e as InstallPrompt;
