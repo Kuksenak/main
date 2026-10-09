@@ -30,7 +30,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         [cdkConnectedOverlayPush]="true"
         [cdkConnectedOverlayViewportMargin]="24"
         [cdkConnectedOverlayHasBackdrop]="true"
-        cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+        [cdkConnectedOverlayBackdropClass]="overDialog ? 'backdrop-dim' : 'cdk-overlay-transparent-backdrop'"
         (backdropClick)="close()"
         (detach)="close()"
       >
@@ -85,6 +85,8 @@ export class Sheet {
   readonly closed = output<void>();
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  // Opened from a dialog (a card): the dialog dims under the dropdown.
+  protected readonly overDialog = !!document.querySelector('app-page-sheet');
 
   // Under the anchor, right-aligned; flips above when there's no room below.
   protected readonly positions: ConnectedPosition[] = [

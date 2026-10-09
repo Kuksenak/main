@@ -381,3 +381,8 @@
            transition-opacity duration-300;
   }
 }
+
+/* Desktop: a dropdown opened over a dialog dims the dialog (the CDK fades it in / out). */
+.cdk-overlay-backdrop.backdrop-dim {
+  background: var(--backdrop);
+}

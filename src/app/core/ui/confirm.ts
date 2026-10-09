@@ -23,6 +23,7 @@ export interface ActionChoice {
     <div
       class="fixed inset-0 z-50 flex transition-opacity duration-200 [animation:fadeIn_200ms_ease-out]"
       [class.opacity-0]="closing()"
+      [class.bg-[var(--backdrop)]]="desktop && overDialog"
       (click)="close()"
     >
       @if (desktop) {
@@ -91,6 +92,8 @@ export class ActionSheet {
 
   protected readonly closing = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  // Desktop, asked from a dialog (a card): the dialog dims under the question.
+  protected readonly overDialog = !!document.querySelector('app-page-sheet');
 
   // Where the panel goes: over the button that asked, centered on it horizontally — growing down
   // from its top when it's in the upper half of the screen, up from its bottom otherwise.
