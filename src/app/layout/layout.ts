@@ -49,6 +49,24 @@ export class Layout {
     { path: '/about', label: 'nav.about' },
   ];
   protected readonly menuOpen = signal(false);
+
+  // Pages menu: the tapped tile shows a running bar while its page opens; the menu closes once
+  // the page is there (at least a short moment, so the bar is seen).
+  protected readonly opening = signal<string | null>(null);
+
+  protected goFromMenu(path: string, sheet: Sheet): void {
+    if (this.opening()) return;
+    if (this.isActive(path)) {
+      sheet.close();
+      return;
+    }
+    this.opening.set(path);
+    const shown = new Promise((r) => setTimeout(r, 450));
+    Promise.all([this.router.navigateByUrl(path), shown]).finally(() => {
+      sheet.close();
+      setTimeout(() => this.opening.set(null), 400);
+    });
+  }
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly i18n = inject(I18nService);
 
