@@ -17,3 +17,10 @@
   --radius-card: 1rem;
   --radius-chip: 0.5rem;
 }
+
+/* Date / time / select chips like iOS Calendar's: capsules in the system tertiary fill. */
+.chip {
+  border-radius: 9999px;
+  background-color: var(--chip-ios);
+  padding: 0.375rem 0.875rem;
+}

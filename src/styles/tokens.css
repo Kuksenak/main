@@ -45,6 +45,7 @@
 
   /* Fills & lines */
   --fill: rgb(0 0 0 / 0.04); /* input chips */
+  --chip-ios: rgb(118 118 128 / 0.12); /* iOS tertiarySystemFill: date / time chips on phones */
   --fill-strong: rgb(0 0 0 / 0.06); /* badges */
   --highlight: rgb(0 0 0 / 0.05); /* hover / pressed rows */
   --separator: rgb(0 0 0 / 0.08);
@@ -89,6 +90,7 @@ html.dark {
   --danger: var(--warning);
 
   --fill: rgb(255 255 255 / 0.06);
+  --chip-ios: rgb(118 118 128 / 0.24);
   --fill-strong: rgb(255 255 255 / 0.1);
   --highlight: rgb(255 255 255 / 0.08);
   --separator: rgb(255 255 255 / 0.1);
