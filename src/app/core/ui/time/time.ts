@@ -96,6 +96,19 @@ export class TimeField implements ControlValueAccessor {
     }
   }
 
+  // Wheel: the default (~100px a notch) flies past several items. A mouse notch moves one row,
+  // smoothly; trackpads (small deltas) scroll at half speed.
+  onWheel(e: WheelEvent, el: HTMLElement): void {
+    e.preventDefault();
+    const dy = e.deltaMode === WheelEvent.DOM_DELTA_LINE ? e.deltaY * 16 : e.deltaY;
+    if (Math.abs(dy) >= 40) {
+      const row = (el.firstElementChild as HTMLElement | null)?.offsetHeight ?? 30;
+      el.scrollBy({ top: Math.sign(dy) * (row + 1), behavior: 'smooth' });
+    } else {
+      el.scrollTop += dy * 0.5;
+    }
+  }
+
   private onChange: (value: string | null) => void = () => {};
   private onTouched: () => void = () => {};
 

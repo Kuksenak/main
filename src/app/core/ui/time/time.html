@@ -40,7 +40,7 @@
 
         <div class="flex gap-1">
           <!-- Hours -->
-          <div #hourCol (scroll)="onColScroll(hourCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-px overflow-y-auto [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
+          <div #hourCol (scroll)="onColScroll(hourCol)" (wheel)="onWheel($event, hourCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-px overflow-y-auto [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
             @for (h of loopHours(); track $index) {
               <button
                 type="button"
@@ -55,7 +55,7 @@
           <div class="my-3 w-px bg-[var(--separator)]"></div>
 
           <!-- Minutes -->
-          <div #minuteCol (scroll)="onColScroll(minuteCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-px overflow-y-auto [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
+          <div #minuteCol (scroll)="onColScroll(minuteCol)" (wheel)="onWheel($event, minuteCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-px overflow-y-auto [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
             @for (m of loopMinutes(); track $index) {
               <button
                 type="button"
