@@ -43,10 +43,11 @@
       [class.!h-[2.375rem]]="desktop"
     >
       @if (desktop) {
-        <span class="max-w-56 truncate">{{ userName() }}</span>
+        <!-- Desktop: the green dot leads, before the name -->
         @if (updates.updateReady() || !install.standalone) {
           <span class="dot size-2 shrink-0 bg-[var(--success)]"></span>
         }
+        <span class="max-w-56 truncate">{{ userName() }}</span>
         <app-icon name="chevron-down" class="size-4 opacity-50" />
       } @else {
         <span class="text-[1.375rem] font-medium uppercase">{{ initial() }}</span>
