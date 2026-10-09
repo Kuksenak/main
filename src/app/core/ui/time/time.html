@@ -40,13 +40,13 @@
 
         <div class="flex gap-1">
           <!-- Hours -->
-          <div #hourCol (scroll)="onColScroll(hourCol)" (wheel)="onWheel($event, hourCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-px overflow-y-auto [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
+          <div #hourCol (scroll)="onColScroll(hourCol)" (wheel)="onWheel($event, hourCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-0.5 overflow-y-auto [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
             @for (h of loopHours(); track $index) {
               <button
                 type="button"
                 (click)="selectHour(h)"
                 [attr.data-active]="activeHour() === h ? '' : null"
-                class="w-11 rounded-md py-1 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
+                class="w-11 rounded-md py-1.5 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
                 [class]="hourClass(h)"
               >{{ h.toString().padStart(2, '0') }}</button>
             }
@@ -55,13 +55,13 @@
           <div class="my-3 w-px bg-[var(--separator)]"></div>
 
           <!-- Minutes -->
-          <div #minuteCol (scroll)="onColScroll(minuteCol)" (wheel)="onWheel($event, minuteCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-px overflow-y-auto [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
+          <div #minuteCol (scroll)="onColScroll(minuteCol)" (wheel)="onWheel($event, minuteCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col items-center gap-0.5 overflow-y-auto [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
             @for (m of loopMinutes(); track $index) {
               <button
                 type="button"
                 (click)="selectMinute(m)"
                 [attr.data-active]="activeMinute() === m ? '' : null"
-                class="w-11 rounded-md py-1 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
+                class="w-11 rounded-md py-1.5 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
                 [class]="minuteClass(m)"
               >{{ m.toString().padStart(2, '0') }}</button>
             }

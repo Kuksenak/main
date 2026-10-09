@@ -103,7 +103,7 @@ export class TimeField implements ControlValueAccessor {
     const dy = e.deltaMode === WheelEvent.DOM_DELTA_LINE ? e.deltaY * 16 : e.deltaY;
     if (Math.abs(dy) >= 40) {
       const row = (el.firstElementChild as HTMLElement | null)?.offsetHeight ?? 30;
-      el.scrollBy({ top: Math.sign(dy) * (row + 1), behavior: 'smooth' });
+      el.scrollBy({ top: Math.sign(dy) * (row + 2), behavior: 'smooth' }); // + the 2px gap
     } else {
       el.scrollTop += dy * 0.5;
     }
