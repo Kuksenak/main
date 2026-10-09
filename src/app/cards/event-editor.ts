@@ -111,7 +111,7 @@ interface Model {
           @if (entry().id) {
             <div class="list-row">
               <span>{{ 'event.status' | t }}</span>
-              <app-select class="ml-auto" [options]="statusOptions()" [ngModel]="m.status" (ngModelChange)="patch({ status: $event })" [ngModelOptions]="{ standalone: true }" />
+              <app-select class="ml-auto" stretch [options]="statusOptions()" [ngModel]="m.status" (ngModelChange)="patch({ status: $event })" [ngModelOptions]="{ standalone: true }" />
             </div>
           }
         </div>

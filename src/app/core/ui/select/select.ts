@@ -1,4 +1,4 @@
-import { Component, Input, computed, forwardRef, inject, signal } from '@angular/core';
+import { Component, Input, booleanAttribute, computed, forwardRef, inject, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { OverlayModule } from '@angular/cdk/overlay';
 import { I18nService } from '../../i18n/i18n.service';
@@ -32,6 +32,8 @@ interface SelectSection {
 export class SelectField implements ControlValueAccessor {
   @Input() disabled = false;
   @Input() options: SelectOption[] = [];
+  /** The whole surrounding row (nearest positioned ancestor, e.g. a .list-row) opens the select. */
+  @Input({ transform: booleanAttribute }) stretch = false;
 
   private deviceService = inject(DeviceDetectionService);
   private i18n = inject(I18nService);

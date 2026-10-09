@@ -134,7 +134,7 @@
      hidden under the last row. */
   .list-row {
     --sep-left: 1rem;
-    @apply text-body relative flex min-h-[var(--row-h)] items-center justify-between gap-3 px-4
+    @apply text-body relative flex min-h-[var(--row-h)] select-none items-center justify-between gap-3 px-4
            after:absolute after:bottom-0 after:left-[var(--sep-left)] after:right-4 after:h-px
            after:bg-[var(--separator)] last:after:hidden;
   }
@@ -172,11 +172,10 @@
            last:after:hidden;
   }
 
-  /* Full-screen "rotate to portrait" notice, shown only on phones held in landscape: no
-     background of its own — just the app behind it, blurred. */
+  /* Full-screen "rotate to portrait" notice, shown only on phones held in landscape. */
   .rotate-hint {
-    @apply fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-3 px-8 text-center
-           text-[var(--text)] backdrop-blur-xl;
+    @apply fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-3 bg-[var(--app-bg)]
+           px-8 text-center text-[var(--text)];
   }
   @media (orientation: landscape) and (max-height: 32rem) {
     [data-device='mobile'] .rotate-hint {

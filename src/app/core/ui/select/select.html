@@ -2,12 +2,21 @@
 
   @if (isMobile()) {
     <!-- Mobile: native select with an iOS-style up/down chevron -->
-    <div class="relative inline-flex items-center">
+    <div class="inline-flex items-center" [class.relative]="!stretch">
+    <!-- stretch: the (invisible) native select covers the whole row; a chip shows the value -->
+    @if (stretch) {
+      <span class="chip pointer-events-none pr-8">{{ triggerLabel() }}</span>
+    }
     <select
       [value]="value() ?? ''"
       [disabled]="disabled"
       (change)="onNativeChange($event)"
       class="chip pr-8"
+      [class.absolute]="stretch"
+      [class.inset-0]="stretch"
+      [class.!h-full]="stretch"
+      [class.!w-full]="stretch"
+      [class.opacity-0]="stretch"
     >
       @if (value() === null) {
         <option value="" disabled selected>{{ triggerLabel() }}</option>
@@ -26,7 +35,7 @@
         }
       }
     </select>
-    <app-icon name="chevrons-up-down" class="pointer-events-none absolute right-2 size-5" />
+    <app-icon name="chevrons-up-down" class="pointer-events-none absolute right-2 size-5" [class.!right-6]="stretch" />
     </div>
   } @else {
     <!-- Desktop: custom iOS-style dropdown via CDK overlay -->
@@ -42,6 +51,10 @@
       <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
       <app-icon name="chevrons-up-down" class="size-5" />
     </button>
+
+    @if (stretch) {
+      <button type="button" tabindex="-1" aria-hidden="true" (click)="toggle()" [disabled]="disabled" class="absolute inset-0 cursor-pointer active:!scale-100"></button>
+    }
 
     <ng-template
       cdkConnectedOverlay
