@@ -59,8 +59,9 @@
         <!-- Pages (mobile; desktop has the tabs), the current one checked -->
         <div class="card desktop:hidden">
           @for (item of navItems; track item.path) {
-            <button type="button" (click)="go(item.path, sheet)" class="list-row w-full text-left active:!bg-transparent">
-              <span class="min-w-0 flex-1 truncate">{{ item.label | t }}</span>
+            <!-- No tap highlight: the label turns bold while pressed -->
+            <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full text-left active:!bg-transparent">
+              <span class="min-w-0 flex-1 truncate group-active:font-semibold">{{ item.label | t }}</span>
               @if (isActive(item.path)) {
                 <app-icon name="check" class="size-5 text-[var(--accent)]" />
               }
