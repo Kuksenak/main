@@ -24,3 +24,12 @@
   background-color: var(--chip-ios);
   padding: 0.375rem 0.875rem;
 }
+
+/* Bottom sheets: in the home-screen app their bottom corners follow the phone's rounded screen;
+   in the browser they sit on the toolbar, where round bottom corners look off — nearly square. */
+@media (display-mode: browser) {
+  .sheet-corners {
+    border-bottom-left-radius: 0.5rem !important;
+    border-bottom-right-radius: 0.5rem !important;
+  }
+}
