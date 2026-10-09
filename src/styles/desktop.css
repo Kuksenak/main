@@ -120,3 +120,12 @@ a[href]:active {
 .chip:not(:disabled):hover {
   background-color: var(--highlight);
 }
+
+/* Popups (dialogs, cards, dropdowns, pickers): less rounded than on phones. */
+.dialog-panel,
+[role='alertdialog'] {
+  border-radius: 0.625rem !important;
+}
+.popover-panel {
+  border-radius: 0.5rem !important;
+}
