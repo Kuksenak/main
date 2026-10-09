@@ -123,7 +123,7 @@ html.dark .field {
   & > button {
     flex: none;
     padding: 0 1rem;
-    border-radius: 0.375rem;
+    border-radius: var(--radius-capsule); /* like every other button */
     color: var(--text-secondary);
     font-weight: 450;
     opacity: 1;

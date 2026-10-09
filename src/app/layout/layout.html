@@ -20,7 +20,7 @@
         <a
           [routerLink]="item.path"
           routerLinkActive="bg-[var(--toolbar-fill)]"
-          class="nav-tab text-body inline-flex h-[2.375rem] items-center gap-2 rounded-lg pl-1.5 pr-3.5 font-medium hover:bg-[var(--toolbar-hover)] mobile:hidden"
+          class="nav-tab text-body inline-flex h-[2.375rem] items-center gap-2 rounded-[var(--radius-capsule)] pl-1.5 pr-3.5 font-medium hover:bg-[var(--toolbar-hover)] mobile:hidden"
         ><app-brand-icon [name]="item.icon" class="size-7" />{{ item.label | t }}</a>
       }
     </nav>
