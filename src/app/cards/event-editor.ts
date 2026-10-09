@@ -93,7 +93,8 @@ interface Model {
           }
           <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" class="edit-only list-row w-full text-left text-[var(--accent)]">
             <span>{{ 'event.invite' | t }}</span>
-            <app-icon name="plus" class="size-5" />
+            <!-- In the same box as the rows' ×, so they line up -->
+            <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
           </button>
         </div>
         </div>
@@ -115,7 +116,8 @@ interface Model {
           }
           <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" class="edit-only list-row w-full text-left text-[var(--accent)]">
             <span>{{ 'event.attachLesson' | t }}</span>
-            <app-icon name="plus" class="size-5" />
+            <!-- In the same box as the rows' ×, so they line up -->
+            <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
           </button>
         </div>
         </div>
