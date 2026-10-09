@@ -26,7 +26,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         cdkConnectedOverlay
         [cdkConnectedOverlayOrigin]="origin()!"
         [cdkConnectedOverlayOpen]="!closing()"
-        [cdkConnectedOverlayPositions]="side() ? sidePositions : positions"
+        [cdkConnectedOverlayPositions]="positions"
         [cdkConnectedOverlayPush]="true"
         [cdkConnectedOverlayViewportMargin]="8"
         [cdkConnectedOverlayHasBackdrop]="true"
@@ -80,8 +80,6 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
 export class Sheet {
   /** Desktop anchor: the button that opened the menu. */
   readonly origin = input<HTMLElement | null>(null);
-  /** Desktop dropdown: beside the origin (right, else left) instead of below it. */
-  readonly side = input(false);
   /** Desktop dropdown: wider (24rem instead of 18rem). */
   readonly wide = input(false);
   readonly closed = output<void>();
@@ -93,17 +91,6 @@ export class Sheet {
     { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 8 },
     { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -8 },
   ];
-  // Beside the origin: to its right (e.g. next to a card), else its left — top-aligned with it,
-  // centered on it or bottom-aligned, whichever fits; only then below / above.
-  protected readonly sidePositions: ConnectedPosition[] = (['end', 'start'] as const).flatMap((side) =>
-    (['top', 'center', 'bottom'] as const).map((y): ConnectedPosition => ({
-      originX: side,
-      originY: y,
-      overlayX: side === 'end' ? ('start' as const) : ('end' as const),
-      overlayY: y,
-      offsetX: side === 'end' ? 12 : -12,
-    })),
-  ).concat(this.positions);
 
   protected readonly closing = signal(false);
   protected readonly dragY = signal(0);
