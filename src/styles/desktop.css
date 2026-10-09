@@ -143,6 +143,7 @@ a[href]:active {
 /* Button and toolbar labels (Claude-like): the body size (like an event's title field), weight 450 */
 .btn-primary,
 .btn-secondary,
+.btn-danger,
 .btn-white,
 .fab,
 .account-pill,
@@ -151,9 +152,7 @@ a[href]:active {
   font-weight: 450 !important;
 }
 .card-btn,
-[role='alertdialog'] button {
-  font-weight: 450 !important;
-}
+
 
 /* Pointer hover feedback (touch devices have no hover). */
 .chip:not(:disabled):hover {
