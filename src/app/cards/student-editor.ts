@@ -16,7 +16,6 @@ import { StudentGroups } from './related-lists';
     <app-page-sheet
       #page
       [actions]="!readOnly()"
-      [title]="(entry().id ? 'students.edit' : 'students.new') | t"
       [dirty]="dirty()"
       [canSave]="canSave()"
       [deletable]="!!entry().id"

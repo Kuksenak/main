@@ -56,7 +56,6 @@ interface Model {
     <app-page-sheet
       #page
       [actions]="!readOnly()"
-      [title]="(entry().id ? 'event.edit' : 'event.new') | t"
       [dirty]="dirty()"
       [canSave]="canSave()"
       [deletable]="!!entry().id"

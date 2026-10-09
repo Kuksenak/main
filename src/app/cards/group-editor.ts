@@ -29,7 +29,6 @@ interface Model {
     <app-page-sheet
       #page
       [actions]="!readOnly()"
-      [title]="(entry().id ? 'groups.edit' : 'groups.new') | t"
       [dirty]="dirty()"
       [canSave]="canSave()"
       [deletable]="!!entry().id"

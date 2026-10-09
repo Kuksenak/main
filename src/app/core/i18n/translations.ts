@@ -38,8 +38,6 @@ const en = {
 
   'students.search': 'Search',
   'students.add': 'Add student',
-  'students.new': 'New Student',
-  'students.edit': 'Edit Student',
   'students.name': 'Name *',
   'students.email': 'Email',
   'students.phone': 'Phone',
@@ -51,8 +49,6 @@ const en = {
   'students.noEvents': 'No events yet',
 
   'groups.title': 'Groups',
-  'groups.new': 'New Group',
-  'groups.edit': 'Edit Group',
   'groups.add': 'Add group',
   'groups.name': 'Group name *',
   'groups.color': 'Color',
@@ -62,8 +58,6 @@ const en = {
   'groups.selectHint': 'Select a group',
   'groups.create': 'Create group',
 
-  'event.new': 'New Event',
-  'event.edit': 'Edit Event',
   'event.title': 'Title',
   'event.invite': 'Invite',
   'event.starts': 'Starts',
@@ -186,8 +180,6 @@ const pl: Dictionary = {
 
   'students.search': 'Szukaj',
   'students.add': 'Dodaj ucznia',
-  'students.new': 'Nowy uczeń',
-  'students.edit': 'Edytuj ucznia',
   'students.name': 'Imię i nazwisko *',
   'students.email': 'E-mail',
   'students.phone': 'Telefon',
@@ -199,8 +191,6 @@ const pl: Dictionary = {
   'students.noEvents': 'Brak wydarzeń',
 
   'groups.title': 'Grupy',
-  'groups.new': 'Nowa grupa',
-  'groups.edit': 'Edytuj grupę',
   'groups.add': 'Dodaj grupę',
   'groups.name': 'Nazwa grupy *',
   'groups.color': 'Kolor',
@@ -210,8 +200,6 @@ const pl: Dictionary = {
   'groups.selectHint': 'Wybierz grupę',
   'groups.create': 'Utwórz grupę',
 
-  'event.new': 'Nowe wydarzenie',
-  'event.edit': 'Edytuj wydarzenie',
   'event.title': 'Tytuł',
   'event.invite': 'Zaproś',
   'event.starts': 'Początek',
@@ -331,8 +319,6 @@ const fr: Dictionary = {
 
   'students.search': 'Rechercher',
   'students.add': 'Ajouter un élève',
-  'students.new': 'Nouvel élève',
-  'students.edit': 'Modifier l’élève',
   'students.name': 'Nom *',
   'students.email': 'E-mail',
   'students.phone': 'Téléphone',
@@ -344,8 +330,6 @@ const fr: Dictionary = {
   'students.noEvents': 'Aucun événement pour l’instant',
 
   'groups.title': 'Groupes',
-  'groups.new': 'Nouveau groupe',
-  'groups.edit': 'Modifier le groupe',
   'groups.add': 'Ajouter un groupe',
   'groups.name': 'Nom du groupe *',
   'groups.color': 'Couleur',
@@ -355,8 +339,6 @@ const fr: Dictionary = {
   'groups.selectHint': 'Sélectionnez un groupe',
   'groups.create': 'Créer un groupe',
 
-  'event.new': 'Nouvel événement',
-  'event.edit': 'Modifier l’événement',
   'event.title': 'Titre',
   'event.invite': 'Inviter',
   'event.starts': 'Début',
