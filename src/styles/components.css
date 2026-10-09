@@ -135,6 +135,22 @@
            bg-[var(--surface)];
   }
 
+  /* Read-only cards (<fieldset disabled class="contents"> around the content): controls keep
+     their normal look, and what leads elsewhere (chevrons, Invite / Attach rows) is hidden. */
+  fieldset:disabled {
+    & .row-chevron,
+    & .edit-only {
+      display: none;
+    }
+    & .chip,
+    & input,
+    & textarea,
+    & button {
+      opacity: 1 !important;
+      -webkit-text-fill-color: currentColor;
+    }
+  }
+
   /* Row inside a card. Hairline divider between rows, iOS-style: it starts at the text (after a
      leading avatar / icon / dot / color bar / check), stops short of the right edge, and is
      hidden under the last row. */

@@ -36,7 +36,7 @@ import { LessonState } from '../lessons/lesson-state';
       (closed)="onClosed()"
     >
       <!-- Top bar (reading): Edit -->
-      @if (!s.editing()) {
+      @if (!s.editing() && !entry().readOnly) {
         <button barEnd type="button" (click)="s.edit()" class="btn-white">{{ 'action.edit' | t }}</button>
       }
 

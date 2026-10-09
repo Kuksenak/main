@@ -50,6 +50,7 @@ interface Model {
     @let m = model();
     <app-page-sheet
       #page
+      [actions]="!readOnly()"
       [title]="(entry().id ? 'event.edit' : 'event.new') | t"
       [dirty]="dirty()"
       [canSave]="canSave()"
@@ -58,6 +59,7 @@ interface Model {
       (delete)="remove()"
       (closed)="closed.emit()"
     >
+      <fieldset [disabled]="readOnly()" class="contents">
       <div class="flex flex-col gap-6">
         <!-- Event | Class: only a class has participants and materials -->
         <div class="segmented">
@@ -84,7 +86,7 @@ interface Model {
               <app-icon name="chevron-right" class="row-chevron" />
             </button>
           }
-          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" class="list-row w-full text-left text-[var(--accent)]">
+          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" class="edit-only list-row w-full text-left text-[var(--accent)]">
             <span>{{ 'event.invite' | t }}</span>
             <app-icon name="plus" class="size-5" />
           </button>
@@ -102,7 +104,7 @@ interface Model {
               <app-icon name="chevron-right" class="row-chevron" />
             </button>
           }
-          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" class="list-row w-full text-left text-[var(--accent)]">
+          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" class="edit-only list-row w-full text-left text-[var(--accent)]">
             <span>{{ 'event.attachLesson' | t }}</span>
             <app-icon name="plus" class="size-5" />
           </button>
@@ -140,6 +142,7 @@ interface Model {
           </div>
         </div>
       </div>
+      </fieldset>
     </app-page-sheet>
 
     @switch (picking()) {
@@ -168,6 +171,8 @@ interface Model {
 })
 export class EventEditor implements OnInit {
   readonly entry = input.required<StackEntry>();
+  // Opened from another card: just for reading (see NavStack).
+  protected readonly readOnly = computed(() => !!this.entry().readOnly);
   readonly closed = output<void>();
 
   private events = inject(EventService);

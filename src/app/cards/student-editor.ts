@@ -15,6 +15,7 @@ import { StudentGroups } from './related-lists';
     @let m = model();
     <app-page-sheet
       #page
+      [actions]="!readOnly()"
       [title]="(entry().id ? 'students.edit' : 'students.new') | t"
       [dirty]="dirty()"
       [canSave]="canSave()"
@@ -23,6 +24,7 @@ import { StudentGroups } from './related-lists';
       (delete)="remove()"
       (closed)="closed.emit()"
     >
+      <fieldset [disabled]="readOnly()" class="contents">
       <div class="flex flex-col gap-6">
         <div class="card">
           <div class="list-row">
@@ -41,11 +43,14 @@ import { StudentGroups } from './related-lists';
           <app-event-list [studentId]="s.id" />
         }
       </div>
+      </fieldset>
     </app-page-sheet>
   `,
 })
 export class StudentEditor implements OnInit {
   readonly entry = input.required<StackEntry>();
+  // Opened from another card: just for reading (see NavStack).
+  protected readonly readOnly = computed(() => !!this.entry().readOnly);
   readonly closed = output<void>();
 
   private students = inject(StudentService);

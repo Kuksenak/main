@@ -11,6 +11,7 @@ export interface StackEntry {
   id: string | null; // null = new
   date?: string; // new event: its day ('yyyy-MM-dd')
   studentIds?: string[]; // new group: pre-selected members
+  readOnly?: boolean; // opened from another card: just for reading, no links out of it
 }
 
 @Injectable({ providedIn: 'root' })
@@ -19,14 +20,16 @@ export class NavStack {
   readonly entries = signal<StackEntry[]>([]);
 
   /**
-   * Open a card on top — or, if that same card (kind + id) is already open further down, go
-   * back to it (the cards above it close), so following links never loops
-   * (event → student → the same event …).
+   * Open a card on top. A card opened from another card is read-only (a peek: no editing and no
+   * links further), so following links never goes in circles. If that same card (kind + id) is
+   * already open further down, go back to it instead.
    */
   push(entry: Omit<StackEntry, 'key'>): void {
     this.entries.update((list) => {
       const i = entry.id ? list.findIndex((e) => e.kind === entry.kind && e.id === entry.id) : -1;
-      return i >= 0 ? list.slice(0, i + 1) : [...list, { ...entry, key: this.nextKey++ }];
+      if (i >= 0) return list.slice(0, i + 1);
+      const readOnly = entry.readOnly ?? list.length > 0;
+      return [...list, { ...entry, readOnly, key: this.nextKey++ }];
     });
   }
 

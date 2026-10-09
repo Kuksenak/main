@@ -28,6 +28,7 @@ interface Model {
     @let m = model();
     <app-page-sheet
       #page
+      [actions]="!readOnly()"
       [title]="(entry().id ? 'groups.edit' : 'groups.new') | t"
       [dirty]="dirty()"
       [canSave]="canSave()"
@@ -36,6 +37,7 @@ interface Model {
       (delete)="remove()"
       (closed)="closed.emit()"
     >
+      <fieldset [disabled]="readOnly()" class="contents">
       <div class="flex flex-col gap-6">
         <div class="card">
           <div class="list-row">
@@ -74,7 +76,7 @@ interface Model {
                 </button>
               </div>
             }
-            <button type="button" (click)="pickingMembers.set(true)" class="list-row w-full text-left text-[var(--accent)]">
+            <button type="button" (click)="pickingMembers.set(true)" class="edit-only list-row w-full text-left text-[var(--accent)]">
               <span class="flex items-center gap-2 font-medium">
                 <app-icon name="plus" class="size-5" />
                 {{ 'groups.addMembers' | t }}
@@ -87,6 +89,7 @@ interface Model {
           <app-event-list [groupId]="g.id" />
         }
       </div>
+      </fieldset>
     </app-page-sheet>
 
     <!-- Member picker: every student with a check -->
@@ -115,6 +118,8 @@ interface Model {
 })
 export class GroupEditor implements OnInit {
   readonly entry = input.required<StackEntry>();
+  // Opened from another card: just for reading (see NavStack).
+  protected readonly readOnly = computed(() => !!this.entry().readOnly);
   readonly closed = output<void>();
 
   private groups = inject(GroupService);
