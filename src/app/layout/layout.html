@@ -80,7 +80,7 @@
   @if (menuOpen()) {
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
       <!-- Just the rows: no card background, outline or dividers; larger labels -->
-      <div class="no-dividers -mx-3 flex flex-col [&_.list-row]:!text-[1.1875rem]">
+      <div class="no-dividers press-bold -mx-3 flex flex-col [&_.list-row]:!py-3.5 [&_.list-row]:!text-[1.1875rem]">
         @for (item of navItems; track item.path) {
           <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: menuSheet, check: true }" />
         }
@@ -90,7 +90,7 @@
 
   @if (accountOpen()) {
     <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
-      <div class="flex flex-1 flex-col gap-3 desktop:gap-2">
+      <div class="press-bold flex flex-1 flex-col gap-3 desktop:gap-2">
         <div class="card">
           <!-- 5 taps on the email show the app version (hidden; for support) -->
           <button type="button" (click)="versionTap()" class="list-row w-full text-left">

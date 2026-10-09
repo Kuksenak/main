@@ -195,6 +195,18 @@
     }
   }
 
+  /* Menu rows (<div class="press-bold">): no hover / pressed background — the label just gets a
+     little bolder while pressed. */
+  .press-bold .list-row {
+    &:hover,
+    &:active {
+      background-color: transparent !important;
+    }
+    &:active span {
+      font-weight: 500;
+    }
+  }
+
   /* Menus without dividers between their rows (<div class="no-dividers">). */
   .no-dividers .list-row::after {
     display: none;
