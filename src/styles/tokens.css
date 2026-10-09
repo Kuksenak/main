@@ -52,6 +52,10 @@
   --glass-edge: rgb(255 255 255 / 0.6);
   --fill-strong: rgb(0 0 0 / 0.06); /* badges */
   --highlight: rgb(0 0 0 / 0.05); /* hover / pressed rows */
+  /* Toolbar (desktop tabs, account pill): the current / pill fill, a hovered tab, a hovered pill */
+  --toolbar-fill: color-mix(in srgb, var(--text) 6%, transparent);
+  --toolbar-hover: color-mix(in srgb, var(--text) 4%, transparent);
+  --toolbar-fill-hover: color-mix(in srgb, var(--text) 10%, transparent);
   --separator: rgb(0 0 0 / 0.08);
   --grabber: rgb(0 0 0 / 0.2);
   --scroll-thumb: rgb(0 0 0 / 0.25);
@@ -102,6 +106,10 @@ html.dark {
   --glass-edge: rgb(255 255 255 / 0.14);
   --fill-strong: rgb(255 255 255 / 0.1);
   --highlight: rgb(255 255 255 / 0.08);
+  /* On black a few % of white vanishes: iOS's grays */
+  --toolbar-fill: #2c2c2e;
+  --toolbar-hover: #1c1c1e;
+  --toolbar-fill-hover: #3a3a3c;
   --separator: rgb(255 255 255 / 0.1);
   --grabber: rgb(255 255 255 / 0.25);
   --scroll-thumb: rgb(255 255 255 / 0.3);
