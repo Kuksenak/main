@@ -34,7 +34,7 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
     }
     .brand-weekday {
       fill: #fff;
-      font: 600 8.5px -apple-system, system-ui, 'Segoe UI', sans-serif;
+      font: 600 7.5px -apple-system, system-ui, 'Segoe UI', sans-serif;
       letter-spacing: 0.02em;
     }
     .brand-date {
@@ -51,15 +51,15 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
                page, a teal band with the weekday, the corner curling up in yellow; today's date in
                white -->
           <mask id="brand-cal-shape">
-            <path d="M10 3h28a7 7 0 0 1 7 7v22L32 45H10a7 7 0 0 1-7-7V10a7 7 0 0 1 7-7z" fill="#fff" />
+            <path d="M10 3h28a7 7 0 0 1 7 7v25L35 45H10a7 7 0 0 1-7-7V10a7 7 0 0 1 7-7z" fill="#fff" />
           </mask>
           <g mask="url(#brand-cal-shape)">
             <rect width="48" height="48" style="fill: var(--brand-blue)" />
-            <rect width="48" height="20" style="fill: var(--brand-teal)" />
+            <rect width="48" height="16" style="fill: var(--brand-teal)" />
           </g>
-          <path d="M32 45c0-7.5 5.5-13 13-13L32 45z" style="fill: var(--brand-yellow)" />
-          <text x="24" y="15.5" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
-          <text x="24" y="36.5" text-anchor="middle" class="brand-date">{{ today }}</text>
+          <path d="M35 45c0-5.5 4-10 10-10l-10 10z" style="fill: var(--brand-yellow)" />
+          <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
+          <text x="24" y="38" text-anchor="middle" class="brand-date">{{ today }}</text>
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->
