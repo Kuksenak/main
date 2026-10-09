@@ -13,12 +13,13 @@ const en = {
   'nav.lessons': 'Lessons',
   'nav.settings': 'Settings',
   'nav.about': 'About',
+  'nav.install': 'Install app',
   'nav.menu': 'Menu',
 
   'account.title': 'Account',
   'account.language': 'Language',
   'settings.languageHint': 'The language of the app.',
-  'account.update': 'Update',
+  'account.update': 'Update available',
   'account.logout': 'Log out',
 
   'login.google': 'Continue with Google',
@@ -31,6 +32,17 @@ const en = {
 
   'about.description':
     'A lightweight scheduling app for teachers — plan lessons, track students and keep your week organized.',
+
+  'install.intro':
+    'This is a web app (PWA): add it to your home screen or computer and it opens from its own icon, full screen, like a regular app — no app store, updates arrive by themselves.',
+  'install.button': 'Install',
+  'install.iphone': 'iPhone and iPad',
+  'install.iphoneSteps': 'In Safari, tap Share, then “Add to Home Screen”, then Add.',
+  'install.android': 'Android',
+  'install.androidSteps': 'In Chrome, open the ⋮ menu and tap “Install app” (or “Add to Home screen”).',
+  'install.computer': 'Computer',
+  'install.computerSteps':
+    'In Chrome or Edge, click the install icon at the right end of the address bar (or menu → “Install”). In Safari on a Mac: File → “Add to Dock”.',
 
   'schedule.today': 'Today',
   'schedule.addEvent': 'Add event',
@@ -157,12 +169,13 @@ const pl: Dictionary = {
   'nav.lessons': 'Lekcje',
   'nav.settings': 'Ustawienia',
   'nav.about': 'O aplikacji',
+  'nav.install': 'Zainstaluj aplikację',
   'nav.menu': 'Menu',
 
   'account.title': 'Konto',
   'account.language': 'Język',
   'settings.languageHint': 'Język aplikacji.',
-  'account.update': 'Aktualizuj',
+  'account.update': 'Dostępna aktualizacja',
   'account.logout': 'Wyloguj się',
 
   'login.google': 'Kontynuuj z Google',
@@ -175,6 +188,17 @@ const pl: Dictionary = {
 
   'about.description':
     'Prosta aplikacja do planowania dla nauczycieli — planuj lekcje, śledź uczniów i miej porządek w tygodniu.',
+
+  'install.intro':
+    'To aplikacja webowa (PWA): dodaj ją do ekranu głównego lub komputera, a otworzy się z własnej ikony, na pełnym ekranie, jak zwykła aplikacja — bez sklepu, aktualizacje przychodzą same.',
+  'install.button': 'Zainstaluj',
+  'install.iphone': 'iPhone i iPad',
+  'install.iphoneSteps': 'W Safari stuknij Udostępnij, potem „Do ekranu początkowego”, potem Dodaj.',
+  'install.android': 'Android',
+  'install.androidSteps': 'W Chrome otwórz menu ⋮ i stuknij „Zainstaluj aplikację” (lub „Dodaj do ekranu głównego”).',
+  'install.computer': 'Komputer',
+  'install.computerSteps':
+    'W Chrome lub Edge kliknij ikonę instalacji po prawej stronie paska adresu (lub menu → „Zainstaluj”). W Safari na Macu: Plik → „Dodaj do Docka”.',
 
   'schedule.today': 'Dziś',
   'schedule.addEvent': 'Dodaj wydarzenie',
@@ -298,12 +322,13 @@ const fr: Dictionary = {
   'nav.lessons': 'Cours',
   'nav.settings': 'Réglages',
   'nav.about': 'À propos',
+  'nav.install': 'Installer l’app',
   'nav.menu': 'Menu',
 
   'account.title': 'Compte',
   'account.language': 'Langue',
   'settings.languageHint': 'La langue de l’application.',
-  'account.update': 'Mettre à jour',
+  'account.update': 'Mise à jour disponible',
   'account.logout': 'Se déconnecter',
 
   'login.google': 'Continuer avec Google',
@@ -316,6 +341,17 @@ const fr: Dictionary = {
 
   'about.description':
     'Une application de planification légère pour les enseignants — planifiez vos cours, suivez vos élèves et organisez votre semaine.',
+
+  'install.intro':
+    'C’est une application web (PWA) : ajoutez-la à l’écran d’accueil ou à l’ordinateur et elle s’ouvre depuis sa propre icône, en plein écran, comme une app classique — sans store, les mises à jour arrivent toutes seules.',
+  'install.button': 'Installer',
+  'install.iphone': 'iPhone et iPad',
+  'install.iphoneSteps': 'Dans Safari, touchez Partager, puis « Sur l’écran d’accueil », puis Ajouter.',
+  'install.android': 'Android',
+  'install.androidSteps': 'Dans Chrome, ouvrez le menu ⋮ et touchez « Installer l’application » (ou « Ajouter à l’écran d’accueil »).',
+  'install.computer': 'Ordinateur',
+  'install.computerSteps':
+    'Dans Chrome ou Edge, cliquez sur l’icône d’installation à droite de la barre d’adresse (ou menu → « Installer »). Dans Safari sur Mac : Fichier → « Ajouter au Dock ».',
 
   'schedule.today': 'Aujourd’hui',
   'schedule.addEvent': 'Ajouter un événement',

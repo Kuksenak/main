@@ -13,6 +13,7 @@ import { EventService } from '../schedule/event.service';
 import { GroupService } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 import { UpdateService } from '../core/services/update.service';
+import { InstallService } from '../core/services/install.service';
 import { StackHost } from '../cards/stack-host';
 import { BrandIcon, BrandIconName } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
@@ -44,9 +45,10 @@ export class Layout {
     { path: '/students', label: 'nav.students', icon: 'people' },
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
   ];
-  // Under the account button.
+  // Under the account button. Install: only in the browser (not once it's the installed app).
   protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName }[] = [
     { path: '/about', label: 'nav.about' },
+    ...(inject(InstallService).standalone ? [] : [{ path: '/install', label: 'nav.install' as TranslationKey }]),
   ];
   protected readonly menuOpen = signal(false);
 

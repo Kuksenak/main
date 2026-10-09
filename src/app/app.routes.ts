@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { About } from './about/about';
+import { Install } from './install/install';
 import { authGuard, guestGuard } from './auth/auth.guard';
 import { Layout } from './layout/layout';
 import { Lessons } from './lessons/lessons';
@@ -23,6 +24,7 @@ export const routes: Routes = [
       { path: 'lessons/:id', component: Lessons }, // the list with that lesson open on top
       { path: 'settings', component: Settings },
       { path: 'about', component: About },
+      { path: 'install', component: Install },
       { path: '', pathMatch: 'full', redirectTo: 'schedule' },
     ],
   },
