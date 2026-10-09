@@ -30,7 +30,7 @@ import { EventService, ScheduleEvent, eventEnd, occurrenceKey, statusKey } from 
               <button type="button" (click)="open(e)" class="list-row w-full py-2 text-left">
                 <span class="color-bar" [style.background]="people.color(e)"></span>
                 <div class="min-w-0 flex-1 leading-tight">
-                  <p class="truncate font-medium" [class.line-through]="e.status === 'Cancelled'">{{ date(e) }}</p>
+                  <p class="truncate font-medium" [class.line-through]="e.status === 'Cancelled'">@if (e.lessonIds.length) {<app-icon name="paperclip" class="mr-1 inline size-4 align-[-2px] opacity-50" />}{{ date(e) }}</p>
                   <p class="text-footnote truncate opacity-50">
                     {{ time(e) }}@if (lessonId() ? people.label(e) : e.title; as name) { · {{ name }} }
                   </p>
