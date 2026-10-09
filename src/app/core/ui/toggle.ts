@@ -27,14 +27,15 @@ import { DeviceDetectionService } from '../services/device-detection.service';
         [attr.aria-checked]="checked()"
         [disabled]="disabled()"
         (click)="toggle()"
-        class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 active:!scale-100 disabled:cursor-default disabled:opacity-40"
+        class="relative block h-5 w-9 shrink-0 cursor-pointer rounded-full p-0 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 active:!scale-100 disabled:cursor-default disabled:opacity-40"
         [class.bg-[var(--accent)]]="checked()"
         [class.hover:brightness-110]="checked()"
         [class.bg-[color-mix(in_srgb,var(--text)_18%,transparent)]]="!checked()"
         [class.hover:bg-[color-mix(in_srgb,var(--text)_26%,transparent)]]="!checked()"
       >
+        <!-- The knob, placed exactly: 2px in from the edges -->
         <span
-          class="ml-0.5 size-4 rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,0.25)] transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
+          class="absolute left-0.5 top-0.5 size-4 rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,0.25)] transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]"
           [class.translate-x-4]="checked()"
         ></span>
       </button>

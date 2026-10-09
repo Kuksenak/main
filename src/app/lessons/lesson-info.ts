@@ -14,15 +14,18 @@ import { Lesson, LessonService, shareUrl } from './lesson.service';
     @let l = lesson();
     <div class="flex flex-col gap-1.5">
       <div class="card">
-        <div class="list-row">
+        <!-- The whole row (a label) flips the switch -->
+        <label class="list-row cursor-pointer">
           <span class="flex-1">{{ 'lessons.public' | t }}</span>
+          <!-- The switch comes first in the markup (it's what the row's label works), ⧉ is
+               shown before it -->
+          <app-toggle class="order-2" [checked]="!!l.shareToken" (checkedChange)="lessons.share(l.id, $event)" [attr.aria-label]="'lessons.public' | t" />
           @if (l.shareToken; as token) {
-            <button type="button" (click)="copy(token)" [attr.aria-label]="'lessons.copy' | t" class="icon-plain !text-[var(--text)]">
+            <button type="button" (click)="copy(token); $event.preventDefault()" [attr.aria-label]="'lessons.copy' | t" class="icon-plain order-1 !text-[var(--text)]">
               <app-icon [name]="copied() ? 'check' : 'copy'" class="size-6" />
             </button>
           }
-          <app-toggle [checked]="!!l.shareToken" (checkedChange)="lessons.share(l.id, $event)" [attr.aria-label]="'lessons.public' | t" />
-        </div>
+        </label>
       </div>
       <p class="text-footnote opacity-50">{{ 'lessons.publicHint' | t }}</p>
     </div>
