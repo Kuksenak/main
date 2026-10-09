@@ -142,8 +142,8 @@ interface Model {
             </div>
             <!-- … and tabs, compact on the right like the time -->
             <div class="list-row">
-              <span>{{ 'event.repeatHow' | t }}</span>
-              <div class="segmented ml-auto w-auto shrink-0 [&>button]:flex-none [&>button]:px-2.5">
+              <span class="min-w-0 truncate">{{ 'event.repeatHow' | t }}</span>
+              <div class="segmented ml-auto !h-8 w-auto shrink-0 text-footnote [&>button]:flex-none [&>button]:px-3 desktop:!h-8">
                 @for (r of repeats; track r) {
                   <button type="button" (click)="patch({ repeat: r })" [attr.aria-pressed]="m.repeat === r">{{ repeatShort(r) | t }}</button>
                 }
