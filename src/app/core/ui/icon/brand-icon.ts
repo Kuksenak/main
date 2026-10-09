@@ -48,15 +48,14 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
       @switch (name()) {
         @case ('calendar') {
           <!-- A colorful tear-off page (the logo's colors, like the other section icons): a blue
-               page, a teal band with the weekday, an orange edge at the bottom, the corner curling
-               up in yellow; today's date in white -->
+               page, a teal band with the weekday, the corner curling up in yellow; today's date in
+               white -->
           <mask id="brand-cal-shape">
             <path d="M13 3h22a10 10 0 0 1 10 10v22l-10 10H13A10 10 0 0 1 3 35V13A10 10 0 0 1 13 3z" fill="#fff" />
           </mask>
           <g mask="url(#brand-cal-shape)">
             <rect width="48" height="48" style="fill: var(--brand-blue)" />
             <rect width="48" height="20" style="fill: var(--brand-teal)" />
-            <rect y="41" width="48" height="7" style="fill: var(--brand-orange)" />
           </g>
           <path d="M35 45c0-5.5 4-10 10-10l-10 10z" style="fill: var(--brand-yellow)" />
           <text x="24" y="15.5" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
