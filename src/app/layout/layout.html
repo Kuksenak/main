@@ -28,8 +28,8 @@
       }
     </nav>
     <!-- Pages menu: a bottom sheet on phones, a dropdown under the button on desktop -->
-    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:size-[var(--control-h)]">
-      <!-- Desktop: as tall as the account button next to it, smaller dots -->
+    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:size-[var(--control-h)] desktop:!bg-[color-mix(in_srgb,var(--text)_6%,transparent)] desktop:hover:!bg-[color-mix(in_srgb,var(--text)_10%,transparent)]">
+      <!-- Desktop: in the account button's style (gray fill, same height), smaller dots -->
       <app-icon name="grid" class="size-6 desktop:size-4" />
     </button>
     <!-- Account. Mobile: the first letter of the email in the round accent button (like +).
