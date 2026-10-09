@@ -19,7 +19,7 @@ import {
   toDateInput,
   toTimeInput,
 } from '../core/utils/time';
-import { EVENT_STATUSES, EventRepeat, EventService, EventStatus, REPEAT_FREQUENCIES, statusKey } from '../schedule/event.service';
+import { EVENT_STATUSES, EventRepeat, EventService, EventStatus, statusKey } from '../schedule/event.service';
 import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
@@ -95,18 +95,15 @@ interface Model {
           }
         </div>
 
-        <!-- Repeat (iOS-like): Never / every day, week, 2 weeks, month, year / Custom; Custom adds
-             the frequency and "every N days / weeks …" -->
+        <!-- Repeat (iOS-like): Never / every day, week, 2 weeks, month, year / Custom (every N
+             days); then when it ends -->
         <div class="card">
           <div class="list-row">
             <span>{{ 'event.repeat' | t }}</span>
             <app-select class="ml-auto" stretch [options]="presetOptions()" [ngModel]="preset()" (ngModelChange)="setPreset($event)" [ngModelOptions]="{ standalone: true }" />
           </div>
           @if (m.repeatCustom) {
-            <div class="list-row">
-              <span>{{ 'event.frequency' | t }}</span>
-              <app-select class="ml-auto" stretch [options]="frequencyOptions()" [ngModel]="m.repeat" (ngModelChange)="setFrequency($event)" [ngModelOptions]="{ standalone: true }" />
-            </div>
+            <!-- Custom: every N days -->
             <div class="list-row">
               <span>{{ 'event.every' | t }}</span>
               <app-select class="ml-auto" stretch [options]="intervalOptions()" [ngModel]="m.repeatInterval" (ngModelChange)="patch({ repeatInterval: +$event })" [ngModelOptions]="{ standalone: true }" />
@@ -118,10 +115,10 @@ interface Model {
               <span>{{ 'event.endRepeat' | t }}</span>
               <app-select class="ml-auto" stretch [options]="endOptions()" [ngModel]="m.repeatUntil ? 'date' : 'never'" (ngModelChange)="setEnd($event)" [ngModelOptions]="{ standalone: true }" />
             </div>
-            @if (m.repeatUntil; as until) {
+            @if (m.repeatUntil) {
               <div class="list-row">
                 <span>{{ 'event.endDate' | t }}</span>
-                <app-date class="ml-auto" [ngModel]="toDate(until)" (ngModelChange)="setUntil($event)" [ngModelOptions]="{ standalone: true }" />
+                <app-date class="ml-auto" [ngModel]="untilDate()" (ngModelChange)="setUntil($event)" [ngModelOptions]="{ standalone: true }" />
               </div>
             }
           }
@@ -290,8 +287,8 @@ export class EventEditor implements OnInit {
     { key: 'month', repeat: 'Monthly', interval: 1 },
     { key: 'year', repeat: 'Yearly', interval: 1 },
   ];
-  // How many of each unit "every N" offers.
-  private static readonly MAX: Record<Exclude<EventRepeat, 'Never'>, number> = { Daily: 365, Weekly: 52, Monthly: 12, Yearly: 10 };
+  // How many days "every N" offers.
+  private static readonly MAX: Record<'Daily', number> = { Daily: 365 };
 
   protected readonly preset = computed(() => {
     const m = this.model();
@@ -302,13 +299,9 @@ export class EventEditor implements OnInit {
     ...EventEditor.PRESETS.map((p) => ({ label: this.i18n.t(`event.repeat.${p.key}` as TranslationKey), value: p.key })),
     { label: this.i18n.t('event.repeat.custom'), value: 'custom' },
   ]);
-  protected readonly frequencyOptions = computed<SelectOption[]>(() =>
-    REPEAT_FREQUENCIES.map((f) => ({ label: this.i18n.t(`event.frequency.${f}`), value: f })),
-  );
-  // "1 day", "2 days" … in the frequency's unit (plural forms per language).
+  // Custom is "every N days": "1 day", "2 days" … (plural forms per language).
   protected readonly intervalOptions = computed<SelectOption[]>(() => {
-    const unit = this.model().repeat;
-    if (unit === 'Never') return [];
+    const unit = 'Daily' as const;
     const rules = new Intl.PluralRules(this.i18n.locale());
     return Array.from({ length: EventEditor.MAX[unit] }, (_, i) => {
       const n = i + 1;
@@ -320,7 +313,8 @@ export class EventEditor implements OnInit {
   protected setPreset(key: string): void {
     if (key === 'custom') {
       const m = this.model();
-      this.patch({ repeatCustom: true, repeat: m.repeat === 'Never' ? 'Daily' : m.repeat });
+      // Every N days: keep N when it already repeats daily, else start from every 2 days.
+      this.patch({ repeatCustom: true, repeat: 'Daily', repeatInterval: m.repeat === 'Daily' ? m.repeatInterval : 2 });
       return;
     }
     const p = EventEditor.PRESETS.find((x) => x.key === key)!;
@@ -330,11 +324,6 @@ export class EventEditor implements OnInit {
       repeatCustom: false,
       ...(p.repeat === 'Never' ? { repeatUntil: null } : {}),
     });
-  }
-
-  // A new unit starts again from "every 1".
-  protected setFrequency(repeat: EventRepeat): void {
-    this.patch({ repeat, repeatInterval: 1 });
   }
 
   protected readonly endOptions = computed<SelectOption[]>(() => [
@@ -357,7 +346,12 @@ export class EventEditor implements OnInit {
     if (date) this.patch({ repeatUntil: toDateInput(date) });
   }
 
-  protected readonly toDate = fromDateInput;
+  // The end date as a Date — computed once per change (a new Date on every check would make the
+  // picker see a "new" value each time and loop).
+  protected readonly untilDate = computed(() => {
+    const until = this.model().repeatUntil;
+    return until ? fromDateInput(until) : null;
+  });
 
   // An event needs a title or someone invited.
   protected readonly canSave = computed(() => {
