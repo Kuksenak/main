@@ -39,7 +39,7 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
     }
     .brand-date {
       fill: var(--brand-orange);
-      font: 800 22px -apple-system, system-ui, 'Segoe UI', sans-serif; /* heavy and orange, like the old paper icon's */
+      font: 600 21px -apple-system, system-ui, 'Segoe UI', sans-serif;
       letter-spacing: -0.04em;
     }
   `,
@@ -47,10 +47,13 @@ function gearPath(cx: number, cy: number, outer: number, inner: number, teeth: n
     <svg viewBox="0 0 48 48" class="size-full">
       @switch (name()) {
         @case ('calendar') {
-          <!-- iOS Calendar style: a white rounded square, the weekday in blue, today's date heavy and orange (like the old paper icon) -->
-          <rect x="3" y="3" width="42" height="42" rx="10" class="brand-tile" />
-          <text x="24" y="16.5" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
-          <text x="24" y="36" text-anchor="middle" class="brand-date">{{ today }}</text>
+          <!-- A white tear-off page: a pale blue band with the weekday, today's date in orange,
+               the bottom-right corner curling up like the old paper icon -->
+          <path d="M13 3h22a10 10 0 0 1 10 10v22l-10 10H13A10 10 0 0 1 3 35V13A10 10 0 0 1 13 3z" class="brand-tile" />
+          <path d="M13 3h22a10 10 0 0 1 10 10v7H3v-7A10 10 0 0 1 13 3z" style="fill: color-mix(in srgb, var(--brand-blue) 14%, white)" />
+          <path d="M35 45c0-5.5 4-10 10-10l-10 10z" style="fill: #e6e9ef; stroke: rgb(0 0 0 / 0.08); stroke-width: 0.5; stroke-linejoin: round" />
+          <text x="24" y="15.5" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
+          <text x="24" y="38" text-anchor="middle" class="brand-date">{{ today }}</text>
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->

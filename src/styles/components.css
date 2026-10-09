@@ -205,6 +205,11 @@
     &:active span {
       font-weight: 500;
     }
+    /* …and the dividers stay (pressed rows elsewhere hide theirs under the highlight) */
+    &:active::after,
+    &:has(+ .list-row:active)::after {
+      opacity: 1;
+    }
   }
 
   /* Menus without dividers between their rows (<div class="no-dividers">). */
