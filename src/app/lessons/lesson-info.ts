@@ -24,7 +24,7 @@ import { Lesson, LessonService, shareUrl } from './lesson.service';
           <app-toggle [checked]="!!l.shareToken" (checkedChange)="lessons.share(l.id, $event)" [attr.aria-label]="'lessons.public' | t" />
         </div>
       </div>
-      <p class="text-footnote px-4 opacity-50">{{ 'lessons.publicHint' | t }}</p>
+      <p class="text-footnote opacity-50">{{ 'lessons.publicHint' | t }}</p>
     </div>
     <app-event-list [lessonId]="l.id" />
   `,

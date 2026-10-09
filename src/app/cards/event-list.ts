@@ -20,7 +20,7 @@ import { EventService, ScheduleEvent, eventEnd, statusKey } from '../schedule/ev
   host: { class: 'flex flex-col gap-6' },
   template: `
     @if (!upcoming().length && !past().length) {
-      <p class="text-footnote px-4 opacity-50">{{ 'students.noEvents' | t }}</p>
+      <p class="text-footnote opacity-50">{{ 'students.noEvents' | t }}</p>
     }
     @for (g of sections(); track g.key) {
       @if (g.items.length) {

@@ -40,7 +40,7 @@ export interface PickSection {
         @if (sec.items.length) {
           <div class="flex flex-col gap-1.5">
             @if (sections().length > 1) {
-              <span class="text-footnote px-4 opacity-50">{{ sec.key | t }}</span>
+              <span class="text-footnote opacity-50">{{ sec.key | t }}</span>
             }
             <div class="card">
               @for (item of sec.items; track item.id) {

@@ -25,7 +25,7 @@ import { LessonBlock } from './lesson.service';
         <p class="text-body whitespace-pre-wrap px-1 leading-relaxed">{{ b.text }}</p>
       }
     } @empty {
-      <p class="text-footnote px-4 opacity-50">{{ 'lessons.noContent' | t }}</p>
+      <p class="text-footnote opacity-50">{{ 'lessons.noContent' | t }}</p>
     }
   `,
 })
