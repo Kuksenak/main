@@ -17,6 +17,7 @@ export type IconName =
   | 'text'
   | 'copy'
   | 'i'
+  | 'grid'
   | 'compose'
   | 'google'
   | 'apple';
@@ -52,6 +53,13 @@ export type IconName =
         <!-- SF Symbols-like: "info" (a typeset i) and "square.and.pencil" (edit) -->
         @case ('i') { <circle cx="12" cy="5.5" r="1.6" fill="currentColor" stroke="none" /><path d="M10 10h2v9M9 19h6" /> }
         @case ('compose') { <path d="M11.5 4.5h-5a2.5 2.5 0 0 0-2.5 2.5v10.5a2.5 2.5 0 0 0 2.5 2.5H17a2.5 2.5 0 0 0 2.5-2.5v-5" /><path d="M18.3 3.7a1.9 1.9 0 0 1 2.7 2.7l-8.3 8.3-3.6.9.9-3.6z" /> }
+        @case ('grid') {
+          @for (y of [5, 12, 19]; track y) {
+            @for (x of [5, 12, 19]; track x) {
+              <circle [attr.cx]="x" [attr.cy]="y" r="2" fill="currentColor" stroke="none" />
+            }
+          }
+        }
         @case ('person') { <circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /> }
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }

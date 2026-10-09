@@ -81,7 +81,6 @@ interface Model {
         <div class="card">
           @for (l of attached(); track l.id) {
             <button type="button" (click)="stack.push({ kind: 'lesson', id: l.id })" class="list-row w-full text-left">
-              <app-icon name="book" class="size-5 text-[var(--accent)]" />
               <p class="min-w-0 flex-1 truncate">{{ l.title }}</p>
               <app-icon name="chevron-right" class="row-chevron" />
             </button>

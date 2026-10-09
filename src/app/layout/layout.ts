@@ -40,9 +40,13 @@ export class Layout {
     { path: '/schedule', label: 'nav.schedule' },
     { path: '/students', label: 'nav.students' },
     { path: '/lessons', label: 'nav.lessons' },
+  ];
+  // Under the account button.
+  protected readonly accountItems: { path: string; label: TranslationKey }[] = [
     { path: '/settings', label: 'nav.settings' },
     { path: '/about', label: 'nav.about' },
   ];
+  protected readonly menuOpen = signal(false);
 
   protected readonly accountOpen = signal(false);
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
