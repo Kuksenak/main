@@ -36,9 +36,9 @@
       (detach)="close()"
     >
       <!-- Two narrow columns, edges fading out (they loop), no scrollbars -->
-      <div class="popover-panel w-40 px-1.5 py-2">
+      <div class="popover-panel w-40 px-1 py-2">
 
-        <div class="flex gap-2">
+        <div class="flex gap-1">
           <!-- Hours -->
           <div #hourCol (scroll)="onColScroll(hourCol)" class="no-scrollbar relative flex max-h-56 flex-1 flex-col gap-px overflow-y-auto py-2 [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
             @for (h of loopHours(); track $index) {
