@@ -52,11 +52,11 @@
            rounded-[var(--radius-capsule)] px-[var(--capsule-px)] font-medium active:opacity-70;
   }
 
-  /* Destructive action — red capsule, white label (e.g. "Yes, delete") */
+  /* Destructive action — gray capsule, danger-colored label (e.g. "Yes, delete") */
   .btn-danger {
     @apply text-body inline-flex h-[var(--control-h)] items-center justify-center
-           rounded-[var(--radius-capsule)] bg-[var(--danger)] px-[var(--capsule-px)] font-semibold text-white
-           active:opacity-80;
+           rounded-[var(--radius-capsule)] bg-[color-mix(in_srgb,var(--text)_6%,transparent)] px-[var(--capsule-px)]
+           font-semibold text-[var(--danger)] hover:bg-[color-mix(in_srgb,var(--text)_10%,transparent)] active:opacity-80;
   }
 
   /* Strong neutral action: black (white in dark theme), e.g. sign-in buttons */

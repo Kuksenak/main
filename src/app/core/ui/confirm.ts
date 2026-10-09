@@ -25,9 +25,8 @@ export interface ActionChoice {
       (click)="close()"
     >
       @if (desktop) {
-        <!-- Desktop: a small dialog by the button — the title and the explanation on the left,
-             then Cancel and the answers as regular buttons on the right (one answer: a row; more:
-             a column) -->
+        <!-- Desktop: a small dialog by the button — the text on the left, then Cancel and the
+             answers as regular buttons on the right (one answer: a row; more: a column) -->
         <div
           role="alertdialog"
           class="fixed flex w-80 flex-col gap-3 rounded-xl border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] p-4 text-[var(--text)] shadow-[var(--shadow-dialog)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
@@ -37,12 +36,8 @@ export interface ActionChoice {
           [class.scale-95]="closing()"
           (click)="$event.stopPropagation()"
         >
-          <div class="flex flex-col gap-0.5">
-            <p class="text-body font-semibold">{{ title() | t }}</p>
-            @if (message(); as msg) {
-              <p class="text-footnote opacity-60">{{ msg | t }}</p>
-            }
-          </div>
+          <!-- Just the explanation when there is one ("This can't be undone"), else the question -->
+          <p class="text-body">{{ (message() ?? title()) | t }}</p>
           <div class="flex gap-2" [class.justify-end]="choices().length === 1" [class.flex-col]="choices().length > 1">
             @if (choices().length === 1) {
               <button type="button" (click)="close()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
