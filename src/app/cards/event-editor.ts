@@ -345,8 +345,12 @@ export class EventEditor implements OnInit {
     return until ? fromDateInput(until) : null;
   });
 
-  // Anything valid that changed (a title isn't required).
-  protected readonly canSave = computed(() => !this.invalid() && this.dirty());
+  // An event needs a title or someone invited (students / groups).
+  protected readonly canSave = computed(() => {
+    const m = this.model();
+    const named = !!m.title.trim() || !!m.invitees.studentIds.length || !!m.invitees.groupIds.length;
+    return named && !this.invalid() && this.dirty();
+  });
 
   // The opened event; for a series, the repeat that was opened (its start).
   private readonly opened = computed(() => {

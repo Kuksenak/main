@@ -31,8 +31,8 @@ const en = {
 
   'install.intro': 'Install the app: it gets its own icon and opens full screen, like any other app.',
   'install.intro2': 'No app store, and it updates by itself.',
-  'install.clickHere': 'Or click here.',
-  'install.tapHere': 'Or tap here.',
+  'install.clickHere': 'or click here.',
+  'install.tapHere': 'or tap here.',
   'install.ios.1': 'Tap Share — the square with an arrow.',
   'install.ios.more': 'No “Add to Home Screen”? Tap the down arrow (View More).',
   'install.ios.2': 'Tap “Add to Home Screen”.',
@@ -188,8 +188,8 @@ const pl: Dictionary = {
 
   'install.intro': 'Zainstaluj aplikację: dostanie własną ikonę i otworzy się na pełnym ekranie, jak każda inna.',
   'install.intro2': 'Bez sklepu, aktualizuje się sama.',
-  'install.clickHere': 'Albo kliknij tutaj.',
-  'install.tapHere': 'Albo stuknij tutaj.',
+  'install.clickHere': 'albo kliknij tutaj.',
+  'install.tapHere': 'albo stuknij tutaj.',
   'install.ios.1': 'Stuknij Udostępnij — kwadrat ze strzałką.',
   'install.ios.more': 'Nie ma „Do ekranu początkowego”? Stuknij strzałkę w dół (Wyświetl więcej).',
   'install.ios.2': 'Stuknij „Do ekranu początkowego”.',
@@ -342,8 +342,8 @@ const fr: Dictionary = {
 
   'install.intro': 'Installez l’app : elle a sa propre icône et s’ouvre en plein écran, comme les autres.',
   'install.intro2': 'Sans store, elle se met à jour toute seule.',
-  'install.clickHere': 'Ou cliquez ici.',
-  'install.tapHere': 'Ou touchez ici.',
+  'install.clickHere': 'ou cliquez ici.',
+  'install.tapHere': 'ou touchez ici.',
   'install.ios.1': 'Touchez Partager — le carré avec une flèche.',
   'install.ios.more': 'Pas de « Sur l’écran d’accueil » ? Touchez la flèche vers le bas (Afficher plus).',
   'install.ios.2': 'Touchez « Sur l’écran d’accueil ».',

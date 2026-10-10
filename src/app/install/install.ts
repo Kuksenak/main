@@ -39,7 +39,8 @@ interface Guide {
                 <app-icon [name]="s.icon" [strokeWidth]="1.5" class="size-6" />
               </span>
               <span class="min-w-0 flex-1">
-                {{ s.text | t }}
+                <!-- With the install link: one sentence ("…address bar, or click here.") -->
+                {{ $first && install.canPrompt() ? joinable(s.text | t) : (s.text | t) }}
                 <!-- Chrome / Edge / Android: their own install dialog, right from the first step -->
                 @if ($first && install.canPrompt()) {
                   <button type="button" (click)="install.prompt()" class="inline font-medium text-[var(--accent)] active:opacity-60">{{ (g.here ?? 'install.clickHere') | t }}</button>
@@ -104,6 +105,11 @@ export class Install {
     if (/Macintosh/.test(ua) && /Safari/.test(ua)) return Install.guides.mac;
     return null;
   })();
+
+  /** A step's sentence to go on with the link: its final period becomes a comma. */
+  protected joinable(text: string): string {
+    return text.replace(/\.$/, ',');
+  }
 
   constructor() {
     // Mobile toolbar: just ‹ (no title).
