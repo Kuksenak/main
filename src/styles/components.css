@@ -203,6 +203,11 @@
     @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-[var(--chip-ios)] px-2 py-1 text-[0.8125rem];
   }
 
+  /* A title in light capitals (a person's name; their lists' titles on phones). */
+  .caps-title {
+    @apply !font-light uppercase tracking-wider;
+  }
+
   /* A block's title on the student page (Upcoming, History). */
   .block-title {
     @apply min-w-0 flex-1 font-medium;
