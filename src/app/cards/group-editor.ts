@@ -1,15 +1,15 @@
-import { Component, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { NavStack, StackEntry } from '../core/services/nav-stack.service';
+import { StackEntry } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { Section } from '../core/ui/section/section';
 import { initial } from '../core/utils/text';
 import { GROUP_COLORS, GroupColor, GroupService, colorVar } from '../students/group.service';
 import { Student, StudentService } from '../students/student.service';
-import { EventList } from './event-list';
+import { GroupView } from './person-views';
 import { PickList, PickSection } from './pick-list';
 
 interface Model {
@@ -18,23 +18,38 @@ interface Model {
   studentIds: string[];
 }
 
-/** Group card (new or existing), opened on the NavStack: name, color, members, events. */
+/**
+ * Group card, opened on the NavStack. An existing group opens for reading (GroupView: avatar,
+ * members, events) with Edit at the top; Edit → the form (name, color, members; Save, Cancel or
+ * back return to reading). A new one, or one opened with `edit`, starts in the form.
+ */
 @Component({
   selector: 'app-group-editor',
-  imports: [FormsModule, Icon, EventList, PageSheet, PickList, Section, TranslatePipe],
+  imports: [FormsModule, GroupView, Icon, PageSheet, PickList, Section, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
       #page
-      [actions]="!readOnly()"
-      [dirty]="dirty()"
+      [actions]="editing()"
+      [dirty]="editing() && dirty()"
       [canSave]="canSave()"
-      [deletable]="!!entry().id"
+      [deletable]="editing() && !!entry().id"
+      [cancelCloses]="!editing() || !startedReading"
+      (cancel)="cancelEdit()"
       (save)="save()"
       (delete)="remove()"
       (closed)="closed.emit()"
     >
-      <div class="contents" [class.read-only]="readOnly()">
+      <!-- Top bar (reading): Edit -->
+      @if (!editing() && !entry().readOnly) {
+        <button barEnd type="button" (click)="editing.set(true)" class="btn-white">{{ 'action.edit' | t }}</button>
+      }
+
+      @if (!editing()) {
+        @if (saved(); as g) {
+          <app-group-view [group]="g" />
+        }
+      } @else {
       <div class="flex flex-col gap-6">
         <div class="card">
           <div class="list-row">
@@ -59,15 +74,15 @@ interface Model {
           </div>
         </div>
 
-        <!-- Members: tap opens the student card on top, × removes from the group -->
+        <!-- Members: × removes from the group -->
         <app-section [title]="'groups.members' | t" [count]="members().length" key="members">
           <div class="card">
             @for (s of members(); track s.id) {
               <div class="list-row py-2">
-                <button type="button" (click)="stack.push({ kind: 'student', id: s.id })" class="flex min-w-0 flex-1 items-center gap-3 text-left">
+                <div class="flex min-w-0 flex-1 items-center gap-3">
                   <span class="avatar">{{ initial(s.name) }}</span>
                   <p class="min-w-0 flex-1 truncate">{{ s.name }}</p>
-                </button>
+                </div>
                 <button type="button" (click)="toggle(s.id)" [attr.aria-label]="'action.delete' | t" class="icon-plain -mr-2">
                   <app-icon name="close" class="size-4" />
                 </button>
@@ -81,12 +96,8 @@ interface Model {
             </button>
           </div>
         </app-section>
-
-        @if (saved(); as g) {
-          <app-event-list [groupId]="g.id" />
-        }
       </div>
-      </div>
+      }
     </app-page-sheet>
 
     <!-- Member picker: every student with a check -->
@@ -98,7 +109,7 @@ interface Model {
         [sections]="memberSections()"
         [selected]="m.studentIds"
         (selectedChange)="patch({ studentIds: $event })"
-        [origin]="addMembersRow"
+        [origin]="addMembersRow()?.nativeElement ?? null"
         (closed)="pickingMembers.set(false)"
       />
     }
@@ -106,15 +117,18 @@ interface Model {
 })
 export class GroupEditor implements OnInit {
   readonly entry = input.required<StackEntry>();
-  // Opened from another card: just for reading (see NavStack).
-  protected readonly readOnly = computed(() => !!this.entry().readOnly);
   readonly closed = output<void>();
+
+  // Opened for reading (an existing group without `edit`): Save / Cancel return to reading.
+  protected startedReading = false;
+  protected readonly editing = signal(false);
 
   private groups = inject(GroupService);
   private students = inject(StudentService);
   private i18n = inject(I18nService);
-  protected stack = inject(NavStack);
   private readonly page = viewChild.required<PageSheet>('page');
+  // Add members (inside the form's block): the member picker opens under it on desktop.
+  protected readonly addMembersRow = viewChild<ElementRef<HTMLElement>>('addMembersRow');
 
   protected readonly colors = GROUP_COLORS;
   protected readonly colorVar = colorVar;
@@ -142,10 +156,10 @@ export class GroupEditor implements OnInit {
   );
 
   ngOnInit(): void {
-    const g = this.saved();
-    if (g) {
-      this.model.set({ name: g.name, color: g.color, studentIds: [...g.studentIds] });
-      this.snapshot.set(GroupEditor.key(this.model()));
+    this.startedReading = !!this.entry().id && !this.entry().edit;
+    this.editing.set(!this.startedReading);
+    if (this.saved()) {
+      this.reset();
     } else {
       // New: first color not used yet; members pre-selected from the students list. Counts as
       // unsaved, so a group made from a selection can be saved right after naming it.
@@ -156,6 +170,19 @@ export class GroupEditor implements OnInit {
       // A brand-new empty group starts by picking its members.
       if (!studentIds.length) this.pickingMembers.set(true);
     }
+  }
+
+  // The form back to the stored group.
+  private reset(): void {
+    const g = this.saved();
+    if (!g) return;
+    this.model.set({ name: g.name, color: g.color, studentIds: [...g.studentIds] });
+    this.snapshot.set(GroupEditor.key(this.model()));
+  }
+
+  protected cancelEdit(): void {
+    this.reset();
+    this.editing.set(false);
   }
 
   protected initial(name: string): string {
@@ -178,7 +205,12 @@ export class GroupEditor implements OnInit {
     const id = this.entry().id;
     if (id) this.groups.update(id, input);
     else this.groups.create(input);
-    this.page().close();
+    if (this.startedReading) {
+      this.snapshot.set(GroupEditor.key(this.model()));
+      this.editing.set(false);
+    } else {
+      this.page().close();
+    }
   }
 
   protected remove(): void {

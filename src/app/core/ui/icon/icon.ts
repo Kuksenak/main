@@ -34,7 +34,9 @@ export type IconName =
   | 'dots-vertical'
   | 'install'
   | 'phone'
-  | 'monitor';
+  | 'monitor'
+  | 'mail'
+  | 'call';
 
 /**
  * All app icons in one place (24×24 stroke icons, currentColor). Size it from the host:
@@ -97,6 +99,9 @@ export type IconName =
         @case ('dots-vertical') { <circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" /><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none" /> }
         @case ('install') { <rect x="2.5" y="4" width="19" height="13" rx="2.5" /><path d="M8 21h8M12 7.5v6M9.5 11 12 13.5 14.5 11" /> }
         @case ('phone') { <rect x="6" y="2.5" width="12" height="19" rx="3" /><path d="M10.5 18.5h3" /> }
+        <!-- Contact actions: an envelope, a handset -->
+        @case ('mail') { <rect x="3" y="5" width="18" height="14" rx="3" /><path d="m3.5 7 8.5 6 8.5-6" /> }
+        @case ('call') { <path d="M6.6 3.5h2.6l1.6 4.2-2 1.4a11 11 0 0 0 6.1 6.1l1.4-2 4.2 1.6v2.6a2.1 2.1 0 0 1-2.3 2.1C10.3 18.9 5.1 13.7 4.5 5.8a2.1 2.1 0 0 1 2.1-2.3z" /> }
         @case ('monitor') { <rect x="2.5" y="4" width="19" height="13" rx="2.5" /><path d="M8 21h8M12 17v4" /> }
         <!-- Brand marks: filled; Google keeps its brand colors, Apple uses currentColor -->
         @case ('google') {

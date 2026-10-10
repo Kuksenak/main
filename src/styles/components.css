@@ -159,6 +159,16 @@
            bg-[var(--surface)];
   }
 
+  /* A contact action under a person's name (Email / Call): an icon over its label, in a card
+     tile; .is-off when there's no address / number. */
+  .contact-action {
+    @apply text-footnote flex flex-col items-center gap-1 rounded-[var(--radius-card)] bg-[var(--surface)] py-2.5
+           font-medium text-[var(--accent)] active:opacity-60;
+    &.is-off {
+      @apply pointer-events-none text-[var(--text-secondary)] opacity-50;
+    }
+  }
+
   /* The blue "+ add" row at the end of a card (Invite, Attach, Add members), with list-row and
      edit-only (hidden in read-only cards); gray when there's nothing to add. */
   .add-row {

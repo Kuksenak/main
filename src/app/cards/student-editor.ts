@@ -4,27 +4,36 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { StudentInput, StudentService } from '../students/student.service';
-import { EventList } from './event-list';
-import { StudentGroups } from './related-lists';
+import { StudentView } from './person-views';
 
-/** Student card (new or existing), opened on the NavStack: contacts, groups, events. */
+/**
+ * Student card, opened on the NavStack. An existing student opens for reading (StudentView:
+ * avatar, Email / Call, contacts, groups, events) with Edit at the top; Edit → the form (Save,
+ * Cancel or back return to reading). A new one, or one opened with `edit`, starts in the form.
+ */
 @Component({
   selector: 'app-student-editor',
-  imports: [FormsModule, EventList, PageSheet, StudentGroups, TranslatePipe],
+  imports: [FormsModule, PageSheet, StudentView, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
       #page
-      [actions]="!readOnly()"
-      [dirty]="dirty()"
+      [actions]="editing()"
+      [dirty]="editing() && dirty()"
       [canSave]="canSave()"
-      [deletable]="!!entry().id"
+      [deletable]="editing() && !!entry().id"
+      [cancelCloses]="!editing() || !startedReading"
+      (cancel)="cancelEdit()"
       (save)="save()"
       (delete)="remove()"
       (closed)="closed.emit()"
     >
-      <div class="contents" [class.read-only]="readOnly()">
-      <div class="flex flex-col gap-6">
+      <!-- Top bar (reading): Edit -->
+      @if (!editing() && !entry().readOnly) {
+        <button barEnd type="button" (click)="editing.set(true)" class="btn-white">{{ 'action.edit' | t }}</button>
+      }
+
+      @if (editing()) {
         <div class="card">
           <div class="list-row">
             <input name="name" [ngModel]="m.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="'students.name' | t" autocomplete="off" class="row-input" />
@@ -36,41 +45,51 @@ import { StudentGroups } from './related-lists';
             <input name="phone" [ngModel]="m.phone" (ngModelChange)="patch({ phone: $event })" type="tel" inputmode="tel" [placeholder]="'students.phone' | t" autocomplete="off" class="row-input" />
           </div>
         </div>
-
-        @if (saved(); as s) {
-          <app-student-groups [studentId]="s.id" />
-          <app-event-list [studentId]="s.id" />
-        }
-      </div>
-      </div>
+      } @else if (saved(); as s) {
+        <app-student-view [student]="s" />
+      }
     </app-page-sheet>
   `,
 })
 export class StudentEditor implements OnInit {
   readonly entry = input.required<StackEntry>();
-  // Opened from another card: just for reading (see NavStack).
-  protected readonly readOnly = computed(() => !!this.entry().readOnly);
   readonly closed = output<void>();
 
   private students = inject(StudentService);
   private readonly page = viewChild.required<PageSheet>('page');
 
-  protected readonly model = signal<StudentInput>({ name: '', email: '', phone: '' });
-  private readonly snapshot = signal(''); // contents when opened, to tell whether anything changed
+  // Opened for reading (an existing student without `edit`): Save / Cancel return to reading.
+  protected startedReading = false;
+  protected readonly editing = signal(false);
 
-  // The stored student (existing cards only) — its groups and events are listed below.
+  protected readonly model = signal<StudentInput>({ name: '', email: '', phone: '' });
+  private readonly snapshot = signal(''); // contents when the form opened, to tell whether anything changed
+
+  // The stored student (existing cards only).
   protected readonly saved = computed(() => this.students.students().find((s) => s.id === this.entry().id) ?? null);
   protected readonly dirty = computed(() => JSON.stringify(this.model()) !== this.snapshot());
   protected readonly canSave = computed(() => !!this.model().name.trim() && this.dirty());
 
   ngOnInit(): void {
+    this.startedReading = !!this.entry().id && !this.entry().edit;
+    this.editing.set(!this.startedReading);
+    this.reset();
+  }
+
+  // The form back to the stored student.
+  private reset(): void {
     const s = this.saved();
-    if (s) this.model.set({ name: s.name, email: s.email, phone: s.phone });
+    this.model.set(s ? { name: s.name, email: s.email, phone: s.phone } : { name: '', email: '', phone: '' });
     this.snapshot.set(JSON.stringify(this.model()));
   }
 
   protected patch(p: Partial<StudentInput>): void {
     this.model.update((m) => ({ ...m, ...p }));
+  }
+
+  protected cancelEdit(): void {
+    this.reset();
+    this.editing.set(false);
   }
 
   protected save(): void {
@@ -80,7 +99,12 @@ export class StudentEditor implements OnInit {
     const id = this.entry().id;
     if (id) this.students.update(id, input);
     else this.students.create(input);
-    this.page().close();
+    if (this.startedReading) {
+      this.snapshot.set(JSON.stringify(this.model()));
+      this.editing.set(false);
+    } else {
+      this.page().close();
+    }
   }
 
   protected remove(): void {

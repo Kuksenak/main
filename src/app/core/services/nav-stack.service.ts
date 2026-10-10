@@ -12,6 +12,7 @@ export interface StackEntry {
   date?: string; // new event: its day ('yyyy-MM-dd')
   at?: string; // a repeating event: which repeat was opened (its start)
   studentIds?: string[]; // new group: pre-selected members
+  edit?: boolean; // student / group: open straight in the form (else it opens for reading, Edit → the form)
   readOnly?: boolean; // opened from another card: just for reading, no links out of it
 }
 
