@@ -142,24 +142,19 @@ export class Schedule implements AfterViewInit {
     return new Date(e.startsAt).getTime() <= now ? 'now' : 'later';
   }
 
-  // Today's list scrolls so the current event (going on, else the next) is second from the top.
+  // Today's list scrolls so the current event (going on, else the next) is at the top.
   private readonly dayList = viewChild<ElementRef<HTMLElement>>('dayList');
 
   private scrollToCurrent(): void {
     const list = this.dayList()?.nativeElement;
-    const rows = list ? (Array.from(list.children) as HTMLElement[]) : [];
-    const current = rows.find((r) => r.hasAttribute('data-now'));
-    if (!list || !current) return;
-    // The element that actually scrolls: the nearest ancestor with overflowing, scrollable content.
-    let viewport: HTMLElement | null = list.parentElement;
-    while (viewport && !(viewport.scrollHeight > viewport.clientHeight && /auto|scroll/.test(getComputedStyle(viewport).overflowY))) {
-      viewport = viewport.parentElement;
-    }
-    if (!viewport) return;
-    const i = rows.indexOf(current);
-    const target = i > 0 ? rows[i - 1] : current;
-    viewport.scrollTop += target.getBoundingClientRect().top - viewport.getBoundingClientRect().top;
+    const current = list?.querySelector<HTMLElement>(':scope > [data-now]');
+    // The list's scroll area viewport (found by its class: whether it overflows yet or not)
+    const viewport = list?.closest<HTMLElement>('.overflow-y-auto');
+    if (!current || !viewport) return;
+    // The nearest event (going on, else the next) at the very top — as high as it can go.
+    viewport.scrollTop += current.getBoundingClientRect().top - viewport.getBoundingClientRect().top;
   }
+
 
   constructor() {
     // Show the visible month in the mobile toolbar while this page is open.
@@ -188,7 +183,11 @@ export class Schedule implements AfterViewInit {
     // Selecting today (or its events loading): bring the current event into view.
     effect(() => {
       const isToday = toDateInput(this.selectedDate()) === toDateInput(new Date());
-      if (isToday && this.dayEvents().length) setTimeout(() => requestAnimationFrame(() => this.scrollToCurrent()), 50);
+      // Once laid out, and again a bit later (late layout shifts on phones: fonts, the toolbar).
+      if (isToday && this.dayEvents().length) {
+        requestAnimationFrame(() => this.scrollToCurrent());
+        setTimeout(() => this.scrollToCurrent(), 400);
+      }
     });
   }
 

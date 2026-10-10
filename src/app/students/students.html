@@ -8,9 +8,6 @@
   <!-- Bottom padding keeps the list clear of the floating button (mobile; on desktop the
        button floats over the details pane, so the list runs to the bottom) -->
   <section class="flex min-h-0 w-full flex-1 flex-col gap-3 pb-14 desktop:max-w-md desktop:pb-0">
-    <!-- Search: here on desktop; on mobile the same template sits in the toolbar -->
-    <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
-
     <!-- Students | Groups, and (desktop) Add on the right of the same row -->
     <div class="flex items-center gap-3">
       <div class="segmented">
@@ -27,6 +24,9 @@
         {{ 'action.add' | t }}
       </button>
     </div>
+
+    <!-- Search: here on desktop (under the tabs); on mobile the same template sits in the toolbar -->
+    <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
 
     <!-- List: the card ends with its last row; when there are more rows than fit it scrolls
          inside (corners stay put, indicator beside it) -->
