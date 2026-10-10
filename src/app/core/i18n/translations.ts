@@ -28,8 +28,6 @@ const en = {
   'login.and': 'and',
   'login.privacy': 'Privacy Policy',
 
-  'about.description':
-    'A lightweight scheduling app for teachers — plan lessons, track students and keep your week organized.',
 
   'install.intro': 'Install the app: it gets its own icon and opens full screen, like any other app.',
   'install.intro2': 'No app store, and it updates by itself.',
@@ -187,8 +185,6 @@ const pl: Dictionary = {
   'login.and': 'oraz',
   'login.privacy': 'Politykę prywatności',
 
-  'about.description':
-    'Prosta aplikacja do planowania dla nauczycieli — planuj lekcje, śledź uczniów i miej porządek w tygodniu.',
 
   'install.intro': 'Zainstaluj aplikację: dostanie własną ikonę i otworzy się na pełnym ekranie, jak każda inna.',
   'install.intro2': 'Bez sklepu, aktualizuje się sama.',
@@ -343,8 +339,6 @@ const fr: Dictionary = {
   'login.and': 'et notre',
   'login.privacy': 'Politique de confidentialité',
 
-  'about.description':
-    'Une application de planification légère pour les enseignants — planifiez vos cours, suivez vos élèves et organisez votre semaine.',
 
   'install.intro': 'Installez l’app : elle a sa propre icône et s’ouvre en plein écran, comme les autres.',
   'install.intro2': 'Sans store, elle se met à jour toute seule.',

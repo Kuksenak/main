@@ -24,11 +24,10 @@ interface Guide {
     <!-- Scrolls on its own (the layout doesn't) -->
     <main class="min-h-0 w-full flex-1 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6">
       <div class="mx-auto flex w-full max-w-xl flex-col gap-8">
-      <!-- The logo, what the app is (from About), then why install it -->
-      <img src="logo.png" [alt]="'app.name' | t" class="size-16" width="64" height="64" />
-      <div class="-mt-4 flex flex-col gap-3 text-body leading-relaxed">
-        <p>{{ 'about.description' | t }}</p>
-        <p class="opacity-70">{{ 'install.intro' | t }} {{ 'install.intro2' | t }}</p>
+      <!-- The logo, why install it on its right -->
+      <div class="flex items-center gap-4">
+        <img src="logo.png" [alt]="'app.name' | t" class="size-16 shrink-0" width="64" height="64" />
+        <p class="text-body leading-snug opacity-70">{{ 'install.intro' | t }} {{ 'install.intro2' | t }}</p>
       </div>
 
       @if (guide; as g) {
