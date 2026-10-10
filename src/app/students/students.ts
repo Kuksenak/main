@@ -6,6 +6,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { NavStack } from '../core/services/nav-stack.service';
 import { ToolbarService } from '../core/services/toolbar.service';
+import { GroupView, StudentView } from '../cards/person-views';
 import { Icon } from '../core/ui/icon/icon';
 import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
@@ -15,15 +16,15 @@ import { Group, GroupService, colorVar } from './group.service';
 import { Student, StudentService } from './student.service';
 
 /**
- * Students and groups (iOS Contacts-like), the search filtering both: phones one list (groups
- * first), desktop two columns (students | groups). A tap opens the card on the NavStack (for
- * reading, Edit inside; a dialog on desktop).
+ * Students and groups in one list (iOS Contacts-like: groups first), the search filtering both.
+ * Phones: a tap opens the card on the NavStack (for reading, Edit inside). Desktop: the list on
+ * the left, the picked student / group on the right; its Edit opens the form.
  * Add offers a new student or group; a long press on a student starts picking students to make a
  * group of.
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, OverlayModule, Icon, LongPress, ScrollArea, SearchField, TranslatePipe],
+  imports: [NgTemplateOutlet, OverlayModule, GroupView, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -90,14 +91,33 @@ export class Students {
     return initial(name, this.i18n.locale());
   }
 
-  // Row taps: select mode toggles; else the card opens.
+  // Desktop details: the picked student / group, else the first student (else the first group).
+  private readonly picked = signal<{ kind: 'student' | 'group'; id: string } | null>(null);
+  protected readonly pickedStudent = computed<Student | null>(() => {
+    const p = this.picked();
+    if (p?.kind === 'group' && this.visibleGroups().some((g) => g.id === p.id)) return null;
+    return this.visible().find((s) => s.id === p?.id) ?? this.visible().at(0) ?? null;
+  });
+  protected readonly pickedGroup = computed<Group | null>(() => {
+    if (this.pickedStudent()) return null;
+    const p = this.picked();
+    return this.visibleGroups().find((g) => g.id === p?.id) ?? this.visibleGroups().at(0) ?? null;
+  });
+
+  protected isPicked(kind: 'student' | 'group', id: string): boolean {
+    return kind === 'student' ? this.pickedStudent()?.id === id : this.pickedGroup()?.id === id;
+  }
+
+  // Row taps: select mode toggles; desktop shows it on the right; phones open the card.
   protected pick(s: Student): void {
     if (this.selecting()) this.toggleChecked(s.id);
+    else if (this.desktop) this.picked.set({ kind: 'student', id: s.id });
     else this.stack.push({ kind: 'student', id: s.id });
   }
 
   protected pickGroup(g: Group): void {
-    this.stack.push({ kind: 'group', id: g.id });
+    if (this.desktop) this.picked.set({ kind: 'group', id: g.id });
+    else this.stack.push({ kind: 'group', id: g.id });
   }
 
   protected openAdd(origin: HTMLElement): void {

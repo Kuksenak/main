@@ -135,6 +135,7 @@
   /* Desktop dialog: solid, modest corners around the cards. */
   .dialog-panel {
     --surface: var(--card);
+    --head-bg: var(--dialog-bg); /* pinned heads (person-head) on the dialog's color */
     @apply rounded-2xl border-0 bg-[var(--dialog-bg)] text-[var(--text)] shadow-[var(--shadow-dialog)]
            backdrop-blur-none;
   }
@@ -163,8 +164,8 @@
      name on desktop; pinned while the rest scrolls (below the phone's top bar). */
   .person-head {
     @apply sticky top-[calc(env(safe-area-inset-top)+3.75rem)] z-[5] -mx-1 flex flex-col items-center gap-2
-           bg-[var(--app-bg)] px-1 pb-2 pt-1 text-center
-           desktop:top-0 desktop:flex-row desktop:gap-3.5 desktop:bg-[var(--dialog-bg)] desktop:pt-0 desktop:text-left;
+           bg-[var(--head-bg,var(--app-bg))] px-1 pb-2 pt-1 text-center
+           desktop:top-0 desktop:flex-row desktop:gap-3.5 desktop:pt-0 desktop:text-left;
   }
 
   /* The next lesson on a student / group page: a card ringed in the accent. */

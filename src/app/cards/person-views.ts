@@ -119,7 +119,7 @@ import { GroupMembers } from './related-lists';
       <app-pick-list
         [title]="'people.materials' | t"
         [sections]="lessonSections()"
-        [selected]="lessonIds()"
+        [selected]="ids()"
         (selectedChange)="lessonIdsChange.emit($event)"
         [origin]="attachRow()?.nativeElement ?? null"
         (closed)="picking.set(false)"
@@ -177,8 +177,10 @@ export class PersonLessons {
     return out;
   });
 
+  // (An API without lessonIds yet sends none: nothing attached.)
+  protected readonly ids = computed(() => this.lessonIds() ?? []);
   protected readonly materials = computed(() =>
-    this.lessonIds()
+    this.ids()
       .map((id) => this.lessons.byId(id))
       .filter((l): l is NonNullable<typeof l> => !!l),
   );
@@ -275,7 +277,7 @@ export class PersonLessons {
       </a>
     </div>
 
-    <app-person-lessons [studentId]="s.id" [lessonIds]="s.lessonIds ?? []" [editable]="editable()" (lessonIdsChange)="students.setLessons(s.id, $event)" />
+    <app-person-lessons [studentId]="s.id" [lessonIds]="s.lessonIds" [editable]="editable()" (lessonIdsChange)="students.setLessons(s.id, $event)" />
   `,
 })
 export class StudentView {
@@ -314,7 +316,7 @@ export class StudentView {
       <div class="flex shrink-0 items-center gap-2 mobile:hidden"><ng-content select="[headerEnd]" /></div>
     </div>
 
-    <app-person-lessons [groupId]="g.id" [lessonIds]="g.lessonIds ?? []" [editable]="editable()" (lessonIdsChange)="groups.setLessons(g.id, $event)" />
+    <app-person-lessons [groupId]="g.id" [lessonIds]="g.lessonIds" [editable]="editable()" (lessonIdsChange)="groups.setLessons(g.id, $event)" />
     <app-group-members [studentIds]="g.studentIds" />
   `,
 })

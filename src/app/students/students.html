@@ -2,10 +2,10 @@
   <app-search-field [(value)]="query" />
 </ng-template>
 
-<!-- Phones: one list (iOS Contacts-like), groups first, then students. Desktop: two columns,
-     students left, groups right, plain rows. A tap opens the card on top (for reading, Edit inside). -->
-<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1">
-  <section class="flex min-h-0 w-full flex-1 flex-col gap-3">
+<!-- One list (iOS Contacts-like): groups first, then students. Phones: a tap opens the card on
+     top. Desktop: the list on the left, the picked student / group on the right (Edit opens its form). -->
+<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-8">
+  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-sm">
     <!-- Desktop: the search and Add in one row, the field as tall as the button (phones: search in
          the toolbar, + at the bottom) -->
     <div class="flex items-center gap-3 mobile:hidden [&_.field]:h-[var(--control-h)]">
@@ -19,7 +19,7 @@
     <!-- The rows, shared by both layouts -->
     <ng-template #groupRows>
       @for (g of visibleGroups(); track g.id) {
-        <button type="button" (click)="pickGroup(g)" class="list-row w-full py-2 text-left">
+        <button type="button" (click)="pickGroup(g)" class="list-row w-full py-2 text-left" [class.bg-[var(--highlight)]]="desktop && isPicked('group', g.id)">
           <span class="avatar text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
           <p class="min-w-0 flex-1 truncate font-medium">{{ g.name }}</p>
           <span class="text-footnote flex items-center gap-1 tabular-nums opacity-50">
@@ -32,7 +32,7 @@
     <!-- Students, alphabetical. Long press: select students to make a group of. -->
     <ng-template #studentRows>
       @for (s of visible(); track s.id) {
-        <button type="button" appLongPress (longPress)="startSelect(s)" (click)="pick(s)" class="list-row w-full py-2 text-left">
+        <button type="button" appLongPress (longPress)="startSelect(s)" (click)="pick(s)" class="list-row w-full py-2 text-left" [class.bg-[var(--highlight)]]="desktop && !selecting() && isPicked('student', s.id)">
           @if (selecting()) {
             <span class="check" [class.is-on]="checked().has(s.id)">
               @if (checked().has(s.id)) {
@@ -59,30 +59,10 @@
       <div class="flex flex-1 items-center justify-center">
         <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : 'students.empty') | t }}</p>
       </div>
-    } @else if (desktop) {
-      <!-- Desktop: two columns, each scrolling on its own inside its card (students | groups) -->
-      <div class="grid min-h-0 flex-1 grid-cols-2 gap-6">
-        <div class="flex min-h-0 flex-col gap-1.5">
-          @if (visible().length) {
-            <span class="card-label">{{ 'nav.students' | t }}</span>
-            <app-scroll-area class="min-h-0 shrink" viewportClass="card">
-              <ng-container [ngTemplateOutlet]="studentRows" />
-            </app-scroll-area>
-          }
-        </div>
-        <div class="flex min-h-0 flex-col gap-1.5">
-          @if (visibleGroups().length) {
-            <span class="card-label">{{ 'groups.title' | t }}</span>
-            <app-scroll-area class="min-h-0 shrink" viewportClass="card">
-              <ng-container [ngTemplateOutlet]="groupRows" />
-            </app-scroll-area>
-          }
-        </div>
-      </div>
     } @else {
-      <!-- Phones: one list, groups first (they stay while selecting students; only students get
-           the circles); bottom padding clears the floating buttons -->
-      <app-scroll-area class="min-h-0 flex-1" contentClass="gap-4 pb-16">
+      <!-- Groups first (they stay while selecting students; only students get the circles);
+           bottom padding clears the floating buttons on phones -->
+      <app-scroll-area class="min-h-0 flex-1" contentClass="gap-4 pb-16 desktop:pb-2">
         @if (visibleGroups().length) {
           <div class="flex flex-col gap-1.5">
             <span class="card-label">{{ 'groups.title' | t }}</span>
@@ -95,6 +75,27 @@
             <div class="card"><ng-container [ngTemplateOutlet]="studentRows" /></div>
           </div>
         }
+      </app-scroll-area>
+    }
+  </section>
+
+  <!-- Desktop: the picked student / group, beside the list (its header stays pinned) -->
+  <section class="flex min-h-0 flex-1 flex-col mobile:hidden">
+    @if (pickedStudent(); as s) {
+      <app-scroll-area class="min-h-0 flex-1" contentClass="pb-10">
+        <app-student-view [student]="s" class="w-full max-w-3xl">
+          <ng-container ngProjectAs="[headerEnd]">
+            <button type="button" (click)="stack.push({ kind: 'student', id: s.id, edit: true })" class="btn-secondary shrink-0">{{ 'action.edit' | t }}</button>
+          </ng-container>
+        </app-student-view>
+      </app-scroll-area>
+    } @else if (pickedGroup(); as g) {
+      <app-scroll-area class="min-h-0 flex-1" contentClass="pb-10">
+        <app-group-view [group]="g" class="w-full max-w-3xl">
+          <ng-container ngProjectAs="[headerEnd]">
+            <button type="button" (click)="stack.push({ kind: 'group', id: g.id, edit: true })" class="btn-secondary shrink-0">{{ 'action.edit' | t }}</button>
+          </ng-container>
+        </app-group-view>
       </app-scroll-area>
     }
   </section>
