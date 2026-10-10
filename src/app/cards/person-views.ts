@@ -301,16 +301,13 @@ export class PersonLessons {
         <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
         <app-icon name="chevron-right" class="row-chevron" />
       </span>
-      <!-- The next lesson: the calendar icon, its title and lessons (plain text), marks, start over end -->
+      <!-- The next lesson: the calendar icon, its title, marks, start over end -->
       <span class="list-row !gap-3.5 py-3">
         <app-brand-icon name="calendar" [date]="start(e)" class="size-14 shrink-0" />
-        <!-- The event's title (else its groups) and the attached lessons' names -->
+        <!-- The event's title (else its groups); attached lessons show as the paperclip only -->
         <span class="flex min-w-0 flex-1 flex-col gap-1.5">
           @if (context(e); as c) {
             <span class="truncate font-medium">{{ c }}</span>
-          }
-          @if (lessonTitles(e).length) {
-            <span class="text-footnote truncate opacity-50">{{ lessonTitles(e).join(', ') }}</span>
           }
         </span>
         <!-- ⟲ repeating over 📎 lessons attached, just left of the time (as in the schedule) -->
@@ -361,7 +358,6 @@ export class StudentView {
 
   protected students = inject(StudentService);
   private groups = inject(GroupService);
-  private lessons = inject(LessonService);
   private events = inject(EventService);
   private people = inject(EventPeople);
   private i18n = inject(I18nService);
@@ -404,9 +400,6 @@ export class StudentView {
         .filter((n): n is string => !!n)
         .join(', ')
     );
-  }
-  protected lessonTitles(e: ScheduleEvent): string[] {
-    return e.lessonIds.map((id) => this.lessons.byId(id)?.title).filter((t): t is string => !!t);
   }
 
   private when(e: ScheduleEvent | undefined): string {
