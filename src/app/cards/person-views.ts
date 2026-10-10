@@ -248,7 +248,7 @@ export class PersonLessons {
 
 /**
  * A student, for reading — like an iOS contact, on phones and desktop alike: a big avatar and the
- * name centered, their groups as colored dots, Email / Call tiles, the phone and email (label
+ * name centered, Email / Call tiles, the phone and email (label
  * over value), History › with the last lesson under it (`history` opens the full list), then
  * their materials. [headerEnd] (e.g. Edit on desktop) sits at the top right.
  */
@@ -263,13 +263,6 @@ export class PersonLessons {
       <span class="avatar size-20 text-3xl">{{ initial(s.name) }}</span>
       <div class="min-w-0 max-w-full">
         <h1 class="truncate text-[1.75rem] font-semibold leading-tight">{{ s.name }}</h1>
-        @if (groups().length) {
-          <p class="text-footnote mt-1 flex flex-wrap justify-center gap-x-2.5 gap-y-0.5 opacity-60">
-            @for (g of groups(); track g.id) {
-              <span class="inline-flex items-center gap-1.5"><span class="dot size-2" [style.background]="colorVar(g.color)"></span>{{ g.name }}</span>
-            }
-          </p>
-        }
       </div>
     </div>
 
@@ -305,13 +298,34 @@ export class PersonLessons {
 
     <!-- Two blocks: Upcoming › with the next lesson under it, Past lessons › with the last one (a
          tap opens the full list); each only when there's something in it -->
-    @if (nextLabel()) {
+    @if (nextEvent(); as e) {
     <button type="button" (click)="upcoming.emit()" class="card flex w-full flex-col text-left">
       <span class="list-row">
         <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
         <app-icon name="chevron-right" class="row-chevron" />
       </span>
-      <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ nextLabel() }}</span>
+      <!-- The next lesson: the calendar tile, time, who else, what's attached -->
+      <span class="list-row !gap-3.5 py-3">
+        <span class="date-tile is-accent">
+          <small>{{ weekday(e) }}</small>
+          <b>{{ day(e) }}</b>
+        </span>
+        <span class="flex min-w-0 flex-1 flex-col gap-1.5">
+          <span class="flex flex-wrap items-baseline gap-x-2">
+            <span class="font-medium tabular-nums">{{ time(e) }}</span>
+            @if (context(e); as c) {
+              <span class="truncate opacity-50">· {{ c }}</span>
+            }
+          </span>
+          @if (lessonTitles(e).length) {
+            <span class="flex flex-wrap gap-1.5">
+              @for (t of lessonTitles(e); track $index) {
+                <span class="lesson-chip"><app-icon name="book" [strokeWidth]="1.75" class="size-3.5 opacity-60" />{{ t }}</span>
+              }
+            </span>
+          }
+        </span>
+      </span>
     </button>
     }
     @if (lastLabel()) {
@@ -342,27 +356,22 @@ export class StudentView {
   readonly history = output<void>();
 
   protected students = inject(StudentService);
-  private groupService = inject(GroupService);
+  private groups = inject(GroupService);
+  private lessons = inject(LessonService);
   private events = inject(EventService);
   private people = inject(EventPeople);
   private i18n = inject(I18nService);
-  protected readonly colorVar = colorVar;
 
-  protected readonly groups = computed(() =>
-    this.groupService.groups().filter((g) => g.studentIds.includes(this.student().id)),
-  );
-
-  // Under Upcoming / History: the next / last lesson ("Mon, 13 Oct · 18:00–19:00").
+  // Under Upcoming: the next lesson; under Past lessons: the last one ("Mon, 13 Oct · 18:00–19:00").
   private readonly mine = computed(() => {
     const id = this.student().id;
     return this.events.events().filter((e) => this.people.invites(e, id));
   });
-  protected readonly nextLabel = computed(() =>
-    this.when(
+  protected readonly nextEvent = computed(
+    () =>
       this.mine()
         .filter((e) => eventEnd(e).getTime() >= Date.now())
-        .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0],
-    ),
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null,
   );
   protected readonly lastLabel = computed(() =>
     this.when(
@@ -371,6 +380,30 @@ export class StudentView {
         .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0],
     ),
   );
+
+  // The next lesson's tile and lines
+  protected day(e: ScheduleEvent): number {
+    return new Date(e.startsAt).getDate();
+  }
+  protected weekday(e: ScheduleEvent): string {
+    return this.i18n.date(new Date(e.startsAt), { weekday: 'short' });
+  }
+  protected time(e: ScheduleEvent): string {
+    return `${this.i18n.time(new Date(e.startsAt))}–${this.i18n.time(eventEnd(e))}`;
+  }
+  // Beside the time: the event's title, else its groups.
+  protected context(e: ScheduleEvent): string {
+    return (
+      e.title ||
+      e.groupIds
+        .map((id) => this.groups.byId(id)?.name)
+        .filter((n): n is string => !!n)
+        .join(', ')
+    );
+  }
+  protected lessonTitles(e: ScheduleEvent): string[] {
+    return e.lessonIds.map((id) => this.lessons.byId(id)?.title).filter((t): t is string => !!t);
+  }
 
   private when(e: ScheduleEvent | undefined): string {
     if (!e) return '';
