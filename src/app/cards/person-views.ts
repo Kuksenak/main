@@ -19,13 +19,20 @@ import { GroupMembers, StudentGroups } from './related-lists';
   host: { class: 'flex flex-col gap-4' },
   template: `
     @let s = student();
-    <div class="flex flex-col items-center gap-2 pt-2 text-center">
-      <span class="avatar size-20 text-3xl">{{ initial(s.name) }}</span>
-      <h1 class="text-2xl font-semibold leading-tight">{{ s.name }}</h1>
-      @if (groupNames()) {
-        <p class="text-footnote -mt-1 opacity-50">{{ groupNames() }}</p>
-      }
+    <!-- Header: centered on phones, avatar beside the name on desktop -->
+    <div class="flex flex-col items-center gap-1.5 pt-1 text-center desktop:flex-row desktop:gap-3 desktop:pt-0 desktop:text-left">
+      <span class="avatar size-16 text-2xl desktop:size-12 desktop:text-lg">{{ initial(s.name) }}</span>
+      <div class="min-w-0">
+        <h1 class="truncate text-xl font-semibold leading-tight">{{ s.name }}</h1>
+        @if (groupNames()) {
+          <p class="text-footnote truncate opacity-50">{{ groupNames() }}</p>
+        }
+      </div>
     </div>
+
+    <!-- Desktop: two columns — the info left, the events right -->
+    <div class="flex flex-col gap-4 desktop:grid desktop:grid-cols-2 desktop:items-start">
+    <div class="flex flex-col gap-4">
 
     <!-- Email / Call (grayed out without an address / number) -->
     <div class="grid grid-cols-2 gap-2">
@@ -57,7 +64,9 @@ import { GroupMembers, StudentGroups } from './related-lists';
     }
 
     <app-student-groups [studentId]="s.id" />
+    </div>
     <app-event-list [studentId]="s.id" />
+    </div>
   `,
 })
 export class StudentView {
@@ -86,15 +95,22 @@ export class StudentView {
   host: { class: 'flex flex-col gap-4' },
   template: `
     @let g = group();
-    <div class="flex flex-col items-center gap-2 pt-2 text-center">
-      <span class="avatar size-20 text-3xl text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
-      <h1 class="text-2xl font-semibold leading-tight">{{ g.name }}</h1>
-      <p class="text-footnote -mt-1 flex items-center gap-1 tabular-nums opacity-50">
-        <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
-      </p>
+    <!-- Header: centered on phones, avatar beside the name on desktop -->
+    <div class="flex flex-col items-center gap-1.5 pt-1 text-center desktop:flex-row desktop:gap-3 desktop:pt-0 desktop:text-left">
+      <span class="avatar size-16 text-2xl text-[var(--accent-fg)] desktop:size-12 desktop:text-lg" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
+      <div class="min-w-0">
+        <h1 class="truncate text-xl font-semibold leading-tight">{{ g.name }}</h1>
+        <p class="text-footnote flex items-center gap-1 tabular-nums opacity-50 mobile:justify-center">
+          <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
+        </p>
+      </div>
     </div>
-    <app-group-members [studentIds]="g.studentIds" />
-    <app-event-list [groupId]="g.id" />
+
+    <!-- Desktop: two columns — the members left, the events right -->
+    <div class="flex flex-col gap-4 desktop:grid desktop:grid-cols-2 desktop:items-start">
+      <app-group-members [studentIds]="g.studentIds" />
+      <app-event-list [groupId]="g.id" />
+    </div>
   `,
 })
 export class GroupView {

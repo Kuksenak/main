@@ -30,6 +30,7 @@ interface Model {
     @let m = model();
     <app-page-sheet
       #page
+      [large]="!editing()"
       [actions]="editing()"
       [dirty]="editing() && dirty()"
       [canSave]="canSave()"

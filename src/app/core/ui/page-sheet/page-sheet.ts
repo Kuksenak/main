@@ -40,6 +40,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [class.desktop:!h-full]="wide()"
         [class.desktop:!max-h-none]="wide()"
         [class.desktop:!max-w-none]="wide()"
+        [class.desktop:!max-w-3xl]="large()"
         [style.transform]="closing() ? 'translateX(100%)' : null"
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
@@ -147,6 +148,8 @@ export class PageSheet {
   readonly canSave = input(false);
   readonly deletable = input(false);
   readonly wide = input(false);
+  // Desktop: a wider dialog (room for two columns, e.g. a student's details and events).
+  readonly large = input(false);
   // false: back / ✕ / Cancel / a click outside emit `cancel` and leave the page open (e.g. a
   // card that leaves its edit mode instead of closing).
   readonly cancelCloses = input(true);

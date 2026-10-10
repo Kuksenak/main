@@ -28,7 +28,9 @@
                 <button type="button" (click)="pickGroup(g)" class="list-row w-full py-2 text-left">
                   <span class="avatar text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
                   <p class="min-w-0 flex-1 truncate font-medium">{{ g.name }}</p>
-                  <span class="text-footnote flex items-center gap-1 tabular-nums opacity-50">
+                  <!-- Desktop: the group's next lesson, lined up with the students' -->
+                  <span class="hidden w-52 truncate tabular-nums opacity-60 desktop:block">{{ nextGroupLabel(g.id) }}</span>
+                  <span class="text-footnote flex items-center gap-1 tabular-nums opacity-50 desktop:w-64">
                     <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
                   </span>
                   <app-icon name="chevron-right" class="row-chevron" />
@@ -60,9 +62,9 @@
                       <p class="text-footnote truncate opacity-50">{{ sub }}</p>
                     }
                   </div>
-                  <!-- Desktop (the room is there): the email and phone in their own columns -->
+                  <!-- Desktop (the room is there): the next lesson and the email in their own columns -->
+                  <span class="hidden w-52 truncate tabular-nums opacity-60 desktop:block">{{ nextLabel(s.id) }}</span>
                   <span class="hidden w-64 truncate opacity-60 desktop:block">{{ s.email }}</span>
-                  <span class="hidden w-40 truncate tabular-nums opacity-60 desktop:block">{{ s.phone }}</span>
                   @if (!selecting()) {
                     <app-icon name="chevron-right" class="row-chevron" />
                   }
