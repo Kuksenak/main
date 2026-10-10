@@ -176,9 +176,11 @@
     @apply text-xs font-semibold not-italic uppercase tracking-wide text-[var(--accent)];
   }
 
-  /* A lesson's date: the day over (or under) its weekday; .is-accent: the filled tile of the next one. */
+  /* A lesson's date: the day over (or under) its weekday, on a light tile; .is-accent: the filled
+     tile of the next one. */
   .date-tile {
-    @apply flex w-11 shrink-0 flex-col items-center justify-center gap-0.5 leading-none;
+    @apply flex size-11 shrink-0 flex-col items-center justify-center gap-0.5 rounded-[0.625rem]
+           bg-[color-mix(in_srgb,var(--text)_6%,transparent)] leading-none;
     & b {
       @apply text-lg font-semibold tabular-nums;
     }

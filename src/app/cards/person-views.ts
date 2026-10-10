@@ -82,28 +82,28 @@ import { GroupMembers } from './related-lists';
           <span class="mt-2 px-0.5 text-[0.9375rem] font-light uppercase tracking-wide opacity-50">{{ m.label }}</span>
           <div class="card">
             @for (e of m.events; track key(e)) {
-              <div class="list-row !items-start pb-3 pt-3.5">
+              <!-- Day, time and who; attached lessons / repeating only as the marks on the right -->
+              <div class="list-row pb-3 pt-3.5">
                 <span class="date-tile">
                   <b>{{ day(e) }}</b>
                   <small>{{ weekday(e) }}</small>
                 </span>
-                <span class="flex min-w-0 flex-1 flex-col gap-1.5">
-                  <span class="flex flex-wrap items-baseline gap-x-2">
-                    <span class="tabular-nums">{{ time(e) }}</span>
-                    @if (context(e); as c) {
-                      <span class="truncate opacity-50">{{ c }}</span>
-                    }
-                  </span>
-                  @if (lessonTitles(e).length) {
-                    <span class="flex flex-wrap gap-1.5">
-                      @for (t of lessonTitles(e); track $index) {
-                        <span class="lesson-chip">{{ t }}</span>
-                      }
-                    </span>
-                  } @else {
-                    <span class="text-footnote opacity-35">{{ 'people.nothingAttached' | t }}</span>
+                <span class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2">
+                  <span class="tabular-nums">{{ time(e) }}</span>
+                  @if (context(e); as c) {
+                    <span class="truncate opacity-50">{{ c }}</span>
                   }
                 </span>
+                @if (e.repeat !== 'Never' || e.lessonIds.length) {
+                  <span class="flex shrink-0 items-center gap-1.5 opacity-50">
+                    @if (e.repeat !== 'Never') {
+                      <app-icon name="repeat" class="size-4" />
+                    }
+                    @if (e.lessonIds.length) {
+                      <app-icon name="paperclip" class="size-4 rotate-45" />
+                    }
+                  </span>
+                }
               </div>
             }
           </div>
