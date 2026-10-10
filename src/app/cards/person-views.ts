@@ -351,22 +351,40 @@ export class PersonLessons {
     </ng-template>
 
     @if (desktop) {
-      <!-- Desktop: Upcoming events | History side by side, every lesson listed, each column
-           scrolling on its own (at most ~60% of the window tall) -->
+      <!-- Desktop: Upcoming | History side by side, folded like on phones (the next / last
+           lesson); a click unfolds every lesson inside the card, scrolling on its own (≤60% of
+           the window) -->
       <div class="grid grid-cols-2 items-start gap-4">
-        @for (col of columns; track col.list) {
+        @if (nextEvent(); as e) {
           <div class="card flex max-h-[60vh] min-h-0 flex-col">
-            <span class="list-row shrink-0"><span class="block-title">{{ col.title | t }}</span></span>
-            <app-scroll-area class="min-h-0 shrink">
-              <app-person-lessons
-                [studentId]="s.id"
-                [showNext]="false"
-                [showUpcoming]="col.list === 'upcoming'"
-                [showPast]="col.list === 'history'"
-                [showMaterials]="false"
-                [flat]="true"
-              />
-            </app-scroll-area>
+            <button type="button" (click)="toggle('upcoming')" class="list-row w-full shrink-0 text-left">
+              <span class="block-title">{{ 'students.upcoming' | t }}</span>
+              <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="open().has('upcoming')" />
+            </button>
+            @if (open().has('upcoming')) {
+              <app-scroll-area class="min-h-0 shrink">
+                <app-person-lessons [studentId]="s.id" [showNext]="false" [showUpcoming]="true" [showPast]="false" [showMaterials]="false" [flat]="true" />
+              </app-scroll-area>
+            } @else {
+              <button type="button" (click)="toggle('upcoming')" class="w-full text-left">
+                <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
+              </button>
+            }
+          </div>
+        }
+        @if (lastEvent(); as e) {
+          <div class="card flex max-h-[60vh] min-h-0 flex-col">
+            <button type="button" (click)="toggle('history')" class="list-row w-full shrink-0 text-left">
+              <span class="block-title">{{ 'people.history' | t }}</span>
+              <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="open().has('history')" />
+            </button>
+            @if (open().has('history')) {
+              <app-scroll-area class="min-h-0 shrink">
+                <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [flat]="true" />
+              </app-scroll-area>
+            } @else {
+              <button type="button" (click)="toggle('history')" class="list-row w-full text-left text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</button>
+            }
           </div>
         }
       </div>
@@ -410,12 +428,17 @@ export class StudentView {
   readonly upcoming = output<void>();
   readonly history = output<void>();
 
-  // Desktop: both lists side by side (phones: blocks that open them as a page).
+  // Desktop: both lists side by side, each folded / unfolded on its own (phones: blocks that
+  // open them as a page).
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
-  protected readonly columns = [
-    { list: 'upcoming', title: 'students.upcoming' },
-    { list: 'history', title: 'people.history' },
-  ] as const;
+  protected readonly open = signal<ReadonlySet<'upcoming' | 'history'>>(new Set());
+
+  protected toggle(list: 'upcoming' | 'history'): void {
+    const next = new Set(this.open());
+    if (next.has(list)) next.delete(list);
+    else next.add(list);
+    this.open.set(next);
+  }
 
   protected students = inject(StudentService);
   private groups = inject(GroupService);
