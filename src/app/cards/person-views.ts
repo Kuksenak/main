@@ -301,23 +301,33 @@ export class PersonLessons {
         <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
         <app-icon name="chevron-right" class="row-chevron" />
       </span>
-      <!-- The next lesson: the calendar tile, time, who else, what's attached -->
+      <!-- The next lesson: the calendar icon, its title and lessons (plain text), marks, start over end -->
       <span class="list-row !gap-3.5 py-3">
         <app-brand-icon name="calendar" [date]="start(e)" class="size-14 shrink-0" />
+        <!-- The event's title (else its groups) and the attached lessons' names -->
         <span class="flex min-w-0 flex-1 flex-col gap-1.5">
-          <span class="flex flex-wrap items-baseline gap-x-2">
-            <span class="font-medium tabular-nums">{{ time(e) }}</span>
-            @if (context(e); as c) {
-              <span class="truncate opacity-50">· {{ c }}</span>
+          @if (context(e); as c) {
+            <span class="truncate font-medium">{{ c }}</span>
+          }
+          @if (lessonTitles(e).length) {
+            <span class="text-footnote truncate opacity-50">{{ lessonTitles(e).join(', ') }}</span>
+          }
+        </span>
+        <!-- ⟲ repeating over 📎 lessons attached, just left of the time (as in the schedule) -->
+        @if (e.repeat !== 'Never' || e.lessonIds.length) {
+          <span class="-mr-1.5 flex w-[1.125rem] shrink-0 flex-col items-center gap-1 opacity-50">
+            @if (e.repeat !== 'Never') {
+              <app-icon name="repeat" class="size-[1.125rem]" />
+            }
+            @if (e.lessonIds.length) {
+              <app-icon name="paperclip" class="size-[1.125rem] rotate-45" />
             }
           </span>
-          @if (lessonTitles(e).length) {
-            <span class="flex flex-wrap gap-1.5">
-              @for (t of lessonTitles(e); track $index) {
-                <span class="lesson-chip">{{ t }}</span>
-              }
-            </span>
-          }
+        }
+        <!-- Start over end (the end lighter), as in the schedule -->
+        <span class="text-callout shrink-0 text-right leading-tight tabular-nums">
+          <span class="block font-medium">{{ startTime(e) }}</span>
+          <span class="block opacity-50">{{ endTime(e) }}</span>
         </span>
       </span>
     </button>
@@ -379,10 +389,13 @@ export class StudentView {
   protected start(e: ScheduleEvent): Date {
     return new Date(e.startsAt);
   }
-  protected time(e: ScheduleEvent): string {
-    return `${this.i18n.time(new Date(e.startsAt))}–${this.i18n.time(eventEnd(e))}`;
+  protected startTime(e: ScheduleEvent): string {
+    return this.i18n.time(new Date(e.startsAt));
   }
-  // Beside the time: the event's title, else its groups.
+  protected endTime(e: ScheduleEvent): string {
+    return this.i18n.time(eventEnd(e));
+  }
+  // Beside the calendar: the event's title, else its groups.
   protected context(e: ScheduleEvent): string {
     return (
       e.title ||
