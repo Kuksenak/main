@@ -6,14 +6,15 @@
      card. Desktop: the list on the left (calendar width), the picked student / group on the right. -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6">
   <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-md">
-    <!-- Desktop: Add, then the search (phones: search in the toolbar, + at the bottom) -->
-    <div class="flex items-center gap-3 mobile:hidden">
-      <button #addBtn type="button" (click)="openAdd(addBtn)" class="btn-primary ml-auto gap-1.5 pl-2.5">
+    <!-- Desktop: the search and Add in one row, the field as tall as the button (phones: search in
+         the toolbar, + at the bottom) -->
+    <div class="flex items-center gap-3 mobile:hidden [&_.field]:h-[var(--control-h)]">
+      <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="search" /></div>
+      <button #addBtn type="button" (click)="openAdd(addBtn)" class="btn-primary shrink-0 gap-1.5 pl-2.5">
         <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
         {{ 'action.add' | t }}
       </button>
     </div>
-    <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
 
     @if (visibleGroups().length || visible().length) {
       <!-- Bottom padding clears the floating buttons (phones) -->
