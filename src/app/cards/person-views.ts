@@ -1,6 +1,5 @@
 import { Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
-import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { initial } from '../core/utils/text';
@@ -219,90 +218,78 @@ export class PersonLessons {
 }
 
 /**
- * A student, for reading. Phones, like an iOS contact: a big avatar and the name centered, their
- * groups as colored dots, Email / Call tiles, the email and phone (label over value), History ›
- * with the last lesson under it (`history` opens the full list), then their materials. Desktop:
- * avatar beside the name with Email / Call (and [headerEnd], e.g. Edit) on the right, then every
- * lesson and the materials (PersonLessons).
+ * A student, for reading — like an iOS contact, on phones and desktop alike: a big avatar and the
+ * name centered, their groups as colored dots, Email / Call tiles, the phone and email (label
+ * over value), History › with the last lesson under it (`history` opens the full list), then
+ * their materials. [headerEnd] (e.g. Edit on desktop) sits at the top right.
  */
 @Component({
   selector: 'app-student-view',
   imports: [Icon, PersonLessons, TranslatePipe],
-  host: { class: 'flex flex-col gap-4' },
+  host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let s = student();
+    <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
     <div class="person-head">
-      <span class="avatar size-20 text-3xl desktop:size-14 desktop:text-xl">{{ initial(s.name) }}</span>
-      <div class="min-w-0 desktop:flex-1">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-xl">{{ s.name }}</h1>
+      <span class="avatar size-20 text-3xl">{{ initial(s.name) }}</span>
+      <div class="min-w-0 max-w-full">
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight">{{ s.name }}</h1>
         @if (groups().length) {
-          <p class="text-footnote mt-1 flex flex-wrap gap-x-2.5 gap-y-0.5 opacity-60 mobile:justify-center">
+          <p class="text-footnote mt-1 flex flex-wrap justify-center gap-x-2.5 gap-y-0.5 opacity-60">
             @for (g of groups(); track g.id) {
               <span class="inline-flex items-center gap-1.5"><span class="dot size-2" [style.background]="colorVar(g.color)"></span>{{ g.name }}</span>
             }
           </p>
         }
       </div>
-      <!-- Desktop: Email / Call beside the name -->
-      <div class="flex shrink-0 items-center gap-2 mobile:hidden">
-        <a [attr.href]="s.email ? 'mailto:' + s.email : null" [attr.title]="s.email" class="btn-secondary gap-1.5 !text-[var(--accent)]" [class.is-off]="!s.email">
-          <app-icon name="mail" [strokeWidth]="1.75" class="size-4" />{{ 'students.actionMail' | t }}
-        </a>
-        <a [attr.href]="s.phone ? 'tel:' + s.phone : null" [attr.title]="s.phone" class="btn-secondary gap-1.5 !text-[var(--accent)]" [class.is-off]="!s.phone">
-          <app-icon name="call" [strokeWidth]="1.75" class="size-4" />{{ 'students.actionCall' | t }}
-        </a>
-        <ng-content select="[headerEnd]" />
-      </div>
     </div>
 
-    @if (!desktop) {
-      <!-- Email / Call tiles -->
-      <div class="grid grid-cols-2 gap-2">
-        <a [attr.href]="s.email ? 'mailto:' + s.email : null" class="contact-action" [class.is-off]="!s.email">
-          <app-icon name="mail" [strokeWidth]="1.75" class="size-6" />
-          {{ 'students.actionMail' | t }}
-        </a>
-        <a [attr.href]="s.phone ? 'tel:' + s.phone : null" class="contact-action" [class.is-off]="!s.phone">
-          <app-icon name="call" [strokeWidth]="1.75" class="size-6" />
-          {{ 'students.actionCall' | t }}
-        </a>
-      </div>
+    <!-- Email / Call tiles -->
+    <div class="grid grid-cols-2 gap-2">
+      <a [attr.href]="s.email ? 'mailto:' + s.email : null" class="contact-action" [class.is-off]="!s.email">
+        <app-icon name="mail" [strokeWidth]="1.75" class="size-6" />
+        {{ 'students.actionMail' | t }}
+      </a>
+      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" class="contact-action" [class.is-off]="!s.phone">
+        <app-icon name="call" [strokeWidth]="1.75" class="size-6" />
+        {{ 'students.actionCall' | t }}
+      </a>
+    </div>
 
-      <!-- The email and phone: a small label over the value (iOS) -->
-      @if (s.phone || s.email) {
-        <div class="card">
-          @if (s.phone) {
-            <a [href]="'tel:' + s.phone" class="list-row contact-field">
-              <span>{{ 'students.phone' | t }}</span>
-              <b class="tabular-nums">{{ s.phone }}</b>
-            </a>
-          }
-          @if (s.email) {
-            <a [href]="'mailto:' + s.email" class="list-row contact-field">
-              <span>{{ 'students.email' | t }}</span>
-              <b>{{ s.email }}</b>
-            </a>
-          }
-        </div>
-      }
-
-      <!-- History ›, the last lesson on the line under it -->
+    <!-- The phone and email: a small label over the value (iOS) -->
+    @if (s.phone || s.email) {
       <div class="card">
-        <button type="button" (click)="history.emit()" class="list-row w-full text-left">
-          <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-            <span class="font-medium">{{ 'people.history' | t }}</span>
-            <span class="text-footnote truncate opacity-50">{{ lastLabel() || ('students.noEvents' | t) }}</span>
-          </span>
-          <app-icon name="chevron-right" class="row-chevron" />
-        </button>
+        @if (s.phone) {
+          <a [href]="'tel:' + s.phone" class="list-row contact-field">
+            <span>{{ 'students.phone' | t }}</span>
+            <b class="tabular-nums">{{ s.phone }}</b>
+          </a>
+        }
+        @if (s.email) {
+          <a [href]="'mailto:' + s.email" class="list-row contact-field">
+            <span>{{ 'students.email' | t }}</span>
+            <b>{{ s.email }}</b>
+          </a>
+        }
       </div>
     }
+
+    <!-- History ›, the last lesson on the line under it -->
+    <div class="card">
+      <button type="button" (click)="history.emit()" class="list-row w-full text-left">
+        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span class="font-medium">{{ 'people.history' | t }}</span>
+          <span class="text-footnote truncate opacity-50">{{ lastLabel() || ('students.noEvents' | t) }}</span>
+        </span>
+        <app-icon name="chevron-right" class="row-chevron" />
+      </button>
+    </div>
 
     <app-person-lessons
       [studentId]="s.id"
       [lessonIds]="s.lessonIds"
       [editable]="editable()"
-      [showLessons]="desktop"
+      [showLessons]="false"
       (lessonIdsChange)="students.setLessons(s.id, $event)"
     />
   `,
@@ -310,7 +297,7 @@ export class PersonLessons {
 export class StudentView {
   readonly student = input.required<Student>();
   readonly editable = input(true);
-  /** Phones: History › tapped (the card opens the full list). */
+  /** History › tapped (the card / page opens the full list). */
   readonly history = output<void>();
 
   protected students = inject(StudentService);
@@ -318,7 +305,6 @@ export class StudentView {
   private events = inject(EventService);
   private people = inject(EventPeople);
   private i18n = inject(I18nService);
-  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly colorVar = colorVar;
 
   protected readonly groups = computed(() =>
@@ -347,18 +333,18 @@ export class StudentView {
 @Component({
   selector: 'app-group-view',
   imports: [GroupMembers, Icon, PersonLessons],
-  host: { class: 'flex flex-col gap-4' },
+  host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let g = group();
+    <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
     <div class="person-head">
-      <span class="avatar size-14 text-xl text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
-      <div class="min-w-0 desktop:flex-1">
-        <h1 class="truncate text-xl font-semibold leading-tight">{{ g.name }}</h1>
-        <p class="text-footnote mt-1 flex items-center gap-1 tabular-nums opacity-60 mobile:justify-center">
+      <span class="avatar size-20 text-3xl text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
+      <div class="min-w-0 max-w-full">
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight">{{ g.name }}</h1>
+        <p class="text-footnote mt-1 flex items-center justify-center gap-1 tabular-nums opacity-60">
           <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
         </p>
       </div>
-      <div class="flex shrink-0 items-center gap-2 mobile:hidden"><ng-content select="[headerEnd]" /></div>
     </div>
 
     <app-person-lessons [groupId]="g.id" [lessonIds]="g.lessonIds" [editable]="editable()" (lessonIdsChange)="groups.setLessons(g.id, $event)" />

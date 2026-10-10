@@ -160,12 +160,11 @@
            bg-[var(--surface)];
   }
 
-  /* The head of a student / group page: avatar and name — centered on phones, avatar beside the
-     name on desktop; pinned while the rest scrolls (below the phone's top bar). */
+  /* The head of a student / group page (iOS contact): avatar and name centered; pinned while the
+     rest scrolls (below the phone's top bar; at the top of a desktop pane / dialog). */
   .person-head {
     @apply sticky top-[calc(env(safe-area-inset-top)+3.75rem)] z-[5] -mx-1 flex flex-col items-center gap-2
-           bg-[var(--head-bg,var(--app-bg))] px-1 pb-2 pt-1 text-center
-           desktop:top-0 desktop:flex-row desktop:gap-3.5 desktop:pt-0 desktop:text-left;
+           bg-[var(--head-bg,var(--app-bg))] px-1 pb-2 pt-1 text-center desktop:top-0;
   }
 
   /* The next lesson on a student / group page: a card ringed in the accent. */

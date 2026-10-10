@@ -19,7 +19,7 @@ import { PersonLessons, StudentView } from './person-views';
     @let m = model();
     @if (startedReading) {
       <!-- The card -->
-      <app-page-sheet #page [large]="true" [actions]="false" (closed)="closed.emit()">
+      <app-page-sheet #page [actions]="false" (closed)="closed.emit()">
         @if (!entry().readOnly) {
           <button barEnd type="button" (click)="openForm()" class="btn-white">{{ 'action.edit' | t }}</button>
         }
@@ -28,7 +28,7 @@ import { PersonLessons, StudentView } from './person-views';
             <!-- Desktop dialogs have no top bar: Edit in the header row -->
             @if (!entry().readOnly) {
               <ng-container ngProjectAs="[headerEnd]">
-                <button type="button" (click)="openForm()" class="btn-secondary shrink-0">{{ 'action.edit' | t }}</button>
+                <button type="button" (click)="openForm()" class="btn-secondary shrink-0 mobile:hidden">{{ 'action.edit' | t }}</button>
               </ng-container>
             }
           </app-student-view>
