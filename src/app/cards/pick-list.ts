@@ -23,9 +23,9 @@ export interface PickSection {
 }
 
 /**
- * Pick any number of items: search + sections, a tap checks / unchecks (applied right away,
- * two-way bound `selected`). Mobile: a page sliding in (it has a search input); desktop: a
- * dropdown under `origin`.
+ * Pick any number of items: search + sections, a tap checks / unchecks (two-way bound
+ * `selected`: on desktop each click applies; on phones ✓ applies the choice, ‹ drops it).
+ * Mobile: a page sliding in (it has a search input); desktop: a dropdown under `origin`.
  */
 @Component({
   selector: 'app-pick-list',
@@ -51,7 +51,7 @@ export interface PickSection {
                     [style.background]="item.color"
                   >{{ initial(item.name) }}</span>
                   <p class="min-w-0 flex-1 truncate">{{ item.name }}</p>
-                  @if (selected().includes(item.id)) {
+                  @if (picked().includes(item.id)) {
                     <app-icon name="check" class="size-5 text-[var(--accent)]" />
                   }
                 </button>
@@ -76,8 +76,8 @@ export interface PickSection {
       </app-sheet>
     } @else {
       <app-page-sheet #page [title]="title()" [actions]="false" [scroll]="false" (closed)="closed.emit()">
-        <!-- ✓ just closes: each tap already applies -->
-        <button barEnd type="button" (click)="page.close()" [attr.aria-label]="'action.done' | t" class="btn-confirm">
+        <!-- ✓ applies the choice; ‹ leaves without it -->
+        <button barEnd type="button" (click)="selected.set(draft()); page.close()" [attr.aria-label]="'action.done' | t" class="btn-confirm">
           <app-icon name="check" [strokeWidth]="2" class="size-7" />
         </button>
         <div class="flex min-h-0 flex-1 flex-col gap-4">
@@ -106,8 +106,13 @@ export class PickList implements OnInit {
   // under the finger as they're checked.)
   private readonly chosenAtOpen = signal(new Set<string>());
 
+  // Phones: taps change a draft, applied by ✓ (‹ drops it). Desktop: each click applies.
+  protected readonly draft = signal<string[]>([]);
+  protected readonly picked = computed(() => (this.desktop ? this.selected() : this.draft()));
+
   ngOnInit(): void {
     this.chosenAtOpen.set(new Set(this.selected()));
+    this.draft.set(this.selected());
   }
 
   // Each section filtered by the search: the chosen ones alphabetically, then the rest alphabetically.
@@ -130,6 +135,9 @@ export class PickList implements OnInit {
   }
 
   protected toggle(id: string): void {
-    this.selected.update((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+    const flip = (ids: string[]) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]);
+    if (this.desktop) this.selected.update(flip);
+    else this.draft.update(flip);
   }
+
 }
