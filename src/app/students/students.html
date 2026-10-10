@@ -2,10 +2,10 @@
   <app-search-field [(value)]="query" />
 </ng-template>
 
-<!-- One list (iOS Contacts-like): groups first, then students by letter. Mobile: a tap opens the
-     card. Desktop: the list on the left (calendar width), the picked student / group on the right. -->
-<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6">
-  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-md">
+<!-- One list (iOS Contacts-like), the full width: groups first, then students. A tap opens the
+     card on top (for reading, Edit inside) — on desktop too. -->
+<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1">
+  <section class="flex min-h-0 w-full flex-1 flex-col gap-3">
     <!-- Desktop: the search and Add in one row, the field as tall as the button (phones: search in
          the toolbar, + at the bottom) -->
     <div class="flex items-center gap-3 mobile:hidden [&_.field]:h-[var(--control-h)]">
@@ -27,11 +27,11 @@
               @for (g of visibleGroups(); track g.id) {
                 <button type="button" (click)="pickGroup(g)" class="list-row w-full py-2 text-left">
                   <span class="avatar text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
-                  <p class="min-w-0 flex-1 truncate font-medium" [class.font-bold]="desktop && isPicked('group', g.id)">{{ g.name }}</p>
+                  <p class="min-w-0 flex-1 truncate font-medium">{{ g.name }}</p>
                   <span class="text-footnote flex items-center gap-1 tabular-nums opacity-50">
                     <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
                   </span>
-                  <app-icon name="chevron-right" class="row-chevron desktop:hidden" />
+                  <app-icon name="chevron-right" class="row-chevron" />
                 </button>
               }
             </div>
@@ -55,14 +55,16 @@
                   }
                   <span class="avatar">{{ initial(s.name) }}</span>
                   <div class="min-w-0 flex-1 leading-tight">
-                    <!-- Desktop: the one shown on the right is bold -->
-                    <p class="truncate font-medium" [class.font-bold]="desktop && !selecting() && isPicked('student', s.id)">{{ s.name }}</p>
+                    <p class="truncate font-medium">{{ s.name }}</p>
                     @if (subtitle(s); as sub) {
                       <p class="text-footnote truncate opacity-50">{{ sub }}</p>
                     }
                   </div>
+                  <!-- Desktop (the room is there): the email and phone in their own columns -->
+                  <span class="hidden w-64 truncate opacity-60 desktop:block">{{ s.email }}</span>
+                  <span class="hidden w-40 truncate tabular-nums opacity-60 desktop:block">{{ s.phone }}</span>
                   @if (!selecting()) {
-                    <app-icon name="chevron-right" class="row-chevron desktop:hidden" />
+                    <app-icon name="chevron-right" class="row-chevron" />
                   }
                 </button>
               }
@@ -77,24 +79,6 @@
     }
   </section>
 
-  <!-- Desktop: the picked student / group, as in the phone card; Edit opens its form -->
-  <section class="flex min-h-0 flex-1 flex-col mobile:hidden">
-    @if (pickedStudent(); as s) {
-      <div class="flex justify-end">
-        <button type="button" (click)="stack.push({ kind: 'student', id: s.id, edit: true })" class="btn-secondary">{{ 'action.edit' | t }}</button>
-      </div>
-      <app-scroll-area class="min-h-0 flex-1" contentClass="pb-14">
-        <app-student-view [student]="s" class="mx-auto w-full max-w-xl" />
-      </app-scroll-area>
-    } @else if (pickedGroup(); as g) {
-      <div class="flex justify-end">
-        <button type="button" (click)="stack.push({ kind: 'group', id: g.id, edit: true })" class="btn-secondary">{{ 'action.edit' | t }}</button>
-      </div>
-      <app-scroll-area class="min-h-0 flex-1" contentClass="pb-14">
-        <app-group-view [group]="g" class="mx-auto w-full max-w-xl" />
-      </app-scroll-area>
-    }
-  </section>
 </main>
 
 <!-- Add: a new student or a new group. Desktop: a compact dropdown under Add (like a select's).

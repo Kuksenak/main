@@ -1,7 +1,6 @@
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { GroupView, StudentView } from '../cards/person-views';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
@@ -16,15 +15,15 @@ import { Group, GroupService, colorVar } from './group.service';
 import { Student, StudentService } from './student.service';
 
 /**
- * Students and groups in one list (iOS Contacts-like): groups first, then students, the search
- * filtering both. Mobile: a tap opens the card on the NavStack (for reading, Edit inside).
- * Desktop: the picked student / group shows on the right the same way; its Edit opens the form.
+ * Students and groups in one full-width list (iOS Contacts-like): groups first, then students, the
+ * search filtering both. A tap opens the card on the NavStack (for reading, Edit inside) — on
+ * desktop too (a dialog); there the rows also show the email and phone.
  * Add offers a new student or group; a long press on a student starts picking students to make a
  * group of.
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, OverlayModule, GroupView, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
+  imports: [NgTemplateOutlet, OverlayModule, Icon, LongPress, ScrollArea, SearchField, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -67,23 +66,6 @@ export class Students {
     return groups.join(', ') || s.email || s.phone || '';
   }
 
-  // Desktop details: the picked student / group, else the first student (else the first group).
-  private readonly picked = signal<{ kind: 'student' | 'group'; id: string } | null>(null);
-  protected readonly pickedStudent = computed<Student | null>(() => {
-    const p = this.picked();
-    if (p?.kind === 'group' && this.visibleGroups().some((g) => g.id === p.id)) return null;
-    return this.visible().find((s) => s.id === p?.id) ?? this.visible().at(0) ?? null;
-  });
-  protected readonly pickedGroup = computed<Group | null>(() => {
-    if (this.pickedStudent()) return null;
-    const p = this.picked();
-    return this.visibleGroups().find((g) => g.id === p?.id) ?? this.visibleGroups().at(0) ?? null;
-  });
-
-  protected isPicked(kind: 'student' | 'group', id: string): boolean {
-    return kind === 'student' ? this.pickedStudent()?.id === id : this.pickedGroup()?.id === id;
-  }
-
   // Select mode (students → new group).
   protected readonly selecting = signal(false);
   protected readonly checked = signal<ReadonlySet<string>>(new Set());
@@ -108,16 +90,14 @@ export class Students {
     return initial(name, this.i18n.locale());
   }
 
-  // Row taps: select mode toggles; desktop shows details; mobile opens the card.
+  // Row taps: select mode toggles; else the card opens.
   protected pick(s: Student): void {
     if (this.selecting()) this.toggleChecked(s.id);
-    else if (this.desktop) this.picked.set({ kind: 'student', id: s.id });
     else this.stack.push({ kind: 'student', id: s.id });
   }
 
   protected pickGroup(g: Group): void {
-    if (this.desktop) this.picked.set({ kind: 'group', id: g.id });
-    else this.stack.push({ kind: 'group', id: g.id });
+    this.stack.push({ kind: 'group', id: g.id });
   }
 
   protected openAdd(origin: HTMLElement): void {
