@@ -97,17 +97,6 @@
               [attr.data-now]="timing(event) !== 'past' ? '' : null"
             >
               <span class="color-bar" [style.background]="people.color(event)"></span>
-              <!-- ⟲ repeating over 📎 lessons attached, left of the text -->
-              @if (dayHasMarks()) {
-                <div class="-mr-1 flex w-[1.125rem] shrink-0 flex-col items-center gap-1 opacity-50">
-                  @if (event.repeat !== 'Never') {
-                    <app-icon name="repeat" class="size-[1.125rem]" />
-                  }
-                  @if (event.lessonIds.length) {
-                    <app-icon name="paperclip" class="size-[1.125rem] rotate-45" />
-                  }
-                </div>
-              }
               <div class="min-w-0 flex-1 leading-tight">
                 <p
                   class="text-body truncate font-medium"
@@ -122,6 +111,17 @@
                   <p class="font-medium">{{ startLabel(event) }}</p>
                   <p class="opacity-50">{{ endLabel(event) }}</p>
                 </div>
+                <!-- ⟲ repeating over 📎 lessons attached, right of the time -->
+                @if (dayHasMarks()) {
+                  <div class="-ml-1 flex w-[1.125rem] shrink-0 flex-col items-center gap-1 opacity-50">
+                    @if (event.repeat !== 'Never') {
+                      <app-icon name="repeat" class="size-[1.125rem]" />
+                    }
+                    @if (event.lessonIds.length) {
+                      <app-icon name="paperclip" class="size-[1.125rem] rotate-45" />
+                    }
+                  </div>
+                }
               </div>
             </button>
           }
