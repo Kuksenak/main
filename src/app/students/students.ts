@@ -11,15 +11,13 @@ import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { SearchField } from '../core/ui/search-field';
 import { initial } from '../core/utils/text';
-import { EventPeople } from '../schedule/event-people';
-import { EventService, ScheduleEvent, eventEnd } from '../schedule/event.service';
 import { Group, GroupService, colorVar } from './group.service';
 import { Student, StudentService } from './student.service';
 
 /**
- * Students and groups in one full-width list (iOS Contacts-like): groups first, then students, the
- * search filtering both. A tap opens the card on the NavStack (for reading, Edit inside) — on
- * desktop too (a dialog); there the rows also show the next lesson and the email.
+ * Students and groups (iOS Contacts-like), the search filtering both: phones one list (groups
+ * first), desktop two columns (students | groups). A tap opens the card on the NavStack (for
+ * reading, Edit inside; a dialog on desktop).
  * Add offers a new student or group; a long press on a student starts picking students to make a
  * group of.
  */
@@ -31,8 +29,6 @@ import { Student, StudentService } from './student.service';
 export class Students {
   private service = inject(StudentService);
   private groupService = inject(GroupService);
-  private events = inject(EventService);
-  private people = inject(EventPeople);
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
   private readonly search = viewChild<TemplateRef<unknown>>('search');
@@ -68,48 +64,6 @@ export class Students {
       .filter((g) => g.studentIds.includes(s.id))
       .map((g) => g.name);
     return groups.join(', ') || s.email || s.phone || '';
-  }
-
-  // ---- Next lesson (desktop columns) ----
-
-  private readonly now = signal(Date.now());
-
-  // Upcoming events (not over yet), soonest first.
-  private readonly upcoming = computed(() => {
-    const now = this.now();
-    return this.events
-      .events()
-      .filter((e) => eventEnd(e).getTime() >= now)
-      .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-  });
-  // Each student's / group's next event (directly or through a group).
-  private readonly nextByStudent = computed(() => {
-    const map = new Map<string, ScheduleEvent>();
-    for (const e of this.upcoming()) {
-      for (const s of this.service.students()) {
-        if (!map.has(s.id) && this.people.invites(e, s.id)) map.set(s.id, e);
-      }
-    }
-    return map;
-  });
-  private readonly nextByGroup = computed(() => {
-    const map = new Map<string, ScheduleEvent>();
-    for (const e of this.upcoming()) for (const id of e.groupIds) if (!map.has(id)) map.set(id, e);
-    return map;
-  });
-
-  protected nextLabel(studentId: string): string {
-    return this.when(this.nextByStudent().get(studentId));
-  }
-  protected nextGroupLabel(groupId: string): string {
-    return this.when(this.nextByGroup().get(groupId));
-  }
-
-  // "Wed, 8 Oct · 18:00"
-  private when(e: ScheduleEvent | undefined): string {
-    if (!e) return '';
-    const start = new Date(e.startsAt);
-    return `${this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' })} · ${this.i18n.time(start)}`;
   }
 
   // Select mode (students → new group).
