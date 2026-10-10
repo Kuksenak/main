@@ -21,7 +21,7 @@ import { GroupMembers } from './related-lists';
 @Component({
   selector: 'app-person-lessons',
   imports: [Icon, NgTemplateOutlet, PickList, TranslatePipe],
-  host: { class: 'flex flex-col gap-4' },
+  host: { class: 'flex flex-col gap-4', '[class.!gap-0]': 'flat()' },
   template: `
     @if (showNext()) {
     <!-- Next lesson -->
@@ -72,44 +72,58 @@ import { GroupMembers } from './related-lists';
       </div>
     }
 
-    <!-- Lessons under their months (upcoming soonest first, past most recent first) -->
-    <ng-template #byMonth let-months let-label="label">
-      <div class="flex flex-col gap-1.5">
-        @if (listLabels()) {
-          <span class="card-label">{{ label | t }}</span>
-        }
-        @for (m of months; track m.label) {
-          <!-- The month: larger, in capitals, gray and light -->
-          <span class="mt-2 px-0.5 text-[0.9375rem] font-light uppercase tracking-wide opacity-50 desktop:mt-1 desktop:text-xs">{{ m.label }}</span>
-          <div class="card">
-            @for (e of m.events; track key(e)) {
-              <!-- Day, time and who; attached lessons / repeating only as the marks on the right -->
-              <div class="list-row pb-3 pt-3.5 desktop:py-2">
-                <span class="date-tile desktop:size-9">
-                  <b>{{ day(e) }}</b>
-                  <small>{{ weekday(e) }}</small>
-                </span>
-                <span class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2">
-                  <span class="tabular-nums">{{ time(e) }}</span>
-                  @if (context(e); as c) {
-                    <span class="truncate opacity-50">{{ c }}</span>
-                  }
-                </span>
-                @if (e.repeat !== 'Never' || e.lessonIds.length) {
-                  <span class="flex shrink-0 items-center gap-1.5 opacity-50">
-                    @if (e.repeat !== 'Never') {
-                      <app-icon name="repeat" class="size-4" />
-                    }
-                    @if (e.lessonIds.length) {
-                      <app-icon name="paperclip" class="size-4 rotate-45" />
-                    }
-                  </span>
-                }
-              </div>
+    <!-- One lesson: day, time and who; attached lessons / repeating only as the marks on the right -->
+    <ng-template #lessonLine let-e>
+      <div class="list-row pb-3 pt-3.5 desktop:py-2">
+        <span class="date-tile desktop:size-9">
+          <b>{{ day(e) }}</b>
+          <small>{{ weekday(e) }}</small>
+        </span>
+        <span class="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2">
+          <span class="tabular-nums">{{ time(e) }}</span>
+          @if (context(e); as c) {
+            <span class="truncate opacity-50">{{ c }}</span>
+          }
+        </span>
+        @if (e.repeat !== 'Never' || e.lessonIds.length) {
+          <span class="flex shrink-0 items-center gap-1.5 opacity-50">
+            @if (e.repeat !== 'Never') {
+              <app-icon name="repeat" class="size-4" />
             }
-          </div>
+            @if (e.lessonIds.length) {
+              <app-icon name="paperclip" class="size-4 rotate-45" />
+            }
+          </span>
         }
       </div>
+    </ng-template>
+
+    <!-- Lessons under their months (upcoming soonest first, past most recent first): a card per
+         month, or (flat) just rows with the months among them, to sit inside another card -->
+    <ng-template #byMonth let-months let-label="label">
+      @if (flat()) {
+        @for (m of months; track m.label) {
+          <span class="list-row !min-h-0 pb-1 pt-3 text-xs font-light uppercase tracking-wide opacity-50">{{ m.label }}</span>
+          @for (e of m.events; track key(e)) {
+            <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+          }
+        }
+      } @else {
+        <div class="flex flex-col gap-1.5">
+          @if (listLabels()) {
+            <span class="card-label">{{ label | t }}</span>
+          }
+          @for (m of months; track m.label) {
+            <!-- The month: larger, in capitals, gray and light -->
+            <span class="mt-2 px-0.5 text-[0.9375rem] font-light uppercase tracking-wide opacity-50 desktop:mt-1 desktop:text-xs">{{ m.label }}</span>
+            <div class="card">
+              @for (e of m.events; track key(e)) {
+                <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+              }
+            </div>
+          }
+        </div>
+      }
     </ng-template>
 
     @if (showUpcoming()) {
@@ -154,6 +168,8 @@ export class PersonLessons {
   readonly showMaterials = input(true);
   // Labels over the lists ("Upcoming", "Past lessons"); off on their own page (its title says it).
   readonly listLabels = input(true);
+  // The lists as bare rows (month headers among them), to sit inside another card.
+  readonly flat = input(false);
   readonly lessonIdsChange = output<string[]>();
 
   private events = inject(EventService);
@@ -336,35 +352,39 @@ export class PersonLessons {
     <!-- Two blocks: Upcoming › with the next lesson under it, History › with the last one (a tap
          opens the full list); each only when there's something in it -->
     @if (nextEvent(); as e) {
-      <button type="button" (click)="tap('upcoming')" class="card flex w-full flex-col text-left">
-        <span class="list-row">
-          <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
-          <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'upcoming'" />
-        </span>
-        <!-- Unfolded (desktop): the full list below takes the next lesson's place -->
-        @if (expanded() !== 'upcoming') {
-          <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
+      <div class="card">
+        <button type="button" (click)="tap('upcoming')" class="flex w-full flex-col text-left">
+          <span class="list-row">
+            <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
+            <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'upcoming'" />
+          </span>
+          @if (expanded() !== 'upcoming') {
+            <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
+          }
+        </button>
+        <!-- Unfolded (desktop): every upcoming lesson, in this same card -->
+        @if (expanded() === 'upcoming') {
+          <app-person-lessons [studentId]="s.id" [showNext]="false" [showUpcoming]="true" [showPast]="false" [showMaterials]="false" [flat]="true" />
         }
-      </button>
-      <!-- Desktop: the full list unfolds right here -->
-      @if (expanded() === 'upcoming') {
-        <app-person-lessons [studentId]="s.id" [showNext]="false" [showUpcoming]="true" [showPast]="false" [showMaterials]="false" [listLabels]="false" />
-      }
+      </div>
     }
     @if (lastEvent(); as e) {
-      <button type="button" (click)="tap('history')" class="card flex w-full flex-col text-left">
-        <span class="list-row">
-          <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
-          <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'history'" />
-        </span>
-        <!-- The last lesson, as a line of text (unfolded: the full list below instead) -->
-        @if (expanded() !== 'history') {
-          <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</span>
+      <div class="card">
+        <button type="button" (click)="tap('history')" class="flex w-full flex-col text-left">
+          <span class="list-row">
+            <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
+            <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'history'" />
+          </span>
+          <!-- The last lesson, as a line of text -->
+          @if (expanded() !== 'history') {
+            <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</span>
+          }
+        </button>
+        <!-- Unfolded (desktop): every past lesson, in this same card -->
+        @if (expanded() === 'history') {
+          <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [flat]="true" />
         }
-      </button>
-      @if (expanded() === 'history') {
-        <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [listLabels]="false" />
-      }
+      </div>
     }
 
     <app-person-lessons
