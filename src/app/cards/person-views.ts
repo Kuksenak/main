@@ -383,7 +383,10 @@ export class PersonLessons {
                 <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [flat]="true" />
               </app-scroll-area>
             } @else {
-              <button type="button" (click)="toggle('history')" class="list-row w-full text-left text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</button>
+              <!-- The last two lessons: about as tall as Upcoming's row beside it -->
+              @for (p of lastTwo(); track p.startsAt) {
+                <button type="button" (click)="toggle('history')" class="list-row w-full text-left text-[var(--text-secondary)] tabular-nums">{{ when(p) }}</button>
+              }
             }
           </div>
         }
@@ -456,6 +459,12 @@ export class StudentView {
       this.mine()
         .filter((e) => eventEnd(e).getTime() >= Date.now())
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null,
+  );
+  protected readonly lastTwo = computed(() =>
+    this.mine()
+      .filter((e) => eventEnd(e).getTime() < Date.now())
+      .sort((a, b) => b.startsAt.localeCompare(a.startsAt))
+      .slice(0, 2),
   );
   protected readonly lastEvent = computed(
     () =>
