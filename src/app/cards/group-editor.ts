@@ -161,12 +161,13 @@ export class GroupEditor implements OnInit {
     if (this.saved()) {
       this.reset();
     } else {
-      // New: first color not used yet; members pre-selected from the students list. Counts as
-      // unsaved, so a group made from a selection can be saved right after naming it.
+      // New: first color not used yet; members pre-selected from the students list. Untouched it
+      // closes without asking (naming it is a change, so Save lights up then).
       const used = new Set(this.groups.groups().map((x) => x.color));
       const color = GROUP_COLORS.find((c) => !used.has(c)) ?? GROUP_COLORS[0];
       const studentIds = this.entry().studentIds ?? [];
       this.model.set({ name: '', color, studentIds });
+      this.snapshot.set(GroupEditor.key(this.model()));
     }
   }
 
