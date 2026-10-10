@@ -96,20 +96,39 @@
   </section>
 </main>
 
-<!-- Add: a new student or a new group (a dropdown under Add on desktop, a bottom sheet on phones) -->
+<!-- Add: a new student or a new group. Desktop: a dropdown under Add. Phones: an iOS pop-up menu
+     growing up from the + (labels left, icons right); a tap outside closes it. -->
 @if (adding()) {
-  <app-sheet #addSheet [origin]="addOrigin()" (closed)="adding.set(false)">
-    <div class="card">
-      <button type="button" (click)="addSheet.close(); openNew('student')" class="list-row w-full text-left">
-        <app-icon name="person" class="size-5 opacity-60" />
-        <span class="flex-1">{{ 'students.add' | t }}</span>
-      </button>
-      <button type="button" (click)="addSheet.close(); openNew('group')" class="list-row w-full text-left">
-        <app-icon name="people" class="size-5 opacity-60" />
-        <span class="flex-1">{{ 'groups.add' | t }}</span>
-      </button>
+  @if (desktop) {
+    <app-sheet #addSheet [origin]="addOrigin()" (closed)="adding.set(false)">
+      <div class="card">
+        <button type="button" (click)="addSheet.close(); openNew('student')" class="list-row w-full text-left">
+          <app-icon name="person" class="size-5 opacity-60" />
+          <span class="flex-1">{{ 'students.add' | t }}</span>
+        </button>
+        <button type="button" (click)="addSheet.close(); openNew('group')" class="list-row w-full text-left">
+          <app-icon name="people" class="size-5 opacity-60" />
+          <span class="flex-1">{{ 'groups.add' | t }}</span>
+        </button>
+      </div>
+    </app-sheet>
+  } @else {
+    <div class="fixed inset-0 z-40" (click)="adding.set(false)">
+      <div
+        class="fixed right-4 bottom-[calc(var(--float-bottom)+var(--control-round)+0.5rem)] w-60 origin-bottom-right overflow-hidden rounded-[1.75rem] p-1.5 text-[var(--text)] shadow-[0_12px_40px_rgb(0_0_0/0.35),0_2px_8px_rgb(0_0_0/0.15)] [animation:menuIn_280ms_var(--ease-out-quick)] [background:var(--picker-bg)]"
+        (click)="$event.stopPropagation()"
+      >
+        <button type="button" (click)="adding.set(false); openNew('student')" class="flex h-12 w-full items-center gap-3 rounded-[1.25rem] px-4 text-left text-[1.0625rem] active:bg-[var(--highlight)] active:![transform:none]">
+          <span class="flex-1">{{ 'students.add' | t }}</span>
+          <app-icon name="person" class="size-[1.375rem]" />
+        </button>
+        <button type="button" (click)="adding.set(false); openNew('group')" class="flex h-12 w-full items-center gap-3 rounded-[1.25rem] px-4 text-left text-[1.0625rem] active:bg-[var(--highlight)] active:![transform:none]">
+          <span class="flex-1">{{ 'groups.add' | t }}</span>
+          <app-icon name="people" class="size-[1.375rem]" />
+        </button>
+      </div>
     </div>
-  </app-sheet>
+  }
 }
 
 <!-- Floating: while selecting, Cancel · Create group; else (phones) + bottom-right -->

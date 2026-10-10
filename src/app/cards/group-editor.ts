@@ -167,8 +167,6 @@ export class GroupEditor implements OnInit {
       const color = GROUP_COLORS.find((c) => !used.has(c)) ?? GROUP_COLORS[0];
       const studentIds = this.entry().studentIds ?? [];
       this.model.set({ name: '', color, studentIds });
-      // A brand-new empty group starts by picking its members.
-      if (!studentIds.length) this.pickingMembers.set(true);
     }
   }
 
