@@ -275,7 +275,7 @@ export class PersonLessons {
       </a>
     </div>
 
-    <app-person-lessons [studentId]="s.id" [lessonIds]="s.lessonIds" [editable]="editable()" (lessonIdsChange)="students.setLessons(s.id, $event)" />
+    <app-person-lessons [studentId]="s.id" [lessonIds]="s.lessonIds ?? []" [editable]="editable()" (lessonIdsChange)="students.setLessons(s.id, $event)" />
   `,
 })
 export class StudentView {
@@ -314,7 +314,7 @@ export class StudentView {
       <div class="flex shrink-0 items-center gap-2 mobile:hidden"><ng-content select="[headerEnd]" /></div>
     </div>
 
-    <app-person-lessons [groupId]="g.id" [lessonIds]="g.lessonIds" [editable]="editable()" (lessonIdsChange)="groups.setLessons(g.id, $event)" />
+    <app-person-lessons [groupId]="g.id" [lessonIds]="g.lessonIds ?? []" [editable]="editable()" (lessonIdsChange)="groups.setLessons(g.id, $event)" />
     <app-group-members [studentIds]="g.studentIds" />
   `,
 })
