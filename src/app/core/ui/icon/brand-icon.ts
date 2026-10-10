@@ -38,20 +38,21 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
   `,
   template: `
     @if (name() === 'calendar' && date()) {
-      <!-- A given date (e.g. a lesson's): a wider page — the month in the band, the date, the
-           weekday under it (size the host about 5:4, e.g. h-14 w-[4.375rem]) -->
-      <svg viewBox="0 0 60 48" class="size-full">
-        <mask id="brand-cal-wide">
-          <rect x="3" y="3" width="54" height="42" rx="8" fill="#fff" />
+      <!-- A given date (e.g. a lesson's), as a two-page booklet: the month on a blue left page, the
+           date and weekday on the white right one (size the host about 19:12, e.g. h-14 w-[5.5rem]) -->
+      <svg viewBox="0 0 76 48" class="size-full">
+        <mask id="brand-cal-book">
+          <rect x="3" y="3" width="70" height="42" rx="8" fill="#fff" />
         </mask>
-        <g mask="url(#brand-cal-wide)">
-          <rect width="60" height="48" fill="#fff" />
-          <rect width="60" height="15" style="fill: var(--brand-blue)" />
+        <g mask="url(#brand-cal-book)">
+          <rect width="76" height="48" fill="#fff" />
+          <rect width="33" height="48" style="fill: var(--brand-blue)" />
         </g>
-        <rect x="3" y="3" width="54" height="42" rx="8" fill="none" style="stroke: rgb(0 0 0 / 0.08); stroke-width: 0.75" />
-        <text x="30" y="12.3" text-anchor="middle" class="brand-weekday" style="font-size: 8px">{{ month() }}</text>
-        <text x="30" y="31.5" text-anchor="middle" class="brand-date" style="font-size: 18px">{{ day() }}</text>
-        <text x="30" y="41.5" text-anchor="middle" class="brand-small" style="font-size: 6.5px">{{ weekday() }}</text>
+        <rect x="33" y="3" width="1" height="42" fill="rgb(0 0 0 / 0.12)" />
+        <rect x="3" y="3" width="70" height="42" rx="8" fill="none" style="stroke: rgb(0 0 0 / 0.08); stroke-width: 0.75" />
+        <text x="18" y="28" text-anchor="middle" class="brand-weekday" style="font-size: 10px; font-weight: 700">{{ month() }}</text>
+        <text x="54" y="29" text-anchor="middle" class="brand-date" style="font-size: 19px">{{ day() }}</text>
+        <text x="54" y="39.5" text-anchor="middle" class="brand-small" style="font-size: 7px">{{ weekday() }}</text>
       </svg>
     } @else {
     <svg viewBox="0 0 48 48" class="size-full">

@@ -303,7 +303,7 @@ export class PersonLessons {
       </span>
       <!-- The next lesson: the calendar icon, its title, marks, start over end -->
       <span class="list-row !gap-3.5 py-3">
-        <app-brand-icon name="calendar" [date]="start(e)" class="h-14 w-[4.375rem] shrink-0" />
+        <app-brand-icon name="calendar" [date]="start(e)" class="h-14 w-[5.5rem] shrink-0" />
         <!-- The event's title (else its groups); attached lessons show as the paperclip only -->
         <span class="flex min-w-0 flex-1 flex-col gap-1.5">
           @if (context(e); as c) {
