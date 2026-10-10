@@ -38,7 +38,7 @@ import { PersonLessons, StudentView } from './person-views';
 
       <!-- Upcoming / History: every lesson ahead / behind, its own page -->
       @if (listOpen() && saved(); as s) {
-        <app-page-sheet [title]="(listOpen() === 'upcoming' ? 'students.upcoming' : 'people.history') | t" [actions]="false" (closed)="listOpen.set(null)">
+        <app-page-sheet [title]="(listOpen() === 'upcoming' ? 'people.upcoming' : 'people.history') | t" [actions]="false" (closed)="listOpen.set(null)">
           <app-person-lessons
             [studentId]="s.id"
             [showNext]="false"

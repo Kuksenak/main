@@ -376,7 +376,7 @@ export class PersonLessons {
       @if (nextEvent(); as e) {
         <button type="button" (click)="upcoming.emit()" class="card flex w-full flex-col text-left">
           <span class="list-row">
-            <span class="block-title">{{ 'people.upcoming' | t }}</span>
+            <span class="block-title">{{ 'students.upcoming' | t }}</span>
             <app-icon name="chevron-right" class="row-chevron" />
           </span>
           <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
@@ -413,7 +413,7 @@ export class StudentView {
   // Desktop: both lists side by side (phones: blocks that open them as a page).
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly columns = [
-    { list: 'upcoming', title: 'people.upcoming' },
+    { list: 'upcoming', title: 'students.upcoming' },
     { list: 'history', title: 'people.history' },
   ] as const;
 

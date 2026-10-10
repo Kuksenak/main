@@ -203,10 +203,9 @@
     @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-[var(--chip-ios)] px-2 py-1 text-[0.8125rem];
   }
 
-  /* A block's title on the student page (Upcoming events, History): capitals, light, like the
-     name in the desktop head. */
+  /* A block's title on the student page (Upcoming, History). */
   .block-title {
-    @apply min-w-0 flex-1 font-light uppercase tracking-wider;
+    @apply min-w-0 flex-1 font-medium;
   }
 
   /* A contact field (iOS): a small label over the value, the value in the accent. */
