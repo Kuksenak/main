@@ -1,9 +1,6 @@
 import { Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { DeviceDetectionService } from '../core/services/device-detection.service';
-import { NavStack } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { initial } from '../core/utils/text';
 import { LessonService } from '../lessons/lesson.service';
@@ -17,8 +14,7 @@ import { GroupMembers } from './related-lists';
 /**
  * A person's / group's lessons, the way the student page shows them: the next lesson as a card
  * (date tile, time, who else, what's attached), their own materials (attached lessons, Attach),
- * then every past lesson by month with what was attached to it. A tap on a lesson opens its
- * event card; on a material, the lesson.
+ * then every past lesson by month with what was attached to it. (Rows don't open anything for now.)
  */
 @Component({
   selector: 'app-person-lessons',
@@ -27,7 +23,7 @@ import { GroupMembers } from './related-lists';
   template: `
     <!-- Next lesson -->
     @if (next(); as e) {
-      <button type="button" (click)="open(e)" class="next-lesson">
+      <div class="next-lesson">
         <span class="date-tile is-accent">
           <small>{{ weekday(e) }}</small>
           <b>{{ day(e) }}</b>
@@ -48,7 +44,7 @@ import { GroupMembers } from './related-lists';
             </span>
           }
         </span>
-      </button>
+      </div>
     }
 
     <!-- Materials: lessons attached to the person / group -->
@@ -57,11 +53,10 @@ import { GroupMembers } from './related-lists';
         <span class="card-label">{{ 'people.materials' | t }}</span>
         <div class="card">
           @for (l of materials(); track l.id) {
-            <button type="button" (click)="openLesson(l.id)" class="list-row w-full text-left">
+            <div class="list-row">
               <app-icon name="book" [strokeWidth]="1.75" class="size-[1.125rem] opacity-50" />
               <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
-              <app-icon name="chevron-right" class="row-chevron" />
-            </button>
+            </div>
           }
           @if (editable()) {
             <button #attachRow type="button" (click)="picking.set(true)" [disabled]="!allLessons().length" class="list-row add-row">
@@ -81,7 +76,7 @@ import { GroupMembers } from './related-lists';
           <span class="text-footnote mt-1 px-0.5 capitalize opacity-50">{{ m.label }}</span>
           <div class="card">
             @for (e of m.events; track key(e)) {
-              <button type="button" (click)="open(e)" class="list-row w-full !items-start text-left">
+              <div class="list-row !items-start">
                 <span class="date-tile">
                   <b>{{ day(e) }}</b>
                   <small>{{ weekday(e) }}</small>
@@ -103,7 +98,7 @@ import { GroupMembers } from './related-lists';
                     <span class="text-footnote opacity-35">{{ 'people.nothingAttached' | t }}</span>
                   }
                 </span>
-              </button>
+              </div>
             }
           </div>
         }
@@ -141,9 +136,6 @@ export class PersonLessons {
   private groups = inject(GroupService);
   private lessons = inject(LessonService);
   private i18n = inject(I18nService);
-  private stack = inject(NavStack);
-  private router = inject(Router);
-  private device = inject(DeviceDetectionService);
 
   protected readonly picking = signal(false);
   protected readonly attachRow = viewChild<ElementRef<HTMLElement>>('attachRow');
@@ -215,19 +207,6 @@ export class PersonLessons {
     return `${this.i18n.time(new Date(e.startsAt))}–${this.i18n.time(eventEnd(e))}`;
   }
 
-  protected open(e: ScheduleEvent): void {
-    this.stack.push({ kind: 'event', id: e.id, at: e.startsAt });
-  }
-
-  // A material: a card on top on phones, the lesson's page on desktop.
-  protected openLesson(id: string): void {
-    if (this.device.isMobile()) {
-      this.stack.push({ kind: 'lesson', id });
-    } else {
-      this.stack.clear();
-      this.router.navigate(['/lessons', id]);
-    }
-  }
 }
 
 /**

@@ -2,7 +2,6 @@ import { Component, computed, inject, input } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { NavStack } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { Section } from '../core/ui/section/section';
 import { EventPeople } from '../schedule/event-people';
@@ -12,7 +11,7 @@ import { EventService, ScheduleEvent, eventEnd, occurrenceKey } from '../schedul
  * Events a student is invited to (directly or through a group), a group is invited to, or a
  * lesson is attached to:
  * Upcoming soonest first, then Past most recent first, each a collapsible section (Past folded
- * by default). A tap opens the event card on top.
+ * by default). Rows don't open anything for now.
  */
 @Component({
   selector: 'app-event-list',
@@ -27,7 +26,7 @@ import { EventService, ScheduleEvent, eventEnd, occurrenceKey } from '../schedul
         <app-section [title]="g.key | t" [count]="g.items.length" [key]="g.key" [initiallyOpen]="g.open">
           <div class="card">
             @for (e of g.items; track key(e)) {
-              <button type="button" (click)="open(e)" class="list-row w-full py-2 text-left">
+              <div class="list-row py-2">
                 <span class="color-bar" [style.background]="people.color(e)"></span>
                 <div class="min-w-0 flex-1 leading-tight">
                   <p class="truncate font-medium">{{ date(e) }}@if (e.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}@if (e.repeat !== 'Never') {<app-icon name="repeat" class="ml-1.5 inline size-4 align-[-2px] opacity-50" />}</p>
@@ -35,8 +34,7 @@ import { EventService, ScheduleEvent, eventEnd, occurrenceKey } from '../schedul
                     {{ time(e) }}@if (lessonId() ? people.label(e) : e.title; as name) { · {{ name }} }
                   </p>
                 </div>
-                <app-icon name="chevron-right" class="row-chevron" />
-              </button>
+              </div>
             }
           </div>
         </app-section>
@@ -53,7 +51,6 @@ export class EventList {
   private events = inject(EventService);
   protected people = inject(EventPeople);
   private i18n = inject(I18nService);
-  private stack = inject(NavStack);
 
   private readonly mine = computed(() => {
     const sid = this.studentId();
@@ -82,10 +79,6 @@ export class EventList {
     { key: 'students.upcoming' as TranslationKey, items: this.upcoming(), open: true },
     { key: 'students.past' as TranslationKey, items: this.past(), open: false },
   ]);
-
-  protected open(e: ScheduleEvent): void {
-    this.stack.push({ kind: 'event', id: e.id, at: e.startsAt });
-  }
 
   protected date(e: ScheduleEvent): string {
     return this.i18n.date(new Date(e.startsAt), { weekday: 'short', day: 'numeric', month: 'short' });

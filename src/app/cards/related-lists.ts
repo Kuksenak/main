@@ -1,25 +1,22 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { NavStack } from '../core/services/nav-stack.service';
-import { Icon } from '../core/ui/icon/icon';
 import { Section } from '../core/ui/section/section';
 import { initial } from '../core/utils/text';
 import { Student, StudentService } from '../students/student.service';
 
-/** Members of a group, alphabetical; a tap opens the student card on top. */
+/** Members of a group, alphabetical (rows don't open anything for now). */
 @Component({
   selector: 'app-group-members',
-  imports: [Icon, Section, TranslatePipe],
+  imports: [Section, TranslatePipe],
   template: `
     <app-section [title]="'groups.members' | t" [count]="members().length" key="members">
       <div class="card">
         @for (s of members(); track s.id) {
-          <button type="button" (click)="stack.push({ kind: 'student', id: s.id })" class="list-row w-full py-2 text-left">
+          <div class="list-row py-2">
             <span class="avatar">{{ initial(s.name) }}</span>
             <p class="min-w-0 flex-1 truncate">{{ s.name }}</p>
-            <app-icon name="chevron-right" class="row-chevron" />
-          </button>
+          </div>
         } @empty {
           <p class="list-row opacity-40">—</p>
         }
@@ -32,7 +29,6 @@ export class GroupMembers {
 
   private students = inject(StudentService);
   private i18n = inject(I18nService);
-  protected stack = inject(NavStack);
 
   protected readonly members = computed(() =>
     this.studentIds()
