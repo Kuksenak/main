@@ -1,6 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
@@ -335,23 +336,30 @@ export class PersonLessons {
     <!-- Two blocks: Upcoming › with the next lesson under it, History › with the last one (a tap
          opens the full list); each only when there's something in it -->
     @if (nextEvent(); as e) {
-      <button type="button" (click)="upcoming.emit()" class="card flex w-full flex-col text-left">
+      <button type="button" (click)="tap('upcoming')" class="card flex w-full flex-col text-left">
         <span class="list-row">
           <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
-          <app-icon name="chevron-right" class="row-chevron" />
+          <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'upcoming'" />
         </span>
         <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
       </button>
+      <!-- Desktop: the full list unfolds right here -->
+      @if (expanded() === 'upcoming') {
+        <app-person-lessons [studentId]="s.id" [showNext]="false" [showUpcoming]="true" [showPast]="false" [showMaterials]="false" [listLabels]="false" />
+      }
     }
     @if (lastEvent(); as e) {
-      <button type="button" (click)="history.emit()" class="card flex w-full flex-col text-left">
+      <button type="button" (click)="tap('history')" class="card flex w-full flex-col text-left">
         <span class="list-row">
           <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
-          <app-icon name="chevron-right" class="row-chevron" />
+          <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'history'" />
         </span>
         <!-- The last lesson, as a line of text -->
         <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</span>
       </button>
+      @if (expanded() === 'history') {
+        <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [listLabels]="false" />
+      }
     }
 
     <app-person-lessons
@@ -370,6 +378,16 @@ export class StudentView {
   /** Upcoming › / History › tapped (the card / page opens the full list). */
   readonly upcoming = output<void>();
   readonly history = output<void>();
+
+  // Desktop: Upcoming / History unfold in place (phones open them as a page).
+  private readonly desktop = !inject(DeviceDetectionService).isMobile();
+  protected readonly expanded = signal<'upcoming' | 'history' | null>(null);
+
+  protected tap(list: 'upcoming' | 'history'): void {
+    if (this.desktop) this.expanded.update((x) => (x === list ? null : list));
+    else if (list === 'upcoming') this.upcoming.emit();
+    else this.history.emit();
+  }
 
   protected students = inject(StudentService);
   private groups = inject(GroupService);

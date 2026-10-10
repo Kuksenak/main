@@ -83,7 +83,7 @@
   <section class="flex min-h-0 flex-1 flex-col mobile:hidden">
     @if (pickedStudent(); as s) {
       <app-scroll-area class="min-h-0 flex-1" contentClass="pb-10">
-        <app-student-view [student]="s" (upcoming)="listFor.set({ id: s.id, list: 'upcoming' })" (history)="listFor.set({ id: s.id, list: 'history' })" class="mx-auto w-full max-w-xl">
+        <app-student-view [student]="s" class="mx-auto w-full max-w-xl">
           <ng-container ngProjectAs="[headerEnd]">
             <button type="button" (click)="stack.push({ kind: 'student', id: s.id, edit: true })" class="btn-secondary shrink-0">{{ 'action.edit' | t }}</button>
           </ng-container>
@@ -163,18 +163,4 @@
     <app-icon name="plus" [strokeWidth]="2" class="size-7" />
     <span class="fab-label">{{ 'action.add' | t }}</span>
   </button>
-}
-
-<!-- Desktop: a student's Upcoming / History (every lesson ahead / behind), as a dialog -->
-@if (listFor(); as l) {
-  <app-page-sheet [title]="(l.list === 'upcoming' ? 'students.upcoming' : 'people.history') | t" [actions]="false" (closed)="listFor.set(null)">
-    <app-person-lessons
-      [studentId]="l.id"
-      [showNext]="false"
-      [showUpcoming]="l.list === 'upcoming'"
-      [showPast]="l.list === 'history'"
-      [showMaterials]="false"
-      [listLabels]="false"
-    />
-  </app-page-sheet>
 }

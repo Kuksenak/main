@@ -6,8 +6,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { NavStack } from '../core/services/nav-stack.service';
 import { ToolbarService } from '../core/services/toolbar.service';
-import { GroupView, PersonLessons, StudentView } from '../cards/person-views';
-import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { GroupView, StudentView } from '../cards/person-views';
 import { Icon } from '../core/ui/icon/icon';
 import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
@@ -25,7 +24,7 @@ import { Student, StudentService } from './student.service';
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, OverlayModule, GroupView, Icon, LongPress, PageSheet, PersonLessons, ScrollArea, SearchField, StudentView, TranslatePipe],
+  imports: [NgTemplateOutlet, OverlayModule, GroupView, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -67,9 +66,6 @@ export class Students {
       .map((g) => g.name);
     return groups.join(', ') || s.email || s.phone || '';
   }
-
-  // Desktop: whose Upcoming / History is open (a dialog).
-  protected readonly listFor = signal<{ id: string; list: 'upcoming' | 'history' } | null>(null);
 
   // Select mode (students → new group).
   protected readonly selecting = signal(false);
