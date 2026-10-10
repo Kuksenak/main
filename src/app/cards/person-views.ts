@@ -289,7 +289,7 @@ export class PersonLessons {
          the Edit button beside it -->
     <div class="person-head mobile:hidden desktop:items-start desktop:pr-80 desktop:text-left">
       <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg desktop:font-light desktop:uppercase desktop:tracking-wider">{{ s.name }}</h1>
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg desktop:font-extralight desktop:uppercase desktop:tracking-wider">{{ s.name }}</h1>
       </div>
     </div>
 
@@ -518,7 +518,7 @@ export class StudentView {
     <!-- Desktop: the name on the left, as tall as the Edit button beside it -->
     <div class="person-head desktop:items-start desktop:pr-24 desktop:text-left">
       <div class="flex min-w-0 max-w-full flex-col desktop:h-[var(--control-h)] desktop:flex-row desktop:items-center desktop:gap-3">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg desktop:font-light desktop:uppercase desktop:tracking-wider">{{ g.name }}</h1>
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg desktop:font-extralight desktop:uppercase desktop:tracking-wider">{{ g.name }}</h1>
         <p class="text-footnote mt-1 flex items-center justify-center gap-1 tabular-nums opacity-60 desktop:mt-0">
           <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
         </p>
