@@ -4,37 +4,56 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { StudentInput, StudentService } from '../students/student.service';
-import { StudentView } from './person-views';
+import { PersonLessons, StudentView } from './person-views';
 
 /**
- * Student card, opened on the NavStack. An existing student opens for reading (StudentView:
- * avatar, Email / Call, contacts, groups, events) with Edit at the top; Edit → the form (Save,
- * Cancel or back return to reading). A new one, or one opened with `edit`, starts in the form.
+ * Student card, opened on the NavStack. An existing student opens for reading (StudentView, like
+ * an iOS contact) with Edit at the top; Edit and History › each open their own page on top of
+ * it (the form: Save / Cancel / back return to the card; the full list of lessons). A new
+ * student, or one opened with `edit` (desktop's Edit), is just the form.
  */
 @Component({
   selector: 'app-student-editor',
-  imports: [FormsModule, PageSheet, StudentView, TranslatePipe],
+  imports: [FormsModule, PageSheet, PersonLessons, StudentView, TranslatePipe],
   template: `
     @let m = model();
-    <app-page-sheet
-      #page
-      [large]="!editing()"
-      [actions]="editing()"
-      [dirty]="editing() && dirty()"
-      [canSave]="canSave()"
-      [deletable]="editing() && !!entry().id"
-      [cancelCloses]="!editing() || !startedReading"
-      (cancel)="cancelEdit()"
-      (save)="save()"
-      (delete)="remove()"
-      (closed)="closed.emit()"
-    >
-      <!-- Top bar (reading): Edit -->
-      @if (!editing() && !entry().readOnly) {
-        <button barEnd type="button" (click)="editing.set(true)" class="btn-white">{{ 'action.edit' | t }}</button>
-      }
+    @if (startedReading) {
+      <!-- The card -->
+      <app-page-sheet #page [large]="true" [actions]="false" (closed)="closed.emit()">
+        @if (!entry().readOnly) {
+          <button barEnd type="button" (click)="openForm()" class="btn-white">{{ 'action.edit' | t }}</button>
+        }
+        @if (saved(); as s) {
+          <app-student-view [student]="s" [editable]="!entry().readOnly" (history)="historyOpen.set(true)">
+            <!-- Desktop dialogs have no top bar: Edit in the header row -->
+            @if (!entry().readOnly) {
+              <ng-container ngProjectAs="[headerEnd]">
+                <button type="button" (click)="openForm()" class="btn-secondary shrink-0">{{ 'action.edit' | t }}</button>
+              </ng-container>
+            }
+          </app-student-view>
+        }
+      </app-page-sheet>
 
-      @if (editing()) {
+      <!-- History: every lesson, its own page -->
+      @if (historyOpen() && saved(); as s) {
+        <app-page-sheet [title]="'people.history' | t" [actions]="false" (closed)="historyOpen.set(false)">
+          <app-person-lessons [studentId]="s.id" [showMaterials]="false" />
+        </app-page-sheet>
+      }
+    }
+
+    <!-- The form: its own page (on top of the card, or the whole card for a new student) -->
+    @if (!startedReading || editing()) {
+      <app-page-sheet
+        #form
+        [dirty]="dirty()"
+        [canSave]="canSave()"
+        [deletable]="!!entry().id"
+        (save)="save()"
+        (delete)="remove()"
+        (closed)="formClosed()"
+      >
         <div class="card">
           <div class="list-row">
             <input name="name" [ngModel]="m.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="'students.name' | t" autocomplete="off" class="row-input" />
@@ -46,17 +65,8 @@ import { StudentView } from './person-views';
             <input name="phone" [ngModel]="m.phone" (ngModelChange)="patch({ phone: $event })" type="tel" inputmode="tel" [placeholder]="'students.phone' | t" autocomplete="off" class="row-input" />
           </div>
         </div>
-      } @else if (saved(); as s) {
-        <app-student-view [student]="s" [editable]="!entry().readOnly">
-          <!-- Desktop dialogs have no top bar: Edit in the header row -->
-          @if (!entry().readOnly) {
-            <ng-container ngProjectAs="[headerEnd]">
-              <button type="button" (click)="editing.set(true)" class="btn-secondary shrink-0 mobile:hidden">{{ 'action.edit' | t }}</button>
-            </ng-container>
-          }
-        </app-student-view>
-      }
-    </app-page-sheet>
+      </app-page-sheet>
+    }
   `,
 })
 export class StudentEditor implements OnInit {
@@ -64,11 +74,14 @@ export class StudentEditor implements OnInit {
   readonly closed = output<void>();
 
   private students = inject(StudentService);
-  private readonly page = viewChild.required<PageSheet>('page');
+  private readonly page = viewChild<PageSheet>('page');
+  private readonly form = viewChild<PageSheet>('form');
 
-  // Opened for reading (an existing student without `edit`): Save / Cancel return to reading.
+  // Opened for reading (an existing student without `edit`): the form opens on top of the card.
   protected startedReading = false;
   protected readonly editing = signal(false);
+  protected readonly historyOpen = signal(false);
+  private deleted = false;
 
   protected readonly model = signal<StudentInput>({ name: '', email: '', phone: '' });
   private readonly snapshot = signal(''); // contents when the form opened, to tell whether anything changed
@@ -80,7 +93,6 @@ export class StudentEditor implements OnInit {
 
   ngOnInit(): void {
     this.startedReading = !!this.entry().id && !this.entry().edit;
-    this.editing.set(!this.startedReading);
     this.reset();
   }
 
@@ -91,13 +103,20 @@ export class StudentEditor implements OnInit {
     this.snapshot.set(JSON.stringify(this.model()));
   }
 
+  protected openForm(): void {
+    this.reset();
+    this.editing.set(true);
+  }
+
   protected patch(p: Partial<StudentInput>): void {
     this.model.update((m) => ({ ...m, ...p }));
   }
 
-  protected cancelEdit(): void {
-    this.reset();
+  // The form's page is gone: back to the card (or, without one, the card closes too).
+  protected formClosed(): void {
     this.editing.set(false);
+    if (!this.startedReading) this.closed.emit();
+    else if (this.deleted) this.page()?.close();
   }
 
   protected save(): void {
@@ -107,18 +126,15 @@ export class StudentEditor implements OnInit {
     const id = this.entry().id;
     if (id) this.students.update(id, input);
     else this.students.create(input);
-    if (this.startedReading) {
-      this.snapshot.set(JSON.stringify(this.model()));
-      this.editing.set(false);
-    } else {
-      this.page().close();
-    }
+    this.snapshot.set(JSON.stringify(this.model())); // saved: closing doesn't ask
+    this.form()?.close();
   }
 
   protected remove(): void {
     const id = this.entry().id;
     if (!id) return;
     this.students.remove(id); // also drops them from their groups (server side)
-    this.page().close();
+    this.deleted = true;
+    this.form()?.close();
   }
 }

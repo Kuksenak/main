@@ -1,5 +1,6 @@
 import { Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { initial } from '../core/utils/text';
@@ -21,6 +22,7 @@ import { GroupMembers } from './related-lists';
   imports: [Icon, PickList, TranslatePipe],
   host: { class: 'flex flex-col gap-4' },
   template: `
+    @if (showLessons()) {
     <!-- Next lesson -->
     @if (next(); as e) {
       <div class="next-lesson">
@@ -47,8 +49,10 @@ import { GroupMembers } from './related-lists';
       </div>
     }
 
+    }
+
     <!-- Materials: lessons attached to the person / group -->
-    @if (materials().length || editable()) {
+    @if (showMaterials() && (materials().length || editable())) {
       <div class="flex flex-col gap-1.5">
         <span class="card-label">{{ 'people.materials' | t }}</span>
         <div class="card">
@@ -68,6 +72,7 @@ import { GroupMembers } from './related-lists';
       </div>
     }
 
+    @if (showLessons()) {
     <!-- Past lessons by month -->
     @if (pastByMonth().length) {
       <div class="flex flex-col gap-1.5">
@@ -108,6 +113,7 @@ import { GroupMembers } from './related-lists';
     @if (!next() && !pastByMonth().length) {
       <p class="text-footnote opacity-50">{{ 'students.noEvents' | t }}</p>
     }
+    }
 
     <!-- Attach: the lesson library with checks (a page on phones, a dropdown on desktop) -->
     @if (picking()) {
@@ -129,6 +135,9 @@ export class PersonLessons {
   /** Their materials (attached lessons), in order; Attach emits the new list. */
   readonly lessonIds = input<string[]>([]);
   readonly editable = input(true);
+  // Which parts: the lessons (next + past) and / or the materials.
+  readonly showLessons = input(true);
+  readonly showMaterials = input(true);
   readonly lessonIdsChange = output<string[]>();
 
   private events = inject(EventService);
@@ -210,9 +219,11 @@ export class PersonLessons {
 }
 
 /**
- * A student, for reading — the same on phones and desktop (a card on top). Header: avatar, name,
- * their groups as colored dots; desktop: Email / Call (and [headerEnd], e.g. Edit) on its right,
- * phones: Email / Call tiles under it. Then their lessons (PersonLessons).
+ * A student, for reading. Phones, like an iOS contact: a big avatar and the name centered, their
+ * groups as colored dots, Email / Call tiles, the email and phone (label over value), History ›
+ * with the last lesson under it (`history` opens the full list), then their materials. Desktop:
+ * avatar beside the name with Email / Call (and [headerEnd], e.g. Edit) on the right, then every
+ * lesson and the materials (PersonLessons).
  */
 @Component({
   selector: 'app-student-view',
@@ -221,9 +232,9 @@ export class PersonLessons {
   template: `
     @let s = student();
     <div class="person-head">
-      <span class="avatar size-14 text-xl">{{ initial(s.name) }}</span>
+      <span class="avatar size-20 text-3xl desktop:size-14 desktop:text-xl">{{ initial(s.name) }}</span>
       <div class="min-w-0 desktop:flex-1">
-        <h1 class="truncate text-xl font-semibold leading-tight">{{ s.name }}</h1>
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-xl">{{ s.name }}</h1>
         @if (groups().length) {
           <p class="text-footnote mt-1 flex flex-wrap gap-x-2.5 gap-y-0.5 opacity-60 mobile:justify-center">
             @for (g of groups(); track g.id) {
@@ -244,33 +255,88 @@ export class PersonLessons {
       </div>
     </div>
 
-    <!-- Phones: Email / Call tiles -->
-    <div class="grid grid-cols-2 gap-2 desktop:hidden">
-      <a [attr.href]="s.email ? 'mailto:' + s.email : null" class="contact-action" [class.is-off]="!s.email">
-        <app-icon name="mail" [strokeWidth]="1.75" class="size-6" />
-        {{ 'students.actionMail' | t }}
-      </a>
-      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" class="contact-action" [class.is-off]="!s.phone">
-        <app-icon name="call" [strokeWidth]="1.75" class="size-6" />
-        {{ 'students.actionCall' | t }}
-      </a>
-    </div>
+    @if (!desktop) {
+      <!-- Email / Call tiles -->
+      <div class="grid grid-cols-2 gap-2">
+        <a [attr.href]="s.email ? 'mailto:' + s.email : null" class="contact-action" [class.is-off]="!s.email">
+          <app-icon name="mail" [strokeWidth]="1.75" class="size-6" />
+          {{ 'students.actionMail' | t }}
+        </a>
+        <a [attr.href]="s.phone ? 'tel:' + s.phone : null" class="contact-action" [class.is-off]="!s.phone">
+          <app-icon name="call" [strokeWidth]="1.75" class="size-6" />
+          {{ 'students.actionCall' | t }}
+        </a>
+      </div>
 
-    <app-person-lessons [studentId]="s.id" [lessonIds]="s.lessonIds" [editable]="editable()" (lessonIdsChange)="students.setLessons(s.id, $event)" />
+      <!-- The email and phone: a small label over the value (iOS) -->
+      @if (s.phone || s.email) {
+        <div class="card">
+          @if (s.phone) {
+            <a [href]="'tel:' + s.phone" class="list-row contact-field">
+              <span>{{ 'students.phone' | t }}</span>
+              <b class="tabular-nums">{{ s.phone }}</b>
+            </a>
+          }
+          @if (s.email) {
+            <a [href]="'mailto:' + s.email" class="list-row contact-field">
+              <span>{{ 'students.email' | t }}</span>
+              <b>{{ s.email }}</b>
+            </a>
+          }
+        </div>
+      }
+
+      <!-- History ›, the last lesson on the line under it -->
+      <div class="card">
+        <button type="button" (click)="history.emit()" class="list-row w-full text-left">
+          <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+            <span class="font-medium">{{ 'people.history' | t }}</span>
+            <span class="text-footnote truncate opacity-50">{{ lastLabel() || ('students.noEvents' | t) }}</span>
+          </span>
+          <app-icon name="chevron-right" class="row-chevron" />
+        </button>
+      </div>
+    }
+
+    <app-person-lessons
+      [studentId]="s.id"
+      [lessonIds]="s.lessonIds"
+      [editable]="editable()"
+      [showLessons]="desktop"
+      (lessonIdsChange)="students.setLessons(s.id, $event)"
+    />
   `,
 })
 export class StudentView {
   readonly student = input.required<Student>();
   readonly editable = input(true);
+  /** Phones: History › tapped (the card opens the full list). */
+  readonly history = output<void>();
 
   protected students = inject(StudentService);
   private groupService = inject(GroupService);
+  private events = inject(EventService);
+  private people = inject(EventPeople);
   private i18n = inject(I18nService);
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly colorVar = colorVar;
 
   protected readonly groups = computed(() =>
     this.groupService.groups().filter((g) => g.studentIds.includes(this.student().id)),
   );
+
+  // Under History: the last lesson ("Mon, 13 Oct · 18:00–19:00").
+  protected readonly lastLabel = computed(() => {
+    const id = this.student().id;
+    const last = this.events
+      .events()
+      .filter((e) => eventEnd(e).getTime() < Date.now() && this.people.invites(e, id))
+      .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0];
+    if (!last) return '';
+    const start = new Date(last.startsAt);
+    const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
+    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(last))}`;
+  });
 
   protected initial(name: string): string {
     return initial(name, this.i18n.locale());
