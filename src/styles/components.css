@@ -447,3 +447,9 @@ html.dark .card,
 html.dark .card-btn {
   border-color: transparent;
 }
+
+/* Dark: the white capsule (Edit) turns the toolbar's gray glass — white glares on black. */
+html.dark .btn-white {
+  background-color: var(--glass-neutral);
+  color: var(--text);
+}
