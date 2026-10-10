@@ -366,7 +366,8 @@ export class PersonLessons {
                 <app-person-lessons [studentId]="s.id" [showNext]="false" [showUpcoming]="true" [showPast]="false" [showMaterials]="false" [flat]="true" />
               </app-scroll-area>
             } @else {
-              <button type="button" (click)="toggle('upcoming')" class="w-full text-left">
+              <!-- Folded previews: both exactly 84px, so the two cards line up -->
+              <button type="button" (click)="toggle('upcoming')" class="flex h-[5.25rem] w-full flex-col text-left [&>.list-row]:!min-h-0 [&>.list-row]:flex-1 [&>.list-row]:!py-0">
                 <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
               </button>
             }
@@ -383,10 +384,12 @@ export class PersonLessons {
                 <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [flat]="true" />
               </app-scroll-area>
             } @else {
-              <!-- The last two lessons: about as tall as Upcoming's row beside it -->
-              @for (p of lastTwo(); track p.startsAt) {
-                <button type="button" (click)="toggle('history')" class="list-row w-full text-left text-[var(--text-secondary)] tabular-nums">{{ when(p) }}</button>
-              }
+              <!-- The last two lessons, sharing the same 84px as Upcoming's row beside it -->
+              <div class="flex h-[5.25rem] flex-col">
+                @for (p of lastTwo(); track p.startsAt) {
+                  <button type="button" (click)="toggle('history')" class="list-row !min-h-0 w-full flex-1 text-left text-[var(--text-secondary)] tabular-nums">{{ when(p) }}</button>
+                }
+              </div>
             }
           </div>
         }
