@@ -274,16 +274,15 @@ export class PersonLessons {
       </div>
     }
 
-    <!-- History ›, the last lesson on the line under it -->
-    <div class="card">
-      <button type="button" (click)="history.emit()" class="list-row w-full text-left">
-        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-          <span class="font-medium">{{ 'people.history' | t }}</span>
-          <span class="text-footnote truncate opacity-50">{{ lastLabel() || ('students.noEvents' | t) }}</span>
-        </span>
+    <!-- One block: History › on the first row, the last lesson on the second (a tap on either
+         opens the full list) -->
+    <button type="button" (click)="history.emit()" class="card flex w-full flex-col text-left">
+      <span class="list-row">
+        <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
         <app-icon name="chevron-right" class="row-chevron" />
-      </button>
-    </div>
+      </span>
+      <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ lastLabel() || ('students.noEvents' | t) }}</span>
+    </button>
 
     <app-person-lessons
       [studentId]="s.id"
