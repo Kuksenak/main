@@ -79,12 +79,12 @@ import { GroupMembers } from './related-lists';
         }
         @for (m of months; track m.label) {
           <!-- The month: larger, in capitals, gray and light -->
-          <span class="mt-2 px-0.5 text-[0.9375rem] font-light uppercase tracking-wide opacity-50">{{ m.label }}</span>
+          <span class="mt-2 px-0.5 text-[0.9375rem] font-light uppercase tracking-wide opacity-50 desktop:mt-1 desktop:text-xs">{{ m.label }}</span>
           <div class="card">
             @for (e of m.events; track key(e)) {
               <!-- Day, time and who; attached lessons / repeating only as the marks on the right -->
-              <div class="list-row pb-3 pt-3.5">
-                <span class="date-tile">
+              <div class="list-row pb-3 pt-3.5 desktop:py-2">
+                <span class="date-tile desktop:size-9">
                   <b>{{ day(e) }}</b>
                   <small>{{ weekday(e) }}</small>
                 </span>
