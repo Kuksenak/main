@@ -288,7 +288,7 @@ export class PersonLessons {
          the Edit button beside it -->
     <div class="person-head mobile:hidden desktop:items-start desktop:pr-80 desktop:text-left">
       <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg">{{ s.name }}</h1>
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg desktop:font-light desktop:uppercase desktop:tracking-wider">{{ s.name }}</h1>
       </div>
     </div>
 
@@ -355,7 +355,7 @@ export class PersonLessons {
       <div class="card">
         <button type="button" (click)="tap('upcoming')" class="flex w-full flex-col text-left">
           <span class="list-row">
-            <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
+            <span class="block-title">{{ 'people.upcoming' | t }}</span>
             <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'upcoming'" />
           </span>
           @if (expanded() !== 'upcoming') {
@@ -372,7 +372,7 @@ export class PersonLessons {
       <div class="card">
         <button type="button" (click)="tap('history')" class="flex w-full flex-col text-left">
           <span class="list-row">
-            <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
+            <span class="block-title">{{ 'people.history' | t }}</span>
             <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'history'" />
           </span>
           <!-- The last lesson, as a line of text -->
@@ -480,7 +480,7 @@ export class StudentView {
     <!-- Desktop: the name on the left, as tall as the Edit button beside it -->
     <div class="person-head desktop:items-start desktop:pr-24 desktop:text-left">
       <div class="flex min-w-0 max-w-full flex-col desktop:h-[var(--control-h)] desktop:flex-row desktop:items-center desktop:gap-3">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg">{{ g.name }}</h1>
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg desktop:font-light desktop:uppercase desktop:tracking-wider">{{ g.name }}</h1>
         <p class="text-footnote mt-1 flex items-center justify-center gap-1 tabular-nums opacity-60 desktop:mt-0">
           <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
         </p>
