@@ -11,10 +11,21 @@
     <!-- Search: here on desktop; on mobile the same template sits in the toolbar -->
     <div class="mobile:hidden"><ng-container [ngTemplateOutlet]="search" /></div>
 
-    <!-- Students | Groups -->
-    <div class="segmented">
-      <button type="button" (click)="setTab('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
-      <button type="button" (click)="setTab('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
+    <!-- Students | Groups, and (desktop) Add on the right of the same row -->
+    <div class="flex items-center gap-3">
+      <div class="segmented">
+        <button type="button" (click)="setTab('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
+        <button type="button" (click)="setTab('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
+      </div>
+      <button
+        type="button"
+        (click)="openNew()"
+        [attr.aria-label]="(tab() === 'groups' ? 'groups.add' : 'students.add') | t"
+        class="btn-primary ml-auto gap-1.5 pl-2.5 mobile:hidden"
+      >
+        <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
+        {{ 'action.add' | t }}
+      </button>
     </div>
 
     <!-- List: the card ends with its last row; when there are more rows than fit it scrolls
@@ -140,7 +151,7 @@
   </section>
 </main>
 
-<!-- Floating actions: + (new student / group), or Cancel · Create group while selecting students -->
+<!-- Floating actions: + (phones; desktop has Add by the tabs), or Cancel · Create group while selecting students -->
 @if (selecting()) {
   <div class="float-bottom inset-x-4 flex items-center gap-2 desktop:left-auto desktop:w-md">
     <button type="button" (click)="cancelSelect()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
@@ -153,7 +164,7 @@
     type="button"
     (click)="openNew()"
     [attr.aria-label]="(tab() === 'groups' ? 'groups.add' : 'students.add') | t"
-    class="fab float-bottom right-4"
+    class="fab float-bottom right-4 desktop:hidden"
   >
     <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
     <span class="fab-label">{{ 'action.add' | t }}</span>
