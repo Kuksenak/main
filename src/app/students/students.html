@@ -83,7 +83,7 @@
   <section class="flex min-h-0 flex-1 flex-col mobile:hidden">
     @if (pickedStudent(); as s) {
       <app-scroll-area class="min-h-0 flex-1" contentClass="pb-10">
-        <app-student-view [student]="s" class="mx-auto w-full max-w-4xl">
+        <app-student-view [student]="s" class="w-full">
           <ng-container ngProjectAs="[headerEnd]">
             <button type="button" (click)="stack.push({ kind: 'student', id: s.id, edit: true })" class="btn-secondary shrink-0">{{ 'action.edit' | t }}</button>
           </ng-container>
@@ -91,7 +91,7 @@
       </app-scroll-area>
     } @else if (pickedGroup(); as g) {
       <app-scroll-area class="min-h-0 flex-1" contentClass="pb-10">
-        <app-group-view [group]="g" class="mx-auto w-full max-w-xl">
+        <app-group-view [group]="g" class="w-full">
           <ng-container ngProjectAs="[headerEnd]">
             <button type="button" (click)="stack.push({ kind: 'group', id: g.id, edit: true })" class="btn-secondary shrink-0">{{ 'action.edit' | t }}</button>
           </ng-container>
