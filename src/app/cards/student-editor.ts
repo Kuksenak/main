@@ -24,7 +24,7 @@ import { PersonLessons, StudentView } from './person-views';
           <button barEnd type="button" (click)="openForm()" class="btn-white">{{ 'action.edit' | t }}</button>
         }
         @if (saved(); as s) {
-          <app-student-view [student]="s" [editable]="!entry().readOnly" (history)="historyOpen.set(true)">
+          <app-student-view [student]="s" [editable]="!entry().readOnly" (upcoming)="listOpen.set('upcoming')" (history)="listOpen.set('history')">
             <!-- Desktop dialogs have no top bar: Edit in the header row -->
             @if (!entry().readOnly) {
               <ng-container ngProjectAs="[headerEnd]">
@@ -35,10 +35,17 @@ import { PersonLessons, StudentView } from './person-views';
         }
       </app-page-sheet>
 
-      <!-- History: every lesson, its own page -->
-      @if (historyOpen() && saved(); as s) {
-        <app-page-sheet [title]="'people.history' | t" [actions]="false" (closed)="historyOpen.set(false)">
-          <app-person-lessons [studentId]="s.id" [showMaterials]="false" />
+      <!-- Upcoming / History: every lesson ahead / behind, its own page -->
+      @if (listOpen() && saved(); as s) {
+        <app-page-sheet [title]="(listOpen() === 'upcoming' ? 'students.upcoming' : 'people.pastLessons') | t" [actions]="false" (closed)="listOpen.set(null)">
+          <app-person-lessons
+            [studentId]="s.id"
+            [showNext]="false"
+            [showUpcoming]="listOpen() === 'upcoming'"
+            [showPast]="listOpen() === 'history'"
+            [showMaterials]="false"
+            [listLabels]="false"
+          />
         </app-page-sheet>
       }
     }
@@ -80,7 +87,7 @@ export class StudentEditor implements OnInit {
   // Opened for reading (an existing student without `edit`): the form opens on top of the card.
   protected startedReading = false;
   protected readonly editing = signal(false);
-  protected readonly historyOpen = signal(false);
+  protected readonly listOpen = signal<'upcoming' | 'history' | null>(null);
   private deleted = false;
 
   protected readonly model = signal<StudentInput>({ name: '', email: '', phone: '' });

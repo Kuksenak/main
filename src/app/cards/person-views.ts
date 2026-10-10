@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -18,10 +19,10 @@ import { GroupMembers } from './related-lists';
  */
 @Component({
   selector: 'app-person-lessons',
-  imports: [Icon, PickList, TranslatePipe],
+  imports: [Icon, NgTemplateOutlet, PickList, TranslatePipe],
   host: { class: 'flex flex-col gap-4' },
   template: `
-    @if (showLessons()) {
+    @if (showNext()) {
     <!-- Next lesson -->
     @if (next(); as e) {
       <div class="next-lesson">
@@ -71,12 +72,13 @@ import { GroupMembers } from './related-lists';
       </div>
     }
 
-    @if (showLessons()) {
-    <!-- Past lessons by month -->
-    @if (pastByMonth().length) {
+    <!-- Lessons under their months (upcoming soonest first, past most recent first) -->
+    <ng-template #byMonth let-months let-label="label">
       <div class="flex flex-col gap-1.5">
-        <span class="card-label">{{ 'people.pastLessons' | t }}</span>
-        @for (m of pastByMonth(); track m.label) {
+        @if (listLabels()) {
+          <span class="card-label">{{ label | t }}</span>
+        }
+        @for (m of months; track m.label) {
           <span class="text-footnote mt-1 px-0.5 capitalize opacity-50">{{ m.label }}</span>
           <div class="card">
             @for (e of m.events; track key(e)) {
@@ -107,11 +109,21 @@ import { GroupMembers } from './related-lists';
           </div>
         }
       </div>
-    }
+    </ng-template>
 
-    @if (!next() && !pastByMonth().length) {
-      <p class="text-footnote opacity-50">{{ 'students.noEvents' | t }}</p>
+    @if (showUpcoming()) {
+      @if (upcomingByMonth().length) {
+        <ng-container [ngTemplateOutlet]="byMonth" [ngTemplateOutletContext]="{ $implicit: upcomingByMonth(), label: 'students.upcoming' }" />
+      } @else {
+        <p class="text-footnote opacity-50">{{ 'students.noEvents' | t }}</p>
+      }
     }
+    @if (showPast()) {
+      @if (pastByMonth().length) {
+        <ng-container [ngTemplateOutlet]="byMonth" [ngTemplateOutletContext]="{ $implicit: pastByMonth(), label: 'people.pastLessons' }" />
+      } @else {
+        <p class="text-footnote opacity-50">{{ 'students.noEvents' | t }}</p>
+      }
     }
 
     <!-- Attach: the lesson library with checks (a page on phones, a dropdown on desktop) -->
@@ -134,9 +146,13 @@ export class PersonLessons {
   /** Their materials (attached lessons), in order; Attach emits the new list. */
   readonly lessonIds = input<string[]>([]);
   readonly editable = input(true);
-  // Which parts: the lessons (next + past) and / or the materials.
-  readonly showLessons = input(true);
+  // Which parts: the next lesson (a card), every upcoming one, the past ones, the materials.
+  readonly showNext = input(true);
+  readonly showUpcoming = input(false);
+  readonly showPast = input(true);
   readonly showMaterials = input(true);
+  // Labels over the lists ("Upcoming", "Past lessons"); off on their own page (its title says it).
+  readonly listLabels = input(true);
   readonly lessonIdsChange = output<string[]>();
 
   private events = inject(EventService);
@@ -160,14 +176,27 @@ export class PersonLessons {
         .filter((e) => eventEnd(e).getTime() >= Date.now())
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null,
   );
-  // Past lessons, most recent first, under their month ("October", "September 2025").
-  protected readonly pastByMonth = computed(() => {
+  // Upcoming lessons soonest first, past ones most recent first, under their month ("October",
+  // "September 2025").
+  protected readonly upcomingByMonth = computed(() =>
+    this.byMonth(
+      this.mine()
+        .filter((e) => eventEnd(e).getTime() >= Date.now())
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt)),
+    ),
+  );
+  protected readonly pastByMonth = computed(() =>
+    this.byMonth(
+      this.mine()
+        .filter((e) => eventEnd(e).getTime() < Date.now())
+        .sort((a, b) => b.startsAt.localeCompare(a.startsAt)),
+    ),
+  );
+
+  private byMonth(list: ScheduleEvent[]): { label: string; events: ScheduleEvent[] }[] {
     const thisYear = new Date().getFullYear();
     const out: { label: string; events: ScheduleEvent[] }[] = [];
-    const past = this.mine()
-      .filter((e) => eventEnd(e).getTime() < Date.now())
-      .sort((a, b) => b.startsAt.localeCompare(a.startsAt));
-    for (const e of past) {
+    for (const e of list) {
       const d = new Date(e.startsAt);
       const label = this.i18n.date(d, d.getFullYear() === thisYear ? { month: 'long' } : { month: 'long', year: 'numeric' });
       const last = out.at(-1);
@@ -175,7 +204,7 @@ export class PersonLessons {
       else out.push({ label, events: [e] });
     }
     return out;
-  });
+  }
 
   // (An API without lessonIds yet sends none: nothing attached.)
   protected readonly ids = computed(() => this.lessonIds() ?? []);
@@ -274,21 +303,33 @@ export class PersonLessons {
       </div>
     }
 
-    <!-- One block: History › on the first row, the last lesson on the second (a tap on either
-         opens the full list) -->
-    <button type="button" (click)="history.emit()" class="card flex w-full flex-col text-left">
+    <!-- Two blocks: Upcoming › with the next lesson under it, Past lessons › with the last one (a
+         tap opens the full list); each only when there's something in it -->
+    @if (nextLabel()) {
+    <button type="button" (click)="upcoming.emit()" class="card flex w-full flex-col text-left">
       <span class="list-row">
-        <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
+        <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
         <app-icon name="chevron-right" class="row-chevron" />
       </span>
-      <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ lastLabel() || ('students.noEvents' | t) }}</span>
+      <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ nextLabel() }}</span>
     </button>
+    }
+    @if (lastLabel()) {
+    <button type="button" (click)="history.emit()" class="card flex w-full flex-col text-left">
+      <span class="list-row">
+        <span class="min-w-0 flex-1 font-medium">{{ 'people.pastLessons' | t }}</span>
+        <app-icon name="chevron-right" class="row-chevron" />
+      </span>
+      <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ lastLabel() }}</span>
+    </button>
+    }
 
     <app-person-lessons
       [studentId]="s.id"
       [lessonIds]="s.lessonIds"
       [editable]="editable()"
-      [showLessons]="false"
+      [showNext]="false"
+      [showPast]="false"
       (lessonIdsChange)="students.setLessons(s.id, $event)"
     />
   `,
@@ -296,7 +337,8 @@ export class PersonLessons {
 export class StudentView {
   readonly student = input.required<Student>();
   readonly editable = input(true);
-  /** History › tapped (the card / page opens the full list). */
+  /** Upcoming › / History › tapped (the card / page opens the full list). */
+  readonly upcoming = output<void>();
   readonly history = output<void>();
 
   protected students = inject(StudentService);
@@ -310,18 +352,32 @@ export class StudentView {
     this.groupService.groups().filter((g) => g.studentIds.includes(this.student().id)),
   );
 
-  // Under History: the last lesson ("Mon, 13 Oct · 18:00–19:00").
-  protected readonly lastLabel = computed(() => {
+  // Under Upcoming / History: the next / last lesson ("Mon, 13 Oct · 18:00–19:00").
+  private readonly mine = computed(() => {
     const id = this.student().id;
-    const last = this.events
-      .events()
-      .filter((e) => eventEnd(e).getTime() < Date.now() && this.people.invites(e, id))
-      .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0];
-    if (!last) return '';
-    const start = new Date(last.startsAt);
-    const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
-    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(last))}`;
+    return this.events.events().filter((e) => this.people.invites(e, id));
   });
+  protected readonly nextLabel = computed(() =>
+    this.when(
+      this.mine()
+        .filter((e) => eventEnd(e).getTime() >= Date.now())
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0],
+    ),
+  );
+  protected readonly lastLabel = computed(() =>
+    this.when(
+      this.mine()
+        .filter((e) => eventEnd(e).getTime() < Date.now())
+        .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0],
+    ),
+  );
+
+  private when(e: ScheduleEvent | undefined): string {
+    if (!e) return '';
+    const start = new Date(e.startsAt);
+    const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
+    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(e))}`;
+  }
 
   protected initial(name: string): string {
     return initial(name, this.i18n.locale());

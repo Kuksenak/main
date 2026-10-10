@@ -68,8 +68,8 @@ export class Students {
     return groups.join(', ') || s.email || s.phone || '';
   }
 
-  // Desktop: whose History is open (a dialog).
-  protected readonly historyFor = signal<string | null>(null);
+  // Desktop: whose Upcoming / History is open (a dialog).
+  protected readonly listFor = signal<{ id: string; list: 'upcoming' | 'history' } | null>(null);
 
   // Select mode (students → new group).
   protected readonly selecting = signal(false);
