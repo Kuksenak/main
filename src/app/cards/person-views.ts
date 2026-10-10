@@ -257,7 +257,8 @@ export class PersonLessons {
   template: `
     @let s = student();
     <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
-    <div class="person-head">
+    <!-- The name (phones: it's in the card's top bar instead) -->
+    <div class="person-head mobile:hidden">
       <div class="min-w-0 max-w-full">
         <h1 class="truncate text-[1.75rem] font-semibold leading-tight">{{ s.name }}</h1>
       </div>
