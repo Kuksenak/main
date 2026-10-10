@@ -35,7 +35,7 @@ import { GroupMembers } from './related-lists';
             <em class="next-tag">{{ 'people.next' | t }}</em>
             <span class="font-medium tabular-nums">{{ time(e) }}</span>
             @if (context(e); as c) {
-              <span class="truncate opacity-50">· {{ c }}</span>
+              <span class="truncate opacity-50">{{ c }}</span>
             }
           </span>
           @if (lessonTitles(e).length) {
@@ -386,11 +386,11 @@ export class StudentView {
         .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0] ?? null,
   );
 
-  // "Mon, 13 Oct · 18:00–19:00"
+  // "Mon, 13 Oct  18:00–19:00" (no dot between)
   protected when(e: ScheduleEvent): string {
     const start = new Date(e.startsAt);
     const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
-    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(e))}`;
+    return `${day} ${this.i18n.time(start)}–${this.i18n.time(eventEnd(e))}`;
   }
 
   // The next lesson's calendar icon and lines
