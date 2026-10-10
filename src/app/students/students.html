@@ -19,8 +19,8 @@
     @if (visibleGroups().length || visible().length) {
       <!-- Bottom padding clears the floating buttons (phones) -->
       <app-scroll-area class="min-h-0 flex-1" contentClass="gap-4 pb-16 desktop:pb-2">
-        <!-- Groups (not while selecting students) -->
-        @if (!selecting() && visibleGroups().length) {
+        <!-- Groups (they stay while selecting students; only students get the circles) -->
+        @if (visibleGroups().length) {
           <div class="flex flex-col gap-1.5">
             <span class="card-label">{{ 'groups.title' | t }}</span>
             <div class="card">
