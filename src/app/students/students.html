@@ -6,11 +6,11 @@
      top. Desktop: the list on the left, the picked student / group on the right (Edit opens its form). -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-8">
   <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-sm">
-    <!-- Desktop: the search and Add in one row, the field as tall as the button (phones: search in
+    <!-- Desktop: the search and Add in one row, both 36px tall (phones: search in
          the toolbar, + at the bottom) -->
-    <div class="flex items-center gap-3 mobile:hidden [&_.field]:h-[var(--control-h)]">
+    <div class="flex items-center gap-3 mobile:hidden [&_.field]:!h-9">
       <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="search" /></div>
-      <button #addBtn type="button" (click)="openAdd(addBtn)" class="btn-primary shrink-0 gap-1.5 pl-2.5">
+      <button #addBtn type="button" (click)="openAdd(addBtn)" class="btn-primary !h-9 shrink-0 gap-1.5 pl-2.5">
         <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
         {{ 'action.add' | t }}
       </button>
