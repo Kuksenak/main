@@ -116,7 +116,7 @@
           @if (showVersion()) {
             <div class="list-row text-footnote tabular-nums opacity-50">{{ updates.version }}</div>
           }
-          <!-- About (and Install, in the browser), in the same card as the email -->
+          <!-- Install (in the browser), in the same card as the email -->
           @for (item of accountItems; track item.path) {
             <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: sheet, chevron: true }" />
           }
