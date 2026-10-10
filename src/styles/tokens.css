@@ -30,8 +30,12 @@
   --brand-orange: #fd7d49;
   --brand-teal: #09c1d5;
   --brand-yellow: #febd1d;
-  /* A lesson's date icon: how strongly the booklet's left page takes the accent (more in dark) */
-  --cal-tint: 0.13;
+  /* A lesson's date icon (a two-page booklet): light — a white page, the left one pale blue */
+  --cal-page: #ffffff;
+  --cal-left: #e3edfe;
+  --cal-line: rgb(0 0 0 / 0.08);
+  --cal-edge: rgb(0 0 0 / 0.08);
+  --cal-weekday: rgb(0 0 0 / 0.45);
 
   /* Group colors (calendar bars, dots, swatches) */
   /* (no blue / orange: those are the accent and the warning color) */
@@ -93,7 +97,12 @@ html.dark {
   --glass-neutral: rgb(58 58 60 / 0.72);
 
   --text: #f5f5f5;
-  --cal-tint: 0.24;
+  /* dark: the card's own grays */
+  --cal-page: rgb(255 255 255 / 0.05);
+  --cal-left: rgb(255 255 255 / 0.09);
+  --cal-line: rgb(255 255 255 / 0.12);
+  --cal-edge: transparent;
+  --cal-weekday: rgb(245 245 245 / 0.5);
 
   --success: #30d158;
   --warning: #ff8a55;
