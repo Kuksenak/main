@@ -37,6 +37,23 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
     }
   `,
   template: `
+    @if (name() === 'calendar' && date()) {
+      <!-- A given date (e.g. a lesson's): a wider page — the month in the band, the date, the
+           weekday under it (size the host about 5:4, e.g. h-14 w-[4.375rem]) -->
+      <svg viewBox="0 0 60 48" class="size-full">
+        <mask id="brand-cal-wide">
+          <rect x="3" y="3" width="54" height="42" rx="8" fill="#fff" />
+        </mask>
+        <g mask="url(#brand-cal-wide)">
+          <rect width="60" height="48" fill="#fff" />
+          <rect width="60" height="15" style="fill: var(--brand-blue)" />
+        </g>
+        <rect x="3" y="3" width="54" height="42" rx="8" fill="none" style="stroke: rgb(0 0 0 / 0.08); stroke-width: 0.75" />
+        <text x="30" y="12.3" text-anchor="middle" class="brand-weekday" style="font-size: 8px">{{ month() }}</text>
+        <text x="30" y="31.5" text-anchor="middle" class="brand-date" style="font-size: 18px">{{ day() }}</text>
+        <text x="30" y="41.5" text-anchor="middle" class="brand-small" style="font-size: 6.5px">{{ weekday() }}</text>
+      </svg>
+    } @else {
     <svg viewBox="0 0 48 48" class="size-full">
       @switch (name()) {
         @case ('calendar') {
@@ -49,15 +66,8 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
             <rect width="48" height="16" style="fill: var(--brand-blue)" />
           </g>
           <rect x="3" y="3" width="42" height="42" rx="8" fill="none" style="stroke: rgb(0 0 0 / 0.08); stroke-width: 0.75" />
-          @if (date()) {
-            <!-- A given date (e.g. a lesson's): the month in the band, the date, the weekday under it -->
-            <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ month() }}</text>
-            <text x="24" y="33" text-anchor="middle" class="brand-date" style="font-size: 18px">{{ day() }}</text>
-            <text x="24" y="41.5" text-anchor="middle" class="brand-small">{{ weekday() }}</text>
-          } @else {
-            <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ weekday() }}</text>
-            <text x="24" y="38" text-anchor="middle" class="brand-date">{{ day() }}</text>
-          }
+          <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ weekday() }}</text>
+          <text x="24" y="38" text-anchor="middle" class="brand-date">{{ day() }}</text>
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->
@@ -83,6 +93,7 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
         }
       }
     </svg>
+    }
   `,
 })
 export class BrandIcon {
