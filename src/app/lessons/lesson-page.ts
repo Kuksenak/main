@@ -21,7 +21,7 @@ import { LessonState } from './lesson-state';
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
-      <app-scroll-area class="min-h-0 flex-1" contentClass="gap-6 pb-10">
+      <app-scroll-area class="min-h-0 flex-1" contentClass="gap-4 pb-10">
         <!-- One row: ‹ (back to the library) · title · Edit, or Cancel · Save while editing -->
         <div class="flex flex-col">
           <div class="flex items-center gap-3">

@@ -39,7 +39,7 @@ import { LessonState } from '../lessons/lesson-state';
         <button barEnd type="button" (click)="s.edit()" class="btn-white">{{ 'action.edit' | t }}</button>
       }
 
-      <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-4">
         @if (s.editing()) {
           <app-lesson-form [(value)]="s.draft" />
           <!-- Public link and the events using the lesson -->

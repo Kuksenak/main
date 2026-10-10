@@ -343,8 +343,13 @@
   }
 
   /* Header of a collapsible list section (app-section): title · count · chevron. */
+  /* The label above a card ("Groups", "Students", "Language"…), and the collapsible section
+     header (same look): a bit larger than footnotes, semibold, gray. */
+  .card-label {
+    @apply text-subhead font-semibold opacity-60;
+  }
   .section-header {
-    @apply text-footnote flex w-full items-center gap-1.5 text-left opacity-50
+    @apply text-subhead flex w-full items-center gap-1.5 text-left font-semibold opacity-60
            active:opacity-30;
   }
 

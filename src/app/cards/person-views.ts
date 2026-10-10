@@ -16,7 +16,7 @@ import { GroupMembers, StudentGroups } from './related-lists';
 @Component({
   selector: 'app-student-view',
   imports: [EventList, Icon, StudentGroups, TranslatePipe],
-  host: { class: 'flex flex-col gap-6' },
+  host: { class: 'flex flex-col gap-4' },
   template: `
     @let s = student();
     <div class="flex flex-col items-center gap-2 pt-2 text-center">
@@ -83,7 +83,7 @@ export class StudentView {
 @Component({
   selector: 'app-group-view',
   imports: [EventList, GroupMembers, Icon],
-  host: { class: 'flex flex-col gap-6' },
+  host: { class: 'flex flex-col gap-4' },
   template: `
     @let g = group();
     <div class="flex flex-col items-center gap-2 pt-2 text-center">

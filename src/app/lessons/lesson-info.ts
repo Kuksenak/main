@@ -9,7 +9,7 @@ import { Lesson, LessonService, shareUrl } from './lesson.service';
 @Component({
   selector: 'app-lesson-info',
   imports: [EventList, Icon, Toggle, TranslatePipe],
-  host: { class: 'flex flex-col gap-6 desktop:gap-4' },
+  host: { class: 'flex flex-col gap-4' },
   template: `
     @let l = lesson();
     <div class="flex flex-col gap-1.5">

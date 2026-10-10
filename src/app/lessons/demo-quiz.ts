@@ -26,7 +26,7 @@ const QUESTIONS: Question[] = [
   template: `
     <div class="flex items-baseline gap-2 px-1">
       <h2 class="text-xl font-semibold">{{ 'quiz.title' | t }}</h2>
-      <span class="text-footnote opacity-50">{{ 'quiz.example' | t }}</span>
+      <span class="card-label">{{ 'quiz.example' | t }}</span>
     </div>
 
     @for (q of questions; track $index; let qi = $index) {

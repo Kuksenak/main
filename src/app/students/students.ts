@@ -1,3 +1,4 @@
+import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { GroupView, StudentView } from '../cards/person-views';
@@ -10,7 +11,6 @@ import { Icon } from '../core/ui/icon/icon';
 import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { SearchField } from '../core/ui/search-field';
-import { Sheet } from '../core/ui/sheet/sheet';
 import { initial } from '../core/utils/text';
 import { Group, GroupService, colorVar } from './group.service';
 import { Student, StudentService } from './student.service';
@@ -24,7 +24,7 @@ import { Student, StudentService } from './student.service';
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, GroupView, Icon, LongPress, ScrollArea, SearchField, Sheet, StudentView, TranslatePipe],
+  imports: [NgTemplateOutlet, OverlayModule, GroupView, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -91,6 +91,11 @@ export class Students {
   // Add menu
   protected readonly adding = signal(false);
   protected readonly addOrigin = signal<HTMLElement | null>(null);
+  // Desktop: under Add, right-aligned; above it when there's no room below.
+  protected readonly addPositions: ConnectedPosition[] = [
+    { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 6 },
+    { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -6 },
+  ];
 
   constructor() {
     // Mobile toolbar: the search field instead of a title.

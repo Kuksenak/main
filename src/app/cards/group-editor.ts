@@ -50,7 +50,7 @@ interface Model {
           <app-group-view [group]="g" />
         }
       } @else {
-      <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-4">
         <div class="card">
           <div class="list-row">
             <input name="groupName" [ngModel]="m.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="'groups.name' | t" autocomplete="off" class="row-input" />

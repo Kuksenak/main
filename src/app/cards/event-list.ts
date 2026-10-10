@@ -17,7 +17,7 @@ import { EventService, ScheduleEvent, eventEnd, occurrenceKey } from '../schedul
 @Component({
   selector: 'app-event-list',
   imports: [Icon, Section, TranslatePipe],
-  host: { class: 'flex flex-col gap-6' },
+  host: { class: 'flex flex-col gap-4' },
   template: `
     @if (!upcoming().length && !past().length) {
       <p class="text-footnote opacity-50">{{ 'students.noEvents' | t }}</p>

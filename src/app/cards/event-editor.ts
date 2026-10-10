@@ -61,7 +61,7 @@ interface Model {
       (closed)="closed.emit()"
     >
       <div class="contents" [class.read-only]="readOnly()">
-      <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-4">
         <div class="card">
           <div class="list-row">
             <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="row-input" />
