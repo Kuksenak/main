@@ -25,6 +25,11 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
       font: 600 7.5px -apple-system, system-ui, 'Segoe UI', sans-serif;
       letter-spacing: 0.02em;
     }
+    .brand-small {
+      fill: rgb(0 0 0 / 0.45);
+      font: 600 6px -apple-system, system-ui, 'Segoe UI', sans-serif;
+      letter-spacing: 0.02em;
+    }
     .brand-date {
       fill: var(--brand-orange);
       font: 700 21px -apple-system, system-ui, 'Segoe UI', sans-serif;
@@ -44,8 +49,15 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
             <rect width="48" height="16" style="fill: var(--brand-blue)" />
           </g>
           <rect x="3" y="3" width="42" height="42" rx="8" fill="none" style="stroke: rgb(0 0 0 / 0.08); stroke-width: 0.75" />
-          <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ weekday() }}</text>
-          <text x="24" y="38" text-anchor="middle" class="brand-date">{{ day() }}</text>
+          @if (date()) {
+            <!-- A given date (e.g. a lesson's): the month in the band, the date, the weekday under it -->
+            <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ month() }}</text>
+            <text x="24" y="33" text-anchor="middle" class="brand-date" style="font-size: 18px">{{ day() }}</text>
+            <text x="24" y="41.5" text-anchor="middle" class="brand-small">{{ weekday() }}</text>
+          } @else {
+            <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ weekday() }}</text>
+            <text x="24" y="38" text-anchor="middle" class="brand-date">{{ day() }}</text>
+          }
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->
@@ -81,6 +93,12 @@ export class BrandIcon {
   private readonly i18n = inject(I18nService);
   private readonly created = new Date();
   protected readonly day = computed(() => (this.date() ?? this.created).getDate());
+  protected readonly month = computed(() =>
+    this.i18n
+      .date(this.date() ?? this.created, { month: 'short' })
+      .replace('.', '')
+      .toLocaleUpperCase(),
+  );
   protected readonly weekday = computed(() =>
     this.i18n
       .date(this.date() ?? this.created, { weekday: 'short' })
