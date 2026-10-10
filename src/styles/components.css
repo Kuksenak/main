@@ -159,6 +159,12 @@
            bg-[var(--surface)];
   }
 
+  /* The blue "+ add" row at the end of a card (Invite, Attach, Add members), with list-row and
+     edit-only (hidden in read-only cards); gray when there's nothing to add. */
+  .add-row {
+    @apply w-full text-left text-[var(--accent)] disabled:!text-[var(--text-secondary)] disabled:opacity-60;
+  }
+
   /* Read-only cards (<div class="contents read-only"> around the content): everything shows
      as is but can't be changed and leads nowhere (no chevrons, no Invite / Attach rows, empty
      fields without placeholders); only collapsible sections still open and close. */

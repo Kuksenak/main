@@ -129,7 +129,7 @@ interface Model {
             </div>
           }
           <!-- Gray when there's no one at all to invite -->
-          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" [disabled]="isEmpty(inviteSections())" class="edit-only list-row w-full text-left text-[var(--accent)] disabled:!text-[var(--text-secondary)] disabled:opacity-60">
+          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" [disabled]="isEmpty(inviteSections())" class="edit-only list-row add-row">
             <span>{{ 'event.invite' | t }}</span>
             <!-- In the same box as the rows' ×, so they line up -->
             <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
@@ -149,7 +149,7 @@ interface Model {
             </div>
           }
           <!-- Gray when there are no lessons yet -->
-          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" [disabled]="isEmpty(lessonSections())" class="edit-only list-row w-full text-left text-[var(--accent)] disabled:!text-[var(--text-secondary)] disabled:opacity-60">
+          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" [disabled]="isEmpty(lessonSections())" class="edit-only list-row add-row">
             <span>{{ 'event.attachLesson' | t }}</span>
             <!-- In the same box as the rows' ×, so they line up -->
             <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
