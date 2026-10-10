@@ -257,10 +257,11 @@ export class PersonLessons {
   template: `
     @let s = student();
     <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
-    <!-- The name (phones: it's in the card's top bar instead) -->
-    <div class="person-head mobile:hidden">
-      <div class="min-w-0 max-w-full">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight">{{ s.name }}</h1>
+    <!-- The name (phones: it's in the card's top bar instead); desktop: on the left, as tall as
+         the Edit button beside it -->
+    <div class="person-head mobile:hidden desktop:items-start desktop:pr-24 desktop:text-left">
+      <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg">{{ s.name }}</h1>
       </div>
     </div>
 
@@ -415,10 +416,11 @@ export class StudentView {
   template: `
     @let g = group();
     <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
-    <div class="person-head">
-      <div class="min-w-0 max-w-full">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight">{{ g.name }}</h1>
-        <p class="text-footnote mt-1 flex items-center justify-center gap-1 tabular-nums opacity-60">
+    <!-- Desktop: the name on the left, as tall as the Edit button beside it -->
+    <div class="person-head desktop:items-start desktop:pr-24 desktop:text-left">
+      <div class="flex min-w-0 max-w-full flex-col desktop:h-[var(--control-h)] desktop:flex-row desktop:items-center desktop:gap-3">
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg">{{ g.name }}</h1>
+        <p class="text-footnote mt-1 flex items-center justify-center gap-1 tabular-nums opacity-60 desktop:mt-0">
           <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
         </p>
       </div>
