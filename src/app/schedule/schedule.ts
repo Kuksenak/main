@@ -155,7 +155,6 @@ export class Schedule implements AfterViewInit {
     viewport.scrollTop += current.getBoundingClientRect().top - viewport.getBoundingClientRect().top;
   }
 
-
   constructor() {
     // Show the visible month in the mobile toolbar while this page is open.
     const toolbar = inject(ToolbarService);
@@ -163,6 +162,17 @@ export class Schedule implements AfterViewInit {
     this.destroyRef.onDestroy(() => toolbar.title.set(''));
 
     this.service.ensureLoaded();
+
+    // Selecting today (or its events loading): bring the current event into view. (An effect
+    // has to be made here, in the constructor — made later it throws and never runs.)
+    effect(() => {
+      const isToday = toDateInput(this.selectedDate()) === toDateInput(new Date());
+      // Once laid out, and again a bit later (late layout shifts on phones: fonts, the toolbar).
+      if (isToday && this.dayEvents().length) {
+        requestAnimationFrame(() => this.scrollToCurrent());
+        setTimeout(() => this.scrollToCurrent(), 400);
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -180,15 +190,6 @@ export class Schedule implements AfterViewInit {
     const tick = setInterval(() => this.now.set(Date.now()), 60_000);
     this.destroyRef.onDestroy(() => clearInterval(tick));
 
-    // Selecting today (or its events loading): bring the current event into view.
-    effect(() => {
-      const isToday = toDateInput(this.selectedDate()) === toDateInput(new Date());
-      // Once laid out, and again a bit later (late layout shifts on phones: fonts, the toolbar).
-      if (isToday && this.dayEvents().length) {
-        requestAnimationFrame(() => this.scrollToCurrent());
-        setTimeout(() => this.scrollToCurrent(), 400);
-      }
-    });
   }
 
   // Mobile scroll: title follows the month filling the middle of the viewport.
