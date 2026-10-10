@@ -257,17 +257,26 @@ export class PersonLessons {
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let s = student();
-    <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
+    <!-- Desktop: Email / Call in a row with [headerEnd] (Edit), top right -->
+    <div class="absolute right-0 top-0 z-[6] flex items-center gap-2">
+      <a [attr.href]="s.email ? 'mailto:' + s.email : null" [attr.title]="s.email" class="btn-secondary gap-1.5 !text-[var(--accent)] mobile:hidden" [class.is-off]="!s.email">
+        <app-icon name="mail" [strokeWidth]="1.75" class="size-4" />{{ 'students.actionMail' | t }}
+      </a>
+      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" [attr.title]="s.phone" class="btn-secondary gap-1.5 !text-[var(--accent)] mobile:hidden" [class.is-off]="!s.phone">
+        <app-icon name="call" [strokeWidth]="1.75" class="size-4" />{{ 'students.actionCall' | t }}
+      </a>
+      <ng-content select="[headerEnd]" />
+    </div>
     <!-- The name (phones: it's in the card's top bar instead); desktop: on the left, as tall as
          the Edit button beside it -->
-    <div class="person-head mobile:hidden desktop:items-start desktop:pr-24 desktop:text-left">
+    <div class="person-head mobile:hidden desktop:items-start desktop:pr-80 desktop:text-left">
       <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
         <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg">{{ s.name }}</h1>
       </div>
     </div>
 
-    <!-- Email / Call tiles -->
-    <div class="grid grid-cols-2 gap-2">
+    <!-- Phones: Email / Call tiles -->
+    <div class="grid grid-cols-2 gap-2 desktop:hidden">
       <a [attr.href]="s.email ? 'mailto:' + s.email : null" class="contact-action" [class.is-off]="!s.email">
         <app-icon name="mail" [strokeWidth]="1.75" class="size-6" />
         {{ 'students.actionMail' | t }}
