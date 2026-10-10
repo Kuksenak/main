@@ -7,7 +7,6 @@ import { Lessons } from './lessons/lessons';
 import { SharedLesson } from './lessons/shared-lesson';
 import { Login } from './login/login';
 import { Schedule } from './schedule/schedule';
-import { Settings } from './settings/settings';
 import { Students } from './students/students';
 
 export const routes: Routes = [
@@ -22,7 +21,6 @@ export const routes: Routes = [
       { path: 'students', component: Students },
       { path: 'lessons', component: Lessons },
       { path: 'lessons/:id', component: Lessons }, // the list with that lesson open on top
-      { path: 'settings', component: Settings },
       { path: 'about', component: About },
       { path: 'install', component: Install },
       { path: '', pathMatch: 'full', redirectTo: 'schedule' },

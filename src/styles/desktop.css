@@ -74,20 +74,16 @@ html.dark:root {
   --glass-neutral: #2c2c2e;
 }
 
-.icon-btn,
-.btn-group {
+.icon-btn {
   background-color: transparent;
   box-shadow: none;
 }
 /* No circles on desktop: round buttons get the regular corners */
 .icon-btn,
-.btn-confirm,
-.btn-group,
-.btn-group > button {
+.btn-confirm {
   border-radius: var(--radius-capsule);
 }
-.icon-btn:hover,
-.btn-group > button:hover {
+.icon-btn:hover {
   background-color: var(--highlight);
 }
 .btn-secondary:hover,

@@ -7,7 +7,6 @@ import { LoadingService } from '../core/services/loading.service';
 /** How often an event repeats — every `repeatInterval` days / weeks / months / years (from its
  * first start, with no end). */
 export type EventRepeat = 'Never' | 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
-export const REPEAT_FREQUENCIES: Exclude<EventRepeat, 'Never'>[] = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
 
 // Events are loaded for a window around today: 26 weeks back, 53 weeks in total, starting
 // on a Monday. The schedule's scrollable calendar covers exactly this window.

@@ -14,9 +14,6 @@
 @utility text-footnote {
   font-size: 0.8125rem; /* 13px */
 }
-@utility text-caption {
-  font-size: 0.6875rem; /* 11px */
-}
 
 /* ---- Materials (glass buttons, matched against native iOS 26 screenshots) ---- */
 
@@ -97,16 +94,6 @@
            rounded-[var(--radius-capsule)] bg-white px-4 font-medium text-[#1c1c1e]
            shadow-[var(--shadow-popover)] active:opacity-70 desktop:h-[var(--control-h)]
            desktop:shadow-[var(--rim-neutral),var(--shadow-control)];
-  }
-
-  /* Several icon buttons in one glass capsule (iOS toolbar group):
-     <div class="btn-group"><button>…</button><button>…</button></div> */
-  .btn-group {
-    @apply glass-neutral inline-flex h-[var(--control-round)] shrink-0 items-center rounded-full px-1;
-    & > button {
-      @apply inline-flex h-full w-[calc(var(--control-round)-0.25rem)] items-center justify-center
-             rounded-full active:opacity-60;
-    }
   }
 
   /* Round icon button — accent (✓, +, avatar) */
@@ -212,10 +199,6 @@
     }
   }
 
-  /* Menus without dividers between their rows (<div class="no-dividers">). */
-  .no-dividers .list-row::after {
-    display: none;
-  }
 
   /* Row inside a card. Hairline divider between rows, iOS-style: it starts at the text (after a
      leading avatar / icon / dot / color bar / check), stops short of the right edge, and is
@@ -367,9 +350,6 @@
     }
   }
 
-  .badge {
-    @apply text-caption rounded-full bg-[var(--fill-strong)] px-2 py-0.5 font-semibold opacity-60;
-  }
 
   .dot {
     @apply size-2 shrink-0 rounded-full;

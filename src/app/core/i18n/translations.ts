@@ -11,14 +11,12 @@ const en = {
   'nav.schedule': 'Schedule',
   'nav.students': 'Students',
   'nav.lessons': 'Lessons',
-  'nav.settings': 'Settings',
   'nav.about': 'About',
   'nav.install': 'Install app',
   'nav.menu': 'Menu',
 
   'account.title': 'Account',
   'account.language': 'Language',
-  'settings.languageHint': 'The language of the app.',
   'account.update': 'Update available',
   'account.logout': 'Log out',
 
@@ -172,14 +170,12 @@ const pl: Dictionary = {
   'nav.schedule': 'Plan',
   'nav.students': 'Uczniowie',
   'nav.lessons': 'Lekcje',
-  'nav.settings': 'Ustawienia',
   'nav.about': 'O aplikacji',
   'nav.install': 'Zainstaluj aplikację',
   'nav.menu': 'Menu',
 
   'account.title': 'Konto',
   'account.language': 'Język',
-  'settings.languageHint': 'Język aplikacji.',
   'account.update': 'Dostępna aktualizacja',
   'account.logout': 'Wyloguj się',
 
@@ -330,14 +326,12 @@ const fr: Dictionary = {
   'nav.schedule': 'Planning',
   'nav.students': 'Élèves',
   'nav.lessons': 'Cours',
-  'nav.settings': 'Réglages',
   'nav.about': 'À propos',
   'nav.install': 'Installer l’app',
   'nav.menu': 'Menu',
 
   'account.title': 'Compte',
   'account.language': 'Langue',
-  'settings.languageHint': 'La langue de l’application.',
   'account.update': 'Mise à jour disponible',
   'account.logout': 'Se déconnecter',
 
