@@ -341,7 +341,10 @@ export class PersonLessons {
           <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
           <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'upcoming'" />
         </span>
-        <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
+        <!-- Unfolded (desktop): the full list below takes the next lesson's place -->
+        @if (expanded() !== 'upcoming') {
+          <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
+        }
       </button>
       <!-- Desktop: the full list unfolds right here -->
       @if (expanded() === 'upcoming') {
@@ -354,8 +357,10 @@ export class PersonLessons {
           <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
           <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="expanded() === 'history'" />
         </span>
-        <!-- The last lesson, as a line of text -->
-        <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</span>
+        <!-- The last lesson, as a line of text (unfolded: the full list below instead) -->
+        @if (expanded() !== 'history') {
+          <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</span>
+        }
       </button>
       @if (expanded() === 'history') {
         <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [listLabels]="false" />
