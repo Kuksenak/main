@@ -7,6 +7,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { NavStack } from '../core/services/nav-stack.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
+import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { SearchField } from '../core/ui/search-field';
 import { Sheet } from '../core/ui/sheet/sheet';
@@ -15,14 +16,15 @@ import { Group, GroupService, colorVar } from './group.service';
 import { Student, StudentService } from './student.service';
 
 /**
- * Students and groups in one list (iOS Contacts-like): groups first, then students by letter, the
- * search filtering both. Mobile: a tap opens the card on the NavStack (for reading, Edit inside).
+ * Students and groups in one list (iOS Contacts-like): groups first, then students, the search
+ * filtering both. Mobile: a tap opens the card on the NavStack (for reading, Edit inside).
  * Desktop: the picked student / group shows on the right the same way; its Edit opens the form.
- * Add offers a new student or group; Select picks students to make a group of.
+ * Add offers a new student or group; a long press on a student starts picking students to make a
+ * group of.
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, GroupView, Icon, ScrollArea, SearchField, Sheet, StudentView, TranslatePipe],
+  imports: [NgTemplateOutlet, GroupView, Icon, LongPress, ScrollArea, SearchField, Sheet, StudentView, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -46,18 +48,6 @@ export class Students {
       .students()
       .filter((s) => !q || [s.name, s.email, s.phone].some((v) => !!v && v.toLocaleLowerCase().includes(q)))
       .sort(this.byName);
-  });
-
-  // Students under their first letter.
-  protected readonly letters = computed(() => {
-    const out: { letter: string; students: Student[] }[] = [];
-    for (const s of this.visible()) {
-      const letter = initial(s.name, this.i18n.locale()) || '#';
-      const last = out.at(-1);
-      if (last?.letter === letter) last.students.push(s);
-      else out.push({ letter, students: [s] });
-    }
-    return out;
   });
 
   protected readonly visibleGroups = computed(() => {
@@ -136,9 +126,11 @@ export class Students {
 
   // ---- Select mode ----
 
-  protected startSelect(): void {
+  // Entered by long-pressing a student (who starts checked).
+  protected startSelect(s: Student): void {
+    if (this.selecting()) return;
     this.selecting.set(true);
-    this.checked.set(new Set());
+    this.checked.set(new Set([s.id]));
   }
 
   protected cancelSelect(): void {

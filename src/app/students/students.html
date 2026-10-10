@@ -6,11 +6,8 @@
      card. Desktop: the list on the left (calendar width), the picked student / group on the right. -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6">
   <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-md">
-    <!-- Desktop: Select · Add, then the search (phones: search in the toolbar, buttons at the bottom) -->
+    <!-- Desktop: Add, then the search (phones: search in the toolbar, + at the bottom) -->
     <div class="flex items-center gap-3 mobile:hidden">
-      @if (!selecting()) {
-        <button type="button" (click)="startSelect()" [disabled]="!visible().length" class="btn-secondary">{{ 'action.select' | t }}</button>
-      }
       <button #addBtn type="button" (click)="openAdd(addBtn)" class="btn-primary ml-auto gap-1.5 pl-2.5">
         <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
         {{ 'action.add' | t }}
@@ -40,13 +37,14 @@
           </div>
         }
 
-        <!-- Students, by first letter; under the name their groups (else the email / phone) -->
-        @for (sec of letters(); track sec.letter) {
+        <!-- Students, alphabetical; under the name their groups (else the email / phone). Long
+             press: select students to make a group of. -->
+        @if (visible().length) {
           <div class="flex flex-col gap-1.5">
-            <span class="text-footnote opacity-50">{{ sec.letter }}</span>
+            <span class="text-footnote opacity-50">{{ 'nav.students' | t }}</span>
             <div class="card">
-              @for (s of sec.students; track s.id) {
-                <button type="button" (click)="pick(s)" class="list-row w-full py-2 text-left">
+              @for (s of visible(); track s.id) {
+                <button type="button" appLongPress (longPress)="startSelect(s)" (click)="pick(s)" class="list-row w-full py-2 text-left">
                   @if (selecting()) {
                     <span class="check" [class.is-on]="checked().has(s.id)">
                       @if (checked().has(s.id)) {
@@ -114,7 +112,7 @@
   </app-sheet>
 }
 
-<!-- Floating: while selecting, Cancel · Create group; else (phones) Select bottom-left, + bottom-right -->
+<!-- Floating: while selecting, Cancel · Create group; else (phones) + bottom-right -->
 @if (selecting()) {
   <div class="float-bottom inset-x-4 flex items-center gap-2 desktop:left-auto desktop:w-md">
     <button type="button" (click)="cancelSelect()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
@@ -123,9 +121,6 @@
     </button>
   </div>
 } @else {
-  @if (visible().length) {
-    <button type="button" (click)="startSelect()" class="btn-secondary float-bottom left-4 !h-12 desktop:hidden">{{ 'action.select' | t }}</button>
-  }
   <button
     #fab
     type="button"
