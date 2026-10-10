@@ -5,6 +5,11 @@
     <div class="mb-3 flex items-center gap-3 mobile:hidden">
       <h1 class="text-xl font-semibold">{{ monthTitle() }}</h1>
       <button type="button" (click)="today()" class="btn-secondary ml-auto">{{ 'schedule.today' | t }}</button>
+      <!-- Add, next to Today (desktop; phones have the floating + at the bottom) -->
+      <button type="button" (click)="openNew()" class="btn-primary gap-1.5 pl-2.5">
+        <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
+        {{ 'action.add' | t }}
+      </button>
     </div>
 
     <!-- Weekday row. Phone sizes as in iOS Calendar's month view: edge to edge, 13px weekdays,
@@ -128,12 +133,12 @@
   </section>
 </main>
 
-<!-- Floating controls: Today (mobile) bottom-left, + bottom-right (same size / edge as the
+<!-- Phones: floating controls — Today bottom-left, + bottom-right (same size / edge as the
      account button in the header) -->
 <button type="button" (click)="today()" class="btn-secondary float-bottom left-4 !h-12 desktop:hidden">
   {{ 'schedule.today' | t }}
 </button>
-<button type="button" (click)="openNew()" [attr.aria-label]="'schedule.addEvent' | t" class="fab float-bottom right-4">
+<button type="button" (click)="openNew()" [attr.aria-label]="'schedule.addEvent' | t" class="fab float-bottom right-4 desktop:hidden">
   <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
     <span class="fab-label">{{ 'action.add' | t }}</span>
 </button>

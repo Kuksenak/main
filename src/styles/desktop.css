@@ -165,14 +165,18 @@ html.dark .btn-white:active {
 .btn-white,
 .fab,
 .account-pill,
-.nav-tab {
+.nav-tab,
+.card-btn {
   font-size: var(--text-body);
   font-weight: 450 !important;
 }
-.card-btn,
-
+/* Card buttons (Update, Log out): as tall as the other buttons */
+.card-btn {
+  height: var(--control-h);
+}
 
 /* Pointer hover feedback (touch devices have no hover). */
+.card-btn:hover,
 .chip:not(:disabled):hover {
   background-color: var(--highlight);
 }
