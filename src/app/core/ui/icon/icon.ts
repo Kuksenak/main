@@ -32,7 +32,6 @@ export type IconName =
   | 'share'
   | 'plus-square'
   | 'dots-vertical'
-  | 'ellipsis'
   | 'install'
   | 'phone'
   | 'monitor';
@@ -95,7 +94,6 @@ export type IconName =
         <!-- Installing: Safari's Share and "Add to Home Screen", Chrome's ⋮ and install marks, devices -->
         @case ('share') { <path d="M12 3v12M8 6.5 12 2.5l4 4" /><path d="M8.5 10H7a2.5 2.5 0 0 0-2.5 2.5v6A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5v-6A2.5 2.5 0 0 0 17 10h-1.5" /> }
         @case ('plus-square') { <rect x="3.5" y="3.5" width="17" height="17" rx="4" /><path d="M12 8v8M8 12h8" /> }
-        @case ('ellipsis') { <circle cx="12" cy="12" r="9" /><circle cx="8" cy="12" r="1.2" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none" /><circle cx="16" cy="12" r="1.2" fill="currentColor" stroke="none" /> }
         @case ('dots-vertical') { <circle cx="12" cy="5" r="1.6" fill="currentColor" stroke="none" /><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" /><circle cx="12" cy="19" r="1.6" fill="currentColor" stroke="none" /> }
         @case ('install') { <rect x="2.5" y="4" width="19" height="13" rx="2.5" /><path d="M8 21h8M12 7.5v6M9.5 11 12 13.5 14.5 11" /> }
         @case ('phone') { <rect x="6" y="2.5" width="12" height="19" rx="3" /><path d="M10.5 18.5h3" /> }
