@@ -45,16 +45,17 @@ interface Model {
       @if (!editing() && !entry().readOnly) {
         <button barEnd type="button" (click)="editing.set(true)" class="btn-white">{{ 'action.edit' | t }}</button>
       }
-      <!-- Desktop dialogs have no top bar: Edit at the top right of the content -->
-      @if (!editing() && !entry().readOnly) {
-        <div class="-mb-2 flex justify-end mobile:hidden">
-          <button type="button" (click)="editing.set(true)" class="btn-secondary">{{ 'action.edit' | t }}</button>
-        </div>
-      }
 
       @if (!editing()) {
         @if (saved(); as g) {
-          <app-group-view [group]="g" />
+          <app-group-view [group]="g">
+          <!-- Desktop dialogs have no top bar: Edit in the header row -->
+          @if (!entry().readOnly) {
+            <ng-container ngProjectAs="[headerEnd]">
+              <button type="button" (click)="editing.set(true)" class="btn-secondary shrink-0 mobile:hidden">{{ 'action.edit' | t }}</button>
+            </ng-container>
+          }
+        </app-group-view>
         }
       } @else {
       <div class="flex flex-col gap-4">

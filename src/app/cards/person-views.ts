@@ -19,15 +19,17 @@ import { GroupMembers, StudentGroups } from './related-lists';
   host: { class: 'flex flex-col gap-4' },
   template: `
     @let s = student();
-    <!-- Header: centered on phones, avatar beside the name on desktop -->
-    <div class="flex flex-col items-center gap-1.5 pt-1 text-center desktop:flex-row desktop:gap-3 desktop:pt-0 desktop:text-left">
+    <!-- Header, pinned while the rest scrolls: centered on phones, avatar beside the name on
+         desktop (with [headerEnd] content — Edit — on the right) -->
+    <div class="sticky top-[calc(env(safe-area-inset-top)+3.75rem)] z-[5] -mx-1 bg-[var(--app-bg)] px-1 pb-2 desktop:top-0 desktop:bg-[var(--dialog-bg)] flex flex-col items-center gap-1.5 pt-1 text-center desktop:flex-row desktop:gap-3 desktop:pt-0 desktop:text-left">
       <span class="avatar size-16 text-2xl desktop:size-12 desktop:text-lg">{{ initial(s.name) }}</span>
-      <div class="min-w-0">
+      <div class="min-w-0 desktop:flex-1">
         <h1 class="truncate text-xl font-semibold leading-tight">{{ s.name }}</h1>
         @if (groupNames()) {
           <p class="text-footnote truncate opacity-50">{{ groupNames() }}</p>
         }
       </div>
+      <ng-content select="[headerEnd]" />
     </div>
 
     <!-- Desktop: two columns — the info left, the events right -->
@@ -95,15 +97,16 @@ export class StudentView {
   host: { class: 'flex flex-col gap-4' },
   template: `
     @let g = group();
-    <!-- Header: centered on phones, avatar beside the name on desktop -->
-    <div class="flex flex-col items-center gap-1.5 pt-1 text-center desktop:flex-row desktop:gap-3 desktop:pt-0 desktop:text-left">
+    <!-- Header, pinned while the rest scrolls (see StudentView) -->
+    <div class="sticky top-[calc(env(safe-area-inset-top)+3.75rem)] z-[5] -mx-1 bg-[var(--app-bg)] px-1 pb-2 desktop:top-0 desktop:bg-[var(--dialog-bg)] flex flex-col items-center gap-1.5 pt-1 text-center desktop:flex-row desktop:gap-3 desktop:pt-0 desktop:text-left">
       <span class="avatar size-16 text-2xl text-[var(--accent-fg)] desktop:size-12 desktop:text-lg" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
-      <div class="min-w-0">
+      <div class="min-w-0 desktop:flex-1">
         <h1 class="truncate text-xl font-semibold leading-tight">{{ g.name }}</h1>
         <p class="text-footnote flex items-center gap-1 tabular-nums opacity-50 mobile:justify-center">
           <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
         </p>
       </div>
+      <ng-content select="[headerEnd]" />
     </div>
 
     <!-- Desktop: two columns — the members left, the events right -->

@@ -16,64 +16,86 @@
       </button>
     </div>
 
-    @if (visibleGroups().length || visible().length) {
-      <!-- Bottom padding clears the floating buttons (phones) -->
-      <app-scroll-area class="min-h-0 flex-1" contentClass="gap-4 pb-16 desktop:grid desktop:grid-cols-2 desktop:content-start desktop:items-start desktop:gap-6 desktop:pb-2">
-        <!-- Groups (they stay while selecting students; only students get the circles) -->
-        @if (visibleGroups().length) {
-          <div class="flex flex-col gap-1.5">
-            <span class="card-label">{{ 'groups.title' | t }}</span>
-            <div class="card">
-              @for (g of visibleGroups(); track g.id) {
-                <button type="button" (click)="pickGroup(g)" class="list-row w-full py-2 text-left">
-                  <span class="avatar text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
-                  <p class="min-w-0 flex-1 truncate font-medium">{{ g.name }}</p>
-                  <span class="text-footnote flex items-center gap-1 tabular-nums opacity-50">
-                    <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
-                  </span>
-                  <app-icon name="chevron-right" class="row-chevron" />
-                </button>
+    <!-- The rows, shared by both layouts -->
+    <ng-template #groupRows>
+      @for (g of visibleGroups(); track g.id) {
+        <button type="button" (click)="pickGroup(g)" class="list-row w-full py-2 text-left">
+          <span class="avatar text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
+          <p class="min-w-0 flex-1 truncate font-medium">{{ g.name }}</p>
+          <span class="text-footnote flex items-center gap-1 tabular-nums opacity-50">
+            <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
+          </span>
+          <app-icon name="chevron-right" class="row-chevron" />
+        </button>
+      }
+    </ng-template>
+    <!-- Students, alphabetical. Long press: select students to make a group of. -->
+    <ng-template #studentRows>
+      @for (s of visible(); track s.id) {
+        <button type="button" appLongPress (longPress)="startSelect(s)" (click)="pick(s)" class="list-row w-full py-2 text-left">
+          @if (selecting()) {
+            <span class="check" [class.is-on]="checked().has(s.id)">
+              @if (checked().has(s.id)) {
+                <app-icon name="check" [strokeWidth]="3" class="size-3.5" />
               }
-            </div>
+            </span>
+          }
+          <span class="avatar">{{ initial(s.name) }}</span>
+          <div class="min-w-0 flex-1 leading-tight">
+            <p class="truncate font-medium">{{ s.name }}</p>
+            <!-- Phones: their groups (else the email / phone) under the name; desktop rows are plain -->
+            @if (subtitle(s); as sub) {
+              <p class="text-footnote truncate opacity-50 desktop:hidden">{{ sub }}</p>
+            }
           </div>
-        }
+          @if (!selecting()) {
+            <app-icon name="chevron-right" class="row-chevron" />
+          }
+        </button>
+      }
+    </ng-template>
 
-        <!-- Students, alphabetical; under the name their groups (else the email / phone). Long
-             press: select students to make a group of. -->
-        @if (visible().length) {
-          <div class="flex flex-col gap-1.5 desktop:order-first">
-            <span class="card-label">{{ 'nav.students' | t }}</span>
-            <div class="card">
-              @for (s of visible(); track s.id) {
-                <button type="button" appLongPress (longPress)="startSelect(s)" (click)="pick(s)" class="list-row w-full py-2 text-left">
-                  @if (selecting()) {
-                    <span class="check" [class.is-on]="checked().has(s.id)">
-                      @if (checked().has(s.id)) {
-                        <app-icon name="check" [strokeWidth]="3" class="size-3.5" />
-                      }
-                    </span>
-                  }
-                  <span class="avatar">{{ initial(s.name) }}</span>
-                  <div class="min-w-0 flex-1 leading-tight">
-                    <p class="truncate font-medium">{{ s.name }}</p>
-                    <!-- Phones: their groups (else the email / phone) under the name; desktop rows are plain -->
-                    @if (subtitle(s); as sub) {
-                      <p class="text-footnote truncate opacity-50 desktop:hidden">{{ sub }}</p>
-                    }
-                  </div>
-                  @if (!selecting()) {
-                    <app-icon name="chevron-right" class="row-chevron" />
-                  }
-                </button>
-              }
-            </div>
-          </div>
-        }
-      </app-scroll-area>
-    } @else {
+    @if (!visibleGroups().length && !visible().length) {
       <div class="flex flex-1 items-center justify-center">
         <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : 'students.empty') | t }}</p>
       </div>
+    } @else if (desktop) {
+      <!-- Desktop: two columns, each scrolling on its own inside its card (students | groups) -->
+      <div class="grid min-h-0 flex-1 grid-cols-2 gap-6">
+        <div class="flex min-h-0 flex-col gap-1.5">
+          @if (visible().length) {
+            <span class="card-label">{{ 'nav.students' | t }}</span>
+            <app-scroll-area class="min-h-0 shrink" viewportClass="card">
+              <ng-container [ngTemplateOutlet]="studentRows" />
+            </app-scroll-area>
+          }
+        </div>
+        <div class="flex min-h-0 flex-col gap-1.5">
+          @if (visibleGroups().length) {
+            <span class="card-label">{{ 'groups.title' | t }}</span>
+            <app-scroll-area class="min-h-0 shrink" viewportClass="card">
+              <ng-container [ngTemplateOutlet]="groupRows" />
+            </app-scroll-area>
+          }
+        </div>
+      </div>
+    } @else {
+      <!-- Phones: one list, groups first (they stay while selecting students; only students get
+           the circles); bottom padding clears the floating buttons -->
+      <app-scroll-area class="min-h-0 flex-1" contentClass="gap-4 pb-16">
+        @if (visibleGroups().length) {
+          <div class="flex flex-col gap-1.5">
+            <span class="card-label">{{ 'groups.title' | t }}</span>
+            <div class="card"><ng-container [ngTemplateOutlet]="groupRows" /></div>
+          </div>
+        }
+        @if (visible().length) {
+          <div class="flex flex-col gap-1.5">
+            <span class="card-label">{{ 'nav.students' | t }}</span>
+            <div class="card"><ng-container [ngTemplateOutlet]="studentRows" /></div>
+          </div>
+        }
+      </app-scroll-area>
     }
   </section>
 
