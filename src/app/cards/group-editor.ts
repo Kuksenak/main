@@ -124,7 +124,12 @@ export class GroupEditor implements OnInit {
   private readonly snapshot = signal(''); // contents when opened, to tell whether anything changed
 
   protected readonly saved = computed(() => this.groups.groups().find((g) => g.id === this.entry().id) ?? null);
-  protected readonly dirty = computed(() => JSON.stringify(this.model()) !== this.snapshot());
+  protected readonly dirty = computed(() => GroupEditor.key(this.model()) !== this.snapshot());
+
+  // What "changed" compares: members as a set (removing someone and adding them back is no change).
+  private static key(m: Model): string {
+    return JSON.stringify({ ...m, studentIds: [...m.studentIds].sort() });
+  }
   protected readonly canSave = computed(() => !!this.model().name.trim() && this.dirty());
 
   private readonly byName = (a: Student, b: Student) => a.name.localeCompare(b.name, this.i18n.locale());
@@ -140,7 +145,7 @@ export class GroupEditor implements OnInit {
     const g = this.saved();
     if (g) {
       this.model.set({ name: g.name, color: g.color, studentIds: [...g.studentIds] });
-      this.snapshot.set(JSON.stringify(this.model()));
+      this.snapshot.set(GroupEditor.key(this.model()));
     } else {
       // New: first color not used yet; members pre-selected from the students list. Counts as
       // unsaved, so a group made from a selection can be saved right after naming it.

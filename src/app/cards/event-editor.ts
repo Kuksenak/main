@@ -267,7 +267,14 @@ export class EventEditor implements OnInit {
   protected readonly invalid = computed(
     () => timeToMin(this.model().endTime) <= timeToMin(this.model().startTime),
   );
-  protected readonly dirty = computed(() => JSON.stringify(this.model()) !== this.snapshot());
+  protected readonly dirty = computed(() => EventEditor.key(this.model()) !== this.snapshot());
+
+  // What "changed" compares: the form, with who's invited as a set (removing someone and adding
+  // them back is no change); attached lessons keep their order (it can be rearranged).
+  private static key(m: Model): string {
+    const sorted = (ids: string[]) => [...ids].sort();
+    return JSON.stringify({ ...m, invitees: { studentIds: sorted(m.invitees.studentIds), groupIds: sorted(m.invitees.groupIds) } });
+  }
   // Save a valid event with a title or someone invited, that differs from what was opened.
   // Repeat presets (iOS-like) over frequency + interval; anything else is Custom.
   private static readonly PRESETS: { key: string; repeat: EventRepeat; interval: number }[] = [
@@ -394,7 +401,7 @@ export class EventEditor implements OnInit {
     }
     // A stored rule that matches no preset opens as Custom.
     if (this.preset() === 'custom') this.model.update((m) => ({ ...m, repeatCustom: true }));
-    this.snapshot.set(JSON.stringify(this.model()));
+    this.snapshot.set(EventEditor.key(this.model()));
     const m = this.model();
     this.repeatSnapshot = JSON.stringify([m.repeat, m.repeatInterval, m.repeatUntil]);
   }
