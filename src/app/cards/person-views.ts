@@ -252,7 +252,7 @@ export class PersonLessons {
  */
 @Component({
   selector: 'app-student-view',
-  imports: [BrandIcon, Icon, PersonLessons, TranslatePipe],
+  imports: [BrandIcon, Icon, NgTemplateOutlet, PersonLessons, TranslatePipe],
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let s = student();
@@ -293,24 +293,16 @@ export class PersonLessons {
       </div>
     }
 
-    <!-- Two blocks: Upcoming › with the next lesson under it, Past lessons › with the last one (a
-         tap opens the full list); each only when there's something in it -->
-    @if (nextEvent(); as e) {
-    <button type="button" (click)="upcoming.emit()" class="card flex w-full flex-col text-left">
-      <span class="list-row">
-        <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
-        <app-icon name="chevron-right" class="row-chevron" />
-      </span>
-      <!-- The next lesson: the calendar icon, its title, marks, start over end -->
-      <span class="list-row !gap-3.5 py-3">
+    <!-- A lesson under Upcoming / History: the calendar icon, its title (else its groups), the
+         repeat / paperclip marks, start over end (as in the schedule) -->
+    <ng-template #lessonRow let-e>
+      <span class="list-row !gap-3.5 pb-3 pt-4">
         <app-brand-icon name="calendar" [date]="start(e)" class="h-14 w-[5.5rem] shrink-0" />
-        <!-- The event's title (else its groups); attached lessons show as the paperclip only -->
         <span class="flex min-w-0 flex-1 flex-col gap-1.5">
           @if (context(e); as c) {
             <span class="truncate font-medium">{{ c }}</span>
           }
         </span>
-        <!-- ⟲ repeating over 📎 lessons attached, just left of the time (as in the schedule) -->
         @if (e.repeat !== 'Never' || e.lessonIds.length) {
           <span class="-mr-1.5 flex w-[1.125rem] shrink-0 flex-col items-center gap-1 opacity-50">
             @if (e.repeat !== 'Never') {
@@ -321,22 +313,32 @@ export class PersonLessons {
             }
           </span>
         }
-        <!-- Start over end (the end lighter), as in the schedule -->
         <span class="text-callout shrink-0 text-right leading-tight tabular-nums">
           <span class="block font-medium">{{ startTime(e) }}</span>
           <span class="block opacity-50">{{ endTime(e) }}</span>
         </span>
       </span>
-    </button>
+    </ng-template>
+
+    <!-- Two blocks: Upcoming › with the next lesson under it, History › with the last one (a tap
+         opens the full list); each only when there's something in it -->
+    @if (nextEvent(); as e) {
+      <button type="button" (click)="upcoming.emit()" class="card flex w-full flex-col text-left">
+        <span class="list-row">
+          <span class="min-w-0 flex-1 font-medium">{{ 'students.upcoming' | t }}</span>
+          <app-icon name="chevron-right" class="row-chevron" />
+        </span>
+        <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
+      </button>
     }
-    @if (lastLabel()) {
-    <button type="button" (click)="history.emit()" class="card flex w-full flex-col text-left">
-      <span class="list-row">
-        <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
-        <app-icon name="chevron-right" class="row-chevron" />
-      </span>
-      <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ lastLabel() }}</span>
-    </button>
+    @if (lastEvent(); as e) {
+      <button type="button" (click)="history.emit()" class="card flex w-full flex-col text-left">
+        <span class="list-row">
+          <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
+          <app-icon name="chevron-right" class="row-chevron" />
+        </span>
+        <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
+      </button>
     }
 
     <app-person-lessons
@@ -362,7 +364,7 @@ export class StudentView {
   private people = inject(EventPeople);
   private i18n = inject(I18nService);
 
-  // Under Upcoming: the next lesson; under Past lessons: the last one ("Mon, 13 Oct · 18:00–19:00").
+  // Under Upcoming: the next lesson; under History: the last one.
   private readonly mine = computed(() => {
     const id = this.student().id;
     return this.events.events().filter((e) => this.people.invites(e, id));
@@ -373,12 +375,11 @@ export class StudentView {
         .filter((e) => eventEnd(e).getTime() >= Date.now())
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null,
   );
-  protected readonly lastLabel = computed(() =>
-    this.when(
+  protected readonly lastEvent = computed(
+    () =>
       this.mine()
         .filter((e) => eventEnd(e).getTime() < Date.now())
-        .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0],
-    ),
+        .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0] ?? null,
   );
 
   // The next lesson's calendar icon and lines
@@ -402,12 +403,7 @@ export class StudentView {
     );
   }
 
-  private when(e: ScheduleEvent | undefined): string {
-    if (!e) return '';
-    const start = new Date(e.startsAt);
-    const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
-    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(e))}`;
-  }
+
 }
 
 /** A group, for reading: its color avatar, the name and member count; its lessons; members. */
