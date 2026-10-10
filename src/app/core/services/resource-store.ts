@@ -42,6 +42,12 @@ export abstract class ResourceStore<T extends { id: string }, Input> {
     this.send(this.http.put(`${this.base}/${id}`, input));
   }
 
+  /** PUT {base}/{id}/{sub} (e.g. a student's lessons); `local` shows the change right away. */
+  protected putSub(id: string, sub: string, body: unknown, local?: Partial<T>): void {
+    if (local) this._items.update((list) => list.map((x) => (x.id === id ? { ...x, ...local } : x)));
+    this.send(this.http.put(`${this.base}/${id}/${sub}`, body));
+  }
+
   remove(id: string): void {
     this.send(this.http.delete(`${this.base}/${id}`));
   }

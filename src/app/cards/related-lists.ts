@@ -5,39 +5,7 @@ import { NavStack } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { Section } from '../core/ui/section/section';
 import { initial } from '../core/utils/text';
-import { GroupService, colorVar } from '../students/group.service';
 import { Student, StudentService } from '../students/student.service';
-
-/** Groups a student is in; a tap opens the group card on top. Renders nothing when none. */
-@Component({
-  selector: 'app-student-groups',
-  imports: [Icon, Section, TranslatePipe],
-  template: `
-    @if (groups().length) {
-      <app-section [title]="'groups.title' | t" [count]="groups().length" key="studentGroups">
-        <div class="card">
-          @for (g of groups(); track g.id) {
-            <button type="button" (click)="stack.push({ kind: 'group', id: g.id })" class="list-row w-full text-left">
-              <span class="dot size-2.5" [style.background]="colorVar(g.color)"></span>
-              <p class="min-w-0 flex-1 truncate">{{ g.name }}</p>
-              <app-icon name="chevron-right" class="row-chevron" />
-            </button>
-          }
-        </div>
-      </app-section>
-    }
-  `,
-})
-export class StudentGroups {
-  readonly studentId = input.required<string>();
-
-  private groupService = inject(GroupService);
-  protected stack = inject(NavStack);
-  protected readonly colorVar = colorVar;
-  protected readonly groups = computed(() =>
-    this.groupService.groups().filter((g) => g.studentIds.includes(this.studentId())),
-  );
-}
 
 /** Members of a group, alphabetical; a tap opens the student card on top. */
 @Component({

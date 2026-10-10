@@ -48,7 +48,7 @@ interface Model {
 
       @if (!editing()) {
         @if (saved(); as g) {
-          <app-group-view [group]="g">
+          <app-group-view [group]="g" [editable]="!entry().readOnly">
           <!-- Desktop dialogs have no top bar: Edit in the header row -->
           @if (!entry().readOnly) {
             <ng-container ngProjectAs="[headerEnd]">

@@ -47,7 +47,7 @@ import { StudentView } from './person-views';
           </div>
         </div>
       } @else if (saved(); as s) {
-        <app-student-view [student]="s">
+        <app-student-view [student]="s" [editable]="!entry().readOnly">
           <!-- Desktop dialogs have no top bar: Edit in the header row -->
           @if (!entry().readOnly) {
             <ng-container ngProjectAs="[headerEnd]">

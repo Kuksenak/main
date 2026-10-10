@@ -159,6 +159,53 @@
            bg-[var(--surface)];
   }
 
+  /* The head of a student / group page: avatar and name — centered on phones, avatar beside the
+     name on desktop; pinned while the rest scrolls (below the phone's top bar). */
+  .person-head {
+    @apply sticky top-[calc(env(safe-area-inset-top)+3.75rem)] z-[5] -mx-1 flex flex-col items-center gap-2
+           bg-[var(--app-bg)] px-1 pb-2 pt-1 text-center
+           desktop:top-0 desktop:flex-row desktop:gap-3.5 desktop:bg-[var(--dialog-bg)] desktop:pt-0 desktop:text-left;
+  }
+
+  /* The next lesson on a student / group page: a card ringed in the accent. */
+  .next-lesson {
+    @apply flex w-full items-center gap-4 rounded-[var(--radius-card)] bg-[var(--surface)] px-4 py-3.5 text-left
+           shadow-[inset_0_0_0_1.5px_var(--accent)] active:opacity-70;
+  }
+  .next-tag {
+    @apply text-xs font-semibold not-italic uppercase tracking-wide text-[var(--accent)];
+  }
+
+  /* A lesson's date: the day over (or under) its weekday; .is-accent: the filled tile of the next one. */
+  .date-tile {
+    @apply flex w-11 shrink-0 flex-col items-center justify-center gap-0.5 leading-none;
+    & b {
+      @apply text-lg font-semibold tabular-nums;
+    }
+    & small {
+      @apply text-[0.6875rem] uppercase tracking-wide opacity-50;
+    }
+    &.is-accent {
+      @apply size-14 rounded-xl bg-[var(--accent)] text-[var(--accent-fg)];
+      & b {
+        @apply text-[1.375rem];
+      }
+      & small {
+        @apply font-semibold opacity-100;
+      }
+    }
+  }
+
+  /* An attached lesson's name, as a small gray tag. */
+  .lesson-chip {
+    @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-[var(--chip-ios)] px-2 py-1 text-[0.8125rem];
+  }
+
+  /* A link with nothing behind it (no email / phone). */
+  a.is-off {
+    @apply pointer-events-none opacity-40;
+  }
+
   /* A contact action under a person's name (Email / Call): an icon over its label, in a card
      tile; .is-off when there's no address / number. */
   .contact-action {

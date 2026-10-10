@@ -8,6 +8,7 @@ export interface Student {
   name: string;
   email: string | null;
   phone: string | null;
+  lessonIds: string[]; // attached lessons (their materials), in order
 }
 
 export interface StudentInput {
@@ -26,6 +27,11 @@ export class StudentService extends ResourceStore<Student, StudentInput> {
 
   constructor() {
     super('students', 'students');
+  }
+
+  /** The lessons attached to a student, in this order. */
+  setLessons(id: string, lessonIds: string[]): void {
+    this.putSub(id, 'lessons', { lessonIds }, { lessonIds });
   }
 
   // A deleted student leaves their groups and is uninvited from events.

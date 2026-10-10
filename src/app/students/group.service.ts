@@ -11,9 +11,10 @@ export interface Group {
   name: string;
   color: GroupColor;
   studentIds: string[];
+  lessonIds: string[]; // attached lessons (its materials), in order
 }
 
-export type GroupInput = Omit<Group, 'id'>;
+export type GroupInput = Omit<Group, 'id' | 'lessonIds'>;
 
 export function colorVar(color: GroupColor): string {
   return `var(--palette-${color})`;
@@ -28,6 +29,11 @@ export class GroupService extends ResourceStore<Group, GroupInput> {
 
   constructor() {
     super('groups', 'groups');
+  }
+
+  /** The lessons attached to a group, in this order. */
+  setLessons(id: string, lessonIds: string[]): void {
+    this.putSub(id, 'lessons', { lessonIds }, { lessonIds });
   }
 
   // A deleted group is uninvited from its events.
