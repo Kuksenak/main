@@ -75,7 +75,7 @@ export interface PickSection {
         </div>
       </app-sheet>
     } @else {
-      <app-page-sheet #page [title]="title()" [actions]="false" [scroll]="false" (closed)="closed.emit()">
+      <app-page-sheet #page [title]="title()" [actions]="false" [scroll]="false" [dirty]="draftChanged()" (closed)="closed.emit()">
         <!-- ✓ applies the choice; ‹ leaves without it -->
         <button barEnd type="button" (click)="selected.set(draft()); page.close()" [attr.aria-label]="'action.done' | t" class="btn-confirm">
           <app-icon name="check" [strokeWidth]="2" class="size-7" />
@@ -109,6 +109,12 @@ export class PickList implements OnInit {
   // Phones: taps change a draft, applied by ✓ (‹ drops it). Desktop: each click applies.
   protected readonly draft = signal<string[]>([]);
   protected readonly picked = computed(() => (this.desktop ? this.selected() : this.draft()));
+  // Changed from what was chosen: ‹ turns into ✕ and asks before dropping the changes.
+  protected readonly draftChanged = computed(() => {
+    const a = new Set(this.draft());
+    const b = this.selected();
+    return a.size !== b.length || b.some((id) => !a.has(id));
+  });
 
   ngOnInit(): void {
     this.chosenAtOpen.set(new Set(this.selected()));
