@@ -2,12 +2,12 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
-import { initial } from '../core/utils/text';
 import { LessonService } from '../lessons/lesson.service';
 import { EventPeople } from '../schedule/event-people';
 import { EventService, ScheduleEvent, eventEnd, occurrenceKey } from '../schedule/event.service';
-import { Group, GroupService, colorVar } from '../students/group.service';
+import { Group, GroupService } from '../students/group.service';
 import { Student, StudentService } from '../students/student.service';
 import { PickList, PickSection } from './pick-list';
 import { GroupMembers } from './related-lists';
@@ -41,7 +41,7 @@ import { GroupMembers } from './related-lists';
           @if (lessonTitles(e).length) {
             <span class="flex flex-wrap gap-1.5">
               @for (t of lessonTitles(e); track $index) {
-                <span class="lesson-chip"><app-icon name="book" [strokeWidth]="1.75" class="size-3.5 opacity-60" />{{ t }}</span>
+                <span class="lesson-chip">{{ t }}</span>
               }
             </span>
           }
@@ -58,7 +58,6 @@ import { GroupMembers } from './related-lists';
         <div class="card">
           @for (l of materials(); track l.id) {
             <div class="list-row">
-              <app-icon name="book" [strokeWidth]="1.75" class="size-[1.125rem] opacity-50" />
               <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
             </div>
           }
@@ -97,7 +96,7 @@ import { GroupMembers } from './related-lists';
                   @if (lessonTitles(e).length) {
                     <span class="flex flex-wrap gap-1.5">
                       @for (t of lessonTitles(e); track $index) {
-                        <span class="lesson-chip"><app-icon name="book" [strokeWidth]="1.75" class="size-3.5 opacity-60" />{{ t }}</span>
+                        <span class="lesson-chip">{{ t }}</span>
                       }
                     </span>
                   } @else {
@@ -247,20 +246,18 @@ export class PersonLessons {
 }
 
 /**
- * A student, for reading — like an iOS contact, on phones and desktop alike: a big avatar and the
- * name centered, Email / Call tiles, the phone and email (label
+ * A student, for reading — like an iOS contact, on phones and desktop alike: the name centered, Email / Call tiles, the phone and email (label
  * over value), History › with the last lesson under it (`history` opens the full list), then
  * their materials. [headerEnd] (e.g. Edit on desktop) sits at the top right.
  */
 @Component({
   selector: 'app-student-view',
-  imports: [Icon, PersonLessons, TranslatePipe],
+  imports: [BrandIcon, Icon, PersonLessons, TranslatePipe],
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let s = student();
     <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
     <div class="person-head">
-      <span class="avatar size-20 text-3xl">{{ initial(s.name) }}</span>
       <div class="min-w-0 max-w-full">
         <h1 class="truncate text-[1.75rem] font-semibold leading-tight">{{ s.name }}</h1>
       </div>
@@ -306,10 +303,7 @@ export class PersonLessons {
       </span>
       <!-- The next lesson: the calendar tile, time, who else, what's attached -->
       <span class="list-row !gap-3.5 py-3">
-        <span class="date-tile is-accent">
-          <small>{{ weekday(e) }}</small>
-          <b>{{ day(e) }}</b>
-        </span>
+        <app-brand-icon name="calendar" [date]="start(e)" class="size-14 shrink-0" />
         <span class="flex min-w-0 flex-1 flex-col gap-1.5">
           <span class="flex flex-wrap items-baseline gap-x-2">
             <span class="font-medium tabular-nums">{{ time(e) }}</span>
@@ -320,7 +314,7 @@ export class PersonLessons {
           @if (lessonTitles(e).length) {
             <span class="flex flex-wrap gap-1.5">
               @for (t of lessonTitles(e); track $index) {
-                <span class="lesson-chip"><app-icon name="book" [strokeWidth]="1.75" class="size-3.5 opacity-60" />{{ t }}</span>
+                <span class="lesson-chip">{{ t }}</span>
               }
             </span>
           }
@@ -331,7 +325,7 @@ export class PersonLessons {
     @if (lastLabel()) {
     <button type="button" (click)="history.emit()" class="card flex w-full flex-col text-left">
       <span class="list-row">
-        <span class="min-w-0 flex-1 font-medium">{{ 'people.pastLessons' | t }}</span>
+        <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
         <app-icon name="chevron-right" class="row-chevron" />
       </span>
       <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ lastLabel() }}</span>
@@ -381,12 +375,9 @@ export class StudentView {
     ),
   );
 
-  // The next lesson's tile and lines
-  protected day(e: ScheduleEvent): number {
-    return new Date(e.startsAt).getDate();
-  }
-  protected weekday(e: ScheduleEvent): string {
-    return this.i18n.date(new Date(e.startsAt), { weekday: 'short' });
+  // The next lesson's calendar icon and lines
+  protected start(e: ScheduleEvent): Date {
+    return new Date(e.startsAt);
   }
   protected time(e: ScheduleEvent): string {
     return `${this.i18n.time(new Date(e.startsAt))}–${this.i18n.time(eventEnd(e))}`;
@@ -411,10 +402,6 @@ export class StudentView {
     const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
     return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(e))}`;
   }
-
-  protected initial(name: string): string {
-    return initial(name, this.i18n.locale());
-  }
 }
 
 /** A group, for reading: its color avatar, the name and member count; its lessons; members. */
@@ -426,7 +413,6 @@ export class StudentView {
     @let g = group();
     <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
     <div class="person-head">
-      <span class="avatar size-20 text-3xl text-[var(--accent-fg)]" [style.background]="colorVar(g.color)">{{ initial(g.name) }}</span>
       <div class="min-w-0 max-w-full">
         <h1 class="truncate text-[1.75rem] font-semibold leading-tight">{{ g.name }}</h1>
         <p class="text-footnote mt-1 flex items-center justify-center gap-1 tabular-nums opacity-60">
@@ -444,10 +430,4 @@ export class GroupView {
   readonly editable = input(true);
 
   protected groups = inject(GroupService);
-  private i18n = inject(I18nService);
-  protected readonly colorVar = colorVar;
-
-  protected initial(name: string): string {
-    return initial(name, this.i18n.locale());
-  }
 }

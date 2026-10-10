@@ -167,7 +167,7 @@
 
 <!-- Desktop: a student's Upcoming / History (every lesson ahead / behind), as a dialog -->
 @if (listFor(); as l) {
-  <app-page-sheet [title]="(l.list === 'upcoming' ? 'students.upcoming' : 'people.pastLessons') | t" [actions]="false" (closed)="listFor.set(null)">
+  <app-page-sheet [title]="(l.list === 'upcoming' ? 'students.upcoming' : 'people.history') | t" [actions]="false" (closed)="listFor.set(null)">
     <app-person-lessons
       [studentId]="l.id"
       [showNext]="false"

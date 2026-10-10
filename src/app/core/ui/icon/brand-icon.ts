@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { I18nService } from '../../i18n/i18n.service';
 
 export type BrandIconName = 'calendar' | 'people' | 'book';
@@ -44,8 +44,8 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
             <rect width="48" height="16" style="fill: var(--brand-blue)" />
           </g>
           <rect x="3" y="3" width="42" height="42" rx="8" fill="none" style="stroke: rgb(0 0 0 / 0.08); stroke-width: 0.75" />
-          <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ weekday }}</text>
-          <text x="24" y="38" text-anchor="middle" class="brand-date">{{ today }}</text>
+          <text x="24" y="12.8" text-anchor="middle" class="brand-weekday">{{ weekday() }}</text>
+          <text x="24" y="38" text-anchor="middle" class="brand-date">{{ day() }}</text>
         }
         @case ('people') {
           <!-- Two people with round shoulders; the back one is cut around the front one -->
@@ -75,11 +75,16 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
 })
 export class BrandIcon {
   readonly name = input.required<BrandIconName>();
-  // Calendar icon shows today's weekday and date (taken when the icon is created, e.g. each
-  // time the menu opens).
-  protected readonly today = new Date().getDate();
-  protected readonly weekday = inject(I18nService)
-    .date(new Date(), { weekday: 'short' })
-    .replace('.', '')
-    .toLocaleUpperCase();
+  /** Calendar: the date it shows (default today, taken when the icon is created). */
+  readonly date = input<Date | null>(null);
+
+  private readonly i18n = inject(I18nService);
+  private readonly created = new Date();
+  protected readonly day = computed(() => (this.date() ?? this.created).getDate());
+  protected readonly weekday = computed(() =>
+    this.i18n
+      .date(this.date() ?? this.created, { weekday: 'short' })
+      .replace('.', '')
+      .toLocaleUpperCase(),
+  );
 }
