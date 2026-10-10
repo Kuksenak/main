@@ -107,13 +107,9 @@
                 }
               </div>
               <div class="flex shrink-0 items-center gap-3">
-                <div class="text-callout text-right leading-tight tabular-nums" [class.text-[var(--warning)]]="timing(event) === 'now'">
-                  <p class="font-medium">{{ startLabel(event) }}</p>
-                  <p class="opacity-50">{{ endLabel(event) }}</p>
-                </div>
-                <!-- ⟲ repeating over 📎 lessons attached, right of the time -->
+                <!-- ⟲ repeating over 📎 lessons attached, left of the time, close to it -->
                 @if (dayHasMarks()) {
-                  <div class="-ml-1 flex w-[1.125rem] shrink-0 flex-col items-center gap-1 opacity-50">
+                  <div class="-mr-1.5 flex w-[1.125rem] shrink-0 flex-col items-center gap-1 opacity-50">
                     @if (event.repeat !== 'Never') {
                       <app-icon name="repeat" class="size-[1.125rem]" />
                     }
@@ -122,6 +118,10 @@
                     }
                   </div>
                 }
+                <div class="text-callout text-right leading-tight tabular-nums" [class.text-[var(--warning)]]="timing(event) === 'now'">
+                  <p class="font-medium">{{ startLabel(event) }}</p>
+                  <p class="opacity-50">{{ endLabel(event) }}</p>
+                </div>
               </div>
             </button>
           }
