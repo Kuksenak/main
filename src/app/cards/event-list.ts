@@ -6,7 +6,7 @@ import { NavStack } from '../core/services/nav-stack.service';
 import { Icon } from '../core/ui/icon/icon';
 import { Section } from '../core/ui/section/section';
 import { EventPeople } from '../schedule/event-people';
-import { EventService, ScheduleEvent, eventEnd, occurrenceKey, statusKey } from '../schedule/event.service';
+import { EventService, ScheduleEvent, eventEnd, occurrenceKey } from '../schedule/event.service';
 
 /**
  * Events a student is invited to (directly or through a group), a group is invited to, or a
@@ -30,14 +30,11 @@ import { EventService, ScheduleEvent, eventEnd, occurrenceKey, statusKey } from 
               <button type="button" (click)="open(e)" class="list-row w-full py-2 text-left">
                 <span class="color-bar" [style.background]="people.color(e)"></span>
                 <div class="min-w-0 flex-1 leading-tight">
-                  <p class="truncate font-medium" [class.line-through]="e.status === 'Cancelled'">{{ date(e) }}@if (e.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}@if (e.repeat !== 'Never') {<app-icon name="repeat" class="ml-1.5 inline size-4 align-[-2px] opacity-50" />}</p>
+                  <p class="truncate font-medium">{{ date(e) }}@if (e.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}@if (e.repeat !== 'Never') {<app-icon name="repeat" class="ml-1.5 inline size-4 align-[-2px] opacity-50" />}</p>
                   <p class="text-footnote truncate opacity-50">
                     {{ time(e) }}@if (lessonId() ? people.label(e) : e.title; as name) { · {{ name }} }
                   </p>
                 </div>
-                @if (e.status !== 'Scheduled') {
-                  <span class="badge">{{ statusKey(e.status) | t }}</span>
-                }
                 <app-icon name="chevron-right" class="row-chevron" />
               </button>
             }
@@ -70,7 +67,6 @@ export class EventList {
       );
   });
   private end = (e: ScheduleEvent) => eventEnd(e).getTime();
-  protected readonly statusKey = statusKey;
   protected readonly key = occurrenceKey;
   protected readonly upcoming = computed(() =>
     this.mine()

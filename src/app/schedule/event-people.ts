@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { I18nService } from '../core/i18n/i18n.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 import { ScheduleEvent } from './event.service';
@@ -8,6 +9,7 @@ import { ScheduleEvent } from './event.service';
 export class EventPeople {
   private students = inject(StudentService);
   private groups = inject(GroupService);
+  private i18n = inject(I18nService);
 
   /** Invited groups first, then students. */
   names(e: ScheduleEvent): string[] {
@@ -17,9 +19,9 @@ export class EventPeople {
     ].filter((n): n is string => !!n);
   }
 
-  /** The title, else who it's for. */
+  /** The title, else who it's for, else "New Event" (the title isn't required). */
   label(e: ScheduleEvent): string {
-    return e.title || this.names(e).join(', ');
+    return e.title || this.names(e).join(', ') || this.i18n.t('event.untitled');
   }
 
   /** Under the label: who it's for, when there's a title above it. */

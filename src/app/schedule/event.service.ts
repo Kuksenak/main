@@ -2,16 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, finalize, of } from 'rxjs';
 import { environment } from '@environments/environment';
-import { TranslationKey } from '../core/i18n/translations';
 import { LoadingService } from '../core/services/loading.service';
-
-export type EventStatus = 'Scheduled' | 'Done' | 'Cancelled';
 
 /** How often an event repeats — every `repeatInterval` days / weeks / months / years (from its
  * first start, with no end). */
 export type EventRepeat = 'Never' | 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
 export const REPEAT_FREQUENCIES: Exclude<EventRepeat, 'Never'>[] = ['Daily', 'Weekly', 'Monthly', 'Yearly'];
-export const EVENT_STATUSES: EventStatus[] = ['Scheduled', 'Done', 'Cancelled'];
 
 // Events are loaded for a window around today: 26 weeks back, 53 weeks in total, starting
 // on a Monday. The schedule's scrollable calendar covers exactly this window.
@@ -27,7 +23,7 @@ export function eventWindow(): { from: Date; to: Date } {
   return { from, to };
 }
 
-/** A scheduled event (class, meeting, …) and who is invited. */
+/** A scheduled event: an optional title, who is invited and the attached lessons. */
 export interface ScheduleEvent {
   id: string;
   title: string | null;
@@ -36,8 +32,6 @@ export interface ScheduleEvent {
   lessonIds: string[]; // attached lessons (materials), in order
   startsAt: string;
   durationMinutes: number;
-  status: EventStatus;
-  note: string | null;
   repeat: EventRepeat;
   repeatInterval: number;
   repeatUntil: string | null; // no repeats after this (end of that day); null = forever
@@ -54,11 +48,6 @@ export function occurrenceKey(e: ScheduleEvent): string {
 /** When an event ends. */
 export function eventEnd(e: ScheduleEvent): Date {
   return new Date(new Date(e.startsAt).getTime() + e.durationMinutes * 60_000);
-}
-
-/** Translation key of an event status. */
-export function statusKey(status: EventStatus): TranslationKey {
-  return `event.status.${status}`;
 }
 
 @Injectable({ providedIn: 'root' })

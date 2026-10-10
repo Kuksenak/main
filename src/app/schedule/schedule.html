@@ -104,8 +104,6 @@
               <div class="min-w-0 flex-1 leading-tight">
                 <p
                   class="text-body truncate font-medium"
-                  [class.line-through]="event.status === 'Cancelled'"
-                  [class.opacity-50]="event.status !== 'Scheduled'"
                   [class.text-[var(--warning)]]="timing(event) === 'now'"
                 >{{ people.label(event) }}</p>
                 @if (people.subtitle(event); as sub) {
@@ -113,9 +111,6 @@
                 }
               </div>
               <div class="flex shrink-0 items-center gap-3">
-                @if (event.status !== 'Scheduled') {
-                  <span class="badge">{{ statusKey(event.status) | t }}</span>
-                }
                 <div class="text-callout text-right leading-tight tabular-nums" [class.text-[var(--warning)]]="timing(event) === 'now'">
                   <p class="font-medium">{{ startLabel(event) }}</p>
                   <p class="opacity-50">{{ endLabel(event) }}</p>
