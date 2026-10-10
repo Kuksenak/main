@@ -78,10 +78,11 @@ import { GroupMembers } from './related-lists';
           <span class="card-label">{{ label | t }}</span>
         }
         @for (m of months; track m.label) {
-          <span class="text-footnote mt-1 px-0.5 capitalize opacity-50">{{ m.label }}</span>
+          <!-- The month: larger, in capitals, gray and light -->
+          <span class="mt-2 px-0.5 text-[0.9375rem] font-light uppercase tracking-wide opacity-50">{{ m.label }}</span>
           <div class="card">
             @for (e of m.events; track key(e)) {
-              <div class="list-row !items-start">
+              <div class="list-row !items-start pb-3 pt-3.5">
                 <span class="date-tile">
                   <b>{{ day(e) }}</b>
                   <small>{{ weekday(e) }}</small>
@@ -339,7 +340,8 @@ export class PersonLessons {
           <span class="min-w-0 flex-1 font-medium">{{ 'people.history' | t }}</span>
           <app-icon name="chevron-right" class="row-chevron" />
         </span>
-        <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
+        <!-- The last lesson, as a line of text -->
+        <span class="list-row text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</span>
       </button>
     }
 
@@ -383,6 +385,13 @@ export class StudentView {
         .filter((e) => eventEnd(e).getTime() < Date.now())
         .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0] ?? null,
   );
+
+  // "Mon, 13 Oct · 18:00–19:00"
+  protected when(e: ScheduleEvent): string {
+    const start = new Date(e.startsAt);
+    const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
+    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(e))}`;
+  }
 
   // The next lesson's calendar icon and lines
   protected start(e: ScheduleEvent): Date {
