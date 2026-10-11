@@ -205,7 +205,7 @@
 
   /* A title in light capitals (a person's name; their lists' titles on phones). */
   .caps-title {
-    @apply !font-extralight uppercase tracking-wider;
+    @apply !font-light uppercase tracking-wider;
   }
 
   /* A block's title on the student page (Upcoming, History). */
