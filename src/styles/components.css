@@ -317,6 +317,16 @@
     @apply w-1 shrink-0 self-stretch rounded-full;
   }
 
+  /* Hatched: someone else's, read-only (e.g. a Google Calendar event) — faint diagonal stripes. */
+  .hatched {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, var(--text) 7%, transparent) 0 2px,
+      transparent 2px 11px
+    );
+    border-radius: var(--radius-chip);
+  }
+
   /* Event row on the page background: inset hairline from the text, none under the last. */
   .event-row {
     @apply relative flex w-full items-center gap-3 py-2 pr-3 text-left
@@ -403,7 +413,8 @@
       @apply flex-1 rounded-[var(--radius-capsule)] font-medium opacity-60 transition-[background-color,opacity];
     }
     & > button[aria-pressed='true'] {
-      @apply bg-[var(--surface)] font-semibold opacity-100 shadow-[var(--shadow-control)];
+      /* A small, close shadow (iOS), not the floating buttons' wide one */
+      @apply bg-[var(--surface)] font-semibold opacity-100 shadow-[0_1px_2px_rgb(0_0_0/0.08),0_1px_4px_rgb(0_0_0/0.05)];
     }
   }
 

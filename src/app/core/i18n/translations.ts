@@ -27,6 +27,7 @@ const en = {
   'schedule.allDay': 'All day',
 
   'login.google': 'Continue with Google',
+  'login.denied': 'Sign-in was cancelled. Try again.',
   'login.unavailable': 'The server is unavailable right now. Please try again in a few minutes.',
   'login.apple': 'Continue with Apple',
   'login.legalPrefix': 'By continuing, you agree to our',
@@ -195,6 +196,7 @@ const pl: Dictionary = {
   'schedule.allDay': 'Cały dzień',
 
   'login.google': 'Kontynuuj z Google',
+  'login.denied': 'Logowanie zostało przerwane. Spróbuj ponownie.',
   'login.unavailable': 'Serwer jest teraz niedostępny. Spróbuj ponownie za kilka minut.',
   'login.apple': 'Kontynuuj z Apple',
   'login.legalPrefix': 'Kontynuując, akceptujesz',
@@ -360,6 +362,7 @@ const fr: Dictionary = {
   'schedule.allDay': 'Toute la journée',
 
   'login.google': 'Continuer avec Google',
+  'login.denied': 'Connexion interrompue. Réessayez.',
   'login.unavailable': 'Le serveur est indisponible pour le moment. Réessayez dans quelques minutes.',
   'login.apple': 'Continuer avec Apple',
   'login.legalPrefix': 'En continuant, vous acceptez nos',

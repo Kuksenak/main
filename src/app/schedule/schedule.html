@@ -66,7 +66,7 @@
         <div class="card">
           @for (l of upcoming(); track key(l)) {
             <!-- Picks that event's day in the calendar (its events then show on the right) -->
-            <button type="button" (click)="showDay(l)" class="list-row w-full py-2 text-left">
+            <button type="button" (click)="showDay(l)" class="list-row w-full py-2 text-left" [class.hatched]="l.source === 'google'">
               <span class="color-bar" [style.background]="people.color(l)"></span>
               <div class="min-w-0 flex-1 leading-tight">
                 <p class="truncate font-medium">{{ people.label(l) }}@if (l.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}@if (l.repeat !== 'Never') {<app-icon name="repeat" class="ml-1.5 inline size-4 align-[-2px] opacity-50" />}</p>
@@ -97,6 +97,7 @@
               type="button"
               (click)="openEdit(event)"
               class="event-row"
+              [class.hatched]="event.source === 'google'"
               [class.opacity-45]="timing(event) === 'past'"
               [attr.data-now]="timing(event) !== 'past' ? '' : null"
             >

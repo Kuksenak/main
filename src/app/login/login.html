@@ -10,9 +10,10 @@
   <!-- Sign-in actions anchored to the bottom -->
   <div class="mx-auto mt-auto flex w-full max-w-sm flex-col gap-3">
     <!-- The API is down: our message instead of the host's error page -->
-    @if (auth.loginError()) {
+    @if (auth.loginError() || (denied && !auth.loggingIn())) {
+      <!-- Or back from Google without a sign-in -->
       <p class="text-footnote rounded-[var(--radius-card)] bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-4 py-3 text-center text-[var(--danger)]">
-        {{ 'login.unavailable' | t }}
+        {{ (auth.loginError() ? 'login.unavailable' : 'login.denied') | t }}
       </p>
     }
     <button type="button" (click)="auth.login()" [disabled]="auth.loggingIn()" class="btn-strong w-full">
