@@ -100,18 +100,23 @@ import { GroupMembers } from './related-lists';
     </ng-template>
 
     <!-- Lessons under their months (upcoming soonest first, past most recent first). Each month
-         folds: a tap on it shows / hides its lessons; only the nearest one starts open. A card per
+         folds: a tap on it shows / hides its lessons; all start open, rendered lazily. A card per
          month, or (flat) just rows with the months among them, to sit inside another card. -->
     <ng-template #byMonth let-months let-label="label" let-list="list">
       @if (flat()) {
         @for (m of months; track m.label; let first = $first) {
           <button type="button" (click)="toggleMonth(list, m.label, first)" class="list-row month-head !min-h-0 w-full pb-1.5 pt-3 text-left">
             <span class="flex-1">{{ m.label }}</span>
-            <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
+            <app-icon name="chevron-right" class="row-chevron !size-5 transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
           </button>
           @if (monthOpen(list, m.label, first)) {
-            @for (e of m.events; track key(e)) {
-              <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+            <!-- Rendered once scrolled into view (long histories stay light) -->
+            @defer (on viewport) {
+              @for (e of m.events; track key(e)) {
+                <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+              }
+            } @placeholder {
+              <div [style.height.px]="m.events.length * 52"></div>
             }
           }
         }
@@ -123,14 +128,19 @@ import { GroupMembers } from './related-lists';
           @for (m of months; track m.label; let first = $first) {
             <button type="button" (click)="toggleMonth(list, m.label, first)" class="month-head mt-2 flex w-full items-center gap-1.5 px-0.5 text-left desktop:mt-1">
               <span class="flex-1">{{ m.label }}</span>
-              <app-icon name="chevron-right" class="row-chevron !opacity-100 transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
+              <app-icon name="chevron-right" class="row-chevron !size-5 !opacity-100 transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
             </button>
             @if (monthOpen(list, m.label, first)) {
-              <div class="card">
-                @for (e of m.events; track key(e)) {
-                  <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
-                }
-              </div>
+              <!-- Rendered once scrolled into view (long histories stay light) -->
+              @defer (on viewport) {
+                <div class="card">
+                  @for (e of m.events; track key(e)) {
+                    <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+                  }
+                </div>
+              } @placeholder {
+                <div [style.height.px]="m.events.length * 60"></div>
+              }
             }
           }
         </div>
@@ -191,12 +201,12 @@ export class PersonLessons {
 
   protected readonly picking = signal(false);
 
-  // Months folded / unfolded by hand ("upcoming:October" → open?); untouched, only the nearest
-  // (first) month of each list is open.
+  // Months folded / unfolded by hand ("upcoming:October" → open?); untouched, every month is
+  // open (each rendered once scrolled into view).
   private readonly months = signal<ReadonlyMap<string, boolean>>(new Map());
 
-  protected monthOpen(list: string, label: string, first: boolean): boolean {
-    return this.months().get(`${list}:${label}`) ?? first;
+  protected monthOpen(list: string, label: string, _first: boolean): boolean {
+    return this.months().get(`${list}:${label}`) ?? true;
   }
 
   protected toggleMonth(list: string, label: string, first: boolean): void {

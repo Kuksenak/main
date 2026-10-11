@@ -231,7 +231,7 @@
 
   /* A month over its lessons (folds them): light gray capitals. */
   .month-head {
-    @apply text-[0.8125rem] font-light uppercase tracking-wider text-[var(--text-secondary)];
+    @apply text-[0.9375rem] font-light uppercase tracking-wider text-[var(--text-secondary)];
   }
 
   /* The blue "+ add" row at the end of a card (Invite, Attach, Add members), with list-row and
