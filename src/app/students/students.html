@@ -58,7 +58,9 @@
     <!-- Phones: the list scrolls under the toolbar (and the tabs page's Groups | Students),
          which float on a fade from the page color to transparent, like a card's top bar -->
     @if (!desktop) {
-      <div class="pointer-events-none absolute inset-x-0 top-0 z-[8] h-[calc(env(safe-area-inset-top)+8.5rem)] bg-[linear-gradient(to_bottom,var(--app-bg)_calc(100%-1.25rem),transparent)]"></div>
+      <!-- Solid down to the tabs' bottom; the fade only in the gap between the tabs and the list's
+           top, so at rest the first row shows in full and fades as it slides under -->
+      <div class="pointer-events-none absolute inset-x-0 top-0 z-[8] h-[calc(env(safe-area-inset-top)+7.5rem)] bg-[linear-gradient(to_bottom,var(--app-bg)_calc(100%-0.75rem),transparent)]"></div>
       <div class="segmented absolute inset-x-4 top-[calc(env(safe-area-inset-top)+4rem)] z-[9]">
         <button type="button" (click)="tab.set('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
         <button type="button" (click)="tab.set('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
