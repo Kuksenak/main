@@ -224,13 +224,11 @@
     @apply pointer-events-none opacity-40;
   }
 
-  /* Phones: a round contact button under a person's name (iOS): the icon in a circle, the label
-     under it; .is-off when there's no address / number. */
-  .contact-circle {
-    @apply flex flex-col items-center gap-1 text-[0.6875rem] font-medium text-[var(--accent)] active:opacity-60;
-    & > span {
-      @apply flex size-11 items-center justify-center rounded-full bg-[var(--surface)];
-    }
+  /* Phones: a contact tile under a person's name (Email / Call) — just the icon, half the width;
+     .is-off when there's no address / number. */
+  .contact-tile {
+    @apply flex h-12 items-center justify-center rounded-[var(--radius-card)] bg-[var(--surface)] text-[var(--accent)]
+           active:opacity-60;
   }
 
   /* The blue "+ add" row at the end of a card (Invite, Attach, Add members), with list-row and

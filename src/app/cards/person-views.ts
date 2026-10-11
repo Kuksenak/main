@@ -289,19 +289,17 @@ export class PersonLessons {
          Edit button beside it) -->
     <div class="person-head desktop:items-start desktop:pr-80 desktop:text-left">
       <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
-        <h1 class="truncate text-[1.375rem] font-light uppercase leading-tight tracking-wider desktop:text-lg">{{ s.name }}</h1>
+        <h1 class="truncate text-[1.375rem] font-normal uppercase leading-tight tracking-wider desktop:text-lg desktop:font-light">{{ s.name }}</h1>
       </div>
     </div>
 
-    <!-- Phones: Email / Call as round buttons under the name (iOS), the label under each -->
-    <div class="-mt-1 flex justify-center gap-7 desktop:hidden">
-      <a [attr.href]="s.email ? 'mailto:' + s.email : null" class="contact-circle" [class.is-off]="!s.email">
-        <span><app-icon name="mail" [strokeWidth]="1.75" class="size-5" /></span>
-        {{ 'students.actionMail' | t }}
+    <!-- Phones: Email / Call as two full-width tiles, just the icon -->
+    <div class="grid grid-cols-2 gap-2 desktop:hidden">
+      <a [attr.href]="s.email ? 'mailto:' + s.email : null" [attr.aria-label]="'students.actionMail' | t" class="contact-tile" [class.is-off]="!s.email">
+        <app-icon name="mail" [strokeWidth]="1.75" class="size-6" />
       </a>
-      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" class="contact-circle" [class.is-off]="!s.phone">
-        <span><app-icon name="call" [strokeWidth]="1.75" class="size-5" /></span>
-        {{ 'students.actionCall' | t }}
+      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" [attr.aria-label]="'students.actionCall' | t" class="contact-tile" [class.is-off]="!s.phone">
+        <app-icon name="call" [strokeWidth]="1.75" class="size-6" />
       </a>
     </div>
 
