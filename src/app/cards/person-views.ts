@@ -285,9 +285,9 @@ export class PersonLessons {
       </a>
       <ng-content select="[headerEnd]" />
     </div>
-    <!-- The name in light capitals: centered on phones, on the left on desktop (as tall as the
-         Edit button beside it) -->
-    <div class="person-head desktop:items-start desktop:pr-80 desktop:text-left">
+    <!-- Desktop: the name in light capitals on the left, as tall as the Edit button beside it
+         (phones: it's in the card's top bar) -->
+    <div class="person-head mobile:hidden desktop:items-start desktop:pr-80 desktop:text-left">
       <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
         <h1 class="truncate text-[1.375rem] font-normal uppercase leading-tight tracking-wider desktop:text-lg desktop:font-light">{{ s.name }}</h1>
       </div>
