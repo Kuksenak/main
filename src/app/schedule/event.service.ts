@@ -35,6 +35,10 @@ export interface ScheduleEvent {
   repeatInterval: number;
   repeatUntil: string | null; // no repeats after this (end of that day); null = forever
   seriesStartsAt: string; // a repeating event comes once per day it falls on; this is its first start
+  // From one of the account's Google calendars (read-only; see GoogleCalendarService)
+  source?: 'google';
+  calendarName?: string;
+  allDay?: boolean;
 }
 
 export type EventInput = Omit<ScheduleEvent, 'id' | 'seriesStartsAt'>;

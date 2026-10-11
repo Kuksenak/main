@@ -24,13 +24,16 @@ export class EventPeople {
     return e.title || this.names(e).join(', ') || this.i18n.t('event.untitled');
   }
 
-  /** Under the label: who it's for, when there's a title above it. */
+  /** Under the label: who it's for, when there's a title above it (Google: its calendar). */
   subtitle(e: ScheduleEvent): string {
+    if (e.source === 'google') return e.calendarName ?? '';
     return (e.title && this.names(e).join(', ')) || '';
   }
 
-  /** Calendar color: the first invited group's color, else the default calendar color. */
+  /** Calendar color: the first invited group's color, else the default calendar color (Google
+   * events: gray, they're someone else's). */
   color(e: ScheduleEvent): string {
+    if (e.source === 'google') return 'var(--text-secondary)';
     const group = this.groups.byId(e.groupIds[0] ?? null);
     return group ? colorVar(group.color) : 'var(--calendar-default)';
   }

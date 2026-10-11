@@ -19,6 +19,7 @@ import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { addDays, startOfDay, toDateInput } from '../core/utils/time';
 import { EventPeople } from './event-people';
+import { GoogleCalendarService } from './google-calendar.service';
 import { EVENT_WEEKS_TOTAL, ScheduleEvent, EventService, eventEnd, eventWindow, occurrenceKey } from './event.service';
 
 function startOfMonth(d: Date): Date {
@@ -41,6 +42,7 @@ function startOfWeek(d: Date): Date {
 })
 export class Schedule implements AfterViewInit {
   private service = inject(EventService);
+  private google = inject(GoogleCalendarService);
   protected people = inject(EventPeople);
   private stack = inject(NavStack);
   private destroyRef = inject(DestroyRef);
@@ -72,10 +74,13 @@ export class Schedule implements AfterViewInit {
     this.i18n.capitalize(this.i18n.date(this.visibleMonth(), { month: 'long', year: 'numeric' })),
   );
 
+  // Our events and (when connected) the Google calendars' ones.
+  private readonly allEvents = computed(() => [...this.service.events(), ...this.google.events()]);
+
   // Events grouped by day key for O(1) cell lookup.
   private readonly byDay = computed(() => {
     const map = new Map<string, ScheduleEvent[]>();
-    for (const l of this.service.events()) {
+    for (const l of this.allEvents()) {
       const key = toDateInput(new Date(l.startsAt));
       (map.get(key) ?? map.set(key, []).get(key)!).push(l);
     }
@@ -86,8 +91,7 @@ export class Schedule implements AfterViewInit {
   // Next 3 events from now (desktop, under the calendar). Cancelled ones are skipped.
   protected readonly upcoming = computed(() => {
     const now = Date.now();
-    return this.service
-      .events()
+    return this.allEvents()
       .filter((l) => eventEnd(l).getTime() >= now)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
       .slice(0, this.upcomingFit());
@@ -120,6 +124,7 @@ export class Schedule implements AfterViewInit {
     return this.i18n.date(new Date(l.startsAt), { weekday: 'short', day: 'numeric', month: 'short' });
   }
   protected upcomingTime(l: ScheduleEvent): string {
+    if (l.allDay) return this.i18n.t('schedule.allDay');
     return `${this.i18n.time(new Date(l.startsAt))}–${this.i18n.time(eventEnd(l))}`;
   }
 
@@ -163,6 +168,7 @@ export class Schedule implements AfterViewInit {
     this.destroyRef.onDestroy(() => toolbar.title.set(''));
 
     this.service.ensureLoaded();
+    this.google.ensureLoaded();
 
     // Selecting today (or its events loading): bring the current event into view. (An effect
     // has to be made here, in the constructor — made later it throws and never runs.)
@@ -259,12 +265,13 @@ export class Schedule implements AfterViewInit {
     this.scrollToToday();
   }
 
+  // A Google all-day event: "All day" instead of times.
   protected startLabel(l: ScheduleEvent): string {
-    return this.i18n.time(new Date(l.startsAt));
+    return l.allDay ? this.i18n.t('schedule.allDay') : this.i18n.time(new Date(l.startsAt));
   }
 
   protected endLabel(l: ScheduleEvent): string {
-    return this.i18n.time(eventEnd(l));
+    return l.allDay ? '' : this.i18n.time(eventEnd(l));
   }
 
 
@@ -280,7 +287,9 @@ export class Schedule implements AfterViewInit {
     this.openNew();
   }
 
+  // Google events are read-only: they open nothing.
   protected openEdit(event: ScheduleEvent): void {
+    if (event.source === 'google') return;
     this.stack.push({ kind: 'event', id: event.id, at: event.startsAt });
   }
 }

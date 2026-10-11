@@ -10,6 +10,7 @@ import { LoadingService } from '../core/services/loading.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { LessonService } from '../lessons/lesson.service';
 import { EventService } from '../schedule/event.service';
+import { GoogleCalendarService } from '../schedule/google-calendar.service';
 import { GroupService } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 import { UpdateService } from '../core/services/update.service';
@@ -38,6 +39,12 @@ export class Layout {
     inject(StudentService).ensureLoaded();
     inject(GroupService).ensureLoaded();
     inject(LessonService).ensureLoaded();
+    inject(GoogleCalendarService).ensureLoaded();
+
+    // Back from Google's consent screen (the API returns to the app's root with
+    // ?calendar=connected / error / disabled): to Settings, where it was switched on.
+    const calendar = new URLSearchParams(location.search).get('calendar');
+    if (calendar) setTimeout(() => this.router.navigate(['/settings'], { queryParams: { calendar }, replaceUrl: true }));
   }
 
   // Sections: desktop tabs and the navigation menu.
@@ -46,9 +53,10 @@ export class Layout {
     { path: '/students', label: 'nav.students', icon: 'people' },
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
   ];
-  // Under the account button. Install: only in the browser (not once it's the installed app).
-  // (About is off the menu for now.)
+  // Under the account button: Settings; Install only in the browser (not once it's the installed
+  // app). (About is off the menu for now.)
   protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName }[] = [
+    { path: '/settings', label: 'nav.settings' },
     ...(this.install.standalone ? [] : [{ path: '/install', label: 'nav.install' as TranslationKey }]),
   ];
   protected readonly menuOpen = signal(false);
