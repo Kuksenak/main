@@ -104,7 +104,7 @@ import { GroupMembers } from './related-lists';
     <ng-template #byMonth let-months let-label="label">
       @if (flat()) {
         @for (m of months; track m.label) {
-          <span class="list-row !min-h-0 pb-1 pt-3 text-xs font-light uppercase tracking-wide opacity-50">{{ m.label }}</span>
+          <span class="list-row !min-h-0 pb-1 pt-3 font-semibold capitalize">{{ m.label }}</span>
           @for (e of m.events; track key(e)) {
             <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
           }
@@ -115,8 +115,8 @@ import { GroupMembers } from './related-lists';
             <span class="card-label">{{ label | t }}</span>
           }
           @for (m of months; track m.label) {
-            <!-- The month: larger, in capitals, gray and light -->
-            <span class="mt-2 px-0.5 text-[0.9375rem] font-light uppercase tracking-wide opacity-50 desktop:mt-1 desktop:text-xs">{{ m.label }}</span>
+            <!-- The month, like the name: larger, normal case -->
+            <span class="mt-2 px-0.5 text-[1.0625rem] font-semibold capitalize desktop:mt-1 desktop:text-body">{{ m.label }}</span>
             <div class="card">
               @for (e of m.events; track key(e)) {
                 <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
