@@ -229,10 +229,9 @@
     @apply pointer-events-none opacity-40;
   }
 
-  /* The round call / mail button at the end of a contact row. */
-  .contact-button {
-    @apply flex size-9 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)]
-           text-[var(--accent)];
+  /* A month over its lessons (folds them): light gray capitals. */
+  .month-head {
+    @apply text-[0.8125rem] font-light uppercase tracking-wider text-[var(--text-secondary)];
   }
 
   /* The blue "+ add" row at the end of a card (Invite, Attach, Add members), with list-row and

@@ -99,14 +99,20 @@ import { GroupMembers } from './related-lists';
       </div>
     </ng-template>
 
-    <!-- Lessons under their months (upcoming soonest first, past most recent first): a card per
-         month, or (flat) just rows with the months among them, to sit inside another card -->
-    <ng-template #byMonth let-months let-label="label">
+    <!-- Lessons under their months (upcoming soonest first, past most recent first). Each month
+         folds: a tap on it shows / hides its lessons; only the nearest one starts open. A card per
+         month, or (flat) just rows with the months among them, to sit inside another card. -->
+    <ng-template #byMonth let-months let-label="label" let-list="list">
       @if (flat()) {
-        @for (m of months; track m.label) {
-          <span class="list-row !min-h-0 pb-1 pt-3 font-semibold capitalize">{{ m.label }}</span>
-          @for (e of m.events; track key(e)) {
-            <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+        @for (m of months; track m.label; let first = $first) {
+          <button type="button" (click)="toggleMonth(list, m.label, first)" class="list-row month-head !min-h-0 w-full pb-1.5 pt-3 text-left">
+            <span class="flex-1">{{ m.label }}</span>
+            <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
+          </button>
+          @if (monthOpen(list, m.label, first)) {
+            @for (e of m.events; track key(e)) {
+              <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+            }
           }
         }
       } @else {
@@ -114,14 +120,18 @@ import { GroupMembers } from './related-lists';
           @if (listLabels()) {
             <span class="card-label">{{ label | t }}</span>
           }
-          @for (m of months; track m.label) {
-            <!-- The month, like the name: larger, normal case -->
-            <span class="mt-2 px-0.5 text-[1.0625rem] font-semibold capitalize desktop:mt-1 desktop:text-body">{{ m.label }}</span>
-            <div class="card">
-              @for (e of m.events; track key(e)) {
-                <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
-              }
-            </div>
+          @for (m of months; track m.label; let first = $first) {
+            <button type="button" (click)="toggleMonth(list, m.label, first)" class="month-head mt-2 flex w-full items-center gap-1.5 px-0.5 text-left desktop:mt-1">
+              <span class="flex-1">{{ m.label }}</span>
+              <app-icon name="chevron-right" class="row-chevron !opacity-100 transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
+            </button>
+            @if (monthOpen(list, m.label, first)) {
+              <div class="card">
+                @for (e of m.events; track key(e)) {
+                  <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+                }
+              </div>
+            }
           }
         </div>
       }
@@ -129,14 +139,14 @@ import { GroupMembers } from './related-lists';
 
     @if (showUpcoming()) {
       @if (upcomingByMonth().length) {
-        <ng-container [ngTemplateOutlet]="byMonth" [ngTemplateOutletContext]="{ $implicit: upcomingByMonth(), label: 'students.upcoming' }" />
+        <ng-container [ngTemplateOutlet]="byMonth" [ngTemplateOutletContext]="{ $implicit: upcomingByMonth(), label: 'students.upcoming', list: 'upcoming' }" />
       } @else {
         <p class="text-footnote opacity-50" [class.list-row]="flat()">{{ 'students.noEvents' | t }}</p>
       }
     }
     @if (showPast()) {
       @if (pastByMonth().length) {
-        <ng-container [ngTemplateOutlet]="byMonth" [ngTemplateOutletContext]="{ $implicit: pastByMonth(), label: 'people.pastLessons' }" />
+        <ng-container [ngTemplateOutlet]="byMonth" [ngTemplateOutletContext]="{ $implicit: pastByMonth(), label: 'people.pastLessons', list: 'past' }" />
       } @else {
         <p class="text-footnote opacity-50" [class.list-row]="flat()">{{ 'students.noEvents' | t }}</p>
       }
@@ -180,6 +190,20 @@ export class PersonLessons {
   private i18n = inject(I18nService);
 
   protected readonly picking = signal(false);
+
+  // Months folded / unfolded by hand ("upcoming:October" → open?); untouched, only the nearest
+  // (first) month of each list is open.
+  private readonly months = signal<ReadonlyMap<string, boolean>>(new Map());
+
+  protected monthOpen(list: string, label: string, first: boolean): boolean {
+    return this.months().get(`${list}:${label}`) ?? first;
+  }
+
+  protected toggleMonth(list: string, label: string, first: boolean): void {
+    const next = new Map(this.months());
+    next.set(`${list}:${label}`, !this.monthOpen(list, label, first));
+    this.months.set(next);
+  }
   protected readonly attachRow = viewChild<ElementRef<HTMLElement>>('attachRow');
   protected readonly key = occurrenceKey;
 
@@ -293,30 +317,6 @@ export class PersonLessons {
       </div>
     </div>
 
-    <!-- The phone and email: a small label over the value, a round call / mail button on the
-         right (the whole row calls / writes) -->
-    @if (s.phone || s.email) {
-      <div class="card">
-        @if (s.phone) {
-          <a [href]="'tel:' + s.phone" class="list-row py-2.5">
-            <span class="contact-field">
-              <span>{{ 'students.phone' | t }}</span>
-              <b class="tabular-nums">{{ s.phone }}</b>
-            </span>
-            <span class="contact-button" [attr.aria-label]="'students.actionCall' | t"><app-icon name="call" [strokeWidth]="1.75" class="size-[1.125rem]" /></span>
-          </a>
-        }
-        @if (s.email) {
-          <a [href]="'mailto:' + s.email" class="list-row py-2.5">
-            <span class="contact-field">
-              <span>{{ 'students.email' | t }}</span>
-              <b>{{ s.email }}</b>
-            </span>
-            <span class="contact-button" [attr.aria-label]="'students.actionMail' | t"><app-icon name="mail" [strokeWidth]="1.75" class="size-[1.125rem]" /></span>
-          </a>
-        }
-      </div>
-    }
 
     <!-- A lesson under Upcoming / History: the calendar icon, its title (else its groups), the
          repeat / paperclip marks, start over end (as in the schedule) -->
@@ -420,6 +420,28 @@ export class PersonLessons {
       [showPast]="false"
       (lessonIdsChange)="students.setLessons(s.id, $event)"
     />
+
+    <!-- At the bottom: the phone and email, a small label over the value (a tap calls / writes) -->
+    @if (s.phone || s.email) {
+      <div class="card">
+        @if (s.phone) {
+          <a [href]="'tel:' + s.phone" class="list-row py-2.5">
+            <span class="contact-field">
+              <span>{{ 'students.phone' | t }}</span>
+              <b class="tabular-nums">{{ s.phone }}</b>
+            </span>
+          </a>
+        }
+        @if (s.email) {
+          <a [href]="'mailto:' + s.email" class="list-row py-2.5">
+            <span class="contact-field">
+              <span>{{ 'students.email' | t }}</span>
+              <b>{{ s.email }}</b>
+            </span>
+          </a>
+        }
+      </div>
+    }
   `,
 })
 export class StudentView {
