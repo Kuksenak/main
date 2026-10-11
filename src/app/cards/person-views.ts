@@ -355,42 +355,32 @@ export class PersonLessons {
       </span>
     </ng-template>
 
-    <!-- One card: Upcoming › with the next lesson under it, then History › with the last one and
-         what was attached to it. A tap on a title opens the full list — a page on phones, unfolded
-         right here on desktop (scrolling on its own, ≤60% of the window). The lessons themselves
-         open nothing (for now). -->
+    <!-- One card: the next lesson (always shown), then Upcoming › and History › (folded). A tap
+         on a title opens the full list — a page on phones, unfolded right here on desktop
+         (scrolling on its own, ≤60% of the window). The lessons themselves open nothing (for now). -->
     @if (nextEvent() || lastEvent()) {
       <div class="card flex min-h-0 flex-col">
         @if (nextEvent(); as e) {
+          <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
           <button type="button" (click)="tapList('upcoming')" class="list-row w-full shrink-0 text-left">
             <span class="block-title">{{ 'students.upcoming' | t }}</span>
             <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="desktop && open().has('upcoming')" />
           </button>
           @if (desktop && open().has('upcoming')) {
-            <app-scroll-area class="max-h-[60vh] min-h-0">
+            <app-scroll-area class="max-h-[60vh] min-h-0" viewportClass="!rounded-none">
               <app-person-lessons [studentId]="s.id" [showNext]="false" [showUpcoming]="true" [showPast]="false" [showMaterials]="false" [flat]="true" />
             </app-scroll-area>
-          } @else {
-            <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
           }
         }
-        @if (lastEvent(); as e) {
+        @if (lastEvent()) {
           <button type="button" (click)="tapList('history')" class="list-row w-full shrink-0 text-left">
             <span class="block-title">{{ 'people.history' | t }}</span>
             <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="desktop && open().has('history')" />
           </button>
           @if (desktop && open().has('history')) {
-            <app-scroll-area class="max-h-[60vh] min-h-0">
+            <app-scroll-area class="max-h-[60vh] min-h-0" viewportClass="!rounded-none">
               <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [flat]="true" />
             </app-scroll-area>
-          } @else {
-            <!-- The last lesson and, under it, the lessons attached to it -->
-            <div class="list-row flex-col !items-start !gap-0.5 py-2.5">
-              <span class="truncate text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</span>
-              @if (attached(e); as names) {
-                <span class="text-footnote max-w-full truncate opacity-50">{{ names }}</span>
-              }
-            </div>
           }
         }
       </div>
@@ -458,7 +448,6 @@ export class StudentView {
 
   protected students = inject(StudentService);
   private groups = inject(GroupService);
-  private lessons = inject(LessonService);
   private events = inject(EventService);
   private people = inject(EventPeople);
   private i18n = inject(I18nService);
@@ -480,21 +469,6 @@ export class StudentView {
         .filter((e) => eventEnd(e).getTime() < Date.now())
         .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0] ?? null,
   );
-
-  // "Mon, 13 Oct  18:00–19:00" (no dot between)
-  protected when(e: ScheduleEvent): string {
-    const start = new Date(e.startsAt);
-    const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
-    return `${day} ${this.i18n.time(start)}–${this.i18n.time(eventEnd(e))}`;
-  }
-
-  // The names of the lessons attached to an event ("Irregular verbs, Past Simple quiz").
-  protected attached(e: ScheduleEvent): string {
-    return e.lessonIds
-      .map((id) => this.lessons.byId(id)?.title)
-      .filter((t): t is string => !!t)
-      .join(', ');
-  }
 
   // The next lesson's calendar icon and lines
   protected start(e: ScheduleEvent): Date {

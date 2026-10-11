@@ -23,12 +23,24 @@ export class I18nService {
 
   /** Time of day in the current locale, e.g. "18:00" / "06:00 PM". */
   time(d: Date): string {
-    return d.toLocaleTimeString(this.locale(), { hour: '2-digit', minute: '2-digit' });
+    return this.format(d, { hour: '2-digit', minute: '2-digit' });
   }
 
   /** A date in the current locale with the given parts, e.g. { weekday: 'short', day: 'numeric' }. */
   date(d: Date, parts: Intl.DateTimeFormatOptions): string {
-    return d.toLocaleDateString(this.locale(), parts);
+    return this.format(d, parts);
+  }
+
+  // A formatter per locale and parts, made once: toLocale…String builds a new one on every call,
+  // which is slow (Safari especially) when lists format hundreds of dates per redraw.
+  private readonly formatters = new Map<string, Intl.DateTimeFormat>();
+
+  private format(d: Date, parts: Intl.DateTimeFormatOptions): string {
+    const locale = this.locale();
+    const key = `${locale}|${JSON.stringify(parts)}`;
+    let f = this.formatters.get(key);
+    if (!f) this.formatters.set(key, (f = new Intl.DateTimeFormat(locale, parts)));
+    return f.format(d);
   }
 
   /** First letter uppercased (month / weekday names are lowercase in some languages). */

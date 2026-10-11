@@ -285,25 +285,25 @@
      leading avatar / icon / dot / color bar / check), stops short of the right edge, and is
      hidden under the last row. */
   .list-row {
-    --sep-left: 1rem;
-    @apply text-body relative flex min-h-[var(--row-h)] select-none items-center justify-between gap-3 px-4
-           after:absolute after:bottom-0 after:left-[var(--sep-left)] after:right-4 after:h-px
+    --sep-left: var(--row-px);
+    @apply text-body relative flex min-h-[var(--row-h)] select-none items-center justify-between gap-3 px-[var(--row-px)]
+           after:absolute after:bottom-0 after:left-[var(--sep-left)] after:right-[var(--row-px)] after:h-px
            after:bg-[var(--separator)] last:after:hidden;
   }
   .list-row:has(> .color-bar) {
-    --sep-left: 2rem; /* 1rem padding + 0.25rem bar + 0.75rem gap */
+    --sep-left: calc(var(--row-px) + 1rem); /* padding + 0.25rem bar + 0.75rem gap */
   }
   .list-row:has(> .dot:first-child) {
-    --sep-left: 2.375rem; /* padding + 0.625rem dot + gap */
+    --sep-left: calc(var(--row-px) + 1.375rem); /* padding + 0.625rem dot + gap */
   }
   .list-row:has(> app-brand-icon) {
-    --sep-left: 3.75rem; /* padding + 2rem icon + gap */
+    --sep-left: calc(var(--row-px) + 2.75rem); /* padding + 2rem icon + gap */
   }
   .list-row:has(.avatar) {
-    --sep-left: 4rem; /* padding + 2.25rem avatar + gap */
+    --sep-left: calc(var(--row-px) + 3rem); /* padding + 2.25rem avatar + gap */
   }
   .list-row:has(> .check) {
-    --sep-left: 6.25rem; /* padding + 1.5rem check + gap + avatar + gap */
+    --sep-left: calc(var(--row-px) + 5.25rem); /* padding + 1.5rem check + gap + avatar + gap */
   }
 
   /* Chevron at the end of a tappable row and on collapsible section headers — one size
@@ -371,7 +371,7 @@
   /* Standalone input (search): the cards' color and corners, leading icon. Wrap: <label class="field">. */
   .field {
     @apply text-body flex h-[var(--row-h)] w-full shrink-0 cursor-text items-center gap-2
-           rounded-[var(--radius-card)] bg-[var(--surface)] px-3;
+           rounded-[var(--radius-card)] bg-[var(--surface)] px-[calc(var(--row-px)-0.25rem)];
     & > input {
       @apply min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-40
              [&::-webkit-search-cancel-button]:appearance-none;

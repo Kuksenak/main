@@ -11,10 +11,11 @@
   --control-h: 2.75rem;
   --capsule-px: 1.25rem;
   --row-h: 3rem; /* list rows and card buttons */
+  --row-px: 1rem; /* list rows' side padding */
 
   /* Corners */
   --radius-capsule: 9999px;
-  --radius-card: 1rem;
+  --radius-card: calc(var(--row-h) / 2); /* a card one row tall is an oval */
   --radius-chip: 0.5rem;
 }
 

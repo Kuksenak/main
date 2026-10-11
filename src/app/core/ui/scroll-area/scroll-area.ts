@@ -17,7 +17,9 @@ import {
  *
  * `viewportClass` styles the scrolling element itself (e.g. `card`, so its rounded corners stay
  * put while the content scrolls inside); the content is a full-height flex column (extend it
- * with `contentClass`). The thumb sits 10px outside the content edge, the same everywhere;
+ * with `contentClass`). The scrolling element has the cards' corners: a card scrolling past its
+ * edge stays rounded instead of being cut straight (`!rounded-none` in `viewportClass` where it
+ * sits inside a card). The thumb sits 6px outside the content edge, the same everywhere;
  * padding on the host is the room it sits in.
  */
 @Component({
@@ -37,7 +39,7 @@ import {
       }
       <div
         #viewport
-        class="no-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-contain"
+        class="no-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[var(--radius-card)]"
         [class]="viewportClass()"
         (scroll)="onScroll()"
       >
@@ -50,7 +52,7 @@ export class ScrollArea {
   readonly viewportClass = input(''); // the scrolling element (e.g. `card`)
   readonly contentClass = input(''); // the content column inside it (e.g. `gap-3`)
   // How far outside the content edge the thumb sits — the same everywhere.
-  protected readonly gutter = 10;
+  protected readonly gutter = 6;
 
   private readonly viewport = viewChild.required<ElementRef<HTMLElement>>('viewport');
   private readonly content = viewChild.required<ElementRef<HTMLElement>>('content');

@@ -6,11 +6,12 @@
   --text-body: 0.9375rem; /* 15px */
   --text-callout: 0.8125rem; /* 13px */
 
-  /* Controls: round buttons 40, capsules 36, list rows 40 */
-  --control-round: 2.5rem;
-  --control-h: 2.125rem;
+  /* Controls: every button (round ones too), tab, search field and segmented control: 36 */
+  --control-h: 2.25rem;
+  --control-round: var(--control-h);
   --capsule-px: 0.875rem;
   --row-h: 2.75rem; /* list rows and card buttons: a bit taller than buttons */
+  --row-px: 1rem; /* list rows' side padding */
 
   /* Corners: less rounded */
   --radius-capsule: 0.3125rem;
@@ -97,6 +98,7 @@ html.dark:root {
 }
 
 .field {
+  height: var(--control-h); /* as tall as the buttons beside it */
   background-color: var(--surface);
   box-shadow: inset 0 0 0 1px var(--control-border);
 }
@@ -108,7 +110,7 @@ html.dark .field {
 .segmented {
   /* Like Claude's settings switches: a gray track as wide as its items; the chosen one white
      with a hairline border; labels like the buttons' (body size, 450; the others in gray). */
-  height: 2.25rem;
+  height: var(--control-h);
   width: fit-content;
   align-self: flex-start;
   gap: 2px;

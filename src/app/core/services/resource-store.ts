@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, signal } from '@angular/core';
+import { computed, inject, signal } from '@angular/core';
 import { Observable, catchError, finalize, of } from 'rxjs';
 import { environment } from '@environments/environment';
 import { LoadingService } from './loading.service';
@@ -27,8 +27,11 @@ export abstract class ResourceStore<T extends { id: string }, Input> {
     if (!this.loaded) this.reload();
   }
 
+  // By id, without scanning the list (lists look things up for every row).
+  private readonly index = computed(() => new Map(this._items().map((x) => [x.id, x])));
+
   byId(id: string | null | undefined): T | null {
-    return this._items().find((x) => x.id === id) ?? null;
+    return (id && this.index().get(id)) || null;
   }
 
   /** Create; `onCreated` gets the new id. */
