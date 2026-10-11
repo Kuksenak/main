@@ -390,10 +390,12 @@ export class PersonLessons {
                 <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [flat]="true" />
               </app-scroll-area>
             } @else {
-              <!-- The last two lessons, sharing the same 84px as Upcoming's row beside it -->
-              <div class="flex h-[5.25rem] flex-col">
-                @for (p of lastTwo(); track p.startsAt) {
-                  <button type="button" (click)="toggle('history')" class="list-row !min-h-0 w-full flex-1 text-left text-[var(--text-secondary)] tabular-nums">{{ when(p) }}</button>
+              <!-- The last lesson and, under it, the lessons attached to it — the same 84px as
+                   Upcoming's row beside it -->
+              <div class="flex h-[5.25rem] flex-col justify-center gap-1 px-4">
+                <span class="truncate text-[var(--text-secondary)] tabular-nums">{{ when(e) }}</span>
+                @if (attached(e); as names) {
+                  <span class="text-footnote truncate opacity-50">{{ names }}</span>
                 }
               </div>
             }
@@ -477,6 +479,7 @@ export class StudentView {
 
   protected students = inject(StudentService);
   private groups = inject(GroupService);
+  private lessons = inject(LessonService);
   private events = inject(EventService);
   private people = inject(EventPeople);
   private i18n = inject(I18nService);
@@ -492,12 +495,6 @@ export class StudentView {
         .filter((e) => eventEnd(e).getTime() >= Date.now())
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null,
   );
-  protected readonly lastTwo = computed(() =>
-    this.mine()
-      .filter((e) => eventEnd(e).getTime() < Date.now())
-      .sort((a, b) => b.startsAt.localeCompare(a.startsAt))
-      .slice(0, 2),
-  );
   protected readonly lastEvent = computed(
     () =>
       this.mine()
@@ -510,6 +507,14 @@ export class StudentView {
     const start = new Date(e.startsAt);
     const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
     return `${day} ${this.i18n.time(start)}–${this.i18n.time(eventEnd(e))}`;
+  }
+
+  // The names of the lessons attached to an event ("Irregular verbs, Past Simple quiz").
+  protected attached(e: ScheduleEvent): string {
+    return e.lessonIds
+      .map((id) => this.lessons.byId(id)?.title)
+      .filter((t): t is string => !!t)
+      .join(', ');
   }
 
   // The next lesson's calendar icon and lines

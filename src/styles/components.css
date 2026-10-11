@@ -309,7 +309,7 @@
   /* Chevron at the end of a tappable row and on collapsible section headers — one size
      everywhere. */
   .row-chevron {
-    @apply size-6 shrink-0 opacity-30; /* 24px everywhere (rows, folding lists) */
+    @apply size-[1.375rem] shrink-0 opacity-30; /* 22px everywhere (rows, folding lists) */
   }
 
   /* Thin vertical bar in an event's calendar color (set its background). */
