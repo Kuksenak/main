@@ -232,7 +232,7 @@
   /* A contact action under a person's name (Email / Call): an icon over its label, in a card
      tile; .is-off when there's no address / number. */
   .contact-action {
-    @apply text-footnote flex flex-col items-center gap-0.5 rounded-[var(--radius-card)] bg-[var(--surface)] py-1.5
+    @apply text-footnote flex w-[4.75rem] flex-col items-center gap-0.5 rounded-[0.875rem] bg-[var(--surface)] py-2
            font-medium text-[var(--accent)] active:opacity-60;
     &.is-off {
       @apply pointer-events-none text-[var(--text-secondary)] opacity-50;
