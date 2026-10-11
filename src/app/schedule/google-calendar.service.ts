@@ -49,10 +49,16 @@ function fromGoogle(e: GoogleEventDto): ScheduleEvent {
   };
 }
 
+// Fresh events: on coming back to the app when they're older than this, and this often while
+// it's open.
+const STALE_MS = 5 * 60_000;
+const EVERY_MS = 10 * 60_000;
+
 /**
  * Google Calendar: whether the account is connected, and (when it is) the events of its Google
- * calendars over the schedule's window. Connecting leaves the app for Google's consent screen;
- * the API brings it back with ?calendar=connected (or error / disabled).
+ * calendars over the schedule's window — refreshed on coming back to the app (if older than 5
+ * minutes) and every 10 minutes while it's open. Connecting leaves the app for Google's consent
+ * screen; the API brings it back with ?calendar=connected (or error / disabled).
  */
 @Injectable({ providedIn: 'root' })
 export class GoogleCalendarService {
@@ -65,10 +71,23 @@ export class GoogleCalendarService {
   private readonly _events = signal<ScheduleEvent[]>([]);
   readonly events = this._events.asReadonly();
   private loaded = false;
+  private loadedAt = 0; // when the events last came
 
-  /** Load the status (and the events) unless something already did. */
+  /** Load the status (and the events) unless something already did; then keep them fresh. */
   ensureLoaded(): void {
-    if (!this.loaded) this.reload();
+    if (this.loaded) return;
+    this.reload();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') this.refreshIfStale(STALE_MS);
+    });
+    setInterval(() => {
+      if (document.visibilityState === 'visible') this.refreshIfStale(EVERY_MS);
+    }, EVERY_MS);
+  }
+
+  // Just the events again (when connected and they're older than `age`).
+  private refreshIfStale(age: number): void {
+    if (this._connected() && Date.now() - this.loadedAt >= age) this.loadEvents();
   }
 
   reload(): void {
@@ -102,7 +121,12 @@ export class GoogleCalendarService {
     const params = { startDate: from.toISOString(), endDate: to.toISOString() };
     this.http
       .get<{ events: GoogleEventDto[] }>(`${this.base}/calendar/events`, { params })
-      .pipe(catchError(() => of({ events: [] as GoogleEventDto[] })))
-      .subscribe((res) => this._events.set((res.events ?? []).map(fromGoogle)));
+      // A failed load keeps what's shown
+      .pipe(catchError(() => of(null)))
+      .subscribe((res) => {
+        if (!res) return;
+        this._events.set((res.events ?? []).map(fromGoogle));
+        this.loadedAt = Date.now();
+      });
   }
 }

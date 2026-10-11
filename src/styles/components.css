@@ -261,6 +261,19 @@
     & textarea::placeholder {
       color: transparent;
     }
+    /* Date / time / select values as plain text: no chip background or padding (!important: the
+       device stylesheets' .chip is unlayered), no select arrows */
+    & .chip {
+      background: transparent !important;
+      padding-inline: 0 !important;
+    }
+    & app-icon[name='chevrons-up-down'] {
+      display: none;
+    }
+    /* Chrome's own calendar / clock icons in native date / time fields */
+    & input::-webkit-calendar-picker-indicator {
+      display: none;
+    }
   }
 
   /* Menu rows (<div class="press-bold">): no hover / pressed background — the label just gets a
