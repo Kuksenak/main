@@ -476,7 +476,7 @@ export class LessonsCard {
  */
 @Component({
   selector: 'app-student-view',
-  imports: [Icon, LessonsCard, PersonLessons, TranslatePipe],
+  imports: [LessonsCard, PersonLessons, TranslatePipe],
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let s = student();
@@ -509,21 +509,15 @@ export class LessonsCard {
       (lessonIdsChange)="students.setLessons(s.id, $event)"
     />
 
-    <!-- At the bottom: the phone and email as buttons, like a confirm's answers (a tap calls /
-         writes) -->
+    <!-- Phones, at the bottom: Call / Email, like a confirm's answers (desktop has them at the
+         top) -->
     @if (s.phone || s.email) {
-      <div class="flex flex-col gap-1.5">
+      <div class="flex flex-col gap-1.5 desktop:hidden">
         @if (s.phone) {
-          <a [href]="'tel:' + s.phone" class="contact-btn">
-            <app-icon name="call" class="size-5 shrink-0 opacity-60" />
-            <span class="truncate tabular-nums">{{ s.phone }}</span>
-          </a>
+          <a [href]="'tel:' + s.phone" class="contact-btn">{{ 'students.actionCall' | t }}</a>
         }
         @if (s.email) {
-          <a [href]="'mailto:' + s.email" class="contact-btn">
-            <app-icon name="mail" class="size-5 shrink-0 opacity-60" />
-            <span class="truncate">{{ s.email }}</span>
-          </a>
+          <a [href]="'mailto:' + s.email" class="contact-btn">{{ 'students.actionMail' | t }}</a>
         }
       </div>
     }

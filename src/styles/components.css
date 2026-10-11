@@ -213,12 +213,10 @@
     @apply min-w-0 flex-1 font-medium;
   }
 
-  /* A student's phone / email: a gray pill like a confirm's answers (desktop: a gray button). */
+  /* A student's Call / Email (phones): a gray pill like a confirm's answers. */
   .contact-btn {
-    @apply flex h-12 min-w-0 items-center justify-center gap-2 rounded-full px-5 text-[1.125rem] font-medium
-           bg-[color-mix(in_srgb,var(--text)_10%,transparent)] active:opacity-70
-           desktop:text-body desktop:h-[var(--control-h)] desktop:rounded-[var(--radius-capsule)]
-           desktop:hover:bg-[color-mix(in_srgb,var(--text)_14%,transparent)];
+    @apply flex h-12 items-center justify-center rounded-full text-[1.125rem] font-medium
+           bg-[color-mix(in_srgb,var(--text)_10%,transparent)] active:opacity-70;
   }
 
   /* A link with nothing behind it (no email / phone). */
