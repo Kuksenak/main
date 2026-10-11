@@ -362,9 +362,10 @@ export class PersonLessons {
               </app-scroll-area>
             } @else {
               <!-- Folded previews: both exactly 84px, so the two cards line up -->
-              <button type="button" (click)="toggle('upcoming')" class="flex h-[5.25rem] w-full flex-col text-left [&>.list-row]:!min-h-0 [&>.list-row]:flex-1 [&>.list-row]:!py-0">
+              <!-- The next lesson itself opens nothing (for now) -->
+              <div class="flex h-[5.25rem] w-full flex-col [&>.list-row]:!min-h-0 [&>.list-row]:flex-1 [&>.list-row]:!py-0">
                 <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
-              </button>
+              </div>
             }
           </div>
         }
@@ -393,13 +394,14 @@ export class PersonLessons {
       <!-- Phones: two blocks — Upcoming events › with the next lesson under it, History › with
            the last one (a tap opens the full list as a page); each only when it has lessons -->
       @if (nextEvent(); as e) {
-        <button type="button" (click)="upcoming.emit()" class="card flex w-full flex-col text-left">
-          <span class="list-row">
+        <!-- Upcoming › opens the list; the next lesson itself opens nothing (for now) -->
+        <div class="card">
+          <button type="button" (click)="upcoming.emit()" class="list-row w-full text-left">
             <span class="block-title">{{ 'students.upcoming' | t }}</span>
             <app-icon name="chevron-right" class="row-chevron" />
-          </span>
+          </button>
           <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
-        </button>
+        </div>
       }
       @if (lastEvent(); as e) {
         <button type="button" (click)="history.emit()" class="card flex w-full flex-col text-left">
