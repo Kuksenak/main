@@ -86,7 +86,8 @@
   <!-- Selected day's events, down to the bottom; bottom padding clears the floating buttons -->
   <section class="flex min-h-0 flex-1 flex-col">
     <h2 class="mb-3 flex h-[var(--control-h)] items-center text-xl font-semibold mobile:hidden">{{ dayTitle() }}</h2>
-    <app-scroll-area class="min-h-0 flex-1">
+    <!-- Plain rows, not cards: no round corners (they'd clip the first row's color bar) -->
+    <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
       @if (dayEvents().length) {
         <!-- Past events grayed out; the one going on now in orange (title and time) -->
         <div #dayList class="pb-14">
