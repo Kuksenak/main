@@ -9,7 +9,7 @@ import { Section } from '../core/ui/section/section';
 import { initial } from '../core/utils/text';
 import { GROUP_COLORS, GroupColor, GroupService, colorVar } from '../students/group.service';
 import { Student, StudentService } from '../students/student.service';
-import { GroupView } from './person-views';
+import { GroupView, PersonLessons } from './person-views';
 import { PickList, PickSection } from './pick-list';
 
 interface Model {
@@ -25,11 +25,14 @@ interface Model {
  */
 @Component({
   selector: 'app-group-editor',
-  imports: [FormsModule, GroupView, Icon, PageSheet, PickList, Section, TranslatePipe],
+  imports: [FormsModule, GroupView, Icon, PageSheet, PersonLessons, PickList, Section, TranslatePipe],
   template: `
     @let m = model();
+    <!-- Phones, reading: the name in the top bar, between back and Edit (like a student's card) -->
     <app-page-sheet
       #page
+      [title]="editing() ? '' : (saved()?.name ?? '')"
+      [bigTitle]="!editing()"
       [large]="!editing()"
       [actions]="editing()"
       [dirty]="editing() && dirty()"
@@ -48,7 +51,7 @@ interface Model {
 
       @if (!editing()) {
         @if (saved(); as g) {
-          <app-group-view [group]="g" [editable]="!entry().readOnly">
+          <app-group-view [group]="g" [editable]="!entry().readOnly" (upcoming)="listOpen.set('upcoming')" (history)="listOpen.set('history')">
           <!-- Desktop dialogs have no top bar: Edit in the header row -->
           @if (!entry().readOnly) {
             <ng-container ngProjectAs="[headerEnd]">
@@ -108,6 +111,21 @@ interface Model {
       }
     </app-page-sheet>
 
+    <!-- Upcoming / History (phones): every lesson ahead / behind, its own page -->
+    @if (listOpen() && saved(); as g) {
+      <!-- No title: the list speaks for itself -->
+      <app-page-sheet [actions]="false" (closed)="listOpen.set(null)">
+        <app-person-lessons
+          [groupId]="g.id"
+          [showNext]="false"
+          [showUpcoming]="listOpen() === 'upcoming'"
+          [showPast]="listOpen() === 'history'"
+          [showMaterials]="false"
+          [listLabels]="false"
+        />
+      </app-page-sheet>
+    }
+
     <!-- Member picker: every student with a check -->
     @if (pickingMembers()) {
       <!-- The same picker as an event's Invite: a page on phones (‹ and ✓ at the top), a dropdown
@@ -130,6 +148,7 @@ export class GroupEditor implements OnInit {
   // Opened for reading (an existing group without `edit`): Save / Cancel return to reading.
   protected startedReading = false;
   protected readonly editing = signal(false);
+  protected readonly listOpen = signal<'upcoming' | 'history' | null>(null);
 
   private groups = inject(GroupService);
   private students = inject(StudentService);

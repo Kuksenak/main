@@ -299,37 +299,18 @@ export class PersonLessons {
 }
 
 /**
- * A student, for reading — like an iOS contact, on phones and desktop alike: the name centered, Email / Call tiles, the phone and email (label
- * over value), History › with the last lesson under it (`history` opens the full list), then
- * their materials. [headerEnd] (e.g. Edit on desktop) sits at the top right.
+ * A person's / group's lessons as one card: the next lesson (always shown), then Upcoming › and
+ * History › (folded). A tap on a title opens the full list — a page on phones (`upcoming` /
+ * `history`: the card / page opens it), unfolded right here on desktop (scrolling on its own,
+ * ≤60% of the window). The lessons themselves open nothing (for now).
  */
 @Component({
-  selector: 'app-student-view',
+  selector: 'app-lessons-card',
   imports: [BrandIcon, Icon, NgTemplateOutlet, PersonLessons, ScrollArea, TranslatePipe],
-  host: { class: 'relative flex flex-col gap-4' },
+  host: { class: 'contents' },
   template: `
-    @let s = student();
-    <!-- Desktop: Email / Call in a row with [headerEnd] (Edit), top right -->
-    <div class="absolute right-0 top-0 z-[6] flex items-center gap-2">
-      <a [attr.href]="s.email ? 'mailto:' + s.email : null" [attr.title]="s.email" class="btn-primary mobile:hidden" [class.is-off]="!s.email">
-        {{ 'students.actionMail' | t }}
-      </a>
-      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" [attr.title]="s.phone" class="btn-primary mobile:hidden" [class.is-off]="!s.phone">
-        {{ 'students.actionCall' | t }}
-      </a>
-      <ng-content select="[headerEnd]" />
-    </div>
-    <!-- Desktop: the name on the left, in line with the Edit button beside it
-         (phones: it's in the card's top bar) -->
-    <div class="person-head mobile:hidden desktop:items-start desktop:pr-80 desktop:text-left">
-      <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
-        <h1 class="truncate text-xl font-semibold leading-tight">{{ s.name }}</h1>
-      </div>
-    </div>
-
-
-    <!-- A lesson under Upcoming / History: the calendar icon, its title (else its groups), the
-         repeat / paperclip marks, start over end (as in the schedule) -->
+    <!-- A lesson: the calendar icon, its title (for a student: else its groups), the repeat /
+         paperclip marks, start over end (as in the schedule) -->
     <ng-template #lessonRow let-e>
       <span class="list-row !gap-3.5 pb-3 pt-4">
         <app-brand-icon name="calendar" [date]="start(e)" class="h-14 w-[5.5rem] shrink-0" />
@@ -355,9 +336,6 @@ export class PersonLessons {
       </span>
     </ng-template>
 
-    <!-- One card: the next lesson (always shown), then Upcoming › and History › (folded). A tap
-         on a title opens the full list — a page on phones, unfolded right here on desktop
-         (scrolling on its own, ≤60% of the window). The lessons themselves open nothing (for now). -->
     @if (nextEvent() || lastEvent()) {
       <div class="card flex min-h-0 flex-col">
         @if (nextEvent(); as e) {
@@ -368,7 +346,7 @@ export class PersonLessons {
           </button>
           @if (desktop && open().has('upcoming')) {
             <app-scroll-area class="max-h-[60vh] min-h-0" viewportClass="!rounded-none">
-              <app-person-lessons [studentId]="s.id" [showNext]="false" [showUpcoming]="true" [showPast]="false" [showMaterials]="false" [flat]="true" />
+              <app-person-lessons [studentId]="studentId()" [groupId]="groupId()" [showNext]="false" [showUpcoming]="true" [showPast]="false" [showMaterials]="false" [flat]="true" />
             </app-scroll-area>
           }
         }
@@ -379,12 +357,114 @@ export class PersonLessons {
           </button>
           @if (desktop && open().has('history')) {
             <app-scroll-area class="max-h-[60vh] min-h-0" viewportClass="!rounded-none">
-              <app-person-lessons [studentId]="s.id" [showNext]="false" [showPast]="true" [showMaterials]="false" [flat]="true" />
+              <app-person-lessons [studentId]="studentId()" [groupId]="groupId()" [showNext]="false" [showPast]="true" [showMaterials]="false" [flat]="true" />
             </app-scroll-area>
           }
         }
       </div>
     }
+  `,
+})
+export class LessonsCard {
+  /** Whose lessons: a student's (directly or through a group) or a group's. */
+  readonly studentId = input<string | null>(null);
+  readonly groupId = input<string | null>(null);
+  /** Upcoming › / History › tapped on a phone (the card / page opens the full list). */
+  readonly upcoming = output<void>();
+  readonly history = output<void>();
+
+  // Desktop: each list folds / unfolds on its own (phones: they open as a page).
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  protected readonly open = signal<ReadonlySet<'upcoming' | 'history'>>(new Set());
+
+  // A list's title: phones open it as a page, desktop folds / unfolds it in place.
+  protected tapList(list: 'upcoming' | 'history'): void {
+    if (!this.desktop) {
+      if (list === 'upcoming') this.upcoming.emit();
+      else this.history.emit();
+      return;
+    }
+    const next = new Set(this.open());
+    if (next.has(list)) next.delete(list);
+    else next.add(list);
+    this.open.set(next);
+  }
+
+  private groups = inject(GroupService);
+  private events = inject(EventService);
+  private people = inject(EventPeople);
+  private i18n = inject(I18nService);
+
+  // The next lesson and the last one.
+  private readonly mine = computed(() => {
+    const sid = this.studentId();
+    const gid = this.groupId();
+    return this.events.events().filter((e) => (sid && this.people.invites(e, sid)) || (gid && e.groupIds.includes(gid)));
+  });
+  protected readonly nextEvent = computed(
+    () =>
+      this.mine()
+        .filter((e) => eventEnd(e).getTime() >= Date.now())
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null,
+  );
+  protected readonly lastEvent = computed(
+    () =>
+      this.mine()
+        .filter((e) => eventEnd(e).getTime() < Date.now())
+        .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0] ?? null,
+  );
+
+  // The calendar icon and the time lines
+  protected start(e: ScheduleEvent): Date {
+    return new Date(e.startsAt);
+  }
+  protected startTime(e: ScheduleEvent): string {
+    return this.i18n.time(new Date(e.startsAt));
+  }
+  protected endTime(e: ScheduleEvent): string {
+    return this.i18n.time(eventEnd(e));
+  }
+  // Beside the calendar: the event's title, else its groups (for a group: just the title).
+  protected context(e: ScheduleEvent): string {
+    if (e.title) return e.title;
+    if (this.groupId()) return '';
+    return e.groupIds
+      .map((id) => this.groups.byId(id)?.name)
+      .filter((n): n is string => !!n)
+      .join(', ');
+  }
+}
+
+/**
+ * A student, for reading — like an iOS contact: on desktop the name on the left with Email / Call
+ * and [headerEnd] (e.g. Edit) at the top right (phones: the name is in the card's top bar); their
+ * lessons (LessonsCard), their materials, then the phone and email (label over value).
+ */
+@Component({
+  selector: 'app-student-view',
+  imports: [LessonsCard, PersonLessons, TranslatePipe],
+  host: { class: 'relative flex flex-col gap-4' },
+  template: `
+    @let s = student();
+    <!-- Desktop: Email / Call in a row with [headerEnd] (Edit), top right -->
+    <div class="absolute right-0 top-0 z-[6] flex items-center gap-2">
+      <a [attr.href]="s.email ? 'mailto:' + s.email : null" [attr.title]="s.email" class="btn-primary mobile:hidden" [class.is-off]="!s.email">
+        {{ 'students.actionMail' | t }}
+      </a>
+      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" [attr.title]="s.phone" class="btn-primary mobile:hidden" [class.is-off]="!s.phone">
+        {{ 'students.actionCall' | t }}
+      </a>
+      <ng-content select="[headerEnd]" />
+    </div>
+    <!-- Desktop: the name on the left, in line with the Edit button beside it
+         (phones: it's in the card's top bar) -->
+    <div class="person-head mobile:hidden desktop:items-start desktop:pr-80 desktop:text-left">
+      <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
+        <h1 class="truncate text-xl font-semibold leading-tight">{{ s.name }}</h1>
+      </div>
+    </div>
+
+    <app-lessons-card [studentId]="s.id" (upcoming)="upcoming.emit()" (history)="history.emit()" />
 
     <app-person-lessons
       [studentId]="s.id"
@@ -421,104 +501,55 @@ export class PersonLessons {
 export class StudentView {
   readonly student = input.required<Student>();
   readonly editable = input(true);
-  /** Upcoming › / History › tapped (the card / page opens the full list). */
+  /** Upcoming › / History › tapped on a phone (the card / page opens the full list). */
   readonly upcoming = output<void>();
   readonly history = output<void>();
 
-  // Desktop: each list folds / unfolds on its own (phones: they open as a page).
-  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
-  protected readonly open = signal<ReadonlySet<'upcoming' | 'history'>>(new Set());
-
-  // A list's title: phones open it as a page, desktop folds / unfolds it in place.
-  protected tapList(list: 'upcoming' | 'history'): void {
-    if (!this.desktop) {
-      if (list === 'upcoming') this.upcoming.emit();
-      else this.history.emit();
-      return;
-    }
-    this.toggle(list);
-  }
-
-  protected toggle(list: 'upcoming' | 'history'): void {
-    const next = new Set(this.open());
-    if (next.has(list)) next.delete(list);
-    else next.add(list);
-    this.open.set(next);
-  }
-
   protected students = inject(StudentService);
-  private groups = inject(GroupService);
-  private events = inject(EventService);
-  private people = inject(EventPeople);
-  private i18n = inject(I18nService);
-
-  // Under Upcoming: the next lesson; under History: the last one.
-  private readonly mine = computed(() => {
-    const id = this.student().id;
-    return this.events.events().filter((e) => this.people.invites(e, id));
-  });
-  protected readonly nextEvent = computed(
-    () =>
-      this.mine()
-        .filter((e) => eventEnd(e).getTime() >= Date.now())
-        .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null,
-  );
-  protected readonly lastEvent = computed(
-    () =>
-      this.mine()
-        .filter((e) => eventEnd(e).getTime() < Date.now())
-        .sort((a, b) => b.startsAt.localeCompare(a.startsAt))[0] ?? null,
-  );
-
-  // The next lesson's calendar icon and lines
-  protected start(e: ScheduleEvent): Date {
-    return new Date(e.startsAt);
-  }
-  protected startTime(e: ScheduleEvent): string {
-    return this.i18n.time(new Date(e.startsAt));
-  }
-  protected endTime(e: ScheduleEvent): string {
-    return this.i18n.time(eventEnd(e));
-  }
-  // Beside the calendar: the event's title, else its groups.
-  protected context(e: ScheduleEvent): string {
-    return (
-      e.title ||
-      e.groupIds
-        .map((id) => this.groups.byId(id)?.name)
-        .filter((n): n is string => !!n)
-        .join(', ')
-    );
-  }
-
-
 }
 
-/** A group, for reading: its color avatar, the name and member count; its lessons; members. */
+/**
+ * A group, for reading, like a student: on desktop the name and member count on the left with
+ * [headerEnd] (e.g. Edit) at the top right (phones: the name is in the card's top bar); its
+ * lessons (LessonsCard), its materials, then the members.
+ */
 @Component({
   selector: 'app-group-view',
-  imports: [GroupMembers, Icon, PersonLessons],
+  imports: [GroupMembers, Icon, LessonsCard, PersonLessons],
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let g = group();
     <div class="absolute right-0 top-0 z-[6] flex items-center gap-2"><ng-content select="[headerEnd]" /></div>
-    <!-- Desktop: the name on the left, as tall as the Edit button beside it -->
-    <div class="person-head desktop:items-start desktop:pr-24 desktop:text-left">
-      <div class="flex min-w-0 max-w-full flex-col desktop:h-[var(--control-h)] desktop:flex-row desktop:items-center desktop:gap-3">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-xl">{{ g.name }}</h1>
-        <p class="text-footnote mt-1 flex items-center justify-center gap-1 tabular-nums opacity-60 desktop:mt-0">
+    <!-- Desktop: the name on the left, as tall as the Edit button beside it
+         (phones: it's in the card's top bar) -->
+    <div class="person-head mobile:hidden desktop:items-start desktop:pr-24 desktop:text-left">
+      <div class="flex min-w-0 max-w-full items-center gap-3 desktop:h-[var(--control-h)]">
+        <h1 class="truncate text-xl font-semibold leading-tight">{{ g.name }}</h1>
+        <p class="text-footnote flex items-center gap-1 tabular-nums opacity-60">
           <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
         </p>
       </div>
     </div>
 
-    <app-person-lessons [groupId]="g.id" [lessonIds]="g.lessonIds" [editable]="editable()" (lessonIdsChange)="groups.setLessons(g.id, $event)" />
+    <app-lessons-card [groupId]="g.id" (upcoming)="upcoming.emit()" (history)="history.emit()" />
+
+    <app-person-lessons
+      [groupId]="g.id"
+      [lessonIds]="g.lessonIds"
+      [editable]="editable()"
+      [showNext]="false"
+      [showPast]="false"
+      (lessonIdsChange)="groups.setLessons(g.id, $event)"
+    />
     <app-group-members [studentIds]="g.studentIds" />
   `,
 })
 export class GroupView {
   readonly group = input.required<Group>();
   readonly editable = input(true);
+  /** Upcoming › / History › tapped on a phone (the card / page opens the full list). */
+  readonly upcoming = output<void>();
+  readonly history = output<void>();
 
   protected groups = inject(GroupService);
 }

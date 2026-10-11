@@ -18,7 +18,7 @@ import {
   toDateInput,
   toTimeInput,
 } from '../core/utils/time';
-import { EventInput, EventRepeat, EventService } from '../schedule/event.service';
+import { EventInput, EventRepeat, EventService, eventEnd } from '../schedule/event.service';
 import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
@@ -197,8 +197,12 @@ interface Model {
 })
 export class EventEditor implements OnInit {
   readonly entry = input.required<StackEntry>();
-  // Opened from another card: just for reading (see NavStack).
-  protected readonly readOnly = computed(() => !!this.entry().readOnly);
+  // Just for reading: opened from another card (see NavStack), or already over — a past event
+  // (for a series: this repeat) can't be changed or deleted.
+  protected readonly readOnly = computed(() => {
+    const e = this.opened();
+    return !!this.entry().readOnly || (!!e && eventEnd(e).getTime() < Date.now());
+  });
   readonly closed = output<void>();
 
   private events = inject(EventService);
