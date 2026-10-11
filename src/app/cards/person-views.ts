@@ -293,29 +293,26 @@ export class PersonLessons {
       </div>
     </div>
 
-    <!-- Phones: Email / Call as two full-width tiles, just the icon -->
-    <div class="grid grid-cols-2 gap-2 desktop:hidden">
-      <a [attr.href]="s.email ? 'mailto:' + s.email : null" [attr.aria-label]="'students.actionMail' | t" class="contact-tile" [class.is-off]="!s.email">
-        <app-icon name="mail" [strokeWidth]="1.75" class="size-6" />
-      </a>
-      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" [attr.aria-label]="'students.actionCall' | t" class="contact-tile" [class.is-off]="!s.phone">
-        <app-icon name="call" [strokeWidth]="1.75" class="size-6" />
-      </a>
-    </div>
-
-    <!-- The phone and email: a small label over the value (iOS) -->
+    <!-- The phone and email: a small label over the value, a round call / mail button on the
+         right (the whole row calls / writes) -->
     @if (s.phone || s.email) {
       <div class="card">
         @if (s.phone) {
-          <a [href]="'tel:' + s.phone" class="list-row contact-field">
-            <span>{{ 'students.phone' | t }}</span>
-            <b class="tabular-nums">{{ s.phone }}</b>
+          <a [href]="'tel:' + s.phone" class="list-row py-2.5">
+            <span class="contact-field">
+              <span>{{ 'students.phone' | t }}</span>
+              <b class="tabular-nums">{{ s.phone }}</b>
+            </span>
+            <span class="contact-button" [attr.aria-label]="'students.actionCall' | t"><app-icon name="call" [strokeWidth]="1.75" class="size-[1.125rem]" /></span>
           </a>
         }
         @if (s.email) {
-          <a [href]="'mailto:' + s.email" class="list-row contact-field">
-            <span>{{ 'students.email' | t }}</span>
-            <b>{{ s.email }}</b>
+          <a [href]="'mailto:' + s.email" class="list-row py-2.5">
+            <span class="contact-field">
+              <span>{{ 'students.email' | t }}</span>
+              <b>{{ s.email }}</b>
+            </span>
+            <span class="contact-button" [attr.aria-label]="'students.actionMail' | t"><app-icon name="mail" [strokeWidth]="1.75" class="size-[1.125rem]" /></span>
           </a>
         }
       </div>

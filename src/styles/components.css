@@ -215,7 +215,7 @@
 
   /* A contact field (iOS): a small label over the value, the value in the accent. */
   .contact-field {
-    @apply flex-col !items-start !gap-0.5 py-2.5;
+    @apply flex min-w-0 flex-1 flex-col items-start gap-0.5;
     & > span {
       @apply text-footnote opacity-60;
     }
@@ -229,11 +229,10 @@
     @apply pointer-events-none opacity-40;
   }
 
-  /* Phones: a contact tile under a person's name (Email / Call) — just the icon, half the width;
-     .is-off when there's no address / number. */
-  .contact-tile {
-    @apply flex h-12 items-center justify-center rounded-[var(--radius-card)] bg-[var(--surface)] text-[var(--accent)]
-           active:opacity-60;
+  /* The round call / mail button at the end of a contact row. */
+  .contact-button {
+    @apply flex size-9 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--accent)_14%,transparent)]
+           text-[var(--accent)];
   }
 
   /* The blue "+ add" row at the end of a card (Invite, Attach, Add members), with list-row and
