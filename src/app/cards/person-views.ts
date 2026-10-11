@@ -105,7 +105,7 @@ import { GroupMembers } from './related-lists';
     <ng-template #byMonth let-months let-label="label" let-list="list">
       @if (flat()) {
         @for (m of months; track m.label; let first = $first) {
-          <button type="button" (click)="toggleMonth(list, m.label, first)" class="list-row month-head !min-h-0 w-full pb-1.5 pt-3 text-left">
+          <button type="button" (click)="toggleMonth(list, m.label, first)" class="list-row month-head !min-h-0 w-full pb-1.5 pt-3 text-left after:hidden">
             <span class="flex-1">{{ m.label }}</span>
             <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
           </button>
