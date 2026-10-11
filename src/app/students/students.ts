@@ -1,8 +1,6 @@
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
@@ -23,8 +21,7 @@ import { Student, StudentService } from './student.service';
  * the left, the picked student / group on the right; its Edit opens the form.
  * Add offers a new student or group; a long press on a student starts picking students to make a
  * group of.
- * Phones show one `mode` per page (route data): students only, groups only, or both behind
- * Groups | Students tabs. Desktop always shows both.
+ * Phones: groups and students behind Groups | Students tabs (desktop: both in one list).
  */
 @Component({
   selector: 'app-students',
@@ -43,21 +40,10 @@ export class Students {
 
   protected readonly query = signal('');
 
-  // What this page lists (phones; desktop: both).
-  private readonly routeMode = toSignal(inject(ActivatedRoute).data, { initialValue: {} as Record<string, unknown> });
-  protected readonly mode = computed<'all' | 'students' | 'groups' | 'tabs'>(() =>
-    this.desktop ? 'all' : ((this.routeMode()['mode'] as 'students' | 'groups' | 'tabs' | undefined) ?? 'all'),
-  );
-  // The tabs page: which tab is showing.
+  // Phones: which tab is showing (desktop lists both).
   protected readonly tab = signal<'groups' | 'students'>('students');
-  protected readonly showGroups = computed(() => {
-    const m = this.mode();
-    return m === 'all' || m === 'groups' || (m === 'tabs' && this.tab() === 'groups');
-  });
-  protected readonly showStudents = computed(() => {
-    const m = this.mode();
-    return m === 'all' || m === 'students' || (m === 'tabs' && this.tab() === 'students');
-  });
+  protected readonly showGroups = computed(() => this.desktop || this.tab() === 'groups');
+  protected readonly showStudents = computed(() => this.desktop || this.tab() === 'students');
 
   private readonly byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, this.i18n.locale());
 
@@ -101,10 +87,15 @@ export class Students {
   ];
 
   constructor() {
-    // Mobile toolbar: the search field instead of a title.
+    // Mobile toolbar: the search field instead of a title, floating over the list (which scrolls
+    // under it and the tabs, like a card's page).
     const toolbar = inject(ToolbarService);
     effect(() => toolbar.content.set(this.search() ?? null));
-    inject(DestroyRef).onDestroy(() => toolbar.content.set(null));
+    if (!this.desktop) toolbar.overlay.set(true);
+    inject(DestroyRef).onDestroy(() => {
+      toolbar.content.set(null);
+      toolbar.overlay.set(false);
+    });
   }
 
   protected initial(name: string): string {
@@ -140,7 +131,7 @@ export class Students {
     else this.stack.push({ kind: 'group', id: g.id });
   }
 
-  // Add: on a page of one kind, straight to a new one of it; else the menu (student or group).
+  // Add: on a tab, straight to a new one of its kind; desktop: the menu (student or group).
   protected openAdd(origin: HTMLElement): void {
     if (!this.showGroups()) return this.openNew('student');
     if (!this.showStudents()) return this.openNew('group');

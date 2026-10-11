@@ -409,9 +409,10 @@
 
   /* Header of a collapsible list section (app-section): title, count, chevron. */
   /* The label above a card ("Groups", "Students", "Language"…), and the collapsible section
-     header (same look): a bit larger than footnotes, regular weight, gray. */
+     header (same look): a bit larger than footnotes, regular weight, gray. Phones: inset like
+     the rows' text (iOS), clear of a scroll area's round corner. */
   .card-label {
-    @apply text-subhead opacity-50;
+    @apply text-subhead opacity-50 mobile:px-[var(--row-px)];
   }
   .section-header {
     @apply text-subhead flex w-full items-center gap-1.5 text-left opacity-50

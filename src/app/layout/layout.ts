@@ -40,19 +40,10 @@ export class Layout {
     inject(LessonService).ensureLoaded();
   }
 
-  // Sections: desktop tabs.
+  // Sections: desktop tabs and the navigation menu.
   protected readonly navItems: { path: string; label: TranslationKey; icon: BrandIconName }[] = [
     { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
     { path: '/students', label: 'nav.students', icon: 'people' },
-    { path: '/lessons', label: 'nav.lessons', icon: 'book' },
-  ];
-  // The phones' pages menu: groups and students on pages of their own, plus (to compare) both
-  // behind Groups | Students tabs.
-  protected readonly menuItems: { path: string; label: TranslationKey; icon: BrandIconName }[] = [
-    { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
-    { path: '/groups', label: 'groups.title', icon: 'people' },
-    { path: '/students', label: 'nav.students', icon: 'people' },
-    { path: '/people', label: 'nav.people', icon: 'people' },
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
   ];
   // Under the account button. Install: only in the browser (not once it's the installed app).

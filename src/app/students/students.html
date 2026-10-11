@@ -4,7 +4,7 @@
 
 <!-- One list (iOS Contacts-like): groups first, then students. Phones: a tap opens the card on
      top. Desktop: the list on the left, the picked student / group on the right (Edit opens its form). -->
-<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-8">
+<main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 mobile:pb-0 mobile:pt-0 desktop:flex-row desktop:gap-8">
   <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-sm">
     <!-- Desktop: the search and Add in one row, both the controls' height (phones: search in
          the toolbar, + at the bottom) -->
@@ -55,9 +55,11 @@
       }
     </ng-template>
 
-    <!-- Phones, the tabs page: Groups | Students -->
-    @if (mode() === 'tabs') {
-      <div class="segmented shrink-0">
+    <!-- Phones: the list scrolls under the toolbar (and the tabs page's Groups | Students),
+         which float on a fade from the page color to transparent, like a card's top bar -->
+    @if (!desktop) {
+      <div class="pointer-events-none absolute inset-x-0 top-0 z-[8] h-[calc(env(safe-area-inset-top)+8.5rem)] bg-[linear-gradient(to_bottom,var(--app-bg)_calc(100%-1.25rem),transparent)]"></div>
+      <div class="segmented absolute inset-x-4 top-[calc(env(safe-area-inset-top)+4rem)] z-[9]">
         <button type="button" (click)="tab.set('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
         <button type="button" (click)="tab.set('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
       </div>
@@ -72,11 +74,14 @@
     } @else {
       <!-- Groups first (they stay while selecting students; only students get the circles);
            bottom padding clears the floating buttons on phones. Labels only when both kinds are
-           listed (a page of one kind, or a tab, says what it is). -->
-      <app-scroll-area class="min-h-0 flex-1" contentClass="gap-4 pb-16 desktop:pb-2">
+           listed (desktop; a tab says what it is). -->
+      <app-scroll-area
+        class="min-h-0 flex-1"
+        [contentClass]="'gap-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] desktop:pb-2 ' + (desktop ? '' : 'pt-[calc(env(safe-area-inset-top)+7.5rem)]')"
+      >
         @if (groupsHere) {
           <div class="flex flex-col gap-1.5">
-            @if (mode() === 'all') {
+            @if (desktop) {
               <span class="card-label">{{ 'groups.title' | t }}</span>
             }
             <div class="card"><ng-container [ngTemplateOutlet]="groupRows" /></div>
@@ -84,7 +89,7 @@
         }
         @if (studentsHere) {
           <div class="flex flex-col gap-1.5">
-            @if (mode() === 'all') {
+            @if (desktop) {
               <span class="card-label">{{ 'nav.students' | t }}</span>
             }
             <div class="card"><ng-container [ngTemplateOutlet]="studentRows" /></div>

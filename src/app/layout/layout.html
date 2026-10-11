@@ -1,6 +1,16 @@
 @if (auth.isAuthenticated()) {
-<div class="flex h-full flex-col overflow-hidden text-[var(--text)]">
-  <header class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
+<div class="relative flex h-full flex-col overflow-hidden text-[var(--text)]">
+  <!-- overlay (a page that scrolls under it, e.g. Students on phones): floating, transparent,
+       only its controls take taps -->
+  <header
+    class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]"
+    [class.!absolute]="toolbar.overlay()"
+    [class.inset-x-0]="toolbar.overlay()"
+    [class.!bg-transparent]="toolbar.overlay()"
+    [class.pointer-events-none]="toolbar.overlay()"
+    [class.[&_button]:pointer-events-auto]="toolbar.overlay()"
+    [class.[&_label]:pointer-events-auto]="toolbar.overlay()"
+  >
     <nav class="flex min-w-0 flex-1 items-center gap-1 desktop:gap-2">
       <!-- Mobile: the current page's toolbar content or title (e.g. month on Schedule);
            tabs live in the ⋯ sheet -->
@@ -84,7 +94,7 @@
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
       <!-- A gap between tiles so a highlighted one and a hovered one never merge -->
       <div class="grid grid-cols-3 gap-1.5">
-        @for (item of desktop ? navItems : menuItems; track item.path) {
+        @for (item of navItems; track item.path) {
           <!-- The highlight: a square under the icon and name, ~88pt like Google's (not the whole
                column), fading in / out -->
           <button

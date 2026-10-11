@@ -15,11 +15,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'schedule', component: Schedule },
-      // Students (desktop: students and groups side by side). Phones: students only, groups only,
-      // or both behind Groups | Students tabs (see Students' `mode`).
-      { path: 'students', loadComponent: () => import('./students/students').then((m) => m.Students), data: { mode: 'students' } },
-      { path: 'groups', loadComponent: () => import('./students/students').then((m) => m.Students), data: { mode: 'groups' } },
-      { path: 'people', loadComponent: () => import('./students/students').then((m) => m.Students), data: { mode: 'tabs' } },
+      { path: 'students', loadComponent: () => import('./students/students').then((m) => m.Students) },
       { path: 'lessons', loadComponent: () => import('./lessons/lessons').then((m) => m.Lessons) },
       // The list with that lesson open on top
       { path: 'lessons/:id', loadComponent: () => import('./lessons/lessons').then((m) => m.Lessons) },

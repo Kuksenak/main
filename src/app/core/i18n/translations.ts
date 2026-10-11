@@ -10,7 +10,6 @@ const en = {
 
   'nav.schedule': 'Schedule',
   'nav.students': 'Students',
-  'nav.people': 'People',
   'nav.lessons': 'Lessons',
   'nav.about': 'About',
   'nav.install': 'Install app',
@@ -173,7 +172,6 @@ const pl: Dictionary = {
 
   'nav.schedule': 'Plan',
   'nav.students': 'Uczniowie',
-  'nav.people': 'Osoby',
   'nav.lessons': 'Lekcje',
   'nav.about': 'O aplikacji',
   'nav.install': 'Zainstaluj aplikację',
@@ -333,7 +331,6 @@ const fr: Dictionary = {
 
   'nav.schedule': 'Planning',
   'nav.students': 'Élèves',
-  'nav.people': 'Personnes',
   'nav.lessons': 'Cours',
   'nav.about': 'À propos',
   'nav.install': 'Installer l’app',
