@@ -285,11 +285,11 @@ export class PersonLessons {
       </a>
       <ng-content select="[headerEnd]" />
     </div>
-    <!-- Desktop: the name in light capitals on the left, as tall as the Edit button beside it
+    <!-- Desktop: the name on the left, in line with the Edit button beside it
          (phones: it's in the card's top bar) -->
     <div class="person-head mobile:hidden desktop:items-start desktop:pr-80 desktop:text-left">
       <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
-        <h1 class="truncate text-[1.375rem] font-normal uppercase leading-tight tracking-wider desktop:text-lg desktop:font-light">{{ s.name }}</h1>
+        <h1 class="truncate text-xl font-semibold leading-tight">{{ s.name }}</h1>
       </div>
     </div>
 
@@ -516,7 +516,7 @@ export class StudentView {
     <!-- Desktop: the name on the left, as tall as the Edit button beside it -->
     <div class="person-head desktop:items-start desktop:pr-24 desktop:text-left">
       <div class="flex min-w-0 max-w-full flex-col desktop:h-[var(--control-h)] desktop:flex-row desktop:items-center desktop:gap-3">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg desktop:font-light desktop:uppercase desktop:tracking-wider">{{ g.name }}</h1>
+        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-xl">{{ g.name }}</h1>
         <p class="text-footnote mt-1 flex items-center justify-center gap-1 tabular-nums opacity-60 desktop:mt-0">
           <app-icon name="person" class="size-3.5" />{{ g.studentIds.length }}
         </p>
