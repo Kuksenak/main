@@ -107,7 +107,7 @@ import { GroupMembers } from './related-lists';
         @for (m of months; track m.label; let first = $first) {
           <button type="button" (click)="toggleMonth(list, m.label, first)" class="list-row month-head !min-h-0 w-full pb-1.5 pt-3 text-left">
             <span class="flex-1">{{ m.label }}</span>
-            <app-icon name="chevron-right" class="row-chevron !size-6 transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
+            <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
           </button>
           @if (monthOpen(list, m.label, first)) {
             <!-- Rendered once scrolled into view (long histories stay light) -->
@@ -128,7 +128,7 @@ import { GroupMembers } from './related-lists';
           @for (m of months; track m.label; let first = $first) {
             <button type="button" (click)="toggleMonth(list, m.label, first)" class="month-head mt-2 flex w-full items-center gap-1.5 px-0.5 text-left desktop:mt-1">
               <span class="flex-1">{{ m.label }}</span>
-              <app-icon name="chevron-right" class="row-chevron !size-6 !opacity-100 transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
+              <app-icon name="chevron-right" class="row-chevron !opacity-100 transition-transform duration-200" [class.rotate-90]="monthOpen(list, m.label, first)" />
             </button>
             @if (monthOpen(list, m.label, first)) {
               <!-- Rendered once scrolled into view (long histories stay light) -->
