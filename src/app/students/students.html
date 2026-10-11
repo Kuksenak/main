@@ -5,7 +5,9 @@
 <!-- One list (iOS Contacts-like): groups first, then students. Phones: a tap opens the card on
      top. Desktop: the list on the left, the picked student / group on the right (Edit opens its form). -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 mobile:pb-0 mobile:pt-0 desktop:flex-row desktop:gap-8">
-  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-sm">
+  <!-- Phones: the list starts at the tabs' bottom edge (its round corners clip a card leaving
+       under them) -->
+  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 mobile:pt-[calc(env(safe-area-inset-top)+6.75rem)] desktop:max-w-sm">
     <!-- Desktop: the search and Add in one row, both the controls' height (phones: search in
          the toolbar, + at the bottom) -->
     <div class="flex items-center gap-3 mobile:hidden">
@@ -79,7 +81,7 @@
            listed (desktop; a tab says what it is). -->
       <app-scroll-area
         class="min-h-0 flex-1"
-        [contentClass]="'gap-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] desktop:pb-2 ' + (desktop ? '' : 'pt-[calc(env(safe-area-inset-top)+7.5rem)]')"
+        [contentClass]="'gap-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] desktop:pb-2 ' + (desktop ? '' : 'pt-3')"
       >
         @if (groupsHere) {
           <div class="flex flex-col gap-1.5">
