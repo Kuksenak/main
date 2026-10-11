@@ -99,6 +99,32 @@ import { GroupMembers } from './related-lists';
       </div>
     </ng-template>
 
+    <!-- A past lesson (History): the day as in the other lists; what was studied first — the
+         attached lessons, the event's title (else its groups) small under them; the time quietly
+         in the right corner, start over end (as in the schedule) -->
+    <ng-template #pastLine let-e>
+      <div class="list-row pb-3 pt-3.5 desktop:py-2">
+        <span class="date-tile desktop:size-9">
+          <b>{{ day(e) }}</b>
+          <small>{{ weekday(e) }}</small>
+        </span>
+        <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+          @if (lessonTitles(e).length) {
+            <span class="line-clamp-2 font-medium">{{ lessonTitles(e).join(', ') }}</span>
+          } @else {
+            <span class="opacity-40">{{ 'people.nothingAttached' | t }}</span>
+          }
+          @if (context(e); as c) {
+            <span class="text-footnote truncate opacity-50">{{ c }}</span>
+          }
+        </span>
+        <span class="text-footnote shrink-0 text-right leading-tight tabular-nums opacity-50">
+          <span class="block">{{ startTime(e) }}</span>
+          <span class="block">{{ endTime(e) }}</span>
+        </span>
+      </div>
+    </ng-template>
+
     <!-- Lessons under their months (upcoming soonest first, past most recent first). Each month
          folds: a tap on it shows / hides its lessons; all start open, rendered lazily. A card per
          month, or (flat) just rows with the months among them, to sit inside another card. -->
@@ -113,7 +139,7 @@ import { GroupMembers } from './related-lists';
             <!-- Rendered once scrolled into view (long histories stay light) -->
             @defer (on viewport) {
               @for (e of m.events; track key(e)) {
-                <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+                <ng-container [ngTemplateOutlet]="list === 'past' ? pastLine : lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
               }
             } @placeholder {
               <div [style.height.px]="m.events.length * 52"></div>
@@ -135,7 +161,7 @@ import { GroupMembers } from './related-lists';
               @defer (on viewport) {
                 <div class="card">
                   @for (e of m.events; track key(e)) {
-                    <ng-container [ngTemplateOutlet]="lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
+                    <ng-container [ngTemplateOutlet]="list === 'past' ? pastLine : lessonLine" [ngTemplateOutletContext]="{ $implicit: e }" />
                   }
                 </div>
               } @placeholder {
@@ -292,6 +318,14 @@ export class PersonLessons {
     return this.i18n.date(new Date(e.startsAt), { weekday: 'short' });
   }
 
+  // History: the time in the corner, start over end.
+  protected startTime(e: ScheduleEvent): string {
+    return this.i18n.time(new Date(e.startsAt));
+  }
+  protected endTime(e: ScheduleEvent): string {
+    return this.i18n.time(eventEnd(e));
+  }
+
   protected time(e: ScheduleEvent): string {
     return `${this.i18n.time(new Date(e.startsAt))}–${this.i18n.time(eventEnd(e))}`;
   }
@@ -442,7 +476,7 @@ export class LessonsCard {
  */
 @Component({
   selector: 'app-student-view',
-  imports: [LessonsCard, PersonLessons, TranslatePipe],
+  imports: [Icon, LessonsCard, PersonLessons, TranslatePipe],
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let s = student();
@@ -475,23 +509,20 @@ export class LessonsCard {
       (lessonIdsChange)="students.setLessons(s.id, $event)"
     />
 
-    <!-- At the bottom: the phone and email, a small label over the value (a tap calls / writes) -->
+    <!-- At the bottom: the phone and email as buttons, like a confirm's answers (a tap calls /
+         writes) -->
     @if (s.phone || s.email) {
-      <div class="card">
+      <div class="flex flex-col gap-1.5">
         @if (s.phone) {
-          <a [href]="'tel:' + s.phone" class="list-row py-2.5">
-            <span class="contact-field">
-              <span>{{ 'students.phone' | t }}</span>
-              <b class="tabular-nums">{{ s.phone }}</b>
-            </span>
+          <a [href]="'tel:' + s.phone" class="contact-btn">
+            <app-icon name="call" class="size-5 shrink-0 opacity-60" />
+            <span class="truncate tabular-nums">{{ s.phone }}</span>
           </a>
         }
         @if (s.email) {
-          <a [href]="'mailto:' + s.email" class="list-row py-2.5">
-            <span class="contact-field">
-              <span>{{ 'students.email' | t }}</span>
-              <b>{{ s.email }}</b>
-            </span>
+          <a [href]="'mailto:' + s.email" class="contact-btn">
+            <app-icon name="mail" class="size-5 shrink-0 opacity-60" />
+            <span class="truncate">{{ s.email }}</span>
           </a>
         }
       </div>

@@ -70,7 +70,10 @@
               <span class="color-bar" [style.background]="people.color(l)"></span>
               <div class="min-w-0 flex-1 leading-tight">
                 <p class="truncate font-medium">{{ people.label(l) }}@if (l.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}@if (l.repeat !== 'Never') {<app-icon name="repeat" class="ml-1.5 inline size-4 align-[-2px] opacity-50" />}</p>
-                <p class="text-footnote truncate opacity-50">{{ upcomingWhen(l) }}</p>
+                <p class="text-footnote flex min-w-0 gap-2 opacity-50">
+                  <span class="truncate">{{ upcomingDay(l) }}</span>
+                  <span class="shrink-0 tabular-nums">{{ upcomingTime(l) }}</span>
+                </p>
               </div>
               <app-icon name="chevron-right" class="row-chevron" />
             </button>

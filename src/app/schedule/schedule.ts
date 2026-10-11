@@ -115,11 +115,12 @@ export class Schedule implements AfterViewInit {
     this.scrollToDay(day);
   }
 
-  // "Wed, 8 Oct · 18:00–19:00"
-  protected upcomingWhen(l: ScheduleEvent): string {
-    const start = new Date(l.startsAt);
-    const day = this.i18n.date(start, { weekday: 'short', day: 'numeric', month: 'short' });
-    return `${day} · ${this.i18n.time(start)}–${this.i18n.time(eventEnd(l))}`;
+  // "Wed, 8 Oct" and "18:00–19:00", side by side
+  protected upcomingDay(l: ScheduleEvent): string {
+    return this.i18n.date(new Date(l.startsAt), { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+  protected upcomingTime(l: ScheduleEvent): string {
+    return `${this.i18n.time(new Date(l.startsAt))}–${this.i18n.time(eventEnd(l))}`;
   }
 
   protected readonly dayEvents = computed(

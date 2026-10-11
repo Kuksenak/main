@@ -213,15 +213,12 @@
     @apply min-w-0 flex-1 font-medium;
   }
 
-  /* A contact field (iOS): a small label over the value, the value in the accent. */
-  .contact-field {
-    @apply flex min-w-0 flex-1 flex-col items-start gap-0.5;
-    & > span {
-      @apply text-footnote opacity-60;
-    }
-    & > b {
-      @apply max-w-full truncate font-normal text-[var(--accent)];
-    }
+  /* A student's phone / email: a gray pill like a confirm's answers (desktop: a gray button). */
+  .contact-btn {
+    @apply flex h-12 min-w-0 items-center justify-center gap-2 rounded-full px-5 text-[1.125rem] font-medium
+           bg-[color-mix(in_srgb,var(--text)_10%,transparent)] active:opacity-70
+           desktop:text-body desktop:h-[var(--control-h)] desktop:rounded-[var(--radius-capsule)]
+           desktop:hover:bg-[color-mix(in_srgb,var(--text)_14%,transparent)];
   }
 
   /* A link with nothing behind it (no email / phone). */
@@ -407,7 +404,7 @@
     }
   }
 
-  /* Header of a collapsible list section (app-section): title · count · chevron. */
+  /* Header of a collapsible list section (app-section): title, count, chevron. */
   /* The label above a card ("Groups", "Students", "Language"…), and the collapsible section
      header (same look): a bit larger than footnotes, regular weight, gray. */
   .card-label {

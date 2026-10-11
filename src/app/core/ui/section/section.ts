@@ -4,7 +4,7 @@ import { Icon } from '../icon/icon';
 const STORAGE_KEY = 'sections';
 
 /**
- * Collapsible list section: a small gray header (title · count · chevron) above its
+ * Collapsible list section: a small gray header (title, count, chevron) above its
  * content. Tapping the header folds it. With `key`, the open/closed state is remembered on this
  * device per key (e.g. every "Past" list stays folded once you fold one).
  *
@@ -18,7 +18,7 @@ const STORAGE_KEY = 'sections';
     <button type="button" (click)="toggle()" class="section-header" [attr.aria-expanded]="open()">
       <span class="truncate">{{ title() }}</span>
       @if (count() !== null) {
-        <span class="tabular-nums">· {{ count() }}</span>
+        <span class="tabular-nums">{{ count() }}</span>
       }
       <app-icon name="chevron-right" class="row-chevron ml-auto !opacity-100 transition-transform duration-200" [class.rotate-90]="open()" />
     </button>

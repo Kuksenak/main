@@ -30,8 +30,11 @@ import { EventService, ScheduleEvent, eventEnd, occurrenceKey } from '../schedul
                 <span class="color-bar" [style.background]="people.color(e)"></span>
                 <div class="min-w-0 flex-1 leading-tight">
                   <p class="truncate font-medium">{{ date(e) }}@if (e.lessonIds.length) {<!-- 📎 lessons attached --><app-icon name="paperclip" class="ml-1.5 inline size-4 rotate-45 align-[-2px] opacity-50" />}@if (e.repeat !== 'Never') {<app-icon name="repeat" class="ml-1.5 inline size-4 align-[-2px] opacity-50" />}</p>
-                  <p class="text-footnote truncate opacity-50">
-                    {{ time(e) }}@if (lessonId() ? people.label(e) : e.title; as name) { · {{ name }} }
+                  <p class="text-footnote flex min-w-0 gap-2 opacity-50">
+                    <span class="shrink-0 tabular-nums">{{ time(e) }}</span>
+                    @if (lessonId() ? people.label(e) : e.title; as name) {
+                      <span class="truncate">{{ name }}</span>
+                    }
                   </p>
                 </div>
               </div>
