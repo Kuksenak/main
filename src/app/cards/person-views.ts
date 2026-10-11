@@ -277,11 +277,11 @@ export class PersonLessons {
     @let s = student();
     <!-- Desktop: Email / Call in a row with [headerEnd] (Edit), top right -->
     <div class="absolute right-0 top-0 z-[6] flex items-center gap-2">
-      <a [attr.href]="s.email ? 'mailto:' + s.email : null" [attr.title]="s.email" class="btn-secondary gap-1.5 !text-[var(--accent)] mobile:hidden" [class.is-off]="!s.email">
-        <app-icon name="mail" [strokeWidth]="1.75" class="size-4" />{{ 'students.actionMail' | t }}
+      <a [attr.href]="s.email ? 'mailto:' + s.email : null" [attr.title]="s.email" class="btn-secondary !text-[var(--accent)] mobile:hidden" [class.is-off]="!s.email">
+        {{ 'students.actionMail' | t }}
       </a>
-      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" [attr.title]="s.phone" class="btn-secondary gap-1.5 !text-[var(--accent)] mobile:hidden" [class.is-off]="!s.phone">
-        <app-icon name="call" [strokeWidth]="1.75" class="size-4" />{{ 'students.actionCall' | t }}
+      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" [attr.title]="s.phone" class="btn-secondary !text-[var(--accent)] mobile:hidden" [class.is-off]="!s.phone">
+        {{ 'students.actionCall' | t }}
       </a>
       <ng-content select="[headerEnd]" />
     </div>
