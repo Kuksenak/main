@@ -22,6 +22,7 @@ import { EventInput, EventRepeat, EventService, eventEnd } from '../schedule/eve
 import { LessonService } from '../lessons/lesson.service';
 import { GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
+import { PreferencesService } from '../settings/preferences.service';
 import { PickList, PickSection } from './pick-list';
 
 /** Who an event is for: any number of groups and students. */
@@ -210,6 +211,7 @@ export class EventEditor implements OnInit {
   private students = inject(StudentService);
   private lessons = inject(LessonService);
   private i18n = inject(I18nService);
+  private prefs = inject(PreferencesService);
 
   private readonly page = viewChild.required<PageSheet>('page');
 
@@ -401,7 +403,7 @@ export class EventEditor implements OnInit {
         endTime: minToTime(timeToMin(toTimeInput(start)) + event.durationMinutes),
       });
     } else if (this.entry().date) {
-      this.model.set({ ...this.blank(), date: this.entry().date!, ...EventEditor.defaultTimes(this.entry().date!) });
+      this.model.set({ ...this.blank(), date: this.entry().date!, ...this.defaultTimes(this.entry().date!) });
     }
     // A stored rule that matches no preset opens as Custom.
     if (this.preset() === 'custom') this.model.update((m) => ({ ...m, repeatCustom: true }));
@@ -410,12 +412,15 @@ export class EventEditor implements OnInit {
     this.repeatSnapshot = JSON.stringify([m.repeat, m.repeatInterval, m.repeatUntil]);
   }
 
-  // A new event's hour: today from now (rounded up to 5 minutes), any other day from 9:00.
-  private static defaultTimes(date: string): { startTime: string; endTime: string } {
-    if (date !== toDateInput(new Date())) return { startTime: '09:00', endTime: '10:00' };
+  // A new event's hour: today from now (rounded up to 5 minutes), any other day from the
+  // settings' hour (9:00); as long as the settings say (an hour). Ends by 23:55.
+  private defaultTimes(date: string): { startTime: string; endTime: string } {
     const now = new Date();
-    const start = Math.min(Math.ceil((now.getHours() * 60 + now.getMinutes()) / 5) * 5, 23 * 60);
-    return { startTime: minToTime(start), endTime: minToTime(Math.min(start + 60, 23 * 60 + 55)) };
+    const start =
+      date === toDateInput(now)
+        ? Math.min(Math.ceil((now.getHours() * 60 + now.getMinutes()) / 5) * 5, 23 * 60)
+        : timeToMin(this.prefs.dayStart());
+    return { startTime: minToTime(start), endTime: minToTime(Math.min(start + this.prefs.eventMinutes(), 23 * 60 + 55)) };
   }
 
   private blank(): Model {
@@ -428,7 +433,7 @@ export class EventEditor implements OnInit {
       invitees: { studentIds: [], groupIds: [] },
       lessonIds: [],
       date: toDateInput(new Date()),
-      ...EventEditor.defaultTimes(toDateInput(new Date())),
+      ...this.defaultTimes(toDateInput(new Date())),
     };
   }
 

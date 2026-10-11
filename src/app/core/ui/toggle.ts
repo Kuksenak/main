@@ -21,24 +21,29 @@ import { DeviceDetectionService } from '../services/device-detection.service';
         class="shrink-0 disabled:opacity-40"
       />
     } @else {
-      <!-- Our own: iOS size on phones (51 × 31), compact on desktop (36 × 20); accent when on, a
-           soft gray track when off; the knob placed exactly, 2px in from the edges -->
+      <!-- Our own: iOS size on phones (51 × 31); on desktop macOS-like (44 × 24): a crisp knob (a
+           1px soft edge — a 0.5px one renders unevenly on 1× screens — and a short light shadow),
+           a soft gray track with a faint edge when off, the accent when on. The knob sits 2px in
+           from the edges; pressed (desktop) it stretches toward the other side: its width and
+           position (Tailwind's translate property) animate together, so the far edge stays put. -->
       <button
         type="button"
         role="switch"
         [attr.aria-checked]="checked()"
         [disabled]="disabled()"
         (click)="toggle()"
-        class="relative block h-[1.9375rem] w-[3.1875rem] shrink-0 cursor-pointer rounded-full p-0 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 active:!scale-100 disabled:cursor-default disabled:opacity-40 desktop:h-5 desktop:w-9"
+        class="group relative block h-[1.9375rem] w-[3.1875rem] shrink-0 cursor-pointer rounded-full p-0 outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 active:!scale-100 disabled:cursor-default disabled:opacity-40 desktop:h-6 desktop:w-11 desktop:shadow-[inset_0_0_0_1px_rgb(0_0_0/0.04)]"
         [class.bg-[var(--accent)]]="checked()"
         [class.hover:brightness-110]="checked()"
         [class.bg-[color-mix(in_srgb,var(--text)_18%,transparent)]]="!checked()"
-        [class.hover:bg-[color-mix(in_srgb,var(--text)_26%,transparent)]]="!checked()"
+        [class.desktop:bg-[color-mix(in_srgb,var(--text)_14%,transparent)]]="!checked()"
+        [class.hover:bg-[color-mix(in_srgb,var(--text)_22%,transparent)]]="!checked()"
       >
         <span
-          class="absolute left-0.5 top-0.5 size-[1.6875rem] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.25)] transition-transform duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] desktop:size-4"
+          class="absolute left-0.5 top-0.5 size-[1.6875rem] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.25)] transition-[translate,width] duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] desktop:size-5 desktop:shadow-[0_0_0_1px_rgb(0_0_0/0.04),0_1px_1.5px_rgb(0_0_0/0.16)] desktop:group-active:w-6"
           [class.translate-x-5]="checked()"
-          [class.desktop:translate-x-4]="checked()"
+          [class.desktop:translate-x-5]="checked()"
+          [class.desktop:group-active:translate-x-4]="checked()"
         ></span>
       </button>
     }
