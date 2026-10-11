@@ -203,9 +203,9 @@
     @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-[var(--chip-ios)] px-2 py-1 text-[0.8125rem];
   }
 
-  /* A title in capitals (a person's name in the card's top bar). */
-  .caps-title {
-    @apply !font-normal uppercase tracking-wider;
+  /* A larger top bar title (a person's name in their card). */
+  .big-title {
+    @apply text-[1.25rem];
   }
 
   /* A block's title on the student page (Upcoming, History). */

@@ -68,7 +68,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
               <app-icon name="chevron-left" class="-ml-0.5 size-7" />
             }
           </button>
-          <span class="text-body pointer-events-none absolute inset-x-0 text-center font-semibold" [class.caps-title]="capsTitle()">{{ title() }}</span>
+          <span class="text-body pointer-events-none absolute inset-x-0 text-center font-semibold" [class.big-title]="bigTitle()">{{ title() }}</span>
           @if (actions()) {
             <button
               type="button"
@@ -140,8 +140,8 @@ import { ScrollArea } from '../scroll-area/scroll-area';
 })
 export class PageSheet {
   readonly title = input('');
-  // The top bar's title in capitals (a person's name).
-  readonly capsTitle = input(false);
+  // A larger top bar title (a person's name).
+  readonly bigTitle = input(false);
   readonly actions = input(true); // editor chrome (✓ / Save / Delete); false for pickers
   // The body scrolls as a whole (app-scroll-area); false when the content pins parts (a search)
   // and scrolls its own list.
