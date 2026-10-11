@@ -10,6 +10,7 @@ const en = {
 
   'nav.schedule': 'Schedule',
   'nav.students': 'Students',
+  'nav.people': 'People',
   'nav.lessons': 'Lessons',
   'nav.about': 'About',
   'nav.install': 'Install app',
@@ -71,6 +72,7 @@ const en = {
   'students.noEvents': 'No events yet',
 
   'groups.title': 'Groups',
+  'groups.empty': 'No Groups',
   'groups.add': 'Add group',
   'groups.name': 'Group name *',
   'groups.color': 'Color',
@@ -171,6 +173,7 @@ const pl: Dictionary = {
 
   'nav.schedule': 'Plan',
   'nav.students': 'Uczniowie',
+  'nav.people': 'Osoby',
   'nav.lessons': 'Lekcje',
   'nav.about': 'O aplikacji',
   'nav.install': 'Zainstaluj aplikację',
@@ -232,6 +235,7 @@ const pl: Dictionary = {
   'students.noEvents': 'Brak wydarzeń',
 
   'groups.title': 'Grupy',
+  'groups.empty': 'Brak grup',
   'groups.add': 'Dodaj grupę',
   'groups.name': 'Nazwa grupy *',
   'groups.color': 'Kolor',
@@ -329,6 +333,7 @@ const fr: Dictionary = {
 
   'nav.schedule': 'Planning',
   'nav.students': 'Élèves',
+  'nav.people': 'Personnes',
   'nav.lessons': 'Cours',
   'nav.about': 'À propos',
   'nav.install': 'Installer l’app',
@@ -390,6 +395,7 @@ const fr: Dictionary = {
   'students.noEvents': 'Aucun événement pour l’instant',
 
   'groups.title': 'Groupes',
+  'groups.empty': 'Aucun groupe',
   'groups.add': 'Ajouter un groupe',
   'groups.name': 'Nom du groupe *',
   'groups.color': 'Couleur',

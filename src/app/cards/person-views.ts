@@ -10,7 +10,7 @@ import { LessonService } from '../lessons/lesson.service';
 import { EventPeople } from '../schedule/event-people';
 import { EventService, ScheduleEvent, eventEnd, occurrenceKey } from '../schedule/event.service';
 import { Group, GroupService } from '../students/group.service';
-import { Student, StudentService } from '../students/student.service';
+import { Student } from '../students/student.service';
 import { PickList, PickSection } from './pick-list';
 import { GroupMembers } from './related-lists';
 
@@ -472,11 +472,11 @@ export class LessonsCard {
 /**
  * A student, for reading — like an iOS contact: on desktop the name on the left with Email / Call
  * and [headerEnd] (e.g. Edit) at the top right (phones: the name is in the card's top bar); their
- * lessons (LessonsCard), their materials, then the phone and email (label over value).
+ * lessons (LessonsCard), then the phone and email (label over value). (No materials for now.)
  */
 @Component({
   selector: 'app-student-view',
-  imports: [LessonsCard, PersonLessons, TranslatePipe],
+  imports: [LessonsCard, TranslatePipe],
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let s = student();
@@ -500,24 +500,25 @@ export class LessonsCard {
 
     <app-lessons-card [studentId]="s.id" (upcoming)="upcoming.emit()" (history)="history.emit()" />
 
-    <app-person-lessons
-      [studentId]="s.id"
-      [lessonIds]="s.lessonIds"
-      [editable]="editable()"
-      [showNext]="false"
-      [showPast]="false"
-      (lessonIdsChange)="students.setLessons(s.id, $event)"
-    />
-
-    <!-- Phones, at the bottom: Call / Email, like a confirm's answers (desktop has them at the
-         top) -->
+    <!-- At the bottom, like an iOS contact: the phone and email, a small label over the value
+         (a tap calls / writes) -->
     @if (s.phone || s.email) {
-      <div class="flex flex-col gap-1.5 desktop:hidden">
+      <div class="card">
         @if (s.phone) {
-          <a [href]="'tel:' + s.phone" class="contact-btn">{{ 'students.actionCall' | t }}</a>
+          <a [href]="'tel:' + s.phone" class="list-row py-2.5">
+            <span class="contact-field">
+              <span>{{ 'students.phone' | t }}</span>
+              <b class="tabular-nums">{{ s.phone }}</b>
+            </span>
+          </a>
         }
         @if (s.email) {
-          <a [href]="'mailto:' + s.email" class="contact-btn">{{ 'students.actionMail' | t }}</a>
+          <a [href]="'mailto:' + s.email" class="list-row py-2.5">
+            <span class="contact-field">
+              <span>{{ 'students.email' | t }}</span>
+              <b>{{ s.email }}</b>
+            </span>
+          </a>
         }
       </div>
     }
@@ -529,18 +530,16 @@ export class StudentView {
   /** Upcoming › / History › tapped on a phone (the card / page opens the full list). */
   readonly upcoming = output<void>();
   readonly history = output<void>();
-
-  protected students = inject(StudentService);
 }
 
 /**
  * A group, for reading, like a student: on desktop the name and member count on the left with
  * [headerEnd] (e.g. Edit) at the top right (phones: the name is in the card's top bar); its
- * lessons (LessonsCard), its materials, then the members.
+ * lessons (LessonsCard), then the members. (No materials for now.)
  */
 @Component({
   selector: 'app-group-view',
-  imports: [GroupMembers, Icon, LessonsCard, PersonLessons],
+  imports: [GroupMembers, Icon, LessonsCard],
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let g = group();
@@ -558,14 +557,6 @@ export class StudentView {
 
     <app-lessons-card [groupId]="g.id" (upcoming)="upcoming.emit()" (history)="history.emit()" />
 
-    <app-person-lessons
-      [groupId]="g.id"
-      [lessonIds]="g.lessonIds"
-      [editable]="editable()"
-      [showNext]="false"
-      [showPast]="false"
-      (lessonIdsChange)="groups.setLessons(g.id, $event)"
-    />
     <app-group-members [studentIds]="g.studentIds" />
   `,
 })
@@ -575,6 +566,4 @@ export class GroupView {
   /** Upcoming › / History › tapped on a phone (the card / page opens the full list). */
   readonly upcoming = output<void>();
   readonly history = output<void>();
-
-  protected groups = inject(GroupService);
 }

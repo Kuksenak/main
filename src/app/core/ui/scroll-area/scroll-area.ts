@@ -18,9 +18,10 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
  *
  * `viewportClass` styles the scrolling element itself (e.g. `card`, so its rounded corners stay
  * put while the content scrolls inside); the content is a full-height flex column (extend it
- * with `contentClass`). The scrolling element has the cards' corners: a card scrolling past its
- * edge stays rounded instead of being cut straight (`!rounded-none` in `viewportClass` where it
- * sits inside a card). The thumb sits 10px (desktop: 6px) outside the content edge, the same everywhere;
+ * with `contentClass`). On desktop the scrolling element has the cards' corners: a card scrolling
+ * past its edge stays rounded instead of being cut straight (`!rounded-none` in `viewportClass`
+ * where it sits inside a card). Not on phones: their big radius would clip a label's first
+ * letter. The thumb sits 10px (desktop: 6px) outside the content edge, the same everywhere;
  * padding on the host is the room it sits in.
  */
 @Component({
@@ -40,7 +41,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
       }
       <div
         #viewport
-        class="no-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[var(--radius-card)]"
+        class="no-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-contain desktop:rounded-[var(--radius-card)]"
         [class]="viewportClass()"
         (scroll)="onScroll()"
       >

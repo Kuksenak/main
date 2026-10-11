@@ -84,7 +84,7 @@
     <app-sheet #menuSheet [origin]="menuBtn" (closed)="menuOpen.set(false)">
       <!-- A gap between tiles so a highlighted one and a hovered one never merge -->
       <div class="grid grid-cols-3 gap-1.5">
-        @for (item of navItems; track item.path) {
+        @for (item of desktop ? navItems : menuItems; track item.path) {
           <!-- The highlight: a square under the icon and name, ~88pt like Google's (not the whole
                column), fading in / out -->
           <button
