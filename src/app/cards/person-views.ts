@@ -285,22 +285,22 @@ export class PersonLessons {
       </a>
       <ng-content select="[headerEnd]" />
     </div>
-    <!-- The name (phones: it's in the card's top bar instead); desktop: on the left, as tall as
-         the Edit button beside it -->
-    <div class="person-head mobile:hidden desktop:items-start desktop:pr-80 desktop:text-left">
+    <!-- The name in light capitals: centered on phones, on the left on desktop (as tall as the
+         Edit button beside it) -->
+    <div class="person-head desktop:items-start desktop:pr-80 desktop:text-left">
       <div class="flex min-w-0 max-w-full desktop:h-[var(--control-h)] desktop:items-center">
-        <h1 class="truncate text-[1.75rem] font-semibold leading-tight desktop:text-lg desktop:font-light desktop:uppercase desktop:tracking-wider">{{ s.name }}</h1>
+        <h1 class="truncate text-[1.375rem] font-light uppercase leading-tight tracking-wider desktop:text-lg">{{ s.name }}</h1>
       </div>
     </div>
 
-    <!-- Phones: Email / Call as compact tiles (iOS contact), centered -->
-    <div class="flex justify-center gap-2 desktop:hidden">
-      <a [attr.href]="s.email ? 'mailto:' + s.email : null" class="contact-action" [class.is-off]="!s.email">
-        <app-icon name="mail" [strokeWidth]="1.75" class="size-6" />
+    <!-- Phones: Email / Call as round buttons under the name (iOS), the label under each -->
+    <div class="-mt-1 flex justify-center gap-7 desktop:hidden">
+      <a [attr.href]="s.email ? 'mailto:' + s.email : null" class="contact-circle" [class.is-off]="!s.email">
+        <span><app-icon name="mail" [strokeWidth]="1.75" class="size-5" /></span>
         {{ 'students.actionMail' | t }}
       </a>
-      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" class="contact-action" [class.is-off]="!s.phone">
-        <app-icon name="call" [strokeWidth]="1.75" class="size-6" />
+      <a [attr.href]="s.phone ? 'tel:' + s.phone : null" class="contact-circle" [class.is-off]="!s.phone">
+        <span><app-icon name="call" [strokeWidth]="1.75" class="size-5" /></span>
         {{ 'students.actionCall' | t }}
       </a>
     </div>

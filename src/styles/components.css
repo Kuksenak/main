@@ -203,11 +203,6 @@
     @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-md bg-[var(--chip-ios)] px-2 py-1 text-[0.8125rem];
   }
 
-  /* A title in light capitals (a person's name; their lists' titles on phones). */
-  .caps-title {
-    @apply !font-light uppercase tracking-wider;
-  }
-
   /* A block's title on the student page (Upcoming, History). */
   .block-title {
     @apply min-w-0 flex-1 font-medium;
@@ -229,13 +224,12 @@
     @apply pointer-events-none opacity-40;
   }
 
-  /* A contact action under a person's name (Email / Call): an icon over its label, in a card
-     tile; .is-off when there's no address / number. */
-  .contact-action {
-    @apply text-footnote flex w-[4.75rem] flex-col items-center gap-0.5 rounded-[0.875rem] bg-[var(--surface)] py-2
-           font-medium text-[var(--accent)] active:opacity-60;
-    &.is-off {
-      @apply pointer-events-none text-[var(--text-secondary)] opacity-50;
+  /* Phones: a round contact button under a person's name (iOS): the icon in a circle, the label
+     under it; .is-off when there's no address / number. */
+  .contact-circle {
+    @apply flex flex-col items-center gap-1 text-[0.6875rem] font-medium text-[var(--accent)] active:opacity-60;
+    & > span {
+      @apply flex size-11 items-center justify-center rounded-full bg-[var(--surface)];
     }
   }
 
