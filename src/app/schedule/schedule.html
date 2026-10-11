@@ -149,3 +149,8 @@
   <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
     <span class="fab-label">{{ 'action.add' | t }}</span>
 </button>
+
+<!-- A Google event's details (read-only) -->
+@if (googleOpen(); as g) {
+  <app-google-event-card [event]="g" (closed)="googleOpen.set(null)" />
+}

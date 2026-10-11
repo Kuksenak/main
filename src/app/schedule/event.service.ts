@@ -39,6 +39,8 @@ export interface ScheduleEvent {
   source?: 'google';
   calendarName?: string;
   allDay?: boolean;
+  location?: string | null;
+  description?: string | null;
 }
 
 export type EventInput = Omit<ScheduleEvent, 'id' | 'seriesStartsAt'>;

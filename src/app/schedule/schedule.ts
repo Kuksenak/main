@@ -20,6 +20,7 @@ import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { addDays, startOfDay, toDateInput } from '../core/utils/time';
 import { EventPeople } from './event-people';
 import { GoogleCalendarService } from './google-calendar.service';
+import { GoogleEventCard } from './google-event-card';
 import { EVENT_WEEKS_TOTAL, ScheduleEvent, EventService, eventEnd, eventWindow, occurrenceKey } from './event.service';
 
 function startOfMonth(d: Date): Date {
@@ -37,7 +38,7 @@ function startOfWeek(d: Date): Date {
  */
 @Component({
   selector: 'app-schedule',
-  imports: [Icon, LongPress, ScrollArea, TranslatePipe],
+  imports: [GoogleEventCard, Icon, LongPress, ScrollArea, TranslatePipe],
   templateUrl: './schedule.html',
 })
 export class Schedule implements AfterViewInit {
@@ -289,9 +290,12 @@ export class Schedule implements AfterViewInit {
     this.openNew();
   }
 
-  // Google events are read-only: they open nothing.
+  // A Google event, open for reading (it's edited in Google)
+  protected readonly googleOpen = signal<ScheduleEvent | null>(null);
+
+  // Ours open their card; Google's their details, read-only.
   protected openEdit(event: ScheduleEvent): void {
-    if (event.source === 'google') return;
+    if (event.source === 'google') return this.googleOpen.set(event);
     this.stack.push({ kind: 'event', id: event.id, at: event.startsAt });
   }
 }

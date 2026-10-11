@@ -13,6 +13,8 @@ interface GoogleEventDto {
   startDate: string; // UTC; an all-day event: that day's UTC midnight
   endDate: string;
   isAllDay: boolean;
+  description: string | null;
+  location: string | null;
 }
 
 // An all-day event's day as a local date (its UTC midnight would be the evening before
@@ -42,6 +44,8 @@ function fromGoogle(e: GoogleEventDto): ScheduleEvent {
     source: 'google',
     calendarName: e.calendarName,
     allDay: e.isAllDay,
+    location: e.location,
+    description: e.description,
   };
 }
 
