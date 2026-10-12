@@ -1,14 +1,11 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, afterNextRender, inject, model, signal, viewChild } from '@angular/core';
-import { environment } from '@environments/environment';
-import { firstValueFrom } from 'rxjs';
+import { Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, model, signal, viewChild } from '@angular/core';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
-import { AiResponse } from './ai-response';
+import { LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonBlockKind, LessonInput } from './lesson.service';
 
 /** A link as typed: "example.com/x" → "https://example.com/x"; null when it isn't a web link. */
@@ -26,20 +23,6 @@ function normalizeUrl(value: string | null): string | null {
 /** Something typed in a link's address that isn't a web link. */
 function badLink(b: LessonBlock): boolean {
   return b.kind === 'link' && !!b.url?.trim() && !normalizeUrl(b.url);
-}
-
-/** A photo as a JPEG at most 2000 px on its longer side (turned upright from its EXIF). */
-async function toJpeg(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 2000 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement('canvas');
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  return new Promise((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('no image'))), 'image/jpeg', 0.85),
-  );
 }
 
 /** Ready to save: has a title and no broken link. */
@@ -91,12 +74,14 @@ export function cleanLesson(l: LessonInput): LessonInput {
  * Editing a lesson in place: the title, then the blocks — each a card with its kind, who sees it
  * (students / only me: a tap switches), its drag handle and ×: texts, checklists (items), exercises
  * (a question, answers, the right one marked by its circle); older lessons' headings and links
- * too. + Text / Exercise / Checklist at the end, and From photo: pages of a book read by the
- * server's AI into blocks added at the end (a title too, if there's none yet) — to check and fix.
+ * too. + Text / Exercise / Checklist at the end, and From photo (or an image pasted, Ctrl+V): pages
+ * of a book read by the server's AI in the background — "Reading…", then "Ready" opens the
+ * preview to fix it and add it here (see LessonImportsService). `photos` off: no photo part (the
+ * preview's own editor).
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiResponse, CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, TranslatePipe],
+  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
@@ -200,38 +185,61 @@ export function cleanLesson(l: LessonInput): LessonInput {
           <app-icon name="plus" class="size-4 text-[var(--accent)]" />{{ k.label | t }}
         </button>
       }
-      <!-- Pages of a book (camera or library on phones) → blocks, read by the picked model -->
-      @if (models().length > 1) {
-        <select [ngModel]="model()" (ngModelChange)="pickModel($event)" [disabled]="reading()" [attr.aria-label]="'lessons.model' | t" class="chip !rounded-full">
-          @for (id of models(); track id) {
-            <option [value]="id">{{ modelName(id) }}</option>
-          }
-        </select>
-      }
-      <button type="button" (click)="photoInput.click()" [disabled]="reading()" class="chip gap-1.5 !rounded-full" [class.opacity-60]="reading()">
-        @if (reading()) {
-          <span class="size-4 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent"></span>{{ 'lessons.reading' | t }}
-        } @else {
-          <app-icon name="image" class="size-4 text-[var(--accent)]" />{{ 'lessons.fromPhoto' | t }}
+      @if (photos()) {
+        <!-- Pages of a book (camera or library on phones; or pasted) → blocks, read by the picked model -->
+        @if (imports.models().length > 1) {
+          <select [ngModel]="imports.model()" (ngModelChange)="imports.pickModel($event)" [attr.aria-label]="'lessons.model' | t" class="chip !rounded-full">
+            @for (id of imports.models(); track id) {
+              <option [value]="id">{{ modelName(id) }}</option>
+            }
+          </select>
         }
-      </button>
-      <input #photoInput type="file" accept="image/*" multiple hidden (change)="fromPhotos(photoInput)" />
+        <button type="button" (click)="photoInput.click()" [disabled]="sending()" class="chip gap-1.5 !rounded-full" [class.opacity-60]="sending()">
+          <app-icon name="image" class="size-4 text-[var(--accent)]" />{{ 'lessons.fromPhoto' | t }}
+        </button>
+        <input #photoInput type="file" accept="image/*" multiple hidden (change)="fromPhotos(photoInput)" />
+      }
     </div>
-    @if (photoRaw(); as r) {
-      <!-- What the model answered (to compare models) -->
-      <app-ai-response class="-mt-1" [model]="r.model" [seconds]="r.seconds" [raw]="r.raw" [blocks]="r.blocks" (closed)="photoRaw.set(null)" />
-    }
-    @if (photoError(); as e) {
-      <p class="text-footnote -mt-2 text-center text-[var(--danger)]">{{ e | t }}</p>
-      <!-- What exactly went wrong (the server's / the provider's words), small -->
-      @if (photoDetail(); as d) {
-        <p class="text-footnote -mt-3 select-text break-words text-center opacity-50">{{ d }}</p>
+    @if (photos()) {
+      <!-- Photos being read for this lesson; ready ones open the preview -->
+      @if (mine().length) {
+        <div class="-mt-2 flex flex-wrap justify-center gap-2">
+          @for (x of mine(); track x.id) {
+            @switch (x.status) {
+              @case ('done') {
+                <button type="button" (click)="imports.preview(x.id)" class="chip gap-1.5 !rounded-full !bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] font-medium text-[var(--accent)]">
+                  <app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'lessons.ready' | t }}
+                </button>
+              }
+              @case ('failed') {
+                <button type="button" (click)="imports.preview(x.id)" class="chip gap-1.5 !rounded-full text-[var(--danger)]">
+                  <app-icon name="close" class="size-4" />{{ 'lessons.readFailed' | t }}
+                </button>
+              }
+              @default {
+                <span class="chip gap-1.5 !rounded-full opacity-70">
+                  <span class="size-3.5 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent"></span>{{ 'lessons.reading' | t }}
+                </span>
+              }
+            }
+          }
+        </div>
+      }
+      @if (photoError(); as e) {
+        <p class="text-footnote -mt-2 text-center text-[var(--danger)]">{{ e | t }}</p>
+        @if (photoDetail(); as d) {
+          <p class="text-footnote -mt-3 select-text break-words text-center opacity-50">{{ d }}</p>
+        }
       }
     }
   `,
 })
 export class LessonForm {
   readonly value = model.required<LessonInput>();
+  /** The lesson being edited (null: a new one) — photos read for it come back here. */
+  readonly lessonId = input<string | null>(null);
+  /** The photo part (From photo, pasting, what's being read); off in the preview's own editor. */
+  readonly photos = input(true);
 
   // Editing starts in the title (desktop; on phones the keyboard would cover the form).
   private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
@@ -240,95 +248,63 @@ export class LessonForm {
     afterNextRender(() => {
       if (desktop) this.titleInput()?.nativeElement.focus({ preventScroll: true });
     });
-    this.loadModels();
+    this.imports.ensureLoaded();
+
+    // An image pasted anywhere (Ctrl+V, like a screenshot): read like a photo
+    const paste = (e: ClipboardEvent) => {
+      if (!this.photos()) return;
+      const files = [...(e.clipboardData?.files ?? [])].filter((f) => f.type.startsWith('image/'));
+      if (!files.length) return;
+      e.preventDefault();
+      this.send(files);
+    };
+    document.addEventListener('paste', paste);
+    // The preview's "Add" lands here when it's this lesson
+    const release = this.imports.take((lessonId, title, blocks) => {
+      if (!this.photos() || lessonId !== this.lessonId()) return false;
+      this.value.update((m) => ({ title: m.title.trim() ? m.title : title, blocks: [...m.blocks, ...blocks] }));
+      return true;
+    });
+    inject(DestroyRef).onDestroy(() => {
+      document.removeEventListener('paste', paste);
+      release();
+    });
   }
 
   protected readonly badLink = badLink;
 
-  private http = inject(HttpClient);
-  protected readonly reading = signal(false);
-  // The models the server allows (its default first picked; the last one picked remembered here)
-  protected readonly models = signal<string[]>([]);
-  protected readonly model = signal<string | null>(null);
-  private static readonly MODEL_KEY = 'lessons.photoModel';
-
-  private loadModels(): void {
-    this.http
-      .get<{ models: string[]; defaultModel: string | null }>(`${environment.apiUrl}/lessons/from-photo/models`)
-      .subscribe({
-        next: (res) => {
-          let saved: string | null = null;
-          try {
-            saved = localStorage.getItem(LessonForm.MODEL_KEY);
-          } catch {}
-          this.models.set(res.models ?? []);
-          this.model.set(saved && res.models.includes(saved) ? saved : res.defaultModel);
-        },
-        error: () => {},
-      });
-  }
-
-  protected pickModel(id: string): void {
-    this.model.set(id);
-    try {
-      localStorage.setItem(LessonForm.MODEL_KEY, id);
-    } catch {}
-  }
+  protected readonly imports = inject(LessonImportsService);
+  protected readonly sending = signal(false);
+  protected readonly photoError = signal<TranslationKey | null>(null);
+  protected readonly photoDetail = signal<string | null>(null);
+  // This lesson's photos being read / ready (a new lesson: those for a new one)
+  protected readonly mine = computed(() => this.imports.imports().filter((x) => x.lessonId === this.lessonId()));
 
   // "gemini-3.5-flash-lite" → "Gemini 3.5 Flash Lite"
   protected modelName(id: string): string {
     return id.replace(/-/g, ' ').replace(/\b[a-z]/g, (c) => c.toUpperCase());
   }
-  protected readonly photoError = signal<TranslationKey | null>(null);
-  protected readonly photoDetail = signal<string | null>(null);
-  protected readonly photoRaw = signal<{ model: string; seconds: number; raw: unknown; blocks: LessonBlock[] } | null>(null);
 
-  // Up to 5 pages, sent as JPEGs no larger than 2000 px (phone photos are huge; HEIC → JPEG)
-  protected async fromPhotos(input: HTMLInputElement): Promise<void> {
-    const files = [...(input.files ?? [])].slice(0, 5);
+  protected fromPhotos(input: HTMLInputElement): void {
+    const files = [...(input.files ?? [])];
     input.value = ''; // the same photo again later still fires (change)
-    if (!files.length) return;
-    this.reading.set(true);
+    this.send(files);
+  }
+
+  // Up to 5 pages to the queue: the answer comes at once, the reading in the background
+  private async send(files: Blob[]): Promise<void> {
+    if (!files.length || this.sending()) return;
+    this.sending.set(true);
     this.photoError.set(null);
     this.photoDetail.set(null);
     try {
-      const form = new FormData();
-      for (const [i, f] of files.entries()) {
-        const jpeg = await toJpeg(f).catch(() => {
-          throw new Error(`can't open ${f.name} (${f.type || 'unknown type'})`);
-        });
-        form.append('images', jpeg, `page-${i + 1}.jpg`);
-      }
-      const model = this.model();
-      if (model) form.append('model', model);
-      const started = performance.now();
-      const draft = await firstValueFrom(
-        this.http.post<{ title: string; blocks: LessonBlock[]; raw: unknown; model: string }>(
-          `${environment.apiUrl}/lessons/from-photo`,
-          form,
-        ),
-      );
-      const seconds = Math.round((performance.now() - started) / 100) / 10;
-      this.photoRaw.set({ model: draft.model, seconds, raw: draft.raw, blocks: draft.blocks });
-      if (!draft.blocks.length) {
-        this.photoError.set('lessons.photoEmpty');
-        return;
-      }
-      this.value.update((m) => ({ title: m.title.trim() ? m.title : draft.title, blocks: [...m.blocks, ...draft.blocks] }));
+      await this.imports.start(files, this.lessonId());
     } catch (e) {
-      const http = e instanceof HttpErrorResponse;
-      this.photoError.set(http && e.status === 503 ? 'lessons.photoOff' : 'lessons.photoFailed');
-      this.photoDetail.set(
-        http
-          ? e.status === 503
-            ? null
-            : `${e.status || 'network'}: ${e.error?.detail ?? e.error?.description ?? e.statusText ?? ''}`.slice(0, 300)
-          : e instanceof Error
-            ? e.message
-            : String(e),
-      );
+      const status = (e as { status?: number }).status;
+      this.photoError.set(status === 503 ? 'lessons.photoOff' : 'lessons.photoFailed');
+      this.photoDetail.set(status === 503 ? null : `${status ?? ''} ${(e as Error).message ?? e}`.trim().slice(0, 300));
     } finally {
-      this.reading.set(false);
+      this.sending.set(false);
     }
   }
 

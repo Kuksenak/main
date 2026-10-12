@@ -36,7 +36,7 @@ import { LessonState } from './lesson-state';
         </div>
 
         @if (s.editing()) {
-          <app-lesson-form [(value)]="s.draft" />
+          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" />
           @if (s.id()) {
             <button #deleteBtn type="button" (click)="askDelete.set(deleteBtn)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
           }

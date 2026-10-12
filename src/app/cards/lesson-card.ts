@@ -44,7 +44,7 @@ import { LessonState } from '../lessons/lesson-state';
 
       <div class="flex flex-col gap-4">
         @if (s.editing()) {
-          <app-lesson-form [(value)]="s.draft" />
+          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" />
         } @else if (s.lesson(); as l) {
           <!-- Where it is next (else last) and its public link, then the content (the title is in
                the top bar) -->

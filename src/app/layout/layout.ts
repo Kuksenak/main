@@ -1,4 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
+import { LessonImportPreview } from '../lessons/lesson-import-preview';
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
@@ -25,7 +26,7 @@ import { SettingsSheet } from '../settings/settings-sheet';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, NotificationBanner, SettingsSheet, StackHost, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe],
   templateUrl: './layout.html',
 })
 export class Layout {
