@@ -216,7 +216,7 @@ const en = {
   'shared.saved': 'saved',
   'shared.send': 'Complete',
   'shared.sent': 'Completed',
-  'shared.reopen': 'Reopen',
+  'shared.reopen': 'Edit answers',
   'lessons.publicHint': 'Anyone with the link can view this lesson, no sign-in needed.',
 
   'action.save': 'Save',
@@ -463,7 +463,7 @@ const pl: Dictionary = {
   'shared.saved': 'zapisano',
   'shared.send': 'Zakończ',
   'shared.sent': 'Zakończone',
-  'shared.reopen': 'Otwórz ponownie',
+  'shared.reopen': 'Popraw odpowiedzi',
   'lessons.publicHint': 'Każdy, kto ma link, zobaczy tę lekcję bez logowania.',
 
   'action.save': 'Zapisz',
@@ -707,7 +707,7 @@ const fr: Dictionary = {
   'shared.saved': 'enregistré',
   'shared.send': 'Terminer',
   'shared.sent': 'Terminé',
-  'shared.reopen': 'Rouvrir',
+  'shared.reopen': 'Modifier les réponses',
   'lessons.publicHint': 'Toute personne disposant du lien peut voir ce cours, sans connexion.',
 
   'action.save': 'Enregistrer',

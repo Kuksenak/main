@@ -81,7 +81,7 @@ interface Attempt {
               <app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'shared.sent' | t }}
             </span>
             <!-- Back to a draft, to change it -->
-            <button type="button" (click)="reopen()" [disabled]="sending()" class="chip shrink-0 !rounded-full">{{ 'shared.reopen' | t }}</button>
+            <button type="button" (click)="reopen()" [disabled]="sending()" class="chip shrink-0 gap-1.5 !rounded-full"><app-icon name="compose" class="size-4 opacity-60" />{{ 'shared.reopen' | t }}</button>
           } @else {
             @if (exercises() > 0) {
               <span class="text-footnote shrink-0 whitespace-nowrap opacity-60 mobile:hidden">{{ progress() }}</span>
