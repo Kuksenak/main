@@ -1,6 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { LessonImportPreview } from '../lessons/lesson-import-preview';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -89,6 +89,8 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
 
   protected readonly accountOpen = signal(false);
+  // Desktop: the side rail's account button (the settings open beside it)
+  protected readonly railAccount = viewChild<ElementRef<HTMLElement>>('railAccount');
   // Settings opened by the app itself (back from Google): why it didn't connect, if it didn't
   protected settingsFailed: string | null = null;
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
