@@ -29,6 +29,7 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
   { kind: 'gaps', icon: 'compose', label: 'lessons.gaps' },
   { kind: 'exercise', icon: 'exercise', label: 'lessons.exercise' },
   { kind: 'checklist', icon: 'checklist', label: 'lessons.checklist' },
+  { kind: 'image', icon: 'image', label: 'lessons.image' },
 ];
 
 /**

@@ -6,7 +6,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
 import { LessonImportsService } from './lesson-imports.service';
-import { LessonBlock, LessonBlockKind, LessonInput } from './lesson.service';
+import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
 
 /** A link as typed: "example.com/x" → "https://example.com/x"; null when it isn't a web link. */
 function normalizeUrl(value: string | null): string | null {
@@ -58,6 +58,9 @@ export function cleanLesson(l: LessonInput): LessonInput {
         if (text && options.length >= 2) blocks.push({ ...base, options, answer });
         break;
       }
+      case 'image':
+        if (b.url) blocks.push({ ...base, url: b.url });
+        break;
       case 'link': {
         const url = normalizeUrl(b.url);
         if (url) blocks.push({ ...base, url });
@@ -147,6 +150,14 @@ export function cleanLesson(l: LessonInput): LessonInput {
             <button type="button" (click)="addItem(i, 'options')" class="list-row add-row">
               <span class="flex items-center gap-2"><app-icon name="plus" class="size-5" />{{ 'lessons.option' | t }}</span>
             </button>
+          }
+          @case ('image') {
+            <div class="px-4 pb-2 pt-1">
+              <img [src]="src(b.url)" alt="" class="max-h-72 w-full rounded-xl bg-white object-contain" />
+            </div>
+            <div class="list-row">
+              <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.caption' | t" autocomplete="off" class="row-input" />
+            </div>
           }
           @case ('link') {
             <div class="list-row">
@@ -272,6 +283,9 @@ export class LessonForm {
   }
 
   protected readonly badLink = badLink;
+  protected src(id: string | null): string {
+    return imageSrc(id);
+  }
 
   protected readonly imports = inject(LessonImportsService);
   protected readonly sending = signal(false);
@@ -319,6 +333,7 @@ export class LessonForm {
     text: { icon: 'text', label: 'lessons.text' },
     exercise: { icon: 'exercise', label: 'lessons.exercise' },
     gaps: { icon: 'compose', label: 'lessons.gaps' },
+    image: { icon: 'image', label: 'lessons.image' },
     checklist: { icon: 'checklist', label: 'lessons.checklist' },
     heading: { icon: 'heading', label: 'lessons.heading' },
     link: { icon: 'link', label: 'lessons.link' },

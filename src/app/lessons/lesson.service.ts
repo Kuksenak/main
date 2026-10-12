@@ -5,12 +5,13 @@ import { catchError, of } from 'rxjs';
 import { ResourceStore } from '../core/services/resource-store';
 import { EventService } from '../schedule/event.service';
 
-export type LessonBlockKind = 'text' | 'checklist' | 'exercise' | 'gaps' | 'heading' | 'link';
+export type LessonBlockKind = 'text' | 'checklist' | 'exercise' | 'gaps' | 'image' | 'heading' | 'link';
 
 /**
  * One piece of a lesson: a text, a checklist (`items`), an exercise (the question in `text`,
  * `options`, the right one's index in `answer`), gaps to fill in (`text` with the answers in
- * [brackets], see gaps.ts); older lessons also have headings and links (url,
+ * [brackets], see gaps.ts), pictures (`url`: the picture's id, see imageSrc; a caption in `text`);
+ * older lessons also have headings and links (url,
  * an optional label in `text`). `private`: for the teacher only (the public link leaves it out).
  */
 export interface LessonBlock {
@@ -21,6 +22,11 @@ export interface LessonBlock {
   items?: string[] | null;
   options?: string[] | null;
   answer?: number | null;
+}
+
+/** A picture block's image (its id → the address it's served at). */
+export function imageSrc(id: string | null): string {
+  return `${environment.apiUrl}/lesson-images/${id ?? ''}`;
 }
 
 /** Lesson material from the library, attached to events. */

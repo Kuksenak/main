@@ -3,7 +3,7 @@ import { Component, computed, input, model } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { GapPart, LessonFills, gapLines, gapRight } from './gaps';
-import { LessonBlock } from './lesson.service';
+import { LessonBlock, imageSrc } from './lesson.service';
 
 /** Exercise answers (block → option) and checklist ticks ("block:item"); blocks by their place in the lesson. */
 export type LessonAnswers = Record<number, number>;
@@ -130,6 +130,14 @@ export type { LessonFills } from './gaps';
               }
             </div>
           </div>
+        }
+        @case ('image') {
+          <figure class="flex flex-col gap-1.5">
+            <img [src]="src(b.url)" [alt]="b.text ?? ''" loading="lazy" class="max-h-96 w-full rounded-[var(--radius-card)] border-[0.5px] border-[var(--separator)] bg-white object-contain" />
+            @if (b.text) {
+              <figcaption class="text-footnote px-1 opacity-60">{{ b.text }}</figcaption>
+            }
+          </figure>
         }
         @case ('link') {
           <a [href]="b.url" target="_blank" rel="noopener noreferrer" class="card list-row active:opacity-70">
@@ -300,6 +308,10 @@ export class LessonContent {
     if (option !== right) return null;
     if (this.mode() === 'teacher') return 'right';
     return picked !== undefined && picked !== right ? 'right' : null;
+  }
+
+  protected src(id: string | null): string {
+    return imageSrc(id);
   }
 
   protected host(url: string | null): string {
