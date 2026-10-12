@@ -10,6 +10,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { FloatingSearch } from '../core/ui/floating-search';
 import { SearchField } from '../core/ui/search-field';
 import { LessonPage } from './lesson-page';
 import { Lesson, LessonService } from './lesson.service';
@@ -21,7 +22,7 @@ import { Lesson, LessonService } from './lesson.service';
  */
 @Component({
   selector: 'app-lessons',
-  imports: [NgTemplateOutlet, Icon, LessonPage, ScrollArea, SearchField, TranslatePipe],
+  imports: [NgTemplateOutlet, FloatingSearch, Icon, LessonPage, ScrollArea, SearchField, TranslatePipe],
   template: `
     <ng-template #search>
       <app-search-field [(value)]="query" />
@@ -57,6 +58,10 @@ import { Lesson, LessonService } from './lesson.service';
       </section>
     </main>
 
+    <!-- Phones: the search bottom-left, + bottom-right -->
+    @if (!desktop) {
+      <app-floating-search [(value)]="query" />
+    }
     <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4">
       <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
     <span class="fab-label">{{ 'action.add' | t }}</span>
@@ -94,10 +99,11 @@ export class Lessons {
       });
     });
 
-    // Mobile toolbar: the search field instead of a title.
+    // Mobile toolbar: the title; the search is at the bottom (FloatingSearch).
     const toolbar = inject(ToolbarService);
-    effect(() => toolbar.content.set(this.search() ?? null));
-    inject(DestroyRef).onDestroy(() => toolbar.content.set(null));
+    const i18n = inject(I18nService);
+    effect(() => toolbar.title.set(i18n.t('nav.lessons')));
+    inject(DestroyRef).onDestroy(() => toolbar.title.set(''));
   }
 
   protected add(): void {

@@ -10,6 +10,7 @@ import { GroupView, StudentView } from '../cards/person-views';
 import { Icon } from '../core/ui/icon/icon';
 import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { FloatingSearch } from '../core/ui/floating-search';
 import { SearchField } from '../core/ui/search-field';
 import { initial } from '../core/utils/text';
 import { Group, GroupService, colorVar } from './group.service';
@@ -25,7 +26,7 @@ import { Student, StudentService } from './student.service';
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, OverlayModule, GroupView, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
+  imports: [NgTemplateOutlet, OverlayModule, FloatingSearch, GroupView, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -87,13 +88,13 @@ export class Students {
   ];
 
   constructor() {
-    // Mobile toolbar: the search field instead of a title, floating over the list (which scrolls
-    // under it and the tabs, like a card's page).
+    // Mobile toolbar: the title, floating over the list (which scrolls under it and the tabs,
+    // like a card's page); the search is at the bottom (FloatingSearch).
     const toolbar = inject(ToolbarService);
-    effect(() => toolbar.content.set(this.search() ?? null));
+    effect(() => toolbar.title.set(this.i18n.t('nav.students')));
     if (!this.desktop) toolbar.overlay.set(true);
     inject(DestroyRef).onDestroy(() => {
-      toolbar.content.set(null);
+      toolbar.title.set('');
       toolbar.overlay.set(false);
     });
   }

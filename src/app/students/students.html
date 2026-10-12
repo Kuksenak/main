@@ -168,7 +168,8 @@
     </div>
 }
 
-<!-- Floating: while selecting, Cancel · Create group; else (phones) + bottom-right -->
+<!-- Floating: while selecting, Cancel · Create group; else (phones) the search bottom-left and
+     + bottom-right -->
 @if (selecting()) {
   <div class="float-bottom inset-x-4 flex items-center gap-2 desktop:left-auto desktop:w-md">
     <button type="button" (click)="cancelSelect()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
@@ -177,6 +178,9 @@
     </button>
   </div>
 } @else {
+  @if (!desktop) {
+    <app-floating-search [(value)]="query" />
+  }
   <button
     #fab
     type="button"
