@@ -106,6 +106,12 @@ export function cleanLesson(l: LessonInput): LessonInput {
           <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
             <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
           </span>
+          @if (b.kind === 'text') {
+            <!-- A task that came as text: a task, its "..." / "___" made gaps -->
+            <button type="button" (click)="toTask(i)" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
+              <app-icon name="compose" class="size-3.5" />{{ 'lessons.toTask' | t }}
+            </button>
+          }
           <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 opacity-60 hover:bg-[var(--highlight)]">
             <app-icon [name]="b.private ? 'lock' : 'eye'" class="size-3.5" />{{ (b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t }}
           </button>
@@ -394,6 +400,12 @@ export class LessonForm {
       answer: null,
     };
     this.value.update((m) => ({ ...m, blocks: [...m.blocks, block] }));
+  }
+
+  // A text → a task: "...", "…", "___" become gaps to write in ([] — no set answer; fill them in)
+  protected toTask(index: number): void {
+    const text = (this.value().blocks[index].text ?? '').replace(/_{2,}|\.{3,}|…/g, '[]');
+    this.setBlock(index, { kind: 'gaps', text });
   }
 
   protected removeBlock(index: number): void {
