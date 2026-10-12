@@ -402,9 +402,9 @@ export class LessonForm {
     this.value.update((m) => ({ ...m, blocks: [...m.blocks, block] }));
   }
 
-  // A text → a task: "...", "…", "___" become gaps to write in ([] — no set answer; fill them in)
+  // A text → a task: "...", "…", "___", "---", "– – –" become gaps to write in ([] — no set answer; fill them in)
   protected toTask(index: number): void {
-    const text = (this.value().blocks[index].text ?? '').replace(/_{2,}|\.{3,}|…/g, '[]');
+    const text = (this.value().blocks[index].text ?? '').replace(/_{2,}|\.{3,}|…+|-{3,}|[–—](?: ?[–—]){2,}/g, '[]');
     this.setBlock(index, { kind: 'gaps', text });
   }
 
