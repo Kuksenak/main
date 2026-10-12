@@ -134,7 +134,7 @@ export type { LessonFills } from './gaps';
                           <!-- On the text's line: a light blue field, like the answers in the teacher's
                                view — the blue is the wrapper's; the field itself just the text's
                                height (browsers stretch the cursor over the whole field) -->
-                          <span class="mx-0.5 inline-block rounded-md bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] py-[0.2em] pl-[1ch] pr-[0.6ch] align-baseline leading-none transition-colors focus-within:bg-[color-mix(in_srgb,var(--accent)_24%,transparent)]">
+                          <span class="mx-0.5 -my-[0.2em] inline-block rounded-md bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] py-[0.2em] pl-[1ch] pr-[0.6ch] align-baseline leading-none transition-colors focus-within:bg-[color-mix(in_srgb,var(--accent)_24%,transparent)]">
                             <input
                               type="text"
                               autocomplete="off"
