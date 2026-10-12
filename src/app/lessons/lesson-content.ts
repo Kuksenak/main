@@ -111,8 +111,8 @@ export type { LessonFills } from './gaps';
                         @case ('student') {
                           @if (g.options; as opts) {
                             <!-- To choose: like a textbook's "( va / vas / vont )", on the write-in
-                                 fields' light blue instead of brackets; the picked one blue, bold,
-                                 underlined, the others faded; a tap picks (again: unpicks) -->
+                                 fields' light blue instead of brackets; the picked one blue and bold,
+                                 the others faded; a tap picks (again: unpicks) -->
                             <span class="mx-0.5 inline rounded-md bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-[0.6ch] py-[0.1em] [box-decoration-break:clone]">
                               @for (o of opts; track $index; let last = $last) {
                                 <button
@@ -122,9 +122,6 @@ export type { LessonFills } from './gaps';
                                   class="inline leading-[1.3] transition-opacity disabled:cursor-default"
                                   [class.font-bold]="w === o"
                                   [class.text-[var(--accent)]]="w === o"
-                                  [class.underline]="w === o"
-                                  [class.underline-offset-4]="w === o"
-                                  [class.decoration-2]="w === o"
                                   [class.opacity-45]="!!w && w !== o"
                                   [class.hover:text-[var(--accent)]]="!locked()"
                                 >{{ o }}</button>
