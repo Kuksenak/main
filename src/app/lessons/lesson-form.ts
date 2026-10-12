@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
+import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
@@ -85,7 +86,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, TranslatePipe],
+  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
@@ -193,13 +194,12 @@ export function cleanLesson(l: LessonInput): LessonInput {
             <div class="list-row items-start pb-1 pt-1">
               <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="5" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input resize-y font-mono text-[0.9375rem] leading-relaxed"></textarea>
             </div>
-            <p class="text-footnote px-4 pb-2 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
-            <!-- What the student sees (as it's typed; answers taken out, choices unmarked) -->
-            <div class="border-t-[0.5px] border-[var(--separator)] bg-[var(--app-bg)] px-3 pb-3 pt-2">
-              <span class="text-footnote mb-1.5 flex items-center gap-1 font-semibold opacity-50">
+            <div class="flex items-start gap-3 px-4 pb-3">
+              <p class="text-footnote flex-1 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
+              <!-- What the student sees, in a popup -->
+              <button type="button" (click)="previewing.set(i)" class="text-footnote flex shrink-0 items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
                 <app-icon name="eye" class="size-3.5" />{{ 'lessons.studentSees' | t }}
-              </span>
-              <app-lesson-content [blocks]="asStudentSees(b)" mode="student" />
+              </button>
             </div>
           }
           @case ('heading') {
@@ -239,6 +239,16 @@ export function cleanLesson(l: LessonInput): LessonInput {
         <input #photoInput type="file" accept="image/*" multiple hidden (change)="fromPhotos(photoInput)" />
       }
     </div>
+    <!-- A task as the student sees it (answers taken out, choices unmarked) -->
+    @if (previewing() !== null && m.blocks[previewing()!]; as b) {
+      <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [large]="true" (closed)="previewing.set(null)">
+        <div class="flex flex-col gap-3">
+          <h1 class="px-1 text-xl font-semibold mobile:hidden">{{ 'lessons.studentSees' | t }}</h1>
+          <app-lesson-content [blocks]="asStudentSees(b)" mode="student" />
+        </div>
+      </app-page-sheet>
+    }
+
     @if (photos()) {
       <!-- Photos being read for this lesson; ready ones open the preview -->
       @if (mine().length) {
@@ -282,6 +292,8 @@ export class LessonForm {
   /** Blocks can be picked (a checkbox each): `selected` — their places. */
   readonly selectable = input(false);
   readonly selected = model<number[]>([]);
+  // The task shown as the student sees it (its place), in a popup
+  protected readonly previewing = signal<number | null>(null);
 
   protected toggle(i: number): void {
     this.selected.update((s) => (s.includes(i) ? s.filter((x) => x !== i) : [...s, i].sort((a, b) => a - b)));
