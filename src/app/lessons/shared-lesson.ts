@@ -70,7 +70,7 @@ interface Attempt {
   imports: [FormsModule, Icon, LessonContent, TranslatePipe],
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
-    <div class="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+1rem)]">
+    <div class="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 desktop:max-w-7xl desktop:px-8 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+1rem)]">
       <!-- Just the visitor's name (a tap changes it) -->
       @if (name()) {
         <div class="flex justify-end">
@@ -92,7 +92,7 @@ interface Attempt {
 
           @if (!name()) {
             <!-- Just a name, before the lesson -->
-            <form (submit)="saveName(); $event.preventDefault()" class="flex flex-col gap-3">
+            <form (submit)="saveName(); $event.preventDefault()" class="flex flex-col gap-3 desktop:max-w-md">
               <p class="text-body px-1">{{ 'shared.askName' | t }}</p>
               <div class="card">
                 <div class="list-row">
@@ -113,6 +113,7 @@ interface Attempt {
               [fills]="fills()"
               (fillsChange)="fills.set($event); save()"
               [locked]="!!sentAt()"
+              [tiled]="true"
             />
           }
         }

@@ -161,8 +161,21 @@ export type { LessonFills } from './gaps';
             <app-icon [name]="g.key === 'me' ? 'lock' : 'eye'" class="size-4" />{{ (g.key === 'me' ? 'lessons.forMe' : 'lessons.forStudents') | t }}
           </span>
         }
-        @for (b of g.blocks; track b.i) {
-          <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
+        @if (tiled()) {
+          <!-- Desktop: tiles in columns, in order (down the first column, then the next) -->
+          <div class="flex flex-col gap-4 desktop:block desktop:columns-2 desktop:gap-5 2xl:columns-3">
+            @for (tile of tilesOf(g.blocks); track tile[0].i) {
+              <div class="flex flex-col gap-4 desktop:mb-5 desktop:break-inside-avoid">
+                @for (b of tile; track b.i) {
+                  <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          @for (b of g.blocks; track b.i) {
+            <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
+          }
         }
       </div>
     }
@@ -180,6 +193,22 @@ export class LessonContent {
   readonly fills = model<LessonFills>({});
   /** Student: sent — nothing changes any more. */
   readonly locked = input(false);
+  /** Desktop: the blocks as tiles in columns (a task with the text before it — its instruction — one tile). */
+  readonly tiled = input(false);
+
+  // Tiles: a text (or heading) starts one, the tasks after it join it; a task with no text
+  // before it starts its own
+  protected tilesOf<T extends { block: LessonBlock }>(blocks: T[]): T[][] {
+    const tiles: T[][] = [];
+    for (const b of blocks) {
+      const last = tiles.at(-1);
+      const isText = b.block.kind === 'text' || b.block.kind === 'heading';
+      const lastHasTask = !!last?.some((x) => x.block.kind !== 'text' && x.block.kind !== 'heading');
+      if (!last || isText || (lastHasTask && b.block.kind !== last.at(-1)!.block.kind)) tiles.push([b]);
+      else last.push(b);
+    }
+    return tiles;
+  }
 
   // A gaps block's lines (parsed once per text)
   private readonly parsed = new Map<string, GapPart[][]>();

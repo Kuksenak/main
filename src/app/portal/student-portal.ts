@@ -40,7 +40,8 @@ interface PortalLesson {
   imports: [Icon, LessonContent, TranslatePipe],
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
-    <div class="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+1rem)]">
+    <!-- Desktop: a lesson open takes the width (its blocks in tiles) -->
+    <div class="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+1rem)]" [class.desktop:max-w-7xl]="!!open()" [class.desktop:px-8]="!!open()">
       @switch (state()) {
         @case ('loading') {
           <p class="text-body py-10 text-center opacity-40">{{ 'app.loading' | t }}</p>
@@ -68,6 +69,7 @@ interface PortalLesson {
               [fills]="l.fills ?? {}"
               (fillsChange)="change(l, { fills: $event })"
               [locked]="!!l.submittedAt"
+              [tiled]="true"
             />
           } @else {
             <h1 class="px-1 text-[1.75rem] font-bold leading-tight">{{ name() }}</h1>
