@@ -110,23 +110,27 @@ export type { LessonFills } from './gaps';
                         }
                         @case ('student') {
                           @if (g.options; as opts) {
-                            <!-- To choose: a segmented control in the line (iOS-like) — the options in
-                                 one gray capsule, the picked one filled blue; a tap picks (again:
-                                 unpicks) -->
-                            <span class="mx-0.5 inline-flex flex-wrap items-center gap-0.5 rounded-lg bg-[var(--fill)] p-0.5 align-middle leading-none">
-                              @for (o of opts; track $index) {
+                            <!-- To choose: like a textbook's "( va / vas / vont )", on the write-in
+                                 fields' light blue instead of brackets; the picked one blue, bold,
+                                 underlined, the others faded; a tap picks (again: unpicks) -->
+                            <span class="mx-0.5 inline rounded-md bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-[0.6ch] py-[0.1em] [box-decoration-break:clone]">
+                              @for (o of opts; track $index; let last = $last) {
                                 <button
                                   type="button"
                                   [disabled]="locked()"
                                   (click)="write(i, g.gap, w === o ? '' : o)"
-                                  class="rounded-md px-2 py-[0.2em] text-[0.95em] leading-[1.3] transition-colors disabled:cursor-default"
-                                  [class.bg-[var(--accent)]]="w === o"
-                                  [class.text-white]="w === o"
-                                  [class.font-semibold]="w === o"
-                                  [class.shadow-sm]="w === o"
-                                  [class.hover:bg-[var(--highlight)]]="w !== o && !locked()"
-                                  [class.opacity-60]="!!w && w !== o"
+                                  class="inline leading-[1.3] transition-opacity disabled:cursor-default"
+                                  [class.font-bold]="w === o"
+                                  [class.text-[var(--accent)]]="w === o"
+                                  [class.underline]="w === o"
+                                  [class.underline-offset-4]="w === o"
+                                  [class.decoration-2]="w === o"
+                                  [class.opacity-45]="!!w && w !== o"
+                                  [class.hover:text-[var(--accent)]]="!locked()"
                                 >{{ o }}</button>
+                                @if (!last) {
+                                  <span class="mx-[0.35ch] opacity-35">/</span>
+                                }
                               }
                             </span>
                           } @else {
