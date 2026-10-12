@@ -41,7 +41,7 @@ interface PortalLesson {
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
     <!-- Desktop: a lesson open takes the width (its blocks in tiles) -->
-    <div class="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]" [class.desktop:max-w-7xl]="!!open()" [class.desktop:px-8]="!!open()">
+    <div class="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]" [class.desktop:max-w-none]="!!open()" [class.desktop:px-6]="!!open()">
       @switch (state()) {
         @case ('loading') {
           <p class="text-body py-10 text-center opacity-40">{{ 'app.loading' | t }}</p>
@@ -57,6 +57,17 @@ interface PortalLesson {
                 <app-icon name="chevron-left" class="-ml-0.5 size-7 desktop:size-5" />
               </button>
               <h1 class="min-w-0 flex-1 truncate text-lg font-semibold leading-tight">{{ l.title }}</h1>
+              <!-- What's answered and kept, Send (the teacher gets it then; sent: closed) -->
+              @if (l.submittedAt) {
+                <span class="text-footnote flex shrink-0 items-center gap-1 font-medium text-[var(--success)]">
+                  <app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'shared.sent' | t }}
+                </span>
+              } @else {
+                @if (exercises(l)) {
+                  <span class="text-footnote mr-1 shrink-0 whitespace-nowrap opacity-60 mobile:hidden">{{ answered(l) }}/{{ exercises(l) }} {{ 'shared.answered' | t }}@if (saved()) {, {{ 'shared.saved' | t }}}</span>
+                }
+                <button type="button" (click)="submit(l)" [disabled]="sending()" class="btn-primary shrink-0 !rounded-full !px-4 !py-1.5">{{ 'shared.send' | t }}</button>
+              }
             </div>
             <app-lesson-content
               [blocks]="l.blocks"
@@ -118,23 +129,6 @@ interface PortalLesson {
       }
     </div>
 
-    <!-- In a lesson: what's answered and kept; Send — the teacher gets it then (sent: closed) -->
-    @if (open(); as l) {
-      <div class="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1rem)] flex justify-center px-4">
-        @if (l.submittedAt) {
-          <span class="glass-neutral text-footnote flex items-center gap-1.5 rounded-full px-3.5 py-2 font-medium">
-            <app-icon name="check" [strokeWidth]="2.5" class="size-4 text-[var(--success)]" />{{ 'shared.sent' | t }}
-          </span>
-        } @else {
-          <div class="glass-neutral pointer-events-auto flex items-center gap-3 rounded-full py-1.5 pl-4 pr-1.5">
-            @if (exercises(l)) {
-              <span class="text-footnote whitespace-nowrap opacity-70">{{ answered(l) }}/{{ exercises(l) }} {{ 'shared.answered' | t }}@if (saved()) {, {{ 'shared.saved' | t }}}</span>
-            }
-            <button type="button" (click)="submit(l)" [disabled]="sending()" class="btn-primary !rounded-full !px-4 !py-1.5">{{ 'shared.send' | t }}</button>
-          </div>
-        }
-      </div>
-    }
   `,
 })
 export class StudentPortal {

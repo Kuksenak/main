@@ -70,10 +70,23 @@ interface Attempt {
   imports: [FormsModule, Icon, LessonContent, TranslatePipe],
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
-    <div class="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 desktop:max-w-7xl desktop:px-8 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-      <!-- One compact row: the lesson's title, the visitor's name (a tap changes it) -->
-      <div class="flex min-h-9 items-center gap-3">
+    <div class="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 desktop:max-w-none desktop:px-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]">
+      <!-- One compact row: the lesson's title; what's answered and kept, Send (the teacher gets it
+           then; sent: closed); the visitor's name (a tap changes it) -->
+      <div class="flex min-h-9 items-center gap-2">
         <h1 class="min-w-0 flex-1 truncate px-1 text-lg font-semibold leading-tight">{{ state() === 'ready' ? title() : '' }}</h1>
+        @if (name() && state() === 'ready') {
+          @if (sentAt()) {
+            <span class="text-footnote flex shrink-0 items-center gap-1 font-medium text-[var(--success)]">
+              <app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'shared.sent' | t }}
+            </span>
+          } @else {
+            @if (exercises() > 0) {
+              <span class="text-footnote shrink-0 whitespace-nowrap opacity-60 mobile:hidden">{{ progress() }}</span>
+            }
+            <button type="button" (click)="submit()" [disabled]="sending()" class="btn-primary shrink-0 !rounded-full !px-4 !py-1.5">{{ 'shared.send' | t }}</button>
+          }
+        }
         @if (name()) {
           <button type="button" (click)="name.set('')" class="chip shrink-0 gap-1.5 !rounded-full">
             <app-icon name="person" class="size-4 opacity-60" />{{ name() }}
@@ -120,23 +133,6 @@ interface Attempt {
       }
     </div>
 
-    <!-- What's answered and kept; Send — the teacher gets it then (sent: closed) -->
-    @if (name() && state() === 'ready') {
-      <div class="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1rem)] flex justify-center px-4">
-        @if (sentAt()) {
-          <span class="glass-neutral text-footnote flex items-center gap-1.5 rounded-full px-3.5 py-2 font-medium">
-            <app-icon name="check" [strokeWidth]="2.5" class="size-4 text-[var(--success)]" />{{ 'shared.sent' | t }}
-          </span>
-        } @else {
-          <div class="glass-neutral pointer-events-auto flex items-center gap-3 rounded-full py-1.5 pl-4 pr-1.5">
-            @if (exercises() > 0) {
-              <span class="text-footnote whitespace-nowrap opacity-70">{{ progress() }}</span>
-            }
-            <button type="button" (click)="submit()" [disabled]="sending()" class="btn-primary !rounded-full !px-4 !py-1.5">{{ 'shared.send' | t }}</button>
-          </div>
-        }
-      </div>
-    }
   `,
 })
 export class SharedLesson {

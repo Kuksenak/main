@@ -85,7 +85,7 @@ export type { LessonFills } from './gaps';
           <div class="flex flex-col gap-1.5">
             <div class="card gaps-card flex flex-col gap-1 px-4 py-3">
               @for (line of lines(b.text); track $index) {
-                <p class="text-body min-h-[1.5em] leading-[2]">
+                <p class="text-body min-h-[1.5em] leading-[1.9]">
                   @for (p of line; track $index) {
                     @if (gapOf(p); as g) {
                       @let w = word(i, g.gap);
@@ -104,7 +104,7 @@ export type { LessonFills } from './gaps';
                             [disabled]="locked()"
                             (input)="write(i, g.gap, $any($event.target).value)"
                             [style.width.ch]="fitsContent ? null : width(g, w)"
-                            class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b-[1.5px] border-[color-mix(in_srgb,var(--text)_35%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline font-medium leading-[1.35] text-[var(--accent)] outline-none transition-colors focus:border-[var(--accent)] disabled:opacity-100"
+                            class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b border-[color-mix(in_srgb,var(--text)_40%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline italic leading-[1.35] text-[color-mix(in_srgb,var(--text)_72%,transparent)] outline-none transition-colors focus:border-[var(--accent)] disabled:opacity-100"
                           />
                         }
                         @default {
@@ -170,7 +170,7 @@ export type { LessonFills } from './gaps';
         }
         @if (tiled()) {
           <!-- Desktop: tiles in columns, in order (down the first column, then the next) -->
-          <div class="flex flex-col gap-3 desktop:block desktop:columns-2 desktop:gap-4 2xl:columns-3">
+          <div class="flex flex-col gap-3 desktop:block desktop:columns-[22rem] desktop:gap-4">
             @for (tile of tilesOf(g.blocks); track tile[0].i) {
               <div class="flex flex-col gap-2 desktop:mb-4 desktop:break-inside-avoid">
                 @for (b of tile; track b.i) {
