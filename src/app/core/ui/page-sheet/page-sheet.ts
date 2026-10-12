@@ -147,6 +147,8 @@ export class PageSheet {
   // and scrolls its own list.
   readonly scroll = input(true);
   readonly dirty = input(false);
+  // Phones too: the cursor in the first field once it's in (e.g. a new student's name)
+  readonly autofocus = input(false);
   readonly canSave = input(false);
   readonly deletable = input(false);
   readonly wide = input(false);
@@ -180,9 +182,10 @@ export class PageSheet {
   constructor() {
     inject(DestroyRef).onDestroy(() => this.layers.remove(this.layer));
     // Desktop editors (with actions) start with the cursor in their first field, once they've
-    // slid in (not on phones: the keyboard would cover the card).
+    // slid in (on phones only with `autofocus` — the keyboard covers part of the card; the tap that
+    // opened it has to bring the keyboard up, see primeKeyboard).
     afterNextRender(() => {
-      if (!this.actions() || !this.desktop) return;
+      if (!this.actions() || (!this.desktop && !this.autofocus())) return;
       setTimeout(() => {
         const field = this.host.nativeElement.querySelector<HTMLElement>(
           '.read-only, input:not([type=hidden]):not([type=checkbox]):not([disabled]), textarea:not([disabled])',

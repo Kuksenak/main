@@ -31,6 +31,7 @@ interface Model {
     <!-- Phones, reading: the name in the top bar, between back and Edit (like a student's card) -->
     <app-page-sheet
       #page
+      [autofocus]="!entry().id"
       [title]="editing() ? '' : (saved()?.name ?? '')"
       [bigTitle]="!editing()"
       [large]="!editing()"

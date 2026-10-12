@@ -1,9 +1,10 @@
-import { Component, DestroyRef, ElementRef, inject, model, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, input, model, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../i18n/t.pipe';
 import { Icon } from './icon/icon';
 
 /**
- * Phones' search, like the Claude app's: a round 🔍 at the bottom left; a tap brings a search
+ * Phones' search, like the Claude app's: a round 🔍 at the bottom left (or, `button` off, the
+ * page's own one calling start() — e.g. in the top bar); a tap brings a search
  * field and a round ✕ to the bottom, riding on the keyboard (iOS doesn't move fixed things for
  * it: the visual viewport tells how tall it is). The keyboard's search key hides the keyboard and
  * keeps the results; ✕ clears and closes; leaving the field empty closes it too.
@@ -13,7 +14,7 @@ import { Icon } from './icon/icon';
   selector: 'app-floating-search',
   imports: [Icon, TranslatePipe],
   template: `
-    @if (!open()) {
+    @if (button() && !open()) {
       <button type="button" (click)="start()" [attr.aria-label]="'students.search' | t" class="icon-btn float-bottom left-4">
         <app-icon name="search" class="size-6" />
       </button>
@@ -52,6 +53,7 @@ import { Icon } from './icon/icon';
 })
 export class FloatingSearch {
   readonly value = model('');
+  readonly button = input(true);
 
   protected readonly open = signal(false);
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');
@@ -75,7 +77,7 @@ export class FloatingSearch {
   }
 
   // Right in the tap: the keyboard comes up.
-  protected start(): void {
+  start(): void {
     this.open.set(true);
     this.input().nativeElement.focus();
   }

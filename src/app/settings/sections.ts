@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -12,11 +12,13 @@ import { EVENT_LENGTHS, PreferencesService } from './preferences.service';
 
 // The pieces of Settings, shared by the desktop page and the phones' Settings sheet.
 
-/** Schedule: a new event's length and the hour new events on other days start at (a card). */
+/** Schedule: a new event's length and the hour new events on other days start at (a card; `flat`:
+ * just the rows, inside another card). */
 @Component({
   selector: 'app-schedule-settings',
   imports: [FormsModule, SelectField, TimeField, TranslatePipe],
-  host: { class: 'card' },
+  // block: a component's element is inline otherwise (no card drawn)
+  host: { class: 'block', '[class.card]': '!flat()' },
   template: `
     <div class="list-row">
       <span>{{ 'settings.eventLength' | t }}</span>
@@ -29,6 +31,7 @@ import { EVENT_LENGTHS, PreferencesService } from './preferences.service';
   `,
 })
 export class ScheduleSettings {
+  readonly flat = input(false);
   protected readonly prefs = inject(PreferencesService);
   private i18n = inject(I18nService);
   protected readonly lengthOptions = computed<SelectOption[]>(() =>
@@ -54,7 +57,7 @@ export class ScheduleSettings {
           <p class="font-medium">Google Calendar</p>
           <p class="text-footnote opacity-50">{{ (google.connected() ? 'settings.googleOn' : 'settings.googleOff') | t }}</p>
         </div>
-        <app-toggle [checked]="!!google.connected()" (checkedChange)="setGoogle($event)" [disabled]="google.connected() === null" />
+        <app-toggle [(checked)]="on" (checkedChange)="setGoogle($event)" [disabled]="google.connected() === null" />
       </div>
     </div>
     @if (error(); as e) {
@@ -68,19 +71,26 @@ export class IntegrationsSettings {
   protected readonly google = inject(GoogleCalendarService);
   private readonly connectFailed = signal(false);
   protected readonly error = computed(() => (this.connectFailed() ? 'error' : this.failed()));
+  // The switch: follows the connection; back off when connecting fails right away
+  protected readonly on = linkedSignal(() => !!this.google.connected());
 
   protected setGoogle(on: boolean): void {
     this.connectFailed.set(false);
-    if (on) this.google.connect(() => this.connectFailed.set(true));
+    if (on)
+      this.google.connect(() => {
+        this.connectFailed.set(true);
+        this.on.set(false);
+      });
     else this.google.disconnect();
   }
 }
 
-/** The languages, the current one checked (a card); `picked` after a tap switches it. */
+/** The languages, the current one checked (a card; `flat`: just the rows); `picked` after a tap
+ * switches it. */
 @Component({
   selector: 'app-language-list',
   imports: [Icon],
-  host: { class: 'card' },
+  host: { class: 'block', '[class.card]': '!flat()' },
   template: `
     @for (lang of i18n.languages; track lang.code) {
       <button type="button" (click)="pick(lang.code)" class="list-row w-full text-left">
@@ -93,6 +103,7 @@ export class IntegrationsSettings {
   `,
 })
 export class LanguageList {
+  readonly flat = input(false);
   readonly picked = output<void>();
   protected readonly i18n = inject(I18nService);
 

@@ -19,7 +19,7 @@ import { StackHost } from '../cards/stack-host';
 import { BrandIcon, BrandIconName } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
-import { SettingsPage, SettingsSheet } from '../settings/settings-sheet';
+import { SettingsSheet } from '../settings/settings-sheet';
 
 @Component({
   selector: 'app-layout',
@@ -43,11 +43,10 @@ export class Layout {
     inject(GoogleCalendarService).ensureLoaded();
 
     // Back from Google's consent screen (the API returns to the app's root with
-    // ?calendar=connected / error / disabled): Settings open on Integrations, where it was
-    // switched on (the error line if it didn't connect); the query is dropped from the address.
+    // ?calendar=connected / error / disabled / wrong-account): Settings open, where it was switched
+    // on (the error line if it didn't connect); the query is dropped from the address.
     const calendar = new URLSearchParams(location.search).get('calendar');
     if (calendar) {
-      this.settingsStart = 'integrations';
       this.settingsFailed = calendar === 'connected' ? null : calendar;
       this.accountOpen.set(true);
       setTimeout(() => this.router.navigate([], { queryParams: {}, replaceUrl: true }));
@@ -85,8 +84,7 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
 
   protected readonly accountOpen = signal(false);
-  // Settings opened by the app itself (back from Google): on that page, with the error or not
-  protected settingsStart: SettingsPage | null = null;
+  // Settings opened by the app itself (back from Google): why it didn't connect, if it didn't
   protected settingsFailed: string | null = null;
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
   // Desktop account button: the user's name, else the email.

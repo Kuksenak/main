@@ -322,6 +322,17 @@
     --sep-left: calc(var(--row-px) + 5.25rem); /* padding + 1.5rem check + gap + avatar + gap */
   }
 
+  /* A row's settings unfolded under it (Settings): its rows start at the row's text */
+  .sub-rows .list-row {
+    --sep-left: calc(var(--row-px) + 2.25rem);
+    padding-left: calc(var(--row-px) + 2.25rem);
+    animation: dropdownIn 160ms var(--ease-out-quick);
+  }
+  /* … and a divider under the last of them when more rows follow in the card */
+  .sub-rows:not(:last-child) .list-row:last-child::after {
+    display: block;
+  }
+
   /* A row's leading icon (Settings rows): line icons a bit muted */
   .row-icon {
     @apply size-6 shrink-0 opacity-70;

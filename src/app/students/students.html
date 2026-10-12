@@ -168,8 +168,8 @@
     </div>
 }
 
-<!-- Floating: while selecting, Cancel · Create group; else (phones) the search bottom-left and
-     + bottom-right -->
+<!-- Floating: while selecting, Cancel · Create group; else (phones) + bottom-right (the search
+     field comes up at the bottom too) -->
 @if (selecting()) {
   <div class="float-bottom inset-x-4 flex items-center gap-2 desktop:left-auto desktop:w-md">
     <button type="button" (click)="cancelSelect()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
@@ -179,7 +179,11 @@
   </div>
 } @else {
   @if (!desktop) {
-    <app-floating-search [(value)]="query" />
+    <!-- The search: its button in the top bar, the field at the bottom -->
+    <ng-template #searchButton>
+      <button type="button" (click)="fsearch.start()" [attr.aria-label]="'students.search' | t" class="icon-btn"><app-icon name="search" class="size-6" /></button>
+    </ng-template>
+    <app-floating-search #fsearch [button]="false" [(value)]="query" />
   }
   <button
     #fab

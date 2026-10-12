@@ -41,7 +41,6 @@ import { InstallService } from '../../services/install.service';
           class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-3rem)] origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [class.w-72]="!wide()"
           [class.w-96]="wide()"
-          [class.h-[min(32rem,calc(var(--app-h,100dvh)-3rem))]]="tall()"
         >
           <ng-container [ngTemplateOutlet]="content" />
         </div>
@@ -61,8 +60,8 @@ import { InstallService } from '../../services/install.service';
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
           [class.!bottom-6]="inBrowser"
-          [class.mobile:top-[calc(env(safe-area-inset-top)+2rem)]]="tall()"
-          [class.mobile:!max-h-none]="tall()"
+          [class.mobile:!max-h-[calc(var(--app-h,100dvh)-env(safe-area-inset-top)-2.5rem)]]="tall() && !inBrowser"
+          [class.mobile:!max-h-[calc(var(--app-h,100dvh)-env(safe-area-inset-top)-3.5rem)]]="tall() && inBrowser"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
           [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
         >
@@ -89,8 +88,8 @@ export class Sheet {
   readonly origin = input<HTMLElement | null>(null);
   /** Desktop dropdown: wider (24rem instead of 18rem). */
   readonly wide = input(false);
-  /** A fixed height, not the content's (pages switching inside it don't make it jump): phones up to
-   * the middle of the top bar; the desktop dropdown 32rem (less in a short window). */
+  /** Phones: grows with its content up to the middle of the top bar (not just 90% of the screen),
+   * e.g. Settings unfolding rows. (Desktop dropdowns grow up to the window anyway.) */
   readonly tall = input(false);
   readonly closed = output<void>();
 

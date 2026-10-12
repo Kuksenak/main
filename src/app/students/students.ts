@@ -12,6 +12,7 @@ import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { FloatingSearch } from '../core/ui/floating-search';
 import { SearchField } from '../core/ui/search-field';
+import { primeKeyboard } from '../core/utils/keyboard';
 import { initial } from '../core/utils/text';
 import { Group, GroupService, colorVar } from './group.service';
 import { Student, StudentService } from './student.service';
@@ -35,6 +36,7 @@ export class Students {
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
   private readonly search = viewChild<TemplateRef<unknown>>('search');
+  private readonly searchButton = viewChild<TemplateRef<unknown>>('searchButton');
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly colorVar = colorVar;
@@ -92,9 +94,11 @@ export class Students {
     // like a card's page); the search is at the bottom (FloatingSearch).
     const toolbar = inject(ToolbarService);
     effect(() => toolbar.title.set(this.i18n.t('nav.students')));
+    effect(() => toolbar.actions.set(this.searchButton() ?? null));
     if (!this.desktop) toolbar.overlay.set(true);
     inject(DestroyRef).onDestroy(() => {
       toolbar.title.set('');
+      toolbar.actions.set(null);
       toolbar.overlay.set(false);
     });
   }
@@ -140,7 +144,9 @@ export class Students {
     this.adding.set(true);
   }
 
+  // Phones: the keyboard comes up right in the tap (the form's name field gets it once it's in).
   protected openNew(kind: 'student' | 'group'): void {
+    if (!this.desktop) primeKeyboard();
     this.stack.push({ kind, id: null });
   }
 
@@ -168,6 +174,7 @@ export class Students {
   protected createGroupFromSelection(): void {
     const studentIds = [...this.checked()];
     this.cancelSelect();
+    if (!this.desktop) primeKeyboard();
     this.stack.push({ kind: 'group', id: null, studentIds });
   }
 }

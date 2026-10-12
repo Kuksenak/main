@@ -56,6 +56,7 @@ import { PersonLessons, StudentView } from './person-views';
     @if (!startedReading || editing()) {
       <app-page-sheet
         #form
+        [autofocus]="!entry().id"
         [dirty]="dirty()"
         [canSave]="canSave()"
         [deletable]="!!entry().id"

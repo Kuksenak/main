@@ -58,9 +58,12 @@ import { Lesson, LessonService } from './lesson.service';
       </section>
     </main>
 
-    <!-- Phones: the search bottom-left, + bottom-right -->
+    <!-- Phones: the search's button in the top bar, its field at the bottom; + bottom-right -->
     @if (!desktop) {
-      <app-floating-search [(value)]="query" />
+      <ng-template #searchButton>
+        <button type="button" (click)="fsearch.start()" [attr.aria-label]="'students.search' | t" class="icon-btn"><app-icon name="search" class="size-6" /></button>
+      </ng-template>
+      <app-floating-search #fsearch [button]="false" [(value)]="query" />
     }
     <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4">
       <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
@@ -77,6 +80,7 @@ export class Lessons {
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
   private readonly search = viewChild<TemplateRef<unknown>>('search');
+  private readonly searchButton = viewChild<TemplateRef<unknown>>('searchButton');
 
   protected readonly query = signal('');
 
@@ -103,7 +107,11 @@ export class Lessons {
     const toolbar = inject(ToolbarService);
     const i18n = inject(I18nService);
     effect(() => toolbar.title.set(i18n.t('nav.lessons')));
-    inject(DestroyRef).onDestroy(() => toolbar.title.set(''));
+    effect(() => toolbar.actions.set(this.searchButton() ?? null));
+    inject(DestroyRef).onDestroy(() => {
+      toolbar.title.set('');
+      toolbar.actions.set(null);
+    });
   }
 
   protected add(): void {

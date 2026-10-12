@@ -34,6 +34,10 @@
         ><app-brand-icon [name]="item.icon" class="size-7" />{{ item.label | t }}</a>
       }
     </nav>
+    <!-- The page's own buttons (phones), e.g. search -->
+    @if (toolbar.actions(); as actions) {
+      <div class="flex shrink-0 items-center gap-2 desktop:hidden"><ng-container [ngTemplateOutlet]="actions" /></div>
+    }
     <!-- Pages menu (phones; desktop has the tabs) -->
     <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
       <!-- Desktop: in the account button's style (gray fill, same height), smaller dots -->
@@ -102,9 +106,8 @@
   @if (accountOpen()) {
     <app-settings-sheet
       [origin]="desktop ? avatarBtn : null"
-      [start]="settingsStart"
       [failed]="settingsFailed"
-      (closed)="accountOpen.set(false); settingsStart = null; settingsFailed = null"
+      (closed)="accountOpen.set(false); settingsFailed = null"
     />
   }
 
