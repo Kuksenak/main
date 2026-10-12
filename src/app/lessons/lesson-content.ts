@@ -119,7 +119,7 @@ export type { LessonFills } from './gaps';
                                   (click)="write(i, g.gap, w === o ? '' : o)"
                                   class="rounded-md px-1 leading-[1.35] transition-colors disabled:cursor-default"
                                   [class.font-semibold]="w === o"
-                                  [class.bg-[var(--fill)]]="w === o"
+                                  [class.bg-[color-mix(in_srgb,var(--accent)_14%,transparent)]]="w === o"
                                   [class.text-[var(--accent)]]="w === o"
                                   [class.opacity-50]="!!w && w !== o"
                                   [class.underline]="!w"
@@ -132,7 +132,7 @@ export type { LessonFills } from './gaps';
                               }
                             </span>
                           } @else {
-                          <!-- On the text's line: the same line height, the underline just under it -->
+                          <!-- On the text's line: a light blue field, like the answers in the teacher's view -->
                           <input
                             type="text"
                             autocomplete="off"
@@ -142,7 +142,7 @@ export type { LessonFills } from './gaps';
                             [disabled]="locked()"
                             (input)="write(i, g.gap, $any($event.target).value)"
                             [style.width.ch]="fitsContent ? null : width(g, w)"
-                            class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b border-[color-mix(in_srgb,var(--text)_40%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline font-semibold leading-[1.35] text-[var(--accent)] outline-none transition-colors focus:border-[color-mix(in_srgb,var(--text)_70%,transparent)] disabled:opacity-100"
+                            class="mx-0.5 inline-block h-[1.5em] min-w-[3.5ch] rounded-md [field-sizing:content] border-0 bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-[0.6ch] py-0 text-center align-baseline font-semibold leading-[1.5] text-[var(--accent)] outline-none transition-colors focus:bg-[color-mix(in_srgb,var(--accent)_24%,transparent)] disabled:opacity-100"
                           />
                           }
                         }
