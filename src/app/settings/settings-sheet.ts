@@ -3,103 +3,111 @@ import { Router } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { TranslationKey } from '../core/i18n/translations';
 import { InstallService } from '../core/services/install.service';
 import { UpdateService } from '../core/services/update.service';
 import { Icon } from '../core/ui/icon/icon';
-import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { Sheet } from '../core/ui/sheet/sheet';
 import { GoogleCalendarService } from '../schedule/google-calendar.service';
 import { IntegrationsSettings, LanguageList, ScheduleSettings } from './sections';
 
 type Page = 'language' | 'schedule' | 'integrations';
 
 /**
- * Phones: the account button's Settings, like the Claude app's: ✕ and the title; the email (5 taps
- * show the version); rows with an icon, the current value and › — each opens its own page
- * (Language, Schedule, Integrations); Install (in the browser), Update when one is ready, Log out.
+ * Phones: the account button's Settings, like the Claude app's — a sheet from the bottom (drag it
+ * down or tap outside to close) with the title on top; the email (5 taps show the version); rows
+ * with an icon, the current value and › — each opens its own page right in the sheet (Language,
+ * Schedule, Integrations; ‹ back); Install (in the browser), Update when one is ready, Log out.
+ * (The pages live in the sheet: nothing can open over it.)
  */
 @Component({
   selector: 'app-settings-sheet',
-  imports: [Icon, IntegrationsSettings, LanguageList, PageSheet, ScheduleSettings, TranslatePipe],
+  imports: [Icon, IntegrationsSettings, LanguageList, ScheduleSettings, Sheet, TranslatePipe],
   template: `
-    <app-page-sheet #sheet [title]="'nav.settings' | t" [actions]="false" [closeIcon]="true" (closed)="closed.emit()">
-      <div class="flex flex-col gap-6">
-        <div class="card">
-          <!-- 5 taps on the email show the app version (hidden; for support) -->
-          <button type="button" (click)="versionTap()" class="list-row w-full text-left">
-            <app-icon name="person" class="row-icon" />
-            <span class="min-w-0 flex-1 truncate">{{ auth.email() }}</span>
+    <app-sheet #sheet (closed)="closed.emit()">
+      <!-- Header: the title in the middle; ‹ back to the list on a row's page -->
+      <div class="relative mb-3 flex h-10 shrink-0 items-center justify-center">
+        @if (page()) {
+          <button type="button" (click)="back()" [attr.aria-label]="'action.back' | t" class="absolute left-0 flex size-10 items-center justify-center rounded-full active:opacity-60">
+            <app-icon name="chevron-left" class="-ml-1 size-7" />
           </button>
-          @if (showVersion()) {
-            <div class="list-row text-footnote tabular-nums opacity-50">{{ updates.version }}</div>
-          }
-        </div>
+        }
+        <span class="text-body font-semibold">{{ title() | t }}</span>
+      </div>
 
-        <div class="flex flex-col gap-1.5">
-          <span class="card-label">{{ 'settings.general' | t }}</span>
-          <div class="card">
-            <button type="button" (click)="page.set('language')" class="list-row w-full text-left">
-              <app-icon name="globe" class="row-icon" />
-              <span class="flex-1">{{ 'account.language' | t }}</span>
-              <span class="opacity-50">{{ langLabel() }}</span>
-              <app-icon name="chevron-right" class="row-chevron -ml-1" />
-            </button>
-            <button type="button" (click)="page.set('schedule')" class="list-row w-full text-left">
-              <app-icon name="calendar" class="row-icon" />
-              <span class="flex-1">{{ 'nav.schedule' | t }}</span>
-              <app-icon name="chevron-right" class="row-chevron" />
-            </button>
-          </div>
-        </div>
+      <!-- The list, or a row's own page sliding in over it (back: sliding back) -->
+      @switch (page()) {
+        @case (null) {
+          <div class="flex flex-col gap-6" [class.[animation:paneBack_280ms_var(--ease-out-quick)]]="cameBack">
+            <div class="card">
+              <!-- 5 taps on the email show the app version (hidden; for support) -->
+              <button type="button" (click)="versionTap()" class="list-row w-full text-left">
+                <app-icon name="person" class="row-icon" />
+                <span class="min-w-0 flex-1 truncate">{{ auth.email() }}</span>
+              </button>
+              @if (showVersion()) {
+                <div class="list-row text-footnote tabular-nums opacity-50">{{ updates.version }}</div>
+              }
+            </div>
 
-        <div class="flex flex-col gap-1.5">
-          <span class="card-label">{{ 'settings.integrations' | t }}</span>
-          <div class="card">
-            <button type="button" (click)="page.set('integrations')" class="list-row w-full text-left">
-              <app-icon name="google" class="row-icon" />
-              <span class="flex-1">Google Calendar</span>
-              <span class="opacity-50">{{ (google.connected() ? 'settings.on' : 'settings.off') | t }}</span>
-              <app-icon name="chevron-right" class="row-chevron -ml-1" />
-            </button>
-          </div>
-        </div>
+            <div class="flex flex-col gap-1.5">
+              <span class="card-label">{{ 'settings.general' | t }}</span>
+              <div class="card">
+                <button type="button" (click)="open('language')" class="list-row w-full text-left">
+                  <app-icon name="globe" class="row-icon" />
+                  <span class="flex-1">{{ 'account.language' | t }}</span>
+                  <span class="opacity-50">{{ langLabel() }}</span>
+                  <app-icon name="chevron-right" class="row-chevron -ml-1" />
+                </button>
+                <button type="button" (click)="open('schedule')" class="list-row w-full text-left">
+                  <app-icon name="calendar" class="row-icon" />
+                  <span class="flex-1">{{ 'nav.schedule' | t }}</span>
+                  <app-icon name="chevron-right" class="row-chevron" />
+                </button>
+              </div>
+            </div>
 
-        @if (!install.standalone) {
-          <div class="card">
-            <button type="button" (click)="go('/install')" class="list-row w-full text-left">
-              <app-icon name="install" class="row-icon" />
-              <span class="flex-1">{{ 'nav.install' | t }}</span>
-              <app-icon name="chevron-right" class="row-chevron" />
-            </button>
+            <div class="flex flex-col gap-1.5">
+              <span class="card-label">{{ 'settings.integrations' | t }}</span>
+              <div class="card">
+                <button type="button" (click)="open('integrations')" class="list-row w-full text-left">
+                  <app-icon name="google" class="row-icon" />
+                  <span class="flex-1">Google Calendar</span>
+                  <span class="opacity-50">{{ (google.connected() ? 'settings.on' : 'settings.off') | t }}</span>
+                  <app-icon name="chevron-right" class="row-chevron -ml-1" />
+                </button>
+              </div>
+            </div>
+
+            @if (!install.standalone) {
+              <div class="card">
+                <button type="button" (click)="go('/install')" class="list-row w-full text-left">
+                  <app-icon name="install" class="row-icon" />
+                  <span class="flex-1">{{ 'nav.install' | t }}</span>
+                  <app-icon name="chevron-right" class="row-chevron" />
+                </button>
+              </div>
+            }
+
+            <div class="flex flex-col gap-3">
+              @if (updates.updateReady()) {
+                <button type="button" (click)="updates.apply()" class="card-btn text-[var(--accent)]">{{ 'account.update' | t }}</button>
+              }
+              <button type="button" (click)="auth.logout()" class="card-btn text-[var(--danger)]">{{ 'account.logout' | t }}</button>
+            </div>
           </div>
         }
-
-        <div class="flex flex-col gap-3">
-          @if (updates.updateReady()) {
-            <button type="button" (click)="updates.apply()" class="card-btn text-[var(--accent)]">{{ 'account.update' | t }}</button>
-          }
-          <button type="button" (click)="auth.logout()" class="card-btn text-[var(--danger)]">{{ 'account.logout' | t }}</button>
-        </div>
-      </div>
-    </app-page-sheet>
-
-    <!-- A row's own page, over the Settings -->
-    @switch (page()) {
-      @case ('language') {
-        <app-page-sheet #sub [title]="'account.language' | t" [actions]="false" (closed)="page.set(null)">
-          <app-language-list (picked)="sub.close()" />
-        </app-page-sheet>
+        @case ('language') {
+          <div class="[animation:paneIn_280ms_var(--ease-out-quick)]"><app-language-list (picked)="back()" /></div>
+        }
+        @case ('schedule') {
+          <div class="[animation:paneIn_280ms_var(--ease-out-quick)]"><app-schedule-settings /></div>
+        }
+        @case ('integrations') {
+          <div class="[animation:paneIn_280ms_var(--ease-out-quick)]"><app-integrations-settings /></div>
+        }
       }
-      @case ('schedule') {
-        <app-page-sheet [title]="'nav.schedule' | t" [actions]="false" (closed)="page.set(null)">
-          <app-schedule-settings />
-        </app-page-sheet>
-      }
-      @case ('integrations') {
-        <app-page-sheet [title]="'settings.integrations' | t" [actions]="false" (closed)="page.set(null)">
-          <app-integrations-settings />
-        </app-page-sheet>
-      }
-    }
+    </app-sheet>
   `,
 })
 export class SettingsSheet {
@@ -111,9 +119,23 @@ export class SettingsSheet {
   protected readonly google = inject(GoogleCalendarService);
   private i18n = inject(I18nService);
   private router = inject(Router);
-  private readonly sheet = viewChild.required<PageSheet>('sheet');
+  private readonly sheet = viewChild.required<Sheet>('sheet');
 
   protected readonly page = signal<Page | null>(null);
+  protected cameBack = false; // the list slides back in only after a page, not on opening
+  protected readonly title = computed<TranslationKey>(() => {
+    const page = this.page();
+    return page === 'language' ? 'account.language' : page === 'schedule' ? 'nav.schedule' : page === 'integrations' ? 'settings.integrations' : 'nav.settings';
+  });
+
+  protected open(page: Page): void {
+    this.page.set(page);
+  }
+
+  protected back(): void {
+    this.cameBack = true;
+    this.page.set(null);
+  }
   protected readonly langLabel = computed(() => this.i18n.languages.find((l) => l.code === this.i18n.lang())?.label ?? '');
 
   // Hidden app version: tap the email 5 times (again to hide).

@@ -62,7 +62,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
             [attr.aria-label]="(dirty() ? 'action.discard' : 'action.back') | t"
             class="icon-btn relative"
           >
-            @if (dirty() || closeIcon()) {
+            @if (dirty()) {
               <app-icon name="close" class="size-6" />
             } @else {
               <app-icon name="chevron-left" class="-ml-0.5 size-7" />
@@ -147,8 +147,6 @@ export class PageSheet {
   // and scrolls its own list.
   readonly scroll = input(true);
   readonly dirty = input(false);
-  // ✕ instead of ‹ at the top (a sheet that closes rather than goes back, e.g. Settings)
-  readonly closeIcon = input(false);
   readonly canSave = input(false);
   readonly deletable = input(false);
   readonly wide = input(false);
