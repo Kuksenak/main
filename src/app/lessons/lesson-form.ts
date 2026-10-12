@@ -1,11 +1,10 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, afterNextRender, inject, model, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, afterNextRender, inject, model, viewChild } from '@angular/core';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
-import { Sheet } from '../core/ui/sheet/sheet';
 import { LessonBlock, LessonBlockKind, LessonInput } from './lesson.service';
 
 /** A link as typed: "example.com/x" → "https://example.com/x"; null when it isn't a web link. */
@@ -30,24 +29,56 @@ export function lessonValid(l: LessonInput): boolean {
   return !!l.title.trim() && !l.blocks.some(badLink);
 }
 
-/** What gets saved: trimmed, links completed, empty blocks dropped. */
-export function cleanLesson(l: LessonInput): LessonInput {
-  return {
-    title: l.title.trim(),
-    blocks: l.blocks
-      .map((b) => ({ kind: b.kind, text: b.text?.trim() || null, url: b.kind === 'link' ? normalizeUrl(b.url) : null }))
-      .filter((b) => (b.kind === 'link' ? !!b.url : !!b.text)),
-  };
+// Trimmed, the empty ones dropped
+function lines(list: string[] | null | undefined): string[] {
+  return (list ?? []).map((x) => x.trim()).filter((x) => !!x);
 }
 
 /**
- * Editing a lesson in place: title, then the blocks (headings, texts, links; × removes one).
- * Add block (at the end) opens the list of kinds; blocks are reordered by dragging their handle.
+ * What gets saved: trimmed, links completed; empty items / answers dropped (the right answer kept
+ * on its option); empty blocks dropped (an exercise needs a question and two answers).
+ */
+export function cleanLesson(l: LessonInput): LessonInput {
+  const blocks: LessonBlock[] = [];
+  for (const b of l.blocks) {
+    const text = b.text?.trim() || null;
+    const base = { kind: b.kind, text, url: null, private: !!b.private };
+    switch (b.kind) {
+      case 'checklist': {
+        const items = lines(b.items);
+        if (items.length) blocks.push({ ...base, text: null, items });
+        break;
+      }
+      case 'exercise': {
+        const raw = b.options ?? [];
+        const options = lines(raw);
+        const answer =
+          b.answer != null && raw[b.answer]?.trim() ? raw.slice(0, b.answer).filter((x) => x.trim()).length : null;
+        if (text && options.length >= 2) blocks.push({ ...base, options, answer });
+        break;
+      }
+      case 'link': {
+        const url = normalizeUrl(b.url);
+        if (url) blocks.push({ ...base, url });
+        break;
+      }
+      default:
+        if (text) blocks.push(base);
+    }
+  }
+  return { title: l.title.trim(), blocks };
+}
+
+/**
+ * Editing a lesson in place: the title, then the blocks — each a card with its kind, who sees it
+ * (students / only me: a tap switches), its drag handle and ×: texts, checklists (items), exercises
+ * (a question, answers, the right one marked by its circle); older lessons' headings and links
+ * too. + Text / Exercise / Checklist at the end.
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, Sheet, TranslatePipe],
-  host: { class: 'flex flex-col gap-6' },
+  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, TranslatePipe],
+  host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
     <div class="card">
@@ -57,88 +88,94 @@ export function cleanLesson(l: LessonInput): LessonInput {
     </div>
 
     <!-- Blocks, reordered by dragging their handle -->
-    <div cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="move($event)" class="flex flex-col gap-6">
+    <div cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="move($event)" class="flex flex-col gap-4">
     @for (b of m.blocks; track $index; let i = $index) {
       <div cdkDrag class="card">
-        @if (b.kind === 'link') {
-          <div class="list-row">
-            <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center self-stretch text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
-              <app-icon name="grip" class="size-5" />
-            </span>
-            <app-icon name="link" class="size-5 opacity-40" />
-            <input
-              [ngModel]="b.url"
-              (ngModelChange)="setBlock(i, { url: $event })"
-              type="url"
-              inputmode="url"
-              placeholder="https://…"
-              autocomplete="off"
-              class="row-input"
-              [class.text-[var(--warning)]]="badLink(b)"
-            />
-            <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
-              <app-icon name="close" class="size-5" />
+        <!-- Head: ⠿ · kind · who sees it · × -->
+        <div class="list-row !min-h-0 gap-2 pb-1 pt-2.5 after:hidden">
+          <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
+            <app-icon name="grip" class="size-5" />
+          </span>
+          <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
+            <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
+          </span>
+          <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 opacity-60 hover:bg-[var(--highlight)]">
+            <app-icon [name]="b.private ? 'lock' : 'eye'" class="size-3.5" />{{ (b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t }}
+          </button>
+          <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
+            <app-icon name="close" class="size-5" />
+          </button>
+        </div>
+
+        @switch (b.kind) {
+          @case ('checklist') {
+            @for (item of b.items ?? []; track $index; let j = $index) {
+              <div class="list-row">
+                <span class="check"></span>
+                <input [ngModel]="item" (ngModelChange)="setItem(i, 'items', j, $event)" type="text" [placeholder]="'lessons.item' | t" autocomplete="off" class="row-input" />
+                <button type="button" (click)="removeItem(i, 'items', j)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
+                  <app-icon name="close" class="size-4" />
+                </button>
+              </div>
+            }
+            <button type="button" (click)="addItem(i, 'items')" class="list-row add-row">
+              <span class="flex items-center gap-2"><app-icon name="plus" class="size-5" />{{ 'lessons.item' | t }}</span>
             </button>
-          </div>
-          <div class="list-row">
-            <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.linkLabel' | t" autocomplete="off" class="row-input" />
-          </div>
-        } @else if (b.kind === 'heading') {
-          <div class="list-row">
-            <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center self-stretch text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
-              <app-icon name="grip" class="size-5" />
-            </span>
-            <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.heading' | t" autocomplete="off" class="row-input text-xl font-semibold" />
-            <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
-              <app-icon name="close" class="size-5" />
+          }
+          @case ('exercise') {
+            <div class="list-row">
+              <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.question' | t" autocomplete="off" class="row-input font-medium" />
+            </div>
+            @for (o of b.options ?? []; track $index; let j = $index) {
+              <div class="list-row">
+                <!-- The circle marks the right answer -->
+                <button type="button" (click)="setBlock(i, { answer: b.answer === j ? null : j })" class="check" [class.is-on]="b.answer === j" [attr.aria-label]="'lessons.right' | t">
+                  @if (b.answer === j) {
+                    <app-icon name="check" [strokeWidth]="3" class="size-3.5" />
+                  }
+                </button>
+                <input [ngModel]="o" (ngModelChange)="setItem(i, 'options', j, $event)" type="text" [placeholder]="'lessons.option' | t" autocomplete="off" class="row-input" />
+                <button type="button" (click)="removeItem(i, 'options', j)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
+                  <app-icon name="close" class="size-4" />
+                </button>
+              </div>
+            }
+            <button type="button" (click)="addItem(i, 'options')" class="list-row add-row">
+              <span class="flex items-center gap-2"><app-icon name="plus" class="size-5" />{{ 'lessons.option' | t }}</span>
             </button>
-          </div>
-        } @else {
-          <div class="list-row items-start py-3 desktop:py-2">
-            <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center pt-0.5 text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
-              <app-icon name="grip" class="size-5" />
-            </span>
-            <textarea
-              [ngModel]="b.text"
-              (ngModelChange)="setBlock(i, { text: $event })"
-              rows="6"
-              [placeholder]="'lessons.text' | t"
-              class="row-input resize-y leading-relaxed"
-            ></textarea>
-            <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2 -mt-1">
-              <app-icon name="close" class="size-5" />
-            </button>
-          </div>
+          }
+          @case ('link') {
+            <div class="list-row">
+              <app-icon name="link" class="size-5 opacity-40" />
+              <input [ngModel]="b.url" (ngModelChange)="setBlock(i, { url: $event })" type="url" inputmode="url" placeholder="https://…" autocomplete="off" class="row-input" [class.text-[var(--warning)]]="badLink(b)" />
+            </div>
+            <div class="list-row">
+              <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.linkLabel' | t" autocomplete="off" class="row-input" />
+            </div>
+          }
+          @case ('heading') {
+            <div class="list-row">
+              <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.heading' | t" autocomplete="off" class="row-input text-xl font-semibold" />
+            </div>
+          }
+          @default {
+            <div class="list-row items-start pb-3 pt-1">
+              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="5" [placeholder]="'lessons.text' | t" class="row-input resize-y leading-relaxed"></textarea>
+            </div>
+          }
         }
       </div>
     }
     </div>
 
     <!-- Add at the end -->
-    <button #addBtn type="button" (click)="openAdd(m.blocks.length, addBtn)" class="card-btn gap-2 text-[var(--accent)]">
-      <app-icon name="plus" class="size-5" />{{ 'lessons.addBlock' | t }}
-    </button>
-
-    <!-- What to add: available kinds, then the ones still to come (dimmed, "soon") -->
-    @if (addOrigin(); as origin) {
-      <app-sheet #addSheet [origin]="origin" (closed)="addOrigin.set(null)">
-        <div class="card">
-          @for (k of kinds; track k.kind) {
-            <button type="button" (click)="add(k.kind, addSheet)" class="list-row w-full text-left">
-              <app-icon [name]="k.icon" class="size-5 text-[var(--accent)]" />
-              <span class="flex-1">{{ k.label | t }}</span>
-            </button>
-          }
-          @for (k of soon; track k.label) {
-            <div class="list-row opacity-40">
-              <app-icon [name]="k.icon" class="size-5" />
-              <span class="flex-1">{{ k.label | t }}</span>
-              <span class="text-footnote">{{ 'lessons.soon' | t }}</span>
-            </div>
-          }
-        </div>
-      </app-sheet>
-    }
+    <div class="flex flex-wrap justify-center gap-2">
+      @for (k of kinds; track k.kind) {
+        <button type="button" (click)="add(k.kind)" class="chip gap-1.5 !rounded-full">
+          <app-icon name="plus" class="size-4 text-[var(--accent)]" />{{ k.label | t }}
+        </button>
+      }
+    </div>
   `,
 })
 export class LessonForm {
@@ -155,6 +192,26 @@ export class LessonForm {
 
   protected readonly badLink = badLink;
 
+  // Block kinds to add (headings and links only in older lessons)
+  protected readonly kinds: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] = [
+    { kind: 'text', icon: 'text', label: 'lessons.text' },
+    { kind: 'exercise', icon: 'exercise', label: 'lessons.exercise' },
+    { kind: 'checklist', icon: 'checklist', label: 'lessons.checklist' },
+  ];
+  private static readonly ALL: Record<LessonBlockKind, { icon: IconName; label: TranslationKey }> = {
+    text: { icon: 'text', label: 'lessons.text' },
+    exercise: { icon: 'exercise', label: 'lessons.exercise' },
+    checklist: { icon: 'checklist', label: 'lessons.checklist' },
+    heading: { icon: 'heading', label: 'lessons.heading' },
+    link: { icon: 'link', label: 'lessons.link' },
+  };
+  protected kindIcon(kind: LessonBlockKind): IconName {
+    return LessonForm.ALL[kind]?.icon ?? 'text';
+  }
+  protected kindLabel(kind: LessonBlockKind): TranslationKey {
+    return LessonForm.ALL[kind]?.label ?? 'lessons.text';
+  }
+
   protected patch(p: Partial<LessonInput>): void {
     this.value.update((m) => ({ ...m, ...p }));
   }
@@ -163,21 +220,24 @@ export class LessonForm {
     this.value.update((m) => ({ ...m, blocks: m.blocks.map((b, i) => (i === index ? { ...b, ...p } : b)) }));
   }
 
-  // Block kinds to add, and those still to come.
-  protected readonly kinds: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] = [
-    { kind: 'heading', icon: 'heading', label: 'lessons.heading' },
-    { kind: 'text', icon: 'text', label: 'lessons.text' },
-    { kind: 'link', icon: 'link', label: 'lessons.link' },
-  ];
-  protected readonly soon: { icon: IconName; label: TranslationKey }[] = [
-    { icon: 'checklist', label: 'lessons.test' },
-    { icon: 'image', label: 'lessons.image' },
-    { icon: 'video', label: 'lessons.video' },
-  ];
+  // A checklist's items / an exercise's answers
+  protected setItem(index: number, list: 'items' | 'options', at: number, text: string): void {
+    const b = this.value().blocks[index];
+    this.setBlock(index, { [list]: (b[list] ?? []).map((x, j) => (j === at ? text : x)) });
+  }
 
-  // The add menu: where the new block goes, and the + it opened from.
-  private insertAt = 0;
-  protected readonly addOrigin = signal<HTMLElement | null>(null);
+  protected addItem(index: number, list: 'items' | 'options'): void {
+    const b = this.value().blocks[index];
+    this.setBlock(index, { [list]: [...(b[list] ?? []), ''] });
+  }
+
+  protected removeItem(index: number, list: 'items' | 'options', at: number): void {
+    const b = this.value().blocks[index];
+    const p: Partial<LessonBlock> = { [list]: (b[list] ?? []).filter((_, j) => j !== at) };
+    // The right answer stays on its option
+    if (list === 'options' && b.answer != null) p.answer = b.answer === at ? null : b.answer > at ? b.answer - 1 : b.answer;
+    this.setBlock(index, p);
+  }
 
   protected move(e: CdkDragDrop<unknown>): void {
     if (e.previousIndex === e.currentIndex) return;
@@ -188,18 +248,19 @@ export class LessonForm {
     });
   }
 
-  protected openAdd(at: number, origin: HTMLElement): void {
-    this.insertAt = at;
-    this.addOrigin.set(origin);
-  }
-
-  protected add(kind: LessonBlockKind, sheet: Sheet): void {
-    const at = this.insertAt;
-    this.value.update((m) => ({
-      ...m,
-      blocks: [...m.blocks.slice(0, at), { kind, text: null, url: null }, ...m.blocks.slice(at)],
-    }));
-    sheet.close();
+  // A new block at the end: a checklist is the teacher's plan by default; an exercise starts with
+  // two empty answers, a checklist with one item.
+  protected add(kind: LessonBlockKind): void {
+    const block: LessonBlock = {
+      kind,
+      text: null,
+      url: null,
+      private: kind === 'checklist',
+      items: kind === 'checklist' ? [''] : null,
+      options: kind === 'exercise' ? ['', ''] : null,
+      answer: null,
+    };
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks, block] }));
   }
 
   protected removeBlock(index: number): void {

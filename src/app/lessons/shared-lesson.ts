@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '@environments/environment';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { DemoQuiz } from './demo-quiz';
 import { LessonContent } from './lesson-content';
 import { LessonBlock } from './lesson.service';
 
@@ -24,7 +23,7 @@ function storedName(): string {
  */
 @Component({
   selector: 'app-shared-lesson',
-  imports: [DemoQuiz, FormsModule, LessonContent, TranslatePipe],
+  imports: [FormsModule, LessonContent, TranslatePipe],
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
     <div class="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pb-[calc(env(safe-area-inset-bottom)+2rem)] pt-[calc(env(safe-area-inset-top)+1rem)]">
@@ -58,8 +57,7 @@ function storedName(): string {
               <button type="submit" [disabled]="!draft.trim()" class="btn-primary self-start">{{ 'shared.continue' | t }}</button>
             </form>
           } @else {
-            <app-lesson-content [blocks]="blocks()" />
-            <app-demo-quiz />
+            <app-lesson-content [blocks]="blocks()" [shared]="true" />
           }
         }
       }

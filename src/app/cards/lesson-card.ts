@@ -4,7 +4,6 @@ import { filter } from 'rxjs';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
-import { DemoQuiz } from '../lessons/demo-quiz';
 import { LessonContent } from '../lessons/lesson-content';
 import { LessonForm } from '../lessons/lesson-form';
 import { LessonInfo } from '../lessons/lesson-info';
@@ -19,7 +18,7 @@ import { LessonState } from '../lessons/lesson-state';
  */
 @Component({
   selector: 'app-lesson-card',
-  imports: [DemoQuiz, LessonContent, LessonForm, LessonInfo, PageSheet, TranslatePipe],
+  imports: [LessonContent, LessonForm, LessonInfo, PageSheet, TranslatePipe],
   template: `
     <app-page-sheet
       #page
@@ -42,13 +41,11 @@ import { LessonState } from '../lessons/lesson-state';
       <div class="flex flex-col gap-4">
         @if (s.editing()) {
           <app-lesson-form [(value)]="s.draft" />
-          <!-- Public link and the events using the lesson -->
-          @if (s.lesson(); as l) {
-            <app-lesson-info [lesson]="l" />
-          }
         } @else if (s.lesson(); as l) {
+          <!-- Its title, where it is next (else last) and its public link, then the content -->
+          <h1 class="px-1 text-[1.75rem] font-bold leading-tight">{{ l.title }}</h1>
+          <app-lesson-info [lesson]="l" [compact]="true" />
           <app-lesson-content [blocks]="l.blocks" />
-          <app-demo-quiz />
         }
       </div>
     </app-page-sheet>

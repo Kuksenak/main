@@ -5,13 +5,21 @@ import { catchError, of } from 'rxjs';
 import { ResourceStore } from '../core/services/resource-store';
 import { EventService } from '../schedule/event.service';
 
-export type LessonBlockKind = 'heading' | 'text' | 'link';
+export type LessonBlockKind = 'text' | 'checklist' | 'exercise' | 'heading' | 'link';
 
-/** One piece of a lesson: a heading, a text, or a link (url, with an optional label in `text`). */
+/**
+ * One piece of a lesson: a text, a checklist (`items`), an exercise (the question in `text`,
+ * `options`, the right one's index in `answer`); older lessons also have headings and links (url,
+ * an optional label in `text`). `private`: for the teacher only (the public link leaves it out).
+ */
 export interface LessonBlock {
   kind: LessonBlockKind;
   text: string | null;
   url: string | null;
+  private?: boolean;
+  items?: string[] | null;
+  options?: string[] | null;
+  answer?: number | null;
 }
 
 /** Lesson material from the library, attached to events. */

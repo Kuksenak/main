@@ -13,12 +13,14 @@ import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { FloatingSearch } from '../core/ui/floating-search';
 import { SearchField } from '../core/ui/search-field';
 import { LessonPage } from './lesson-page';
-import { Lesson, LessonService } from './lesson.service';
+import { LessonService } from './lesson.service';
+import { LessonUsage } from './lesson-usage';
 
 /**
- * The lesson library: search (mobile: in the toolbar) and the list; a tap opens the lesson at
- * its own link, /lessons/:id, so it can be shared — desktop: as a page (LessonPage) in place of
- * the list; mobile: as a full-screen card over it. + starts a new one.
+ * The lesson library: search and the list — each lesson with where it is next (else last) in the
+ * schedule, 🔗 when public. A tap opens it at its own link, /lessons/:id, so it can be shared —
+ * desktop: on the right of the list (LessonPage; the first one when none is picked); phones: as a
+ * full-screen card over it. + starts a new one (desktop: /lessons/new on the right).
  */
 @Component({
   selector: 'app-lessons',
@@ -28,23 +30,41 @@ import { Lesson, LessonService } from './lesson.service';
       <app-search-field [(value)]="query" />
     </ng-template>
 
-    @if (desktop && linkedId()) {
-      <app-lesson-page [lessonId]="linkedId() === 'new' ? null : linkedId()!" />
-    } @else {
-    <!-- Bottom padding keeps the list clear of the floating button -->
-    <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1">
-      <section class="flex min-h-0 w-full flex-1 flex-col gap-3 pb-14">
-        <div class="mobile:hidden desktop:max-w-md"><ng-container [ngTemplateOutlet]="search" /></div>
+    <!-- Desktop: the list on the left (as wide as the schedule's calendar), the lesson on the right
+         (like Students). Phones: the list; a lesson opens as a card over it. -->
+    <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4">
+      <section class="flex min-h-0 w-full flex-1 flex-col gap-3 mobile:pb-14 desktop:max-w-[25rem]">
+        <!-- Desktop: the search and Add in one row -->
+        <div class="flex items-center gap-3 mobile:hidden">
+          <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="search" /></div>
+          <button type="button" (click)="add()" class="btn-primary shrink-0 gap-1.5 pl-2.5">
+            <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
+            {{ 'action.add' | t }}
+          </button>
+        </div>
 
         @if (visible().length) {
           <app-scroll-area class="min-h-0 shrink" viewportClass="card">
             @for (l of visible(); track l.id) {
-              <button type="button" (click)="router.navigate(['/lessons', l.id])" class="list-row w-full py-2 text-left">
+              @let use = usage.of(l.id);
+              <button type="button" (click)="router.navigate(['/lessons', l.id])" class="list-row w-full py-2 text-left" [class.bg-[var(--highlight)]]="desktop && selected() === l.id">
                 <div class="min-w-0 flex-1 leading-tight">
-                  <p class="truncate font-medium">{{ l.title }}</p>
-                  @if (summary(l); as s) {
-                    <p class="text-footnote truncate opacity-50">{{ s }}</p>
-                  }
+                  <p class="flex items-center gap-1.5 font-medium">
+                    <span class="truncate">{{ l.title }}</span>
+                    @if (l.shareToken) {
+                      <app-icon name="link" class="size-4 shrink-0 opacity-40" />
+                    }
+                  </p>
+                  <!-- Where it is next (else last) in the schedule -->
+                  <p class="text-footnote flex min-w-0 gap-2 opacity-50">
+                    @if (use.next ?? use.last; as e) {
+                      <span class="shrink-0">{{ (use.next ? 'lessons.next' : 'lessons.last') | t }}</span>
+                      <span class="shrink-0">{{ usage.day(e) }}</span>
+                      <span class="truncate">{{ usage.who(e) }}</span>
+                    } @else {
+                      <span>{{ 'lessons.unscheduled' | t }}</span>
+                    }
+                  </p>
                 </div>
                 <app-icon name="chevron-right" class="row-chevron" />
               </button>
@@ -56,6 +76,15 @@ import { Lesson, LessonService } from './lesson.service';
           </div>
         }
       </section>
+
+      @if (desktop) {
+        <section class="flex min-h-0 flex-1 flex-col">
+          <!-- One page per lesson (switching lessons starts it afresh: not in the previous one's editing) -->
+          @for (id of selectedKey(); track id) {
+            <app-lesson-page [lessonId]="id === 'new' ? null : id" />
+          }
+        </section>
+      }
     </main>
 
     <!-- Phones: the search's button in the top bar, its field at the bottom; + bottom-right -->
@@ -65,15 +94,16 @@ import { Lesson, LessonService } from './lesson.service';
       </ng-template>
       <app-floating-search #fsearch [button]="false" [(value)]="query" />
     }
-    <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4" [class.invisible]="searching()">
-      <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
-    <span class="fab-label">{{ 'action.add' | t }}</span>
-    </button>
+    @if (!desktop) {
+      <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4" [class.invisible]="searching()">
+        <app-icon name="plus" [strokeWidth]="2" class="size-7" />
+      </button>
     }
   `,
 })
 export class Lessons {
   private service = inject(LessonService);
+  protected usage = inject(LessonUsage);
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
   protected router = inject(Router);
@@ -117,9 +147,10 @@ export class Lessons {
     else this.stack.push({ kind: 'lesson', id: null });
   }
 
-  // Under the title: the start of the first text, else the first link.
-  protected summary(l: Lesson): string {
-    const text = l.blocks.find((b) => b.kind === 'text')?.text;
-    return text ?? l.blocks.find((b) => b.kind === 'link')?.url ?? '';
-  }
+  // Desktop: the lesson on the right — the linked one ('new': a new one), else the first in the list
+  protected readonly selected = computed(() => this.linkedId() ?? this.visible().at(0)?.id ?? null);
+  protected readonly selectedKey = computed(() => {
+    const id = this.selected();
+    return id ? [id] : [];
+  });
 }
