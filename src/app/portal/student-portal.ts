@@ -26,6 +26,7 @@ interface PortalLesson {
   answers: LessonAnswers;
   ticks: string[];
   fills?: LessonFills;
+  submittedAt?: string | null; // sent to the teacher: closed
 }
 
 /**
@@ -66,6 +67,7 @@ interface PortalLesson {
               (ticksChange)="change(l, { ticks: $event })"
               [fills]="l.fills ?? {}"
               (fillsChange)="change(l, { fills: $event })"
+              [locked]="!!l.submittedAt"
             />
           } @else {
             <h1 class="px-1 text-[1.75rem] font-bold leading-tight">{{ name() }}</h1>
@@ -114,15 +116,22 @@ interface PortalLesson {
       }
     </div>
 
-    <!-- In a lesson: what's answered, and that it's kept -->
+    <!-- In a lesson: what's answered and kept; Send — the teacher gets it then (sent: closed) -->
     @if (open(); as l) {
-      @if (exercises(l)) {
-        <div class="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1rem)] flex justify-center">
-          <span class="glass-neutral text-footnote rounded-full px-3.5 py-2">
-            {{ answered(l) }}/{{ exercises(l) }} {{ 'shared.answered' | t }}@if (saved()) {, {{ 'shared.saved' | t }}}
+      <div class="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1rem)] flex justify-center px-4">
+        @if (l.submittedAt) {
+          <span class="glass-neutral text-footnote flex items-center gap-1.5 rounded-full px-3.5 py-2 font-medium">
+            <app-icon name="check" [strokeWidth]="2.5" class="size-4 text-[var(--success)]" />{{ 'shared.sent' | t }}
           </span>
-        </div>
-      }
+        } @else {
+          <div class="glass-neutral pointer-events-auto flex items-center gap-3 rounded-full py-1.5 pl-4 pr-1.5">
+            @if (exercises(l)) {
+              <span class="text-footnote whitespace-nowrap opacity-70">{{ answered(l) }}/{{ exercises(l) }} {{ 'shared.answered' | t }}@if (saved()) {, {{ 'shared.saved' | t }}}</span>
+            }
+            <button type="button" (click)="submit(l)" [disabled]="sending()" class="btn-primary !rounded-full !px-4 !py-1.5">{{ 'shared.send' | t }}</button>
+          </div>
+        }
+      </div>
     }
   `,
 })
@@ -137,6 +146,7 @@ export class StudentPortal {
   protected readonly lessons = signal<PortalLesson[]>([]);
   protected readonly open = signal<PortalLesson | null>(null);
   protected readonly saved = signal(true);
+  protected readonly sending = signal(false);
 
   constructor() {
     this.http.get<{ name: string; upcoming: PortalClass[]; lessons: PortalLesson[] }>(this.base).subscribe({
@@ -164,6 +174,7 @@ export class StudentPortal {
   // change (each lesson on its own)
   private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
   protected change(l: PortalLesson, p: Partial<Pick<PortalLesson, 'answers' | 'ticks' | 'fills'>>): void {
+    if (l.submittedAt) return;
     const updated = { ...l, ...p };
     this.lessons.update((list) => list.map((x) => (x.id === l.id ? updated : x)));
     this.open.set(updated);
@@ -178,6 +189,29 @@ export class StudentPortal {
           .subscribe({ next: () => this.saved.set(true), error: () => {} });
       }, 400),
     );
+  }
+
+  // The lesson as it is now, sent to the teacher (its pending save goes with it); closed then
+  protected submit(l: PortalLesson): void {
+    if (this.sending()) return;
+    clearTimeout(this.timers.get(l.id));
+    this.timers.delete(l.id);
+    this.sending.set(true);
+    this.http
+      .post<{ submittedAt: string }>(`${this.base}/lessons/${l.id}/attempt/submit`, {
+        answers: l.answers,
+        ticks: l.ticks,
+        fills: l.fills ?? {},
+      })
+      .subscribe({
+        next: (r) => {
+          const sent = { ...l, submittedAt: r.submittedAt ?? new Date().toISOString() };
+          this.lessons.update((list) => list.map((x) => (x.id === l.id ? sent : x)));
+          this.open.set(sent);
+          this.sending.set(false);
+        },
+        error: () => this.sending.set(false),
+      });
   }
 
   protected day(iso: string): string {

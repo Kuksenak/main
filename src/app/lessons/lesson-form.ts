@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
+import { AiResponse } from './ai-response';
 import { LessonBlock, LessonBlockKind, LessonInput } from './lesson.service';
 
 /** A link as typed: "example.com/x" → "https://example.com/x"; null when it isn't a web link. */
@@ -95,7 +96,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, TranslatePipe],
+  imports: [AiResponse, CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
@@ -217,16 +218,8 @@ export function cleanLesson(l: LessonInput): LessonInput {
       <input #photoInput type="file" accept="image/*" multiple hidden (change)="fromPhotos(photoInput)" />
     </div>
     @if (photoRaw(); as r) {
-      <!-- What the model answered, as it came (to compare models) -->
-      <details class="card -mt-1">
-        <summary class="list-row cursor-pointer select-none after:hidden">
-          <span class="text-footnote flex-1 font-semibold">{{ 'lessons.aiResponse' | t }} · {{ modelName(r.model) }}</span>
-          <button type="button" (click)="$event.preventDefault(); photoRaw.set(null)" [attr.aria-label]="'action.done' | t" class="icon-plain -mr-2">
-            <app-icon name="close" class="size-4" />
-          </button>
-        </summary>
-        <pre class="max-h-96 select-text overflow-auto whitespace-pre-wrap break-words px-4 pb-3 font-mono text-xs leading-relaxed opacity-80">{{ r.json }}</pre>
-      </details>
+      <!-- What the model answered (to compare models) -->
+      <app-ai-response class="-mt-1" [model]="r.model" [seconds]="r.seconds" [raw]="r.raw" [blocks]="r.blocks" (closed)="photoRaw.set(null)" />
     }
     @if (photoError(); as e) {
       <p class="text-footnote -mt-2 text-center text-[var(--danger)]">{{ e | t }}</p>
@@ -288,7 +281,7 @@ export class LessonForm {
   }
   protected readonly photoError = signal<TranslationKey | null>(null);
   protected readonly photoDetail = signal<string | null>(null);
-  protected readonly photoRaw = signal<{ model: string; json: string } | null>(null);
+  protected readonly photoRaw = signal<{ model: string; seconds: number; raw: unknown; blocks: LessonBlock[] } | null>(null);
 
   // Up to 5 pages, sent as JPEGs no larger than 2000 px (phone photos are huge; HEIC → JPEG)
   protected async fromPhotos(input: HTMLInputElement): Promise<void> {
@@ -308,13 +301,15 @@ export class LessonForm {
       }
       const model = this.model();
       if (model) form.append('model', model);
+      const started = performance.now();
       const draft = await firstValueFrom(
         this.http.post<{ title: string; blocks: LessonBlock[]; raw: unknown; model: string }>(
           `${environment.apiUrl}/lessons/from-photo`,
           form,
         ),
       );
-      this.photoRaw.set({ model: draft.model, json: JSON.stringify(draft.raw, null, 2) });
+      const seconds = Math.round((performance.now() - started) / 100) / 10;
+      this.photoRaw.set({ model: draft.model, seconds, raw: draft.raw, blocks: draft.blocks });
       if (!draft.blocks.length) {
         this.photoError.set('lessons.photoEmpty');
         return;

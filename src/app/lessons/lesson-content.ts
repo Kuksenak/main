@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, input, model, signal } from '@angular/core';
+import { Component, computed, input, model } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { GapPart, LessonFills, gapLines, gapRight } from './gaps';
@@ -14,12 +14,13 @@ export type { LessonFills } from './gaps';
  * - `teacher`: the teacher's own blocks under "For me" (🔒), the rest under "For students" (👁) —
  *   no labels when there's only one kind; exercises with the right answer marked; checklist ticks
  *   kept while the page is open;
- * - `student` (the public link — only the students' blocks come there, `indexes` giving each one's
- *   place in the whole lesson): a tap answers — right ✓ green; wrong ✗ orange, the right one shown;
- *   ticks; both two-way bound (`answers`, `ticks`) so the page saves them;
+ * - `student` (the public link / their own page — only the students' blocks come there, without
+ *   the right answers, `indexes` giving each one's place in the whole lesson): a tap picks (the
+ *   pick marked, never right / wrong — the teacher checks), gaps typed in, ticks; all two-way
+ *   bound (`answers`, `ticks`, `fills`) so the page saves them; `locked` once sent;
  * - `review`: one student's answers and ticks as they left them (their pick marked with `who`).
- * Gaps blocks: the lines with the right words marked (teacher), a field in each gap (student:
- * green / orange once left), the words written in (review: wrong ones with the right one beside).
+ * Gaps blocks: the lines with the right words marked (teacher), a field in each gap on the
+ * text's line (student), the words written in (review: wrong ones with the right one beside).
  * Exercises are cards of rows (the question, then the answers with a circle); texts paragraphs;
  * older lessons' headings and links too.
  */
@@ -51,7 +52,7 @@ export type { LessonFills } from './gaps';
         @case ('checklist') {
           <div class="card">
             @for (item of b.items ?? []; track $index; let j = $index) {
-              <button type="button" (click)="tick(i, j)" class="list-row w-full text-left" [disabled]="mode() === 'review'">
+              <button type="button" (click)="tick(i, j)" class="list-row w-full text-left" [disabled]="mode() === 'review' || locked()">
                 <span class="check" [class.is-on]="ticked(i, j)">
                   @if (ticked(i, j)) {
                     <app-icon name="check" [strokeWidth]="3" class="size-3.5" />
@@ -69,7 +70,7 @@ export type { LessonFills } from './gaps';
               <div class="list-row py-3"><span class="font-medium">{{ b.text }}</span></div>
               @for (o of b.options ?? []; track $index; let j = $index) {
                 @let state = optionState(b, i, j);
-                <button type="button" (click)="choose(i, j)" class="list-row w-full text-left" [disabled]="mode() !== 'student'">
+                <button type="button" (click)="choose(i, j)" class="list-row w-full text-left" [disabled]="mode() !== 'student' || locked()">
                   <ng-container [ngTemplateOutlet]="dot" [ngTemplateOutletContext]="{ $implicit: state }" />
                   <span class="flex-1" [class.font-semibold]="state === 'right'">{{ o }}</span>
                   @if (note(b, i, j); as n) {
@@ -94,23 +95,17 @@ export type { LessonFills } from './gaps';
                           <span class="mx-0.5 rounded-md bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-1.5 py-0.5 font-medium text-[var(--accent)]">{{ g.answers.join(' / ') || '…' }}</span>
                         }
                         @case ('student') {
-                          @let st = gapState(i, g);
+                          <!-- On the text's line: the same line height, the underline just under it -->
                           <input
                             type="text"
                             autocomplete="off"
                             autocapitalize="off"
                             spellcheck="false"
                             [value]="w"
+                            [disabled]="locked()"
                             (input)="write(i, g.gap, $any($event.target).value)"
-                            (focus)="focused.set(i + ':' + g.gap)"
-                            (blur)="focused.set(null)"
                             [style.width.ch]="width(g, w)"
-                            class="mx-0.5 inline-block rounded-none border-b-2 bg-transparent px-0.5 text-center font-medium outline-none transition-colors"
-                            [class.border-[var(--success)]]="st === 'right'"
-                            [class.text-[var(--success)]]="st === 'right'"
-                            [class.border-[var(--warning)]]="st === 'wrong'"
-                            [class.text-[var(--warning)]]="st === 'wrong'"
-                            [class.border-[var(--accent)]]="st === 'none'"
+                            class="mx-0.5 inline-block h-[1.35em] rounded-none border-0 border-b-[1.5px] border-[color-mix(in_srgb,var(--text)_35%,transparent)] bg-transparent p-0 text-center align-baseline font-medium leading-[1.35] text-[var(--accent)] outline-none transition-colors focus:border-[var(--accent)] disabled:opacity-100"
                           />
                         }
                         @default {
@@ -183,8 +178,8 @@ export class LessonContent {
   readonly answers = model<LessonAnswers>({});
   readonly ticks = model<string[]>([]);
   readonly fills = model<LessonFills>({});
-  // The gap being typed in ("block:gap": not marked right / wrong while typing)
-  protected readonly focused = signal<string | null>(null);
+  /** Student: sent — nothing changes any more. */
+  readonly locked = input(false);
 
   // A gaps block's lines (parsed once per text)
   private readonly parsed = new Map<string, GapPart[][]>();
@@ -220,17 +215,10 @@ export class LessonContent {
     return gapRight(g.answers, w);
   }
 
-  // A student's gap: right / wrong once written and left (no set answer: just written)
-  protected gapState(block: number, g: { gap: number; answers: string[] }): 'right' | 'wrong' | 'none' {
-    const w = this.word(block, g.gap);
-    if (!w.trim() || !g.answers.length || this.focused() === `${block}:${g.gap}`) return 'none';
-    return gapRight(g.answers, w) ? 'right' : 'wrong';
-  }
-
-  // Wide enough for the answer (not giving its length away exactly) and what's typed
+  // Room for a word (students don't get the answers — nothing to give away), growing with it
   protected width(g: { answers: string[] }, w: string): number {
     const longest = Math.max(0, ...g.answers.map((a) => a.length));
-    return Math.max(5, longest + 2, w.length + 1);
+    return Math.max(8, longest + 2, w.length + 1.5);
   }
 
   // The teacher's own blocks first, then the students' (each with its place in the lesson)
@@ -249,20 +237,24 @@ export class LessonContent {
   }
 
   protected tick(block: number, item: number): void {
+    if (this.locked()) return;
     const key = `${block}:${item}`;
     this.ticks.update((t) => (t.includes(key) ? t.filter((x) => x !== key) : [...t, key]));
   }
 
   protected choose(block: number, option: number): void {
+    if (this.locked()) return;
     this.answers.update((a) => ({ ...a, [block]: option }));
   }
 
-  // An answer's circle: the teacher sees the right one; a student / a review: the pick ✓ or ✗,
-  // and once answered wrong, the right one ✓ (no right answer set: the pick in the accent).
+  // An answer's circle: the teacher sees the right one; a student their pick (in the accent —
+  // never right / wrong); a review: the pick ✓ or ✗, and once wrong, the right one ✓ (no right
+  // answer set: the pick in the accent).
   protected optionState(b: LessonBlock, block: number, option: number): 'right' | 'wrong' | 'picked' | 'none' {
     const right = b.answer ?? null;
     if (this.mode() === 'teacher') return option === right ? 'right' : 'none';
     const picked = this.answers()[block];
+    if (this.mode() === 'student') return picked === option ? 'picked' : 'none';
     if (picked === undefined) return 'none';
     if (right === null) return picked === option ? 'picked' : 'none';
     if (option === right) return 'right';
@@ -273,6 +265,7 @@ export class LessonContent {
   protected note(b: LessonBlock, block: number, option: number): string | null {
     const right = b.answer ?? null;
     const picked = this.answers()[block];
+    if (this.mode() === 'student') return null;
     if (this.mode() === 'review' && picked === option) return this.who() || null;
     if (option !== right) return null;
     if (this.mode() === 'teacher') return 'right';

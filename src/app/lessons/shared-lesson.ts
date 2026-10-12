@@ -55,6 +55,7 @@ interface Attempt {
   answers: LessonAnswers;
   ticks: string[];
   fills?: LessonFills;
+  submittedAt?: string | null;
 }
 
 /**
@@ -111,16 +112,28 @@ interface Attempt {
               (ticksChange)="ticks.set($event); save()"
               [fills]="fills()"
               (fillsChange)="fills.set($event); save()"
+              [locked]="!!sentAt()"
             />
           }
         }
       }
     </div>
 
-    <!-- What's answered, and that it's kept -->
-    @if (name() && exercises() > 0) {
-      <div class="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1rem)] flex justify-center">
-        <span class="glass-neutral text-footnote rounded-full px-3.5 py-2">{{ progress() }}</span>
+    <!-- What's answered and kept; Send — the teacher gets it then (sent: closed) -->
+    @if (name() && state() === 'ready') {
+      <div class="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1rem)] flex justify-center px-4">
+        @if (sentAt()) {
+          <span class="glass-neutral text-footnote flex items-center gap-1.5 rounded-full px-3.5 py-2 font-medium">
+            <app-icon name="check" [strokeWidth]="2.5" class="size-4 text-[var(--success)]" />{{ 'shared.sent' | t }}
+          </span>
+        } @else {
+          <div class="glass-neutral pointer-events-auto flex items-center gap-3 rounded-full py-1.5 pl-4 pr-1.5">
+            @if (exercises() > 0) {
+              <span class="text-footnote whitespace-nowrap opacity-70">{{ progress() }}</span>
+            }
+            <button type="button" (click)="submit()" [disabled]="sending()" class="btn-primary !rounded-full !px-4 !py-1.5">{{ 'shared.send' | t }}</button>
+          </div>
+        }
       </div>
     }
   `,
@@ -148,6 +161,9 @@ export class SharedLesson {
   protected readonly ticks = signal<string[]>([]);
   protected readonly fills = signal<LessonFills>({});
   private readonly saved = signal(false);
+  // Sent to the teacher (when): closed then
+  protected readonly sentAt = signal<string | null>(null);
+  protected readonly sending = signal(false);
 
   // The tasks (exercises and gaps blocks): how many, how many done
   private readonly tasks = computed(() => taskProgress(this.blocks(), this.indexes(), this.answers(), this.fills()));
@@ -178,6 +194,7 @@ export class SharedLesson {
     this.answers.set({});
     this.ticks.set([]);
     this.fills.set({});
+    this.sentAt.set(null);
     this.saved.set(false);
     this.http.get<Attempt | null>(`${this.base}/attempt`, { params: { visitor: this.visitor() } }).subscribe({
       next: (a) => {
@@ -186,6 +203,7 @@ export class SharedLesson {
         this.answers.set(a.answers ?? {});
         this.ticks.set(a.ticks ?? []);
         this.fills.set(a.fills ?? {});
+        this.sentAt.set(a.submittedAt ?? null);
         this.saved.set(true);
       },
       error: () => {},
@@ -200,15 +218,33 @@ export class SharedLesson {
     this.loadAttempt();
   }
 
+  // Everything as it is now, sent to the teacher (the draft's pending save goes with it)
+  protected submit(): void {
+    if (!this.name() || this.sending()) return;
+    clearTimeout(this.timer);
+    this.sending.set(true);
+    this.http.post<{ submittedAt: string }>(`${this.base}/attempt/submit`, this.body()).subscribe({
+      next: (r) => {
+        this.sentAt.set(r.submittedAt ?? new Date().toISOString());
+        this.sending.set(false);
+      },
+      error: () => this.sending.set(false),
+    });
+  }
+
+  private body() {
+    return { visitor: this.visitor(), name: this.name(), answers: this.answers(), ticks: this.ticks(), fills: this.fills() };
+  }
+
   // Saved a moment after the last change (taps in a row: one request)
   private timer?: ReturnType<typeof setTimeout>;
   protected save(): void {
+    if (this.sentAt()) return;
     this.saved.set(false);
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       if (!this.name()) return;
-      const body = { visitor: this.visitor(), name: this.name(), answers: this.answers(), ticks: this.ticks(), fills: this.fills() };
-      this.http.put(`${this.base}/attempt`, body).subscribe({ next: () => this.saved.set(true), error: () => {} });
+      this.http.put(`${this.base}/attempt`, this.body()).subscribe({ next: () => this.saved.set(true), error: () => {} });
     }, 400);
   }
 }
