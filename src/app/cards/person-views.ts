@@ -372,7 +372,6 @@ export class PersonLessons {
 
     @if (nextEvent() || lastEvent()) {
       <div class="flex min-h-0 flex-col gap-1.5">
-      <span class="card-label">{{ 'nav.lessons' | t }}</span>
       <div class="card flex min-h-0 flex-col">
         @if (nextEvent(); as e) {
           <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />

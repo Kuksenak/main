@@ -99,12 +99,18 @@ html.dark:root {
 
 .field {
   height: var(--control-h); /* as tall as the buttons beside it */
+  /* White with a clear gray edge (a faint hairline on the near-white page vanished) */
   background-color: var(--surface);
-  box-shadow: inset 0 0 0 1px var(--control-border);
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.18);
 }
-/* Dark: no outline (like the cards) — the gray field stands out on its own */
+/* The placeholder readable, not a ghost */
+.field > input::placeholder {
+  opacity: 0.6;
+}
+/* Dark: the card gray with a faint edge */
 html.dark .field {
-  box-shadow: none;
+  background-color: var(--surface);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
 }
 
 .segmented {
