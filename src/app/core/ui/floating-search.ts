@@ -1,5 +1,6 @@
 import { Component, DestroyRef, ElementRef, inject, input, model, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../i18n/t.pipe';
+import { primeKeyboard } from '../utils/keyboard';
 import { Icon } from './icon/icon';
 
 /**
@@ -39,6 +40,7 @@ import { Icon } from './icon/icon';
           (input)="value.set(input.value)"
           (keydown.enter)="input.blur()"
           (blur)="onBlur()"
+          (touchend)="refocus($event)"
           [placeholder]="'students.search' | t"
           [tabindex]="open() ? 0 : -1"
           class="text-body min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-40 [&::-webkit-search-cancel-button]:appearance-none"
@@ -86,6 +88,29 @@ export class FloatingSearch {
     this.value.set('');
     this.open.set(false);
     this.input().nativeElement.blur();
+  }
+
+  // A tap on the lowered field (keyboard hidden): iOS would focus it at the bottom and shift the
+  // whole page up to show it above the keyboard, while the bar rises too — a jump. Instead the
+  // keyboard comes up for a helper field at the top (nothing shifts), the bar rises above it, and
+  // then the field takes the focus where it already is.
+  protected refocus(event: TouchEvent): void {
+    const input = this.input().nativeElement;
+    if (!this.open() || document.activeElement === input) return;
+    event.preventDefault(); // no native focus (and no shift)
+    primeKeyboard();
+    const vv = window.visualViewport;
+    let done = false;
+    const focus = () => {
+      if (done) return;
+      done = true;
+      vv?.removeEventListener('resize', onResize);
+      input.focus({ preventScroll: true });
+    };
+    // Once the keyboard is up (the bar moved above it), or after a moment anyway
+    const onResize = () => setTimeout(focus, 50);
+    vv?.addEventListener('resize', onResize);
+    setTimeout(focus, 600);
   }
 
   // The keyboard went away with nothing typed: close.
