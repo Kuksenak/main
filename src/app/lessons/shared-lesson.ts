@@ -186,7 +186,17 @@ export class SharedLesson {
       error: () => this.state.set('missing'),
     });
     if (this.name()) this.loadAttempt();
-    inject(DestroyRef).onDestroy(() => clearTimeout(this.timer));
+    // Leaving / hiding the page: what's not saved yet goes now (a request that outlives the page)
+    const hide = () => {
+      if (document.visibilityState === 'hidden') this.flush(true);
+    };
+    document.addEventListener('visibilitychange', hide);
+    window.addEventListener('pagehide', hide);
+    inject(DestroyRef).onDestroy(() => {
+      this.flush(true);
+      document.removeEventListener('visibilitychange', hide);
+      window.removeEventListener('pagehide', hide);
+    });
   }
 
   // This device's earlier attempt under this name: continue it (none: start one)
@@ -222,6 +232,7 @@ export class SharedLesson {
   protected submit(): void {
     if (!this.name() || this.sending()) return;
     clearTimeout(this.timer);
+    this.pending = false;
     this.sending.set(true);
     this.http.post<{ submittedAt: string }>(`${this.base}/attempt/submit`, this.body()).subscribe({
       next: (r) => {
@@ -236,15 +247,30 @@ export class SharedLesson {
     return { visitor: this.visitor(), name: this.name(), answers: this.answers(), ticks: this.ticks(), fills: this.fills() };
   }
 
-  // Saved a moment after the last change (taps in a row: one request)
+  // Saved 1.5 s after the last change (typing, taps in a row: one request), or as the page goes
   private timer?: ReturnType<typeof setTimeout>;
+  private pending = false;
   protected save(): void {
     if (this.sentAt()) return;
     this.saved.set(false);
+    this.pending = true;
     clearTimeout(this.timer);
-    this.timer = setTimeout(() => {
-      if (!this.name()) return;
-      this.http.put(`${this.base}/attempt`, this.body()).subscribe({ next: () => this.saved.set(true), error: () => {} });
-    }, 400);
+    this.timer = setTimeout(() => this.flush(), 1500);
+  }
+
+  private flush(leaving = false): void {
+    clearTimeout(this.timer);
+    if (!this.pending || !this.name() || this.sentAt()) return;
+    this.pending = false;
+    if (leaving) {
+      fetch(`${this.base}/attempt`, {
+        method: 'PUT',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.body()),
+      }).catch(() => {});
+      return;
+    }
+    this.http.put(`${this.base}/attempt`, this.body()).subscribe({ next: () => this.saved.set(true), error: () => {} });
   }
 }

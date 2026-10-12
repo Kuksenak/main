@@ -158,7 +158,17 @@ export class StudentPortal {
       },
       error: () => this.state.set('missing'),
     });
-    inject(DestroyRef).onDestroy(() => this.timers.forEach((t) => clearTimeout(t)));
+    // Leaving / hiding the page: what's not saved yet goes now (requests that outlive the page)
+    const hide = () => {
+      if (document.visibilityState === 'hidden') this.flushAll();
+    };
+    document.addEventListener('visibilitychange', hide);
+    window.addEventListener('pagehide', hide);
+    inject(DestroyRef).onDestroy(() => {
+      this.flushAll();
+      document.removeEventListener('visibilitychange', hide);
+      window.removeEventListener('pagehide', hide);
+    });
   }
 
   // Its tasks (exercises and gaps blocks), and how many are done
@@ -170,24 +180,45 @@ export class StudentPortal {
     return taskProgress(l.blocks, l.indexes, l.answers, l.fills ?? {}).done;
   }
 
-  // An answer / a tick: kept in the lesson (and the list), saved a moment after the lesson's last
-  // change (each lesson on its own)
+  // An answer / a tick / a word: kept in the lesson (and the list), saved 1.5 s after the lesson's
+  // last change (typing: one request per pause; each lesson on its own), or as the page goes
   private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly pending = new Map<string, PortalLesson>();
+
+  private payload(l: PortalLesson) {
+    return { answers: l.answers, ticks: l.ticks, fills: l.fills ?? {} };
+  }
+
+  private flushAll(): void {
+    for (const l of this.pending.values()) {
+      fetch(`${this.base}/lessons/${l.id}/attempt`, {
+        method: 'PUT',
+        keepalive: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.payload(l)),
+      }).catch(() => {});
+    }
+    this.pending.clear();
+    this.timers.forEach((t) => clearTimeout(t));
+    this.timers.clear();
+  }
   protected change(l: PortalLesson, p: Partial<Pick<PortalLesson, 'answers' | 'ticks' | 'fills'>>): void {
     if (l.submittedAt) return;
     const updated = { ...l, ...p };
     this.lessons.update((list) => list.map((x) => (x.id === l.id ? updated : x)));
     this.open.set(updated);
     this.saved.set(false);
+    this.pending.set(l.id, updated);
     clearTimeout(this.timers.get(l.id));
     this.timers.set(
       l.id,
       setTimeout(() => {
         this.timers.delete(l.id);
+        this.pending.delete(l.id);
         this.http
-          .put(`${this.base}/lessons/${updated.id}/attempt`, { answers: updated.answers, ticks: updated.ticks, fills: updated.fills ?? {} })
+          .put(`${this.base}/lessons/${updated.id}/attempt`, this.payload(updated))
           .subscribe({ next: () => this.saved.set(true), error: () => {} });
-      }, 400),
+      }, 1500),
     );
   }
 
@@ -196,6 +227,7 @@ export class StudentPortal {
     if (this.sending()) return;
     clearTimeout(this.timers.get(l.id));
     this.timers.delete(l.id);
+    this.pending.delete(l.id);
     this.sending.set(true);
     this.http
       .post<{ submittedAt: string }>(`${this.base}/lessons/${l.id}/attempt/submit`, {
