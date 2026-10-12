@@ -5,7 +5,8 @@ import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
-import { LessonAnswers, LessonContent } from '../lessons/lesson-content';
+import { taskProgress } from '../lessons/gaps';
+import { LessonAnswers, LessonContent, LessonFills } from '../lessons/lesson-content';
 import { LessonBlock } from '../lessons/lesson.service';
 
 interface PortalClass {
@@ -24,6 +25,7 @@ interface PortalLesson {
   lastAt: string | null;
   answers: LessonAnswers;
   ticks: string[];
+  fills?: LessonFills;
 }
 
 /**
@@ -62,6 +64,8 @@ interface PortalLesson {
               (answersChange)="change(l, { answers: $event })"
               [ticks]="l.ticks"
               (ticksChange)="change(l, { ticks: $event })"
+              [fills]="l.fills ?? {}"
+              (fillsChange)="change(l, { fills: $event })"
             />
           } @else {
             <h1 class="px-1 text-[1.75rem] font-bold leading-tight">{{ name() }}</h1>
@@ -147,18 +151,19 @@ export class StudentPortal {
     inject(DestroyRef).onDestroy(() => this.timers.forEach((t) => clearTimeout(t)));
   }
 
+  // Its tasks (exercises and gaps blocks), and how many are done
   protected exercises(l: PortalLesson): number {
-    return l.blocks.filter((b) => b.kind === 'exercise').length;
+    return taskProgress(l.blocks, l.indexes, l.answers, l.fills ?? {}).total;
   }
 
   protected answered(l: PortalLesson): number {
-    return Object.keys(l.answers).length;
+    return taskProgress(l.blocks, l.indexes, l.answers, l.fills ?? {}).done;
   }
 
   // An answer / a tick: kept in the lesson (and the list), saved a moment after the lesson's last
   // change (each lesson on its own)
   private readonly timers = new Map<string, ReturnType<typeof setTimeout>>();
-  protected change(l: PortalLesson, p: Partial<Pick<PortalLesson, 'answers' | 'ticks'>>): void {
+  protected change(l: PortalLesson, p: Partial<Pick<PortalLesson, 'answers' | 'ticks' | 'fills'>>): void {
     const updated = { ...l, ...p };
     this.lessons.update((list) => list.map((x) => (x.id === l.id ? updated : x)));
     this.open.set(updated);
@@ -169,7 +174,7 @@ export class StudentPortal {
       setTimeout(() => {
         this.timers.delete(l.id);
         this.http
-          .put(`${this.base}/lessons/${updated.id}/attempt`, { answers: updated.answers, ticks: updated.ticks })
+          .put(`${this.base}/lessons/${updated.id}/attempt`, { answers: updated.answers, ticks: updated.ticks, fills: updated.fills ?? {} })
           .subscribe({ next: () => this.saved.set(true), error: () => {} });
       }, 400),
     );

@@ -6,7 +6,8 @@ import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
-import { LessonAnswers, LessonContent } from './lesson-content';
+import { taskProgress } from './gaps';
+import { LessonAnswers, LessonContent, LessonFills } from './lesson-content';
 import { LessonBlock } from './lesson.service';
 
 const NAME_KEY = 'guestName';
@@ -53,6 +54,7 @@ interface Attempt {
   name: string;
   answers: LessonAnswers;
   ticks: string[];
+  fills?: LessonFills;
 }
 
 /**
@@ -107,6 +109,8 @@ interface Attempt {
               (answersChange)="answers.set($event); save()"
               [ticks]="ticks()"
               (ticksChange)="ticks.set($event); save()"
+              [fills]="fills()"
+              (fillsChange)="fills.set($event); save()"
             />
           }
         }
@@ -142,13 +146,16 @@ export class SharedLesson {
   protected draft = this.name();
   protected readonly answers = signal<LessonAnswers>({});
   protected readonly ticks = signal<string[]>([]);
+  protected readonly fills = signal<LessonFills>({});
   private readonly saved = signal(false);
 
-  protected readonly exercises = computed(() => this.blocks().filter((b) => b.kind === 'exercise').length);
+  // The tasks (exercises and gaps blocks): how many, how many done
+  private readonly tasks = computed(() => taskProgress(this.blocks(), this.indexes(), this.answers(), this.fills()));
+  protected readonly exercises = computed(() => this.tasks().total);
   // "2/3 answered, saved"
   protected readonly progress = computed(() => {
-    const done = Object.keys(this.answers()).length;
-    const text = `${done}/${this.exercises()} ${this.i18n.t('shared.answered')}`;
+    const { done, total } = this.tasks();
+    const text = `${done}/${total} ${this.i18n.t('shared.answered')}`;
     return this.saved() ? `${text}, ${this.i18n.t('shared.saved')}` : text;
   });
 
@@ -170,6 +177,7 @@ export class SharedLesson {
   private loadAttempt(): void {
     this.answers.set({});
     this.ticks.set([]);
+    this.fills.set({});
     this.saved.set(false);
     this.http.get<Attempt | null>(`${this.base}/attempt`, { params: { visitor: this.visitor() } }).subscribe({
       next: (a) => {
@@ -177,6 +185,7 @@ export class SharedLesson {
         if (!a) return this.save();
         this.answers.set(a.answers ?? {});
         this.ticks.set(a.ticks ?? []);
+        this.fills.set(a.fills ?? {});
         this.saved.set(true);
       },
       error: () => {},
@@ -198,7 +207,7 @@ export class SharedLesson {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       if (!this.name()) return;
-      const body = { visitor: this.visitor(), name: this.name(), answers: this.answers(), ticks: this.ticks() };
+      const body = { visitor: this.visitor(), name: this.name(), answers: this.answers(), ticks: this.ticks(), fills: this.fills() };
       this.http.put(`${this.base}/attempt`, body).subscribe({ next: () => this.saved.set(true), error: () => {} });
     }, 400);
   }

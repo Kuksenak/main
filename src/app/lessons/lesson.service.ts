@@ -5,11 +5,12 @@ import { catchError, of } from 'rxjs';
 import { ResourceStore } from '../core/services/resource-store';
 import { EventService } from '../schedule/event.service';
 
-export type LessonBlockKind = 'text' | 'checklist' | 'exercise' | 'heading' | 'link';
+export type LessonBlockKind = 'text' | 'checklist' | 'exercise' | 'gaps' | 'heading' | 'link';
 
 /**
  * One piece of a lesson: a text, a checklist (`items`), an exercise (the question in `text`,
- * `options`, the right one's index in `answer`); older lessons also have headings and links (url,
+ * `options`, the right one's index in `answer`), gaps to fill in (`text` with the answers in
+ * [brackets], see gaps.ts); older lessons also have headings and links (url,
  * an optional label in `text`). `private`: for the teacher only (the public link leaves it out).
  */
 export interface LessonBlock {

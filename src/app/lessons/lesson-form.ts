@@ -171,6 +171,12 @@ export function cleanLesson(l: LessonInput): LessonInput {
               <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.linkLabel' | t" autocomplete="off" class="row-input" />
             </div>
           }
+          @case ('gaps') {
+            <div class="list-row items-start pb-1 pt-1">
+              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="5" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input resize-y font-mono text-[0.9375rem] leading-relaxed"></textarea>
+            </div>
+            <p class="text-footnote px-4 pb-3 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
+          }
           @case ('heading') {
             <div class="list-row">
               <input [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" type="text" [placeholder]="'lessons.heading' | t" autocomplete="off" class="row-input text-xl font-semibold" />
@@ -210,6 +216,18 @@ export function cleanLesson(l: LessonInput): LessonInput {
       </button>
       <input #photoInput type="file" accept="image/*" multiple hidden (change)="fromPhotos(photoInput)" />
     </div>
+    @if (photoRaw(); as r) {
+      <!-- What the model answered, as it came (to compare models) -->
+      <details class="card -mt-1">
+        <summary class="list-row cursor-pointer select-none after:hidden">
+          <span class="text-footnote flex-1 font-semibold">{{ 'lessons.aiResponse' | t }} · {{ modelName(r.model) }}</span>
+          <button type="button" (click)="$event.preventDefault(); photoRaw.set(null)" [attr.aria-label]="'action.done' | t" class="icon-plain -mr-2">
+            <app-icon name="close" class="size-4" />
+          </button>
+        </summary>
+        <pre class="max-h-96 select-text overflow-auto whitespace-pre-wrap break-words px-4 pb-3 font-mono text-xs leading-relaxed opacity-80">{{ r.json }}</pre>
+      </details>
+    }
     @if (photoError(); as e) {
       <p class="text-footnote -mt-2 text-center text-[var(--danger)]">{{ e | t }}</p>
       <!-- What exactly went wrong (the server's / the provider's words), small -->
@@ -270,6 +288,7 @@ export class LessonForm {
   }
   protected readonly photoError = signal<TranslationKey | null>(null);
   protected readonly photoDetail = signal<string | null>(null);
+  protected readonly photoRaw = signal<{ model: string; json: string } | null>(null);
 
   // Up to 5 pages, sent as JPEGs no larger than 2000 px (phone photos are huge; HEIC → JPEG)
   protected async fromPhotos(input: HTMLInputElement): Promise<void> {
@@ -290,8 +309,12 @@ export class LessonForm {
       const model = this.model();
       if (model) form.append('model', model);
       const draft = await firstValueFrom(
-        this.http.post<{ title: string; blocks: LessonBlock[] }>(`${environment.apiUrl}/lessons/from-photo`, form),
+        this.http.post<{ title: string; blocks: LessonBlock[]; raw: unknown; model: string }>(
+          `${environment.apiUrl}/lessons/from-photo`,
+          form,
+        ),
       );
+      this.photoRaw.set({ model: draft.model, json: JSON.stringify(draft.raw, null, 2) });
       if (!draft.blocks.length) {
         this.photoError.set('lessons.photoEmpty');
         return;
@@ -318,11 +341,13 @@ export class LessonForm {
   protected readonly kinds: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] = [
     { kind: 'text', icon: 'text', label: 'lessons.text' },
     { kind: 'exercise', icon: 'exercise', label: 'lessons.exercise' },
+    { kind: 'gaps', icon: 'compose', label: 'lessons.gaps' },
     { kind: 'checklist', icon: 'checklist', label: 'lessons.checklist' },
   ];
   private static readonly ALL: Record<LessonBlockKind, { icon: IconName; label: TranslationKey }> = {
     text: { icon: 'text', label: 'lessons.text' },
     exercise: { icon: 'exercise', label: 'lessons.exercise' },
+    gaps: { icon: 'compose', label: 'lessons.gaps' },
     checklist: { icon: 'checklist', label: 'lessons.checklist' },
     heading: { icon: 'heading', label: 'lessons.heading' },
     link: { icon: 'link', label: 'lessons.link' },

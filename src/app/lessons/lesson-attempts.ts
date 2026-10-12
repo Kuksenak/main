@@ -11,7 +11,8 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { initial } from '../core/utils/text';
-import { LessonAnswers, LessonContent } from './lesson-content';
+import { gapAnswers, gapRight, gapsDone } from './gaps';
+import { LessonAnswers, LessonContent, LessonFills } from './lesson-content';
 import { Lesson } from './lesson.service';
 
 /** Someone's go at the lesson by its public link. */
@@ -21,6 +22,7 @@ interface Attempt {
   studentId: string | null; // one of the teacher's students (their personal link), else a guest
   answers: LessonAnswers;
   ticks: string[];
+  fills?: LessonFills;
   createdAt: string;
   updatedAt: string;
 }
@@ -55,7 +57,7 @@ interface Attempt {
                 <span class="truncate">{{ s.done }}/{{ s.total }} {{ 'shared.answered' | t }}</span>
               </p>
             </div>
-            @if (s.total) {
+            @if (s.checkable) {
               <span class="text-footnote rounded-full bg-[color-mix(in_srgb,var(--success)_15%,transparent)] px-2 py-0.5 font-semibold text-[var(--success)]">{{ s.right }} {{ 'lessons.rightShort' | t }}</span>
             }
             <app-icon name="chevron-right" class="row-chevron" />
@@ -74,7 +76,7 @@ interface Attempt {
             <div class="list-row"><span class="flex-1">{{ 'lessons.opened' | t }}</span><span class="opacity-50">{{ when(a.createdAt) }}</span></div>
             <div class="list-row"><span class="flex-1">{{ 'lessons.answeredRow' | t }}</span><span class="opacity-50">{{ s.done }}/{{ s.total }}, {{ s.right }} {{ 'lessons.rightShort' | t }}</span></div>
           </div>
-          <app-lesson-content [blocks]="studentBlocks()" [indexes]="studentIndexes()" mode="review" [who]="a.name" [answers]="a.answers" [ticks]="a.ticks" />
+          <app-lesson-content [blocks]="studentBlocks()" [indexes]="studentIndexes()" mode="review" [who]="a.name" [answers]="a.answers" [ticks]="a.ticks" [fills]="a.fills ?? {}" />
         </div>
       </app-page-sheet>
     }
@@ -137,18 +139,33 @@ export class LessonAttempts {
       .subscribe((res) => this.attempts.set(res.attempts ?? []));
   }
 
-  // How far they got: exercises answered, and right (of those with a right answer set)
-  protected score(a: Attempt): { done: number; total: number; right: number } {
-    const exercises = this.studentPart().filter((b) => b.block.kind === 'exercise');
+  // How far they got: tasks (exercises, gaps blocks) done; right — exercises with a right answer
+  // set, and gaps with answers set
+  protected score(a: Attempt): { done: number; total: number; right: number; checkable: number } {
     let done = 0;
+    let total = 0;
     let right = 0;
-    for (const { block, i } of exercises) {
-      const picked = a.answers[i];
-      if (picked === undefined) continue;
-      done++;
-      if (block.answer != null && block.answer === picked) right++;
+    let checkable = 0;
+    for (const { block, i } of this.studentPart()) {
+      if (block.kind === 'exercise') {
+        total++;
+        if (block.answer != null) checkable++;
+        const picked = a.answers[i];
+        if (picked === undefined) continue;
+        done++;
+        if (block.answer != null && block.answer === picked) right++;
+      } else if (block.kind === 'gaps') {
+        total++;
+        const words = a.fills?.[i];
+        if (gapsDone(block, words)) done++;
+        gapAnswers(block.text).forEach((answers, n) => {
+          if (!answers.length) return;
+          checkable++;
+          if (gapRight(answers, words?.[n])) right++;
+        });
+      }
     }
-    return { done, total: exercises.length, right };
+    return { done, total, right, checkable };
   }
 
   // "Today 10:24" / "Thu 9 Oct"
