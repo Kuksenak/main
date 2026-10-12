@@ -1,13 +1,12 @@
-import { Component, DestroyRef, ElementRef, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon, IconName } from '../core/ui/icon/icon';
 import { LessonContent } from '../lessons/lesson-content';
 import { LessonImportsService } from '../lessons/lesson-imports.service';
-import { LessonBlockKind } from '../lessons/lesson.service';
+import { LessonBlock, LessonBlockKind, LessonInput } from '../lessons/lesson.service';
 import { AiChatService, ChatMessage } from './ai-chat.service';
 
 const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] = [
@@ -19,22 +18,23 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
 ];
 
 /**
- * The AI chat, like Claude's: ask for material ("10 exercises on the passé composé", "a text
- * about travel, A2, with questions") or send photos (attach, paste, drop); the AI answers with a
- * short reply and lesson blocks — shown here, "Review & add" opens them with checkboxes to save
- * as a new lesson or add to one. Ask again to change them. One conversation, on this device; New
- * chat starts over.
+ * A lesson's AI chat, like Claude's, inside the lesson editor (its ✨ AI): ask for material
+ * ("10 more like these", "a text about travel, A2, with questions") or send photos (attach,
+ * paste, drop); the AI answers with a short reply and lesson blocks — Add to lesson puts them
+ * all at the lesson's end, Pick… lets you choose. Only lesson material (the server holds it to
+ * that). One chat per lesson, on this device; New chat starts over.
  */
 @Component({
-  selector: 'app-ai-page',
+  selector: 'app-ai-chat',
   imports: [FormsModule, Icon, LessonContent, TranslatePipe],
-  host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
+  host: { class: 'flex min-h-0 flex-1 flex-col desktop:h-[min(78vh,46rem)]' },
   template: `
-    <div #list class="min-h-0 flex-1 overflow-y-auto px-4">
-      <div class="mx-auto flex w-full max-w-3xl flex-col gap-5 pb-4 pt-2 desktop:pt-6">
-        @if (!chat.messages().length) {
+    <div #list class="min-h-0 flex-1 overflow-y-auto">
+      <div class="flex w-full flex-col gap-5 pb-4">
+        @if (!messages().length) {
           <!-- Nothing yet: what to ask -->
-          <div class="flex flex-col items-center gap-4 py-10 text-center">
+          <div class="flex flex-col items-center gap-4 py-8 text-center">
+            <app-icon name="wand" class="size-8 text-[var(--accent)]" />
             <p class="text-body max-w-md opacity-60">{{ 'ai.empty' | t }}</p>
             <div class="flex flex-wrap justify-center gap-2">
               @for (ex of examples; track ex) {
@@ -43,7 +43,7 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
             </div>
           </div>
         }
-        @for (m of chat.messages(); track m.id) {
+        @for (m of messages(); track m.id) {
           @if (m.role === 'user') {
             <!-- The teacher's: on the right -->
             <div class="flex flex-col items-end gap-1.5">
@@ -81,7 +81,12 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
                     <button type="button" (click)="toggle(m.id)" class="text-footnote rounded-full px-2 py-1 font-medium opacity-70 hover:bg-[var(--highlight)]">
                       {{ (shown().includes(m.id) ? 'ai.hide' : 'ai.show') | t }}
                     </button>
-                    <button type="button" (click)="review(m)" class="btn-primary !rounded-full !px-3.5 !py-1.5">{{ 'ai.review' | t }}</button>
+                    <button type="button" (click)="pick(m)" class="chip !rounded-full">{{ 'ai.pick' | t }}</button>
+                    @if (added().includes(m.id)) {
+                      <span class="text-footnote flex items-center gap-1 px-2 font-medium text-[var(--success)]"><app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'ai.added' | t }}</span>
+                    } @else {
+                      <button type="button" (click)="addAll(m)" class="btn-primary !rounded-full !px-3.5 !py-1.5">{{ 'lessons.addToLesson' | t }}</button>
+                    }
                   </div>
                   @if (shown().includes(m.id)) {
                     <div class="border-t-[0.5px] border-[var(--separator)] bg-[var(--app-bg)] p-3">
@@ -93,7 +98,7 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
             </div>
           }
         }
-        @if (chat.pending()) {
+        @if (chat.pending() === chatKey()) {
           <div class="flex items-center gap-2 opacity-60">
             <span class="size-4 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent"></span>
             <span class="text-footnote">{{ 'ai.thinking' | t }}</span>
@@ -103,7 +108,7 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
     </div>
 
     <!-- The message being written: pictures, text, Send; the model; New chat -->
-    <div class="mx-auto w-full max-w-3xl px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">
+    <div class="pt-2">
       @if (files().length) {
         <div class="mb-2 flex flex-wrap gap-1.5">
           @for (f of files(); track f.url; let k = $index) {
@@ -130,11 +135,11 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
           [placeholder]="'ai.placeholder' | t"
           class="text-body max-h-48 min-h-9 flex-1 resize-none bg-transparent px-1 py-1.5 outline-none"
         ></textarea>
-        <button type="button" (click)="send()" [disabled]="chat.pending() || (!draft.trim() && !files().length)" [attr.aria-label]="'ai.send' | t" class="btn-primary flex size-9 shrink-0 items-center justify-center !rounded-full !p-0">
+        <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [attr.aria-label]="'ai.send' | t" class="btn-primary flex size-9 shrink-0 items-center justify-center !rounded-full !p-0">
           <app-icon name="chevron-right" [strokeWidth]="2.5" class="size-5 -rotate-90" />
         </button>
       </div>
-      <div class="mt-1.5 flex items-center gap-2">
+      <div class="mt-1.5 flex items-center gap-2 pb-[env(safe-area-inset-bottom)]">
         @if (imports.models().length > 1) {
           <select [ngModel]="imports.model()" (ngModelChange)="imports.pickModel($event)" [attr.aria-label]="'lessons.model' | t" class="text-footnote rounded-full bg-transparent px-1 py-0.5 opacity-70">
             @for (id of imports.models(); track id) {
@@ -143,14 +148,21 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
           </select>
         }
         <span class="flex-1"></span>
-        @if (chat.messages().length) {
-          <button type="button" (click)="chat.clear()" [disabled]="chat.pending()" class="text-footnote rounded-full px-2 py-1 font-medium opacity-70 hover:bg-[var(--highlight)]">{{ 'ai.newChat' | t }}</button>
+        @if (messages().length) {
+          <button type="button" (click)="chat.clear(chatKey())" [disabled]="chat.pending() === chatKey()" class="text-footnote rounded-full px-2 py-1 font-medium opacity-70 hover:bg-[var(--highlight)]">{{ 'ai.newChat' | t }}</button>
         }
       </div>
     </div>
   `,
 })
-export class AiPage {
+export class AiChat {
+  /** Whose chat: the lesson's id ('new' for one not saved yet). */
+  readonly chatKey = input.required<string>();
+  /** The lesson as it is now (the AI sees it). */
+  readonly lesson = input.required<LessonInput>();
+  /** Blocks for the lesson's end. */
+  readonly add = output<LessonBlock[]>();
+
   protected readonly chat = inject(AiChatService);
   protected readonly imports = inject(LessonImportsService);
   private readonly i18n = inject(I18nService);
@@ -158,20 +170,22 @@ export class AiPage {
   private readonly box = viewChild.required<ElementRef<HTMLTextAreaElement>>('box');
 
   protected draft = '';
+  protected readonly messages = computed(() => {
+    this.chat.pending();
+    return this.chat.messages(this.chatKey());
+  });
   protected readonly files = signal<{ blob: Blob; url: string }[]>([]);
   protected readonly shown = signal<string[]>([]);
+  protected readonly added = signal<string[]>([]);
   protected readonly examples: TranslationKey[] = ['ai.example1', 'ai.example2', 'ai.example3'];
 
   constructor() {
     this.imports.ensureLoaded();
-
-    // Phones: the title in the top bar
-    const toolbar = inject(ToolbarService);
-    effect(() => toolbar.title.set(this.i18n.t('nav.ai')));
+    effect(() => this.chat.open.add(this.chatKey()));
 
     // New messages: scrolled to the end
     effect(() => {
-      this.chat.messages();
+      this.messages();
       this.chat.pending();
       queueMicrotask(() => {
         const el = this.list().nativeElement;
@@ -179,11 +193,12 @@ export class AiPage {
       });
     });
 
-    // Pictures pasted (Ctrl+V) or dropped anywhere on the page: attached
+    // Pictures pasted (Ctrl+V) or dropped: attached
     const paste = (e: ClipboardEvent) => {
       const images = [...(e.clipboardData?.files ?? [])].filter((f) => f.type.startsWith('image/'));
       if (!images.length) return;
       e.preventDefault();
+      e.stopImmediatePropagation();
       this.attach(images);
     };
     const over = (e: DragEvent) => e.preventDefault();
@@ -193,12 +208,12 @@ export class AiPage {
       e.preventDefault();
       this.attach(images);
     };
-    document.addEventListener('paste', paste);
+    document.addEventListener('paste', paste, true);
     document.addEventListener('dragover', over);
     document.addEventListener('drop', drop);
     inject(DestroyRef).onDestroy(() => {
-      toolbar.title.set('');
-      document.removeEventListener('paste', paste);
+      this.chat.open.delete(this.chatKey());
+      document.removeEventListener('paste', paste, true);
       document.removeEventListener('dragover', over);
       document.removeEventListener('drop', drop);
     });
@@ -228,14 +243,7 @@ export class AiPage {
     this.draft = '';
     this.files.set([]);
     queueMicrotask(() => this.grow());
-    this.chat.send(text, files);
-  }
-
-  // The box grows with its text (up to its max height)
-  protected grow(): void {
-    const el = this.box().nativeElement;
-    el.style.height = 'auto';
-    el.style.height = `${el.scrollHeight}px`;
+    this.chat.send(this.chatKey(), text, files, this.lesson());
   }
 
   protected useExample(key: TranslationKey): void {
@@ -246,13 +254,31 @@ export class AiPage {
     });
   }
 
+  // The box grows with its text (up to its max height)
+  protected grow(): void {
+    const el = this.box().nativeElement;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }
+
   protected toggle(id: string): void {
     this.shown.update((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   }
 
-  // Its blocks with checkboxes: a new lesson, or into one
-  protected review(m: ChatMessage): void {
-    if (m.draft) this.imports.previewLocal(m.draft);
+  // All of it at the lesson's end
+  protected addAll(m: ChatMessage): void {
+    if (!m.draft?.blocks.length) return;
+    this.add.emit(m.draft.blocks);
+    this.added.update((a) => [...a, m.id]);
+  }
+
+  // Some of it: the preview's checkboxes, then Add to lesson
+  protected pick(m: ChatMessage): void {
+    if (!m.draft) return;
+    this.imports.previewLocal(m.draft, (blocks) => {
+      this.add.emit(blocks);
+      this.added.update((a) => [...a, m.id]);
+    });
   }
 
   protected counts(m: ChatMessage) {

@@ -5,7 +5,7 @@ import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { AiResponse } from './ai-response';
 import { LessonForm } from './lesson-form';
 import { LessonImport, LessonImportsService } from './lesson-imports.service';
-import { LessonInput, LessonService } from './lesson.service';
+import { LessonBlock, LessonInput, LessonService } from './lesson.service';
 
 /**
  * What was read from photos, before it goes in: what the model made of it (AiResponse) and the
@@ -36,7 +36,10 @@ import { LessonInput, LessonService } from './lesson.service';
             <!-- The picked ones: a new lesson, or into a lesson; then the rest stays here -->
             <div class="flex flex-wrap items-center justify-end gap-2 pt-2">
               <button type="button" (click)="discard(x)" class="btn-secondary mr-auto !text-[var(--danger)]">{{ 'lessons.discard' | t }}</button>
-              @if (x.draft && draft.blocks.length) {
+              @if (x.draft && draft.blocks.length && x.id === 'local' && imports.localInto(); as into) {
+                <!-- From the lesson's AI chat: into that lesson -->
+                <button type="button" (click)="intoOpen(x, into)" [disabled]="!picked().length" class="btn-primary">{{ 'lessons.addToLesson' | t }} ({{ picked().length }})</button>
+              } @else if (x.draft && draft.blocks.length) {
                 <button type="button" (click)="asNew(x)" [disabled]="!picked().length" class="btn-secondary">{{ 'lessons.saveAsNew' | t }} ({{ picked().length }})</button>
                 <span class="flex items-center gap-1">
                   <select [value]="target() ?? ''" (change)="target.set($any($event.target).value || null)" [attr.aria-label]="'lessons.lessonPick' | t" class="chip max-w-48 !rounded-full">
@@ -92,6 +95,11 @@ export class LessonImportPreview {
 
   protected asNew(x: LessonImport): void {
     this.imports.addAsNew(this.draft.title, this.take(), (id) => this.target.set(id));
+    this.next(x);
+  }
+
+  protected intoOpen(x: LessonImport, into: (blocks: LessonBlock[]) => void): void {
+    into(this.take());
     this.next(x);
   }
 

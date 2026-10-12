@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
+import { AiChat } from '../ai/ai-chat';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
@@ -86,7 +87,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, TranslatePipe],
+  imports: [AiChat, CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
@@ -233,12 +234,28 @@ export function cleanLesson(l: LessonInput): LessonInput {
             }
           </select>
         }
+        <!-- The lesson's AI chat -->
+        <button type="button" (click)="aiOpen.set(true)" class="chip gap-1.5 !rounded-full">
+          <app-icon name="wand" class="size-4 text-[var(--accent)]" />{{ 'nav.ai' | t }}
+        </button>
         <button type="button" (click)="photoInput.click()" [disabled]="sending()" class="chip gap-1.5 !rounded-full" [class.opacity-60]="sending()">
           <app-icon name="image" class="size-4 text-[var(--accent)]" />{{ 'lessons.fromPhoto' | t }}
         </button>
         <input #photoInput type="file" accept="image/*" multiple hidden (change)="fromPhotos(photoInput)" />
       }
     </div>
+    @if (aiOpen()) {
+      <app-page-sheet [title]="'nav.ai' | t" [actions]="false" [scroll]="false" [large]="true" (closed)="aiOpen.set(false)">
+        <h1 class="mb-3 flex items-center gap-2 px-1 text-xl font-semibold mobile:hidden"><app-icon name="wand" class="size-5 text-[var(--accent)]" />{{ 'nav.ai' | t }}</h1>
+        <!-- Loaded the first time it's opened -->
+        @defer {
+          <app-ai-chat [chatKey]="lessonId() ?? 'new'" [lesson]="m" (add)="appendBlocks($event)" />
+        } @loading {
+          <p class="text-body py-10 text-center opacity-40">{{ 'app.loading' | t }}</p>
+        }
+      </app-page-sheet>
+    }
+
     <!-- A task as the student sees it (answers taken out, choices unmarked) -->
     @if (previewing() !== null && m.blocks[previewing()!]; as b) {
       <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [large]="true" (closed)="previewing.set(null)">
@@ -292,6 +309,13 @@ export class LessonForm {
   /** Blocks can be picked (a checkbox each): `selected` — their places. */
   readonly selectable = input(false);
   readonly selected = model<number[]>([]);
+  protected readonly aiOpen = signal(false);
+
+  // Blocks from the AI at the lesson's end
+  protected appendBlocks(blocks: LessonBlock[]): void {
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks, ...blocks] }));
+  }
+
   // The task shown as the student sees it (its place), in a popup
   protected readonly previewing = signal<number | null>(null);
 
@@ -310,7 +334,7 @@ export class LessonForm {
 
     // An image pasted anywhere (Ctrl+V, like a screenshot): read like a photo
     const paste = (e: ClipboardEvent) => {
-      if (!this.photos()) return;
+      if (!this.photos() || this.aiOpen()) return; // the AI chat takes its own
       const files = [...(e.clipboardData?.files ?? [])].filter((f) => f.type.startsWith('image/'));
       if (!files.length) return;
       e.preventDefault();

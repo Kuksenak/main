@@ -150,8 +150,11 @@ export class LessonImportsService {
 
   /** A draft made here (the AI chat's), previewed the same way — nothing kept on the server. */
   readonly local = signal<LessonImport | null>(null);
-  previewLocal(draft: LessonDraft): void {
+  /** `into`: the picked blocks go there (the lesson being edited) — instead of new lesson / any lesson. */
+  readonly localInto = signal<((blocks: LessonBlock[]) => void) | null>(null);
+  previewLocal(draft: LessonDraft, into?: (blocks: LessonBlock[]) => void): void {
     this.local.set({ id: 'local', lessonId: null, model: draft.model, pages: 0, status: 'done', error: null, createdAt: '', draft });
+    this.localInto.set(into ?? null);
     this.previewing.set('local');
   }
 

@@ -41,7 +41,8 @@ export type IconName =
   | 'lock'
   | 'eye'
   | 'exercise'
-  | 'bell';
+  | 'bell'
+  | 'wand';
 
 /**
  * All app icons in one place (24×24 stroke icons, currentColor). Size it from the host:
@@ -69,6 +70,7 @@ export type IconName =
         @case ('lock') { <rect x="5" y="11" width="14" height="9.5" rx="2.5" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /> }
         @case ('eye') { <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" /><circle cx="12" cy="12" r="3" /> }
         @case ('exercise') { <circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.01" /> }
+        @case ('wand') { <path d="m4 20 11-11M13.5 7.5l3 3" /><path d="M17 3v3M15.5 4.5h3M20 8.5v2.5M18.75 9.75h2.5M10 3.5v2M9 4.5h2" /> }
         @case ('bell') { <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" /><path d="M10 20.5a2 2 0 0 0 4 0" /> }
         @case ('globe') { <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9s1.3-6.4 3.8-9z" /> }
         @case ('info') { <circle cx="12" cy="12" r="9" /><path d="M12 11v6M12 7.5v.5" /> }
