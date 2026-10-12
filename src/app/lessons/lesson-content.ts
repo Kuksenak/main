@@ -117,14 +117,11 @@ export type { LessonFills } from './gaps';
                                   type="button"
                                   [disabled]="locked()"
                                   (click)="write(i, g.gap, w === o ? '' : o)"
-                                  class="rounded-md px-1 leading-[1.35] transition-colors disabled:cursor-default"
+                                  class="rounded-md px-[0.6ch] leading-[1.5] text-[var(--accent)] transition-colors disabled:cursor-default"
                                   [class.font-semibold]="w === o"
-                                  [class.bg-[color-mix(in_srgb,var(--accent)_14%,transparent)]]="w === o"
-                                  [class.text-[var(--accent)]]="w === o"
+                                  [class.bg-[color-mix(in_srgb,var(--accent)_24%,transparent)]]="w === o"
+                                  [class.bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]]="w !== o"
                                   [class.opacity-50]="!!w && w !== o"
-                                  [class.underline]="!w"
-                                  [class.decoration-dotted]="!w"
-                                  [class.underline-offset-4]="!w"
                                 >{{ o }}</button>
                                 @if (!last) {
                                   <span class="opacity-30">/</span>
