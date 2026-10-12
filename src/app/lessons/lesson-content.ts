@@ -110,22 +110,23 @@ export type { LessonFills } from './gaps';
                         }
                         @case ('student') {
                           @if (g.options; as opts) {
-                            <!-- To choose: a tap picks one (again: unpicks) -->
-                            <span class="mx-0.5 inline-flex flex-wrap items-baseline gap-x-0.5">
-                              @for (o of opts; track $index; let last = $last) {
+                            <!-- To choose: a segmented control in the line (iOS-like) — the options in
+                                 one gray capsule, the picked one filled blue; a tap picks (again:
+                                 unpicks) -->
+                            <span class="mx-0.5 inline-flex flex-wrap items-center gap-0.5 rounded-lg bg-[var(--fill)] p-0.5 align-middle leading-none">
+                              @for (o of opts; track $index) {
                                 <button
                                   type="button"
                                   [disabled]="locked()"
                                   (click)="write(i, g.gap, w === o ? '' : o)"
-                                  class="rounded-md px-[0.6ch] leading-[1.5] text-[var(--accent)] transition-colors disabled:cursor-default"
+                                  class="rounded-md px-2 py-[0.2em] text-[0.95em] leading-[1.3] transition-colors disabled:cursor-default"
+                                  [class.bg-[var(--accent)]]="w === o"
+                                  [class.text-white]="w === o"
                                   [class.font-semibold]="w === o"
-                                  [class.bg-[color-mix(in_srgb,var(--accent)_24%,transparent)]]="w === o"
-                                  [class.bg-[color-mix(in_srgb,var(--accent)_10%,transparent)]]="w !== o"
-                                  [class.opacity-50]="!!w && w !== o"
+                                  [class.shadow-sm]="w === o"
+                                  [class.hover:bg-[var(--highlight)]]="w !== o && !locked()"
+                                  [class.opacity-60]="!!w && w !== o"
                                 >{{ o }}</button>
-                                @if (!last) {
-                                  <span class="opacity-30">/</span>
-                                }
                               }
                             </span>
                           } @else {
