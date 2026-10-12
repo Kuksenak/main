@@ -142,7 +142,7 @@ export type { LessonFills } from './gaps';
                             [disabled]="locked()"
                             (input)="write(i, g.gap, $any($event.target).value)"
                             [style.width.ch]="fitsContent ? null : width(g, w)"
-                            class="mx-0.5 inline-block h-[1.5em] min-w-[3.5ch] rounded-md [field-sizing:content] border-0 bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-[0.6ch] py-0 text-center align-baseline font-semibold leading-[1.5] text-[var(--accent)] outline-none transition-colors focus:bg-[color-mix(in_srgb,var(--accent)_24%,transparent)] disabled:opacity-100"
+                            class="mx-0.5 inline-block h-[1.5em] min-w-[7ch] rounded-md [field-sizing:content] border-0 bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-[0.6ch] py-0 text-center align-baseline font-semibold leading-[1.5] text-[var(--accent)] outline-none transition-colors focus:bg-[color-mix(in_srgb,var(--accent)_24%,transparent)] disabled:opacity-100"
                           />
                           }
                         }
@@ -333,7 +333,7 @@ export class LessonContent {
   protected readonly fitsContent = typeof CSS !== 'undefined' && CSS.supports?.('field-sizing', 'content');
   protected width(g: { answers: string[] }, w: string): number {
     const longest = Math.max(0, ...g.answers.map((a) => a.length));
-    return Math.max(4.5, longest + 1, w.length * 0.85 + 1);
+    return Math.max(8, longest + 1, w.length * 0.85 + 1);
   }
 
   // The teacher's own blocks first, then the students' (each with its place in the lesson)
