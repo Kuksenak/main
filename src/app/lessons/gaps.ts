@@ -23,7 +23,7 @@ const GAP = /\[([^[\]\n]*)\]|\{([^{}\n]*)\}/g;
  */
 export function gapLines(text: string | null): GapPart[][] {
   let n = 0;
-  return (text ?? '').split('\n').map((line) => {
+  return itemLines(text ?? '').map((line) => {
     const parts: GapPart[] = [];
     let at = 0;
     for (const m of line.matchAll(GAP)) {
@@ -34,6 +34,13 @@ export function gapLines(text: string | null): GapPart[][] {
     if (at < line.length || !parts.length) parts.push({ text: line.slice(at) });
     return parts;
   });
+}
+
+// Items run together on one line ("… 1. Les riverains … 2. Les piétons …"): each on its own line
+// (only where the line is cut — the gaps' order, and so the answers, stay as they are)
+const INLINE_ITEM = / (?=\d{1,2}[.)] +\S)/g;
+function itemLines(text: string): string[] {
+  return text.split('\n').flatMap((line) => ((line.match(/ \d{1,2}[.)] +\S/g)?.length ?? 0) >= 2 ? line.split(INLINE_ITEM) : [line]));
 }
 
 /** Each gap's accepted answers (empty: none set). */

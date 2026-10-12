@@ -85,7 +85,7 @@ export type { LessonFills } from './gaps';
         }
         @case ('gaps') {
           <div class="flex flex-col gap-1.5">
-            <div class="card gaps-card flex flex-col gap-1 px-4 py-3">
+            <div class="card gaps-card flex flex-col px-4 py-3">
               @for (line of lines(b.text); track $index; let first = $first) {
                 <!-- The first line, when it's just text: the task's instruction, a bit stronger -->
                 <p class="text-body min-h-[1.5em] leading-[1.9]" [class.font-semibold]="first && line.length === 1 && !gapOf(line[0])">
