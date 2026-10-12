@@ -1,17 +1,18 @@
-import { Component, ElementRef, model, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, effect, inject, model, viewChild } from '@angular/core';
 import { TranslatePipe } from '../i18n/t.pipe';
 import { Icon } from './icon/icon';
 
 /**
  * Phones' search, in the top bar: a gray "🔍 Search" field (the placeholder centered); a tap types
- * right in it — `active` turns on (the top bar's menu and account step aside, the field widens), a
- * round ✕ appears beside it: it clears and leaves. Leaving an empty field (the keyboard gone)
- * leaves search too. Two-way bound: `[(value)]`, `[(active)]`.
+ * right in it — `active` turns on (the top bar's menu and account slide away, the field widens), a
+ * round ✕ in the field's gray slides in beside it: it clears and leaves. A tap anywhere else puts
+ * the keyboard away (an empty field leaves search then; with text the results stay). Two-way
+ * bound: `[(value)]`, `[(active)]`.
  */
 @Component({
   selector: 'app-search-bar',
   imports: [Icon, TranslatePipe],
-  host: { class: 'flex items-center gap-2' },
+  host: { class: 'flex min-w-0 items-center gap-3' },
   template: `
     <label class="relative flex h-[var(--control-round)] min-w-0 flex-1 items-center gap-2 rounded-full bg-[var(--fill)] px-4">
       <!-- At rest: the icon and "Search" in the middle (the field is under it, empty) -->
@@ -38,8 +39,14 @@ import { Icon } from './icon/icon';
       />
     </label>
     @if (active()) {
-      <!-- ✕: clears and leaves search (pointerdown: no blur first) -->
-      <button type="button" (pointerdown)="$event.preventDefault()" (click)="leave()" [attr.aria-label]="'action.cancel' | t" class="icon-btn [animation:fadeIn_200ms_ease-out]">
+      <!-- ✕ in the field's gray, sliding in: clears and leaves search (pointerdown: no blur first) -->
+      <button
+        type="button"
+        (pointerdown)="$event.preventDefault()"
+        (click)="leave()"
+        [attr.aria-label]="'action.cancel' | t"
+        class="flex size-[var(--control-round)] shrink-0 items-center justify-center rounded-full bg-[var(--fill)] [animation:slideInRight_300ms_var(--ease-out-quick)] active:opacity-60"
+      >
         <app-icon name="close" class="size-6" />
       </button>
     }
@@ -49,6 +56,20 @@ export class SearchBar {
   readonly value = model('');
   readonly active = model(false);
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+
+  constructor() {
+    // While searching, a tap anywhere else puts the keyboard away (iOS keeps the focus otherwise)
+    const outside = (e: PointerEvent) => {
+      const field = this.input().nativeElement;
+      if (document.activeElement === field && !this.host.nativeElement.contains(e.target as Node)) field.blur();
+    };
+    effect(() => {
+      if (this.active()) document.addEventListener('pointerdown', outside, true);
+      else document.removeEventListener('pointerdown', outside, true);
+    });
+    inject(DestroyRef).onDestroy(() => document.removeEventListener('pointerdown', outside, true));
+  }
 
   protected leave(): void {
     this.value.set('');

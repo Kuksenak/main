@@ -333,6 +333,23 @@
     display: block;
   }
 
+  /* Top bar buttons that slide off to the right while the page searches (phones): their width (and
+     the gap before them) goes to the search field, smoothly */
+  .slide-away {
+    transition: transform 300ms var(--ease-out-quick), width 300ms var(--ease-out-quick),
+      margin 300ms var(--ease-out-quick), opacity 200ms ease-out;
+    &.slid-away {
+      width: 0 !important;
+      min-width: 0 !important;
+      margin-left: -0.75rem;
+      padding: 0 !important;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateX(6rem);
+      pointer-events: none;
+    }
+  }
+
   /* A row's leading icon (Settings rows): line icons a bit muted */
   .row-icon {
     @apply size-6 shrink-0 opacity-70;

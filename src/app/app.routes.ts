@@ -22,6 +22,7 @@ export const routes: Routes = [
       // The list with that lesson open on top
       { path: 'lessons/:id', loadComponent: () => import('./lessons/lessons').then((m) => m.Lessons) },
       { path: 'about', loadComponent: () => import('./about/about').then((m) => m.About) },
+      { path: 'notifications', loadComponent: () => import('./notifications/notifications-page').then((m) => m.NotificationsPage) },
       { path: 'install', loadComponent: () => import('./install/install').then((m) => m.Install) },
       { path: '', pathMatch: 'full', redirectTo: 'schedule' },
     ],

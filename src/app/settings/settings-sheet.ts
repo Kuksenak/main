@@ -9,12 +9,11 @@ import { InstallService } from '../core/services/install.service';
 import { UpdateService } from '../core/services/update.service';
 import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
-import { Toggle } from '../core/ui/toggle';
 import { NotificationsService } from '../core/services/notifications.service';
 import { GoogleCalendarService } from '../schedule/google-calendar.service';
-import { IntegrationsSettings, LanguageList, ScheduleSettings } from './sections';
+import { IntegrationsSettings, LanguageList, NotificationSettings, ScheduleSettings } from './sections';
 
-type Section = 'language' | 'schedule' | 'google';
+type Section = 'language' | 'schedule' | 'google' | 'notifications';
 
 /**
  * The account button's Settings, like the Claude app's — on phones a sheet from the bottom (drag
@@ -27,7 +26,7 @@ type Section = 'language' | 'schedule' | 'google';
  */
 @Component({
   selector: 'app-settings-sheet',
-  imports: [Icon, IntegrationsSettings, LanguageList, ScheduleSettings, Sheet, Toggle, TranslatePipe],
+  imports: [Icon, IntegrationsSettings, LanguageList, NotificationSettings, ScheduleSettings, Sheet, TranslatePipe],
   template: `
     <app-sheet #sheet [origin]="origin()" [wide]="true" [tall]="true" (closed)="closed.emit()">
       <!-- Phones, a row's page: ‹ back to the list and its title in the middle -->
@@ -43,6 +42,7 @@ type Section = 'language' | 'schedule' | 'google';
             @case ('language') { <app-language-list (picked)="back()" /> }
             @case ('schedule') { <app-schedule-settings /> }
             @case ('google') { <app-integrations-settings [failed]="failed()" /> }
+            @case ('notifications') { <app-notification-settings (openList)="go('/notifications')" /> }
           }
         </div>
       } @else {
@@ -81,6 +81,15 @@ type Section = 'language' | 'schedule' | 'google';
             @if (desktop && open() === 'schedule') {
               <app-schedule-settings class="sub-rows" [flat]="true" />
             }
+            <button type="button" (click)="tap('notifications')" class="list-row w-full text-left" [attr.aria-expanded]="desktop ? open() === 'notifications' : null">
+              <app-icon name="bell" class="row-icon" />
+              <span class="flex-1">{{ 'settings.notifications' | t }}</span>
+              <span class="opacity-50">{{ (notifications.pushOn() ? 'settings.on' : 'settings.off') | t }}</span>
+              <app-icon name="chevron-right" class="row-chevron -ml-1 transition-transform duration-200" [class.rotate-90]="open() === 'notifications'" />
+            </button>
+            @if (desktop && open() === 'notifications') {
+              <app-notification-settings class="sub-rows" [flat]="true" (openList)="go('/notifications')" />
+            }
           </div>
         </div>
 
@@ -97,20 +106,6 @@ type Section = 'language' | 'schedule' | 'google';
               <app-integrations-settings class="sub-rows" [flat]="true" [failed]="failed()" />
             }
           </div>
-        </div>
-
-        <!-- Push notifications to this device (e.g. a student finished a lesson) -->
-        <div class="flex flex-col gap-1.5">
-          <div class="card">
-            <div class="list-row">
-              <app-icon name="bell" class="row-icon" />
-              <span class="flex-1">{{ 'settings.notifications' | t }}</span>
-              <app-toggle [checked]="!!notifications.pushOn()" (checkedChange)="setPush($event)" [disabled]="!pushReady()" />
-            </div>
-          </div>
-          <p class="text-footnote px-1 opacity-50 mobile:px-[var(--row-px)]">
-            {{ (pushHint() ?? 'settings.notificationsHint') | t }}
-          </p>
         </div>
 
         @if (!install.standalone) {
@@ -160,32 +155,14 @@ export class SettingsSheet implements OnInit {
     language: 'account.language',
     schedule: 'nav.schedule',
     google: 'settings.integrations',
+    notifications: 'settings.notifications',
   };
 
   protected readonly notifications = inject(NotificationsService);
-  // Push: the device's state and the server's key known (asked ahead: the permission prompt has
-  // to come right in the tap)
-  private readonly pushChecked = signal(false);
-  protected readonly pushReady = computed(() => this.pushChecked() && this.notifications.pushAvailable && this.notifications.pushConfigured);
-  // Why it can't be switched on here, else null (the usual hint)
-  protected readonly pushHint = computed<TranslationKey | null>(() => {
-    if (!this.pushChecked()) return null;
-    if (!this.notifications.pushAvailable) return 'settings.notificationsInstall';
-    if (!this.notifications.pushConfigured) return 'settings.notificationsOff';
-    if (this.pushDenied()) return 'settings.notificationsDenied';
-    return null;
-  });
-  private readonly pushDenied = signal(false);
 
   constructor() {
     this.google.reload(); // fresh status (e.g. just back from Google)
-    this.notifications.prepare().finally(() => this.pushChecked.set(true));
-  }
-
-  protected async setPush(on: boolean): Promise<void> {
-    this.pushDenied.set(false);
-    if (!on) return this.notifications.disablePush();
-    if (!(await this.notifications.enablePush())) this.pushDenied.set(true);
+    this.notifications.prepare(); // this device's push: On / Off on the Notifications row
   }
 
   ngOnInit(): void {

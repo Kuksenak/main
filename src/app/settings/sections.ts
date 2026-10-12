@@ -2,7 +2,8 @@ import { Component, computed, inject, input, linkedSignal, output, signal } from
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { LanguageCode } from '../core/i18n/translations';
+import { LanguageCode, TranslationKey } from '../core/i18n/translations';
+import { NotificationsService } from '../core/services/notifications.service';
 import { Icon } from '../core/ui/icon/icon';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
@@ -122,5 +123,63 @@ export class LanguageList {
   protected pick(code: LanguageCode): void {
     this.i18n.setLang(code);
     this.picked.emit();
+  }
+}
+
+/**
+ * Notifications: this device's push switch (with why it can't be switched on here, else what it's
+ * for) and "All notifications ›" (`openList`: the page with them). A card; `flat`: just the rows,
+ * unfolded under the Notifications row.
+ */
+@Component({
+  selector: 'app-notification-settings',
+  imports: [Icon, Toggle, TranslatePipe],
+  host: { class: 'flex flex-col', '[class.gap-1.5]': '!flat()' },
+  template: `
+    <div [class.card]="!flat()">
+      <div class="list-row">
+        <span class="flex-1">{{ 'settings.pushThisDevice' | t }}</span>
+        <app-toggle [checked]="!!notifications.pushOn()" (checkedChange)="setPush($event)" [disabled]="!pushReady()" />
+      </div>
+      @if (flat()) {
+        <p class="list-row text-footnote opacity-50">{{ (pushHint() ?? 'settings.notificationsHint') | t }}</p>
+      }
+      <button type="button" (click)="openList.emit()" class="list-row w-full text-left">
+        <span class="flex-1">{{ 'settings.allNotifications' | t }}</span>
+        <app-icon name="chevron-right" class="row-chevron" />
+      </button>
+    </div>
+    @if (!flat()) {
+      <p class="text-footnote px-1 opacity-50 mobile:px-[var(--row-px)]">{{ (pushHint() ?? 'settings.notificationsHint') | t }}</p>
+    }
+  `,
+})
+export class NotificationSettings {
+  readonly flat = input(false);
+  readonly openList = output<void>();
+
+  protected readonly notifications = inject(NotificationsService);
+  // The device's state and the server's key, asked ahead (the permission prompt has to come right
+  // in the tap)
+  private readonly checked = signal(false);
+  private readonly denied = signal(false);
+  protected readonly pushReady = computed(() => this.checked() && this.notifications.pushAvailable && this.notifications.pushConfigured);
+  // Why it can't be switched on here, else null (the usual hint)
+  protected readonly pushHint = computed<TranslationKey | null>(() => {
+    if (!this.checked()) return null;
+    if (!this.notifications.pushAvailable) return 'settings.notificationsInstall';
+    if (!this.notifications.pushConfigured) return 'settings.notificationsOff';
+    if (this.denied()) return 'settings.notificationsDenied';
+    return null;
+  });
+
+  constructor() {
+    this.notifications.prepare().finally(() => this.checked.set(true));
+  }
+
+  protected async setPush(on: boolean): Promise<void> {
+    this.denied.set(false);
+    if (!on) return this.notifications.disablePush();
+    if (!(await this.notifications.enablePush())) this.denied.set(true);
   }
 }

@@ -26,6 +26,12 @@
   to { transform: translateY(0); }
 }
 
+/* In from the right edge (e.g. the search's ✕). */
+@keyframes slideInRight {
+  from { transform: translateX(6rem); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
