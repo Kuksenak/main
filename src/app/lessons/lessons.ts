@@ -70,9 +70,13 @@ import { LessonUsage } from './lesson-usage';
               </button>
             }
           </app-scroll-area>
+        } @else if (query()) {
+          <!-- Nothing found: a line where the list was (not centered: that made the page jump
+               under the keyboard) -->
+          <p class="text-body py-8 text-center opacity-40">{{ 'students.notFound' | t }}</p>
         } @else {
           <div class="flex flex-1 items-center justify-center">
-            <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : 'lessons.empty') | t }}</p>
+            <p class="text-body opacity-40">{{ 'lessons.empty' | t }}</p>
           </div>
         }
       </section>

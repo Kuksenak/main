@@ -72,9 +72,11 @@
 
     @let groupsHere = showGroups() && visibleGroups().length;
     @let studentsHere = showStudents() && visible().length;
-    @if (!groupsHere && !studentsHere) {
+    <!-- Nobody yet: in the middle. While searching the list stays put (nothing found: a line at
+         its top) — swapping it for a centered message made the page jump under the keyboard -->
+    @if (!groupsHere && !studentsHere && !query()) {
       <div class="flex flex-1 items-center justify-center">
-        <p class="text-body opacity-40">{{ (query() ? 'students.notFound' : showStudents() ? 'students.empty' : 'groups.empty') | t }}</p>
+        <p class="text-body opacity-40">{{ (showStudents() ? 'students.empty' : 'groups.empty') | t }}</p>
       </div>
     } @else {
       <!-- Groups first (they stay while selecting students; only students get the circles);
@@ -99,6 +101,9 @@
             }
             <div class="card"><ng-container [ngTemplateOutlet]="studentRows" /></div>
           </div>
+        }
+        @if (!groupsHere && !studentsHere) {
+          <p class="text-body py-8 text-center opacity-40">{{ 'students.notFound' | t }}</p>
         }
       </app-scroll-area>
     }
