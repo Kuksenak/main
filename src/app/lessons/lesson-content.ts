@@ -1,5 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, input, model } from '@angular/core';
+import { Component, computed, inject, input, model } from '@angular/core';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
+import { Masonry } from '../core/ui/masonry';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { Gap, GapPart, LessonFills, gapLines, gapRight } from './gaps';
@@ -26,7 +28,7 @@ export type { LessonFills } from './gaps';
  */
 @Component({
   selector: 'app-lesson-content',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe],
+  imports: [Icon, Masonry, NgTemplateOutlet, TranslatePipe],
   // Tiled (a student's page): dense like a textbook page (see .lesson-dense)
   host: { class: 'flex flex-col', '[class.gap-5]': '!tiled()', '[class.gap-3]': 'tiled()', '[class.lesson-dense]': 'tiled()' },
   template: `
@@ -206,16 +208,29 @@ export type { LessonFills } from './gaps';
           </span>
         }
         @if (tiled()) {
-          <!-- Desktop: tiles in columns, in order (down the first column, then the next) -->
-          <div class="flex flex-col gap-3 desktop:block desktop:columns-[22rem] desktop:gap-4">
-            @for (tile of tilesOf(g.blocks); track tile[0].i) {
-              <div class="flex flex-col gap-2 desktop:mb-4 desktop:break-inside-avoid">
-                @for (b of tile; track b.i) {
-                  <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
-                }
-              </div>
-            }
-          </div>
+          @if (desktop) {
+            <!-- Desktop: tiles like Pinterest's, each as wide as its lines need (1–3 columns),
+                 packed tight (see Masonry) -->
+            <div appMasonry>
+              @for (tile of tilesOf(g.blocks); track tile[0].i) {
+                <div class="flex flex-col gap-2" [attr.data-span]="spanOf(tile)">
+                  @for (b of tile; track b.i) {
+                    <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
+                  }
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="flex flex-col gap-3">
+              @for (tile of tilesOf(g.blocks); track tile[0].i) {
+                <div class="flex flex-col gap-2">
+                  @for (b of tile; track b.i) {
+                    <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
+                  }
+                </div>
+              }
+            </div>
+          }
         } @else {
           @for (b of g.blocks; track b.i) {
             <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
@@ -239,6 +254,30 @@ export class LessonContent {
   readonly locked = input(false);
   /** Desktop: the blocks as tiles in columns (a task with the text before it — its instruction — one tile). */
   readonly tiled = input(false);
+
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+
+  // A tile's width in columns, by its longest line (gaps / choices counted as they show): short
+  // lines — one column, longer — two, long ones and pictures — three / two
+  protected spanOf(tile: { block: LessonBlock }[]): number {
+    let longest = 0;
+    let total = 0;
+    for (const { block: b } of tile) {
+      if (b.kind === 'image') longest = Math.max(longest, 60);
+      const lines = [...(b.text ?? '').split('\n'), ...(b.items ?? []), ...(b.options ?? [])].map((l) =>
+        l
+          .replace(/\[[^[\]\n]*\]/g, '________')
+          .replace(/\{([^{}\n]*)\}/g, (_, x: string) => x.replace(/\*/g, '').split('|').join(' / ')),
+      );
+      for (const l of lines) {
+        longest = Math.max(longest, l.length);
+        total += l.length;
+      }
+    }
+    // A long paragraph wraps anyway: wide enough to read, not the whole width
+    if (longest > 120) longest = Math.max(70, Math.min(longest, total / 4));
+    return longest <= 34 ? 1 : longest <= 70 ? 2 : 3;
+  }
 
   // Tiles: a text (or heading) starts one, the tasks after it join it; a task with no text
   // before it starts its own
