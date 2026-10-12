@@ -15,7 +15,7 @@ type Page = 'language' | 'schedule' | 'integrations';
 
 /**
  * Phones: the account button's Settings, like the Claude app's — a sheet from the bottom (drag it
- * down or tap outside to close) with the title on top; the email (5 taps show the version); rows
+ * down or tap outside to close), no title; the email (5 taps show the version); rows
  * with an icon, the current value and › — each opens its own page right in the sheet (Language,
  * Schedule, Integrations; ‹ back); Install (in the browser), Update when one is ready, Log out.
  * (The pages live in the sheet: nothing can open over it.)
@@ -24,16 +24,17 @@ type Page = 'language' | 'schedule' | 'integrations';
   selector: 'app-settings-sheet',
   imports: [Icon, IntegrationsSettings, LanguageList, ScheduleSettings, Sheet, TranslatePipe],
   template: `
-    <app-sheet #sheet (closed)="closed.emit()">
-      <!-- Header: the title in the middle; ‹ back to the list on a row's page -->
-      <div class="relative mb-3 flex h-10 shrink-0 items-center justify-center">
-        @if (page()) {
+    <app-sheet #sheet [tall]="true" (closed)="closed.emit()">
+      <!-- A row's page: ‹ back to the list and its title in the middle (the list itself has no
+           title) -->
+      @if (page()) {
+        <div class="relative mb-3 flex h-10 shrink-0 items-center justify-center">
           <button type="button" (click)="back()" [attr.aria-label]="'action.back' | t" class="absolute left-0 flex size-10 items-center justify-center rounded-full active:opacity-60">
             <app-icon name="chevron-left" class="-ml-1 size-7" />
           </button>
-        }
-        <span class="text-body font-semibold">{{ title() | t }}</span>
-      </div>
+          <span class="text-body font-semibold">{{ title() | t }}</span>
+        </div>
+      }
 
       <!-- The list, or a row's own page sliding in over it (back: sliding back) -->
       @switch (page()) {
@@ -125,7 +126,7 @@ export class SettingsSheet {
   protected cameBack = false; // the list slides back in only after a page, not on opening
   protected readonly title = computed<TranslationKey>(() => {
     const page = this.page();
-    return page === 'language' ? 'account.language' : page === 'schedule' ? 'nav.schedule' : page === 'integrations' ? 'settings.integrations' : 'nav.settings';
+    return page === 'language' ? 'account.language' : page === 'schedule' ? 'nav.schedule' : 'settings.integrations';
   });
 
   protected open(page: Page): void {

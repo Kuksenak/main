@@ -60,6 +60,8 @@ import { InstallService } from '../../services/install.service';
           [class.dialog-panel]="desktop"
           [class.sheet-panel]="!desktop"
           [class.!bottom-6]="inBrowser"
+          [class.mobile:top-[calc(env(safe-area-inset-top)+2rem)]]="tall()"
+          [class.mobile:!max-h-none]="tall()"
           [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : (dragY() ? 'translateY(' + dragY() + 'px)' : null)"
           [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
         >
@@ -86,6 +88,9 @@ export class Sheet {
   readonly origin = input<HTMLElement | null>(null);
   /** Desktop dropdown: wider (24rem instead of 18rem). */
   readonly wide = input(false);
+  /** Phones: a fixed height, up to the middle of the top bar (not the content's: pages switching
+   * inside it don't make it jump). */
+  readonly tall = input(false);
   readonly closed = output<void>();
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
