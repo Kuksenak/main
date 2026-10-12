@@ -131,18 +131,22 @@ export type { LessonFills } from './gaps';
                               }
                             </span>
                           } @else {
-                          <!-- On the text's line: a light blue field, like the answers in the teacher's view -->
-                          <input
-                            type="text"
-                            autocomplete="off"
-                            autocapitalize="off"
-                            spellcheck="false"
-                            [value]="w"
-                            [disabled]="locked()"
-                            (input)="write(i, g.gap, $any($event.target).value)"
-                            [style.width.ch]="fitsContent ? null : width(g, w)"
-                            class="mx-0.5 inline-block h-[1.5em] min-w-[7ch] rounded-md [field-sizing:content] border-0 bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] pl-[1ch] pr-[0.6ch] py-0 text-left align-baseline font-semibold leading-[1.1] text-[var(--accent)] caret-[var(--accent)] outline-none transition-colors focus:bg-[color-mix(in_srgb,var(--accent)_24%,transparent)] disabled:opacity-100"
-                          />
+                          <!-- On the text's line: a light blue field, like the answers in the teacher's
+                               view — the blue is the wrapper's; the field itself just the text's
+                               height (browsers stretch the cursor over the whole field) -->
+                          <span class="mx-0.5 inline-block rounded-md bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] py-[0.2em] pl-[1ch] pr-[0.6ch] align-baseline leading-none transition-colors focus-within:bg-[color-mix(in_srgb,var(--accent)_24%,transparent)]">
+                            <input
+                              type="text"
+                              autocomplete="off"
+                              autocapitalize="off"
+                              spellcheck="false"
+                              [value]="w"
+                              [disabled]="locked()"
+                              (input)="write(i, g.gap, $any($event.target).value)"
+                              [style.width.ch]="fitsContent ? null : width(g, w)"
+                              class="inline-block h-[1.1em] min-w-[6ch] align-baseline border-0 bg-transparent p-0 text-left font-semibold leading-[1.1] text-[var(--accent)] caret-[var(--accent)] outline-none [field-sizing:content] disabled:opacity-100"
+                            />
+                          </span>
                           }
                         }
                         @default {
