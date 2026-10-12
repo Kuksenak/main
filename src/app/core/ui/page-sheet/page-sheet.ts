@@ -59,10 +59,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
           <button
             type="button"
             (click)="back($event.currentTarget)"
-            [attr.aria-label]="(dirty() ? 'action.discard' : 'action.back') | t"
+            [attr.aria-label]="(dirty() ? 'action.discard' : closeIcon() ? 'action.done' : 'action.back') | t"
             class="icon-btn relative"
           >
-            @if (dirty()) {
+            @if (dirty() || closeIcon()) {
               <app-icon name="close" class="size-6" />
             } @else {
               <app-icon name="chevron-left" class="-ml-0.5 size-7" />
@@ -147,6 +147,9 @@ export class PageSheet {
   // and scrolls its own list.
   readonly scroll = input(true);
   readonly dirty = input(false);
+  // Phones: ✕ instead of ‹ (a card over the page rather than a step in — e.g. a lesson opened
+  // from a notification)
+  readonly closeIcon = input(false);
   // Phones too: the cursor in the first field once it's in (e.g. a new student's name)
   readonly autofocus = input(false);
   readonly canSave = input(false);

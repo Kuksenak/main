@@ -82,6 +82,8 @@ interface Attempt {
 })
 export class LessonAttempts {
   readonly lesson = input.required<Lesson>();
+  // A student's answers to open right away (a card opened from a notification)
+  readonly attempt = input<string | null>(null);
 
   private http = inject(HttpClient);
   private i18n = inject(I18nService);
@@ -116,6 +118,15 @@ export class LessonAttempts {
       if (!a) return;
       this.open.set(a);
       router.navigate([], { queryParams: { attempt: null }, queryParamsHandling: 'merge', replaceUrl: true });
+    });
+    // [attempt]: the same, once (not again when the list reloads)
+    let shown = false;
+    effect(() => {
+      const id = this.attempt();
+      const a = !shown && id && this.attempts().find((x) => x.id === id);
+      if (!a) return;
+      shown = true;
+      this.open.set(a);
     });
   }
 

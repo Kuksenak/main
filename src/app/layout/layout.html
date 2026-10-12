@@ -19,8 +19,12 @@
         <div class="flex min-w-0 flex-1 items-center gap-1 desktop:hidden [&_app-search-field]:flex-1 [&_app-search-bar]:flex-1 [&_.field]:h-[var(--control-round)] [&_.field]:rounded-full"><ng-container [ngTemplateOutlet]="content" /></div>
       } @else {
         @if (toolbar.back()) {
-          <button type="button" (click)="back()" [attr.aria-label]="'action.back' | t" class="icon-btn mr-1 shrink-0 desktop:hidden">
-            <app-icon name="chevron-left" class="-ml-0.5 size-7" />
+          <button type="button" (click)="back()" [attr.aria-label]="(toolbar.close() ? 'action.done' : 'action.back') | t" class="icon-btn mr-1 shrink-0 desktop:hidden">
+            @if (toolbar.close()) {
+              <app-icon name="close" class="size-6" />
+            } @else {
+              <app-icon name="chevron-left" class="-ml-0.5 size-7" />
+            }
           </button>
         }
         <!-- The page's own buttons (phones), e.g. search -->

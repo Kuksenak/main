@@ -1,5 +1,4 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { NotificationsService } from '../services/notifications.service';
 
 /**
@@ -25,10 +24,9 @@ import { NotificationsService } from '../services/notifications.service';
 })
 export class NotificationBanner {
   protected readonly notifications = inject(NotificationsService);
-  private router = inject(Router);
 
   protected open(url: string): void {
     this.notifications.dismiss();
-    this.router.navigateByUrl(url);
+    this.notifications.open(url);
   }
 }

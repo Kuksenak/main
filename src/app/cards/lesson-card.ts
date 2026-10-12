@@ -26,6 +26,7 @@ import { LessonState } from '../lessons/lesson-state';
       [title]="s.editing() ? '' : (s.lesson()?.title ?? '')"
       [bigTitle]="true"
       [wide]="true"
+      [closeIcon]="!!entry().attempt"
       [actions]="s.editing()"
       [dirty]="s.editing() && s.dirty()"
       [canSave]="s.canSave()"
@@ -48,7 +49,7 @@ import { LessonState } from '../lessons/lesson-state';
           <!-- Where it is next (else last) and its public link, then the content (the title is in
                the top bar) -->
           <app-lesson-info [lesson]="l" [compact]="true" />
-          <app-lesson-attempts [lesson]="l" />
+          <app-lesson-attempts [lesson]="l" [attempt]="entry().attempt ?? null" />
           <app-lesson-content [blocks]="l.blocks" />
         }
       </div>

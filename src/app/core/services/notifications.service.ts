@@ -1,10 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { SwPush } from '@angular/service-worker';
 import type { HubConnection } from '@microsoft/signalr';
 import { environment } from '@environments/environment';
 import { Subject, catchError, firstValueFrom, of } from 'rxjs';
 import { AuthStore } from '../../auth/auth.store';
+import { DeviceDetectionService } from './device-detection.service';
+import { NavStack } from './nav-stack.service';
 
 /** Something for the teacher (e.g. a student finished a lesson): what to show, where a tap goes. */
 export interface TeacherNotification {
@@ -26,6 +29,9 @@ export class NotificationsService {
   private http = inject(HttpClient);
   private auth = inject(AuthStore);
   private swPush = inject(SwPush);
+  private router = inject(Router);
+  private stack = inject(NavStack);
+  private device = inject(DeviceDetectionService);
 
   /** The banner's notification (null: none showing). */
   readonly showing = signal<TeacherNotification | null>(null);
@@ -99,6 +105,20 @@ export class NotificationsService {
   dismiss(): void {
     clearTimeout(this.hideTimer);
     this.showing.set(null);
+  }
+
+  /**
+   * Opens what a notification is about (its URL). Phones: a lesson comes up as a card right over
+   * the current page (the student's answers on top; just ✕, closing back to where you were);
+   * otherwise the page itself.
+   */
+  open(url: string): void {
+    const m = /^\/lessons\/([^/?#]+)(?:\?attempt=([^&#]+))?/.exec(url);
+    if (m && this.device.isMobile()) {
+      this.stack.push({ kind: 'lesson', id: m[1], attempt: m[2], readOnly: true });
+      return;
+    }
+    this.router.navigateByUrl(url);
   }
 
   // ---- Push (this device) ----

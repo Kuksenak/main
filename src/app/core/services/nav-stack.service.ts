@@ -14,6 +14,7 @@ export interface StackEntry {
   studentIds?: string[]; // new group: pre-selected members
   edit?: boolean; // student / group: open straight in the form (else it opens for reading, Edit → the form)
   readOnly?: boolean; // opened from another card: just for reading, no links out of it
+  attempt?: string; // lesson: a student's answers to open on top of it (from a notification)
 }
 
 @Injectable({ providedIn: 'root' })
