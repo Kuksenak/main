@@ -22,7 +22,8 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
  * edge stays rounded instead of being cut straight (`!rounded-none` in `viewportClass` where it
  * sits inside a card; labels on phones are inset clear of the corner, see .card-label). The
  * thumb sits 10px (desktop: 6px) outside the content edge, the same everywhere; padding on the
- * host is the room it sits in.
+ * host is the room it sits in. (The mask and isolation: iOS Safari otherwise sometimes stops
+ * clipping a rounded scrolling box while it scrolls — rows drawn over what's above it.)
  */
 @Component({
   selector: 'app-scroll-area',
@@ -41,7 +42,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
       }
       <div
         #viewport
-        class="no-scrollbar relative min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[var(--radius-card)]"
+        class="no-scrollbar relative isolate min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-[var(--radius-card)] [-webkit-mask-image:-webkit-radial-gradient(white,black)]"
         [class]="viewportClass()"
         (scroll)="onScroll()"
       >
