@@ -30,7 +30,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
   template: `
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:p-4"
-      [class.desktop:bg-[var(--backdrop)]]="!overPage"
+      [class.desktop:bg-[var(--backdrop)]]="!overPage && dim()"
       [class.desktop:!p-2]="wide()"
       (click)="back(null)"
     >
@@ -68,7 +68,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
               <app-icon name="chevron-left" class="-ml-0.5 size-7" />
             }
           </button>
-          <span class="text-body pointer-events-none absolute inset-x-0 text-center font-semibold" [class.big-title]="bigTitle()">{{ title() }}</span>
+          <span class="text-body pointer-events-none absolute inset-x-0 truncate px-[6.5rem] text-center font-semibold" [class.big-title]="bigTitle()">{{ title() }}</span>
           @if (actions()) {
             <button
               type="button"
@@ -152,6 +152,9 @@ export class PageSheet {
   readonly canSave = input(false);
   readonly deletable = input(false);
   readonly wide = input(false);
+  // Desktop: the window behind darkened (false: left as it is — e.g. a student's answers over
+  // the lesson, which stays readable)
+  readonly dim = input(true);
   // Desktop: a wider dialog (room for two columns, e.g. a student's details and events).
   readonly large = input(false);
   // false: back / ✕ / Cancel / a click outside emit `cancel` and leave the page open (e.g. a
@@ -180,7 +183,15 @@ export class PageSheet {
   protected readonly overPage = this.layers.overPage(this.layer); // the page is already dimmed
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => this.layers.remove(this.layer));
+    // Over the whole window wherever it's declared: moved to <body>, so no ancestor (a scroll
+    // area's mask / isolate, a transform) turns `fixed` into "inside that box" — e.g. a
+    // student's answers opened from within a lesson's column
+    const el = this.host.nativeElement;
+    afterNextRender(() => document.body.appendChild(el));
+    inject(DestroyRef).onDestroy(() => {
+      this.layers.remove(this.layer);
+      el.remove();
+    });
     // Desktop editors (with actions) start with the cursor in their first field, once they've
     // slid in (on phones only with `autofocus` — the keyboard covers part of the card; the tap that
     // opened it has to bring the keyboard up, see primeKeyboard).

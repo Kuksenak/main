@@ -3,7 +3,9 @@ import { DestroyRef } from '@angular/core';
 import { NotificationsService } from '../core/services/notifications.service';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { environment } from '@environments/environment';
-import { catchError, of } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, map, of } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
@@ -27,6 +29,7 @@ interface Attempt {
  * The teacher's view of who went through the lesson by its public link: a "Students" card —
  * each one's name, when they were last there, how many exercises they answered and how many
  * right; a tap opens their answers (the lesson as they left it). Nothing shows until someone has.
+ * `?attempt=<id>` (a "finished" notification's link) opens that one's answers right away.
  */
 @Component({
   selector: 'app-lesson-attempts',
@@ -63,7 +66,7 @@ interface Attempt {
 
     <!-- One student's answers -->
     @if (open(); as a) {
-      <app-page-sheet [title]="a.name" [actions]="false" (closed)="open.set(null)">
+      <app-page-sheet [title]="a.name" [actions]="false" [dim]="false" (closed)="open.set(null)">
         <div class="flex flex-col gap-5">
           <h1 class="px-1 text-xl font-semibold desktop:block mobile:hidden">{{ a.name }}</h1>
           @let s = score(a);
@@ -99,9 +102,21 @@ export class LessonAttempts {
     effect(() => this.load(this.lesson().id));
     // Someone just finished it: the list again (the banner says so)
     const sub = inject(NotificationsService).received.subscribe((n) => {
-      if (n.kind === 'lessonFinished' && n.url.endsWith(`/${this.lesson().id}`)) this.load(this.lesson().id);
+      if (n.kind === 'lessonFinished' && n.url.split('?')[0].endsWith(`/${this.lesson().id}`)) this.load(this.lesson().id);
     });
     inject(DestroyRef).onDestroy(() => sub.unsubscribe());
+
+    // ?attempt=<id> (from a notification): their answers on top, once loaded; the param goes then
+    // (‹ closes them back to the lesson, a reload doesn't reopen them)
+    const router = inject(Router);
+    const wanted = toSignal(inject(ActivatedRoute).queryParamMap.pipe(map((q) => q.get('attempt'))));
+    effect(() => {
+      const id = wanted();
+      const a = id && this.attempts().find((x) => x.id === id);
+      if (!a) return;
+      this.open.set(a);
+      router.navigate([], { queryParams: { attempt: null }, queryParamsHandling: 'merge', replaceUrl: true });
+    });
   }
 
   private load(id: string): void {

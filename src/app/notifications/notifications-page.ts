@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { environment } from '@environments/environment';
 import { catchError, of } from 'rxjs';
@@ -20,16 +20,16 @@ interface Item {
 
 /**
  * The teacher's notifications (e.g. a student finished a lesson), latest first: what it said and
- * when; a tap opens what it's about. A page of its own like Install (phones: ‹ in the top bar);
- * a new one arriving meanwhile comes in at the top.
+ * when; a tap opens what it's about. A page of its own like Install, the whole width (phones: ‹
+ * and the title in the top bar); a new one arriving meanwhile comes in at the top.
  */
 @Component({
   selector: 'app-notifications-page',
   imports: [Icon, TranslatePipe],
   template: `
     <main class="min-h-0 w-full flex-1 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-1 desktop:pt-6">
-      <div class="mx-auto flex w-full max-w-xl flex-col gap-4">
-        <h1 class="px-1 text-[1.75rem] font-bold leading-tight desktop:text-xl desktop:font-semibold">{{ 'settings.notifications' | t }}</h1>
+      <div class="flex w-full flex-col gap-4">
+        <h1 class="px-1 text-xl font-semibold mobile:hidden">{{ 'settings.notifications' | t }}</h1>
         @if (items(); as list) {
           @if (list.length) {
             <div class="card">
@@ -64,12 +64,14 @@ export class NotificationsPage {
     // A new one meanwhile: the list again
     const sub = inject(NotificationsService).received.subscribe(() => this.load());
 
-    // Phones: ‹ in the top bar
+    // Phones: ‹ and the title in the top bar
     const toolbar = inject(ToolbarService);
     toolbar.back.set(true);
+    effect(() => toolbar.title.set(this.i18n.t('settings.notifications')));
     inject(DestroyRef).onDestroy(() => {
       sub.unsubscribe();
       toolbar.back.set(false);
+      toolbar.title.set('');
     });
   }
 

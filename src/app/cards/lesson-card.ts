@@ -23,6 +23,8 @@ import { LessonState } from '../lessons/lesson-state';
   template: `
     <app-page-sheet
       #page
+      [title]="s.editing() ? '' : (s.lesson()?.title ?? '')"
+      [bigTitle]="true"
       [wide]="true"
       [actions]="s.editing()"
       [dirty]="s.editing() && s.dirty()"
@@ -43,8 +45,8 @@ import { LessonState } from '../lessons/lesson-state';
         @if (s.editing()) {
           <app-lesson-form [(value)]="s.draft" />
         } @else if (s.lesson(); as l) {
-          <!-- Its title, where it is next (else last) and its public link, then the content -->
-          <h1 class="px-1 text-[1.75rem] font-bold leading-tight">{{ l.title }}</h1>
+          <!-- Where it is next (else last) and its public link, then the content (the title is in
+               the top bar) -->
           <app-lesson-info [lesson]="l" [compact]="true" />
           <app-lesson-attempts [lesson]="l" />
           <app-lesson-content [blocks]="l.blocks" />
@@ -62,13 +64,17 @@ export class LessonCard implements OnInit {
   private destroyRef = inject(DestroyRef);
   private readonly page = viewChild.required<PageSheet>('page');
 
-  // The lesson's link, when the card was opened from it.
+  // The lesson's link, when the card was opened from it; and whether the app was already open
+  // before (e.g. a notification tapped in it) — then closing goes back there.
   private link: string | null = null;
+  private cameFromApp = false;
 
   ngOnInit(): void {
     const own = `/lessons/${this.entry().id}`;
     if (this.router.url !== own) return;
     this.link = own;
+    // Angular numbers its navigations in history.state: 1 is the app's first page
+    this.cameFromApp = (history.state?.navigationId ?? 1) > 1;
     const sub = this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe(() => {
@@ -77,8 +83,13 @@ export class LessonCard implements OnInit {
     this.destroyRef.onDestroy(() => sub.unsubscribe());
   }
 
+  // Opened from its link: back where it came from in the app (the notifications, …), else the
+  // lesson library.
   protected onClosed(): void {
-    if (this.link && this.router.url === this.link) this.router.navigate(['/lessons']);
+    if (this.link && this.router.url === this.link) {
+      if (this.cameFromApp) history.back();
+      else this.router.navigate(['/lessons']);
+    }
     this.closed.emit();
   }
 

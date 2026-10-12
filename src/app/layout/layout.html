@@ -27,7 +27,12 @@
         @if (toolbar.actions(); as actions) {
           <div class="flex shrink-0 items-center gap-2 desktop:hidden"><ng-container [ngTemplateOutlet]="actions" /></div>
         }
-        <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
+        @if (toolbar.back()) {
+          <!-- A page's title, in the middle between ‹ and the menu / account (clear of both) -->
+          <span class="text-body pointer-events-none absolute inset-x-0 truncate px-[8.5rem] text-center font-semibold desktop:hidden">{{ toolbar.title() }}</span>
+        } @else {
+          <span class="truncate text-xl font-semibold desktop:hidden">{{ toolbar.title() }}</span>
+        }
       }
       <!-- Desktop tabs, each with its section icon; the current one on the account button's gray -->
       @for (item of navItems; track item.path) {
@@ -39,9 +44,7 @@
       }
     </nav>
     <!-- Pages menu (phones; desktop has the tabs) -->
-    <!-- (a page searching: the menu and account slide off to the right, their room going to its
-         field) -->
-    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="slide-away icon-btn shrink-0 desktop:hidden" [class.slid-away]="toolbar.searching()">
+    <button #menuBtn type="button" (click)="menuOpen.set(true)" [attr.aria-label]="'nav.menu' | t" class="icon-btn shrink-0 desktop:hidden">
       <!-- Desktop: in the account button's style (gray fill, same height), smaller dots -->
       <app-icon name="grid" class="size-6 desktop:size-4" />
     </button>
@@ -50,12 +53,11 @@
          Green dot when an app update is ready. -->
     <button
       #avatarBtn
-      [class.slid-away]="toolbar.searching()"
+     
       type="button"
       (click)="accountOpen.set(true)"
       [attr.aria-label]="'account.title' | t"
       class="relative"
-      [class.slide-away]="!desktop"
       [class.btn-confirm]="!desktop"
       [class.account-pill]="desktop"
       [class.!h-[2.375rem]]="desktop"

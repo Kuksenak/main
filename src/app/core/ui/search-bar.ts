@@ -4,15 +4,14 @@ import { Icon } from './icon/icon';
 
 /**
  * Phones' search, in the top bar: a gray "🔍 Search" field (the placeholder centered); a tap types
- * right in it — `active` turns on (the top bar's menu and account slide away, the field widens), a
- * round ✕ in the field's gray slides in beside it: it clears and leaves. A tap anywhere else puts
- * the keyboard away (an empty field leaves search then; with text the results stay). Two-way
- * bound: `[(value)]`, `[(active)]`.
+ * right in it (nothing around it moves); ✕ inside clears and leaves. A tap anywhere else puts the
+ * keyboard away (an empty field leaves search then; with text the results stay). Two-way bound:
+ * `[(value)]`, `[(active)]`.
  */
 @Component({
   selector: 'app-search-bar',
   imports: [Icon, TranslatePipe],
-  host: { class: 'flex min-w-0 items-center gap-3' },
+  host: { class: 'flex min-w-0 items-center' },
   template: `
     <label class="relative flex h-[var(--control-round)] min-w-0 flex-1 items-center gap-2 rounded-full bg-[var(--fill)] px-4">
       <!-- At rest: the icon and "Search" in the middle (the field is under it, empty) -->
@@ -37,19 +36,13 @@ import { Icon } from './icon/icon';
         [placeholder]="active() ? ('students.search' | t) : ''"
         class="text-body min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-40 [&::-webkit-search-cancel-button]:appearance-none"
       />
+      @if (active() || value()) {
+        <!-- ✕ inside: clears and leaves search (pointerdown: no blur first) -->
+        <button type="button" (pointerdown)="$event.preventDefault()" (click)="leave()" [attr.aria-label]="'action.cancel' | t" class="-mr-1.5 flex size-7 shrink-0 items-center justify-center rounded-full opacity-50 active:opacity-30">
+          <app-icon name="close" [strokeWidth]="2.25" class="size-5" />
+        </button>
+      }
     </label>
-    @if (active()) {
-      <!-- ✕ in the field's gray, sliding in: clears and leaves search (pointerdown: no blur first) -->
-      <button
-        type="button"
-        (pointerdown)="$event.preventDefault()"
-        (click)="leave()"
-        [attr.aria-label]="'action.cancel' | t"
-        class="flex size-[var(--control-round)] shrink-0 items-center justify-center rounded-full bg-[var(--fill)] [animation:slideInRight_300ms_var(--ease-out-quick)] active:opacity-60"
-      >
-        <app-icon name="close" class="size-6" />
-      </button>
-    }
   `,
 })
 export class SearchBar {
