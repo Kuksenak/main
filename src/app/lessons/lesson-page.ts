@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { LessonAttempts } from './lesson-attempts';
 import { LessonContent } from './lesson-content';
 import { LessonForm } from './lesson-form';
 import { LessonInfo } from './lesson-info';
@@ -16,7 +17,7 @@ import { LessonState } from './lesson-state';
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [ConfirmDelete, LessonContent, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
+  imports: [ConfirmDelete, LessonAttempts, LessonContent, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -43,7 +44,10 @@ import { LessonState } from './lesson-state';
           <!-- The content, and beside it its events and public link -->
           <div class="flex items-start gap-6">
             <app-lesson-content class="min-w-0 flex-1" [blocks]="l.blocks" />
-            <app-lesson-info class="w-72 shrink-0" [lesson]="l" />
+            <div class="flex w-72 shrink-0 flex-col gap-4">
+              <app-lesson-attempts [lesson]="l" />
+              <app-lesson-info [lesson]="l" />
+            </div>
           </div>
         } @else {
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>

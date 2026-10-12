@@ -4,6 +4,7 @@ import { filter } from 'rxjs';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { LessonAttempts } from '../lessons/lesson-attempts';
 import { LessonContent } from '../lessons/lesson-content';
 import { LessonForm } from '../lessons/lesson-form';
 import { LessonInfo } from '../lessons/lesson-info';
@@ -18,7 +19,7 @@ import { LessonState } from '../lessons/lesson-state';
  */
 @Component({
   selector: 'app-lesson-card',
-  imports: [LessonContent, LessonForm, LessonInfo, PageSheet, TranslatePipe],
+  imports: [LessonAttempts, LessonContent, LessonForm, LessonInfo, PageSheet, TranslatePipe],
   template: `
     <app-page-sheet
       #page
@@ -45,6 +46,7 @@ import { LessonState } from '../lessons/lesson-state';
           <!-- Its title, where it is next (else last) and its public link, then the content -->
           <h1 class="px-1 text-[1.75rem] font-bold leading-tight">{{ l.title }}</h1>
           <app-lesson-info [lesson]="l" [compact]="true" />
+          <app-lesson-attempts [lesson]="l" />
           <app-lesson-content [blocks]="l.blocks" />
         }
       </div>

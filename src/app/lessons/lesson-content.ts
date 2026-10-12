@@ -1,27 +1,53 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, computed, input, model } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { LessonBlock } from './lesson.service';
 
+/** Exercise answers (block → option) and checklist ticks ("block:item"); blocks by their place in the lesson. */
+export type LessonAnswers = Record<number, number>;
+
 /**
- * A lesson's content as read. The teacher's own blocks under "For me" (🔒), the rest under "For
- * students" (👁) — no labels when there's only one kind, nor on the public link (`shared`: only
- * the students' blocks come there). Texts as paragraphs, checklists with ticks (kept while the
- * page is open), exercises: tap an answer — right in green, wrong in red; older lessons' headings
- * and links too.
+ * A lesson's content as read, in one of three ways:
+ * - `teacher`: the teacher's own blocks under "For me" (🔒), the rest under "For students" (👁) —
+ *   no labels when there's only one kind; exercises with the right answer marked; checklist ticks
+ *   kept while the page is open;
+ * - `student` (the public link — only the students' blocks come there, `indexes` giving each one's
+ *   place in the whole lesson): a tap answers — right ✓ green; wrong ✗ orange, the right one shown;
+ *   ticks; both two-way bound (`answers`, `ticks`) so the page saves them;
+ * - `review`: one student's answers and ticks as they left them (their pick marked with `who`).
+ * Exercises are cards of rows (the question, then the answers with a circle); texts paragraphs;
+ * older lessons' headings and links too.
  */
 @Component({
   selector: 'app-lesson-content',
   imports: [Icon, NgTemplateOutlet, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
+    <!-- An answer's circle: empty; ✓ (green); ✗ (orange) -->
+    <ng-template #dot let-state>
+      @switch (state) {
+        @case ('right') {
+          <span class="flex size-[1.375rem] shrink-0 items-center justify-center rounded-full bg-[var(--success)] text-white"><app-icon name="check" [strokeWidth]="3" class="size-3.5" /></span>
+        }
+        @case ('wrong') {
+          <span class="flex size-[1.375rem] shrink-0 items-center justify-center rounded-full bg-[var(--warning)] text-white"><app-icon name="close" [strokeWidth]="3" class="size-3.5" /></span>
+        }
+        @case ('picked') {
+          <span class="flex size-[1.375rem] shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-white"><app-icon name="check" [strokeWidth]="3" class="size-3.5" /></span>
+        }
+        @default {
+          <span class="size-[1.375rem] shrink-0 rounded-full shadow-[inset_0_0_0_1.5px_color-mix(in_srgb,var(--text)_28%,transparent)]"></span>
+        }
+      }
+    </ng-template>
+
     <ng-template #block let-b let-i="i">
       @switch (b.kind) {
         @case ('checklist') {
           <div class="card">
             @for (item of b.items ?? []; track $index; let j = $index) {
-              <button type="button" (click)="tick(i, j)" class="list-row w-full text-left">
+              <button type="button" (click)="tick(i, j)" class="list-row w-full text-left" [disabled]="mode() === 'review'">
                 <span class="check" [class.is-on]="ticked(i, j)">
                   @if (ticked(i, j)) {
                     <app-icon name="check" [strokeWidth]="3" class="size-3.5" />
@@ -33,20 +59,19 @@ import { LessonBlock } from './lesson.service';
           </div>
         }
         @case ('exercise') {
-          <div class="card flex flex-col gap-3 px-[var(--row-px)] py-3">
-            <p class="text-footnote opacity-50">{{ 'lessons.exercise' | t }}</p>
-            <p class="font-medium">{{ b.text }}</p>
-            <div class="flex flex-wrap gap-2">
+          <div class="flex flex-col gap-1.5">
+            <span class="card-label">{{ 'lessons.exercise' | t }}</span>
+            <div class="card">
+              <div class="list-row py-3"><span class="font-medium">{{ b.text }}</span></div>
               @for (o of b.options ?? []; track $index; let j = $index) {
-                <button
-                  type="button"
-                  (click)="choose(i, j)"
-                  class="chip !rounded-full"
-                  [class.!bg-[var(--success)]]="chosen(i) === j && b.answer === j"
-                  [class.!bg-[var(--danger)]]="chosen(i) === j && b.answer != null && b.answer !== j"
-                  [class.!bg-[var(--accent)]]="chosen(i) === j && b.answer == null"
-                  [class.text-white]="chosen(i) === j"
-                >{{ o }}</button>
+                @let state = optionState(b, i, j);
+                <button type="button" (click)="choose(i, j)" class="list-row w-full text-left" [disabled]="mode() !== 'student'">
+                  <ng-container [ngTemplateOutlet]="dot" [ngTemplateOutletContext]="{ $implicit: state }" />
+                  <span class="flex-1" [class.font-semibold]="state === 'right'">{{ o }}</span>
+                  @if (note(b, i, j); as n) {
+                    <span class="text-footnote opacity-55">{{ n === 'right' ? ('lessons.rightAnswer' | t) : n }}</span>
+                  }
+                </button>
               }
             </div>
           </div>
@@ -74,7 +99,7 @@ import { LessonBlock } from './lesson.service';
       <p class="text-footnote opacity-50">{{ 'lessons.noContent' | t }}</p>
     }
     @for (g of groups(); track g.key) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-4">
         @if (labelled()) {
           <span class="card-label flex items-center gap-1.5">
             <app-icon [name]="g.key === 'me' ? 'lock' : 'eye'" class="size-4" />{{ (g.key === 'me' ? 'lessons.forMe' : 'lessons.forStudents') | t }}
@@ -89,41 +114,58 @@ import { LessonBlock } from './lesson.service';
 })
 export class LessonContent {
   readonly blocks = input.required<LessonBlock[]>();
-  /** The public link: just the blocks, no "For me / For students". */
-  readonly shared = input(false);
+  /** Each block's place in the whole lesson (the public link has only the students' ones). */
+  readonly indexes = input<number[] | null>(null);
+  readonly mode = input<'teacher' | 'student' | 'review'>('teacher');
+  /** Review: whose answers (shown beside their pick). */
+  readonly who = input('');
+  readonly answers = model<LessonAnswers>({});
+  readonly ticks = model<string[]>([]);
 
-  // The teacher's own blocks first, then the students' (each keeps its index in the lesson)
+  // The teacher's own blocks first, then the students' (each with its place in the lesson)
   protected readonly groups = computed(() => {
-    const indexed = this.blocks().map((block, i) => ({ block, i }));
+    const indexes = this.indexes();
+    const indexed = this.blocks().map((block, n) => ({ block, i: indexes?.[n] ?? n }));
     return [
       { key: 'me', blocks: indexed.filter((b) => b.block.private) },
       { key: 'students', blocks: indexed.filter((b) => !b.block.private) },
     ].filter((g) => g.blocks.length);
   });
-  protected readonly labelled = computed(() => !this.shared() && this.groups().length > 1);
-
-  // Ticks and chosen answers, while the page is open ("block:item" / block → option)
-  private readonly ticks = signal<ReadonlySet<string>>(new Set());
-  private readonly answers = signal<ReadonlyMap<number, number>>(new Map());
+  protected readonly labelled = computed(() => this.mode() === 'teacher' && this.groups().length > 1);
 
   protected ticked(block: number, item: number): boolean {
-    return this.ticks().has(`${block}:${item}`);
+    return this.ticks().includes(`${block}:${item}`);
   }
 
   protected tick(block: number, item: number): void {
-    const next = new Set(this.ticks());
     const key = `${block}:${item}`;
-    if (next.has(key)) next.delete(key);
-    else next.add(key);
-    this.ticks.set(next);
-  }
-
-  protected chosen(block: number): number | undefined {
-    return this.answers().get(block);
+    this.ticks.update((t) => (t.includes(key) ? t.filter((x) => x !== key) : [...t, key]));
   }
 
   protected choose(block: number, option: number): void {
-    this.answers.update((m) => new Map(m).set(block, option));
+    this.answers.update((a) => ({ ...a, [block]: option }));
+  }
+
+  // An answer's circle: the teacher sees the right one; a student / a review: the pick ✓ or ✗,
+  // and once answered wrong, the right one ✓ (no right answer set: the pick in the accent).
+  protected optionState(b: LessonBlock, block: number, option: number): 'right' | 'wrong' | 'picked' | 'none' {
+    const right = b.answer ?? null;
+    if (this.mode() === 'teacher') return option === right ? 'right' : 'none';
+    const picked = this.answers()[block];
+    if (picked === undefined) return 'none';
+    if (right === null) return picked === option ? 'picked' : 'none';
+    if (option === right) return 'right';
+    return picked === option ? 'wrong' : 'none';
+  }
+
+  // Beside an answer: "right answer" (where it isn't the pick itself), the student's name (review)
+  protected note(b: LessonBlock, block: number, option: number): string | null {
+    const right = b.answer ?? null;
+    const picked = this.answers()[block];
+    if (this.mode() === 'review' && picked === option) return this.who() || null;
+    if (option !== right) return null;
+    if (this.mode() === 'teacher') return 'right';
+    return picked !== undefined && picked !== right ? 'right' : null;
   }
 
   protected host(url: string | null): string {

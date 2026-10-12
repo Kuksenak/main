@@ -90,7 +90,7 @@ import { LessonUsage } from './lesson-usage';
     <!-- Phones: the search's button in the top bar, its field at the bottom; + bottom-right -->
     @if (!desktop) {
       <ng-template #searchButton>
-        <button type="button" (click)="fsearch.start()" [attr.aria-label]="'students.search' | t" class="icon-btn"><app-icon name="search" class="size-6" /></button>
+        <button type="button" (click)="fsearch.start()" [attr.aria-label]="'students.search' | t" class="icon-btn" [class.invisible]="searching()"><app-icon name="search" class="size-6" /></button>
       </ng-template>
       <app-floating-search #fsearch [button]="false" [(value)]="query" />
     }
