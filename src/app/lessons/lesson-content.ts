@@ -120,7 +120,7 @@ export type { LessonFills } from './gaps';
                                   class="rounded-md px-1 leading-[1.35] transition-colors disabled:cursor-default"
                                   [class.font-semibold]="w === o"
                                   [class.bg-[var(--fill)]]="w === o"
-                                  [class.text-[color-mix(in_srgb,var(--text)_72%,transparent)]]="w === o"
+                                  [class.text-[var(--accent)]]="w === o"
                                   [class.opacity-50]="!!w && w !== o"
                                   [class.underline]="!w"
                                   [class.decoration-dotted]="!w"
@@ -142,7 +142,7 @@ export type { LessonFills } from './gaps';
                             [disabled]="locked()"
                             (input)="write(i, g.gap, $any($event.target).value)"
                             [style.width.ch]="fitsContent ? null : width(g, w)"
-                            class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b border-[color-mix(in_srgb,var(--text)_40%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline font-semibold leading-[1.35] text-[color-mix(in_srgb,var(--text)_72%,transparent)] outline-none transition-colors focus:border-[color-mix(in_srgb,var(--text)_70%,transparent)] disabled:opacity-100"
+                            class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b border-[color-mix(in_srgb,var(--text)_40%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline font-semibold leading-[1.35] text-[var(--accent)] outline-none transition-colors focus:border-[color-mix(in_srgb,var(--text)_70%,transparent)] disabled:opacity-100"
                           />
                           }
                         }
