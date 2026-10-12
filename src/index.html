@@ -23,13 +23,25 @@
   <script>
     (function () {
       var query = window.matchMedia('(prefers-color-scheme: dark)');
+      // The theme follows the system. The status bar's color (theme-color): a new tag rather than an
+      // edited one — iOS didn't notice an edit while a popup was open (only once it closed).
       function apply(isDark) {
         document.documentElement.classList.toggle('dark', isDark);
-        var meta = document.querySelector('meta[name="theme-color"]');
-        if (meta) meta.setAttribute('content', isDark ? '#000000' : '#faf9f5');
+        var color = isDark ? '#000000' : '#faf9f5';
+        var old = document.querySelector('meta[name="theme-color"]');
+        if (old && old.getAttribute('content') === color) return;
+        var meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = color;
+        if (old) old.replaceWith(meta);
+        else document.head.appendChild(meta);
       }
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });
+      // Back in the app: the system theme may have changed while it was hidden.
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible') apply(query.matches);
+      });
 
       var ua = navigator.userAgent;
       var mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||

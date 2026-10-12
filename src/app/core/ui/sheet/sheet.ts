@@ -41,6 +41,7 @@ import { InstallService } from '../../services/install.service';
           class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-3rem)] origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [class.w-72]="!wide()"
           [class.w-96]="wide()"
+          [class.h-[min(32rem,calc(var(--app-h,100dvh)-3rem))]]="tall()"
         >
           <ng-container [ngTemplateOutlet]="content" />
         </div>
@@ -88,8 +89,8 @@ export class Sheet {
   readonly origin = input<HTMLElement | null>(null);
   /** Desktop dropdown: wider (24rem instead of 18rem). */
   readonly wide = input(false);
-  /** Phones: a fixed height, up to the middle of the top bar (not the content's: pages switching
-   * inside it don't make it jump). */
+  /** A fixed height, not the content's (pages switching inside it don't make it jump): phones up to
+   * the middle of the top bar; the desktop dropdown 32rem (less in a short window). */
   readonly tall = input(false);
   readonly closed = output<void>();
 

@@ -19,7 +19,7 @@ import { StackHost } from '../cards/stack-host';
 import { BrandIcon, BrandIconName } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
-import { SettingsSheet } from '../settings/settings-sheet';
+import { SettingsPage, SettingsSheet } from '../settings/settings-sheet';
 
 @Component({
   selector: 'app-layout',
@@ -43,9 +43,15 @@ export class Layout {
     inject(GoogleCalendarService).ensureLoaded();
 
     // Back from Google's consent screen (the API returns to the app's root with
-    // ?calendar=connected / error / disabled): to Settings, where it was switched on.
+    // ?calendar=connected / error / disabled): Settings open on Integrations, where it was
+    // switched on (the error line if it didn't connect); the query is dropped from the address.
     const calendar = new URLSearchParams(location.search).get('calendar');
-    if (calendar) setTimeout(() => this.router.navigate(['/settings'], { queryParams: { calendar }, replaceUrl: true }));
+    if (calendar) {
+      this.settingsStart = 'integrations';
+      this.settingsFailed = calendar === 'connected' ? null : calendar;
+      this.accountOpen.set(true);
+      setTimeout(() => this.router.navigate([], { queryParams: {}, replaceUrl: true }));
+    }
   }
 
   // Sections: desktop tabs and the navigation menu.
@@ -53,12 +59,6 @@ export class Layout {
     { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
     { path: '/students', label: 'nav.students', icon: 'people' },
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
-  ];
-  // Under the account button: Settings; Install only in the browser (not once it's the installed
-  // app). (About is off the menu for now.)
-  protected readonly accountItems: { path: string; label: TranslationKey; icon?: BrandIconName }[] = [
-    { path: '/settings', label: 'nav.settings' },
-    ...(this.install.standalone ? [] : [{ path: '/install', label: 'nav.install' as TranslationKey }]),
   ];
   protected readonly menuOpen = signal(false);
 
@@ -85,19 +85,13 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
 
   protected readonly accountOpen = signal(false);
+  // Settings opened by the app itself (back from Google): on that page, with the error or not
+  protected settingsStart: SettingsPage | null = null;
+  protected settingsFailed: string | null = null;
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
   // Desktop account button: the user's name, else the email.
   protected readonly userName = computed(() => this.auth.name() ?? this.auth.email() ?? '');
 
-  // Hidden app version: tap the email 5 times (again to hide).
-  protected readonly showVersion = signal(false);
-  private versionTaps = 0;
-
-  protected versionTap(): void {
-    if (++this.versionTaps < 5) return;
-    this.versionTaps = 0;
-    this.showVersion.update((v) => !v);
-  }
 
   protected isActive(path: string): boolean {
     return this.router.isActive(path, {

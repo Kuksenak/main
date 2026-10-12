@@ -112,9 +112,17 @@ export class GoogleCalendarService {
       });
   }
 
-  /** Off to Google's consent screen (the API returns to the app afterwards). */
-  connect(): void {
-    window.location.href = `${this.base}/calendars/connect`;
+  /** Off to Google's consent screen, bound to the signed-in account: the API hands out a one-time
+   * link for it, and afterwards accepts only that same Google account (returns to the app either
+   * way). Unreachable: back where it was, with the error. */
+  connect(onError?: () => void): void {
+    this.http
+      .post<{ url: string }>(`${this.base}/calendars/connect-link`, {})
+      .pipe(catchError(() => of(null)))
+      .subscribe((res) => {
+        if (res?.url) window.location.href = `${this.base}${res.url}`;
+        else onError?.();
+      });
   }
 
   disconnect(): void {

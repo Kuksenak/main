@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, signal, viewChild } from '@angular/core';
+import { Component, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -11,11 +11,12 @@ import { Sheet } from '../core/ui/sheet/sheet';
 import { GoogleCalendarService } from '../schedule/google-calendar.service';
 import { IntegrationsSettings, LanguageList, ScheduleSettings } from './sections';
 
-type Page = 'language' | 'schedule' | 'integrations';
+export type SettingsPage = 'language' | 'schedule' | 'integrations';
+type Page = SettingsPage;
 
 /**
- * Phones: the account button's Settings, like the Claude app's — a sheet from the bottom (drag it
- * down or tap outside to close), no title; the email (5 taps show the version); rows
+ * The account button's Settings, like the Claude app's — on phones a sheet from the bottom (drag
+ * it down or tap outside to close), on desktop a dropdown under the button (`origin`); no title; the email (5 taps show the version); rows
  * with an icon, the current value and › — each opens its own page right in the sheet (Language,
  * Schedule, Integrations; ‹ back); Install (in the browser), Update when one is ready, Log out.
  * (The pages live in the sheet: nothing can open over it.)
@@ -24,7 +25,7 @@ type Page = 'language' | 'schedule' | 'integrations';
   selector: 'app-settings-sheet',
   imports: [Icon, IntegrationsSettings, LanguageList, ScheduleSettings, Sheet, TranslatePipe],
   template: `
-    <app-sheet #sheet [tall]="true" (closed)="closed.emit()">
+    <app-sheet #sheet [origin]="origin()" [wide]="true" [tall]="true" (closed)="closed.emit()">
       <!-- A row's page: ‹ back to the list and its title in the middle (the list itself has no
            title) -->
       @if (page()) {
@@ -105,13 +106,20 @@ type Page = 'language' | 'schedule' | 'integrations';
           <div class="[animation:paneIn_280ms_var(--ease-out-quick)]"><app-schedule-settings /></div>
         }
         @case ('integrations') {
-          <div class="[animation:paneIn_280ms_var(--ease-out-quick)]"><app-integrations-settings /></div>
+          <div class="[animation:paneIn_280ms_var(--ease-out-quick)]"><app-integrations-settings [failed]="failed()" /></div>
         }
       }
     </app-sheet>
   `,
 })
-export class SettingsSheet {
+export class SettingsSheet implements OnInit {
+  /** Desktop: the account button (the dropdown hangs under it). */
+  readonly origin = input<HTMLElement | null>(null);
+  /** Open on a page (e.g. Integrations, back from Google) instead of the list. */
+  readonly start = input<Page | null>(null);
+  /** Back from Google without a connection (why: error / disabled / wrong-account): the error line
+   * under Google Calendar. */
+  readonly failed = input<string | null>(null);
   readonly closed = output<void>();
 
   protected readonly auth = inject(AuthStore);
@@ -128,6 +136,11 @@ export class SettingsSheet {
     const page = this.page();
     return page === 'language' ? 'account.language' : page === 'schedule' ? 'nav.schedule' : 'settings.integrations';
   });
+
+  ngOnInit(): void {
+    this.page.set(this.start());
+    this.google.reload(); // fresh status (e.g. just back from Google)
+  }
 
   protected open(page: Page): void {
     this.page.set(page);

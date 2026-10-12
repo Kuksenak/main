@@ -94,7 +94,7 @@ export type IconName =
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
         @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
-        @case ('chevrons-up-down') { <path d="M8.5 9.5 12 6l3.5 3.5M8.5 14.5 12 18l3.5-3.5" /> }
+        @case ('chevrons-up-down') { <path d="M8.5 10 12 7.25l3.5 2.75M8.5 14 12 16.75l3.5-2.75" /> }
         <!-- Installing: Safari's Share and "Add to Home Screen", Chrome's ⋮ and install marks, devices -->
         @case ('share') { <path d="M12 3v12M8 6.5 12 2.5l4 4" /><path d="M8.5 10H7a2.5 2.5 0 0 0-2.5 2.5v6A2.5 2.5 0 0 0 7 21h10a2.5 2.5 0 0 0 2.5-2.5v-6A2.5 2.5 0 0 0 17 10h-1.5" /> }
         @case ('plus-square') { <rect x="3.5" y="3.5" width="17" height="17" rx="4" /><path d="M12 8v8M8 12h8" /> }

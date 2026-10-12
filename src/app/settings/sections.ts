@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -38,8 +38,9 @@ export class ScheduleSettings {
 
 /**
  * Integrations: Google Calendar (its events in the schedule) — on goes through Google's consent
- * screen and comes back (?calendar=connected / error / disabled), off disconnects. `failed`: back
- * from Google without a connection (an error line under the card).
+ * screen and comes back (?calendar=connected / error / disabled / wrong-account), off
+ * disconnects. `failed`: back from Google without a connection — why (an error line under the
+ * card; another Google account than the signed-in one gets its own).
  */
 @Component({
   selector: 'app-integrations-settings',
@@ -56,17 +57,21 @@ export class ScheduleSettings {
         <app-toggle [checked]="!!google.connected()" (checkedChange)="setGoogle($event)" [disabled]="google.connected() === null" />
       </div>
     </div>
-    @if (failed()) {
-      <p class="text-footnote text-[var(--danger)] mobile:px-[var(--row-px)]">{{ 'settings.googleError' | t }}</p>
+    @if (error(); as e) {
+      <p class="text-footnote text-[var(--danger)] mobile:px-[var(--row-px)]">{{ (e === 'wrong-account' ? 'settings.googleWrongAccount' : 'settings.googleError') | t }}</p>
     }
   `,
 })
 export class IntegrationsSettings {
-  readonly failed = input(false);
+  // Why it didn't connect, back from Google (null: it did / nothing tried)
+  readonly failed = input<string | null>(null);
   protected readonly google = inject(GoogleCalendarService);
+  private readonly connectFailed = signal(false);
+  protected readonly error = computed(() => (this.connectFailed() ? 'error' : this.failed()));
 
   protected setGoogle(on: boolean): void {
-    if (on) this.google.connect();
+    this.connectFailed.set(false);
+    if (on) this.google.connect(() => this.connectFailed.set(true));
     else this.google.disconnect();
   }
 }

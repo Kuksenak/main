@@ -69,24 +69,6 @@
   <!-- Cards (event / student / group / lesson) opened over any page; back closes only the top one -->
   <app-stack-host />
 
-  <!-- A page row in a menu: no tap highlight; the current
-       page checked (in the pages menu only, not Settings / About) -->
-  <ng-template #pageRow let-item let-sheet="sheet" let-check="check" let-chevron="chevron">
-    <button type="button" (click)="go(item.path, sheet)" class="group list-row w-full py-2.5 text-left active:!bg-transparent">
-      @if (item.icon) {
-        <app-brand-icon [name]="item.icon" class="size-9" />
-      }
-      <!-- leading-none: the label sits on the icon's middle -->
-      <span class="min-w-0 flex-1 truncate leading-none">{{ item.label | t }}</span>
-      @if (check && isActive(item.path)) {
-        <app-icon name="check" class="size-5 text-[var(--accent)]" />
-      }
-      @if (chevron) {
-        <app-icon name="chevron-right" class="row-chevron" />
-      }
-    </button>
-  </ng-template>
-
   @if (menuOpen()) {
     <!-- Pages menu: the bottom sheet, with a grid of big section icons and their names like
          Google's app launcher (~108 × 100pt tiles, 40pt icons, 16pt names); the current page's
@@ -115,39 +97,15 @@
     </app-sheet>
   }
 
-  <!-- Phones: Settings (like the Claude app's); desktop: the account menu -->
-  @if (accountOpen() && !desktop) {
-    <app-settings-sheet (closed)="accountOpen.set(false)" />
-  }
-  @if (accountOpen() && desktop) {
-    <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
-      <div class="press-bold flex flex-1 flex-col gap-3 desktop:gap-2">
-        <div class="card">
-          <!-- 5 taps on the email show the app version (hidden; for support) -->
-          <button type="button" (click)="versionTap()" class="list-row w-full text-left">
-            <span class="min-w-0 truncate">{{ auth.email() }}</span>
-          </button>
-          @if (showVersion()) {
-            <div class="list-row text-footnote tabular-nums opacity-50">{{ updates.version }}</div>
-          }
-          <!-- Settings, Install (in the browser), in the same card as the email -->
-          @for (item of accountItems; track item.path) {
-            <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: item, sheet: sheet, chevron: true }" />
-          }
-        </div>
-
-
-        <!-- Actions pinned to the bottom -->
-        <div class="mt-auto flex flex-col gap-3 desktop:gap-2">
-          @if (updates.updateReady()) {
-            <button type="button" (click)="updates.apply()" class="card-btn text-[var(--accent)]">
-              {{ 'account.update' | t }}
-            </button>
-          }
-          <button type="button" (click)="logout()" class="card-btn text-[var(--danger)]">{{ 'account.logout' | t }}</button>
-        </div>
-      </div>
-    </app-sheet>
+  <!-- Settings (like the Claude app's): a bottom sheet on phones, a dropdown under the account
+       button on desktop -->
+  @if (accountOpen()) {
+    <app-settings-sheet
+      [origin]="desktop ? avatarBtn : null"
+      [start]="settingsStart"
+      [failed]="settingsFailed"
+      (closed)="accountOpen.set(false); settingsStart = null; settingsFailed = null"
+    />
   }
 
   <!-- Global loading bar — fixed strip at the bottom; components report via LoadingService -->

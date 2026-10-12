@@ -19,7 +19,6 @@ export const routes: Routes = [
       { path: 'lessons', loadComponent: () => import('./lessons/lessons').then((m) => m.Lessons) },
       // The list with that lesson open on top
       { path: 'lessons/:id', loadComponent: () => import('./lessons/lessons').then((m) => m.Lessons) },
-      { path: 'settings', loadComponent: () => import('./settings/settings').then((m) => m.Settings) },
       { path: 'about', loadComponent: () => import('./about/about').then((m) => m.About) },
       { path: 'install', loadComponent: () => import('./install/install').then((m) => m.Install) },
       { path: '', pathMatch: 'full', redirectTo: 'schedule' },

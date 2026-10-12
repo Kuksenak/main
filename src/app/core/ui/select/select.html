@@ -7,12 +7,13 @@
     #origin="cdkOverlayOrigin"
     [disabled]="disabled"
     (click)="toggle()"
-    class="chip gap-2"
+    class="chip gap-0"
     [class.!bg-transparent]="stretch"
     [class.!pr-0]="stretch"
   >
     <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
-    <app-icon name="chevrons-up-down" class="size-5 shrink-0" />
+    <!-- ⇅ thin and a bit large, close to the value (the icon has its own side margin) -->
+    <app-icon name="chevrons-up-down" [strokeWidth]="1.5" class="-ml-0.5 -mr-1 size-6 shrink-0" />
   </button>
 
   <!-- stretch: the whole row opens it too -->
