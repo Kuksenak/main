@@ -27,7 +27,8 @@ export type { LessonFills } from './gaps';
 @Component({
   selector: 'app-lesson-content',
   imports: [Icon, NgTemplateOutlet, TranslatePipe],
-  host: { class: 'flex flex-col gap-5' },
+  // Tiled (a student's page): dense like a textbook page (see .lesson-dense)
+  host: { class: 'flex flex-col', '[class.gap-5]': '!tiled()', '[class.gap-3]': 'tiled()', '[class.lesson-dense]': 'tiled()' },
   template: `
     <!-- An answer's circle: empty; ✓ (green); ✗ (orange) -->
     <ng-template #dot let-state>
@@ -82,7 +83,7 @@ export type { LessonFills } from './gaps';
         }
         @case ('gaps') {
           <div class="flex flex-col gap-1.5">
-            <div class="card flex flex-col gap-1 px-4 py-3">
+            <div class="card gaps-card flex flex-col gap-1 px-4 py-3">
               @for (line of lines(b.text); track $index) {
                 <p class="text-body min-h-[1.5em] leading-[2]">
                   @for (p of line; track $index) {
@@ -161,9 +162,9 @@ export type { LessonFills } from './gaps';
         }
         @if (tiled()) {
           <!-- Desktop: tiles in columns, in order (down the first column, then the next) -->
-          <div class="flex flex-col gap-4 desktop:block desktop:columns-2 desktop:gap-5 2xl:columns-3">
+          <div class="flex flex-col gap-3 desktop:block desktop:columns-2 desktop:gap-4 2xl:columns-3">
             @for (tile of tilesOf(g.blocks); track tile[0].i) {
-              <div class="flex flex-col gap-4 desktop:mb-5 desktop:break-inside-avoid">
+              <div class="flex flex-col gap-2 desktop:mb-4 desktop:break-inside-avoid">
                 @for (b of tile; track b.i) {
                   <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
                 }
