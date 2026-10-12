@@ -10,13 +10,8 @@
      top. Desktop: the list on the left, the picked student / group on the right (Edit opens its form). -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 mobile:pb-0 mobile:pt-0 desktop:flex-row desktop:gap-6 desktop:pb-4">
   <!-- Desktop: the list column as wide as the schedule's calendar column (25rem, the same gap) -->
-  <!-- Phones: the list starts at the tabs' bottom edge (its round corners clip a card leaving
-       under them) -->
-  <section
-    class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-[25rem]"
-    [class.mobile:pt-[calc(env(safe-area-inset-top)+6.75rem)]]="!searchActive()"
-    [class.mobile:pt-[calc(env(safe-area-inset-top)+4rem)]]="searchActive()"
-  >
+  <!-- Phones: the tabs, then the list (its round corners clip a card leaving at its top) -->
+  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-[25rem]">
     <!-- Desktop: the search and Add in one row, both the controls' height (phones: search in
          the toolbar, + at the bottom) -->
     <div class="flex items-center gap-3 mobile:hidden">
@@ -66,23 +61,13 @@
       }
     </ng-template>
 
-    <!-- Phones: the list scrolls under the top bar (the search field in it) and the Groups |
-         Students tabs, which float on a fade from the page color to transparent, like a card's top
-         bar. Searching: the tabs go, groups and students both listed. -->
+    <!-- Phones: Groups | Students under the top bar (the search field in it); they stay while
+         searching — it filters the open tab -->
     @if (!desktop) {
-      <!-- Solid down to the tabs' (searching: the field's) bottom; the fade only in the gap above
-           the list's top, so at rest the first row shows in full and fades as it slides under -->
-      <div
-        class="pointer-events-none absolute inset-x-0 top-0 z-[8] bg-[linear-gradient(to_bottom,var(--app-bg)_calc(100%-0.75rem),transparent)]"
-        [class.h-[calc(env(safe-area-inset-top)+7.5rem)]]="!searchActive()"
-        [class.h-[calc(env(safe-area-inset-top)+4.75rem)]]="searchActive()"
-      ></div>
-      @if (!searchActive()) {
-        <div class="segmented absolute inset-x-4 top-[calc(env(safe-area-inset-top)+4rem)] z-[9]">
-          <button type="button" (click)="tab.set('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
-          <button type="button" (click)="tab.set('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
-        </div>
-      }
+      <div class="segmented shrink-0">
+        <button type="button" (click)="tab.set('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
+        <button type="button" (click)="tab.set('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
+      </div>
     }
 
     @let groupsHere = showGroups() && visibleGroups().length;
@@ -99,11 +84,11 @@
            listed (desktop; a tab says what it is). -->
       <app-scroll-area
         class="min-h-0 flex-1"
-        [contentClass]="'gap-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] desktop:pb-2 ' + (desktop ? '' : 'pt-3')"
+        contentClass="gap-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] desktop:pb-2"
       >
         @if (groupsHere) {
           <div class="flex flex-col gap-1.5">
-            @if (desktop || searchActive()) {
+            @if (desktop) {
               <span class="card-label">{{ 'groups.title' | t }}</span>
             }
             <div class="card"><ng-container [ngTemplateOutlet]="groupRows" /></div>
@@ -111,7 +96,7 @@
         }
         @if (studentsHere) {
           <div class="flex flex-col gap-1.5">
-            @if (desktop || searchActive()) {
+            @if (desktop) {
               <span class="card-label">{{ 'nav.students' | t }}</span>
             }
             <div class="card"><ng-container [ngTemplateOutlet]="studentRows" /></div>

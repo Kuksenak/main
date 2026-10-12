@@ -47,9 +47,9 @@ export class Students {
 
   // Phones: which tab is showing (desktop lists both).
   protected readonly tab = signal<'groups' | 'students'>('students');
-  // Phones: the open tab (searching: both); desktop: both
-  protected readonly showGroups = computed(() => this.desktop || this.searchActive() || this.tab() === 'groups');
-  protected readonly showStudents = computed(() => this.desktop || this.searchActive() || this.tab() === 'students');
+  // Phones: the open tab (searching too: it filters that tab); desktop: both
+  protected readonly showGroups = computed(() => this.desktop || this.tab() === 'groups');
+  protected readonly showStudents = computed(() => this.desktop || this.tab() === 'students');
 
   private readonly byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, this.i18n.locale());
 
@@ -93,17 +93,13 @@ export class Students {
   ];
 
   constructor() {
-    // Mobile toolbar: floating over the list (which scrolls under it and the tabs, like a card's
-    // page).
     const toolbar = inject(ToolbarService);
-    if (!this.desktop) toolbar.overlay.set(true);
     // The search field in the top bar (searching: the menu and account step aside)
     if (!this.desktop) effect(() => toolbar.content.set(this.searchBar() ?? null));
     effect(() => toolbar.searching.set(this.searchActive()));
     inject(DestroyRef).onDestroy(() => {
       toolbar.content.set(null);
       toolbar.searching.set(false);
-      toolbar.overlay.set(false);
     });
   }
 

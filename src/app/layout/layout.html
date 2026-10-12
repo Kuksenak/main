@@ -3,7 +3,7 @@
   <!-- overlay (a page that scrolls under it, e.g. Students on phones): floating, transparent,
        only its controls take taps -->
   <header
-    class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]"
+    class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)] mobile:gap-3"
     [class.!absolute]="toolbar.overlay()"
     [class.inset-x-0]="toolbar.overlay()"
     [class.!bg-transparent]="toolbar.overlay()"

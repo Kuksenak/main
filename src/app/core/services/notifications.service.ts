@@ -17,7 +17,8 @@ export interface TeacherNotification {
 /**
  * The teacher's notifications: live in the open app (SignalR — a banner at the top, see
  * NotificationBanner; `received` for pages that refresh, e.g. a lesson's Students), and push
- * notifications to this device when the app is closed (Web Push through the Angular service
+ * notifications to this device when the app is closed or out of view (the app tells the server
+ * when it's in view — then its device gets the banner only, not also the push) (Web Push through the Angular service
  * worker — only in the production build; on iPhone only in the app added to the Home Screen).
  */
 @Injectable({ providedIn: 'root' })
@@ -56,10 +57,15 @@ export class NotificationsService {
         .build();
       hub.on('notification', (n: TeacherNotification) => {
         this.received.next(n);
-        this.show(n);
+        // In view: the banner (hidden: the device's push says it)
+        if (document.visibilityState === 'visible') this.show(n);
       });
       this.hub = hub;
       await hub.start();
+      // Here and in view (or not): a visible app gets the banner, not also a push
+      this.report();
+      hub.onreconnected(() => this.report());
+      document.addEventListener('visibilitychange', this.onVisibility);
     } catch {
       // Not reachable now: the next start (another page load) tries again
       this.hub = undefined;
@@ -69,8 +75,19 @@ export class NotificationsService {
   }
 
   stop(): void {
+    document.removeEventListener('visibilitychange', this.onVisibility);
     this.hub?.stop();
     this.hub = undefined;
+  }
+
+  private readonly onVisibility = () => this.report();
+
+  // Tell the server this app's device (its push endpoint, if subscribed) and whether it's in view.
+  private async report(): Promise<void> {
+    const hub = this.hub;
+    if (!hub) return;
+    const sub = this.swPush.isEnabled ? await firstValueFrom(this.swPush.subscription).catch(() => null) : null;
+    hub.invoke('Here', sub?.endpoint ?? null, document.visibilityState === 'visible').catch(() => {});
   }
 
   show(n: TeacherNotification): void {
@@ -119,6 +136,7 @@ export class NotificationsService {
         this.http.post(`${environment.apiUrl}/push/subscribe`, { endpoint: sub.endpoint, p256dh: json.keys?.['p256dh'], auth: json.keys?.['auth'] }),
       );
       this.pushOn.set(true);
+      this.report();
       return true;
     } catch {
       this.pushOn.set(false);
@@ -130,6 +148,7 @@ export class NotificationsService {
     const sub = await firstValueFrom(this.swPush.subscription);
     this.pushOn.set(false);
     if (!sub) return;
+    this.hub?.invoke('Here', null, document.visibilityState === 'visible').catch(() => {});
     await sub.unsubscribe().catch(() => false);
     await firstValueFrom(this.http.post(`${environment.apiUrl}/push/unsubscribe`, { endpoint: sub.endpoint }).pipe(catchError(() => of(null))));
   }
