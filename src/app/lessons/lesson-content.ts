@@ -65,7 +65,6 @@ export type { LessonFills } from './gaps';
         }
         @case ('exercise') {
           <div class="flex flex-col gap-1.5">
-            <span class="card-label">{{ 'lessons.exercise' | t }}</span>
             <div class="card">
               <div class="list-row py-3"><span class="font-medium">{{ b.text }}</span></div>
               @for (o of b.options ?? []; track $index; let j = $index) {
@@ -83,7 +82,6 @@ export type { LessonFills } from './gaps';
         }
         @case ('gaps') {
           <div class="flex flex-col gap-1.5">
-            <span class="card-label">{{ 'lessons.gaps' | t }}</span>
             <div class="card flex flex-col gap-1 px-4 py-3">
               @for (line of lines(b.text); track $index) {
                 <p class="text-body min-h-[1.5em] leading-[2]">
