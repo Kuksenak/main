@@ -62,6 +62,8 @@ interface PortalLesson {
                 <span class="text-footnote flex shrink-0 items-center gap-1 font-medium text-[var(--success)]">
                   <app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'shared.sent' | t }}
                 </span>
+                <!-- Back to a draft, to change it -->
+                <button type="button" (click)="reopen(l)" [disabled]="sending()" class="chip ml-1 shrink-0 !rounded-full">{{ 'shared.reopen' | t }}</button>
               } @else {
                 @if (exercises(l)) {
                   <span class="text-footnote mr-1 shrink-0 whitespace-nowrap opacity-60 mobile:hidden">{{ answered(l) }}/{{ exercises(l) }} {{ 'shared.answered' | t }}@if (saved()) {, {{ 'shared.saved' | t }}}</span>
@@ -240,6 +242,21 @@ export class StudentPortal {
         },
         error: () => this.sending.set(false),
       });
+  }
+
+  // Completed → a draft again
+  protected reopen(l: PortalLesson): void {
+    if (this.sending()) return;
+    this.sending.set(true);
+    this.http.post(`${this.base}/lessons/${l.id}/attempt/reopen`, {}).subscribe({
+      next: () => {
+        const draft = { ...l, submittedAt: null };
+        this.lessons.update((list) => list.map((x) => (x.id === l.id ? draft : x)));
+        this.open.set(draft);
+        this.sending.set(false);
+      },
+      error: () => this.sending.set(false),
+    });
   }
 
   protected day(iso: string): string {

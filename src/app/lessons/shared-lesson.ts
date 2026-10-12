@@ -80,6 +80,8 @@ interface Attempt {
             <span class="text-footnote flex shrink-0 items-center gap-1 font-medium text-[var(--success)]">
               <app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'shared.sent' | t }}
             </span>
+            <!-- Back to a draft, to change it -->
+            <button type="button" (click)="reopen()" [disabled]="sending()" class="chip shrink-0 !rounded-full">{{ 'shared.reopen' | t }}</button>
           } @else {
             @if (exercises() > 0) {
               <span class="text-footnote shrink-0 whitespace-nowrap opacity-60 mobile:hidden">{{ progress() }}</span>
@@ -234,6 +236,19 @@ export class SharedLesson {
     this.http.post<{ submittedAt: string }>(`${this.base}/attempt/submit`, this.body()).subscribe({
       next: (r) => {
         this.sentAt.set(r.submittedAt ?? new Date().toISOString());
+        this.sending.set(false);
+      },
+      error: () => this.sending.set(false),
+    });
+  }
+
+  // Completed → a draft again
+  protected reopen(): void {
+    if (this.sending()) return;
+    this.sending.set(true);
+    this.http.post(`${this.base}/attempt/reopen`, { visitor: this.visitor() }).subscribe({
+      next: () => {
+        this.sentAt.set(null);
         this.sending.set(false);
       },
       error: () => this.sending.set(false),
