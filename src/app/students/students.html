@@ -1,6 +1,10 @@
 <ng-template #search>
   <app-search-field [(value)]="query" />
 </ng-template>
+<!-- Phones: the search field in the top bar -->
+<ng-template #searchBar>
+  <app-search-bar [(value)]="query" [(active)]="searchActive" />
+</ng-template>
 
 <!-- One list (iOS Contacts-like): groups first, then students. Phones: a tap opens the card on
      top. Desktop: the list on the left, the picked student / group on the right (Edit opens its form). -->
@@ -10,8 +14,8 @@
        under them) -->
   <section
     class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-[25rem]"
-    [class.mobile:pt-[calc(env(safe-area-inset-top)+10.25rem)]]="!searchActive()"
-    [class.mobile:pt-[calc(env(safe-area-inset-top)+3.5rem)]]="searchActive()"
+    [class.mobile:pt-[calc(env(safe-area-inset-top)+6.75rem)]]="!searchActive()"
+    [class.mobile:pt-[calc(env(safe-area-inset-top)+4rem)]]="searchActive()"
   >
     <!-- Desktop: the search and Add in one row, both the controls' height (phones: search in
          the toolbar, + at the bottom) -->
@@ -62,27 +66,19 @@
       }
     </ng-template>
 
-    <!-- Phones: the list scrolls under the toolbar, the search field and the Groups | Students
-         tabs, which float on a fade from the page color to transparent, like a card's top bar.
-         Searching (Telegram-like): the top bar and the tabs go, the field moves up in their place,
-         groups and students both listed. -->
+    <!-- Phones: the list scrolls under the top bar (the search field in it) and the Groups |
+         Students tabs, which float on a fade from the page color to transparent, like a card's top
+         bar. Searching: the tabs go, groups and students both listed. -->
     @if (!desktop) {
       <!-- Solid down to the tabs' (searching: the field's) bottom; the fade only in the gap above
            the list's top, so at rest the first row shows in full and fades as it slides under -->
       <div
         class="pointer-events-none absolute inset-x-0 top-0 z-[8] bg-[linear-gradient(to_bottom,var(--app-bg)_calc(100%-0.75rem),transparent)]"
-        [class.h-[calc(env(safe-area-inset-top)+11rem)]]="!searchActive()"
-        [class.h-[calc(env(safe-area-inset-top)+4.25rem)]]="searchActive()"
+        [class.h-[calc(env(safe-area-inset-top)+7.5rem)]]="!searchActive()"
+        [class.h-[calc(env(safe-area-inset-top)+4.75rem)]]="searchActive()"
       ></div>
-      <app-search-bar
-        class="absolute inset-x-4 z-[9] transition-[top] duration-300 ease-[var(--ease-out-quick)]"
-        [class.top-[calc(env(safe-area-inset-top)+4rem)]]="!searchActive()"
-        [class.top-[calc(env(safe-area-inset-top)+0.5rem)]]="searchActive()"
-        [(value)]="query"
-        [(active)]="searchActive"
-      />
       @if (!searchActive()) {
-        <div class="segmented absolute inset-x-4 top-[calc(env(safe-area-inset-top)+7.5rem)] z-[9]">
+        <div class="segmented absolute inset-x-4 top-[calc(env(safe-area-inset-top)+4rem)] z-[9]">
           <button type="button" (click)="tab.set('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
           <button type="button" (click)="tab.set('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
         </div>

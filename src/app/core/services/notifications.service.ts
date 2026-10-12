@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
-import { HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import type { HubConnection } from '@microsoft/signalr';
 import { environment } from '@environments/environment';
 import { Subject, catchError, firstValueFrom, of } from 'rxjs';
 import { AuthStore } from '../../auth/auth.store';
@@ -39,22 +39,33 @@ export class NotificationsService {
     });
   }
 
-  /** Connect once signed in (reconnects on its own). */
-  start(): void {
-    if (this.hub) return;
-    this.hub = new HubConnectionBuilder()
-      .withUrl(`${environment.apiUrl}/notifications-hub`, { accessTokenFactory: () => this.auth.accessToken() ?? '' })
-      .withAutomaticReconnect()
-      .configureLogging(LogLevel.Warning)
-      .build();
-    this.hub.on('notification', (n: TeacherNotification) => {
-      this.received.next(n);
-      this.show(n);
-    });
-    this.hub.start().catch(() => {
+  private starting = false;
+
+  /** Connect once signed in (reconnects on its own). The SignalR library loads only now — it isn't
+   * in the app's first download. */
+  async start(): Promise<void> {
+    if (this.hub || this.starting) return;
+    this.starting = true;
+    try {
+      const { HubConnectionBuilder, LogLevel } = await import('@microsoft/signalr');
+      if (!this.auth.isAuthenticated()) return;
+      const hub = new HubConnectionBuilder()
+        .withUrl(`${environment.apiUrl}/notifications-hub`, { accessTokenFactory: () => this.auth.accessToken() ?? '' })
+        .withAutomaticReconnect()
+        .configureLogging(LogLevel.Warning)
+        .build();
+      hub.on('notification', (n: TeacherNotification) => {
+        this.received.next(n);
+        this.show(n);
+      });
+      this.hub = hub;
+      await hub.start();
+    } catch {
       // Not reachable now: the next start (another page load) tries again
       this.hub = undefined;
-    });
+    } finally {
+      this.starting = false;
+    }
   }
 
   stop(): void {

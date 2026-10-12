@@ -29,15 +29,15 @@ import { LessonUsage } from './lesson-usage';
     <ng-template #search>
       <app-search-field [(value)]="query" />
     </ng-template>
+    <!-- Phones: the search field in the top bar -->
+    <ng-template #searchBar>
+      <app-search-bar [(value)]="query" [(active)]="searchActive" />
+    </ng-template>
 
     <!-- Desktop: the list on the left (as wide as the schedule's calendar), the lesson on the right
          (like Students). Phones: the list; a lesson opens as a card over it. -->
     <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4">
       <section class="flex min-h-0 w-full flex-1 flex-col gap-3 mobile:pb-14 desktop:max-w-[25rem]">
-        <!-- Phones: the search field (searching: in the top bar's place) -->
-        @if (!desktop) {
-          <app-search-bar class="mt-1 shrink-0" [(value)]="query" [(active)]="searchActive" />
-        }
         <!-- Desktop: the search and Add in one row -->
         <div class="flex items-center gap-3 mobile:hidden">
           <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="search" /></div>
@@ -111,6 +111,7 @@ export class Lessons {
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
   private readonly search = viewChild<TemplateRef<unknown>>('search');
+  private readonly searchBar = viewChild<TemplateRef<unknown>>('searchBar');
   // Searching (phones): + hides (it'd show through the search bar's ✕)
   protected readonly searchActive = signal(false);
 
@@ -126,10 +127,14 @@ export class Lessons {
   });
 
   constructor() {
-    // Phones searching: the top bar steps aside (the field takes its place)
+    // Phones: the search field in the top bar (searching: the menu and account step aside)
     const toolbar = inject(ToolbarService);
-    effect(() => toolbar.hidden.set(this.searchActive()));
-    inject(DestroyRef).onDestroy(() => toolbar.hidden.set(false));
+    if (!this.desktop) effect(() => toolbar.content.set(this.searchBar() ?? null));
+    effect(() => toolbar.searching.set(this.searchActive()));
+    inject(DestroyRef).onDestroy(() => {
+      toolbar.content.set(null);
+      toolbar.searching.set(false);
+    });
 
     // Mobile: /lessons/:id → that lesson's card on top (unless it's open already).
     effect(() => {

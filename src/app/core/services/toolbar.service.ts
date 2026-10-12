@@ -5,8 +5,8 @@ import { Injectable, TemplateRef, signal } from '@angular/core';
  * its own content such as a search field (`content` wins over `title`). `back`: a round ‹
  * before the title, for pages opened from a menu (Settings, About). `overlay`: the toolbar floats
  * over the page with no background of its own (the page scrolls under it and draws the fade).
- * `actions`: the page's own round buttons, at the left. `hidden`: out of the way (phones' search
- * takes its place).
+ * `actions`: the page's own round buttons, at the left. `searching`: the page's search (its
+ * `content`) is in use — the menu and account buttons step aside for it.
  */
 @Injectable({ providedIn: 'root' })
 export class ToolbarService {
@@ -15,5 +15,5 @@ export class ToolbarService {
   readonly back = signal(false);
   readonly overlay = signal(false);
   readonly actions = signal<TemplateRef<unknown> | null>(null);
-  readonly hidden = signal(false);
+  readonly searching = signal(false);
 }

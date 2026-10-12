@@ -3,10 +3,10 @@ import { TranslatePipe } from '../i18n/t.pipe';
 import { Icon } from './icon/icon';
 
 /**
- * Phones' search, like Telegram's / iOS': a gray "🔍 Search" field near the top (the placeholder
- * centered); a tap types right in it — `active` turns on (the page hides its top bar and moves the
- * field up), a round ✕ appears beside it (clears and leaves), ⓧ inside clears the text. Leaving
- * an empty field (the keyboard gone) leaves search too. Two-way bound: `[(value)]`, `[(active)]`.
+ * Phones' search, in the top bar: a gray "🔍 Search" field (the placeholder centered); a tap types
+ * right in it — `active` turns on (the top bar's menu and account step aside, the field widens), a
+ * round ✕ appears beside it: it clears and leaves. Leaving an empty field (the keyboard gone)
+ * leaves search too. Two-way bound: `[(value)]`, `[(active)]`.
  */
 @Component({
   selector: 'app-search-bar',
@@ -36,12 +36,6 @@ import { Icon } from './icon/icon';
         [placeholder]="active() ? ('students.search' | t) : ''"
         class="text-body min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-40 [&::-webkit-search-cancel-button]:appearance-none"
       />
-      @if (value()) {
-        <!-- ⓧ clears (the field keeps the focus) -->
-        <button type="button" (pointerdown)="$event.preventDefault()" (click)="value.set('')" [attr.aria-label]="'action.clear' | t" class="-mr-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--text)_35%,transparent)] text-[var(--app-bg)]">
-          <app-icon name="close" [strokeWidth]="3" class="size-3" />
-        </button>
-      }
     </label>
     @if (active()) {
       <!-- ✕: clears and leaves search (pointerdown: no blur first) -->
