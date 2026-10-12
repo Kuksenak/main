@@ -41,7 +41,7 @@ interface PortalLesson {
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
     <!-- Desktop: a lesson open takes the width (its blocks in tiles) -->
-    <div class="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+1rem)]" [class.desktop:max-w-7xl]="!!open()" [class.desktop:px-8]="!!open()">
+    <div class="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]" [class.desktop:max-w-7xl]="!!open()" [class.desktop:px-8]="!!open()">
       @switch (state()) {
         @case ('loading') {
           <p class="text-body py-10 text-center opacity-40">{{ 'app.loading' | t }}</p>
@@ -51,13 +51,13 @@ interface PortalLesson {
         }
         @default {
           @if (open(); as l) {
-            <!-- One lesson -->
-            <div class="flex items-center">
-              <button type="button" (click)="open.set(null)" [attr.aria-label]="'action.back' | t" class="icon-btn">
+            <!-- One lesson: ‹ and its title in one compact row -->
+            <div class="flex min-h-9 items-center gap-1">
+              <button type="button" (click)="open.set(null)" [attr.aria-label]="'action.back' | t" class="icon-btn shrink-0">
                 <app-icon name="chevron-left" class="-ml-0.5 size-7 desktop:size-5" />
               </button>
+              <h1 class="min-w-0 flex-1 truncate text-lg font-semibold leading-tight">{{ l.title }}</h1>
             </div>
-            <h1 class="px-1 text-[1.75rem] font-bold leading-tight">{{ l.title }}</h1>
             <app-lesson-content
               [blocks]="l.blocks"
               [indexes]="l.indexes"

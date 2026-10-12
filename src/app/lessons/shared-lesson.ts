@@ -70,15 +70,16 @@ interface Attempt {
   imports: [FormsModule, Icon, LessonContent, TranslatePipe],
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
-    <div class="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 desktop:max-w-7xl desktop:px-8 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+1rem)]">
-      <!-- Just the visitor's name (a tap changes it) -->
-      @if (name()) {
-        <div class="flex justify-end">
-          <button type="button" (click)="name.set('')" class="chip gap-1.5 !rounded-full">
+    <div class="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 desktop:max-w-7xl desktop:px-8 pb-[calc(env(safe-area-inset-bottom)+5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]">
+      <!-- One compact row: the lesson's title, the visitor's name (a tap changes it) -->
+      <div class="flex min-h-9 items-center gap-3">
+        <h1 class="min-w-0 flex-1 truncate px-1 text-lg font-semibold leading-tight">{{ state() === 'ready' ? title() : '' }}</h1>
+        @if (name()) {
+          <button type="button" (click)="name.set('')" class="chip shrink-0 gap-1.5 !rounded-full">
             <app-icon name="person" class="size-4 opacity-60" />{{ name() }}
           </button>
-        </div>
-      }
+        }
+      </div>
 
       @switch (state()) {
         @case ('loading') {
@@ -88,7 +89,6 @@ interface Attempt {
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
         }
         @default {
-          <h1 class="px-1 text-[1.75rem] font-bold leading-tight">{{ title() }}</h1>
 
           @if (!name()) {
             <!-- Just a name, before the lesson -->
