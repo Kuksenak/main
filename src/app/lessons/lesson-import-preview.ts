@@ -1,16 +1,18 @@
-import { Component, effect, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { AiResponse } from './ai-response';
 import { LessonForm } from './lesson-form';
 import { LessonImport, LessonImportsService } from './lesson-imports.service';
-import { LessonInput } from './lesson.service';
+import { LessonInput, LessonService } from './lesson.service';
 
 /**
- * A lesson read from photos, before it goes in: what the model made of it (AiResponse) and the
- * draft in the lesson editor — fix what's off, then Add to lesson (into its lesson, or a new
- * one) or Discard. Opened from the editor's "Ready" chip or the "ready" notification; placed once
- * in the layout.
+ * What was read from photos, before it goes in: what the model made of it (AiResponse) and the
+ * page's pieces (each exercise one block) in the lesson editor, each with a checkbox — fix what's
+ * off, pick some, then Save as a new lesson or Add to a lesson (any; the one it was read for
+ * first); the rest stays for the next pick, and once all are placed (or Discard) it's done.
+ * Opened from the editor's "Ready" chip or the "ready" notification; placed once in the layout.
  */
 @Component({
   selector: 'app-lesson-import-preview',
@@ -26,14 +28,24 @@ import { LessonInput } from './lesson.service';
               <p class="text-footnote select-text break-words opacity-60">{{ x.error }}</p>
             } @else if (x.draft; as d) {
               <app-ai-response [model]="d.model" [seconds]="d.seconds" [raw]="d.raw" [blocks]="d.blocks" (closed)="0" />
-              <app-lesson-form [(value)]="draft" [photos]="false" />
+              <p class="text-footnote px-1 opacity-60">{{ 'lessons.pickHint' | t }}</p>
+              <app-lesson-form [(value)]="draft" [photos]="false" [selectable]="true" [(selected)]="picked" />
             } @else {
               <p class="text-body py-10 text-center opacity-40">{{ 'lessons.reading' | t }}</p>
             }
-            <div class="flex flex-wrap justify-end gap-2 pt-2">
-              <button type="button" (click)="discard(x)" class="btn-secondary !text-[var(--danger)]">{{ 'lessons.discard' | t }}</button>
-              @if (x.draft) {
-                <button type="button" (click)="add(x)" class="btn-primary">{{ (x.lessonId ? 'lessons.addToLesson' : 'lessons.addAsNew') | t }}</button>
+            <!-- The picked ones: a new lesson, or into a lesson; then the rest stays here -->
+            <div class="flex flex-wrap items-center justify-end gap-2 pt-2">
+              <button type="button" (click)="discard(x)" class="btn-secondary mr-auto !text-[var(--danger)]">{{ 'lessons.discard' | t }}</button>
+              @if (x.draft && draft.blocks.length) {
+                <button type="button" (click)="asNew(x)" [disabled]="!picked().length" class="btn-secondary">{{ 'lessons.saveAsNew' | t }} ({{ picked().length }})</button>
+                <span class="flex items-center gap-1">
+                  <select [value]="target() ?? ''" (change)="target.set($any($event.target).value || null)" [attr.aria-label]="'lessons.lessonPick' | t" class="chip max-w-48 !rounded-full">
+                    @for (l of lessonList(); track l.id) {
+                      <option [value]="l.id" [selected]="l.id === target()">{{ l.title }}</option>
+                    }
+                  </select>
+                  <button type="button" (click)="intoLesson(x)" [disabled]="!picked().length || !target()" class="btn-primary">{{ 'lessons.addToLesson' | t }} ({{ picked().length }})</button>
+                </span>
               }
             </div>
           } @else {
@@ -49,6 +61,14 @@ export class LessonImportPreview {
   private readonly page = viewChild<PageSheet>('page');
   protected readonly imp = signal<LessonImport | null>(null);
   protected draft: LessonInput = { title: '', blocks: [] };
+  // The picked blocks (all at first), and the lesson to add them to
+  protected readonly picked = signal<number[]>([]);
+  protected readonly target = signal<string | null>(null);
+  private lessons = inject(LessonService);
+  private i18n = inject(I18nService);
+  protected readonly lessonList = computed(() =>
+    [...this.lessons.lessons()].sort((a, b) => a.title.localeCompare(b.title, this.i18n.locale())),
+  );
 
   constructor() {
     // The one asked for, with its draft
@@ -60,6 +80,8 @@ export class LessonImportPreview {
         (x) => {
           if (this.imports.previewing() !== id) return;
           this.draft = { title: x.draft?.title ?? '', blocks: x.draft?.blocks ?? [] };
+          this.picked.set(this.draft.blocks.map((_, i) => i));
+          this.target.set(x.lessonId ?? this.lessonList()[0]?.id ?? null);
           this.imp.set(x);
         },
         () => this.imports.previewing.set(null),
@@ -67,8 +89,31 @@ export class LessonImportPreview {
     });
   }
 
-  protected add(x: LessonImport): void {
-    this.imports.add(x, this.draft.title, this.draft.blocks);
+  protected asNew(x: LessonImport): void {
+    this.imports.addAsNew(this.draft.title, this.take(), (id) => this.target.set(id));
+    this.next(x);
+  }
+
+  protected intoLesson(x: LessonImport): void {
+    const id = this.target();
+    if (!id) return;
+    this.imports.addTo(id, this.take());
+    this.next(x);
+  }
+
+  // The picked blocks, out of the draft
+  private take() {
+    const picked = new Set(this.picked());
+    const taken = this.draft.blocks.filter((_, i) => picked.has(i));
+    this.draft = { ...this.draft, blocks: this.draft.blocks.filter((_, i) => !picked.has(i)) };
+    return taken;
+  }
+
+  // The rest stays (all picked again); nothing left: done with it
+  private next(x: LessonImport): void {
+    this.picked.set(this.draft.blocks.map((_, i) => i));
+    if (this.draft.blocks.length) return;
+    this.imports.drop(x.id);
     this.page()?.close();
   }
 

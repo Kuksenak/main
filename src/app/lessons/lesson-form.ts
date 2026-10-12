@@ -101,6 +101,14 @@ export function cleanLesson(l: LessonInput): LessonInput {
       <div cdkDrag class="card">
         <!-- Head: ⠿ · kind · who sees it · × -->
         <div class="list-row !min-h-0 gap-2 pb-1 pt-2.5 after:hidden">
+          @if (selectable()) {
+            <!-- Picked (for Save as a new lesson / Add to a lesson) -->
+            <button type="button" (click)="toggle(i)" class="check shrink-0" [class.is-on]="selected().includes(i)" [attr.aria-label]="'lessons.pick' | t">
+              @if (selected().includes(i)) {
+                <app-icon name="check" [strokeWidth]="3" class="size-3.5" />
+              }
+            </button>
+          }
           <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
             <app-icon name="grip" class="size-5" />
           </span>
@@ -271,6 +279,13 @@ export class LessonForm {
   readonly lessonId = input<string | null>(null);
   /** The photo part (From photo, pasting, what's being read); off in the preview's own editor. */
   readonly photos = input(true);
+  /** Blocks can be picked (a checkbox each): `selected` — their places. */
+  readonly selectable = input(false);
+  readonly selected = model<number[]>([]);
+
+  protected toggle(i: number): void {
+    this.selected.update((s) => (s.includes(i) ? s.filter((x) => x !== i) : [...s, i].sort((a, b) => a - b)));
+  }
 
   // Editing starts in the title (desktop; on phones the keyboard would cover the form).
   private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
@@ -399,6 +414,13 @@ export class LessonForm {
       moveItemInArray(blocks, e.previousIndex, e.currentIndex);
       return { ...m, blocks };
     });
+    // The picks follow their blocks
+    if (this.selectable()) {
+      const order = this.value().blocks.map((_, j) => j);
+      moveItemInArray(order, e.currentIndex, e.previousIndex); // new place → old place
+      const was = new Set(this.selected());
+      this.selected.set(order.map((old, now) => (was.has(old) ? now : -1)).filter((x) => x >= 0));
+    }
   }
 
   // A new block at the end: a checklist is the teacher's plan by default; an exercise starts with
@@ -455,5 +477,6 @@ export class LessonForm {
 
   protected removeBlock(index: number): void {
     this.value.update((m) => ({ ...m, blocks: m.blocks.filter((_, i) => i !== index) }));
+    if (this.selectable()) this.selected.update((s) => s.filter((x) => x !== index).map((x) => (x > index ? x - 1 : x)));
   }
 }

@@ -154,15 +154,16 @@ export class LessonImportsService {
     return () => this.takers.delete(taker);
   }
 
-  /** The (edited) draft into its lesson; the import is done with then. */
-  add(imp: LessonImport, title: string, blocks: LessonBlock[]): void {
-    const taken = [...this.takers].some((t) => t(imp.lessonId, title, blocks));
-    if (!taken) {
-      const lesson = imp.lessonId ? this.lessons.byId(imp.lessonId) : null;
-      if (lesson) this.lessons.update(lesson.id, { title: lesson.title, blocks: [...lesson.blocks, ...blocks] });
-      else this.lessons.create({ title: title.trim() || 'Lesson', blocks });
-    }
-    this.drop(imp.id);
+  /** Blocks at the end of a lesson: into its open editor if there is one, else saved into it. */
+  addTo(lessonId: string, blocks: LessonBlock[]): void {
+    const lesson = this.lessons.byId(lessonId);
+    const taken = [...this.takers].some((t) => t(lessonId, lesson?.title ?? '', blocks));
+    if (!taken && lesson) this.lessons.update(lesson.id, { title: lesson.title, blocks: [...lesson.blocks, ...blocks] });
+  }
+
+  /** Blocks as a new lesson (`created` gets its id). */
+  addAsNew(title: string, blocks: LessonBlock[], created?: (id: string) => void): void {
+    this.lessons.create({ title: title.trim() || 'Lesson', blocks }, created);
   }
 
   drop(id: string): void {
