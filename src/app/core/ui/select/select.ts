@@ -17,6 +17,12 @@ interface SelectSection {
   options: SelectOption[];
 }
 
+/**
+ * Phones: the system's own picker (true) — or our own iOS-like menu (false; kept, not in use for
+ * now).
+ */
+const NATIVE_ON_PHONES = true;
+
 @Component({
   selector: 'app-select',
   imports: [OverlayModule, Icon, ScrollArea],
@@ -65,6 +71,8 @@ export class SelectField implements ControlValueAccessor {
   private deviceService = inject(DeviceDetectionService);
   private i18n = inject(I18nService);
   isMobile = this.deviceService.isMobile;
+  /** The system's picker instead of ours (phones, see NATIVE_ON_PHONES). */
+  protected readonly native = computed(() => NATIVE_ON_PHONES && this.isMobile());
 
   readonly value = signal<string | number | null>(null);
   readonly isOpen = signal(false);
@@ -78,8 +86,22 @@ export class SelectField implements ControlValueAccessor {
     return opt ? opt.label : this.i18n.t('picker.select');
   });
 
+  // The system's picker: the option by its place
+  protected indexOf(opt: SelectOption): number {
+    return this.options.indexOf(opt);
+  }
+
+  protected pickIndex(index: string): void {
+    const opt = this.options[+index];
+    if (opt) this.setValue(opt.value);
+  }
+
+  protected onBlur(): void {
+    this.onTouched();
+  }
+
   toggle(): void {
-    if (this.disabled) return;
+    if (this.disabled || this.native()) return;
     if (!this.isOpen() && this.isMobile()) this.placePhoneMenu();
     this.isOpen.update((open) => !open);
   }
