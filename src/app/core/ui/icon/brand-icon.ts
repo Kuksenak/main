@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { I18nService } from '../../i18n/i18n.service';
 
-export type BrandIconName = 'calendar' | 'people' | 'book';
+export type BrandIconName = 'calendar' | 'people' | 'book' | 'sparkle';
 
 /**
  * Flat multi-color product icons in the logo's colors (Google-product style, no background),
@@ -92,6 +92,12 @@ export type BrandIconName = 'calendar' | 'people' | 'book';
           <rect x="4" y="18" width="40" height="6.5" rx="3.25" style="fill: var(--brand-blue)" />
           <rect x="4" y="28" width="40" height="6.5" rx="3.25" style="fill: var(--brand-teal)" />
           <rect x="4" y="38" width="27" height="6.5" rx="3.25" style="fill: var(--brand-blue)" />
+        }
+        @case ('sparkle') {
+          <!-- AI: a big blue four-point star, a small orange one and a teal dot -->
+          <path d="M20 6c1.2 8.6 4.4 11.8 13 13-8.6 1.2-11.8 4.4-13 13-1.2-8.6-4.4-11.8-13-13 8.6-1.2 11.8-4.4 13-13z" style="fill: var(--brand-blue)" />
+          <path d="M36 27c.6 4.3 2.2 5.9 6.5 6.5-4.3.6-5.9 2.2-6.5 6.5-.6-4.3-2.2-5.9-6.5-6.5 4.3-.6 5.9-2.2 6.5-6.5z" style="fill: var(--brand-orange)" />
+          <circle cx="37.5" cy="10.5" r="3" style="fill: var(--brand-teal)" />
         }
       }
     </svg>

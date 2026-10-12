@@ -76,7 +76,8 @@ export class LessonImportPreview {
       const id = this.imports.previewing();
       this.imp.set(null);
       if (!id) return;
-      this.imports.get(id).then(
+      const local = id === 'local' ? this.imports.local() : null;
+      (local ? Promise.resolve(local) : this.imports.get(id)).then(
         (x) => {
           if (this.imports.previewing() !== id) return;
           this.draft = { title: x.draft?.title ?? '', blocks: x.draft?.blocks ?? [] };

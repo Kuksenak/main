@@ -63,6 +63,7 @@ export class Layout {
     { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
     { path: '/students', label: 'nav.students', icon: 'people' },
     { path: '/lessons', label: 'nav.lessons', icon: 'book' },
+    { path: '/ai', label: 'nav.ai', icon: 'sparkle' },
   ];
   protected readonly menuOpen = signal(false);
 

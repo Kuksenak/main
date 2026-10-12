@@ -148,6 +148,13 @@ export class LessonImportsService {
     this.previewing.set(id);
   }
 
+  /** A draft made here (the AI chat's), previewed the same way — nothing kept on the server. */
+  readonly local = signal<LessonImport | null>(null);
+  previewLocal(draft: LessonDraft): void {
+    this.local.set({ id: 'local', lessonId: null, model: draft.model, pages: 0, status: 'done', error: null, createdAt: '', draft });
+    this.previewing.set('local');
+  }
+
   /** An open editor offers to take drafts for its lesson (until the returned function is called). */
   take(taker: Taker): () => void {
     this.takers.add(taker);
@@ -167,8 +174,12 @@ export class LessonImportsService {
   }
 
   drop(id: string): void {
-    this.imports.update((list) => list.filter((x) => x.id !== id));
     if (this.previewing() === id) this.previewing.set(null);
+    if (id === 'local') {
+      this.local.set(null);
+      return;
+    }
+    this.imports.update((list) => list.filter((x) => x.id !== id));
     this.http.delete(`${this.base}/${id}`).subscribe({ error: () => {} });
   }
 }
