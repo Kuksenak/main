@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, signal } from '@angular/core';
 import { Observable, catchError, finalize, of } from 'rxjs';
 import { environment } from '@environments/environment';
@@ -34,15 +34,20 @@ export abstract class ResourceStore<T extends { id: string }, Input> {
     return (id && this.index().get(id)) || null;
   }
 
-  /** Create; `onCreated` gets the new id. */
-  create(input: Input, onCreated?: (id: string) => void): void {
-    this.send(this.http.post<{ id: string }>(this.base, input), (res) => {
-      if (res?.id) onCreated?.(res.id);
-    });
+  /** Create; `onCreated` gets the new id; `onFailed` the server's reason. */
+  create(input: Input, onCreated?: (id: string) => void, onFailed?: (reason: string) => void): void {
+    this.send(
+      this.http.post<{ id: string }>(this.base, input),
+      (res) => {
+        if (res?.id) onCreated?.(res.id);
+      },
+      onFailed,
+    );
   }
 
-  update(id: string, input: Input): void {
-    this.send(this.http.put(`${this.base}/${id}`, input));
+  /** Update; `onFailed` gets the server's reason. */
+  update(id: string, input: Input, onFailed?: (reason: string) => void): void {
+    this.send(this.http.put(`${this.base}/${id}`, input), undefined, onFailed);
   }
 
   /** PUT {base}/{id}/{sub} (e.g. a student's lessons); `local` shows the change right away. */
@@ -67,13 +72,21 @@ export abstract class ResourceStore<T extends { id: string }, Input> {
       .subscribe((res) => this._items.set(res[this.listKey] ?? []));
   }
 
-  // A change, then the list again (plus anything that depends on it, see afterChange).
-  private send<R>(request: Observable<R>, then?: (res: R | null) => void): void {
-    request.pipe(catchError(() => of(null))).subscribe((res) => {
-      then?.(res);
-      this.reload();
-      this.afterChange();
-    });
+  // A change, then the list again (plus anything that depends on it, see afterChange); refused:
+  // `failed` hears why (the server's words).
+  private send<R>(request: Observable<R>, then?: (res: R | null) => void, failed?: (reason: string) => void): void {
+    request
+      .pipe(
+        catchError((e: HttpErrorResponse) => {
+          failed?.(`${e.status || 'network'}: ${e.error?.description ?? e.error?.detail ?? e.error?.title ?? e.statusText ?? ''}`.trim());
+          return of(null);
+        }),
+      )
+      .subscribe((res) => {
+        then?.(res);
+        this.reload();
+        this.afterChange();
+      });
   }
 
   /** Hook for stores whose changes affect other data (e.g. deleting a student changes groups). */

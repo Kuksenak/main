@@ -36,6 +36,9 @@ import { LessonState } from './lesson-state';
         </div>
 
         @if (s.editing()) {
+          @if (s.saveError(); as e) {
+            <p class="text-footnote select-text break-words rounded-xl bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-3 py-2 text-[var(--danger)]">{{ 'lessons.saveFailed' | t }} {{ e }}</p>
+          }
           <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" />
           @if (s.id()) {
             <button #deleteBtn type="button" (click)="askDelete.set(deleteBtn)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>

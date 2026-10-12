@@ -23,7 +23,11 @@ export class LessonState {
   readonly draft = signal<LessonInput>({ title: '', blocks: [] });
   private readonly snapshot = signal(JSON.stringify(this.draft()));
   readonly dirty = computed(() => JSON.stringify(this.draft()) !== this.snapshot());
-  readonly canSave = computed(() => lessonValid(this.draft()) && this.dirty());
+  // A new lesson being created: no second Save meanwhile (it'd make a second lesson)
+  readonly creating = signal(false);
+  readonly canSave = computed(() => lessonValid(this.draft()) && this.dirty() && !this.creating());
+  /** The server refused the last save (why) — the editor stays open with the draft. */
+  readonly saveError = signal<string | null>(null);
 
   readonly heading = computed(() => {
     if (this.editing()) return this.draft().title.trim() || this.i18n.t('lessons.new');
@@ -50,12 +54,26 @@ export class LessonState {
     if (!this.canSave()) return;
     const input = cleanLesson(this.draft());
     const id = this.id();
-    if (id) this.lessons.update(id, input);
-    else
-      this.lessons.create(input, (newId) => {
-        this.createdId.set(newId);
-        onCreated?.(newId);
-      });
+    this.saveError.set(null);
+    // Refused: back to the draft, with the reason
+    const failed = (reason: string) => {
+      this.creating.set(false);
+      this.saveError.set(reason);
+      this.editRequested.set(true);
+    };
+    if (id) this.lessons.update(id, input, failed);
+    else {
+      this.creating.set(true);
+      this.lessons.create(
+        input,
+        (newId) => {
+          this.creating.set(false);
+          this.createdId.set(newId);
+          onCreated?.(newId);
+        },
+        failed,
+      );
+    }
     this.editRequested.set(false);
   }
 
