@@ -37,6 +37,7 @@ export class Students {
   protected stack = inject(NavStack);
   private readonly search = viewChild<TemplateRef<unknown>>('search');
   private readonly searchBar = viewChild<TemplateRef<unknown>>('searchBar');
+  private readonly searchField = viewChild<TemplateRef<unknown>>('search');
   // Searching (phones): + hides (it'd show through the search bar's ✕)
   protected readonly searchActive = signal(false);
 
@@ -96,9 +97,12 @@ export class Students {
     const toolbar = inject(ToolbarService);
     // The search field in the top bar (searching: the menu and account step aside)
     if (!this.desktop) effect(() => toolbar.content.set(this.searchBar() ?? null));
+    // Desktop: the search field in the top bar
+    else effect(() => toolbar.search.set(this.searchField() ?? null));
     effect(() => toolbar.searching.set(this.searchActive()));
     inject(DestroyRef).onDestroy(() => {
       toolbar.content.set(null);
+      toolbar.search.set(null);
       toolbar.searching.set(false);
     });
   }

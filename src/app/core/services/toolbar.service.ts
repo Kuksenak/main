@@ -18,4 +18,6 @@ export class ToolbarService {
   readonly overlay = signal(false);
   readonly actions = signal<TemplateRef<unknown> | null>(null);
   readonly searching = signal(false);
+  /** Desktop: the page's search, in the top bar between the tabs and the account. */
+  readonly search = signal<TemplateRef<unknown> | null>(null);
 }

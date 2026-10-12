@@ -1,4 +1,3 @@
-import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,7 +23,7 @@ import { LessonUsage } from './lesson-usage';
  */
 @Component({
   selector: 'app-lessons',
-  imports: [NgTemplateOutlet, Icon, LessonPage, ScrollArea, SearchBar, SearchField, TranslatePipe],
+  imports: [Icon, LessonPage, ScrollArea, SearchBar, SearchField, TranslatePipe],
   template: `
     <ng-template #search>
       <app-search-field [(value)]="query" />
@@ -38,9 +37,8 @@ import { LessonUsage } from './lesson-usage';
          (like Students). Phones: the list; a lesson opens as a card over it. -->
     <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4">
       <section class="flex min-h-0 w-full flex-1 flex-col gap-3 mobile:pb-14 desktop:max-w-[25rem]">
-        <!-- Desktop: the search and Add in one row -->
-        <div class="flex items-center gap-3 mobile:hidden">
-          <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="search" /></div>
+        <!-- Desktop: Add (the search is in the top bar) -->
+        <div class="flex items-center justify-end gap-3 mobile:hidden">
           <button type="button" (click)="add()" class="btn-primary shrink-0 gap-1.5 pl-2.5">
             <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
             {{ 'action.add' | t }}
@@ -112,6 +110,7 @@ export class Lessons {
   protected readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
   private readonly search = viewChild<TemplateRef<unknown>>('search');
   private readonly searchBar = viewChild<TemplateRef<unknown>>('searchBar');
+  private readonly searchField = viewChild<TemplateRef<unknown>>('search');
   // Searching (phones): + hides (it'd show through the search bar's ✕)
   protected readonly searchActive = signal(false);
 
@@ -130,9 +129,12 @@ export class Lessons {
     // Phones: the search field in the top bar (searching: the menu and account step aside)
     const toolbar = inject(ToolbarService);
     if (!this.desktop) effect(() => toolbar.content.set(this.searchBar() ?? null));
+    // Desktop: the search field in the top bar
+    else effect(() => toolbar.search.set(this.searchField() ?? null));
     effect(() => toolbar.searching.set(this.searchActive()));
     inject(DestroyRef).onDestroy(() => {
       toolbar.content.set(null);
+      toolbar.search.set(null);
       toolbar.searching.set(false);
     });
 
