@@ -1,5 +1,8 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, afterNextRender, inject, model, viewChild } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Component, ElementRef, afterNextRender, inject, model, signal, viewChild } from '@angular/core';
+import { environment } from '@environments/environment';
+import { firstValueFrom } from 'rxjs';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -22,6 +25,20 @@ function normalizeUrl(value: string | null): string | null {
 /** Something typed in a link's address that isn't a web link. */
 function badLink(b: LessonBlock): boolean {
   return b.kind === 'link' && !!b.url?.trim() && !normalizeUrl(b.url);
+}
+
+/** A photo as a JPEG at most 2000 px on its longer side (turned upright from its EXIF). */
+async function toJpeg(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, 2000 / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  return new Promise((resolve, reject) =>
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('no image'))), 'image/jpeg', 0.85),
+  );
 }
 
 /** Ready to save: has a title and no broken link. */
@@ -73,7 +90,8 @@ export function cleanLesson(l: LessonInput): LessonInput {
  * Editing a lesson in place: the title, then the blocks — each a card with its kind, who sees it
  * (students / only me: a tap switches), its drag handle and ×: texts, checklists (items), exercises
  * (a question, answers, the right one marked by its circle); older lessons' headings and links
- * too. + Text / Exercise / Checklist at the end.
+ * too. + Text / Exercise / Checklist at the end, and From photo: pages of a book read by the
+ * server's AI into blocks added at the end (a title too, if there's none yet) — to check and fix.
  */
 @Component({
   selector: 'app-lesson-form',
@@ -175,7 +193,19 @@ export function cleanLesson(l: LessonInput): LessonInput {
           <app-icon name="plus" class="size-4 text-[var(--accent)]" />{{ k.label | t }}
         </button>
       }
+      <!-- Pages of a book (camera or library on phones) → blocks -->
+      <button type="button" (click)="photoInput.click()" [disabled]="reading()" class="chip gap-1.5 !rounded-full" [class.opacity-60]="reading()">
+        @if (reading()) {
+          <span class="size-4 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent"></span>{{ 'lessons.reading' | t }}
+        } @else {
+          <app-icon name="image" class="size-4 text-[var(--accent)]" />{{ 'lessons.fromPhoto' | t }}
+        }
+      </button>
+      <input #photoInput type="file" accept="image/*" multiple hidden (change)="fromPhotos(photoInput)" />
     </div>
+    @if (photoError(); as e) {
+      <p class="text-footnote -mt-2 text-center text-[var(--danger)]">{{ e | t }}</p>
+    }
   `,
 })
 export class LessonForm {
@@ -191,6 +221,37 @@ export class LessonForm {
   }
 
   protected readonly badLink = badLink;
+
+  private http = inject(HttpClient);
+  protected readonly reading = signal(false);
+  protected readonly photoError = signal<TranslationKey | null>(null);
+
+  // Up to 5 pages, sent as JPEGs no larger than 2000 px (phone photos are huge; HEIC → JPEG)
+  protected async fromPhotos(input: HTMLInputElement): Promise<void> {
+    const files = [...(input.files ?? [])].slice(0, 5);
+    input.value = ''; // the same photo again later still fires (change)
+    if (!files.length) return;
+    this.reading.set(true);
+    this.photoError.set(null);
+    try {
+      const form = new FormData();
+      for (const [i, f] of files.entries()) form.append('images', await toJpeg(f), `page-${i + 1}.jpg`);
+      const draft = await firstValueFrom(
+        this.http.post<{ title: string; blocks: LessonBlock[] }>(`${environment.apiUrl}/lessons/from-photo`, form),
+      );
+      if (!draft.blocks.length) {
+        this.photoError.set('lessons.photoEmpty');
+        return;
+      }
+      this.value.update((m) => ({ title: m.title.trim() ? m.title : draft.title, blocks: [...m.blocks, ...draft.blocks] }));
+    } catch (e) {
+      this.photoError.set(
+        e instanceof HttpErrorResponse && e.status === 503 ? 'lessons.photoOff' : 'lessons.photoFailed',
+      );
+    } finally {
+      this.reading.set(false);
+    }
+  }
 
   // Block kinds to add (headings and links only in older lessons)
   protected readonly kinds: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] = [
