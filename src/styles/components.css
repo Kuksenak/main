@@ -312,11 +312,19 @@
   .list-row:has(> app-brand-icon) {
     --sep-left: calc(var(--row-px) + 2.75rem); /* padding + 2rem icon + gap */
   }
+  .list-row:has(> .row-icon) {
+    --sep-left: calc(var(--row-px) + 2.25rem); /* padding + 1.5rem icon + gap */
+  }
   .list-row:has(.avatar) {
     --sep-left: calc(var(--row-px) + 3rem); /* padding + 2.25rem avatar + gap */
   }
   .list-row:has(> .check) {
     --sep-left: calc(var(--row-px) + 5.25rem); /* padding + 1.5rem check + gap + avatar + gap */
+  }
+
+  /* A row's leading icon (Settings rows): line icons a bit muted */
+  .row-icon {
+    @apply size-6 shrink-0 opacity-70;
   }
 
   /* Chevron at the end of a tappable row and on collapsible section headers — one size
@@ -433,10 +441,11 @@
 
   /* Header of a collapsible list section (app-section): title, count, chevron. */
   /* The label above a card ("Groups", "Students", "Language"…), and the collapsible section
-     header (same look): a bit larger than footnotes, regular weight, gray. Phones: inset like
-     the rows' text (iOS), clear of a scroll area's round corner. */
+     header (same look): gray. Desktop: a bit larger than footnotes, regular weight. Phones: like
+     iOS Settings' section headers — the body size, semibold, inset like the rows' text (and so
+     clear of a scroll area's round corner). */
   .card-label {
-    @apply text-subhead opacity-50 mobile:px-[var(--row-px)];
+    @apply text-subhead opacity-50 mobile:text-body mobile:px-[var(--row-px)] mobile:font-semibold;
   }
   .section-header {
     @apply text-subhead flex w-full items-center gap-1.5 text-left opacity-50

@@ -371,6 +371,8 @@ export class PersonLessons {
     </ng-template>
 
     @if (nextEvent() || lastEvent()) {
+      <div class="flex min-h-0 flex-col gap-1.5">
+      <span class="card-label">{{ 'nav.lessons' | t }}</span>
       <div class="card flex min-h-0 flex-col">
         @if (nextEvent(); as e) {
           <ng-container [ngTemplateOutlet]="lessonRow" [ngTemplateOutletContext]="{ $implicit: e }" />
@@ -395,6 +397,7 @@ export class PersonLessons {
             </app-scroll-area>
           }
         }
+      </div>
       </div>
     }
   `,
@@ -503,6 +506,8 @@ export class LessonsCard {
     <!-- At the bottom, like an iOS contact: the phone and email, a small label over the value
          (a tap calls / writes) -->
     @if (s.phone || s.email) {
+      <div class="flex flex-col gap-1.5">
+      <span class="card-label">{{ 'students.contact' | t }}</span>
       <div class="card">
         @if (s.phone) {
           <a [href]="'tel:' + s.phone" class="list-row py-2.5">
@@ -520,6 +525,7 @@ export class LessonsCard {
             </span>
           </a>
         }
+      </div>
       </div>
     }
   `,

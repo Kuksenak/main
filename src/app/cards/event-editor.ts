@@ -114,8 +114,9 @@ interface Model {
         </div>
 
 
-        <!-- Participants (no caption): groups and students, then Invite (rows don't open anything for now) -->
+        <!-- Participants: groups and students, then Invite (rows don't open anything for now) -->
         <div class="flex flex-col gap-1.5">
+        <span class="card-label">{{ 'event.participants' | t }}</span>
         <div class="card">
           <!-- × takes them out of the event -->
           @for (p of invited(); track p.id) {
@@ -138,8 +139,9 @@ interface Model {
         </div>
         </div>
 
-        <!-- Files (no caption): attached lessons, then Attach (rows don't open anything for now) -->
+        <!-- Lessons: the attached ones, then Attach (rows don't open anything for now) -->
         <div class="flex flex-col gap-1.5">
+        <span class="card-label">{{ 'event.lessons' | t }}</span>
         <div class="card">
           @for (l of attached(); track l.id) {
             <div class="list-row !gap-1">

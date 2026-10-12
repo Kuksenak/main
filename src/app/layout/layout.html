@@ -115,7 +115,11 @@
     </app-sheet>
   }
 
-  @if (accountOpen()) {
+  <!-- Phones: Settings (like the Claude app's); desktop: the account menu -->
+  @if (accountOpen() && !desktop) {
+    <app-settings-sheet (closed)="accountOpen.set(false)" />
+  }
+  @if (accountOpen() && desktop) {
     <app-sheet #sheet [origin]="avatarBtn" (closed)="accountOpen.set(false)">
       <div class="press-bold flex flex-1 flex-col gap-3 desktop:gap-2">
         <div class="card">
