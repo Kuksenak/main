@@ -212,8 +212,9 @@ export type { LessonFills } from './gaps';
             <!-- Desktop: tiles like Pinterest's, each as wide as its lines need (1–3 columns),
                  packed tight (see Masonry) -->
             <div appMasonry>
-              @for (tile of tilesOf(g.blocks); track tile[0].i) {
-                <div class="flex flex-col gap-2" [attr.data-span]="spanOf(tile)">
+              @for (tile of tilesOf(g.blocks); track tile[0].i; let count = $count) {
+                <!-- Just one: the whole width -->
+                <div class="flex flex-col gap-2" [attr.data-span]="count === 1 ? 99 : spanOf(tile)">
                   @for (b of tile; track b.i) {
                     <ng-container [ngTemplateOutlet]="block" [ngTemplateOutletContext]="{ $implicit: b.block, i: b.i }" />
                   }
