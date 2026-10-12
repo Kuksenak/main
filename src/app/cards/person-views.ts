@@ -13,6 +13,7 @@ import { Group, GroupService } from '../students/group.service';
 import { Student } from '../students/student.service';
 import { PickList, PickSection } from './pick-list';
 import { GroupMembers } from './related-lists';
+import { StudentLink } from './student-link';
 
 /**
  * A person's / group's lessons, the way the student page shows them: the next lesson as a card
@@ -478,7 +479,7 @@ export class LessonsCard {
  */
 @Component({
   selector: 'app-student-view',
-  imports: [LessonsCard, TranslatePipe],
+  imports: [LessonsCard, StudentLink, TranslatePipe],
   host: { class: 'relative flex flex-col gap-4' },
   template: `
     @let s = student();
@@ -501,6 +502,11 @@ export class LessonsCard {
     </div>
 
     <app-lessons-card [studentId]="s.id" (upcoming)="upcoming.emit()" (history)="history.emit()" />
+
+    <!-- Their personal link: their own page, their answers saved as theirs -->
+    @if (editable()) {
+      <app-student-link [studentId]="s.id" />
+    }
 
     <!-- At the bottom, like an iOS contact: the phone and email, a small label over the value
          (a tap calls / writes) -->

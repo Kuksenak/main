@@ -4,9 +4,9 @@ import { primeKeyboard } from '../utils/keyboard';
 import { Icon } from './icon/icon';
 
 /**
- * Phones' search, like the Claude app's: a round 🔍 at the bottom left (or, `button` off, the
- * page's own one calling start() — e.g. in the top bar); a tap brings a search
- * field and a round ✕ to the bottom, riding on the keyboard (iOS doesn't move fixed things for
+ * Phones' search, like iOS Settings': a wide "🔍 Search" bar at the bottom (`beside`: leaving room
+ * for the page's + on its right); a tap brings the search field (ⓧ inside clears it) and a round
+ * ✕ beside it, riding on the keyboard (iOS doesn't move fixed things for
  * it: the visual viewport tells how tall it is). The keyboard's search key hides the keyboard and
  * keeps the results; ✕ clears and closes; leaving the field empty closes it too.
  * Two-way bound: `<app-floating-search [(value)]="query" />`.
@@ -15,9 +15,16 @@ import { Icon } from './icon/icon';
   selector: 'app-floating-search',
   imports: [Icon, TranslatePipe],
   template: `
-    @if (button() && !open()) {
-      <button type="button" (click)="start()" [attr.aria-label]="'students.search' | t" class="icon-btn float-bottom left-4">
-        <app-icon name="search" class="size-6" />
+    @if (!open()) {
+      <button
+        type="button"
+        (click)="start()"
+        class="glass-neutral text-body fixed bottom-[var(--float-bottom)] left-4 z-20 flex h-[var(--control-round)] items-center gap-2 rounded-full px-4 text-left active:opacity-70"
+        [class.right-4]="!beside()"
+        [class.right-[calc(2rem+var(--control-round))]]="beside()"
+      >
+        <app-icon name="search" class="size-5 shrink-0 opacity-50" />
+        <span class="opacity-40">{{ 'students.search' | t }}</span>
       </button>
     }
     <!-- Always there (hidden while closed): iOS opens the keyboard only for a field focused
@@ -45,9 +52,15 @@ import { Icon } from './icon/icon';
           [tabindex]="open() ? 0 : -1"
           class="text-body min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-40 [&::-webkit-search-cancel-button]:appearance-none"
         />
+        <!-- ⓧ clears (the field keeps the focus) -->
+        @if (value()) {
+          <button type="button" (pointerdown)="$event.preventDefault()" (click)="value.set('')" [attr.aria-label]="'action.clear' | t" class="-mr-1 flex size-6 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--text)_35%,transparent)] text-[var(--app-bg)]">
+            <app-icon name="close" [strokeWidth]="3" class="size-3" />
+          </button>
+        }
       </label>
       <!-- pointerdown keeps the field focused (no blur first): ✕ clears and closes -->
-      <button type="button" (pointerdown)="$event.preventDefault()" (click)="stop()" [attr.aria-label]="'action.clear' | t" class="icon-btn">
+      <button type="button" (pointerdown)="$event.preventDefault()" (click)="stop()" [attr.aria-label]="'action.cancel' | t" class="icon-btn">
         <app-icon name="close" class="size-6" />
       </button>
     </div>
@@ -55,7 +68,8 @@ import { Icon } from './icon/icon';
 })
 export class FloatingSearch {
   readonly value = model('');
-  readonly button = input(true);
+  /** The page's + sits on the right of the closed bar. */
+  readonly beside = input(false);
 
   readonly open = signal(false); // the page hides what's under the bar meanwhile (e.g. its +)
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');

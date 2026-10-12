@@ -14,6 +14,7 @@ import { Lesson } from './lesson.service';
 interface Attempt {
   id: string;
   name: string;
+  studentId: string | null; // one of the teacher's students (their personal link), else a guest
   answers: LessonAnswers;
   ticks: string[];
   createdAt: string;
@@ -38,7 +39,12 @@ interface Attempt {
           <button type="button" (click)="open.set(a)" class="list-row w-full py-2 text-left">
             <span class="avatar">{{ initial(a.name) }}</span>
             <div class="min-w-0 flex-1 leading-tight">
-              <p class="truncate font-medium">{{ a.name }}</p>
+              <p class="flex items-center gap-1.5">
+                <span class="truncate font-medium">{{ a.name }}</span>
+                @if (!a.studentId) {
+                  <span class="text-footnote shrink-0 opacity-50">{{ 'lessons.guest' | t }}</span>
+                }
+              </p>
               <p class="text-footnote flex min-w-0 gap-2 opacity-50">
                 <span class="shrink-0">{{ when(a.updatedAt) }}</span>
                 <span class="truncate">{{ s.done }}/{{ s.total }} {{ 'shared.answered' | t }}</span>

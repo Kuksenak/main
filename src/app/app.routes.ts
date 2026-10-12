@@ -9,6 +9,8 @@ export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./login/login').then((m) => m.Login), canActivate: [guestGuard] },
   // A shared lesson: public, no sign-in
   { path: 'l/:token', loadComponent: () => import('./lessons/shared-lesson').then((m) => m.SharedLesson) },
+  // A student's own page by their personal link: public, no sign-in
+  { path: 's/:token', loadComponent: () => import('./portal/student-portal').then((m) => m.StudentPortal) },
   {
     path: '',
     component: Layout,

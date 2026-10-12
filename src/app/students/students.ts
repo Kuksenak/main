@@ -36,7 +36,6 @@ export class Students {
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
   private readonly search = viewChild<TemplateRef<unknown>>('search');
-  private readonly searchButton = viewChild<TemplateRef<unknown>>('searchButton');
   private readonly fsearch = viewChild<FloatingSearch>('fsearch');
   // Searching (phones): + hides (it'd show through the search bar's ✕)
   protected readonly searching = computed(() => this.fsearch()?.open() ?? false);
@@ -93,13 +92,11 @@ export class Students {
   ];
 
   constructor() {
-    // Mobile toolbar: no title, the search button at the left, floating over the list (which
-    // scrolls under it and the tabs, like a card's page); the search field comes up at the bottom.
+    // Mobile toolbar: no title, floating over the list (which scrolls under it and the tabs, like
+    // a card's page); the search is a bar at the bottom.
     const toolbar = inject(ToolbarService);
-    effect(() => toolbar.actions.set(this.searchButton() ?? null));
     if (!this.desktop) toolbar.overlay.set(true);
     inject(DestroyRef).onDestroy(() => {
-      toolbar.actions.set(null);
       toolbar.overlay.set(false);
     });
   }

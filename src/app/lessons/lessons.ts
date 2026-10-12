@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import { Component, TemplateRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
@@ -7,7 +7,6 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { NavStack } from '../core/services/nav-stack.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { FloatingSearch } from '../core/ui/floating-search';
@@ -91,12 +90,9 @@ import { LessonUsage } from './lesson-usage';
       }
     </main>
 
-    <!-- Phones: the search's button in the top bar, its field at the bottom; + bottom-right -->
+    <!-- Phones: the search bar at the bottom, + beside it -->
     @if (!desktop) {
-      <ng-template #searchButton>
-        <button type="button" (click)="fsearch.start()" [attr.aria-label]="'students.search' | t" class="icon-btn" [class.invisible]="searching()"><app-icon name="search" class="size-6" /></button>
-      </ng-template>
-      <app-floating-search #fsearch [button]="false" [(value)]="query" />
+      <app-floating-search #fsearch [beside]="true" [(value)]="query" />
     }
     @if (!desktop) {
       <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4" [class.invisible]="searching()">
@@ -114,7 +110,6 @@ export class Lessons {
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
   private readonly search = viewChild<TemplateRef<unknown>>('search');
-  private readonly searchButton = viewChild<TemplateRef<unknown>>('searchButton');
   private readonly fsearch = viewChild<FloatingSearch>('fsearch');
   // Searching (phones): + hides (it'd show through the search bar's ✕)
   protected readonly searching = computed(() => this.fsearch()?.open() ?? false);
@@ -140,10 +135,6 @@ export class Lessons {
       });
     });
 
-    // Mobile toolbar: no title, the search button at the left; the field comes up at the bottom.
-    const toolbar = inject(ToolbarService);
-    effect(() => toolbar.actions.set(this.searchButton() ?? null));
-    inject(DestroyRef).onDestroy(() => toolbar.actions.set(null));
   }
 
   protected add(): void {
