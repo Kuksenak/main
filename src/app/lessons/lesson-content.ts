@@ -86,7 +86,7 @@ export type { LessonFills } from './gaps';
             <span class="card-label">{{ 'lessons.gaps' | t }}</span>
             <div class="card flex flex-col gap-1 px-4 py-3">
               @for (line of lines(b.text); track $index) {
-                <p class="text-body min-h-[1.5em] leading-[2.25]">
+                <p class="text-body min-h-[1.5em] leading-[2]">
                   @for (p of line; track $index) {
                     @if (gapOf(p); as g) {
                       @let w = word(i, g.gap);
@@ -105,7 +105,7 @@ export type { LessonFills } from './gaps';
                             [disabled]="locked()"
                             (input)="write(i, g.gap, $any($event.target).value)"
                             [style.width.ch]="width(g, w)"
-                            class="mx-0.5 inline-block h-[1.35em] rounded-none border-0 border-b-[1.5px] border-[color-mix(in_srgb,var(--text)_35%,transparent)] bg-transparent p-0 text-center align-baseline font-medium leading-[1.35] text-[var(--accent)] outline-none transition-colors focus:border-[var(--accent)] disabled:opacity-100"
+                            class="mx-px inline-block h-[1.35em] rounded-none border-0 border-b-[1.5px] border-[color-mix(in_srgb,var(--text)_35%,transparent)] bg-transparent p-0 text-center align-baseline font-medium leading-[1.35] text-[var(--accent)] outline-none transition-colors focus:border-[var(--accent)] disabled:opacity-100"
                           />
                         }
                         @default {
@@ -218,7 +218,7 @@ export class LessonContent {
   // Room for a word (students don't get the answers — nothing to give away), growing with it
   protected width(g: { answers: string[] }, w: string): number {
     const longest = Math.max(0, ...g.answers.map((a) => a.length));
-    return Math.max(8, longest + 2, w.length + 1.5);
+    return Math.max(5, longest + 1, w.length + 1);
   }
 
   // The teacher's own blocks first, then the students' (each with its place in the lesson)
