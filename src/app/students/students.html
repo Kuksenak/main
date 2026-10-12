@@ -8,7 +8,11 @@
   <!-- Desktop: the list column as wide as the schedule's calendar column (25rem, the same gap) -->
   <!-- Phones: the list starts at the tabs' bottom edge (its round corners clip a card leaving
        under them) -->
-  <section class="flex min-h-0 w-full flex-1 flex-col gap-3 mobile:pt-[calc(env(safe-area-inset-top)+6.75rem)] desktop:max-w-[25rem]">
+  <section
+    class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-[25rem]"
+    [class.mobile:pt-[calc(env(safe-area-inset-top)+10.25rem)]]="!searchActive()"
+    [class.mobile:pt-[calc(env(safe-area-inset-top)+3.5rem)]]="searchActive()"
+  >
     <!-- Desktop: the search and Add in one row, both the controls' height (phones: search in
          the toolbar, + at the bottom) -->
     <div class="flex items-center gap-3 mobile:hidden">
@@ -58,16 +62,31 @@
       }
     </ng-template>
 
-    <!-- Phones: the list scrolls under the toolbar (and the tabs page's Groups | Students),
-         which float on a fade from the page color to transparent, like a card's top bar -->
+    <!-- Phones: the list scrolls under the toolbar, the search field and the Groups | Students
+         tabs, which float on a fade from the page color to transparent, like a card's top bar.
+         Searching (Telegram-like): the top bar and the tabs go, the field moves up in their place,
+         groups and students both listed. -->
     @if (!desktop) {
-      <!-- Solid down to the tabs' bottom; the fade only in the gap between the tabs and the list's
-           top, so at rest the first row shows in full and fades as it slides under -->
-      <div class="pointer-events-none absolute inset-x-0 top-0 z-[8] h-[calc(env(safe-area-inset-top)+7.5rem)] bg-[linear-gradient(to_bottom,var(--app-bg)_calc(100%-0.75rem),transparent)]"></div>
-      <div class="segmented absolute inset-x-4 top-[calc(env(safe-area-inset-top)+4rem)] z-[9]">
-        <button type="button" (click)="tab.set('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
-        <button type="button" (click)="tab.set('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
-      </div>
+      <!-- Solid down to the tabs' (searching: the field's) bottom; the fade only in the gap above
+           the list's top, so at rest the first row shows in full and fades as it slides under -->
+      <div
+        class="pointer-events-none absolute inset-x-0 top-0 z-[8] bg-[linear-gradient(to_bottom,var(--app-bg)_calc(100%-0.75rem),transparent)]"
+        [class.h-[calc(env(safe-area-inset-top)+11rem)]]="!searchActive()"
+        [class.h-[calc(env(safe-area-inset-top)+4.25rem)]]="searchActive()"
+      ></div>
+      <app-search-bar
+        class="absolute inset-x-4 z-[9] transition-[top] duration-300 ease-[var(--ease-out-quick)]"
+        [class.top-[calc(env(safe-area-inset-top)+4rem)]]="!searchActive()"
+        [class.top-[calc(env(safe-area-inset-top)+0.5rem)]]="searchActive()"
+        [(value)]="query"
+        [(active)]="searchActive"
+      />
+      @if (!searchActive()) {
+        <div class="segmented absolute inset-x-4 top-[calc(env(safe-area-inset-top)+7.5rem)] z-[9]">
+          <button type="button" (click)="tab.set('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
+          <button type="button" (click)="tab.set('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
+        </div>
+      }
     }
 
     @let groupsHere = showGroups() && visibleGroups().length;
@@ -88,7 +107,7 @@
       >
         @if (groupsHere) {
           <div class="flex flex-col gap-1.5">
-            @if (desktop) {
+            @if (desktop || searchActive()) {
               <span class="card-label">{{ 'groups.title' | t }}</span>
             }
             <div class="card"><ng-container [ngTemplateOutlet]="groupRows" /></div>
@@ -96,7 +115,7 @@
         }
         @if (studentsHere) {
           <div class="flex flex-col gap-1.5">
-            @if (desktop) {
+            @if (desktop || searchActive()) {
               <span class="card-label">{{ 'nav.students' | t }}</span>
             }
             <div class="card"><ng-container [ngTemplateOutlet]="studentRows" /></div>
@@ -184,17 +203,13 @@
     </button>
   </div>
 } @else {
-  @if (!desktop) {
-    <!-- The search bar at the bottom, + beside it -->
-    <app-floating-search #fsearch [beside]="true" [(value)]="query" />
-  }
   <button
     #fab
     type="button"
     (click)="openAdd(fab)"
     [attr.aria-label]="'action.add' | t"
     class="fab float-bottom right-4 desktop:hidden"
-    [class.invisible]="searching()"
+    [class.invisible]="searchActive()"
   >
     <app-icon name="plus" [strokeWidth]="2" class="size-7" />
     <span class="fab-label">{{ 'action.add' | t }}</span>

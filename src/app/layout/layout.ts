@@ -11,6 +11,8 @@ import { ToolbarService } from '../core/services/toolbar.service';
 import { LessonService } from '../lessons/lesson.service';
 import { EventService } from '../schedule/event.service';
 import { GoogleCalendarService } from '../schedule/google-calendar.service';
+import { NotificationsService } from '../core/services/notifications.service';
+import { NotificationBanner } from '../core/ui/notification-banner';
 import { GroupService } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 import { UpdateService } from '../core/services/update.service';
@@ -23,7 +25,7 @@ import { SettingsSheet } from '../settings/settings-sheet';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, SettingsSheet, StackHost, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, NotificationBanner, SettingsSheet, StackHost, TranslatePipe],
   templateUrl: './layout.html',
 })
 export class Layout {
@@ -33,6 +35,7 @@ export class Layout {
   protected readonly toolbar = inject(ToolbarService);
   protected readonly install = inject(InstallService);
   private readonly router = inject(Router);
+  private readonly notifications = inject(NotificationsService);
 
   constructor() {
     // The signed-in account's data, loaded once for every page and card.
@@ -41,6 +44,7 @@ export class Layout {
     inject(GroupService).ensureLoaded();
     inject(LessonService).ensureLoaded();
     inject(GoogleCalendarService).ensureLoaded();
+    this.notifications.start(); // live notifications (e.g. a student finished a lesson)
 
     // Back from Google's consent screen (the API returns to the app's root with
     // ?calendar=connected / error / disabled / wrong-account): Settings open, where it was switched

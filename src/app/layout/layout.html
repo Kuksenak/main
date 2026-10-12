@@ -4,6 +4,7 @@
        only its controls take taps -->
   <header
     class="sticky top-0 z-10 flex items-center gap-2 bg-[var(--app-bg)] px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]"
+    [class.!hidden]="toolbar.hidden()"
     [class.!absolute]="toolbar.overlay()"
     [class.inset-x-0]="toolbar.overlay()"
     [class.!bg-transparent]="toolbar.overlay()"
@@ -69,6 +70,9 @@
   </header>
 
   <router-outlet></router-outlet>
+
+  <!-- A notification while the app is open -->
+  <app-notification-banner />
 
   <!-- Cards (event / student / group / lesson) opened over any page; back closes only the top one -->
   <app-stack-host />

@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, TemplateRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
@@ -9,7 +9,8 @@ import { NavStack } from '../core/services/nav-stack.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
-import { FloatingSearch } from '../core/ui/floating-search';
+import { SearchBar } from '../core/ui/search-bar';
+import { ToolbarService } from '../core/services/toolbar.service';
 import { SearchField } from '../core/ui/search-field';
 import { LessonPage } from './lesson-page';
 import { LessonService } from './lesson.service';
@@ -23,7 +24,7 @@ import { LessonUsage } from './lesson-usage';
  */
 @Component({
   selector: 'app-lessons',
-  imports: [NgTemplateOutlet, FloatingSearch, Icon, LessonPage, ScrollArea, SearchField, TranslatePipe],
+  imports: [NgTemplateOutlet, Icon, LessonPage, ScrollArea, SearchBar, SearchField, TranslatePipe],
   template: `
     <ng-template #search>
       <app-search-field [(value)]="query" />
@@ -33,6 +34,10 @@ import { LessonUsage } from './lesson-usage';
          (like Students). Phones: the list; a lesson opens as a card over it. -->
     <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4">
       <section class="flex min-h-0 w-full flex-1 flex-col gap-3 mobile:pb-14 desktop:max-w-[25rem]">
+        <!-- Phones: the search field (searching: in the top bar's place) -->
+        @if (!desktop) {
+          <app-search-bar class="mt-1 shrink-0" [(value)]="query" [(active)]="searchActive" />
+        }
         <!-- Desktop: the search and Add in one row -->
         <div class="flex items-center gap-3 mobile:hidden">
           <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="search" /></div>
@@ -90,12 +95,8 @@ import { LessonUsage } from './lesson-usage';
       }
     </main>
 
-    <!-- Phones: the search bar at the bottom, + beside it -->
     @if (!desktop) {
-      <app-floating-search #fsearch [beside]="true" [(value)]="query" />
-    }
-    @if (!desktop) {
-      <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4" [class.invisible]="searching()">
+      <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4" [class.invisible]="searchActive()">
         <app-icon name="plus" [strokeWidth]="2" class="size-7" />
       </button>
     }
@@ -110,9 +111,8 @@ export class Lessons {
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
   private readonly search = viewChild<TemplateRef<unknown>>('search');
-  private readonly fsearch = viewChild<FloatingSearch>('fsearch');
   // Searching (phones): + hides (it'd show through the search bar's ✕)
-  protected readonly searching = computed(() => this.fsearch()?.open() ?? false);
+  protected readonly searchActive = signal(false);
 
   protected readonly query = signal('');
 
@@ -126,6 +126,11 @@ export class Lessons {
   });
 
   constructor() {
+    // Phones searching: the top bar steps aside (the field takes its place)
+    const toolbar = inject(ToolbarService);
+    effect(() => toolbar.hidden.set(this.searchActive()));
+    inject(DestroyRef).onDestroy(() => toolbar.hidden.set(false));
+
     // Mobile: /lessons/:id → that lesson's card on top (unless it's open already).
     effect(() => {
       const id = this.linkedId();

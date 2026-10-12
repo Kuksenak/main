@@ -10,6 +10,12 @@
   to { transform: none; opacity: 1; }
 }
 
+/* A notification banner dropping in at the top. */
+@keyframes bannerIn {
+  from { transform: translateY(-120%); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
 @keyframes pageInRight {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }

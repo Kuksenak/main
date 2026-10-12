@@ -10,7 +10,7 @@ import { GroupView, StudentView } from '../cards/person-views';
 import { Icon } from '../core/ui/icon/icon';
 import { LongPress } from '../core/ui/long-press';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
-import { FloatingSearch } from '../core/ui/floating-search';
+import { SearchBar } from '../core/ui/search-bar';
 import { SearchField } from '../core/ui/search-field';
 import { primeKeyboard } from '../core/utils/keyboard';
 import { initial } from '../core/utils/text';
@@ -27,7 +27,7 @@ import { Student, StudentService } from './student.service';
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, OverlayModule, FloatingSearch, GroupView, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
+  imports: [NgTemplateOutlet, OverlayModule, GroupView, SearchBar, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -36,9 +36,8 @@ export class Students {
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
   private readonly search = viewChild<TemplateRef<unknown>>('search');
-  private readonly fsearch = viewChild<FloatingSearch>('fsearch');
   // Searching (phones): + hides (it'd show through the search bar's ✕)
-  protected readonly searching = computed(() => this.fsearch()?.open() ?? false);
+  protected readonly searchActive = signal(false);
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly colorVar = colorVar;
@@ -47,8 +46,9 @@ export class Students {
 
   // Phones: which tab is showing (desktop lists both).
   protected readonly tab = signal<'groups' | 'students'>('students');
-  protected readonly showGroups = computed(() => this.desktop || this.tab() === 'groups');
-  protected readonly showStudents = computed(() => this.desktop || this.tab() === 'students');
+  // Phones: the open tab (searching: both); desktop: both
+  protected readonly showGroups = computed(() => this.desktop || this.searchActive() || this.tab() === 'groups');
+  protected readonly showStudents = computed(() => this.desktop || this.searchActive() || this.tab() === 'students');
 
   private readonly byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, this.i18n.locale());
 
@@ -96,7 +96,10 @@ export class Students {
     // a card's page); the search is a bar at the bottom.
     const toolbar = inject(ToolbarService);
     if (!this.desktop) toolbar.overlay.set(true);
+    // Searching: the top bar steps aside (the field takes its place)
+    effect(() => toolbar.hidden.set(this.searchActive()));
     inject(DestroyRef).onDestroy(() => {
+      toolbar.hidden.set(false);
       toolbar.overlay.set(false);
     });
   }

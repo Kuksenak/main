@@ -1,4 +1,6 @@
 import { HttpClient } from '@angular/common/http';
+import { DestroyRef } from '@angular/core';
+import { NotificationsService } from '../core/services/notifications.service';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { catchError, of } from 'rxjs';
@@ -94,13 +96,19 @@ export class LessonAttempts {
 
   constructor() {
     // The lesson's attempts (again when it changes, e.g. after an edit)
-    effect(() => {
-      const id = this.lesson().id;
-      this.http
-        .get<{ attempts: Attempt[] }>(`${environment.apiUrl}/lessons/${id}/attempts`)
-        .pipe(catchError(() => of({ attempts: [] as Attempt[] })))
-        .subscribe((res) => this.attempts.set(res.attempts ?? []));
+    effect(() => this.load(this.lesson().id));
+    // Someone just finished it: the list again (the banner says so)
+    const sub = inject(NotificationsService).received.subscribe((n) => {
+      if (n.kind === 'lessonFinished' && n.url.endsWith(`/${this.lesson().id}`)) this.load(this.lesson().id);
     });
+    inject(DestroyRef).onDestroy(() => sub.unsubscribe());
+  }
+
+  private load(id: string): void {
+    this.http
+      .get<{ attempts: Attempt[] }>(`${environment.apiUrl}/lessons/${id}/attempts`)
+      .pipe(catchError(() => of({ attempts: [] as Attempt[] })))
+      .subscribe((res) => this.attempts.set(res.attempts ?? []));
   }
 
   // How far they got: exercises answered, and right (of those with a right answer set)
