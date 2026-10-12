@@ -12,9 +12,10 @@
   <!-- Desktop: the list column as wide as the schedule's calendar column (25rem, the same gap) -->
   <!-- Phones: the tabs, then the list (its round corners clip a card leaving at its top) -->
   <section class="flex min-h-0 w-full flex-1 flex-col gap-3 desktop:max-w-[25rem]">
-    <!-- Desktop: Add (the search is in the top bar; phones: search in the toolbar, + at the
-         bottom) -->
-    <div class="flex items-center justify-end gap-3 mobile:hidden">
+    <!-- Desktop: the search and Add in one row, both the controls' height (phones: search in
+         the toolbar, + at the bottom) -->
+    <div class="flex items-center gap-3 mobile:hidden">
+      <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="search" /></div>
       <button #addBtn type="button" (click)="openAdd(addBtn)" class="btn-primary shrink-0 gap-1.5 pl-2.5">
         <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
         {{ 'action.add' | t }}
