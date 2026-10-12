@@ -41,7 +41,7 @@ import { LessonUsage } from './lesson-usage';
         <!-- Desktop: the search and Add in one row -->
         <div class="flex items-center gap-3 mobile:hidden">
           <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="search" /></div>
-          <button type="button" (click)="add()" class="btn-primary shrink-0 gap-1.5 pl-2.5">
+          <button type="button" (click)="add()" class="btn-secondary shrink-0 gap-1.5 pl-2.5">
             <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
             {{ 'action.add' | t }}
           </button>

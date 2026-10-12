@@ -6,7 +6,7 @@
       <h1 class="text-xl font-semibold">{{ monthTitle() }}</h1>
       <button type="button" (click)="today()" class="btn-secondary ml-auto">{{ 'schedule.today' | t }}</button>
       <!-- Add, next to Today (desktop; phones have the floating + at the bottom) -->
-      <button type="button" (click)="openNew()" class="btn-primary gap-1.5 pl-2.5">
+      <button type="button" (click)="openNew()" class="btn-secondary gap-1.5 pl-2.5">
         <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />
         {{ 'action.add' | t }}
       </button>
