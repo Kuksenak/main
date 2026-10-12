@@ -104,7 +104,7 @@ export type { LessonFills } from './gaps';
                             [disabled]="locked()"
                             (input)="write(i, g.gap, $any($event.target).value)"
                             [style.width.ch]="fitsContent ? null : width(g, w)"
-                            class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b border-[color-mix(in_srgb,var(--text)_40%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline italic leading-[1.35] text-[color-mix(in_srgb,var(--text)_72%,transparent)] outline-none transition-colors focus:border-[var(--accent)] disabled:opacity-100"
+                            class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b border-[color-mix(in_srgb,var(--text)_40%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline font-semibold leading-[1.35] text-[color-mix(in_srgb,var(--text)_72%,transparent)] outline-none transition-colors focus:border-[color-mix(in_srgb,var(--text)_70%,transparent)] disabled:opacity-100"
                           />
                         }
                         @default {
