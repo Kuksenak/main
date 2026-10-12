@@ -1,5 +1,15 @@
 /* Keyframes shared across components. */
 
+/* A page inside a sheet (Settings on phones): in from the right; the list back from the left. */
+@keyframes paneIn {
+  from { transform: translateX(2.5rem); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes paneBack {
+  from { transform: translateX(-2.5rem); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
 @keyframes pageInRight {
   from { transform: translateX(100%); }
   to { transform: translateX(0); }

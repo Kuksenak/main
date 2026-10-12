@@ -37,6 +37,9 @@ export class Students {
   protected stack = inject(NavStack);
   private readonly search = viewChild<TemplateRef<unknown>>('search');
   private readonly searchButton = viewChild<TemplateRef<unknown>>('searchButton');
+  private readonly fsearch = viewChild<FloatingSearch>('fsearch');
+  // Searching (phones): + hides (it'd show through the search bar's ✕)
+  protected readonly searching = computed(() => this.fsearch()?.open() ?? false);
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly colorVar = colorVar;
@@ -90,14 +93,12 @@ export class Students {
   ];
 
   constructor() {
-    // Mobile toolbar: the title, floating over the list (which scrolls under it and the tabs,
-    // like a card's page); the search is at the bottom (FloatingSearch).
+    // Mobile toolbar: no title, the search button at the left, floating over the list (which
+    // scrolls under it and the tabs, like a card's page); the search field comes up at the bottom.
     const toolbar = inject(ToolbarService);
-    effect(() => toolbar.title.set(this.i18n.t('nav.students')));
     effect(() => toolbar.actions.set(this.searchButton() ?? null));
     if (!this.desktop) toolbar.overlay.set(true);
     inject(DestroyRef).onDestroy(() => {
-      toolbar.title.set('');
       toolbar.actions.set(null);
       toolbar.overlay.set(false);
     });

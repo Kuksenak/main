@@ -1,8 +1,10 @@
-import { Component, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { TranslationKey } from '../core/i18n/translations';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { InstallService } from '../core/services/install.service';
 import { UpdateService } from '../core/services/update.service';
 import { Icon } from '../core/ui/icon/icon';
@@ -10,13 +12,15 @@ import { Sheet } from '../core/ui/sheet/sheet';
 import { GoogleCalendarService } from '../schedule/google-calendar.service';
 import { IntegrationsSettings, LanguageList, ScheduleSettings } from './sections';
 
-type Section = 'language' | 'schedule';
+type Section = 'language' | 'schedule' | 'google';
 
 /**
  * The account button's Settings, like the Claude app's — on phones a sheet from the bottom (drag
- * it down or tap outside to close), on desktop a dropdown under the button (`origin`); no title.
- * The email (5 taps show the version); Language and Schedule rows unfold their settings right
- * under them (one at a time, all folded on opening); Google Calendar with its switch; Install (in
+ * it down or tap outside to close; a fixed height), on desktop a dropdown under the button
+ * (`origin`); no title. The email (5 taps show the version); Language, Schedule and Google
+ * Calendar rows — on phones each opens its own page right in the sheet (slides in, ‹ back), on
+ * desktop each unfolds its settings under it (one at a time, all folded on opening); back from
+ * Google without a connection, Google Calendar's page / settings show the reason; Install (in
  * the browser); Update when one is ready and Log out at the bottom.
  */
 @Component({
@@ -24,8 +28,24 @@ type Section = 'language' | 'schedule';
   imports: [Icon, IntegrationsSettings, LanguageList, ScheduleSettings, Sheet, TranslatePipe],
   template: `
     <app-sheet #sheet [origin]="origin()" [wide]="true" [tall]="true" (closed)="closed.emit()">
+      <!-- Phones, a row's page: ‹ back to the list and its title in the middle -->
+      @if (page(); as p) {
+        <div class="relative mb-3 flex h-[var(--control-round)] shrink-0 items-center justify-center">
+          <button type="button" (click)="back()" [attr.aria-label]="'action.back' | t" class="icon-btn absolute left-0">
+            <app-icon name="chevron-left" class="-ml-0.5 size-7" />
+          </button>
+          <span class="text-body font-semibold">{{ titles[p] | t }}</span>
+        </div>
+        <div class="[animation:paneIn_280ms_var(--ease-out-quick)]">
+          @switch (p) {
+            @case ('language') { <app-language-list (picked)="back()" /> }
+            @case ('schedule') { <app-schedule-settings /> }
+            @case ('google') { <app-integrations-settings [failed]="failed()" /> }
+          }
+        </div>
+      } @else {
       <!-- Desktop: compact — no section labels, cards close together -->
-      <div class="flex flex-1 flex-col gap-6 desktop:gap-2">
+      <div class="flex flex-1 flex-col gap-6 desktop:gap-2" [class.[animation:paneBack_280ms_var(--ease-out-quick)]]="cameBack">
         <div class="card">
           <!-- 5 taps on the email show the app version (hidden; for support) -->
           <button type="button" (click)="versionTap()" class="list-row w-full text-left">
@@ -37,25 +57,26 @@ type Section = 'language' | 'schedule';
           }
         </div>
 
-        <!-- A row unfolds its settings under it (indented to the row's text); › turns down -->
+        <!-- A row: on phones opens its page; on desktop unfolds its settings under it (indented to
+             the row's text, › turns down) -->
         <div class="flex flex-col gap-1.5 desktop:gap-0">
           <span class="card-label desktop:hidden">{{ 'settings.general' | t }}</span>
           <div class="card">
-            <button type="button" (click)="toggle('language')" class="list-row w-full text-left" [attr.aria-expanded]="open() === 'language'">
+            <button type="button" (click)="tap('language')" class="list-row w-full text-left" [attr.aria-expanded]="desktop ? open() === 'language' : null">
               <app-icon name="globe" class="row-icon" />
               <span class="flex-1">{{ 'account.language' | t }}</span>
               <span class="opacity-50">{{ langLabel() }}</span>
               <app-icon name="chevron-right" class="row-chevron -ml-1 transition-transform duration-200" [class.rotate-90]="open() === 'language'" />
             </button>
-            @if (open() === 'language') {
+            @if (desktop && open() === 'language') {
               <app-language-list class="sub-rows" [flat]="true" />
             }
-            <button type="button" (click)="toggle('schedule')" class="list-row w-full text-left" [attr.aria-expanded]="open() === 'schedule'">
+            <button type="button" (click)="tap('schedule')" class="list-row w-full text-left" [attr.aria-expanded]="desktop ? open() === 'schedule' : null">
               <app-icon name="calendar" class="row-icon" />
               <span class="flex-1">{{ 'nav.schedule' | t }}</span>
               <app-icon name="chevron-right" class="row-chevron transition-transform duration-200" [class.rotate-90]="open() === 'schedule'" />
             </button>
-            @if (open() === 'schedule') {
+            @if (desktop && open() === 'schedule') {
               <app-schedule-settings class="sub-rows" [flat]="true" />
             }
           </div>
@@ -63,7 +84,17 @@ type Section = 'language' | 'schedule';
 
         <div class="flex flex-col gap-1.5 desktop:gap-0">
           <span class="card-label desktop:hidden">{{ 'settings.integrations' | t }}</span>
-          <app-integrations-settings [failed]="failed()" />
+          <div class="card">
+            <button type="button" (click)="tap('google')" class="list-row w-full text-left" [attr.aria-expanded]="desktop ? open() === 'google' : null">
+              <app-icon name="google" class="row-icon !opacity-100" />
+              <span class="flex-1">Google Calendar</span>
+              <span class="opacity-50">{{ (google.connected() ? 'settings.on' : 'settings.off') | t }}</span>
+              <app-icon name="chevron-right" class="row-chevron -ml-1 transition-transform duration-200" [class.rotate-90]="open() === 'google'" />
+            </button>
+            @if (desktop && open() === 'google') {
+              <app-integrations-settings class="sub-rows" [flat]="true" [failed]="failed()" />
+            }
+          </div>
         </div>
 
         @if (!install.standalone) {
@@ -84,10 +115,11 @@ type Section = 'language' | 'schedule';
           <button type="button" (click)="auth.logout()" class="card-btn text-[var(--danger)]">{{ 'account.logout' | t }}</button>
         </div>
       </div>
+      }
     </app-sheet>
   `,
 })
-export class SettingsSheet {
+export class SettingsSheet implements OnInit {
   /** Desktop: the account button (the dropdown hangs under it). */
   readonly origin = input<HTMLElement | null>(null);
   /** Back from Google without a connection (why: error / disabled / wrong-account): the error line
@@ -103,15 +135,35 @@ export class SettingsSheet {
   private router = inject(Router);
   private readonly sheet = viewChild.required<Sheet>('sheet');
 
-  // The unfolded row (one at a time; none on opening)
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  // Desktop: the unfolded row (one at a time; none on opening). Phones: the row's page shown.
   protected readonly open = signal<Section | null>(null);
+  protected readonly page = signal<Section | null>(null);
+  protected cameBack = false; // the list slides back in only after a page, not on opening
+  protected readonly titles: Record<Section, TranslationKey> = {
+    language: 'account.language',
+    schedule: 'nav.schedule',
+    google: 'settings.integrations',
+  };
 
   constructor() {
     this.google.reload(); // fresh status (e.g. just back from Google)
   }
 
-  protected toggle(section: Section): void {
-    this.open.update((s) => (s === section ? null : section));
+  ngOnInit(): void {
+    // Back from Google without a connection: its row unfolded, the reason showing
+    if (this.failed()) this.tap('google');
+  }
+
+  // A row: its page (phones) or its settings unfolding / folding (desktop).
+  protected tap(section: Section): void {
+    if (this.desktop) this.open.update((s) => (s === section ? null : section));
+    else this.page.set(section);
+  }
+
+  protected back(): void {
+    this.cameBack = true;
+    this.page.set(null);
   }
 
   protected readonly langLabel = computed(() => this.i18n.languages.find((l) => l.code === this.i18n.lang())?.label ?? '');

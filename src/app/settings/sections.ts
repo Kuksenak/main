@@ -43,13 +43,23 @@ export class ScheduleSettings {
  * Integrations: Google Calendar (its events in the schedule) — on goes through Google's consent
  * screen and comes back (?calendar=connected / error / disabled / wrong-account), off
  * disconnects. `failed`: back from Google without a connection — why (an error line under the
- * card; another Google account than the signed-in one gets its own).
+ * card; another Google account than the signed-in one gets its own). `flat`: just the switch's
+ * row (and the error as a row), unfolded under a "Google Calendar" row.
  */
 @Component({
   selector: 'app-integrations-settings',
   imports: [Icon, Toggle, TranslatePipe],
-  host: { class: 'flex flex-col gap-1.5' },
+  host: { class: 'flex flex-col', '[class.gap-1.5]': '!flat()' },
   template: `
+    @if (flat()) {
+      <div class="list-row">
+        <span class="flex-1">{{ 'settings.googleOff' | t }}</span>
+        <app-toggle [(checked)]="on" (checkedChange)="setGoogle($event)" [disabled]="google.connected() === null" />
+      </div>
+      @if (error(); as e) {
+        <p class="list-row text-footnote text-[var(--danger)]">{{ (e === 'wrong-account' ? 'settings.googleWrongAccount' : 'settings.googleError') | t }}</p>
+      }
+    } @else {
     <div class="card">
       <div class="list-row py-2.5">
         <app-icon name="google" class="size-6 shrink-0" />
@@ -63,11 +73,13 @@ export class ScheduleSettings {
     @if (error(); as e) {
       <p class="text-footnote text-[var(--danger)] mobile:px-[var(--row-px)]">{{ (e === 'wrong-account' ? 'settings.googleWrongAccount' : 'settings.googleError') | t }}</p>
     }
+    }
   `,
 })
 export class IntegrationsSettings {
   // Why it didn't connect, back from Google (null: it did / nothing tried)
   readonly failed = input<string | null>(null);
+  readonly flat = input(false);
   protected readonly google = inject(GoogleCalendarService);
   private readonly connectFailed = signal(false);
   protected readonly error = computed(() => (this.connectFailed() ? 'error' : this.failed()));

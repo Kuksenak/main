@@ -191,6 +191,7 @@
     (click)="openAdd(fab)"
     [attr.aria-label]="'action.add' | t"
     class="fab float-bottom right-4 desktop:hidden"
+    [class.invisible]="searching()"
   >
     <app-icon name="plus" [strokeWidth]="2" class="size-7" />
     <span class="fab-label">{{ 'action.add' | t }}</span>

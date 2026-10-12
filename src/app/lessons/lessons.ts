@@ -65,7 +65,7 @@ import { Lesson, LessonService } from './lesson.service';
       </ng-template>
       <app-floating-search #fsearch [button]="false" [(value)]="query" />
     }
-    <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4">
+    <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4" [class.invisible]="searching()">
       <app-icon name="plus" [strokeWidth]="2" class="size-7 desktop:size-[1.125rem]" />
     <span class="fab-label">{{ 'action.add' | t }}</span>
     </button>
@@ -81,6 +81,9 @@ export class Lessons {
   protected readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
   private readonly search = viewChild<TemplateRef<unknown>>('search');
   private readonly searchButton = viewChild<TemplateRef<unknown>>('searchButton');
+  private readonly fsearch = viewChild<FloatingSearch>('fsearch');
+  // Searching (phones): + hides (it'd show through the search bar's ✕)
+  protected readonly searching = computed(() => this.fsearch()?.open() ?? false);
 
   protected readonly query = signal('');
 
@@ -103,15 +106,10 @@ export class Lessons {
       });
     });
 
-    // Mobile toolbar: the title; the search is at the bottom (FloatingSearch).
+    // Mobile toolbar: no title, the search button at the left; the field comes up at the bottom.
     const toolbar = inject(ToolbarService);
-    const i18n = inject(I18nService);
-    effect(() => toolbar.title.set(i18n.t('nav.lessons')));
     effect(() => toolbar.actions.set(this.searchButton() ?? null));
-    inject(DestroyRef).onDestroy(() => {
-      toolbar.title.set('');
-      toolbar.actions.set(null);
-    });
+    inject(DestroyRef).onDestroy(() => toolbar.actions.set(null));
   }
 
   protected add(): void {

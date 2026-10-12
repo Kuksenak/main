@@ -55,7 +55,7 @@ export class FloatingSearch {
   readonly value = model('');
   readonly button = input(true);
 
-  protected readonly open = signal(false);
+  readonly open = signal(false); // the page hides what's under the bar meanwhile (e.g. its +)
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('input');
 
   // Where the bar sits: above the keyboard while it's up, else where the floating buttons are.
