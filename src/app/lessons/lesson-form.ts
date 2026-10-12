@@ -193,7 +193,14 @@ export function cleanLesson(l: LessonInput): LessonInput {
           <app-icon name="plus" class="size-4 text-[var(--accent)]" />{{ k.label | t }}
         </button>
       }
-      <!-- Pages of a book (camera or library on phones) → blocks -->
+      <!-- Pages of a book (camera or library on phones) → blocks, read by the picked model -->
+      @if (models().length > 1) {
+        <select [ngModel]="model()" (ngModelChange)="pickModel($event)" [disabled]="reading()" [attr.aria-label]="'lessons.model' | t" class="chip !rounded-full">
+          @for (id of models(); track id) {
+            <option [value]="id">{{ modelName(id) }}</option>
+          }
+        </select>
+      }
       <button type="button" (click)="photoInput.click()" [disabled]="reading()" class="chip gap-1.5 !rounded-full" [class.opacity-60]="reading()">
         @if (reading()) {
           <span class="size-4 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent"></span>{{ 'lessons.reading' | t }}
@@ -205,6 +212,10 @@ export function cleanLesson(l: LessonInput): LessonInput {
     </div>
     @if (photoError(); as e) {
       <p class="text-footnote -mt-2 text-center text-[var(--danger)]">{{ e | t }}</p>
+      <!-- What exactly went wrong (the server's / the provider's words), small -->
+      @if (photoDetail(); as d) {
+        <p class="text-footnote -mt-3 select-text break-words text-center opacity-50">{{ d }}</p>
+      }
     }
   `,
 })
@@ -218,13 +229,47 @@ export class LessonForm {
     afterNextRender(() => {
       if (desktop) this.titleInput()?.nativeElement.focus({ preventScroll: true });
     });
+    this.loadModels();
   }
 
   protected readonly badLink = badLink;
 
   private http = inject(HttpClient);
   protected readonly reading = signal(false);
+  // The models the server allows (its default first picked; the last one picked remembered here)
+  protected readonly models = signal<string[]>([]);
+  protected readonly model = signal<string | null>(null);
+  private static readonly MODEL_KEY = 'lessons.photoModel';
+
+  private loadModels(): void {
+    this.http
+      .get<{ models: string[]; defaultModel: string | null }>(`${environment.apiUrl}/lessons/from-photo/models`)
+      .subscribe({
+        next: (res) => {
+          let saved: string | null = null;
+          try {
+            saved = localStorage.getItem(LessonForm.MODEL_KEY);
+          } catch {}
+          this.models.set(res.models ?? []);
+          this.model.set(saved && res.models.includes(saved) ? saved : res.defaultModel);
+        },
+        error: () => {},
+      });
+  }
+
+  protected pickModel(id: string): void {
+    this.model.set(id);
+    try {
+      localStorage.setItem(LessonForm.MODEL_KEY, id);
+    } catch {}
+  }
+
+  // "gemini-3.5-flash-lite" → "Gemini 3.5 Flash Lite"
+  protected modelName(id: string): string {
+    return id.replace(/-/g, ' ').replace(/\b[a-z]/g, (c) => c.toUpperCase());
+  }
   protected readonly photoError = signal<TranslationKey | null>(null);
+  protected readonly photoDetail = signal<string | null>(null);
 
   // Up to 5 pages, sent as JPEGs no larger than 2000 px (phone photos are huge; HEIC → JPEG)
   protected async fromPhotos(input: HTMLInputElement): Promise<void> {
@@ -233,9 +278,17 @@ export class LessonForm {
     if (!files.length) return;
     this.reading.set(true);
     this.photoError.set(null);
+    this.photoDetail.set(null);
     try {
       const form = new FormData();
-      for (const [i, f] of files.entries()) form.append('images', await toJpeg(f), `page-${i + 1}.jpg`);
+      for (const [i, f] of files.entries()) {
+        const jpeg = await toJpeg(f).catch(() => {
+          throw new Error(`can't open ${f.name} (${f.type || 'unknown type'})`);
+        });
+        form.append('images', jpeg, `page-${i + 1}.jpg`);
+      }
+      const model = this.model();
+      if (model) form.append('model', model);
       const draft = await firstValueFrom(
         this.http.post<{ title: string; blocks: LessonBlock[] }>(`${environment.apiUrl}/lessons/from-photo`, form),
       );
@@ -245,8 +298,16 @@ export class LessonForm {
       }
       this.value.update((m) => ({ title: m.title.trim() ? m.title : draft.title, blocks: [...m.blocks, ...draft.blocks] }));
     } catch (e) {
-      this.photoError.set(
-        e instanceof HttpErrorResponse && e.status === 503 ? 'lessons.photoOff' : 'lessons.photoFailed',
+      const http = e instanceof HttpErrorResponse;
+      this.photoError.set(http && e.status === 503 ? 'lessons.photoOff' : 'lessons.photoFailed');
+      this.photoDetail.set(
+        http
+          ? e.status === 503
+            ? null
+            : `${e.status || 'network'}: ${e.error?.detail ?? e.error?.description ?? e.statusText ?? ''}`.slice(0, 300)
+          : e instanceof Error
+            ? e.message
+            : String(e),
       );
     } finally {
       this.reading.set(false);
