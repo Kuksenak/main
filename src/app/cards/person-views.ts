@@ -475,7 +475,8 @@ export class LessonsCard {
 /**
  * A student, for reading — like an iOS contact: on desktop the name on the left with Email / Call
  * and [headerEnd] (e.g. Edit) at the top right (phones: the name is in the card's top bar); their
- * lessons (LessonsCard), then the phone and email (label over value). (No materials for now.)
+ * lessons (LessonsCard), then their personal link and the phone and email (label over value) —
+ * on desktop in two columns: the lessons on the left, the rest on the right. (No materials for now.)
  */
 @Component({
   selector: 'app-student-view',
@@ -501,8 +502,11 @@ export class LessonsCard {
       </div>
     </div>
 
-    <app-lessons-card [studentId]="s.id" (upcoming)="upcoming.emit()" (history)="history.emit()" />
+    <!-- Desktop: the lessons on the left, the link and contacts on the right -->
+    <div class="flex flex-col gap-4 desktop:grid desktop:grid-cols-[minmax(0,1.7fr)_minmax(18rem,1fr)] desktop:items-start desktop:gap-6">
+    <app-lessons-card class="min-w-0" [studentId]="s.id" (upcoming)="upcoming.emit()" (history)="history.emit()" />
 
+    <div class="flex min-w-0 flex-col gap-4">
     <!-- Their personal link: their own page, their answers saved as theirs -->
     @if (editable()) {
       <app-student-link [studentId]="s.id" />
@@ -533,6 +537,8 @@ export class LessonsCard {
       </div>
       </div>
     }
+    </div>
+    </div>
   `,
 })
 export class StudentView {

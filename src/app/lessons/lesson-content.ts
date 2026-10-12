@@ -104,8 +104,8 @@ export type { LessonFills } from './gaps';
                             [value]="w"
                             [disabled]="locked()"
                             (input)="write(i, g.gap, $any($event.target).value)"
-                            [style.width.ch]="width(g, w)"
-                            class="mx-px inline-block h-[1.35em] rounded-none border-0 border-b-[1.5px] border-[color-mix(in_srgb,var(--text)_35%,transparent)] bg-transparent p-0 text-center align-baseline font-medium leading-[1.35] text-[var(--accent)] outline-none transition-colors focus:border-[var(--accent)] disabled:opacity-100"
+                            [style.width.ch]="fitsContent ? null : width(g, w)"
+                            class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b-[1.5px] border-[color-mix(in_srgb,var(--text)_35%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline font-medium leading-[1.35] text-[var(--accent)] outline-none transition-colors focus:border-[var(--accent)] disabled:opacity-100"
                           />
                         }
                         @default {
@@ -216,9 +216,11 @@ export class LessonContent {
   }
 
   // Room for a word (students don't get the answers — nothing to give away), growing with it
+  // Where fields can size to their text (field-sizing): exactly the word, no room left around it
+  protected readonly fitsContent = typeof CSS !== 'undefined' && CSS.supports?.('field-sizing', 'content');
   protected width(g: { answers: string[] }, w: string): number {
     const longest = Math.max(0, ...g.answers.map((a) => a.length));
-    return Math.max(5, longest + 1, w.length + 1);
+    return Math.max(4.5, longest + 1, w.length * 0.85 + 1);
   }
 
   // The teacher's own blocks first, then the students' (each with its place in the lesson)

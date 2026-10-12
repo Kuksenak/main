@@ -20,7 +20,8 @@ import { PersonLessons, StudentView } from './person-views';
     @if (startedReading) {
       <!-- The card -->
       <!-- Phones: the name in the top bar, between back and Edit -->
-      <app-page-sheet #page [title]="saved()?.name ?? ''" [bigTitle]="true" [actions]="false" (closed)="closed.emit()">
+      <!-- Desktop: nearly the whole window (the view lays itself out in columns) -->
+      <app-page-sheet #page [title]="saved()?.name ?? ''" [bigTitle]="true" [wide]="true" [actions]="false" (closed)="closed.emit()">
         @if (!entry().readOnly) {
           <button barEnd type="button" (click)="openForm()" class="btn-white">{{ 'action.edit' | t }}</button>
         }
