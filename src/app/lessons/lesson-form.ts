@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
+import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
 
@@ -84,7 +85,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, TranslatePipe],
+  imports: [CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
@@ -106,6 +107,12 @@ export function cleanLesson(l: LessonInput): LessonInput {
           <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
             <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
           </span>
+          @if (b.kind === 'gaps' && i > 0 && m.blocks[i - 1].kind === 'text') {
+            <!-- Its instruction as a text block above it: into the task (one piece to move around) -->
+            <button type="button" (click)="joinAbove(i)" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
+              <app-icon name="chevron-down" class="size-3.5 rotate-180" />{{ 'lessons.joinAbove' | t }}
+            </button>
+          }
           @if (b.kind === 'text') {
             <!-- A task that came as text: a task, its "..." / "___" made gaps -->
             <button type="button" (click)="toTask(i)" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
@@ -178,7 +185,14 @@ export function cleanLesson(l: LessonInput): LessonInput {
             <div class="list-row items-start pb-1 pt-1">
               <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="5" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input resize-y font-mono text-[0.9375rem] leading-relaxed"></textarea>
             </div>
-            <p class="text-footnote px-4 pb-3 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
+            <p class="text-footnote px-4 pb-2 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
+            <!-- What the student sees (as it's typed; answers taken out, choices unmarked) -->
+            <div class="border-t-[0.5px] border-[var(--separator)] bg-[var(--app-bg)] px-3 pb-3 pt-2">
+              <span class="text-footnote mb-1.5 flex items-center gap-1 font-semibold opacity-50">
+                <app-icon name="eye" class="size-3.5" />{{ 'lessons.studentSees' | t }}
+              </span>
+              <app-lesson-content [blocks]="asStudentSees(b)" mode="student" />
+            </div>
           }
           @case ('heading') {
             <div class="list-row">
@@ -406,6 +420,37 @@ export class LessonForm {
   protected toTask(index: number): void {
     const text = (this.value().blocks[index].text ?? '').replace(/_{2,}|\.{3,}|…+|-{3,}|[–—](?: ?[–—]){2,}/g, '[]');
     this.setBlock(index, { kind: 'gaps', text });
+  }
+
+  // The text block above a task, into it (first) — the instruction with its task, one block
+  protected joinAbove(index: number): void {
+    this.value.update((m) => {
+      const above = m.blocks[index - 1];
+      const task = m.blocks[index];
+      const text = [above.text?.trim(), task.text ?? ''].filter((x) => x !== undefined && x !== '').join('\n');
+      const blocks = m.blocks.filter((_, j) => j !== index - 1).map((b, j) => (j === index - 1 ? { ...task, text } : b));
+      return { ...m, blocks };
+    });
+  }
+
+  // A task as students get it: the write-in answers taken out, the choices unstarred (the same
+  // object for the same text — the preview isn't redrawn on every check)
+  private readonly seen = new Map<string, LessonBlock[]>();
+  protected asStudentSees(b: LessonBlock): LessonBlock[] {
+    const key = b.text ?? '';
+    let shown = this.seen.get(key);
+    if (!shown) {
+      if (this.seen.size > 50) this.seen.clear();
+      this.seen.set(key, (shown = [this.blank(b)]));
+    }
+    return shown;
+  }
+
+  private blank(b: LessonBlock): LessonBlock {
+    const text = (b.text ?? '')
+      .replace(/\[[^[\]\n]*\]/g, '[]')
+      .replace(/\{([^{}\n]*)\}/g, (_, inside: string) => `{${inside.replace(/(^|\|)\s*\*/g, '$1')}}`);
+    return { ...b, text, private: false };
   }
 
   protected removeBlock(index: number): void {
