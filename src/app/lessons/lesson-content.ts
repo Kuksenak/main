@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, input, model } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
-import { GapPart, LessonFills, gapLines, gapRight } from './gaps';
+import { Gap, GapPart, LessonFills, gapLines, gapRight } from './gaps';
 import { LessonBlock, imageSrc } from './lesson.service';
 
 /** Exercise answers (block → option) and checklist ticks ("block:item"); blocks by their place in the lesson. */
@@ -84,16 +84,52 @@ export type { LessonFills } from './gaps';
         @case ('gaps') {
           <div class="flex flex-col gap-1.5">
             <div class="card gaps-card flex flex-col gap-1 px-4 py-3">
-              @for (line of lines(b.text); track $index) {
-                <p class="text-body min-h-[1.5em] leading-[1.9]">
+              @for (line of lines(b.text); track $index; let first = $first) {
+                <!-- The first line, when it's just text: the task's instruction, a bit stronger -->
+                <p class="text-body min-h-[1.5em] leading-[1.9]" [class.font-semibold]="first && line.length === 1 && !gapOf(line[0])">
                   @for (p of line; track $index) {
                     @if (gapOf(p); as g) {
                       @let w = word(i, g.gap);
                       @switch (mode()) {
                         @case ('teacher') {
-                          <span class="mx-0.5 rounded-md bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-1.5 py-0.5 font-medium text-[var(--accent)]">{{ g.answers.join(' / ') || '…' }}</span>
+                          @if (g.options; as opts) {
+                            <!-- To choose: the options, the right one marked -->
+                            <span class="mx-0.5 inline-flex flex-wrap items-baseline gap-x-1">
+                              @for (o of opts; track $index; let last = $last) {
+                                <span [class.font-semibold]="isRight(g, o)" [class.text-[var(--accent)]]="isRight(g, o)" [class.opacity-55]="!isRight(g, o)">{{ o }}</span>
+                                @if (!last) {
+                                  <span class="opacity-30">/</span>
+                                }
+                              }
+                            </span>
+                          } @else {
+                            <span class="mx-0.5 rounded-md bg-[color-mix(in_srgb,var(--accent)_14%,transparent)] px-1.5 py-0.5 font-medium text-[var(--accent)]">{{ g.answers.join(' / ') || '…' }}</span>
+                          }
                         }
                         @case ('student') {
+                          @if (g.options; as opts) {
+                            <!-- To choose: a tap picks one (again: unpicks) -->
+                            <span class="mx-0.5 inline-flex flex-wrap items-baseline gap-x-0.5">
+                              @for (o of opts; track $index; let last = $last) {
+                                <button
+                                  type="button"
+                                  [disabled]="locked()"
+                                  (click)="write(i, g.gap, w === o ? '' : o)"
+                                  class="rounded-md px-1 leading-[1.35] transition-colors disabled:cursor-default"
+                                  [class.font-semibold]="w === o"
+                                  [class.bg-[var(--fill)]]="w === o"
+                                  [class.text-[color-mix(in_srgb,var(--text)_72%,transparent)]]="w === o"
+                                  [class.opacity-50]="!!w && w !== o"
+                                  [class.underline]="!w"
+                                  [class.decoration-dotted]="!w"
+                                  [class.underline-offset-4]="!w"
+                                >{{ o }}</button>
+                                @if (!last) {
+                                  <span class="opacity-30">/</span>
+                                }
+                              }
+                            </span>
+                          } @else {
                           <!-- On the text's line: the same line height, the underline just under it -->
                           <input
                             type="text"
@@ -106,6 +142,7 @@ export type { LessonFills } from './gaps';
                             [style.width.ch]="fitsContent ? null : width(g, w)"
                             class="mx-px inline-block h-[1.35em] min-w-[3.5ch] rounded-none [field-sizing:content] border-0 border-b border-[color-mix(in_srgb,var(--text)_40%,transparent)] bg-transparent px-[0.5ch] py-0 text-center align-baseline font-semibold leading-[1.35] text-[color-mix(in_srgb,var(--text)_72%,transparent)] outline-none transition-colors focus:border-[color-mix(in_srgb,var(--text)_70%,transparent)] disabled:opacity-100"
                           />
+                          }
                         }
                         @default {
                           @if (w.trim()) {
@@ -226,7 +263,7 @@ export class LessonContent {
     return lines;
   }
 
-  protected gapOf(p: GapPart): { gap: number; answers: string[] } | null {
+  protected gapOf(p: GapPart): Gap | null {
     return 'gap' in p ? p : null;
   }
 

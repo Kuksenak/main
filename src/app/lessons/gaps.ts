@@ -1,16 +1,25 @@
 import { LessonBlock } from './lesson.service';
 
-/** Words written in gaps blocks: block (its place in the lesson) → each gap's word, in order. */
+/** Answers in gaps blocks: block (its place in the lesson) → each gap's word written / option picked, in order. */
 export type LessonFills = Record<number, string[]>;
 
-/** A line of a gaps block: plain text and gaps (numbered through the whole block, in order). */
-export type GapPart = { text: string } | { gap: number; answers: string[] };
+/** A gap: to write in, or to choose (`options`); `answers` — the accepted ones (empty: none set). */
+export interface Gap {
+  gap: number;
+  answers: string[];
+  options?: string[];
+}
 
-const GAP = /\[([^[\]\n]*)\]/g;
+/** A line of a gaps block: plain text and gaps (numbered through the whole block, in order). */
+export type GapPart = { text: string } | Gap;
+
+// [to write in] or {to|choose}
+const GAP = /\[([^[\]\n]*)\]|\{([^{}\n]*)\}/g;
 
 /**
- * A gaps block's text as lines of parts: "tu [envoies]; nous [envoyons]" → "tu ", gap 0
- * (envoies), "; nous ", gap 1. [colour|color]: either is right; []: no set answer.
+ * A gaps block's text (a whole task) as lines of parts: "tu [envoies]" → "tu ", gap 0 to write
+ * (envoies); "She {*goes|go} home" → "She ", gap 1 to choose (goes or go, goes right). [a|b]:
+ * either is right; []: none set; {a|b} without a star: none set.
  */
 export function gapLines(text: string | null): GapPart[][] {
   let n = 0;
@@ -19,7 +28,7 @@ export function gapLines(text: string | null): GapPart[][] {
     let at = 0;
     for (const m of line.matchAll(GAP)) {
       if (m.index > at) parts.push({ text: line.slice(at, m.index) });
-      parts.push({ gap: n++, answers: answersOf(m[1]) });
+      parts.push({ gap: n++, ...spec(m) });
       at = m.index + m[0].length;
     }
     if (at < line.length || !parts.length) parts.push({ text: line.slice(at) });
@@ -29,10 +38,19 @@ export function gapLines(text: string | null): GapPart[][] {
 
 /** Each gap's accepted answers (empty: none set). */
 export function gapAnswers(text: string | null): string[][] {
-  return [...(text ?? '').matchAll(GAP)].map((m) => answersOf(m[1]));
+  return [...(text ?? '').matchAll(GAP)].map((m) => spec(m).answers);
 }
 
-function answersOf(inside: string): string[] {
+function spec(m: RegExpMatchArray): { answers: string[]; options?: string[] } {
+  if (m[1] !== undefined) return { answers: split(m[1]) };
+  const raw = split(m[2]);
+  return {
+    options: raw.map((o) => o.replace(/^\*/, '').trim()),
+    answers: raw.filter((o) => o.startsWith('*')).map((o) => o.slice(1).trim()),
+  };
+}
+
+function split(inside: string): string[] {
   return inside
     .split('|')
     .map((x) => x.trim())
@@ -44,12 +62,12 @@ function normal(s: string): string {
   return s.replace(/[’`]/g, "'").trim().toLowerCase().split(/\s+/).join(' ');
 }
 
-/** The written word is one of the answers. */
+/** The written word / picked option is one of the answers. */
 export function gapRight(answers: string[], written: string | null | undefined): boolean {
   return !!written?.trim() && answers.some((a) => normal(a) === normal(written));
 }
 
-/** A gaps block with every gap written in. */
+/** A gaps block with every gap answered. */
 export function gapsDone(b: LessonBlock, words: string[] | undefined): boolean {
   const count = gapAnswers(b.text).length;
   return count > 0 && Array.from({ length: count }, (_, n) => !!words?.[n]?.trim()).every(Boolean);
