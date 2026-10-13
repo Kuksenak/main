@@ -264,8 +264,9 @@ export class LessonContent {
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
 
-  // A tile's width in columns, by its longest line (gaps / choices counted as they show): short
-  // lines — one column, longer — two, long ones and pictures — three / two
+  // A tile's width in columns, by its longest item line (gaps / choices counted as they show; the
+  // instruction wraps, it doesn't count): short lines — one column, longer — two, long ones and
+  // pictures — three / two
   protected spanOf(tile: { block: LessonBlock }[]): number {
     let longest = 0;
     let total = 0;
@@ -286,16 +287,17 @@ export class LessonContent {
     return longest <= 34 ? 1 : longest <= 70 ? 2 : 3;
   }
 
-  // Tiles: a text (or heading) starts one, the tasks after it join it; a task with no text
-  // before it starts its own
+  // Tiles: every task its own; a text (or heading) takes the task after it along
   protected tilesOf<T extends { block: LessonBlock }>(blocks: T[]): T[][] {
     const tiles: T[][] = [];
+    const isText = (x: T) => x.block.kind === 'text' || x.block.kind === 'heading';
     for (const b of blocks) {
       const last = tiles.at(-1);
-      const isText = b.block.kind === 'text' || b.block.kind === 'heading';
-      const lastHasTask = !!last?.some((x) => x.block.kind !== 'text' && x.block.kind !== 'heading');
-      if (!last || isText || (lastHasTask && b.block.kind !== last.at(-1)!.block.kind)) tiles.push([b]);
-      else last.push(b);
+      // Joins the tile before it: after a text (or heading) only — its instruction; one-question
+      // exercises of older lessons, one after another. Every task its own tile.
+      const join = !!last && !isText(b) && (last.every(isText) || (b.block.kind === 'exercise' && last.at(-1)!.block.kind === 'exercise'));
+      if (join) last.push(b);
+      else tiles.push([b]);
     }
     return tiles;
   }
