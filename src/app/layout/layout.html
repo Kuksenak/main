@@ -1,5 +1,5 @@
 @if (auth.isAuthenticated()) {
-<div class="relative flex h-full overflow-hidden text-[var(--text)] mobile:flex-col">
+<div class="relative flex h-full overflow-hidden text-[var(--text)] mobile:flex-col desktop:bg-[var(--side-bg)]">
   @if (desktop) {
     <!-- Desktop: the sidebar (as Notion's) — search, the pages, the next events, students, lessons;
          the account at the bottom -->
@@ -12,7 +12,9 @@
       </button>
     }
   }
-  <div class="relative flex min-h-0 min-w-0 flex-1 flex-col desktop:pt-3" [class.pl-9]="desktop && !sidebarOpen()">
+  <!-- Desktop (as Claude's): the content a sheet of its own over the sidebar's color — rounded, a
+       hairline, a whisper of shadow -->
+  <div class="relative flex min-h-0 min-w-0 flex-1 flex-col desktop:my-2 desktop:mr-2 desktop:overflow-hidden desktop:rounded-xl desktop:border-[0.5px] desktop:border-[var(--separator)] desktop:bg-[var(--app-bg)] desktop:pt-3 desktop:shadow-[0_1px_3px_rgb(0_0_0/0.04)]" [class.desktop:ml-11]="desktop && !sidebarOpen()">
   <!-- overlay (a page that scrolls under it, e.g. Students on phones): floating, transparent,
        only its controls take taps -->
   @if (!desktop) {
