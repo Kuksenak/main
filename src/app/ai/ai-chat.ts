@@ -222,7 +222,7 @@ export class AiChat {
     if (!text.trim() && !files.length) return;
     this.draft = '';
     this.files.set([]);
-    queueMicrotask(() => this.grow());
+    setTimeout(() => this.grow()); // (once the emptied text is in the box)
     this.chat.send(this.chatKey(), text, files, this.lesson());
   }
 
