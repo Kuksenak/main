@@ -15,7 +15,8 @@ import { LessonContent } from './lesson-content';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { forStudents } from './gaps';
 import { cleanLesson } from './lesson-input';
-import { LEVELS, Level, LessonService, shareUrl } from './lesson.service';
+import { LEVELS, Level, LessonService, levelColor, shareUrl } from './lesson.service';
+import { Tip } from '../core/ui/tip';
 import { EventList } from '../cards/event-list';
 import { Toggle } from '../core/ui/toggle';
 
@@ -31,7 +32,7 @@ const SAVE_AT_LEAST_MS = 5000;
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, Toggle, LessonContent, PageSheet],
+  imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, Toggle, LessonContent, PageSheet, Tip],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -48,6 +49,11 @@ const SAVE_AT_LEAST_MS = 5000;
                 <app-icon name="cloud-check" class="size-7 opacity-45" />
               </span>
             }
+            <!-- Its level: a chip in its color; a list under it (each level with its color) -->
+            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="btn-secondary !px-3 font-semibold" [style.background]="levelColor(s.draft().level)">
+              {{ s.draft().level ?? ('lessons.level' | t) }}
+              <app-icon name="chevron-down" class="-mr-1 size-4 opacity-50" />
+            </button>
             <!-- ☰: the lesson's settings and the rest (level, public link, events, answers, Delete) -->
             <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-label]="'nav.settings' | t" [attr.aria-expanded]="menuOpen()" class="btn-secondary !px-2.5" [class.!bg-[var(--highlight)]]="menuOpen()">
               <app-icon name="menu" [strokeWidth]="2" class="size-5" />
@@ -62,6 +68,22 @@ const SAVE_AT_LEAST_MS = 5000;
       </app-scroll-area>
     </main>
 
+    @if (levelOpen()) {
+      <app-sheet [origin]="levelBtn()?.nativeElement ?? null" (closed)="levelOpen.set(false)">
+        <div class="card">
+          @for (o of levelOptions(); track o.value) {
+            <button type="button" (click)="setLevel($any(o.value) || null); levelOpen.set(false)" class="list-row w-full text-left">
+              <span class="size-3.5 shrink-0 rounded-full" [style.background]="levelColor($any(o.value) || null) ?? 'transparent'" [class.border]="!o.value" [class.border-[var(--separator)]]="!o.value"></span>
+              <span class="flex-1">{{ o.label }}</span>
+              @if ((s.draft().level ?? '') === o.value) {
+                <app-icon name="check" class="size-5 text-[var(--accent)]" />
+              }
+            </button>
+          }
+        </div>
+      </app-sheet>
+    }
+
     <!-- ☰'s panel, under it (like the account's settings) -->
     @if (menuOpen()) {
       <app-sheet [origin]="menuBtn()?.nativeElement ?? null" [wide]="true" [tall]="true" (closed)="menuOpen.set(false)">
@@ -75,24 +97,6 @@ const SAVE_AT_LEAST_MS = 5000;
           </div>
           <!-- Rows as in the account's menu: each unfolds its choices under it (› turns down) -->
           <div class="card">
-            <button type="button" (click)="unfold('level')" class="list-row w-full text-left" [attr.aria-expanded]="unfolded() === 'level'">
-              <app-icon name="book" class="row-icon" />
-              <span class="flex-1">{{ 'lessons.level' | t }}</span>
-              <span class="opacity-50">{{ s.draft().level ?? ('lessons.levelNone' | t) }}</span>
-              <app-icon name="chevron-right" class="row-chevron -ml-1 transition-transform duration-200" [class.rotate-90]="unfolded() === 'level'" />
-            </button>
-            @if (unfolded() === 'level') {
-              <div class="sub-rows">
-                @for (o of levelOptions(); track o.value) {
-                  <button type="button" (click)="setLevel($any(o.value) || null)" class="list-row w-full text-left">
-                    <span class="flex-1">{{ o.label }}</span>
-                    @if ((s.draft().level ?? '') === o.value) {
-                      <app-icon name="check" class="size-5 text-[var(--accent)]" />
-                    }
-                  </button>
-                }
-              </div>
-            }
             @if (s.lesson(); as l) {
               <!-- The public link: On / Off; unfolded, its switch (with what it does) and Copy link -->
               <button type="button" (click)="unfold('link')" class="list-row w-full text-left" [attr.aria-expanded]="unfolded() === 'link'">
@@ -160,13 +164,16 @@ export class LessonPage {
   ]);
   protected readonly form = viewChild(LessonForm);
   protected readonly menuOpen = signal(false);
+  protected readonly levelOpen = signal(false);
+  protected readonly levelBtn = viewChild<ElementRef<HTMLButtonElement>>('levelBtn');
+  protected readonly levelColor = levelColor;
   protected readonly previewAll = signal(false);
   protected readonly studentBlocks = computed(() =>
     cleanLesson(this.s.draft()).blocks.filter((b) => !b.private).map(forStudents),
   );
   // ☰'s row unfolded
-  protected readonly unfolded = signal<'level' | 'link' | null>(null);
-  protected unfold(row: 'level' | 'link'): void {
+  protected readonly unfolded = signal<'link' | null>(null);
+  protected unfold(row: 'link'): void {
     this.unfolded.set(this.unfolded() === row ? null : row);
   }
   protected readonly lessons = inject(LessonService);
