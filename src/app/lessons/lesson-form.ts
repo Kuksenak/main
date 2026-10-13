@@ -124,6 +124,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
           (keyup)="onSelect(i, tx)"
           (focus)="field = tx"
           (click)="openFocus(i, tx)"
+          (contextmenu)="onMenu($event, i, tx)"
           [readOnly]="!desktop"
           (blur)="onBlur(); dropIfEmpty(i)"
           rows="1"
@@ -675,6 +676,8 @@ export class LessonForm {
         return;
       }
       if (!this.desktop) return; // phones: the bar over the keyboard
+      // The right click's menu stays (it made this selection itself)
+      if (this.sel()?.menu && this.sel()?.block === block) return;
       const r = caretRect(ta, ta.selectionStart);
       this.sel.set({ block, x: Math.max(8, Math.min(r.left, window.innerWidth - 308)), y: Math.max(4, r.top - 44) });
     });
