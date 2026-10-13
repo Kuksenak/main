@@ -15,7 +15,7 @@ import { ToBody } from '../core/ui/to-body';
 import { Mark, asOptions, asTask, forStudents, marked, marksAt, unmark } from './gaps';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
-import { LessonBlock, LessonBlockKind, LessonInput, imageSrc, levelColor } from './lesson.service';
+import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
 import { badLink } from './lesson-input';
 
 type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 'link';
@@ -71,7 +71,6 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div
         class="card group relative"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
-        [style.box-shadow]="stripe() ? 'inset 4px 0 0 ' + stripe() : null"
         cdkDrag
         [cdkDragDisabled]="!slim"
       >
@@ -480,8 +479,6 @@ export class LessonForm {
   readonly selected = model<number[]>([]);
   protected readonly aiOpen = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
-  // The lesson's level: its color, a stripe at the left of each task
-  protected readonly stripe = computed(() => levelColor(this.value().level));
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly i18n = inject(I18nService);
