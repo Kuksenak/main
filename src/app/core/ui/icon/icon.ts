@@ -12,6 +12,8 @@ export type IconName =
   | 'dots'
   | 'duplicate'
   | 'paste'
+  | 'clipboard'
+  | 'unlock'
   | 'trash'
   | 'popout'
   | 'chevrons-up-down'
@@ -118,9 +120,13 @@ export type IconName =
         <!-- More: three dots in a row -->
         @case ('dots') { <circle cx="6" cy="12" r="1.1" fill="currentColor" /><circle cx="12" cy="12" r="1.1" fill="currentColor" /><circle cx="18" cy="12" r="1.1" fill="currentColor" /> }
         <!-- Duplicate: two pages, a plus on the front one -->
-        @case ('duplicate') { <rect x="8" y="8" width="12" height="12" rx="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" /><path d="M14 11.5v5M11.5 14h5" /> }
+        @case ('duplicate') { <rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2" /><path d="M15.5 8.5V6A2 2 0 0 0 13.5 4H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5" /> }
         <!-- Paste: a clipboard -->
-        @case ('paste') { <rect x="8" y="3" width="8" height="4" rx="1" /><path d="M16 5h1.5A1.5 1.5 0 0 1 19 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-12A1.5 1.5 0 0 1 6.5 5H8" /> }
+        @case ('paste') { <rect x="8" y="3" width="8" height="4" rx="1" /><path d="M16 5h1.5A1.5 1.5 0 0 1 19 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-12A1.5 1.5 0 0 1 6.5 5H8" /><path d="M12 10.5v6M9.5 14l2.5 2.5 2.5-2.5" /> }
+        <!-- Copy contents: a clipboard with lines -->
+        @case ('clipboard') { <rect x="8" y="3" width="8" height="4" rx="1" /><path d="M16 5h1.5A1.5 1.5 0 0 1 19 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-12A1.5 1.5 0 0 1 6.5 5H8" /><path d="M9 12h6M9 15.5h4" /> }
+        <!-- Unlocked: an open padlock -->
+        @case ('unlock') { <rect x="5" y="11" width="14" height="9.5" rx="2" /><path d="M8 11V7.5a4 4 0 0 1 7.75-1.4" /> }
         <!-- Saved: a cloud with a check -->
         @case ('cloud-check') { <path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.3 9.6 4.5 4.5 0 0 0 7 18.5z" /><path d="m9.5 13.75 1.75 1.75 3.5-3.5" /> }
         @case ('menu') { <path d="M4 7h16M4 12h16M4 17h16" /> }

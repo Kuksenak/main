@@ -71,14 +71,17 @@ const SAVE_AT_LEAST_MS = 5000;
             <button type="button" (click)="previewAll.set(true)" class="head-btn">
               <app-icon name="popout" />{{ 'lessons.studentSees' | t }}
             </button>
-            <!-- Publish: makes its public link (then Share, as in Notion: the link to copy, Unpublish) -->
+            <!-- Publish (a globe): makes its public link; then Copy link beside it, and Unpublish (a lock) -->
             @if (s.lesson(); as l) {
-              @if (l.shareToken) {
-                <button #shareBtn type="button" (click)="shareOpen.set(!shareOpen())" [attr.aria-expanded]="shareOpen()" class="head-btn">
-                  <app-icon name="globe" />{{ 'lessons.share' | t }}
+              @if (l.shareToken; as token) {
+                <button type="button" (click)="copy(token)" class="head-btn">
+                  <app-icon [name]="copied() ? 'check' : 'link'" />{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}
+                </button>
+                <button type="button" (click)="lessons.share(l.id, false)" [appTip]="'lessons.unpublishHint' | t" tipSide="bottom" class="head-btn">
+                  <app-icon name="lock" />{{ 'lessons.unpublish' | t }}
                 </button>
               } @else {
-                <button type="button" (click)="publish(l.id)" [disabled]="publishing()" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn">
+                <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn">
                   <app-icon name="globe" />{{ 'lessons.publish' | t }}
                 </button>
               }
@@ -120,31 +123,6 @@ const SAVE_AT_LEAST_MS = 5000;
       </app-sheet>
     }
 
-    <!-- Share's panel: its link to copy; Unpublish -->
-    @if (shareOpen() && s.lesson(); as l) {
-      <app-sheet [origin]="shareBtn()?.nativeElement ?? null" (closed)="shareOpen.set(false)">
-        <div class="menu-list !min-w-[19rem]">
-          @if (l.shareToken; as token) {
-            <p class="text-footnote px-2 pb-1 pt-1.5 opacity-55">{{ 'lessons.publicShort' | t }}</p>
-            <div class="flex items-center gap-1.5 p-1">
-              <span class="text-footnote min-w-0 flex-1 select-all truncate rounded-md bg-[var(--fill)] px-2 py-1.5 opacity-80">{{ link(token) }}</span>
-              <button type="button" (click)="copy(token)" class="head-btn !h-[1.875rem] shrink-0 !bg-[var(--fill-strong)] hover:!bg-[var(--highlight)]">
-                <app-icon [name]="copied() ? 'check' : 'copy'" />{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}
-              </button>
-            </div>
-            <div class="menu-sep"></div>
-            <button type="button" (click)="unpublish(l.id)" class="menu-item">
-              <app-icon name="lock" />
-              <span class="flex flex-1 flex-col">
-                <span>{{ 'lessons.unpublish' | t }}</span>
-                <span class="text-footnote opacity-55">{{ 'lessons.unpublishHint' | t }}</span>
-              </span>
-            </button>
-          }
-        </div>
-      </app-sheet>
-    }
-
     <!-- ⋯'s menu, under it -->
     @if (menuOpen()) {
       <app-sheet [origin]="menuBtn()?.nativeElement ?? null" (closed)="menuOpen.set(false)">
@@ -154,7 +132,7 @@ const SAVE_AT_LEAST_MS = 5000;
             <span class="flex-1">{{ 'lessons.duplicate' | t }}</span>
           </button>
           <button type="button" (click)="copyContent()" [disabled]="!s.draft().blocks.length" class="menu-item">
-            <app-icon name="copy" />
+            <app-icon name="clipboard" />
             <span class="flex-1">{{ 'lessons.copyContent' | t }}</span>
           </button>
           @if (clipboard.blocks(); as clip) {
@@ -166,7 +144,7 @@ const SAVE_AT_LEAST_MS = 5000;
           }
           <div class="menu-sep"></div>
           <button type="button" (click)="setLocked(!s.draft().locked)" role="switch" [attr.aria-checked]="!!s.draft().locked" class="menu-item">
-            <app-icon name="lock" />
+            <app-icon [name]="s.draft().locked ? 'lock' : 'unlock'" />
             <span class="flex-1">{{ 'lessons.lock' | t }}</span>
             <app-toggle class="pointer-events-none scale-[0.8] origin-right" [checked]="!!s.draft().locked" />
           </button>
@@ -221,22 +199,6 @@ export class LessonPage {
   ]);
   protected readonly form = viewChild(LessonForm);
   protected readonly menuOpen = signal(false);
-  protected readonly shareOpen = signal(false);
-  protected readonly publishing = signal(false);
-
-  // Publish: the link made, then (once the lesson has it) Share's panel opened to copy it
-  protected publish(id: string): void {
-    this.publishing.set(true);
-    this.lessons.share(id, true, (token) => {
-      if (!token) this.publishing.set(false);
-    });
-  }
-
-  protected unpublish(id: string): void {
-    this.shareOpen.set(false);
-    this.lessons.share(id, false);
-  }
-  protected readonly shareBtn = viewChild<ElementRef<HTMLButtonElement>>('shareBtn');
   protected readonly link = shareUrl;
   protected readonly clipboard = inject(LessonClipboard);
 
@@ -307,15 +269,6 @@ export class LessonPage {
   private pendingSince: number | null = null;
 
   constructor() {
-    // Just published: Share's panel opens with the new link
-    effect(() => {
-      if (this.publishing() && this.s.lesson()?.shareToken) {
-        untracked(() => {
-          this.publishing.set(false);
-          setTimeout(() => this.shareOpen.set(true));
-        });
-      }
-    });
     // The lesson in the editor as soon as it's there (once: later reloads don't touch the draft)
     effect(() => {
       if (this.s.lesson()) untracked(() => this.s.open());
