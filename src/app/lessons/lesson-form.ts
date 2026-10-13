@@ -48,9 +48,11 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     @if (dropLine(); as y) {
       <div aria-hidden="true" class="drop-line pointer-events-none absolute right-0 z-20" [class.left-5]="desktop && !selectable()" [class.left-0]="!desktop || selectable()" [style.top.px]="y"></div>
     }
-    <!-- A click between tasks: a caret there — Ctrl+V pastes in there -->
+    <!-- A click between tasks: a caret there, and what it's for — Ctrl+V pastes in there, a key
+         ("/" or letters) opens the commands for a new task there -->
     @if (caret(); as c) {
       <div aria-hidden="true" class="paste-caret pointer-events-none absolute right-0 z-20" [class.left-5]="desktop && !selectable()" [class.left-0]="!desktop || selectable()" [style.top.px]="c.y"></div>
+      <span aria-hidden="true" class="text-footnote pointer-events-none absolute z-20 -translate-y-1/2 rounded bg-[var(--app-bg)] px-1.5 opacity-45" [class.left-7]="desktop && !selectable()" [class.left-2]="!desktop || selectable()" [style.top.px]="c.y + 1">{{ 'lessons.caretHint' | t }}</span>
     }
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
@@ -607,6 +609,14 @@ export class LessonForm {
 
   // "+ Add": the commands under it (`query`: typed to filter them)
   protected openAdd(query = ''): void {
+    // (a caret between tasks: the commands open at it)
+    const c = this.caret();
+    const list = this.host.nativeElement.querySelector<HTMLElement>('[data-tasks]');
+    if (c && list) {
+      const box = list.getBoundingClientRect();
+      this.slash.set({ block: -1, start: 0, end: 0, query, x: box.left + 20, y: Math.min(box.top + c.y + 8, window.innerHeight - 140), active: 0 });
+      return;
+    }
     const r = this.addRow()?.nativeElement.getBoundingClientRect();
     if (!r) return;
     this.addRow()!.nativeElement.scrollIntoView({ block: 'nearest' });
@@ -618,7 +628,7 @@ export class LessonForm {
   // them (by its key, whatever the keyboard's language: "t" for Task); while they're open: ↑ ↓ pick,
   // Enter runs, Esc closes, letters / Backspace change the filter
   protected typeOnPage(e: KeyboardEvent): void {
-    if (e.key === 'Escape' && this.caret()) {
+    if (e.key === 'Escape' && this.caret() && !this.slash()) {
       this.caret.set(null);
       return;
     }
@@ -681,8 +691,11 @@ export class LessonForm {
     this.slash.set(null);
     if (!sl) return;
     if (sl.block < 0) {
+      // (at the caret between tasks, else at the end)
+      const at = this.caret()?.at ?? this.value().blocks.length;
+      this.caret.set(null);
       if (id === 'assistant') this.aiOpen.set(true);
-      else this.insertBlock(this.value().blocks.length, 'gaps', '');
+      else this.insertBlock(at, 'gaps', '');
       return;
     }
     const text = this.value().blocks[sl.block]?.text ?? '';
@@ -1214,7 +1227,8 @@ export class LessonForm {
 
   // (a click anywhere but between the tasks: gone)
   private clearCaret(e: MouseEvent): void {
-    if (this.caret() && !(e.target as HTMLElement | null)?.hasAttribute?.('data-tasks')) this.caret.set(null);
+    const t = e.target as HTMLElement | null;
+    if (this.caret() && !t?.hasAttribute?.('data-tasks') && !t?.closest?.('[data-commands]')) this.caret.set(null);
   }
 
   protected pasteOnPage(e: ClipboardEvent): void {
