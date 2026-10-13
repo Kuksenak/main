@@ -80,7 +80,7 @@ interface Found {
       <div class="side-head group mt-2">
         <button type="button" (click)="fold('upcoming')" [attr.aria-expanded]="!folded().includes('upcoming')" class="flex flex-1 items-center gap-1 text-left">
           {{ 'sidebar.upcoming' | t }}
-          <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('upcoming')" />
+          <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('upcoming')" />
         </button>
         <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
@@ -99,7 +99,7 @@ interface Found {
       <div class="side-head group mt-2">
         <button type="button" (click)="fold('lessons')" [attr.aria-expanded]="!folded().includes('lessons')" class="flex flex-1 items-center gap-1 text-left">
           {{ 'nav.lessons' | t }}
-          <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('lessons')" />
+          <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('lessons')" />
         </button>
         <button type="button" (click)="create('lesson')" [appTip]="'lessons.add' | t" tipSide="right" [attr.aria-label]="'lessons.add' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
@@ -116,7 +116,7 @@ interface Found {
       <div class="side-head group mt-2">
         <button type="button" (click)="fold('people')" [attr.aria-expanded]="!folded().includes('people')" class="flex flex-1 items-center gap-1 text-left">
           {{ 'nav.students' | t }}
-          <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('people')" />
+          <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('people')" />
         </button>
         <button type="button" (click)="create('student')" [appTip]="'sidebar.newStudent' | t" tipSide="right" [attr.aria-label]="'sidebar.newStudent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>

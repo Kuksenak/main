@@ -733,11 +733,11 @@ html.dark .btn-white {
 }
 .side-head {
   display: flex;
-  height: 1.625rem;
+  height: 1.875rem;
   align-items: center;
   gap: 0.25rem;
   padding: 0 0.25rem 0 0.5rem;
-  font-size: 0.75rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: color-mix(in srgb, var(--text) 50%, transparent);
 }
