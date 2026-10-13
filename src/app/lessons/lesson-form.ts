@@ -42,7 +42,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
     <!-- (tasks are moved by their ⠿: the others make way, the place it'd go shown dashed) -->
-    <div class="flex flex-col gap-3" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable()" (cdkDropListDropped)="moved($event)">
+    <div class="flex flex-col gap-3" [class.px-10]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable()" (cdkDropListDropped)="moved($event)">
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
@@ -76,15 +76,16 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         [cdkDragDisabled]="!slim"
       >
         @if (slim) {
-          <!-- Desktop tasks: no head row — its buttons at the top right, shown on hover (or while
+          <!-- Desktop tasks: no head row — its buttons in a column outside it at the right, shown on hover (or while
                it's being typed in): ↗ as the student sees it (in a window), who sees it, ×;
                "only me" always shows -->
-          <!-- ⠿ at the left: drag to move it (shown on hover; kept on the one being moved) -->
-          <button type="button" cdkDragHandle [attr.title]="'lessons.move' | t" [attr.aria-label]="'lessons.move' | t" class="drag-handle absolute left-1 top-2.5 z-10 flex h-7 w-6 cursor-grab items-center justify-center rounded-md opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-50 group-hover:opacity-50 hover:!opacity-100 active:cursor-grabbing">
+          <!-- Outside the card (as in Notion): ⠿ at its left, drag to move it (shown on hover; kept on
+               the one being moved) -->
+          <button type="button" cdkDragHandle [attr.title]="'lessons.move' | t" [attr.aria-label]="'lessons.move' | t" class="drag-handle absolute -left-8 top-2.5 z-10 flex h-7 w-6 cursor-grab items-center justify-center rounded-md opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-50 group-hover:opacity-50 hover:!opacity-100 active:cursor-grabbing">
             <app-icon name="grip" class="size-5" />
           </button>
-          <div class="task-tools absolute right-2 top-1.5 z-10 flex items-center gap-0.5 p-0.5">
-            <span class="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100" >
+          <div class="task-tools absolute -right-10 top-1 z-10 flex flex-col items-center gap-0.5 p-0.5">
+            <span class="flex flex-col items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
               <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
                 <app-icon name="popout" class="size-5" />
               </button>
@@ -193,7 +194,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             </div>
           }
           @case ('gaps') {
-            <div class="list-row items-start pb-3" [class.pt-1]="!slim" [class.pt-3]="slim" [class.!pl-8]="slim">
+            <div class="list-row items-start pb-3" [class.pt-1]="!slim" [class.pt-3]="slim">
               <div class="relative min-w-0 flex-1">
               <!-- Under the field: the same text, its [gaps] and {choices} highlighted (only
                    backgrounds — nothing that would move the text) -->
