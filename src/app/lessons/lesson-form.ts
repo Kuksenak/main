@@ -33,7 +33,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 @Component({
   selector: 'app-lesson-form',
   imports: [AiChat, BrandIcon, ConfirmDelete, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
-  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
+  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:dragover)': 'autoScroll($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
     @if (showTitle()) {
@@ -1180,6 +1180,20 @@ export class LessonForm {
     const box = list.getBoundingClientRect();
     const y = at < cards.length ? cards[at].top - (at ? (cards[at].top - cards[at - 1].bottom) / 2 : 4) : cards[cards.length - 1].bottom + 4;
     this.dropLine.set(y - box.top - 1.5);
+  }
+
+  // Near the top / bottom of what scrolls while moving one: it scrolls (faster the closer)
+  protected autoScroll(e: DragEvent): void {
+    if (this.dragFrom() === null) return;
+    let box: HTMLElement | null = this.host.nativeElement.parentElement;
+    while (box && !(box.scrollHeight > box.clientHeight && /auto|scroll/.test(getComputedStyle(box).overflowY))) box = box.parentElement;
+    if (!box) return;
+    const r = box.getBoundingClientRect();
+    const edge = 80;
+    const down = e.clientY - (r.bottom - edge);
+    const up = r.top + edge - e.clientY;
+    if (down > 0) box.scrollTop += Math.ceil(down / 4);
+    else if (up > 0) box.scrollTop -= Math.ceil(up / 4);
   }
 
   protected drop(e: DragEvent): void {
