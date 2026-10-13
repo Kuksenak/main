@@ -119,7 +119,10 @@ export function cleanLesson(l: LessonInput): LessonInput {
             <app-icon name="grip" class="size-5" />
           </span>
           <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
-            <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
+            <!-- (Tasks need no label; older kinds keep theirs) -->
+            @if (b.kind !== 'gaps') {
+              <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
+            }
           </span>
           @if (b.kind === 'gaps' && i > 0 && m.blocks[i - 1].kind === 'text') {
             <!-- Its instruction as a text block above it: into the task (one piece to move around) -->
