@@ -15,6 +15,8 @@ export interface ChatMessage {
   imageCount?: number;
   draft?: LessonDraft | null;
   error?: string;
+  /** What the teacher did with its draft (kept with the chat: no buttons again on reopening). */
+  decided?: 'accepted' | 'declined';
 }
 
 /**
@@ -87,6 +89,11 @@ export class AiChatService {
         url: key === 'new' ? '/lessons' : `/lessons/${key}`,
       });
     }
+  }
+
+  /** Its draft accepted / declined. */
+  decide(key: string, id: string, decided: 'accepted' | 'declined'): void {
+    this.set(key, this.messages(key).map((m) => (m.id === id ? { ...m, decided } : m)));
   }
 
   clear(key: string): void {

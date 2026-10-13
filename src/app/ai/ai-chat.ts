@@ -61,20 +61,21 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
               }
               @if (m.draft?.blocks?.length) {
                 <!-- What it made, as the student will see it; Accept puts it in the lesson -->
-                @if (declined().includes(m.id)) {
+                @if (m.decided === 'declined') {
                   <p class="text-footnote opacity-45">{{ 'ai.declined' | t }}</p>
                 } @else {
-                  <div class="flex flex-col gap-2 rounded-[10px] border-[0.5px] border-[var(--separator)] p-2.5">
+                  <!-- (as in Preview: plain on the page, no frame) -->
+                  <div class="compact-view">
                     <app-lesson-content [blocks]="preview(m)" mode="student" />
                   </div>
-                  <div class="flex items-center justify-end gap-1">
-                    @if (added().includes(m.id)) {
-                      <span class="head-btn pointer-events-none text-[var(--success)]"><app-icon name="check" class="!opacity-100" />{{ 'ai.added' | t }}</span>
-                    } @else {
+                  @if (m.decided === 'accepted') {
+                    <p class="text-footnote flex items-center gap-1 opacity-45"><app-icon name="check" class="size-3.5" />{{ 'ai.added' | t }}</p>
+                  } @else {
+                    <div class="flex items-center justify-end gap-1">
                       <button type="button" (click)="decline(m)" class="head-btn"><app-icon name="close" />{{ 'ai.decline' | t }}</button>
                       <button type="button" (click)="addAll(m)" class="head-btn font-medium"><app-icon name="check" />{{ 'ai.accept' | t }}</button>
-                    }
-                  </div>
+                    </div>
+                  }
                 }
               }
             </div>
@@ -158,8 +159,6 @@ export class AiChat {
     return this.chat.messages(this.chatKey());
   });
   protected readonly files = signal<{ blob: Blob; url: string }[]>([]);
-  protected readonly added = signal<string[]>([]);
-  protected readonly declined = signal<string[]>([]);
 
   constructor() {
     this.imports.ensureLoaded();
@@ -239,7 +238,7 @@ export class AiChat {
   protected addAll(m: ChatMessage): void {
     if (!m.draft?.blocks.length) return;
     this.add.emit(m.draft.blocks);
-    this.added.update((a) => [...a, m.id]);
+    this.chat.decide(this.chatKey(), m.id, 'accepted');
   }
 
   // As the student will see it: tasks with their answers taken out (the same object per answer)
@@ -251,7 +250,7 @@ export class AiChat {
   }
 
   protected decline(m: ChatMessage): void {
-    this.declined.update((d) => [...d, m.id]);
+    this.chat.decide(this.chatKey(), m.id, 'declined');
   }
 
   // "gemini-3.5-flash-lite" → "Gemini 3.5 Flash Lite"
