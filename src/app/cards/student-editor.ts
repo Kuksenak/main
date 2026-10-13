@@ -1,5 +1,8 @@
 import { Component, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
+import { Icon } from '../core/ui/icon/icon';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
@@ -14,8 +17,9 @@ import { PersonLessons, StudentView } from './person-views';
  */
 @Component({
   selector: 'app-student-editor',
-  imports: [FormsModule, PageSheet, PersonLessons, StudentView, TranslatePipe],
+  imports: [FormsModule, Icon, PageSheet, PersonLessons, StudentView, TranslatePipe],
   template: `
+    @if (!redirecting) {
     @let m = model();
     @if (startedReading) {
       <!-- The card -->
@@ -64,6 +68,23 @@ import { PersonLessons, StudentView } from './person-views';
         (delete)="remove()"
         (closed)="formClosed()"
       >
+        @if (desktop) {
+          <!-- Desktop, in the new style (as a Notion page): the name big, then email and phone as
+               properties -->
+          <div class="flex flex-col gap-3 pt-1">
+            <input name="name" [ngModel]="m.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="'students.name' | t" autocomplete="off" class="w-full bg-transparent px-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
+            <div class="flex flex-col">
+              <label class="flex h-9 items-center gap-3 text-[0.875rem]">
+                <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="mail" class="size-4" />{{ 'students.email' | t }}</span>
+                <input name="email" [ngModel]="m.email" (ngModelChange)="patch({ email: $event })" type="email" inputmode="email" [placeholder]="'sidebar.empty' | t" autocomplete="off" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+              </label>
+              <label class="flex h-9 items-center gap-3 text-[0.875rem]">
+                <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="call" class="size-4" />{{ 'students.phone' | t }}</span>
+                <input name="phone" [ngModel]="m.phone" (ngModelChange)="patch({ phone: $event })" type="tel" inputmode="tel" [placeholder]="'sidebar.empty' | t" autocomplete="off" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 tabular-nums outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+              </label>
+            </div>
+          </div>
+        } @else {
         <div class="card">
           <div class="list-row">
             <input name="name" [ngModel]="m.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="'students.name' | t" autocomplete="off" class="row-input" />
@@ -75,15 +96,21 @@ import { PersonLessons, StudentView } from './person-views';
             <input name="phone" [ngModel]="m.phone" (ngModelChange)="patch({ phone: $event })" type="tel" inputmode="tel" [placeholder]="'students.phone' | t" autocomplete="off" class="row-input" />
           </div>
         </div>
+        }
       </app-page-sheet>
+    }
     }
   `,
 })
 export class StudentEditor implements OnInit {
+  // (desktop, an existing one: off to its page — nothing drawn meanwhile)
+  protected redirecting = false;
   readonly entry = input.required<StackEntry>();
   readonly closed = output<void>();
 
   private students = inject(StudentService);
+  private router = inject(Router);
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   private readonly page = viewChild<PageSheet>('page');
   private readonly form = viewChild<PageSheet>('form');
 
@@ -102,6 +129,14 @@ export class StudentEditor implements OnInit {
   protected readonly canSave = computed(() => !!this.model().name.trim() && this.dirty());
 
   ngOnInit(): void {
+    // Desktop: an existing student opens as their page (always edited there), not as a card
+    const id = this.entry().id;
+    if (this.desktop && id && !this.entry().readOnly) {
+      this.router.navigate(['/students', 'student', id]);
+      this.redirecting = true;
+      setTimeout(() => this.closed.emit());
+      return;
+    }
     this.startedReading = !!this.entry().id && !this.entry().edit;
     this.reset();
   }

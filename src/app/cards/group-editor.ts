@@ -1,3 +1,5 @@
+import { DeviceDetectionService } from '../core/services/device-detection.service';
+import { Router } from '@angular/router';
 import { Component, ElementRef, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -27,6 +29,7 @@ interface Model {
   selector: 'app-group-editor',
   imports: [FormsModule, GroupView, Icon, PageSheet, PersonLessons, PickList, Section, TranslatePipe],
   template: `
+    @if (!redirecting) {
     @let m = model();
     <!-- Phones, reading: the name in the top bar, between back and Edit (like a student's card) -->
     <app-page-sheet
@@ -63,6 +66,20 @@ interface Model {
         }
       } @else {
       <div class="flex flex-col gap-4">
+        @if (desktop) {
+          <!-- Desktop, in the new style: the name big, its color as a property -->
+          <input name="groupName" [ngModel]="m.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="'groups.name' | t" autocomplete="off" class="w-full bg-transparent px-1 pt-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
+          <div class="flex h-9 items-center gap-3 text-[0.875rem]">
+            <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="people" class="size-4" />{{ 'groups.color' | t }}</span>
+            <div class="flex flex-1 items-center gap-1">
+              @for (c of colors; track c) {
+                <button type="button" (click)="patch({ color: c })" [attr.aria-label]="c" [attr.aria-pressed]="m.color === c" class="flex size-7 items-center justify-center rounded-md hover:bg-[var(--tint)]" [class.bg-[var(--tint-strong)]]="m.color === c">
+                  <span class="size-3.5 rounded-full" [style.background]="colorVar(c)"></span>
+                </button>
+              }
+            </div>
+          </div>
+        } @else {
         <div class="card">
           <div class="list-row">
             <input name="groupName" [ngModel]="m.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="'groups.name' | t" autocomplete="off" class="row-input" />
@@ -85,6 +102,7 @@ interface Model {
             </div>
           </div>
         </div>
+        }
 
         <!-- Members: × removes from the group -->
         <app-section [title]="'groups.members' | t" [count]="members().length" key="members">
@@ -140,9 +158,14 @@ interface Model {
         (closed)="pickingMembers.set(false)"
       />
     }
+    }
   `,
 })
 export class GroupEditor implements OnInit {
+  // (desktop, an existing one: off to its page — nothing drawn meanwhile)
+  protected redirecting = false;
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  private readonly router = inject(Router);
   readonly entry = input.required<StackEntry>();
   readonly closed = output<void>();
 
@@ -184,6 +207,14 @@ export class GroupEditor implements OnInit {
   );
 
   ngOnInit(): void {
+    // Desktop: an existing group opens as its page (always edited there), not as a card
+    const gid = this.entry().id;
+    if (this.desktop && gid && !this.entry().readOnly) {
+      this.router.navigate(['/students', 'group', gid]);
+      this.redirecting = true;
+      setTimeout(() => this.closed.emit());
+      return;
+    }
     this.startedReading = !!this.entry().id && !this.entry().edit;
     this.editing.set(!this.startedReading);
     if (this.saved()) {
