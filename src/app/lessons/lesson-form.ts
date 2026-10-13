@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, DestroyRef, ElementRef, afterNextRender, 
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDelete } from '../core/ui/confirm';
+import { Tip } from '../core/ui/tip';
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -30,7 +31,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
+  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDropList, FormsModule, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
   host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
@@ -81,19 +82,19 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                "only me" always shows -->
           <div class="task-tools absolute -right-10 top-1 z-10 flex flex-col items-center gap-0.5 p-0.5">
             <!-- ⠿ first: drag to move it (kept on the one being moved) -->
-            <button type="button" cdkDragHandle [attr.title]="'lessons.move' | t" [attr.aria-label]="'lessons.move' | t" class="drag-handle flex size-8 cursor-grab items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 active:cursor-grabbing">
+            <button type="button" cdkDragHandle [appTip]="'lessons.move' | t" tipSide="left" [attr.aria-label]="'lessons.move' | t" class="drag-handle flex size-8 cursor-grab items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 active:cursor-grabbing">
               <app-icon name="grip" class="size-5" />
             </button>
             <span class="flex flex-col items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
-              <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
+              <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [appTip]="'lessons.studentSees' | t" tipSide="left" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
                 <app-icon name="popout" class="size-5" />
               </button>
             </span>
-            <button type="button" (click)="setBlock(i, { private: !b.private })" [attr.title]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-8 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
+            <button type="button" (click)="setBlock(i, { private: !b.private })" [appTip]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" tipSide="left" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-8 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
               <app-icon [name]="b.private ? 'lock' : 'people'" class="size-5" />
             </button>
-            <button type="button" #rm (click)="askRemove(i, rm)" [attr.title]="'lessons.removeBlock' | t" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-8 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
-              <app-icon name="close" class="size-5" />
+            <button type="button" #rm (click)="askRemove(i, rm)" [appTip]="'lessons.removeBlock' | t" tipSide="left" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-8 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
+              <app-icon name="trash" class="size-5" />
             </button>
           </div>
         } @else {

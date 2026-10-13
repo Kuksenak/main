@@ -585,3 +585,31 @@ body:has(.cdk-drag-preview) * {
 .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
+
+/* A hover hint (Tip): a small dark label, faded in, sliding a little from its element */
+.tip {
+  position: fixed;
+  z-index: 3000;
+  max-width: 16rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 0.45rem;
+  background: color-mix(in srgb, var(--text) 88%, var(--app-bg));
+  color: var(--app-bg);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.16);
+  animation: tipIn 140ms ease-out;
+}
+.tip[data-side='left'] { --tip-from: translateX(3px); }
+.tip[data-side='right'] { --tip-from: translateX(-3px); }
+.tip[data-side='top'] { --tip-from: translateY(3px); }
+.tip[data-side='bottom'] { --tip-from: translateY(-3px); }
+@keyframes tipIn {
+  from {
+    opacity: 0;
+    transform: var(--tip-from, none);
+  }
+}
