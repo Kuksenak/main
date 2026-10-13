@@ -95,7 +95,7 @@ const SAVE_AT_LEAST_MS = 5000;
           <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" [locked]="!!s.draft().locked" />
           <!-- Under the tasks: where it's used, and the students' answers -->
           @if (s.lesson(); as l) {
-            <div class="flex flex-col gap-4 pl-10 pt-2">
+            <div class="flex flex-col gap-4 pl-8 pt-2">
               <app-event-list [lessonId]="l.id" />
               <app-lesson-attempts [lesson]="l" />
             </div>
