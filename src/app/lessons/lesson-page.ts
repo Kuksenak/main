@@ -18,7 +18,6 @@ import { cleanLesson } from './lesson-input';
 import { LEVELS, Level, LessonService, levelColor, shareUrl } from './lesson.service';
 import { Tip } from '../core/ui/tip';
 import { EventList } from '../cards/event-list';
-import { Toggle } from '../core/ui/toggle';
 
 /** How long after the last change the lesson is saved; typed on without a pause: at least this often. */
 const SAVE_AFTER_MS = 1500;
@@ -32,7 +31,7 @@ const SAVE_AT_LEAST_MS = 5000;
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, Toggle, LessonContent, PageSheet, Tip],
+  imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, LessonContent, PageSheet, Tip],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -40,7 +39,7 @@ const SAVE_AT_LEAST_MS = 5000;
         @if (s.id() && !s.lesson()) {
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
         } @else {
-          <!-- One row, always at the top: the name; saved; the level; ☰ -->
+          <!-- One row, always at the top: the name; saved; the level; Preview; Publish (Copy link); ☰ -->
           <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-3 bg-[var(--app-bg)] px-1">
             <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
             <!-- Just saved: a cloud with a check, for a moment -->
@@ -50,11 +49,26 @@ const SAVE_AT_LEAST_MS = 5000;
               </span>
             }
             <!-- Its level: a chip in its color; a list under it (each level with its color) -->
-            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="btn-secondary !px-3 font-semibold" [style.background]="levelColor(s.draft().level)">
+            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="btn-secondary gap-2 !px-3 font-semibold" [style.background]="levelColor(s.draft().level)">
               {{ s.draft().level ?? ('lessons.level' | t) }}
-              <app-icon name="chevron-down" class="-mr-1 size-4 opacity-50" />
+              <app-icon name="chevron-down" class="-mr-0.5 size-4 opacity-50" />
             </button>
-            <!-- ☰: the lesson's settings and the rest (level, public link, events, answers, Delete) -->
+            <!-- The whole lesson as the student sees it -->
+            <button type="button" (click)="previewAll.set(true)" class="btn-secondary gap-1.5 pl-2.5">
+              <app-icon name="popout" class="size-[1.125rem]" />{{ 'lessons.studentSees' | t }}
+            </button>
+            <!-- Publish: the public link on (then Copy link beside it, and Unpublish) -->
+            @if (s.lesson(); as l) {
+              @if (l.shareToken; as token) {
+                <button type="button" (click)="copy(token)" class="btn-secondary gap-1.5 pl-2.5">
+                  <app-icon [name]="copied() ? 'check' : 'link'" class="size-[1.125rem]" />{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}
+                </button>
+                <button type="button" (click)="lessons.share(l.id, false)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="btn-secondary">{{ 'lessons.unpublish' | t }}</button>
+              } @else {
+                <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="btn-primary">{{ 'lessons.publish' | t }}</button>
+              }
+            }
+            <!-- ☰: the rest (events, answers, Delete) -->
             <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-label]="'nav.settings' | t" [attr.aria-expanded]="menuOpen()" class="btn-secondary !px-2.5" [class.!bg-[var(--highlight)]]="menuOpen()">
               <app-icon name="menu" [strokeWidth]="2" class="size-5" />
             </button>
@@ -70,13 +84,13 @@ const SAVE_AT_LEAST_MS = 5000;
 
     @if (levelOpen()) {
       <app-sheet [origin]="levelBtn()?.nativeElement ?? null" (closed)="levelOpen.set(false)">
-        <div class="card">
+        <div class="flex min-w-40 flex-col">
           @for (o of levelOptions(); track o.value) {
-            <button type="button" (click)="setLevel($any(o.value) || null); levelOpen.set(false)" class="list-row w-full text-left">
+            <button type="button" (click)="setLevel($any(o.value) || null); levelOpen.set(false)" class="text-body flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left hover:bg-[var(--highlight)]">
               <span class="size-3.5 shrink-0 rounded-full" [style.background]="levelColor($any(o.value) || null) ?? 'transparent'" [class.border]="!o.value" [class.border-[var(--separator)]]="!o.value"></span>
               <span class="flex-1">{{ o.label }}</span>
               @if ((s.draft().level ?? '') === o.value) {
-                <app-icon name="check" class="size-5 text-[var(--accent)]" />
+                <app-icon name="check" class="size-[1.125rem] text-[var(--accent)]" />
               }
             </button>
           }
@@ -88,39 +102,6 @@ const SAVE_AT_LEAST_MS = 5000;
     @if (menuOpen()) {
       <app-sheet [origin]="menuBtn()?.nativeElement ?? null" [wide]="true" [tall]="true" (closed)="menuOpen.set(false)">
         <div class="flex flex-col gap-4 desktop:gap-3">
-          <!-- The whole lesson as the student sees it -->
-          <div class="card">
-            <button type="button" (click)="menuOpen.set(false); previewAll.set(true)" class="list-row w-full text-left">
-              <app-icon name="popout" class="row-icon" />
-              <span class="flex-1">{{ 'lessons.studentSees' | t }}</span>
-            </button>
-          </div>
-          <!-- Rows as in the account's menu: each unfolds its choices under it (› turns down) -->
-          <div class="card">
-            @if (s.lesson(); as l) {
-              <!-- The public link: On / Off; unfolded, its switch (with what it does) and Copy link -->
-              <button type="button" (click)="unfold('link')" class="list-row w-full text-left" [attr.aria-expanded]="unfolded() === 'link'">
-                <app-icon name="link" class="row-icon" />
-                <span class="flex-1">{{ 'lessons.public' | t }}</span>
-                <span class="opacity-50">{{ (l.shareToken ? 'settings.on' : 'settings.off') | t }}</span>
-                <app-icon name="chevron-right" class="row-chevron -ml-1 transition-transform duration-200" [class.rotate-90]="unfolded() === 'link'" />
-              </button>
-              @if (unfolded() === 'link') {
-                <div class="sub-rows">
-                  <label class="list-row cursor-pointer">
-                    <span class="text-subhead flex-1 opacity-70">{{ 'lessons.publicShort' | t }}</span>
-                    <app-toggle [checked]="!!l.shareToken" (checkedChange)="lessons.share(l.id, $event)" [attr.aria-label]="'lessons.public' | t" />
-                  </label>
-                  @if (l.shareToken; as token) {
-                    <button type="button" (click)="copy(token)" class="list-row w-full text-left">
-                      <span class="flex-1">{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}</span>
-                      <app-icon [name]="copied() ? 'check' : 'copy'" class="size-5 opacity-70" />
-                    </button>
-                  }
-                </div>
-              }
-            }
-          </div>
           @if (s.lesson(); as l) {
             <app-event-list [lessonId]="l.id" />
             <app-lesson-attempts [lesson]="l" />
@@ -172,11 +153,7 @@ export class LessonPage {
     cleanLesson(this.s.draft()).blocks.filter((b) => !b.private).map(forStudents),
   );
   // ☰'s row unfolded
-  protected readonly unfolded = signal<'link' | null>(null);
-  protected unfold(row: 'link'): void {
-    this.unfolded.set(this.unfolded() === row ? null : row);
-  }
-  protected readonly lessons = inject(LessonService);
+    protected readonly lessons = inject(LessonService);
   protected readonly copied = signal(false);
   protected copy(token: string): void {
     navigator.clipboard?.writeText(shareUrl(token)).then(
