@@ -316,7 +316,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         @if (linking()) {
           <form (submit)="applyLink(); $event.preventDefault()" class="flex items-center gap-1 p-0.5">
             <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.enter)="applyLink(); $event.preventDefault()" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
-            <button type="submit" [attr.aria-label]="'action.done' | t" title="Enter" class="btn-primary !h-8 !w-9 !px-0 !py-0 text-base">↵</button>
+            <button type="submit" [attr.aria-label]="'action.done' | t" title="Enter" class="flex h-8 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--accent)] text-white hover:opacity-90"><app-icon name="enter" [strokeWidth]="2.25" class="size-[1.125rem]" /></button>
           </form>
         } @else {
           <div class="flex items-center gap-0.5">

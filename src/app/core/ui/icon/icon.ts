@@ -6,6 +6,7 @@ export type IconName =
   | 'close'
   | 'chevron-left'
   | 'chevron-right'
+  | 'enter'
   | 'chevrons-up-down'
   | 'chevron-down'
   | 'search'
@@ -103,6 +104,8 @@ export type IconName =
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
+        <!-- The Enter key: down, then left -->
+        @case ('enter') { <path d="M19 5v6.5a3.5 3.5 0 0 1-3.5 3.5H5.5" /><path d="m9.5 10.5-4.5 4.5 4.5 4.5" /> }
         @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
         @case ('chevrons-up-down') { <path d="M8.5 10 12 7.25l3.5 2.75M8.5 14 12 16.75l3.5-2.75" /> }
         <!-- Installing: Safari's Share and "Add to Home Screen", Chrome's ⋮ and install marks, devices -->

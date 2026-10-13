@@ -116,8 +116,8 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
           [placeholder]="'ai.placeholder' | t"
           class="text-body max-h-48 min-h-[calc(2lh+0.75rem)] flex-1 resize-none bg-transparent px-1 py-1.5 outline-none"
         ></textarea>
-        <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [attr.aria-label]="'ai.send' | t" title="Enter" class="btn-confirm disabled:opacity-40">
-          <span class="text-xl leading-none" aria-hidden="true">↵</span>
+        <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [attr.aria-label]="'ai.send' | t" title="Enter" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-white hover:opacity-90 disabled:opacity-40">
+          <app-icon name="enter" [strokeWidth]="2.25" class="size-5" />
         </button>
       </div>
       <div class="mt-1.5 flex items-center gap-2 pb-[env(safe-area-inset-bottom)]">
