@@ -49,7 +49,7 @@ const SAVE_AT_LEAST_MS = 5000;
                 <app-icon name="lock" class="size-5" />
               </button>
             }
-            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--highlight)] focus:bg-[var(--highlight)]" />
+            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" [class.ml-4]="!s.draft().locked" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--highlight)] focus:bg-[var(--highlight)]" />
             <!-- Just saved: a cloud with a check, for a moment -->
             @if (justSaved()) {
               <span class="head-btn pointer-events-none !px-2 opacity-60 [animation:fadeIn_200ms_ease-out]" role="status" [attr.aria-label]="'lessons.saved' | t">
