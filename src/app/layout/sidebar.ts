@@ -85,7 +85,6 @@ interface Found {
           {{ 'sidebar.upcoming' | t }}
           <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('upcoming')" />
         </button>
-        <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('upcoming')) {
         @for (e of upcoming(); track e.id + e.startsAt) {
