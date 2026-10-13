@@ -50,10 +50,19 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     }
     @for (b of m.blocks; track $index; let i = $index) {
       @if (caret()?.at === i) {
-        <!-- The caret between tasks: they part for a line, a text cursor in it and what it's for -->
-        <div data-caret class="flex h-7 items-center gap-1.5 [animation:fadeIn_120ms_ease-out]">
-          <span class="text-cursor"></span>
-          <span class="text-footnote opacity-45">{{ 'lessons.caretHint' | t }}</span>
+        <!-- The caret between tasks: they part for a line — a plain field with its hint; what's typed
+             becomes a task there, "/" the commands, Ctrl+V pastes -->
+        <div data-caret class="flex h-7 items-center [animation:fadeIn_120ms_ease-out]">
+          <input
+            data-caret-input
+            type="text"
+            autocomplete="off"
+            [placeholder]="'lessons.caretHint' | t"
+            (input)="caretTyped($event)"
+            (keydown)="caretKey($event)"
+            (blur)="caretBlur()"
+            class="h-7 w-full bg-transparent text-[0.875rem] outline-none placeholder:opacity-45"
+          />
         </div>
       }
       @if (b.kind === 'text') {
@@ -242,10 +251,19 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       }
     }
       @if (caret()?.at === m.blocks.length) {
-        <!-- The caret between tasks: they part for a line, a text cursor in it and what it's for -->
-        <div data-caret class="flex h-7 items-center gap-1.5 [animation:fadeIn_120ms_ease-out]">
-          <span class="text-cursor"></span>
-          <span class="text-footnote opacity-45">{{ 'lessons.caretHint' | t }}</span>
+        <!-- The caret between tasks: they part for a line — a plain field with its hint; what's typed
+             becomes a task there, "/" the commands, Ctrl+V pastes -->
+        <div data-caret class="flex h-7 items-center [animation:fadeIn_120ms_ease-out]">
+          <input
+            data-caret-input
+            type="text"
+            autocomplete="off"
+            [placeholder]="'lessons.caretHint' | t"
+            (input)="caretTyped($event)"
+            (keydown)="caretKey($event)"
+            (blur)="caretBlur()"
+            class="h-7 w-full bg-transparent text-[0.875rem] outline-none placeholder:opacity-45"
+          />
         </div>
       }
       @if (desktop && !locked()) {
@@ -1262,8 +1280,46 @@ export class LessonForm {
     e.preventDefault();
     (document.activeElement as HTMLElement | null)?.blur();
     this.caret.set(this.gapAt(list, e.clientY));
-    // (and the commands right away, under it, once it's drawn)
-    setTimeout(() => this.openAdd());
+    // (its field focused, and the commands right away under it, once it's drawn)
+    setTimeout(() => {
+      this.host.nativeElement.querySelector<HTMLInputElement>('[data-caret-input]')?.focus();
+      this.openAdd();
+    });
+  }
+
+  // Typed in the caret's field: "/…" filters the commands; anything else — a new task with it
+  protected caretTyped(e: Event): void {
+    const field = e.target as HTMLInputElement;
+    const v = field.value;
+    if (v.startsWith('/')) {
+      if (!this.slash()) this.openAdd(v.slice(1));
+      else this.slash.update((sl) => (sl ? { ...sl, query: v.slice(1), active: 0 } : sl));
+      this.bySlash = true;
+      return;
+    }
+    if (!v) return;
+    const at = this.caret()?.at ?? this.value().blocks.length;
+    this.caret.set(null);
+    this.slash.set(null);
+    this.insertBlock(at, 'gaps', v);
+  }
+
+  // Its keys: the commands' (↑ ↓ Enter Esc); Esc with none open drops the caret
+  protected caretKey(e: KeyboardEvent): void {
+    if (this.slash()) {
+      this.onSlashKey(e);
+      return;
+    }
+    if (e.key === 'Escape') this.caret.set(null);
+  }
+
+  // Left (not for the commands' menu): the caret goes
+  protected caretBlur(): void {
+    setTimeout(() => {
+      if (document.activeElement?.hasAttribute('data-caret-input') || this.aiOpen()) return;
+      this.caret.set(null);
+      if (this.slash()?.block === -1) this.slash.set(null);
+    }, 120);
   }
 
   // (a click anywhere but between the tasks: gone)
@@ -1275,7 +1331,7 @@ export class LessonForm {
   protected pasteOnPage(e: ClipboardEvent): void {
     if (!this.desktop || !this.photos() || this.locked() || this.aiOpen() || this.previewing() !== null) return;
     const a = document.activeElement as HTMLElement | null;
-    if (a?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
+    if (a?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])') && !a.hasAttribute('data-caret-input')) return;
     const copied = this.clipboard.blocks();
     const text = e.clipboardData?.getData('text/plain')?.trim() ?? '';
     const blocks: LessonBlock[] = copied?.length ? copied.map((b) => ({ ...b })) : text ? [{ kind: 'gaps', text, url: null, private: false, instruction: null }] : [];
