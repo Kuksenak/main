@@ -98,7 +98,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 @Component({
   selector: 'app-lesson-form',
   imports: [AiChat, BrandIcon, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
-  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)' },
+  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
     @if (showTitle()) {
@@ -270,21 +270,12 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       }
     }
       @if (desktop) {
-        <!-- The end of the page: the commands' line — "/" and what's typed after it picks one (Task,
-             Assistant). Typing on the page outside a task starts it; so does a click under the
-             tasks. Its hint shows while it's focused (always on an empty lesson); left, it's emptied. -->
-        <textarea
-          #end
-          rows="1"
-          (input)="onEnd(end)"
-          (focus)="onEnd(end)"
-          (keydown)="onEndKey($event, end)"
-          (blur)="onBlur(); end.value = ''"
-          [placeholder]="'lessons.slashHint' | t"
-          class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none [field-sizing:content] placeholder:opacity-0 focus:placeholder:opacity-40"
-          [class.placeholder:!opacity-40]="!m.blocks.length"
-        ></textarea>
-        <div aria-hidden="true" class="-mt-3 min-h-[40vh] cursor-text" (mousedown)="$event.preventDefault(); end.focus()"></div>
+        <!-- The end of the page: "+ Add" (faded) — it, or a click on the page under it, opens the
+             commands (Task, Assistant); so does a key typed outside a task (it filters them) -->
+        <button #addRow type="button" (click)="openAdd()" class="text-subhead -mt-1 flex items-center gap-2 self-start rounded-lg px-1.5 py-1 opacity-35 hover:bg-[var(--highlight)] hover:opacity-70" [class.!opacity-70]="slash()?.block === -1">
+          <app-icon name="plus" [strokeWidth]="2" class="size-4" />{{ 'action.add' | t }}
+        </button>
+        <div aria-hidden="true" class="-mt-3 min-h-[40vh]" (click)="openAdd()"></div>
       }
       <!-- The end of the page: a new task; the assistant (unless the page has them in its head) -->
       @if (endButtons()) {
@@ -303,7 +294,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 
     <!-- "/": the commands at the cursor -->
     @if (slash(); as sl) {
-      <div appToBody class="popover-panel fixed z-[2100] w-64 p-1" [style.left.px]="sl.x" [style.top.px]="sl.y">
+      <div appToBody data-commands class="popover-panel fixed z-[2100] w-64 p-1" [style.left.px]="sl.x" [style.top.px]="sl.y">
         @for (c of slashItems(); track c.id; let k = $index) {
           <button
             type="button"
@@ -601,49 +592,52 @@ export class LessonForm {
     this.slash.set({ block, start: lineStart, end: caret, query: m[1], x: r.left, y: r.top + r.height + 2, active: was?.block === block ? was.active : 0 });
   }
 
-  // The page's end: "/…" the commands
-  protected onEnd(end: HTMLTextAreaElement): void {
-    this.field = end;
-    // (only commands here: typed without "/", it's put in front)
-    if (end.value && !end.value.startsWith('/')) end.value = `/${end.value.trimStart()}`;
-    const v = end.value;
-    // (empty: all of them — the line focused opens them)
-    if (!v || /^\/\S*$/u.test(v)) {
-      const r = end.getBoundingClientRect();
-      const was = this.slash();
-      this.slash.set({ block: -1, start: 0, end: v.length, query: v.slice(1), x: r.left, y: r.bottom + 2, active: was?.block === -1 ? was.active : 0 });
-      return;
-    }
-    this.slash.set(null);
+  private readonly addRow = viewChild<ElementRef<HTMLButtonElement>>('addRow');
+
+  // "+ Add": the commands under it (`query`: typed to filter them)
+  protected openAdd(query = ''): void {
+    const r = this.addRow()?.nativeElement.getBoundingClientRect();
+    if (!r) return;
+    this.addRow()!.nativeElement.scrollIntoView({ block: 'nearest' });
+    const top = this.addRow()!.nativeElement.getBoundingClientRect();
+    this.slash.set({ block: -1, start: 0, end: 0, query, x: top.left, y: Math.min(top.bottom + 4, window.innerHeight - 140), active: 0 });
   }
 
-  // The commands' line: their keys (arrows, Enter, Escape); no new lines in it
-  protected onEndKey(e: KeyboardEvent, end: HTMLTextAreaElement): void {
-    if (this.slash()) {
-      this.onSlashKey(e);
-      if (e.key === 'Escape') end.value = '';
-      return;
-    }
-    if (e.key === 'Enter') e.preventDefault();
-  }
-
-  private readonly endField = viewChild<ElementRef<HTMLTextAreaElement>>('end');
-
-  // Typing on the page outside any field (nothing open over it): the commands open at the page's
-  // end, what's typed filtering them ("/" itself or not)
+  // Keys on the page outside any field (nothing open over it): open the commands, a letter filtering
+  // them (by its key, whatever the keyboard's language: "t" for Task); while they're open: ↑ ↓ pick,
+  // Enter runs, Esc closes, letters / Backspace change the filter
   protected typeOnPage(e: KeyboardEvent): void {
-    const end = this.endField()?.nativeElement;
-    if (!end || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1 || e.key === ' ') return;
-    if (!this.photos() || this.aiOpen() || this.previewing() !== null || this.slash() || this.sel()) return;
+    if (!this.desktop || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (!this.photos() || this.aiOpen() || this.previewing() !== null || this.sel()) return;
     const a = document.activeElement as HTMLElement | null;
     if (a?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
     if (a && a !== document.body && !this.host.nativeElement.contains(a)) return;
-    e.preventDefault();
-    end.focus();
-    // (letters by their key, whatever the keyboard's language: "t" for Task on any layout)
-    const key = /^Key[A-Z]$/.test(e.code) ? e.code.slice(3).toLowerCase() : e.key;
-    end.value = key === '/' ? '/' : `/${key}`;
-    this.onEnd(end);
+    const letter = /^Key[A-Z]$/.test(e.code) ? e.code.slice(3).toLowerCase() : e.key.length === 1 && e.key !== ' ' ? e.key : '';
+    const sl = this.slash();
+    if (sl && sl.block !== -1) return;
+    if (!sl) {
+      if (!letter) return;
+      e.preventDefault();
+      this.openAdd(letter === '/' ? '' : letter);
+      return;
+    }
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+      this.slash.set({ ...sl, query: sl.query.slice(0, -1), active: 0 });
+    } else if (letter && letter !== '/') {
+      e.preventDefault();
+      this.slash.set({ ...sl, query: sl.query + letter, active: 0 });
+    } else {
+      this.onSlashKey(e);
+    }
+  }
+
+  // A click away from the "+ Add" commands: they close
+  protected clickOnPage(e: MouseEvent): void {
+    if (this.slash()?.block !== -1) return;
+    const t = e.target as HTMLElement | null;
+    if (t?.closest('[data-commands]') || this.addRow()?.nativeElement.contains(t)) return;
+    this.slash.set(null);
   }
 
   protected onSlashKey(e: KeyboardEvent): void {
@@ -671,7 +665,6 @@ export class LessonForm {
     this.slash.set(null);
     if (!sl) return;
     if (sl.block < 0) {
-      if (this.field) this.field.value = '';
       if (id === 'assistant') this.aiOpen.set(true);
       else this.insertBlock(this.value().blocks.length, 'gaps', '');
       return;
