@@ -4,7 +4,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { Masonry } from '../core/ui/masonry';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
-import { Gap, GapPart, LessonFills, gapLines, gapRight } from './gaps';
+import { Gap, GapPart, LessonFills, gapLines, gapRight, splitInstruction } from './gaps';
 import { LessonBlock, imageSrc } from './lesson.service';
 
 /** Exercise answers (block → option) and checklist ticks ("block:item"); blocks by their place in the lesson. */
@@ -272,7 +272,10 @@ export class LessonContent {
     let total = 0;
     for (const { block: b } of tile) {
       if (b.kind === 'image') longest = Math.max(longest, 60);
-      const lines = [...(b.text ?? '').split('\n'), ...(b.items ?? []), ...(b.options ?? [])].map((l) =>
+      // (an older task's instruction is its first line: it wraps too, it doesn't count)
+      const items = splitInstruction(b).text ?? '';
+      if (b.kind !== 'gaps' && b.kind !== 'exercise' && b.kind !== 'checklist' && tile.length > 1) continue; // a text before its task wraps
+      const lines = [...items.split('\n'), ...(b.items ?? []), ...(b.options ?? [])].map((l) =>
         l
           .replace(/\[[^[\]\n]*\]/g, '________')
           .replace(/\{([^{}\n]*)\}/g, (_, x: string) => x.replace(/\*/g, '').split('|').join(' / ')),
