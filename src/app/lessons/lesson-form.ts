@@ -43,7 +43,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
     <!-- (tasks are moved by their ⠿: the others make way, the place it'd go shown dashed) -->
-    <div class="flex flex-col gap-3" [class.pr-16]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable()" (cdkDropListDropped)="moved($event)">
+    <div class="flex flex-col gap-3" [class.pr-10]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable()" (cdkDropListDropped)="moved($event)">
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
@@ -73,15 +73,15 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div
         class="card group relative"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
-        [class.min-h-[3.75rem]]="slim"
+        [class.min-h-[7.75rem]]="slim"
         cdkDrag
         [cdkDragDisabled]="!slim"
       >
         @if (slim) {
-          <!-- Desktop tasks: no head row — its buttons two by two outside it at the right (⠿ ↗ / who sees it, bin; a short task is at least as tall), shown on hover (or while
+          <!-- Desktop tasks: no head row — its buttons in a column outside it at the right (⠿, ↗, who sees it, bin; a task at least as tall as it), shown on hover (or while
                it's being typed in): ↗ as the student sees it (in a window), who sees it, ×;
                "only me" always shows -->
-          <div class="task-tools absolute -right-16 top-1 z-10 grid grid-cols-2 gap-0.5 p-0.5">
+          <div class="task-tools absolute -right-10 top-1 z-10 flex flex-col items-center gap-0.5 p-0.5">
             <!-- ⠿ first: drag to move it (kept on the one being moved) -->
             <button type="button" cdkDragHandle [appTip]="'lessons.move' | t" tipSide="left" [attr.aria-label]="'lessons.move' | t" class="drag-handle flex size-7 cursor-grab items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 active:cursor-grabbing">
               <app-icon name="grip" class="size-[1.125rem]" />
