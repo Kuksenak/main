@@ -98,22 +98,26 @@ export function cleanLesson(l: LessonInput): LessonInput {
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
-    <div class="card">
-      <div class="list-row">
-        <input #titleInput name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'lessons.name' | t" autocomplete="off" class="row-input font-semibold" />
-      </div>
-    </div>
-
-    <!-- The tasks (no blocks yet: one to start typing in) -->
-    <div class="flex flex-col gap-4">
-    @if (!m.blocks.length) {
-      <div class="card">
-        <div class="list-row items-start pb-3 pt-3">
-          <textarea #first rows="2" (input)="startFirst(first)" [placeholder]="'lessons.slashHint' | t" class="row-input text-subhead min-h-[3lh] resize-none leading-relaxed [field-sizing:content]"></textarea>
-        </div>
-      </div>
+    @if (showTitle()) {
+      <!-- The lesson's name: the page's title, plain (no card) -->
+      <input #titleInput name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="w-full bg-transparent px-1 text-[1.5rem] font-bold leading-tight outline-none placeholder:opacity-35" />
     }
+
+    <!-- The page: the tasks, with a line above each and one under them — "/" there opens the
+         commands (a task goes in right there), other text starts a task there -->
+    <div class="flex flex-col">
     @for (b of m.blocks; track $index; let i = $index) {
+      <input
+        type="text"
+        [attr.data-line]="i"
+        (focus)="lineFocus.set(i)"
+        (input)="onLine(i, $any($event.target))"
+        (keydown)="onLineKey($event, i, $any($event.target))"
+        (blur)="onBlur()"
+        [placeholder]="lineFocus() === i ? ('lessons.slashHint' | t) : ''"
+        autocomplete="off"
+        class="text-subhead h-9 w-full bg-transparent px-1 outline-none placeholder:opacity-40"
+      />
       <div class="card" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
         <!-- Head: (kind) · Preview · who sees it · ? · × -->
         <div class="list-row !min-h-0 gap-2 pb-1 pt-2.5 after:hidden">
@@ -216,14 +220,13 @@ export function cleanLesson(l: LessonInput): LessonInput {
                 [attr.data-task]="i"
                 [ngModel]="b.text"
                 (ngModelChange)="setBlock(i, { text: $event })"
-                (input)="onType(i, ta)"
-                (keydown)="onKey($event, i, ta)"
+                (input)="sel.set(null)"
                 (select)="onSelect(i, ta)"
                 (mouseup)="onSelect(i, ta)"
                 (keyup)="onSelect(i, ta)"
                 (blur)="onBlur()"
                 rows="2"
-                [placeholder]="'lessons.slashHint' | t"
+                [placeholder]="'lessons.gapsPlaceholder' | t"
                 class="row-input text-subhead min-h-[3lh] resize-none leading-relaxed [field-sizing:content]"
               ></textarea>
             </div>
@@ -241,6 +244,17 @@ export function cleanLesson(l: LessonInput): LessonInput {
         }
       </div>
     }
+      <input
+        type="text"
+        [attr.data-line]="m.blocks.length"
+        (focus)="lineFocus.set(m.blocks.length)"
+        (input)="onLine(m.blocks.length, $any($event.target))"
+        (keydown)="onLineKey($event, m.blocks.length, $any($event.target))"
+        (blur)="onBlur()"
+        [placeholder]="true ? ('lessons.slashHint' | t) : ''"
+        autocomplete="off"
+        class="text-subhead h-9 w-full bg-transparent px-1 outline-none placeholder:opacity-40"
+      />
     </div>
 
     <!-- "/": the commands at the cursor -->
@@ -353,6 +367,8 @@ export class LessonForm {
   readonly lessonId = input<string | null>(null);
   /** The photo part (From photo, pasting, what's being read); off in the preview's own editor. */
   readonly photos = input(true);
+  /** The name field at the top (off: the page shows it in its own head — the desktop lesson page). */
+  readonly showTitle = input(true);
   /** Blocks can be picked (a checkbox each): `selected` — their places. */
   readonly selectable = input(false);
   readonly selected = model<number[]>([]);
@@ -370,8 +386,10 @@ export class LessonForm {
 
   // ---- "/" commands and the selection's formatting
 
-  protected readonly slash = signal<{ block: number; start: number; query: string; x: number; y: number; active: number } | null>(null);
+  // The commands open from a line (its place: where a task goes), what's typed after "/"
+  protected readonly slash = signal<{ line: number; query: string; x: number; y: number; active: number } | null>(null);
   protected readonly sel = signal<{ block: number; x: number; y: number } | null>(null);
+  protected readonly lineFocus = signal<number | null>(null);
   private field: HTMLTextAreaElement | null = null;
 
   private readonly commands: { id: 'task' | 'assistant'; label: TranslationKey; hint: TranslationKey; words: string }[] = [
@@ -393,57 +411,62 @@ export class LessonForm {
     { id: 'choice', mark: '{ }', label: 'lessons.fmtChoice' },
   ];
 
-  // Typing: "/" at a line's start or after a space opens the commands (the letters after it filter)
-  protected onType(block: number, ta: HTMLTextAreaElement): void {
-    this.field = ta;
-    this.sel.set(null);
-    const pos = ta.selectionStart;
-    const before = ta.value.slice(0, pos);
-    const m = /(^|\s)\/([\p{L}]*)$/u.exec(before);
-    if (!m) {
-      this.slash.set(null);
+  // A line: "/…" opens the commands (the letters after it filter); other text becomes a task there
+  protected onLine(at: number, input: HTMLInputElement): void {
+    const v = input.value;
+    if (v.startsWith('/')) {
+      const r = input.getBoundingClientRect();
+      const was = this.slash();
+      this.slash.set({ line: at, query: v.slice(1).trim(), x: r.left, y: r.bottom + 2, active: was?.line === at ? was.active : 0 });
       return;
     }
-    const start = pos - m[2].length - 1;
-    const r = caretRect(ta, start);
-    const was = this.slash();
-    this.slash.set({ block, start, query: m[2], x: r.left, y: r.top + r.height + 4, active: was?.block === block ? was.active : 0 });
+    this.slash.set(null);
+    if (!v) return;
+    input.value = '';
+    this.insertTask(at, v);
   }
 
-  protected onKey(e: KeyboardEvent, block: number, ta: HTMLTextAreaElement): void {
+  protected onLineKey(e: KeyboardEvent, at: number, input: HTMLInputElement): void {
     const sl = this.slash();
-    if (!sl || sl.block !== block) return;
-    const n = this.slashItems().length;
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    if (sl && sl.line === at) {
+      const n = this.slashItems().length;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (n) this.slash.set({ ...sl, active: (sl.active + (e.key === 'ArrowDown' ? 1 : n - 1)) % n });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const c = this.slashItems()[sl.active];
+        if (c) this.runSlash(c.id);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        this.slash.set(null);
+        input.value = '';
+      }
+      return;
+    }
+    // Enter on an empty line: a task there
+    if (e.key === 'Enter' && !input.value) {
       e.preventDefault();
-      if (n) this.slash.set({ ...sl, active: (sl.active + (e.key === 'ArrowDown' ? 1 : n - 1)) % n });
-    } else if (e.key === 'Enter') {
-      const c = this.slashItems()[sl.active];
-      if (!c) return;
-      e.preventDefault();
-      this.field = ta;
-      this.runSlash(c.id);
-    } else if (e.key === 'Escape') {
-      e.preventDefault();
-      this.slash.set(null);
+      this.insertTask(at, '');
     }
   }
 
-  // A command: its "/word" taken out of the text, then a new task below / the assistant
+  // A command: the line cleared, then a task there / the assistant
   protected runSlash(id: 'task' | 'assistant'): void {
     const sl = this.slash();
-    const ta = this.field;
     this.slash.set(null);
-    if (!sl || !ta) return;
-    const text = ta.value.slice(0, sl.start) + ta.value.slice(ta.selectionStart);
-    this.setBlock(sl.block, { text });
-    if (id === 'assistant') {
-      this.aiOpen.set(true);
-      return;
-    }
-    const task: LessonBlock = { kind: 'gaps', text: null, url: null, private: false, instruction: null };
-    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, sl.block + 1), task, ...m.blocks.slice(sl.block + 1)] }));
-    this.focusTask(sl.block + 1, 0);
+    if (!sl) return;
+    const input = this.host.nativeElement.querySelector<HTMLInputElement>(`input[data-line="${sl.line}"]`);
+    if (input) input.value = '';
+    if (id === 'assistant') this.aiOpen.set(true);
+    else this.insertTask(sl.line, '');
+  }
+
+  // A new task at `at`, its text `text`, the cursor at its end
+  private insertTask(at: number, text: string): void {
+    const task: LessonBlock = { kind: 'gaps', text, url: null, private: false, instruction: null };
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), task, ...m.blocks.slice(at)] }));
+    this.focusTask(at, text.length);
   }
 
   // A selection in a task: the formatting toolbar over it
@@ -463,6 +486,7 @@ export class LessonForm {
     setTimeout(() => {
       this.slash.set(null);
       this.sel.set(null);
+      if (!this.host.nativeElement.contains(document.activeElement)) this.lineFocus.set(null);
     }, 120);
   }
 
@@ -484,22 +508,14 @@ export class LessonForm {
     else ta.setSelectionRange(a + open.length, a + open.length + picked.length);
   }
 
-  // The first task of an empty lesson, from what's typed in its stand-in
-  protected startFirst(first: HTMLTextAreaElement): void {
-    const text = first.value;
-    const caret = first.selectionStart;
-    this.value.update((m) => ({ ...m, blocks: [{ kind: 'gaps', text, url: null, private: false, instruction: null }] }));
-    this.focusTask(0, caret, true);
-  }
-
-  // A task's field focused (the cursor at `caret`); `typed`: as if just typed in (a "/" opens the commands)
-  private focusTask(index: number, caret: number, typed = false): void {
+  // A task's field focused, the cursor at `caret`
+  private focusTask(index: number, caret: number): void {
+    this.lineFocus.set(null);
     setTimeout(() => {
       const ta = this.host.nativeElement.querySelector<HTMLTextAreaElement>(`textarea[data-task="${index}"]`);
       if (!ta) return;
       ta.focus();
       ta.setSelectionRange(caret, caret);
-      if (typed) this.onType(index, ta);
     });
   }
 

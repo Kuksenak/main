@@ -1,3 +1,4 @@
+import { FormsModule } from '@angular/forms';
 import { Component, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -17,7 +18,7 @@ import { LessonState } from './lesson-state';
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [ConfirmDelete, LessonAttempts, LessonContent, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
+  imports: [ConfirmDelete, FormsModule, LessonAttempts, LessonContent, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -25,7 +26,12 @@ import { LessonState } from './lesson-state';
         <!-- One row: the title, then Edit, or Cancel and Save while editing -->
         <div class="flex flex-col">
           <div class="flex h-[var(--control-h)] items-center gap-3">
-            <h1 class="min-w-0 flex-1 truncate text-xl font-semibold">{{ s.heading() }}</h1>
+            @if (s.editing()) {
+              <!-- The name, edited right in the head -->
+              <input #nameInput [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
+            } @else {
+              <h1 class="min-w-0 flex-1 truncate text-xl font-semibold">{{ s.heading() }}</h1>
+            }
             @if (s.editing()) {
               <button type="button" (click)="cancel()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
               <button type="button" (click)="save()" [disabled]="!s.canSave()" class="btn-primary">{{ 'action.save' | t }}</button>
@@ -39,7 +45,7 @@ import { LessonState } from './lesson-state';
           @if (s.saveError(); as e) {
             <p class="text-footnote select-text break-words rounded-xl bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-3 py-2 text-[var(--danger)]">{{ 'lessons.saveFailed' | t }} {{ e }}</p>
           }
-          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" />
+          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" />
           @if (s.id()) {
             <button #deleteBtn type="button" (click)="askDelete.set(deleteBtn)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
           }
@@ -70,6 +76,10 @@ export class LessonPage {
   protected readonly s = new LessonState(() => this.lessonId());
   private router = inject(Router);
   protected readonly askDelete = signal<HTMLElement | null>(null); // the Delete button, while asking
+
+  protected setTitle(title: string): void {
+    this.s.draft.update((d) => ({ ...d, title }));
+  }
 
   protected cancel(): void {
     if (this.s.id()) this.s.cancelEdit();
