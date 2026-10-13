@@ -82,7 +82,6 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         class="card group relative"
         [class.task-card]="slim"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
-        [class.min-h-14]="slim"
         data-block
         #card
       >
@@ -194,7 +193,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             </div>
           }
           @case ('gaps') {
-            <div class="list-row items-start" [class.pb-3]="!slim" [class.pt-1]="!slim" [class.py-2]="slim">
+            <div class="list-row items-start" [class.pb-3]="!slim" [class.pt-1]="!slim" [class.py-1.5]="slim" [class.!px-2.5]="slim">
               <div class="relative min-w-0 flex-1" [class.only-me]="b.private">
               <!-- Only me: a gray lock before its first letter (its first line set in for it) -->
               @if (b.private) {
