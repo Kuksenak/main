@@ -636,7 +636,7 @@ export class LessonForm {
     if (c && list) {
       const box = list.getBoundingClientRect();
       const line = list.querySelector<HTMLElement>('[data-caret]')?.getBoundingClientRect();
-      this.slash.set({ block: -1, start: 0, end: 0, query, x: (line?.left ?? box.left) + 8, y: Math.min((line?.bottom ?? box.top + c.y) + 4, window.innerHeight - 140), active: 0 });
+      this.slash.set({ block: -1, start: 0, end: 0, query, x: (line?.left ?? box.left) - 4, y: Math.min((line?.bottom ?? box.top + c.y) - 2, window.innerHeight - 140), active: 0 });
       return;
     }
     const r = this.addRow()?.nativeElement.getBoundingClientRect();
