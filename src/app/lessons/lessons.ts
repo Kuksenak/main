@@ -172,6 +172,11 @@ import { LessonUsage } from './lesson-usage';
           <!-- One page per lesson (switching lessons starts it afresh: not in the previous one's editing) -->
           @for (key of selectedKey(); track key) {
             <app-lesson-page [lessonId]="selected() === 'new' ? null : selected()" (created)="adopt($event)" />
+          } @empty {
+            <!-- None picked: nothing open -->
+            <div class="flex flex-1 items-center justify-center">
+              <p class="text-[0.875rem] opacity-40">{{ 'lessons.pickOne' | t }}</p>
+            </div>
           }
         </section>
       }
@@ -310,8 +315,8 @@ export class Lessons {
     else this.stack.push({ kind: 'lesson', id: null });
   }
 
-  // Desktop: the lesson on the right — the linked one ('new': a new one), else the first in the list
-  protected readonly selected = computed(() => this.linkedId() ?? this.visible().at(0)?.id ?? null);
+  // Desktop: the lesson on the right — the linked one ('new': a new one); none picked: none open
+  protected readonly selected = computed(() => this.linkedId() ?? null);
   // One page per lesson; a new one keeps its page once saved (its link changes under it)
   protected readonly selectedKey = computed(() => {
     const id = this.selected();
