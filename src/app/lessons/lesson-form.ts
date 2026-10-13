@@ -315,11 +315,12 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- A selection: its menu beside it — B I U in a row, then Fill in, Choice,
          Link a row each; Link asks for the address -->
     @if (desktop && sel(); as se) {
-      <div appToBody class="popover-panel fixed z-[2100] flex w-48 flex-col p-1" [style.left.px]="se.x" [style.top.px]="se.y" (mousedown)="keepFocus($event)">
+      <!-- (in the menus' style: B I U S in a row, then a row each with its icon; what's on: gray, ✓) -->
+      <div appToBody class="dialog-panel fixed z-[2100] flex w-max min-w-44 flex-col !rounded-[10px] p-1 [animation:dropdownIn_160ms_var(--ease-out-quick)]" [style.left.px]="se.x" [style.top.px]="se.y" (mousedown)="keepFocus($event)">
         @if (linking()) {
-          <form (submit)="applyLink(); $event.preventDefault()" class="flex items-center gap-1 p-0.5">
-            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.enter)="applyLink(); $event.preventDefault()" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
-            <button type="submit" [attr.aria-label]="'action.done' | t" title="Enter" class="flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--text)] opacity-60 hover:bg-[var(--highlight)] hover:opacity-100"><app-icon name="enter" [strokeWidth]="2" class="size-4" /></button>
+          <form (submit)="applyLink(); $event.preventDefault()" class="flex w-64 items-center gap-1">
+            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.enter)="applyLink(); $event.preventDefault()" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 text-[0.875rem] outline-none placeholder:opacity-45" />
+            <button type="submit" [appTip]="'action.done' | t" tipSide="bottom" [attr.aria-label]="'action.done' | t" class="head-btn !px-1.5"><app-icon name="enter" /></button>
           </form>
         } @else {
           <div class="flex items-center gap-0.5">
@@ -328,10 +329,10 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                 type="button"
                 (click)="pickFormat(f.id)"
                 [attr.aria-label]="f.label | t"
-                [attr.title]="f.label | t"
-                class="flex h-8 flex-1 items-center justify-center rounded-md text-[0.9375rem] hover:bg-[var(--highlight)]"
-                [class.!bg-[color-mix(in_srgb,var(--accent)_16%,transparent)]]="se.on?.includes(f.id)"
-                [class.text-[var(--accent)]]="se.on?.includes(f.id)"
+                [appTip]="f.label | t"
+                tipSide="top"
+                class="flex h-8 flex-1 items-center justify-center rounded-md text-[0.875rem] hover:bg-[var(--highlight)]"
+                [class.!bg-[var(--highlight)]]="se.on?.includes(f.id)"
                 [class.font-bold]="f.id === 'bold'"
                 [class.italic]="f.id === 'italic'"
                 [class.underline]="f.id === 'underline'"
@@ -339,17 +340,18 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               >{{ f.mark }}</button>
             }
           </div>
-          <div class="my-1 h-px bg-[var(--separator)]"></div>
-          @for (f of itemFormats(se.block); track f.id) {
-            <button
-              type="button"
-              (click)="pickFormat(f.id)"
-              [attr.title]="f.label | t"
-              class="text-subhead flex h-8 w-full items-center rounded-md px-2.5 text-left hover:bg-[var(--highlight)]"
-              [class.!bg-[color-mix(in_srgb,var(--accent)_16%,transparent)]]="se.on?.includes(f.id)"
-              [class.text-[var(--accent)]]="se.on?.includes(f.id)"
-            >{{ f.text! | t }}</button>
-          }
+          <div class="menu-sep !mx-0"></div>
+          <div class="menu-list">
+            @for (f of itemFormats(se.block); track f.id) {
+              <button type="button" (click)="pickFormat(f.id)" class="menu-item">
+                <app-icon [name]="f.id === 'gap' ? 'text' : f.id === 'choice' ? 'checklist' : 'link'" />
+                <span class="flex-1">{{ f.text! | t }}</span>
+                @if (se.on?.includes(f.id)) {
+                  <app-icon name="check" class="size-4 text-[var(--accent)]" />
+                }
+              </button>
+            }
+          </div>
         }
       </div>
     }
