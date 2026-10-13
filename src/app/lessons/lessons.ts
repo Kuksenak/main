@@ -39,7 +39,7 @@ import { LessonUsage } from './lesson-usage';
     <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-4 desktop:-mt-2 desktop:pb-4 desktop:pl-2 desktop:pr-2 desktop:pt-0">
       @if (desktop) {
         <!-- Desktop (as Notion's sidebar): a small search and +, then a row a lesson — its level's
-             dot, its name, a globe when published; the open one gray; where it's used in a hint -->
+             dot and its name; the open one gray; where it's used in a hint -->
         <section class="flex min-h-0 w-64 shrink-0 flex-col gap-1 border-r border-[var(--separator)] pr-2">
           <div class="flex h-[var(--control-h)] shrink-0 items-center gap-1">
             <label class="flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-md bg-[var(--fill)] px-2">
@@ -65,9 +65,6 @@ import { LessonUsage } from './lesson-usage';
                   >
                     <span class="size-2 shrink-0 rounded-full" [style.background]="levelColor(l.level) ?? 'color-mix(in srgb, var(--text) 22%, transparent)'"></span>
                     <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
-                    @if (l.shareToken) {
-                      <app-icon name="globe" class="size-3.5 shrink-0 opacity-40" />
-                    }
                   </button>
                 }
               </div>
