@@ -201,7 +201,7 @@ export type { LessonFills } from './gaps';
           <h2 class="px-1 pt-2 text-xl font-semibold">{{ b.text }}</h2>
         }
         @default {
-          <p class="text-body whitespace-pre-wrap px-1 leading-relaxed">{{ b.text }}</p>
+          <p class="text-body whitespace-pre-wrap px-1 leading-relaxed">@for (st of style(b.text ?? ''); track $index) {<span [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>}</p>
         }
       }
     </ng-template>

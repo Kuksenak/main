@@ -118,6 +118,22 @@ export function cleanLesson(l: LessonInput): LessonInput {
         autocomplete="off"
         class="text-subhead h-9 w-full bg-transparent px-1 outline-none placeholder:opacity-40"
       />
+      @if (b.kind === 'text') {
+        <!-- Text right on the page (no card): typed where it is; emptied, it goes -->
+        <textarea
+          #tx
+          [attr.data-task]="i"
+          [ngModel]="b.text"
+          (ngModelChange)="setBlock(i, { text: $event })"
+          (input)="sel.set(null)"
+          (select)="onSelect(i, tx)"
+          (mouseup)="onSelect(i, tx)"
+          (keyup)="onSelect(i, tx)"
+          (blur)="onBlur(); dropIfEmpty(i)"
+          rows="1"
+          class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none [field-sizing:content]"
+        ></textarea>
+      } @else {
       <div class="card" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
         <!-- Head: (kind) · Preview · who sees it · ? · × -->
         <div class="list-row !min-h-0 gap-2 pb-1 pt-2.5 after:hidden">
@@ -243,6 +259,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
           }
         }
       </div>
+      }
     }
       <input
         type="text"
@@ -287,7 +304,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
     <!-- A selection: its formatting -->
     @if (sel(); as se) {
       <div class="popover-panel fixed z-[2100] flex items-center gap-0.5 p-1" [style.left.px]="se.x" [style.top.px]="se.y">
-        @for (f of formats; track f.id) {
+        @for (f of formatsFor(se.block); track f.id) {
           <button
             type="button"
             (mousedown)="$event.preventDefault()"
@@ -423,7 +440,7 @@ export class LessonForm {
     this.slash.set(null);
     if (!v) return;
     input.value = '';
-    this.insertTask(at, v);
+    this.insertBlock(at, 'text', v);
   }
 
   protected onLineKey(e: KeyboardEvent, at: number, input: HTMLInputElement): void {
@@ -444,11 +461,7 @@ export class LessonForm {
       }
       return;
     }
-    // Enter on an empty line: a task there
-    if (e.key === 'Enter' && !input.value) {
-      e.preventDefault();
-      this.insertTask(at, '');
-    }
+
   }
 
   // A command: the line cleared, then a task there / the assistant
@@ -459,14 +472,26 @@ export class LessonForm {
     const input = this.host.nativeElement.querySelector<HTMLInputElement>(`input[data-line="${sl.line}"]`);
     if (input) input.value = '';
     if (id === 'assistant') this.aiOpen.set(true);
-    else this.insertTask(sl.line, '');
+    else this.insertBlock(sl.line, 'gaps', '');
   }
 
-  // A new task at `at`, its text `text`, the cursor at its end
-  private insertTask(at: number, text: string): void {
-    const task: LessonBlock = { kind: 'gaps', text, url: null, private: false, instruction: null };
-    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), task, ...m.blocks.slice(at)] }));
+  // A new block at `at` (a task, or text on the page), its text `text`, the cursor at its end
+  private insertBlock(at: number, kind: 'gaps' | 'text', text: string): void {
+    const block: LessonBlock = { kind, text, url: null, private: false, instruction: null };
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), block, ...m.blocks.slice(at)] }));
     this.focusTask(at, text.length);
+  }
+
+  // Text on the page left empty: gone
+  protected dropIfEmpty(i: number): void {
+    setTimeout(() => {
+      const b = this.value().blocks[i];
+      if (b?.kind === 'text' && !b.text?.trim() && document.activeElement?.getAttribute('data-task') !== String(i)) this.removeBlock(i);
+    }, 150);
+  }
+
+  protected formatsFor(block: number) {
+    return this.value().blocks[block]?.kind === 'gaps' ? this.formats : this.formats.filter((f) => f.id !== 'gap' && f.id !== 'choice');
   }
 
   // A selection in a task: the formatting toolbar over it
