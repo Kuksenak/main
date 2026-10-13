@@ -551,11 +551,24 @@ html.dark .btn-white {
   color: var(--text);
 }
 
-/* Moving tasks (as in Notion): where it'd go, a thin line between the tasks */
+/* Moving tasks (as in Notion): where it'd go, a thin gray line between the tasks */
 .drop-line {
   height: 3px;
   border-radius: 2px;
-  background: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--text) 30%, transparent);
+}
+
+/* The caret between tasks (where Ctrl+V pastes): a thin blinking line */
+.paste-caret {
+  height: 2px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--text) 45%, transparent);
+  animation: caretBlink 1.1s steps(1) infinite;
+}
+@keyframes caretBlink {
+  50% {
+    opacity: 0;
+  }
 }
 
 /* A hover hint (Tip): a small dark label, faded in, sliding a little from its element */

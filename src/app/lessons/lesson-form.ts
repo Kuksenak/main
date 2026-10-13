@@ -33,7 +33,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 @Component({
   selector: 'app-lesson-form',
   imports: [AiChat, BrandIcon, ConfirmDelete, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
-  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:dragover)': 'autoScroll($event)', '(document:mousedown)': 'clickOnPage($event)' },
+  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:dragover)': 'autoScroll($event)', '(document:paste)': 'pasteOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
     @if (showTitle()) {
@@ -44,9 +44,13 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
     <!-- (tasks are moved by their ⠿, as in Notion: nothing moves meanwhile, a line shows where it'd go) -->
-    <div #list class="relative flex flex-col gap-2" [class.pl-5]="desktop && !selectable()" (dragover)="dragOver($event, list)" (drop)="drop($event)">
+    <div #list data-tasks class="relative flex flex-col gap-2" [class.pl-5]="desktop && !selectable()" (dragover)="dragOver($event, list)" (drop)="drop($event)" (mousedown)="placeCaret($event, list)">
     @if (dropLine(); as y) {
       <div aria-hidden="true" class="drop-line pointer-events-none absolute right-0 z-20" [class.left-5]="desktop && !selectable()" [class.left-0]="!desktop || selectable()" [style.top.px]="y"></div>
+    }
+    <!-- A click between tasks: a caret there — Ctrl+V pastes in there -->
+    @if (caret(); as c) {
+      <div aria-hidden="true" class="paste-caret pointer-events-none absolute right-0 z-20" [class.left-5]="desktop && !selectable()" [class.left-0]="!desktop || selectable()" [style.top.px]="c.y"></div>
     }
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
@@ -615,6 +619,10 @@ export class LessonForm {
   // them (by its key, whatever the keyboard's language: "t" for Task); while they're open: ↑ ↓ pick,
   // Enter runs, Esc closes, letters / Backspace change the filter
   protected typeOnPage(e: KeyboardEvent): void {
+    if (e.key === 'Escape' && this.caret()) {
+      this.caret.set(null);
+      return;
+    }
     if (!this.desktop || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
     if (!this.photos() || this.locked() || this.aiOpen() || this.previewing() !== null || this.sel()) return;
     const a = document.activeElement as HTMLElement | null;
@@ -642,6 +650,7 @@ export class LessonForm {
 
   // A click away from the "+ Add" commands: they close
   protected clickOnPage(e: MouseEvent): void {
+    this.clearCaret(e);
     if (this.slash()?.block !== -1) return;
     const t = e.target as HTMLElement | null;
     if (t?.closest('[data-commands]') || this.addRow()?.nativeElement.contains(t)) return;
@@ -1180,6 +1189,47 @@ export class LessonForm {
     const box = list.getBoundingClientRect();
     const y = at < cards.length ? cards[at].top - (at ? (cards[at].top - cards[at - 1].bottom) / 2 : 4) : cards[cards.length - 1].bottom + 4;
     this.dropLine.set(y - box.top - 1.5);
+  }
+
+  // ---- A caret between tasks (a click in the gap between them, above the first, under the last):
+  // Ctrl+V pastes the tasks copied there (else the clipboard's text, a new task); without one, at the end
+  protected readonly caret = signal<{ at: number; y: number } | null>(null);
+
+  // (the place between two tasks nearest to y, and the middle of the gap there)
+  private gapAt(list: HTMLElement, clientY: number): { at: number; y: number } {
+    const box = list.getBoundingClientRect();
+    const cards = [...list.querySelectorAll<HTMLElement>(':scope > [data-block]')].map((c) => c.getBoundingClientRect());
+    if (!cards.length) return { at: 0, y: 0 };
+    let at = cards.findIndex((r) => clientY < r.top + r.height / 2);
+    if (at < 0) at = cards.length;
+    const y = at < cards.length ? cards[at].top - (at ? (cards[at].top - cards[at - 1].bottom) / 2 : 4) : cards[cards.length - 1].bottom + 4;
+    return { at, y: y - box.top - 1 };
+  }
+
+  protected placeCaret(e: MouseEvent, list: HTMLElement): void {
+    if (e.target !== list || !this.desktop || this.locked()) return;
+    e.preventDefault();
+    (document.activeElement as HTMLElement | null)?.blur();
+    this.caret.set(this.gapAt(list, e.clientY));
+  }
+
+  // (a click anywhere but between the tasks: gone)
+  private clearCaret(e: MouseEvent): void {
+    if (this.caret() && !(e.target as HTMLElement | null)?.hasAttribute?.('data-tasks')) this.caret.set(null);
+  }
+
+  protected pasteOnPage(e: ClipboardEvent): void {
+    if (!this.desktop || !this.photos() || this.locked() || this.aiOpen() || this.previewing() !== null) return;
+    const a = document.activeElement as HTMLElement | null;
+    if (a?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
+    const copied = this.clipboard.blocks();
+    const text = e.clipboardData?.getData('text/plain')?.trim() ?? '';
+    const blocks: LessonBlock[] = copied?.length ? copied.map((b) => ({ ...b })) : text ? [{ kind: 'gaps', text, url: null, private: false, instruction: null }] : [];
+    if (!blocks.length) return;
+    e.preventDefault();
+    const at = this.caret()?.at ?? this.value().blocks.length;
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), ...blocks, ...m.blocks.slice(at)] }));
+    this.caret.set(null);
   }
 
   // Near the top / bottom of what scrolls while moving one: it scrolls (faster the closer)
