@@ -71,81 +71,68 @@ interface Found {
     </div>
 
     <!-- (room at the right for its scroll thumb: inside the sidebar, not over its edge) -->
+    <!-- (room at the right for its scroll thumb: inside the sidebar, not over its edge) -->
     <app-scroll-area class="min-h-0 flex-1 pr-2" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-2 pt-2">
-      <!-- The pages as Notion's tree: a click on a name opens it; its icon (an arrow on hover) folds
-           what's in it, shown under it, set in -->
-      <!-- Schedule: the next few events -->
-      <div class="side-row group/row" [class.is-on]="rlaS.isActive">
-        <button type="button" (click)="fold('upcoming')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('upcoming')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
-          <app-icon name="calendar" class="side-glyph group-hover/row:hidden" />
-          <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('upcoming')" />
+      <!-- Calendar: the schedule -->
+      <a routerLink="/schedule" routerLinkActive="is-on" class="side-row">{{ 'sidebar.calendar' | t }}</a>
+
+      <!-- Sections (as Notion's): a head folds them (+ on hover adds); the first 5, then View all -->
+      <div class="side-head group mt-2">
+        <button type="button" (click)="fold('upcoming')" [attr.aria-expanded]="!folded().includes('upcoming')" class="flex flex-1 items-center gap-1 text-left">
+          {{ 'sidebar.upcoming' | t }}
+          <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('upcoming')" />
         </button>
-        <a routerLink="/schedule" routerLinkActive #rlaS="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.schedule' | t }}</a>
         <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('upcoming')) {
-        <div class="flex flex-col gap-px pl-4">
-          @for (e of upcoming(); track e.id + e.startsAt) {
-            <button type="button" (click)="openEvent(e)" class="side-row">
-              <span class="w-[4.5rem] shrink-0 text-[0.8125rem] tabular-nums opacity-50">{{ when(e) }}</span>
-              <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
-            </button>
-          } @empty {
-            <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
-          }
-        </div>
+        @for (e of upcoming(); track e.id + e.startsAt) {
+          <button type="button" (click)="openEvent(e)" class="side-row">
+            <span class="w-[4.5rem] shrink-0 text-[0.8125rem] tabular-nums opacity-50">{{ when(e) }}</span>
+            <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
+          </button>
+        } @empty {
+          <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
+        }
+        <a routerLink="/schedule" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
 
-      <!-- Lessons -->
-      <div class="side-row group/row" [class.is-on]="rlaL.isActive">
-        <button type="button" (click)="fold('lessons')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('lessons')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
-          <app-icon name="book" class="side-glyph group-hover/row:hidden" />
-          <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('lessons')" />
+      <div class="side-head group mt-2">
+        <button type="button" (click)="fold('lessons')" [attr.aria-expanded]="!folded().includes('lessons')" class="flex flex-1 items-center gap-1 text-left">
+          {{ 'nav.lessons' | t }}
+          <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('lessons')" />
         </button>
-        <a routerLink="/lessons" routerLinkActive #rlaL="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.lessons' | t }}</a>
         <button type="button" (click)="create('lesson')" [appTip]="'lessons.add' | t" tipSide="right" [attr.aria-label]="'lessons.add' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('lessons')) {
-        <div class="flex flex-col gap-px pl-4">
-          @for (l of lessonsShown(); track l.id) {
-            <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row" [class.is-on]="openLesson() === l.id">
-              <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
-              <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
-            </a>
-          }
-          @if (lessonsSorted().length > shown) {
-            <a routerLink="/lessons" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
-          }
-        </div>
+        @for (l of lessonsShown(); track l.id) {
+          <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row" [class.is-on]="openLesson() === l.id">
+            <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
+            <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
+          </a>
+        }
+        <a routerLink="/lessons" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
 
-      <!-- Students: groups and students -->
-      <div class="side-row group/row" [class.is-on]="rlaP.isActive">
-        <button type="button" (click)="fold('people')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('people')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
-          <app-icon name="people" class="side-glyph group-hover/row:hidden" />
-          <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('people')" />
+      <div class="side-head group mt-2">
+        <button type="button" (click)="fold('people')" [attr.aria-expanded]="!folded().includes('people')" class="flex flex-1 items-center gap-1 text-left">
+          {{ 'nav.students' | t }}
+          <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('people')" />
         </button>
-        <a routerLink="/students" routerLinkActive #rlaP="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.students' | t }}</a>
         <button type="button" (click)="create('student')" [appTip]="'sidebar.newStudent' | t" tipSide="right" [attr.aria-label]="'sidebar.newStudent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('people')) {
-        <div class="flex flex-col gap-px pl-4">
-          @for (r of peopleShown(); track r.kind + r.id) {
-            <button type="button" (click)="stack.push({ kind: r.kind, id: r.id })" class="side-row">
-              @if (r.kind === 'group') {
-                <app-icon name="people" class="side-glyph" [style.color]="glyphColor(r.color)" />
-              } @else {
-                <app-icon name="person" class="side-glyph" />
-              }
-              <span class="min-w-0 flex-1 truncate">{{ r.name }}</span>
-            </button>
-          }
-          @if (peopleAll().length > shown) {
-            <a routerLink="/students" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
-          }
-        </div>
+        @for (r of peopleShown(); track r.kind + r.id) {
+          <button type="button" (click)="stack.push({ kind: r.kind, id: r.id })" class="side-row">
+            @if (r.kind === 'group') {
+              <app-icon name="people" class="side-glyph" [style.color]="glyphColor(r.color)" />
+            } @else {
+              <app-icon name="person" class="side-glyph" />
+            }
+            <span class="min-w-0 flex-1 truncate">{{ r.name }}</span>
+          </button>
+        }
+        <a routerLink="/students" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
-
     </app-scroll-area>
 
     <!-- The account: its email; the settings open by it -->
@@ -283,14 +270,14 @@ export class Sidebar {
   });
   protected readonly lessonsSorted = computed(() => [...this.lessons.lessons()].sort((a, b) => a.title.localeCompare(b.title, this.i18n.locale())));
 
-  // The next three events not over yet
+  // The next five events not over yet
   protected readonly upcoming = computed(() => {
     const now = Date.now();
     return this.events
       .events()
       .filter((e) => new Date(e.startsAt).getTime() + e.durationMinutes * 60000 > now)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-      .slice(0, 3);
+      .slice(0, 5);
   });
 
   // "Mon 14:00"; today: "14:00"
