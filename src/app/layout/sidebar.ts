@@ -59,7 +59,7 @@ interface Found {
             <span class="absolute right-1 top-1 size-1.5 rounded-full bg-[var(--accent)]"></span>
           }
         </a>
-        <button #newBtn type="button" (click)="newOpen.set(!newOpen())" [appTip]="'sidebar.new' | t" tipSide="bottom" [attr.aria-label]="'sidebar.new' | t" [attr.aria-expanded]="newOpen()" class="side-icon">
+        <button #newBtn type="button" (click)="newOpen.set(!newOpen())" [appTip]="('sidebar.new' | t) + '  Ctrl+Alt+N'" tipSide="bottom" [attr.aria-label]="'sidebar.new' | t" [attr.aria-expanded]="newOpen()" class="side-icon">
           <app-icon name="compose" />
         </button>
       </div>
@@ -381,6 +381,11 @@ export class Sidebar {
       if ((e.ctrlKey || e.metaKey) && e.code === 'KeyK') {
         e.preventDefault();
         this.openSearch();
+      }
+      // Ctrl+Alt+N / ⌘⌥N: ✎'s menu (Ctrl+N is the browser's own: a new window)
+      if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyN') {
+        e.preventDefault();
+        this.newOpen.set(true);
       }
     };
     document.addEventListener('keydown', onKey);
