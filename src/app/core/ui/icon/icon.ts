@@ -9,7 +9,6 @@ export type IconName =
   | 'enter'
   | 'menu'
   | 'cloud-check'
-  | 'preview'
   | 'popout'
   | 'chevrons-up-down'
   | 'chevron-down'
@@ -110,8 +109,6 @@ export type IconName =
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
         <!-- Open in a window: a square, an arrow out of it -->
         @case ('popout') { <path d="M13 4h7v7" /><path d="M20 4l-9 9" /><path d="M18 14v4.5A1.5 1.5 0 0 1 16.5 20h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10" /> }
-        <!-- Preview: a page with a magnifier -->
-        @case ('preview') { <path d="M13 21H6.5A1.5 1.5 0 0 1 5 19.5v-15A1.5 1.5 0 0 1 6.5 3H14l4 4v3.5" /><path d="M14 3v4h4" /><circle cx="16.5" cy="16.5" r="3" /><path d="m18.75 18.75 2 2" /> }
         <!-- Saved: a cloud with a check -->
         @case ('cloud-check') { <path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.3 9.6 4.5 4.5 0 0 0 7 18.5z" /><path d="m9.5 13.75 1.75 1.75 3.5-3.5" /> }
         @case ('menu') { <path d="M4 7h16M4 12h16M4 17h16" /> }
