@@ -120,14 +120,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
           </span>
           @if (b.kind === 'gaps' && desktop) {
             <!-- Desktop: the task's heading right in its head row -->
-            <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input min-w-0 flex-1 resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
-            <!-- ?: how to write a task, in a popup -->
-            <span class="relative shrink-0">
-              <button type="button" (click)="helpOpen.set(helpOpen() === i ? null : i)" [attr.aria-label]="'lessons.howTo' | t" class="flex size-7 items-center justify-center rounded-full text-[0.9375rem] font-semibold opacity-60 shadow-[inset_0_0_0_1.5px_currentColor] hover:opacity-90" [class.!opacity-100]="helpOpen() === i">?</button>
-              @if (helpOpen() === i) {
-                <div class="popover-panel text-footnote absolute right-0 top-full z-30 mt-2 w-80 p-3 leading-relaxed">{{ 'lessons.gapsHint' | t }}</div>
-              }
-            </span>
+            <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input text-subhead min-w-0 flex-1 resize-none leading-relaxed [field-sizing:content]"></textarea>
           } @else {
             <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
               <!-- (Tasks need no label; older kinds keep theirs) -->
@@ -150,14 +143,23 @@ export function cleanLesson(l: LessonInput): LessonInput {
           }
           @if (b.kind === 'gaps') {
             <!-- What the student sees, in a popup -->
-            <button type="button" (click)="previewing.set(i)" class="text-subhead flex items-center gap-1 rounded-full px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 font-medium text-[var(--accent)]">{{ 'lessons.studentSees' | t }}</button>
+            <button type="button" (click)="previewing.set(i)" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70">{{ 'lessons.studentSees' | t }}</button>
           }
-          <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-subhead flex items-center gap-1 rounded-full px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-60">
+          <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70">
             @if (b.private) {
               <app-icon name="lock" class="size-4" />
             }
             {{ (b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t }}
           </button>
+          @if (b.kind === 'gaps' && desktop) {
+            <!-- ?: how to write a task, in a popup -->
+            <span class="relative shrink-0">
+              <button type="button" (click)="helpOpen.set(helpOpen() === i ? null : i)" [attr.aria-label]="'lessons.howTo' | t" class="text-subhead flex h-8 w-6 items-center justify-center font-semibold opacity-50 hover:opacity-90" [class.!opacity-100]="helpOpen() === i">?</button>
+              @if (helpOpen() === i) {
+                <div class="popover-panel text-footnote absolute right-0 top-full z-30 mt-2 w-80 p-3 leading-relaxed">{{ 'lessons.gapsHint' | t }}</div>
+              }
+            </span>
+          }
           <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
             <app-icon name="close" class="size-5" />
           </button>
@@ -220,11 +222,11 @@ export function cleanLesson(l: LessonInput): LessonInput {
           @case ('gaps') {
             @if (!desktop) {
             <div class="list-row items-start pb-1 pt-1">
-              <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
+              <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input text-subhead resize-none leading-relaxed [field-sizing:content]"></textarea>
             </div>
             }
             <div class="list-row items-start pb-1 pt-1">
-              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="2" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input min-h-[3lh] resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
+              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="2" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input text-subhead min-h-[3lh] resize-none leading-relaxed [field-sizing:content]"></textarea>
             </div>
             @if (!desktop) {
               <p class="text-footnote px-4 pb-3 opacity-50">{{ 'lessons.gapsHint' | t }}</p>

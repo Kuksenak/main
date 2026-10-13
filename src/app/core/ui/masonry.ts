@@ -1,4 +1,4 @@
-import { DestroyRef, Directive, ElementRef, afterNextRender, inject } from '@angular/core';
+import { DestroyRef, Directive, ElementRef, afterNextRender, effect, inject, input } from '@angular/core';
 
 /** The grid's row step, px: tiles take whole steps of it (their height rounded up). */
 const ROW = 4;
@@ -7,16 +7,24 @@ const GAP = 16;
 
 /**
  * Pinterest-like tiles, but of different widths: the element becomes a grid of equal columns
- * (as many as fit, at least `--masonry-col` wide) with a fine row step; each child takes
- * `data-span` columns (as many as there are, at most) and as many rows as its height needs, and
+ * (`appMasonry="3"`: that many; else as many as fit, at least `--masonry-col` wide) with a fine
+ * row step; each child takes `data-span` columns (as many as there are, at most) and as many rows
+ * as its height needs, and
  * `dense` packing fills the holes with later, smaller tiles. Children re-measured when they (or
  * the grid) resize, or come and go.
  */
 @Directive({ selector: '[appMasonry]', host: { class: 'grid grid-flow-row-dense' } })
 export class Masonry {
+  /** The number of columns ('' / unset: as many as fit). */
+  readonly appMasonry = input<string | number | null>(null);
+
   constructor() {
     const grid: HTMLElement = inject(ElementRef).nativeElement;
-    grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(var(--masonry-col, 15rem), 1fr))';
+    effect(() => {
+      const n = Number(this.appMasonry()) || 0;
+      grid.style.gridTemplateColumns =
+        n > 0 ? `repeat(${n}, minmax(0, 1fr))` : 'repeat(auto-fill, minmax(var(--masonry-col, 15rem), 1fr))';
+    });
     grid.style.gridAutoRows = `${ROW}px`;
     grid.style.columnGap = `${GAP}px`;
     grid.style.alignItems = 'start';

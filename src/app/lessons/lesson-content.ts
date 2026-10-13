@@ -217,7 +217,8 @@ export type { LessonFills } from './gaps';
           @if (desktop) {
             <!-- Desktop: tiles like Pinterest's, each as wide as its lines need (1–3 columns),
                  packed tight (see Masonry) -->
-            <div appMasonry>
+            <!-- Thirds of the page: a tile takes one, two or all three (lines may wrap) -->
+            <div appMasonry="3">
               @for (tile of tilesOf(g.blocks); track tile[0].i; let count = $count) {
                 <!-- Just one: the whole width -->
                 <div class="flex flex-col gap-2" [attr.data-span]="count === 1 ? 99 : spanOf(tile)">
@@ -286,8 +287,9 @@ export class LessonContent {
       }
     }
     // A long paragraph wraps anyway: wide enough to read, not the whole width
-    if (longest > 120) longest = Math.max(70, Math.min(longest, total / 4));
-    return longest <= 34 ? 1 : longest <= 70 ? 2 : 3;
+    // Lines may wrap: a third holds ~60 characters a line; a long paragraph — two thirds at most
+    if (longest > 120) longest = Math.max(100, Math.min(longest, total / 4));
+    return longest <= 60 ? 1 : longest <= 120 ? 2 : 3;
   }
 
   // Tiles: every task its own; a text (or heading) takes the task after it along
