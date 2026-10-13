@@ -140,7 +140,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         class="card group relative"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
         [class.opacity-40]="dragFrom() === i"
-        [style.box-shadow]="dropAt() === i ? '0 -3px 0 var(--accent)' : dropAt() === i + 1 && i === m.blocks.length - 1 ? '0 3px 0 var(--accent)' : null"
+        [style.box-shadow]="dropAt() === i ? '0 -3px 0 var(--text-secondary)' : dropAt() === i + 1 && i === m.blocks.length - 1 ? '0 3px 0 var(--text-secondary)' : null"
         (dragover)="dragOver($event, i, card)"
         (drop)="drop($event)"
       >
