@@ -91,8 +91,8 @@ import { LessonUsage } from './lesson-usage';
       @if (desktop) {
         <section class="flex min-h-0 flex-1 flex-col">
           <!-- One page per lesson (switching lessons starts it afresh: not in the previous one's editing) -->
-          @for (id of selectedKey(); track id) {
-            <app-lesson-page [lessonId]="id === 'new' ? null : id" />
+          @for (key of selectedKey(); track key) {
+            <app-lesson-page [lessonId]="selected() === 'new' ? null : selected()" (created)="adopt($event)" />
           }
         </section>
       }
@@ -151,15 +151,28 @@ export class Lessons {
 
   }
 
+  // A new lesson: a fresh page each time (the one before it may have been saved and kept its page)
+  private readonly newCount = signal(0);
+  private readonly adopted = signal<string | null>(null);
+
   protected add(): void {
+    this.newCount.update((n) => n + 1);
+    this.adopted.set(null);
     if (this.desktop) this.router.navigate(['/lessons', 'new']);
     else this.stack.push({ kind: 'lesson', id: null });
   }
 
   // Desktop: the lesson on the right — the linked one ('new': a new one), else the first in the list
   protected readonly selected = computed(() => this.linkedId() ?? this.visible().at(0)?.id ?? null);
+  // One page per lesson; a new one keeps its page once saved (its link changes under it)
   protected readonly selectedKey = computed(() => {
     const id = this.selected();
-    return id ? [id] : [];
+    if (!id) return [];
+    return [id === 'new' || id === this.adopted() ? `new-${this.newCount()}` : id];
   });
+
+  protected adopt(id: string): void {
+    this.adopted.set(id);
+    this.router.navigate(['/lessons', id], { replaceUrl: true });
+  }
 }

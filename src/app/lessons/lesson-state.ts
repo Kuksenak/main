@@ -20,7 +20,7 @@ export class LessonState {
 
   // Editing: from the start for a new lesson; the draft and what it started from.
   private readonly editRequested = signal(false);
-  readonly editing = computed(() => !this.id() || this.editRequested());
+  readonly editing = computed(() => this.alwaysEditing || !this.id() || this.editRequested());
   readonly draft = signal<LessonInput>({ title: '', blocks: [] });
   private readonly snapshot = signal(JSON.stringify(this.draft()));
   readonly dirty = computed(() => JSON.stringify(this.draft()) !== this.snapshot());
@@ -29,13 +29,70 @@ export class LessonState {
   readonly canSave = computed(() => lessonValid(this.draft()) && this.dirty() && !this.creating());
   /** The server refused the last save (why) — the editor stays open with the draft. */
   readonly saveError = signal<string | null>(null);
+  /** Autosave: a save on its way. */
+  readonly saving = signal(false);
+  // The lesson whose draft is in the editor (opened once; reloads after saves don't reset it)
+  private openedId: string | null = null;
 
   readonly heading = computed(() => {
     if (this.editing()) return this.draft().title.trim() || this.i18n.t('lessons.new');
     return this.lesson()?.title ?? '';
   });
 
-  constructor(private readonly givenId: () => string | null) {}
+  constructor(
+    private readonly givenId: () => string | null,
+    /** Always edited (desktop): no reading mode; saved by autosave(). */
+    private readonly alwaysEditing = false,
+  ) {}
+
+  /** The lesson into the editor, once per lesson. */
+  open(): void {
+    const l = this.lesson();
+    if (!l || this.openedId === l.id) return;
+    this.openedId = l.id;
+    this.edit();
+  }
+
+  /**
+   * Saves what changed, staying in the editor (a new lesson: created once there's something in it,
+   * named "New lesson" until it has a name; `onCreated` gets its id).
+   */
+  autosave(onCreated?: (id: string) => void): void {
+    if (!this.dirty() || this.creating()) return;
+    const draft = this.draft();
+    const id = this.id();
+    if (!id && !draft.title.trim() && !draft.blocks.some((b) => b.text?.trim() || b.url)) return;
+    const input = cleanLesson({ ...draft, title: draft.title.trim() || this.i18n.t('lessons.new') });
+    if (!lessonValid(input)) return;
+    this.snapshot.set(JSON.stringify(draft));
+    this.saveError.set(null);
+    this.saving.set(true);
+    // Refused: shown; it's tried again with the next change
+    const failed = (reason: string) => {
+      this.creating.set(false);
+      this.saving.set(false);
+      this.saveError.set(reason);
+      this.snapshot.set('');
+    };
+    if (id) {
+      this.lessons.update(id, input, failed, () => this.saving.set(false));
+      return;
+    }
+    this.creating.set(true);
+    this.lessons.create(
+      input,
+      (newId) => {
+        this.openedId = newId;
+        this.creating.set(false);
+        this.saving.set(false);
+        this.createdId.set(newId);
+        onCreated?.(newId);
+        // (changed meanwhile: saved too)
+        if (this.dirty()) this.autosave();
+      },
+      failed,
+    );
+  }
 
   edit(): void {
     const l = this.lesson();

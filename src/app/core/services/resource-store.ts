@@ -45,9 +45,9 @@ export abstract class ResourceStore<T extends { id: string }, Input> {
     );
   }
 
-  /** Update; `onFailed` gets the server's reason. */
-  update(id: string, input: Input, onFailed?: (reason: string) => void): void {
-    this.send(this.http.put(`${this.base}/${id}`, input), undefined, onFailed);
+  /** Update; `onFailed` gets the server's reason; `onDone`: answered (either way). */
+  update(id: string, input: Input, onFailed?: (reason: string) => void, onDone?: () => void): void {
+    this.send(this.http.put(`${this.base}/${id}`, input), () => onDone?.(), onFailed);
   }
 
   /** PUT {base}/{id}/{sub} (e.g. a student's lessons); `local` shows the change right away. */
