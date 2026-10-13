@@ -289,7 +289,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         @if (linking()) {
           <form (submit)="applyLink(); $event.preventDefault()" class="flex items-center gap-1 p-0.5">
             <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.enter)="applyLink(); $event.preventDefault()" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
-            <button type="submit" [attr.aria-label]="'action.done' | t" title="Enter" class="flex h-8 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--accent)] text-white hover:opacity-90"><app-icon name="enter" [strokeWidth]="2.25" class="size-[1.125rem]" /></button>
+            <button type="submit" [attr.aria-label]="'action.done' | t" title="Enter" class="flex size-8 shrink-0 items-center justify-center rounded-md text-[var(--text)] opacity-60 hover:bg-[var(--highlight)] hover:opacity-100"><app-icon name="enter" [strokeWidth]="2" class="size-4" /></button>
           </form>
         } @else {
           <div class="flex items-center gap-0.5">
@@ -859,12 +859,22 @@ export class LessonForm {
     // A choice from several options selected ("a) va b) vas", "va / vas"): all of them, the first
     // the right one; one: it's the right one, the cursor where the others go
     const options = kind === 'choice' ? asOptions(picked).map((o) => o.replace(/[|{}]/g, ' ')) : [];
+    // Marks don't go over a line's end: several lines selected, each line's text marked on its own
+    // (its spaces at the ends left outside)
+    const [open, close] = (({ bold: ['**', '**'], italic: ['*', '*'], underline: ['__', '__'], strike: ['~~', '~~'], gap: ['[', ']'] }) as Record<string, string[]>)[kind] ?? ['', ''];
+    const wrapLine = (line: string) => {
+      const m = /^(\s*)(.*?)(\s*)$/.exec(line)!;
+      return m[2] ? `${m[1]}${open}${m[2]}${close}${m[3]}` : line;
+    };
+    const multiline = kind !== 'choice' && picked.includes('\n');
     const inserted =
       kind === 'choice'
         ? options.length > 1
           ? `{*${options.join('|')}}`
           : `{*${options[0] ?? picked}|}`
-        : (({ bold: ['**', '**'], italic: ['*', '*'], underline: ['__', '__'], strike: ['~~', '~~'], gap: ['[', ']'] }) as Record<string, string[]>)[kind].join(picked);
+        : multiline
+          ? picked.split('\n').map(wrapLine).join('\n')
+          : open + picked + close;
     const text = ta.value.slice(0, a) + inserted + ta.value.slice(b);
     this.setBlock(se.block, { text });
     this.sel.set(null);
@@ -873,9 +883,10 @@ export class LessonForm {
     if (kind === 'choice') {
       const at = options.length > 1 ? a + inserted.length : a + inserted.length - 1;
       ta.setSelectionRange(at, at);
+    } else if (multiline) {
+      ta.setSelectionRange(a, a + inserted.length);
     } else {
-      const open = kind === 'bold' || kind === 'underline' || kind === 'strike' ? 2 : 1;
-      ta.setSelectionRange(a + open, a + open + picked.length);
+      ta.setSelectionRange(a + open.length, a + open.length + picked.length);
     }
   }
 
