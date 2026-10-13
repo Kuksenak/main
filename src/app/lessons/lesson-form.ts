@@ -78,7 +78,6 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         [class.task-card]="slim"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
         [class.min-h-14]="slim"
-        [class.opacity-40]="dragFrom() === i"
         data-block
         #card
       >
@@ -89,7 +88,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           <!-- At its left, outside it (as in Notion): ⠿ — drag to move it, click for its menu (Preview,
                who sees it, Delete). Shown on hover; "only me": a lock under it, always. -->
           <div class="task-tools absolute -left-5 top-1.5 z-10 flex flex-col items-center gap-1">
-            <button type="button" draggable="true" (dragstart)="dragStart($event, i, card)" (dragend)="dragEnd()" #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="'lessons.moveOrMenu' | t" tipSide="left" [attr.aria-label]="'lessons.moveOrMenu' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="drag-handle flex h-6 w-5 cursor-grab items-center justify-center rounded transition-opacity hover:bg-[var(--highlight)] active:cursor-grabbing" [class]="taskMenu()?.index === i ? 'opacity-100 bg-[var(--highlight)]' : 'opacity-0 group-hover:opacity-50 group-focus-within:opacity-50 hover:!opacity-100'">
+            <button type="button" draggable="true" (dragstart)="dragStart($event, i)" (dragend)="dragEnd()" #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="'lessons.moveOrMenu' | t" tipSide="left" [attr.aria-label]="'lessons.moveOrMenu' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="drag-handle flex h-6 w-5 cursor-grab items-center justify-center rounded transition-opacity hover:bg-[var(--highlight)] active:cursor-grabbing" [class]="taskMenu()?.index === i ? 'opacity-100 bg-[var(--highlight)]' : 'opacity-0 group-hover:opacity-50 group-focus-within:opacity-50 hover:!opacity-100'">
               <app-icon name="grip" class="size-[1.125rem]" />
             </button>
           </div>
@@ -1141,30 +1140,39 @@ export class LessonForm {
     return shown;
   }
 
-  // ---- Moving a task (by its ⠿), as in Notion: the browser's own drag — a faint picture of it
-  // under the pointer, nothing else moving; a line between the tasks where it'd go
+  // ---- Moving a task (by its ⠿), as in Notion: only the ⠿ follows the pointer, nothing else moves;
+  // a line jumps between the tasks — moving down, under the task the pointer is over; up, above it
+  // (none while it's over its own place)
   protected readonly dragFrom = signal<number | null>(null);
   private dropAt: number | null = null;
+  private dragY = 0;
   protected readonly dropLine = signal<number | null>(null);
 
-  protected dragStart(e: DragEvent, i: number, card: HTMLElement): void {
+  protected dragStart(e: DragEvent, i: number): void {
     this.taskMenu.set(null);
     this.dragFrom.set(i);
+    this.dragY = e.clientY;
     e.dataTransfer?.setData('text/plain', '');
     if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer?.setDragImage(card, 16, 16);
   }
 
   protected dragOver(e: DragEvent, list: HTMLElement): void {
-    if (this.dragFrom() === null) return;
+    const from = this.dragFrom();
+    if (from === null) return;
     e.preventDefault();
     if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-    const box = list.getBoundingClientRect();
     const cards = [...list.querySelectorAll<HTMLElement>(':scope > [data-block]')].map((c) => c.getBoundingClientRect());
-    let at = cards.findIndex((r) => e.clientY < r.top + r.height / 2);
-    if (at < 0) at = cards.length;
+    // The task under the pointer (above them all: the first; under them all: the last)
+    let over = cards.findIndex((r) => e.clientY < r.bottom + 4);
+    if (over < 0) over = cards.length - 1;
+    const at = e.clientY >= this.dragY ? over + 1 : over;
+    if (at === from || at === from + 1) {
+      this.dropAt = null;
+      this.dropLine.set(null);
+      return;
+    }
     this.dropAt = at;
-    // (the line in the middle of the gap above that task; after the last, under it)
+    const box = list.getBoundingClientRect();
     const y = at < cards.length ? cards[at].top - (at ? (cards[at].top - cards[at - 1].bottom) / 2 : 4) : cards[cards.length - 1].bottom + 4;
     this.dropLine.set(y - box.top - 1.5);
   }
@@ -1174,7 +1182,7 @@ export class LessonForm {
     const from = this.dragFrom();
     const at = this.dropAt;
     this.dragEnd();
-    if (from === null || at === null || at === from || at === from + 1) return;
+    if (from === null || at === null) return;
     this.value.update((m) => {
       const blocks = [...m.blocks];
       const [moved] = blocks.splice(from, 1);
