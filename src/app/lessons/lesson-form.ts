@@ -1312,9 +1312,16 @@ export class LessonForm {
     }
     if (!v) return;
     const at = this.caret()?.at ?? this.value().blocks.length;
+    field.value = '';
     this.caret.set(null);
     this.slash.set(null);
-    this.insertBlock(at, 'gaps', v);
+    // (the new task drawn and focused at once: the next letters go on in it, not here)
+    const block: LessonBlock = { kind: 'gaps', text: v, url: null, private: false, instruction: null };
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), block, ...m.blocks.slice(at)] }));
+    this.cdr.detectChanges();
+    const ta = this.host.nativeElement.querySelector<HTMLTextAreaElement>(`textarea[data-task="${at}"]`);
+    ta?.focus();
+    ta?.setSelectionRange(v.length, v.length);
   }
 
   // Its keys: the commands' (↑ ↓ Enter Esc); Esc with none open drops the caret
