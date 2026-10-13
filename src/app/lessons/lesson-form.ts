@@ -603,6 +603,8 @@ export class LessonForm {
   // The page's end: "/…" the commands
   protected onEnd(end: HTMLTextAreaElement): void {
     this.field = end;
+    // (only commands here: typed without "/", it's put in front)
+    if (end.value && !end.value.startsWith('/')) end.value = `/${end.value.trimStart()}`;
     const v = end.value;
     if (/^\/\S*$/u.test(v)) {
       const r = end.getBoundingClientRect();
@@ -636,7 +638,9 @@ export class LessonForm {
     if (a && a !== document.body && !this.host.nativeElement.contains(a)) return;
     e.preventDefault();
     end.focus();
-    end.value = e.key === '/' ? '/' : `/${e.key}`;
+    // (letters by their key, whatever the keyboard's language: "t" for Task on any layout)
+    const key = /^Key[A-Z]$/.test(e.code) ? e.code.slice(3).toLowerCase() : e.key;
+    end.value = key === '/' ? '/' : `/${key}`;
     this.onEnd(end);
   }
 
