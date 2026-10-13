@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input, model, signal, viewChild } from '@angular/core';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
+import { ConfirmDelete } from '../core/ui/confirm';
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -29,7 +30,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
+  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
   host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
@@ -94,7 +95,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             <button type="button" (click)="setBlock(i, { private: !b.private })" [attr.title]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-8 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
               <app-icon [name]="b.private ? 'lock' : 'people'" class="size-5" />
             </button>
-            <button type="button" (click)="removeBlock(i)" [attr.title]="'lessons.removeBlock' | t" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-8 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
+            <button type="button" #rm (click)="askRemove(i, rm)" [attr.title]="'lessons.removeBlock' | t" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-8 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
               <app-icon name="close" class="size-5" />
             </button>
           </div>
@@ -134,7 +135,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               }
             </span>
           }
-          <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" [class]="b.kind === 'gaps' && desktop ? 'flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--fill)] hover:bg-[var(--highlight)] -mr-1 opacity-70' : 'icon-plain -mr-2'">
+          <button type="button" #rm (click)="askRemove(i, rm)" [attr.aria-label]="'lessons.removeBlock' | t" [class]="b.kind === 'gaps' && desktop ? 'flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--fill)] hover:bg-[var(--highlight)] -mr-1 opacity-70' : 'icon-plain -mr-2'">
             <app-icon name="close" class="size-5" />
           </button>
         </div>
@@ -409,6 +410,11 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           <p class="text-body py-10 text-center opacity-40">{{ 'app.loading' | t }}</p>
         }
       </app-page-sheet>
+    }
+
+    <!-- × on a task with something in it: asked first -->
+    @if (removing(); as r) {
+      <app-confirm-delete [origin]="r.from" (confirmed)="removeBlock(r.index)" (closed)="removing.set(null)" />
     }
 
     <!-- A task as the student sees it (answers taken out, choices unmarked) -->
@@ -1098,6 +1104,15 @@ export class LessonForm {
       moveItemInArray(blocks, e.previousIndex, e.currentIndex);
       return { ...m, blocks };
     });
+  }
+
+  // ×: an empty block goes at once; one with something in it, once confirmed
+  protected readonly removing = signal<{ index: number; from: HTMLElement } | null>(null);
+  protected askRemove(index: number, from: HTMLElement): void {
+    const b = this.value().blocks[index];
+    const filled = !!(b?.text?.trim() || b?.url || b?.items?.some((x) => x.trim()) || b?.options?.some((x) => x.trim()) || b?.instruction?.trim());
+    if (filled) this.removing.set({ index, from });
+    else this.removeBlock(index);
   }
 
   protected removeBlock(index: number): void {
