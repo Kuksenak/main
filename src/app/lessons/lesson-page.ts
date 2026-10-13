@@ -1,5 +1,7 @@
 import { FormsModule } from '@angular/forms';
-import { Component, inject, input, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, input, signal, viewChild } from '@angular/core';
+import { I18nService } from '../core/i18n/i18n.service';
+import { SelectField, SelectOption } from '../core/ui/select/select';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
 import { Router } from '@angular/router';
@@ -21,7 +23,7 @@ import { LEVELS, Level } from './lesson.service';
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [BrandIcon, ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonContent, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
+  imports: [SelectField, BrandIcon, ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonContent, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -70,27 +72,11 @@ import { LEVELS, Level } from './lesson.service';
             </div>
             <!-- The lesson's settings: its level; its public link (once it's saved) -->
             <div class="flex w-72 shrink-0 flex-col gap-4">
-              <div class="flex flex-col gap-1.5">
-                <p class="text-footnote px-1 font-semibold uppercase tracking-wide opacity-50">{{ 'lessons.level' | t }}</p>
-                <div class="card flex gap-1 p-1">
-                  <button
-                    type="button"
-                    (click)="setLevel(null)"
-                    [attr.aria-pressed]="!s.draft().level"
-                    class="text-subhead h-8 flex-[1.4] rounded-lg font-medium hover:bg-[var(--highlight)]"
-                    [class.!bg-[var(--accent)]]="!s.draft().level"
-                    [class.text-white]="!s.draft().level"
-                  >{{ 'lessons.levelNone' | t }}</button>
-                  @for (lv of levels; track lv) {
-                    <button
-                      type="button"
-                      (click)="setLevel(lv)"
-                      [attr.aria-pressed]="s.draft().level === lv"
-                      class="text-subhead h-8 flex-1 rounded-lg font-medium hover:bg-[var(--highlight)]"
-                      [class.!bg-[var(--accent)]]="s.draft().level === lv"
-                      [class.text-white]="s.draft().level === lv"
-                    >{{ lv }}</button>
-                  }
+              <!-- Its level: a list (None, A1 … C2) -->
+              <div class="card">
+                <div class="list-row">
+                  <span class="flex-1">{{ 'lessons.level' | t }}</span>
+                  <app-select [options]="levelOptions()" [ngModel]="s.draft().level ?? ''" (ngModelChange)="setLevel($event || null)" [ngModelOptions]="{ standalone: true }" />
                 </div>
               </div>
               @if (s.lesson(); as l) {
@@ -126,7 +112,11 @@ export class LessonPage {
   private router = inject(Router);
   protected readonly askDelete = signal<HTMLElement | null>(null); // the Delete button, while asking
 
-  protected readonly levels = LEVELS;
+  private i18n = inject(I18nService);
+  protected readonly levelOptions = computed<SelectOption[]>(() => [
+    { label: this.i18n.t('lessons.levelNone'), value: '' },
+    ...LEVELS.map((l) => ({ label: l, value: l })),
+  ]);
   protected readonly form = viewChild(LessonForm);
 
   // The level picked (null: none)
