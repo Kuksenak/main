@@ -68,7 +68,7 @@ function store(key: string, value: string | null): void {
           <!-- The PIN: 4 digits, a box each (one field over them); made up on the first visit, asked on
                a new device; its digits shown as typed; sent as the fourth is typed -->
           <form (submit)="sendPin(); $event.preventDefault()" class="mx-auto flex w-full max-w-sm flex-col items-center gap-4 py-10 text-center">
-            <app-icon name="lock" class="size-8 text-[var(--accent)]" />
+            <app-icon name="lock" class="size-8 text-[var(--text-secondary)]" />
             <h1 class="text-xl font-semibold">{{ (pinMode() === 'set' ? 'portal.pinSetTitle' : 'portal.pinEnterTitle') | t }}</h1>
             <p class="text-body opacity-60">{{ (pinMode() === 'set' ? 'portal.pinSetHint' : 'portal.pinEnterHint') | t }}</p>
             <label class="relative mt-1 flex gap-1.5" [class.opacity-40]="pinLocked()">
@@ -76,7 +76,7 @@ function store(key: string, value: string | null): void {
                 <span
                   class="flex size-9 items-center justify-center rounded-lg border-2 bg-[var(--fill)] text-base font-semibold tabular-nums transition-colors"
                   [class.border-transparent]="pinLocked() || i !== min(pin().length, 3)"
-                  [class.border-[var(--accent)]]="!pinLocked() && i === min(pin().length, 3)"
+                  [class.border-[var(--text-secondary)]]="!pinLocked() && i === min(pin().length, 3)"
                 >{{ pin()[i] }}</span>
               }
               <input
