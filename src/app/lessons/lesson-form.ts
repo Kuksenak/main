@@ -146,7 +146,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       >
         @if (slim) {
           <!-- Desktop tasks: no head row — its buttons at the top right, shown on hover (or while
-               it's being typed in): ⠿ drag to move it, ▷ as the student sees it, who sees it, ×;
+               it's being typed in): ⠿ drag to move it, the page with a magnifier: as the student sees it, who sees it, ×;
                "only me" always shows -->
           <div class="absolute right-2 top-1.5 z-10 flex items-center gap-0.5 rounded-full bg-[var(--surface)] p-0.5">
             <span class="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100" [class.!opacity-100]="dragFrom() === i">
@@ -154,7 +154,11 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                 <app-icon name="grip" class="size-5" />
               </button>
               <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
-                <app-icon name="play" class="size-5" />
+                <app-icon name="preview" class="size-5" />
+              </button>
+              <!-- (two looks for it, side by side, to pick one) -->
+              <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
+                <app-icon name="popout" class="size-5" />
               </button>
             </span>
             <button type="button" (click)="setBlock(i, { private: !b.private })" [attr.title]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-8 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
