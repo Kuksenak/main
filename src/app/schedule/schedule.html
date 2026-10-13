@@ -4,7 +4,7 @@
 <main class="flex min-h-0 w-full flex-1 gap-6 pb-4 pl-4 pr-2 desktop:-mt-2">
   <section class="flex w-[17rem] shrink-0 flex-col">
     <div class="flex h-[var(--control-h)] shrink-0 items-center gap-1">
-      <h1 class="ml-1 flex-1 text-[1rem] font-medium">{{ monthTitle() }}</h1>
+      <h1 class="ml-1 flex-1 text-[0.9375rem] font-medium">{{ monthTitle() }}</h1>
       <button type="button" (click)="today()" class="head-btn">{{ 'schedule.today' | t }}</button>
     </div>
     <div class="flex pb-1">
@@ -44,7 +44,7 @@
 
   <section class="flex min-h-0 flex-1 flex-col">
     <div class="flex h-[var(--control-h)] shrink-0 items-center gap-1">
-      <h2 class="ml-1 flex-1 text-[1rem] font-medium">{{ dayTitle() }}</h2>
+      <h2 class="ml-1 flex-1 text-[0.9375rem] font-medium">{{ dayTitle() }}</h2>
       <button type="button" (click)="openNew()" class="head-btn"><app-icon name="plus" />{{ 'sidebar.newEvent' | t }}</button>
     </div>
     <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
@@ -66,7 +66,7 @@
               </span>
               <span class="h-8 w-[3px] shrink-0 rounded-full" [style.background]="people.color(event)"></span>
               <span class="min-w-0 flex-1 leading-tight">
-                <span class="block truncate text-[0.9375rem] font-medium" [class.text-[var(--warning)]]="timing(event) === 'now'">{{ people.label(event) }}</span>
+                <span class="block truncate text-[0.875rem] font-medium" [class.text-[var(--warning)]]="timing(event) === 'now'">{{ people.label(event) }}</span>
                 @if (people.subtitle(event); as sub) {
                   <span class="block truncate text-[0.8125rem] opacity-50">{{ sub }}</span>
                 }
@@ -81,7 +81,7 @@
           }
         </div>
       } @else {
-        <p class="ml-1 py-3 text-[0.9375rem] opacity-40">{{ 'schedule.noEvents' | t }}</p>
+        <p class="ml-1 py-3 text-[0.875rem] opacity-40">{{ 'schedule.noEvents' | t }}</p>
       }
     </app-scroll-area>
   </section>

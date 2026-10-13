@@ -64,7 +64,7 @@ interface Found {
         </button>
       </div>
       <!-- Search: a field (as Notion's), its shortcut in a chip -->
-      <button type="button" (click)="openSearch()" class="flex h-8 w-full items-center gap-2 rounded-lg border-[0.5px] border-[var(--separator)] bg-transparent px-2.5 text-left text-[0.9375rem] hover:bg-[var(--tint)]">
+      <button type="button" (click)="openSearch()" class="flex h-8 w-full items-center gap-2 rounded-lg border-[0.5px] border-[var(--separator)] bg-transparent px-2.5 text-left text-[0.875rem] hover:bg-[var(--tint)]">
         <span class="flex-1 opacity-50">{{ 'students.search' | t }}</span>
         <span class="rounded bg-[var(--fill-strong)] px-1.5 py-px text-[0.6875rem] font-medium opacity-60">Ctrl+K</span>
       </button>
@@ -170,7 +170,7 @@ interface Found {
         <div #newBox tabindex="-1" (keydown)="newKey($event)" class="dialog-panel flex w-80 max-w-[90vw] flex-col !rounded-xl p-1.5 outline-none [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
           <p class="px-2.5 pb-1 pt-1.5 text-[0.75rem] font-medium opacity-50">{{ 'sidebar.new' | t }}</p>
           @for (c of newChoices; track c.kind; let k = $index) {
-            <button type="button" (click)="closeNewWindow(); create(c.kind)" (mouseenter)="newIndex.set(k)" class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.9375rem]" [class.bg-[var(--highlight)]]="k === newIndex()">
+            <button type="button" (click)="closeNewWindow(); create(c.kind)" (mouseenter)="newIndex.set(k)" class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.875rem]" [class.bg-[var(--highlight)]]="k === newIndex()">
               <app-icon [name]="c.icon" class="side-glyph" />
               <span class="flex-1">{{ c.label | t }}</span>
               <span class="rounded bg-[var(--fill-strong)] px-1.5 py-px text-[0.6875rem] font-medium opacity-55">{{ c.key }}</span>
@@ -194,12 +194,12 @@ interface Found {
               type="text"
               [placeholder]="'students.search' | t"
               autocomplete="off"
-              class="min-w-0 flex-1 bg-transparent text-[1rem] outline-none placeholder:opacity-45"
+              class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45"
             />
           </label>
           <div class="min-h-0 overflow-y-auto p-1.5">
             @for (f of found(); track f.kind + f.id; let k = $index) {
-              <button type="button" (click)="pick(f)" (mouseenter)="index.set(k)" class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.9375rem]" [class.bg-[var(--highlight)]]="k === index()">
+              <button type="button" (click)="pick(f)" (mouseenter)="index.set(k)" class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.875rem]" [class.bg-[var(--highlight)]]="k === index()">
                 @if (f.kind === 'student') {
                   <app-icon name="person" class="size-4 shrink-0 opacity-55" />
                 } @else {

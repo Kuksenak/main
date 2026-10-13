@@ -40,12 +40,12 @@ interface Draft {
     <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
       <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-1 pb-10">
         @if (!exists()) {
-          <p class="py-10 text-center text-[0.9375rem] opacity-40">{{ 'students.notFound' | t }}</p>
+          <p class="py-10 text-center text-[0.875rem] opacity-40">{{ 'students.notFound' | t }}</p>
         } @else {
           @let d = draft();
           <!-- The head, always at the top -->
           <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
-            <input [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+            <input [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
             @if (kind() === 'student') {
               <a [attr.href]="d.email ? 'mailto:' + d.email : null" [class.pointer-events-none]="!d.email" [class.opacity-35]="!d.email" class="head-btn"><app-icon name="mail" />{{ 'students.actionMail' | t }}</a>
               <a [attr.href]="d.phone ? 'tel:' + d.phone : null" [class.pointer-events-none]="!d.phone" [class.opacity-35]="!d.phone" class="head-btn"><app-icon name="call" />{{ 'students.actionCall' | t }}</a>
@@ -65,11 +65,11 @@ interface Draft {
             @if (kind() === 'student') {
               <!-- Contact: a label and its value, edited in place (as a page's properties) -->
               <div class="flex flex-col">
-                <label class="flex h-9 items-center gap-3 text-[0.9375rem]">
+                <label class="flex h-9 items-center gap-3 text-[0.875rem]">
                   <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="mail" class="size-4" />{{ 'students.email' | t }}</span>
                   <input [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
                 </label>
-                <label class="flex h-9 items-center gap-3 text-[0.9375rem]">
+                <label class="flex h-9 items-center gap-3 text-[0.875rem]">
                   <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="call" class="size-4" />{{ 'students.phone' | t }}</span>
                   <input [ngModel]="d.phone" (ngModelChange)="patch({ phone: $event || null })" type="tel" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 tabular-nums outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
                 </label>

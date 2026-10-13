@@ -13,7 +13,7 @@
       <app-person-page [kind]="openKind()!" [id]="openId()!" />
     } @empty {
       <div class="flex min-h-0 flex-1 flex-col pl-4">
-        <h1 class="flex h-[var(--control-h)] shrink-0 items-center px-2 text-[1rem] font-medium">{{ 'nav.students' | t }}</h1>
+        <h1 class="flex h-[var(--control-h)] shrink-0 items-center px-2 text-[0.9375rem] font-medium">{{ 'nav.students' | t }}</h1>
         <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
           <div class="flex flex-col gap-px">
             @for (g of visibleGroups(); track g.id) {
@@ -31,7 +31,7 @@
               </button>
             }
             @if (!visibleGroups().length && !visible().length) {
-              <p class="px-2 py-3 text-[0.9375rem] opacity-40">{{ 'students.empty' | t }}</p>
+              <p class="px-2 py-3 text-[0.875rem] opacity-40">{{ 'students.empty' | t }}</p>
             }
           </div>
         </app-scroll-area>
