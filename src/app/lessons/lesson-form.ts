@@ -94,7 +94,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                "only me" always shows -->
           <!-- At its left, outside it (as in Notion): ⠿ — drag to move it, click for its menu (Preview,
                who sees it, Delete). Shown on hover; "only me": a lock under it, always. -->
-          <div class="task-tools absolute -left-5 top-0 z-10 flex flex-col items-center gap-1">
+          <div class="task-tools absolute -left-6 top-0 z-10 flex flex-col items-center gap-1">
             <button type="button" draggable="true" (dragstart)="dragStart($event, i)" (dragend)="dragEnd()" #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="'lessons.moveOrMenu' | t" tipSide="left" [attr.aria-label]="'lessons.moveOrMenu' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="drag-handle flex h-6 w-5 cursor-grab items-center justify-center rounded transition-opacity hover:bg-[var(--highlight)] active:cursor-grabbing" [class]="taskMenu()?.index === i ? 'opacity-100 bg-[var(--highlight)]' : 'opacity-0 group-hover:opacity-50 group-focus-within:opacity-50 hover:!opacity-100'">
               <app-icon name="grip" class="size-[1.125rem]" />
             </button>
@@ -196,7 +196,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             </div>
           }
           @case ('gaps') {
-            <div class="list-row items-start" [class.pb-3]="!slim" [class.pt-1]="!slim" [class.py-[6px]]="slim" [class.!px-[10px]]="slim">
+            <div class="list-row items-start" [class.pb-3]="!slim" [class.pt-1]="!slim" [class.py-[4px]]="slim" [class.!px-[8px]]="slim">
               <div class="relative min-w-0 flex-1" [class.only-me]="b.private">
               <!-- Only me: a gray lock before its first letter (its first line set in for it) -->
               @if (b.private) {
