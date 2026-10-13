@@ -277,6 +277,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           #end
           rows="1"
           (input)="onEnd(end)"
+          (focus)="onEnd(end)"
           (keydown)="onEndKey($event, end)"
           (blur)="onBlur(); end.value = ''"
           [placeholder]="'lessons.slashHint' | t"
@@ -606,7 +607,8 @@ export class LessonForm {
     // (only commands here: typed without "/", it's put in front)
     if (end.value && !end.value.startsWith('/')) end.value = `/${end.value.trimStart()}`;
     const v = end.value;
-    if (/^\/\S*$/u.test(v)) {
+    // (empty: all of them — the line focused opens them)
+    if (!v || /^\/\S*$/u.test(v)) {
       const r = end.getBoundingClientRect();
       const was = this.slash();
       this.slash.set({ block: -1, start: 0, end: v.length, query: v.slice(1), x: r.left, y: r.bottom + 2, active: was?.block === -1 ? was.active : 0 });
