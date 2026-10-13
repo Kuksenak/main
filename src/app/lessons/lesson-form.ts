@@ -86,7 +86,6 @@ export function cleanLesson(l: LessonInput): LessonInput {
 }
 
 type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
-type SlashId = 'task' | 'link' | 'assistant';
 
 /**
  * Editing a lesson in place, Notion-like: the title, then the tasks — each one text (its first
@@ -276,14 +275,7 @@ type SlashId = 'task' | 'link' | 'assistant';
 
     <!-- "/": the commands at the cursor -->
     @if (slash(); as sl) {
-      <div class="popover-panel fixed z-[2100] w-64 p-1" [style.left.px]="sl.x" [style.top.px]="sl.y" (mousedown)="keepFocus($event)">
-        @if (slashLinking()) {
-          <!-- /link: its address -->
-          <form (submit)="slashLink(); $event.preventDefault()" class="flex items-center gap-1 p-0.5">
-            <input #slashUrl type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.escape)="slash.set(null); slashLinking.set(false)" (blur)="slashLinkBlur()" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
-            <button type="submit" class="btn-primary !h-8 !px-3 !py-0">OK</button>
-          </form>
-        } @else {
+      <div class="popover-panel fixed z-[2100] w-64 p-1" [style.left.px]="sl.x" [style.top.px]="sl.y">
         @for (c of slashItems(); track c.id; let k = $index) {
           <button
             type="button"
@@ -295,7 +287,7 @@ type SlashId = 'task' | 'link' | 'assistant';
             @if (c.id === 'assistant') {
               <app-brand-icon name="sparkle" class="size-6 shrink-0" />
             } @else {
-              <span class="flex size-6 shrink-0 items-center justify-center rounded-md bg-[var(--fill)]"><app-icon [name]="c.id === 'link' ? 'link' : 'plus'" class="size-4" /></span>
+              <span class="flex size-6 shrink-0 items-center justify-center rounded-md bg-[var(--fill)]"><app-icon name="plus" class="size-4" /></span>
             }
             <span class="min-w-0 leading-tight">
               <span class="text-subhead block font-medium">{{ c.label | t }}</span>
@@ -304,7 +296,6 @@ type SlashId = 'task' | 'link' | 'assistant';
           </button>
         } @empty {
           <p class="text-footnote px-2.5 py-2 opacity-50">{{ 'lessons.slashNone' | t }}</p>
-        }
         }
       </div>
     }
@@ -459,14 +450,10 @@ export class LessonForm {
   protected readonly linkField = viewChild<ElementRef<HTMLInputElement>>('linkField');
   private field: HTMLTextAreaElement | null = null;
 
-  private readonly commands: { id: SlashId; label: TranslationKey; hint: TranslationKey; words: string }[] = [
+  private readonly commands: { id: 'task' | 'assistant'; label: TranslationKey; hint: TranslationKey; words: string }[] = [
     { id: 'task', label: 'lessons.slashTask', hint: 'lessons.slashTaskHint', words: 'task exercise new add zadanie exercice' },
-    { id: 'link', label: 'lessons.fmtLinkShort', hint: 'lessons.slashLinkHint', words: 'link url lien odnośnik' },
     { id: 'assistant', label: 'nav.ai', hint: 'lessons.slashAssistantHint', words: 'assistant ai asystent ia' },
   ];
-  // /link: its address being typed
-  protected readonly slashLinking = signal(false);
-  private readonly slashUrl = viewChild<ElementRef<HTMLInputElement>>('slashUrl');
   protected readonly slashItems = computed(() => {
     const q = (this.slash()?.query ?? '').toLowerCase();
     return this.commands
@@ -554,14 +541,7 @@ export class LessonForm {
 
   // A command: its "/…" taken out; a task goes right there (the text around it split: above it,
   // under it), or the assistant opens
-  protected runSlash(id: SlashId): void {
-    if (id === 'link') {
-      // Its address first, in the menu
-      this.linkUrl = '';
-      this.slashLinking.set(true);
-      setTimeout(() => this.slashUrl()?.nativeElement.focus());
-      return;
-    }
+  protected runSlash(id: 'task' | 'assistant'): void {
     const sl = this.slash();
     this.slash.set(null);
     if (!sl) return;
@@ -584,36 +564,6 @@ export class LessonForm {
     const replaced = [...(before ? [piece(before)] : []), task, ...(after ? [piece(after)] : [])];
     this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, sl.block), ...replaced, ...m.blocks.slice(sl.block + 1)] }));
     this.focusTask(sl.block + (before ? 1 : 0), 0);
-  }
-
-  // /link with its address: <address|https://…> where "/link" was (the page's end: text there)
-  protected slashLink(): void {
-    const sl = this.slash();
-    this.slashLinking.set(false);
-    this.slash.set(null);
-    let url = this.linkUrl.trim();
-    if (!sl || !url) return;
-    if (!/^[a-z][a-z\d+.-]*:/i.test(url)) url = `https://${url}`;
-    const label = url.replace(/^https?:\/\//, '').replace(/[<>|]/g, ' ');
-    const link = `<${label}|${url}>`;
-    if (sl.block < 0) {
-      if (this.field) this.field.value = '';
-      this.insertBlock(this.value().blocks.length, 'text', link);
-      return;
-    }
-    const text = this.value().blocks[sl.block]?.text ?? '';
-    const next = text.slice(0, sl.start) + link + text.slice(sl.end);
-    this.setBlock(sl.block, { text: next });
-    this.focusTask(sl.block, sl.start + link.length);
-  }
-
-  protected slashLinkBlur(): void {
-    setTimeout(() => {
-      if (document.activeElement !== this.slashUrl()?.nativeElement) {
-        this.slashLinking.set(false);
-        this.slash.set(null);
-      }
-    }, 150);
   }
 
   // A new block at `at` (a task, or text on the page), its text `text`, the cursor at its end
@@ -676,7 +626,7 @@ export class LessonForm {
 
   protected onBlur(): void {
     setTimeout(() => {
-      if (this.linking() || this.slashLinking()) return; // a link's address being typed
+      if (this.linking()) return; // the link's address being typed
       this.slash.set(null);
       this.sel.set(null);
     }, 120);
