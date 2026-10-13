@@ -50,7 +50,7 @@ export class ScheduleSettings {
 @Component({
   selector: 'app-integrations-settings',
   imports: [Icon, Toggle, TranslatePipe],
-  host: { class: 'flex flex-col', '[class.gap-1.5]': '!flat()' },
+  host: { class: 'flex flex-col', '[class.gap-[6px]]': '!flat()' },
   template: `
     @if (flat()) {
       <div class="list-row">
@@ -134,7 +134,7 @@ export class LanguageList {
 @Component({
   selector: 'app-notification-settings',
   imports: [Icon, Toggle, TranslatePipe],
-  host: { class: 'flex flex-col', '[class.gap-1.5]': '!flat()' },
+  host: { class: 'flex flex-col', '[class.gap-[6px]]': '!flat()' },
   template: `
     <div [class.card]="!flat()">
       <div class="list-row">

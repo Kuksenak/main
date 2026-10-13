@@ -41,7 +41,7 @@ import { InstallService } from '../../services/install.service';
           class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-3rem)] origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [class.p-3]="!fit()"
           [class.p-1]="fit()"
-          [class.!rounded-[0.625rem]]="fit()"
+          [class.!rounded-[10px]]="fit()"
           [class.w-72]="!wide() && !fit()"
           [class.w-96]="wide() && !fit()"
           [class.w-max]="fit()"
