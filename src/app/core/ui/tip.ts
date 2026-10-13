@@ -2,7 +2,7 @@ import { Directive, ElementRef, OnDestroy, inject, input } from '@angular/core';
 
 /**
  * A hover hint (a small dark label beside the element), the app's own instead of the browser's
- * title: `appTip="Text"`, `tipSide` where it shows (left / top / right / bottom; flipped when there's
+ * title: `appTip="Text"` (`**words**` in it stand out, the rest faded), `tipSide` where it shows (left / top / right / bottom; flipped when there's
  * no room). Shown after a short pause on hover; gone on leaving, a press or scrolling. Not on touch
  * screens.
  */
@@ -44,7 +44,17 @@ export class Tip implements OnDestroy {
     const tip = document.createElement('div');
     tip.className = 'tip';
     tip.setAttribute('role', 'tooltip');
-    tip.textContent = text;
+    // (**words** stand out, the rest faded — "**Drag** to move")
+    if (text.includes('**')) {
+      text.split(/(\*\*[^*]+\*\*)/).forEach((part) => {
+        if (!part) return;
+        const span = document.createElement('span');
+        const strong = part.startsWith('**') && part.endsWith('**');
+        span.textContent = strong ? part.slice(2, -2) : part;
+        if (!strong) span.className = 'tip-dim';
+        tip.appendChild(span);
+      });
+    } else tip.textContent = text;
     document.body.appendChild(tip);
     const r = this.el.getBoundingClientRect();
     const t = tip.getBoundingClientRect();

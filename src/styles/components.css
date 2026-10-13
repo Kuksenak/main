@@ -575,6 +575,9 @@ html.dark .btn-white {
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.16);
   animation: tipIn 140ms ease-out;
 }
+.tip-dim {
+  opacity: 0.6;
+}
 .tip[data-side='left'] { --tip-from: translateX(3px); }
 .tip[data-side='right'] { --tip-from: translateX(-3px); }
 .tip[data-side='top'] { --tip-from: translateY(3px); }
