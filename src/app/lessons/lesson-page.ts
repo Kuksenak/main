@@ -177,7 +177,7 @@ const SAVE_AT_LEAST_MS = 5000;
 
     <!-- The whole lesson as the student sees it (their tasks only, answers taken out) -->
     @if (previewAll()) {
-      <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [large]="true" (closed)="previewAll.set(false)">
+      <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [fit]="true" (closed)="previewAll.set(false)">
         <div class="compact-view flex flex-col gap-2">
           <h1 class="px-1 text-[0.9375rem] font-medium">{{ s.draft().title || ('lessons.new' | t) }}</h1>
           <app-lesson-content [blocks]="studentBlocks()" mode="student" />

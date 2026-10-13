@@ -482,7 +482,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 
     <!-- A task as the student sees it (answers taken out, choices unmarked) -->
     @if (previewing() !== null && m.blocks[previewing()!]; as b) {
-      <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [large]="true" (closed)="previewing.set(null)">
+      <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [fit]="true" (closed)="previewing.set(null)">
         <div class="compact-view flex flex-col gap-2">
           <app-lesson-content [blocks]="asStudentSees(b)" mode="student" />
         </div>

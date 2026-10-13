@@ -42,6 +42,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [class.desktop:!max-h-none]="wide()"
         [class.desktop:!max-w-none]="wide()"
         [class.desktop:!max-w-3xl]="large()"
+        [class.desktop:!w-fit]="fit()"
+        [class.desktop:!min-w-80]="fit()"
+        [class.desktop:!max-w-[85vw]]="fit()"
+        [class.desktop:!max-h-[85vh]]="fit()"
         [style.transform]="closing() ? 'translateX(100%)' : null"
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
@@ -161,6 +165,8 @@ export class PageSheet {
   readonly dim = input(true);
   // Desktop: a wider dialog (room for two columns, e.g. a student's details and events).
   readonly large = input(false);
+  /** Desktop: as big as its content, up to 85% of the window either way (then it scrolls). */
+  readonly fit = input(false);
   // false: back / ✕ / Cancel / a click outside emit `cancel` and leave the page open (e.g. a
   // card that leaves its edit mode instead of closing).
   readonly cancelCloses = input(true);
