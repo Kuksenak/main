@@ -564,6 +564,11 @@ html.dark .btn-white {
 .cdk-drag-placeholder {
   opacity: 0;
 }
+/* (while one is held: the pointer a closed hand everywhere) */
+body:has(.cdk-drag-preview),
+body:has(.cdk-drag-preview) * {
+  cursor: grabbing !important;
+}
 /* (the handle stays on the one held) */
 .cdk-drag-preview .drag-handle {
   opacity: 0.5 !important;
