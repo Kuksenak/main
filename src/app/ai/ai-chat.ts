@@ -131,7 +131,7 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
             <button type="button" (click)="chat.clear(chatKey())" [disabled]="chat.pending() === chatKey()" class="head-btn opacity-70">{{ 'ai.newChat' | t }}</button>
           }
           <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [appTip]="'ai.send' | t" tipSide="top" [attr.aria-label]="'ai.send' | t" class="ml-1 flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--text)] text-[var(--app-bg)] hover:opacity-85 disabled:opacity-25">
-            <app-icon name="enter" [strokeWidth]="2" class="size-4" />
+            <app-icon name="arrow-up" [strokeWidth]="2.25" class="size-4" />
           </button>
         </div>
       </div>

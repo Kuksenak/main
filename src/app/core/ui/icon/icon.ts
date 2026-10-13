@@ -13,6 +13,7 @@ export type IconName =
   | 'duplicate'
   | 'paste'
   | 'clipboard'
+  | 'arrow-up'
   | 'unlock'
   | 'trash'
   | 'popout'
@@ -122,7 +123,10 @@ export type IconName =
         <!-- Duplicate: two pages, a plus on the front one -->
         @case ('duplicate') { <rect x="8.5" y="8.5" width="11.5" height="11.5" rx="2" /><path d="M15.5 8.5V6A2 2 0 0 0 13.5 4H6a2 2 0 0 0-2 2v7.5a2 2 0 0 0 2 2h2.5" /> }
         <!-- Paste: a clipboard -->
-        @case ('paste') { <rect x="8" y="3" width="8" height="4" rx="1" /><path d="M16 5h1.5A1.5 1.5 0 0 1 19 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-12A1.5 1.5 0 0 1 6.5 5H8" /><path d="M12 10.5v6M9.5 14l2.5 2.5 2.5-2.5" /> }
+        <!-- Paste (as Notion's): a plain clipboard -->
+        @case ('paste') { <path d="M15 4.5h1.5A2.5 2.5 0 0 1 19 7v11.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 18.5V7a2.5 2.5 0 0 1 2.5-2.5H9" /><rect x="9" y="2.75" width="6" height="3.5" rx="1.25" /> }
+        <!-- Send: an arrow up -->
+        @case ('arrow-up') { <path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" /> }
         <!-- Copy contents: a clipboard with lines -->
         @case ('clipboard') { <rect x="8" y="3" width="8" height="4" rx="1" /><path d="M16 5h1.5A1.5 1.5 0 0 1 19 6.5v12a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5v-12A1.5 1.5 0 0 1 6.5 5H8" /><path d="M9 12h6M9 15.5h4" /> }
         <!-- Unlocked: an open padlock -->
