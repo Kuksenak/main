@@ -68,17 +68,12 @@ interface Found {
         <span class="flex-1 opacity-50">{{ 'students.search' | t }}</span>
         <span class="rounded bg-[var(--fill-strong)] px-1.5 py-px text-[0.6875rem] font-medium opacity-60">Ctrl+K</span>
       </button>
-      <!-- The pages: the open one a pill (its icon and name), the others just their icon -->
-      <div class="flex items-center gap-1">
+      <!-- The pages, one under another -->
+      <div class="flex flex-col gap-px">
         @for (p of pages; track p.path) {
-          <a [routerLink]="p.path" routerLinkActive #rla="routerLinkActive" [appTip]="rla.isActive ? null : (p.label | t)" tipSide="bottom" [attr.aria-label]="p.label | t"
-             class="flex h-8 items-center gap-1.5 rounded-lg text-[0.875rem] hover:bg-[var(--highlight)]"
-             [class.px-2.5]="rla.isActive" [class.w-8]="!rla.isActive" [class.justify-center]="!rla.isActive"
-             [class.bg-[var(--highlight)]]="rla.isActive" [class.font-medium]="rla.isActive">
+          <a [routerLink]="p.path" routerLinkActive="is-on" class="side-row">
             <app-icon [name]="p.icon" class="side-glyph" />
-            @if (rla.isActive) {
-              <span>{{ p.label | t }}</span>
-            }
+            <span class="flex-1">{{ p.label | t }}</span>
           </a>
         }
       </div>
@@ -114,17 +109,18 @@ interface Found {
           </button>
         </div>
         @if (!folded().includes('people')) {
-          @for (g of groups.groups(); track g.id) {
-            <button type="button" (click)="stack.push({ kind: 'group', id: g.id })" class="side-row">
-              <app-icon name="people" class="side-glyph" [style.color]="glyphColor(colorVar(g.color))" />
-              <span class="min-w-0 flex-1 truncate">{{ g.name }}</span>
+          @for (r of peopleShown(); track r.kind + r.id) {
+            <button type="button" (click)="stack.push({ kind: r.kind, id: r.id })" class="side-row">
+              @if (r.kind === 'group') {
+                <app-icon name="people" class="side-glyph" [style.color]="glyphColor(r.color)" />
+              } @else {
+                <app-icon name="person" class="side-glyph" />
+              }
+              <span class="min-w-0 flex-1 truncate">{{ r.name }}</span>
             </button>
           }
-          @for (s of studentsSorted(); track s.id) {
-            <button type="button" (click)="stack.push({ kind: 'student', id: s.id })" class="side-row">
-              <app-icon name="person" class="side-glyph" />
-              <span class="min-w-0 flex-1 truncate">{{ s.name }}</span>
-            </button>
+          @if (peopleAll().length > shown) {
+            <a routerLink="/students" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
           }
         }
       </div>
@@ -138,11 +134,14 @@ interface Found {
           </button>
         </div>
         @if (!folded().includes('lessons')) {
-          @for (l of lessonsSorted(); track l.id) {
+          @for (l of lessonsShown(); track l.id) {
             <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row" [class.is-on]="openLesson() === l.id">
               <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
               <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
             </a>
+          }
+          @if (lessonsSorted().length > shown) {
+            <a routerLink="/lessons" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
           }
         }
       </div>
@@ -251,6 +250,19 @@ export class Sidebar {
   );
 
   protected readonly studentsSorted = computed(() => [...this.students.students()].sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale())));
+  // A section shows its first few (the open lesson too), then View all
+  protected readonly shown = 5;
+  protected readonly peopleAll = computed(() => [
+    ...this.groups.groups().map((g) => ({ kind: 'group' as const, id: g.id, name: g.name, color: colorVar(g.color) as string | null })),
+    ...this.studentsSorted().map((s) => ({ kind: 'student' as const, id: s.id, name: s.name, color: null })),
+  ]);
+  protected readonly peopleShown = computed(() => this.peopleAll().slice(0, this.shown));
+  protected readonly lessonsShown = computed(() => {
+    const all = this.lessonsSorted();
+    const first = all.slice(0, this.shown);
+    const open = all.find((l) => l.id === this.openLesson());
+    return open && !first.includes(open) ? [...first, open] : first;
+  });
   protected readonly lessonsSorted = computed(() => [...this.lessons.lessons()].sort((a, b) => a.title.localeCompare(b.title, this.i18n.locale())));
 
   // The next three events not over yet

@@ -90,9 +90,25 @@ import { LessonUsage } from './lesson-usage';
           @for (key of selectedKey(); track key) {
             <app-lesson-page [lessonId]="selected() === 'new' ? null : selected()" (created)="adopt($event)" />
           } @empty {
-            <!-- None picked: nothing open -->
-            <div class="flex flex-1 items-center justify-center">
-              <p class="text-[0.875rem] opacity-40">{{ 'lessons.pickOne' | t }}</p>
+            <!-- None picked (the sidebar's View all): every lesson, a row each — its level, name, where it's used -->
+            <div class="flex min-h-0 flex-1 flex-col">
+              <h1 class="flex h-[var(--control-h)] shrink-0 items-center px-2 text-[0.9375rem] font-medium">{{ 'nav.lessons' | t }}</h1>
+              @if (visible().length) {
+                <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
+                  <div class="flex flex-col gap-px">
+                    @for (l of visible(); track l.id) {
+                      <button type="button" (click)="router.navigate(['/lessons', l.id])" class="side-row !h-9">
+                        <app-icon name="page" class="side-glyph" [style.color]="l.level ? 'color-mix(in srgb, ' + levelColor(l.level) + ' 70%, var(--text))' : null" />
+                        <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
+                        <span class="w-10 shrink-0 text-[0.8125rem] opacity-50">{{ l.level }}</span>
+                        <span class="w-56 shrink-0 truncate text-[0.8125rem] opacity-50">{{ useHint(l.id) }}</span>
+                      </button>
+                    }
+                  </div>
+                </app-scroll-area>
+              } @else {
+                <p class="px-2 py-3 text-[0.875rem] opacity-40">{{ 'lessons.empty' | t }}</p>
+              }
             </div>
           }
         </section>
