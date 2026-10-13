@@ -90,6 +90,17 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
 
   protected readonly accountOpen = signal(false);
+
+  // Desktop: the sidebar shown or hidden (kept in this browser)
+  protected readonly sidebarOpen = signal(readSidebar());
+  protected setSidebar(open: boolean): void {
+    this.sidebarOpen.set(open);
+    try {
+      localStorage.setItem('sidebar.open', open ? '1' : '0');
+    } catch {
+      // (storage off: just for this visit)
+    }
+  }
   // Desktop: the sidebar's account row (the settings open by it)
   protected readonly accountFrom = signal<HTMLElement | null>(null);
   // Settings opened by the app itself (back from Google): why it didn't connect, if it didn't
@@ -124,5 +135,13 @@ export class Layout {
   // Logging out leaves the app (AuthStore redirects to /login and this layout un-renders).
   protected logout(): void {
     this.auth.logout();
+  }
+}
+
+function readSidebar(): boolean {
+  try {
+    return localStorage.getItem('sidebar.open') !== '0';
+  } catch {
+    return true;
   }
 }

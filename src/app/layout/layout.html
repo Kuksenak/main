@@ -3,9 +3,16 @@
   @if (desktop) {
     <!-- Desktop: the sidebar (as Notion's) — search, the pages, the next events, students, lessons;
          the account at the bottom -->
-    <app-sidebar (account)="accountFrom.set($event); accountOpen.set(true)" />
+    @if (sidebarOpen()) {
+      <app-sidebar (account)="accountFrom.set($event); accountOpen.set(true)" (hide)="setSidebar(false)" />
+    } @else {
+      <!-- (hidden: a button at the top left brings it back) -->
+      <button type="button" (click)="setSidebar(true)" [attr.aria-label]="'sidebar.show' | t" class="side-icon fixed left-2 top-2 z-30">
+        <app-icon name="sidebar" />
+      </button>
+    }
   }
-  <div class="relative flex min-h-0 min-w-0 flex-1 flex-col desktop:pt-3">
+  <div class="relative flex min-h-0 min-w-0 flex-1 flex-col desktop:pt-3" [class.pl-9]="desktop && !sidebarOpen()">
   <!-- overlay (a page that scrolls under it, e.g. Students on phones): floating, transparent,
        only its controls take taps -->
   @if (!desktop) {

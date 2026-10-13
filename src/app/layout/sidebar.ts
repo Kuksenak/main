@@ -7,6 +7,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { NavStack } from '../core/services/nav-stack.service';
+import { NotificationsService } from '../core/services/notifications.service';
 import { UpdateService } from '../core/services/update.service';
 import { EscStack } from '../core/ui/esc-stack';
 import { Icon, IconName } from '../core/ui/icon/icon';
@@ -45,8 +46,19 @@ interface Found {
   host: { class: 'flex w-60 shrink-0 flex-col border-r-[0.5px] border-[var(--separator)] bg-[color-mix(in_srgb,var(--surface)_35%,var(--app-bg))]' },
   template: `
     <div class="flex shrink-0 flex-col gap-2 px-2 pb-1 pt-2">
-      <!-- ✎ (as Notion's, at the top right): new — an event, a group, a student, a lesson -->
-      <div class="flex h-7 items-center justify-end">
+      <!-- The top row (as Notion's): hide the sidebar; the inbox (notifications; a dot for a new one),
+           ✎ — new: an event, a group, a student, a lesson -->
+      <div class="flex h-7 items-center gap-0.5">
+        <button type="button" (click)="hide.emit()" [appTip]="'sidebar.hide' | t" tipSide="bottom" [attr.aria-label]="'sidebar.hide' | t" class="side-icon">
+          <app-icon name="sidebar" />
+        </button>
+        <span class="flex-1"></span>
+        <a routerLink="/notifications" (click)="unseen.set(false)" [appTip]="'sidebar.inbox' | t" tipSide="bottom" [attr.aria-label]="'sidebar.inbox' | t" class="side-icon relative">
+          <app-icon name="inbox" />
+          @if (unseen()) {
+            <span class="absolute right-1 top-1 size-1.5 rounded-full bg-[var(--accent)]"></span>
+          }
+        </a>
         <button #newBtn type="button" (click)="newOpen.set(!newOpen())" [appTip]="'sidebar.new' | t" tipSide="bottom" [attr.aria-label]="'sidebar.new' | t" [attr.aria-expanded]="newOpen()" class="side-icon">
           <app-icon name="compose" />
         </button>
@@ -203,6 +215,11 @@ interface Found {
 export class Sidebar {
   /** The account row clicked (the settings open by it). */
   readonly account = output<HTMLElement>();
+  /** Its "hide" button. */
+  readonly hide = output<void>();
+
+  // A notification come in since the inbox was last opened
+  protected readonly unseen = signal(false);
 
   protected readonly auth = inject(AuthStore);
   protected readonly updates = inject(UpdateService);
@@ -357,6 +374,8 @@ export class Sidebar {
   }
 
   constructor() {
+    const sub = inject(NotificationsService).received.subscribe(() => this.unseen.set(true));
+    inject(DestroyRef).onDestroy(() => sub.unsubscribe());
     // Ctrl+K / ⌘K: the search window
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.code === 'KeyK') {
