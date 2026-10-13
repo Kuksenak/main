@@ -90,7 +90,7 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
     </div>
 
     <!-- The message being written (as in Claude): one rounded box — the text on top; under it
-         attach, the model, New chat and Send -->
+         attach, the model, New chat and Send (an Enter key, as the head's buttons) -->
     <div class="pt-2 pb-[env(safe-area-inset-bottom)]">
       <div class="flex flex-col rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--surface)] p-2 shadow-[0_1px_4px_rgb(0_0_0/0.04)]">
         @if (files().length) {
@@ -130,8 +130,8 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
           @if (messages().length) {
             <button type="button" (click)="chat.clear(chatKey())" [disabled]="chat.pending() === chatKey()" class="head-btn opacity-70">{{ 'ai.newChat' | t }}</button>
           }
-          <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [appTip]="'ai.send' | t" tipSide="top" [attr.aria-label]="'ai.send' | t" class="ml-1 flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--text)] text-[var(--app-bg)] hover:opacity-85 disabled:opacity-25">
-            <app-icon name="arrow-up" [strokeWidth]="2.25" class="size-4" />
+          <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [appTip]="'ai.send' | t" tipSide="top" [attr.aria-label]="'ai.send' | t" class="head-btn !px-1.5 disabled:opacity-30">
+            <app-icon name="enter" class="!opacity-90" />
           </button>
         </div>
       </div>
