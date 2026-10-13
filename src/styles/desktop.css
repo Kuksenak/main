@@ -71,7 +71,24 @@ html:root body {
   --accent-label: #ffffff;
   --control-border: rgb(0 0 0 / 0.1);
 }
+/* The desktop's own look (the new style): cool near-whites, a barely blue sidebar, hovers a faint
+   blue — the whole page one family, not Notion's warm gray. (html:root: over tokens.css's :root,
+   which loads after this file) */
+html:root {
+  --app-bg: #fcfcfd;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --side-bg: #f5f6f9;
+  --tint: color-mix(in srgb, var(--accent) 5%, transparent);
+  --tint-strong: color-mix(in srgb, var(--accent) 9%, transparent);
+}
+
 html.dark:root {
+  /* (dark: the same, a cool near-black) */
+  --app-bg: #101114;
+  --side-bg: #15171b;
+  --tint: color-mix(in srgb, var(--accent) 10%, transparent);
+  --tint-strong: color-mix(in srgb, var(--accent) 16%, transparent);
   --control-border: rgb(255 255 255 / 0.15);
   /* Gray buttons (Today, Cancel…): on black a few % of white vanishes — iOS's grays */
   --glass-neutral: #2c2c2e;
