@@ -3,6 +3,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { FormsModule } from '@angular/forms';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { Tip } from '../core/ui/tip';
+import { Resized } from '../core/ui/resized';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -32,7 +33,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDropList, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
+  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDropList, FormsModule, Resized, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
   host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
@@ -44,7 +45,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
     <!-- (tasks are moved by their ⠿: the others make way, the place it'd go shown dashed) -->
-    <div class="flex flex-col gap-2" [class.pr-10]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable() || locked()" (cdkDropListDropped)="moved($event)">
+    <div class="flex flex-col gap-2" [class.pl-10]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable() || locked()" (cdkDropListDropped)="moved($event)">
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
@@ -74,6 +75,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div
         class="card group relative"
         [class.task-card]="slim"
+        (appResized)="setTall(i, $event)"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
         [class.min-h-14]="slim"
         cdkDrag
@@ -83,15 +85,28 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           <!-- Desktop tasks: no head row — ⠿ and ▾ outside it at the right (▾: Preview, who sees it, Delete; a lock instead for "only me"), shown on hover (or while
                it's being typed in): ↗ as the student sees it (in a window), who sees it, ×;
                "only me" always shows -->
-          <div class="task-tools absolute -right-10 top-0 z-10 flex flex-col items-center">
-            <!-- ⠿ first: drag to move it (kept on the one being moved) -->
-            <button type="button" cdkDragHandle [appTip]="'lessons.move' | t" tipSide="left" [attr.aria-label]="'lessons.move' | t" class="drag-handle flex size-7 cursor-grab items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 active:cursor-grabbing">
+          <!-- At its left, outside it (as in Notion): ⠿ to move it; then, when it's tall enough, ↗
+               Preview, who sees it and Delete one under another — else ⋯, a menu with them.
+               Shown on hover; "only me" always shows (a lock). -->
+          <div class="task-tools absolute -left-10 top-0 z-10 flex flex-col items-center">
+            <button type="button" cdkDragHandle [appTip]="'lessons.move' | t" tipSide="right" [attr.aria-label]="'lessons.move' | t" class="drag-handle flex size-7 cursor-grab items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 active:cursor-grabbing">
               <app-icon name="grip" class="size-[1.125rem]" />
             </button>
-            <!-- ▾: the rest in a menu (Preview, who sees it, Delete); "only me": a lock instead -->
-            <button type="button" #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="(b.private ? 'lessons.onlyMe' : 'nav.settings') | t" tipSide="left" [attr.aria-label]="'nav.settings' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="flex size-7 items-center justify-center rounded-full transition-opacity hover:bg-[var(--highlight)] hover:!opacity-100" [class]="b.private ? 'text-[var(--accent)]' : taskMenu()?.index === i ? 'opacity-100' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
-              <app-icon [name]="b.private ? 'lock' : 'chevron-down'" class="size-[1.125rem]" />
-            </button>
+            @if (tall()[i]) {
+              <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [appTip]="'lessons.studentSees' | t" tipSide="right" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-7 items-center justify-center rounded-full hover:bg-[var(--highlight)] disabled:!opacity-20 opacity-0 transition-opacity group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
+                <app-icon name="popout" class="size-[1.125rem]" />
+              </button>
+              <button type="button" (click)="setBlock(i, { private: !b.private })" [appTip]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" tipSide="right" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-7 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:!opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
+                <app-icon [name]="b.private ? 'lock' : 'people'" class="size-[1.125rem]" />
+              </button>
+              <button type="button" #rm (click)="askRemove(i, rm)" [appTip]="'lessons.removeBlock' | t" tipSide="right" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-7 items-center justify-center rounded-full hover:bg-[var(--highlight)] opacity-0 transition-opacity group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
+                <app-icon name="trash" class="size-[1.125rem]" />
+              </button>
+            } @else {
+              <button type="button" #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="(b.private ? 'lessons.onlyMe' : 'lessons.more') | t" tipSide="right" [attr.aria-label]="'lessons.more' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="flex size-7 items-center justify-center rounded-full transition-opacity hover:bg-[var(--highlight)] hover:!opacity-100" [class]="b.private ? 'text-[var(--accent)]' : taskMenu()?.index === i ? 'opacity-100' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
+                <app-icon [name]="b.private ? 'lock' : 'dots'" class="size-[1.125rem]" />
+              </button>
+            }
           </div>
         } @else {
         <!-- Head: (kind) · Preview · who sees it · ? · × -->
@@ -406,7 +421,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       </app-page-sheet>
     }
 
-    <!-- A task's ▾ menu: Preview, who sees it, Delete -->
+    <!-- A task's ⋯ menu: Preview, who sees it, Delete -->
     @if (taskMenu(); as tm) {
       @let tb = m.blocks[tm.index];
       @if (tb) {
@@ -1141,7 +1156,14 @@ export class LessonForm {
     });
   }
 
-  // A task's ▾ menu (which one, and its button)
+  // Tall enough for its four buttons one under another (else ⠿ and ⋯)
+  protected readonly tall = signal<Record<number, boolean>>({});
+  protected setTall(i: number, height: number): void {
+    const t = height >= 116;
+    if (this.tall()[i] !== t) this.tall.update((x) => ({ ...x, [i]: t }));
+  }
+
+  // A task's ⋯ menu (which one, and its button)
   protected readonly taskMenu = signal<{ index: number; from: HTMLElement } | null>(null);
   protected removeFromMenu(index: number, from: HTMLElement): void {
     this.taskMenu.set(null);
