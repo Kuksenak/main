@@ -35,7 +35,7 @@ const SAVE_AT_LEAST_MS = 5000;
   imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, LessonContent, PageSheet, Tip],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
-    <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
+    <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4">
       <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-4 pb-10">
         @if (s.id() && !s.lesson()) {
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
@@ -56,10 +56,14 @@ const SAVE_AT_LEAST_MS = 5000;
               </span>
             }
             <!-- Its level: a chip in its color; a list under it (each level with its color) -->
-            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="head-btn font-medium">
-              <!-- (its color as a dot) -->
-              <span class="size-2.5 shrink-0 rounded-full" [style.background]="levelColor(s.draft().level) ?? 'transparent'" [class.border]="!s.draft().level" [class.border-[var(--text-secondary)]]="!s.draft().level"></span>
-              {{ s.draft().level ?? ('lessons.level' | t) }}
+            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="head-btn" [class.font-medium]="!!s.draft().level">
+              <!-- Set: a dot of its color and its name; none: just "Level", faded -->
+              @if (levelColor(s.draft().level); as c) {
+                <span class="size-2.5 shrink-0 rounded-full" [style.background]="c"></span>
+                {{ s.draft().level }}
+              } @else {
+                <span class="opacity-55">{{ 'lessons.level' | t }}</span>
+              }
               <app-icon name="chevron-down" class="!size-3.5 !opacity-50" />
             </button>
             <!-- The whole lesson as the student sees it -->
@@ -74,7 +78,7 @@ const SAVE_AT_LEAST_MS = 5000;
                 </button>
                 <button type="button" (click)="lessons.share(l.id, false)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn"><app-icon name="globe" />{{ 'lessons.unpublish' | t }}</button>
               } @else {
-                <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn font-medium text-[var(--accent)]"><app-icon name="lock" class="!opacity-100" />{{ 'lessons.publish' | t }}</button>
+                <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn"><app-icon name="lock" />{{ 'lessons.publish' | t }}</button>
               }
             }
             <!-- ⋯: Duplicate, Copy page content, Paste content, Lock page, Delete -->
