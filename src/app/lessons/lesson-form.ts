@@ -308,61 +308,38 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
       </div>
     }
 
-    <!-- A selection: its formatting — a toolbar over it; a right click: a menu in rows (styles,
-         gaps, link); Link asks for the address -->
+    <!-- A selection or a right click: one menu beside it — B I U in a row, then Fill in, Choice,
+         Link a row each; Link asks for the address -->
     @if (desktop && sel(); as se) {
-      <div
-        appToBody
-        class="popover-panel fixed z-[2100] p-1"
-        [class.flex]="!se.menu"
-        [class.items-center]="!se.menu"
-        [class.gap-0.5]="!se.menu"
-        [class.w-max]="se.menu"
-        [style.left.px]="se.x"
-        [style.top.px]="se.y"
-        (mousedown)="keepFocus($event)"
-      >
+      <div appToBody class="popover-panel fixed z-[2100] flex w-48 flex-col p-1" [style.left.px]="se.x" [style.top.px]="se.y" (mousedown)="keepFocus($event)">
         @if (linking()) {
           <form (submit)="applyLink(); $event.preventDefault()" class="flex items-center gap-1 p-0.5">
             <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.escape)="linking.set(false)" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
             <button type="submit" class="btn-primary !h-8 !px-3 !py-0">OK</button>
           </form>
-        } @else if (se.menu) {
-          @for (row of formatRows(se.block); track $index; let last = $last) {
-            <div class="flex items-center gap-0.5">
-              @for (f of row; track f.id) {
-          <button
-            type="button"
-            (mousedown)="$event.preventDefault()"
-            (click)="pickFormat(f.id)"
-            [attr.aria-label]="f.label | t"
-            [attr.title]="f.label | t"
-            class="flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-[0.9375rem] hover:bg-[var(--highlight)]"
-            [class.font-bold]="f.id === 'bold'"
-            [class.italic]="f.id === 'italic'"
-            [class.underline]="f.id === 'underline'"
-            [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
-          >{{ f.text ? (f.text | t) : f.mark }}</button>
-              }
-            </div>
-            @if (!last) {
-              <div class="my-1 h-px bg-[var(--separator)]"></div>
-            }
-          }
         } @else {
-          @for (f of formatsFor(se.block); track f.id) {
-          <button
-            type="button"
-            (mousedown)="$event.preventDefault()"
-            (click)="pickFormat(f.id)"
-            [attr.aria-label]="f.label | t"
-            [attr.title]="f.label | t"
-            class="flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-[0.9375rem] hover:bg-[var(--highlight)]"
-            [class.font-bold]="f.id === 'bold'"
-            [class.italic]="f.id === 'italic'"
-            [class.underline]="f.id === 'underline'"
-            [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
-          >{{ f.text ? (f.text | t) : f.mark }}</button>
+          <div class="flex items-center gap-0.5">
+            @for (f of styleFormats; track f.id) {
+              <button
+                type="button"
+                (click)="pickFormat(f.id)"
+                [attr.aria-label]="f.label | t"
+                [attr.title]="f.label | t"
+                class="flex h-8 flex-1 items-center justify-center rounded-md text-[0.9375rem] hover:bg-[var(--highlight)]"
+                [class.font-bold]="f.id === 'bold'"
+                [class.italic]="f.id === 'italic'"
+                [class.underline]="f.id === 'underline'"
+              >{{ f.mark }}</button>
+            }
+          </div>
+          <div class="my-1 h-px bg-[var(--separator)]"></div>
+          @for (f of itemFormats(se.block); track f.id) {
+            <button
+              type="button"
+              (click)="pickFormat(f.id)"
+              [attr.title]="f.label | t"
+              class="text-subhead flex h-8 w-full items-center rounded-md px-2.5 text-left hover:bg-[var(--highlight)]"
+            >{{ f.text! | t }}</button>
           }
         }
       </div>
@@ -552,12 +529,10 @@ export class LessonForm {
     { id: 'link', mark: 'Link', text: 'lessons.fmtLinkShort', label: 'lessons.fmtLink' },
   ];
 
-  // The right click's menu: two rows — the styles; gaps, choices (tasks) and the link
-  protected formatRows(block: number) {
-    const all = this.formatsFor(block);
-    return [['bold', 'italic', 'underline'], ['gap', 'choice', 'link']]
-      .map((ids) => all.filter((f) => ids.includes(f.id)))
-      .filter((row) => row.length);
+  // The menu: B I U in a row; then a row each — Fill in, Choice (tasks), Link
+  protected readonly styleFormats = this.formats.filter((f) => f.id === 'bold' || f.id === 'italic' || f.id === 'underline');
+  protected itemFormats(block: number) {
+    return this.formatsFor(block).filter((f) => f.text);
   }
 
   // A task's text cut at its gaps / choices (the highlighting under its field; once per text)
@@ -676,10 +651,10 @@ export class LessonForm {
         return;
       }
       if (!this.desktop) return; // phones: the bar over the keyboard
-      // The right click's menu stays (it made this selection itself)
+      // Opened by a right click: it stays where it is
       if (this.sel()?.menu && this.sel()?.block === block) return;
-      const r = caretRect(ta, ta.selectionStart);
-      this.sel.set({ block, x: Math.max(8, Math.min(r.left, window.innerWidth - 308)), y: Math.max(4, r.top - 44) });
+      const r = caretRect(ta, ta.selectionEnd);
+      this.sel.set({ block, x: Math.min(r.left + 14, window.innerWidth - 200), y: Math.max(8, Math.min(r.top - 8, window.innerHeight - 180)) });
     });
   }
 
@@ -691,7 +666,7 @@ export class LessonForm {
     requestAnimationFrame(() => {
       this.linking.set(false);
       // Beside the pointer, a little up (not over the words clicked)
-      this.sel.set({ block, x: Math.min(e.clientX + 18, window.innerWidth - 280), y: Math.max(8, Math.min(e.clientY - 36, window.innerHeight - 120)), menu: true });
+      this.sel.set({ block, x: Math.min(e.clientX + 14, window.innerWidth - 200), y: Math.max(8, Math.min(e.clientY - 8, window.innerHeight - 180)), menu: true });
     });
   }
 
