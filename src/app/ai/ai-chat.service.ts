@@ -17,13 +17,12 @@ export interface ChatMessage {
   error?: string;
 }
 
-const KEY = 'ai.chats';
-const KEEP = 20; // chats kept on the device (the latest)
-
 /**
- * The lesson editor's AI chats: one per lesson (its id; 'new' for a lesson not saved yet), kept on
- * this device. send() asks the server (/ai/chat) with the chat so far and the lesson as it is;
- * the answer arrives even when the chat was closed meanwhile (a banner says so then).
+ * The lesson editor's assistant chats: one per lesson (its id; 'new' for a lesson not saved yet),
+ * for as long as its editor is open (closing the assistant keeps it; leaving the lesson clears
+ * it). send() asks the server (/ai/chat) with the chat so far and the lesson as it is; the answer
+ * arrives even when the assistant was closed meanwhile (a banner says so then) — not once the
+ * chat was cleared.
  */
 @Injectable({ providedIn: 'root' })
 export class AiChatService {
@@ -31,7 +30,7 @@ export class AiChatService {
   private notifications = inject(NotificationsService);
   private imports = inject(LessonImportsService);
 
-  private readonly chats = signal<Record<string, ChatMessage[]>>(this.restore());
+  private readonly chats = signal<Record<string, ChatMessage[]>>({});
   /** The chat waiting for its answer (one at a time). */
   readonly pending = signal<string | null>(null);
   /** The chats open on screen now (an answer for another one gets a banner). */
@@ -74,8 +73,10 @@ export class AiChatService {
             : String(e);
       answer = { id: crypto.randomUUID(), role: 'assistant', text: '', error: reason.slice(0, 400) };
     }
-    this.set(key, [...this.messages(key), answer]);
     this.pending.set(null);
+    // Its chat cleared meanwhile (the lesson was left): the answer goes nowhere
+    if (!this.messages(key).some((m) => m.id === mine.id)) return;
+    this.set(key, [...this.messages(key), answer]);
 
     // Its chat closed meanwhile: a banner (a tap opens the lesson)
     if (!this.open.has(key)) {
@@ -100,32 +101,12 @@ export class AiChatService {
       else delete next[key];
       return next;
     });
-    this.save();
   }
 
   // What the model is told of a message: the teacher's text; the AI's reply and its blocks
   private asText(m: ChatMessage): string {
     if (m.role === 'user') return (m.text || '') + (m.imageCount ? `\n(${m.imageCount} photo(s) were attached)` : '');
     return `${m.text}\n${blocksAsText(m.draft?.blocks ?? [])}`.trim().slice(0, 6000);
-  }
-
-  // Kept on this device: the latest chats, without the pictures and the model's raw answers
-  private save(): void {
-    try {
-      const entries = Object.entries(this.chats()).slice(-KEEP);
-      const kept = Object.fromEntries(
-        entries.map(([k, list]) => [k, list.map(({ images, draft, ...m }) => ({ ...m, draft: draft ? { ...draft, raw: null } : draft }))]),
-      );
-      localStorage.setItem(KEY, JSON.stringify(kept));
-    } catch {}
-  }
-
-  private restore(): Record<string, ChatMessage[]> {
-    try {
-      return JSON.parse(localStorage.getItem(KEY) ?? '{}') as Record<string, ChatMessage[]>;
-    } catch {
-      return {};
-    }
   }
 }
 

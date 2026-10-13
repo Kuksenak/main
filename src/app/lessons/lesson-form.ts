@@ -6,6 +6,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
 import { AiChat } from '../ai/ai-chat';
+import { AiChatService } from '../ai/ai-chat.service';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { LessonContent } from './lesson-content';
@@ -135,15 +136,9 @@ export function cleanLesson(l: LessonInput): LessonInput {
               <app-icon name="chevron-down" class="size-3.5 rotate-180" />{{ 'lessons.joinAbove' | t }}
             </button>
           }
-          @if (b.kind === 'text') {
-            <!-- A task that came as text: a task, its "..." / "___" made gaps -->
-            <button type="button" (click)="toTask(i)" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
-              <app-icon name="compose" class="size-3.5" />{{ 'lessons.toTask' | t }}
-            </button>
-          }
           @if (b.kind === 'gaps') {
             <!-- What the student sees, in a popup -->
-            <button type="button" (click)="previewing.set(i)" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70">{{ 'lessons.studentSees' | t }}</button>
+            <button type="button" (click)="previewing.set(i)" [disabled]="!b.instruction?.trim() && !b.text?.trim()" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70 disabled:opacity-30 disabled:hover:bg-[var(--fill)]">{{ 'lessons.studentSees' | t }}</button>
           }
           <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70">
             @if (b.private) {
@@ -358,9 +353,11 @@ export class LessonForm {
     });
     const closeHelp = () => this.helpOpen.set(null);
     document.addEventListener('click', closeHelp);
+    const chats = inject(AiChatService);
     inject(DestroyRef).onDestroy(() => {
       release();
       document.removeEventListener('click', closeHelp);
+      if (this.photos()) chats.clear(this.lessonId() ?? 'new');
     });
   }
 
@@ -507,7 +504,7 @@ export class LessonForm {
   // object for the same text — the preview isn't redrawn on every check)
   private readonly seen = new Map<string, LessonBlock[]>();
   protected asStudentSees(b: LessonBlock): LessonBlock[] {
-    const key = b.text ?? '';
+    const key = JSON.stringify([b.instruction ?? '', b.text ?? '']);
     let shown = this.seen.get(key);
     if (!shown) {
       if (this.seen.size > 50) this.seen.clear();
