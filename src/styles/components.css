@@ -683,15 +683,17 @@ html.dark .btn-white {
   text-indent: 1.55em;
 }
 
-/* Previews (and a locked lesson) in the editor's look: 14 px text, cards nearly the page's color
-   with a thin outline, less room inside */
+/* Previews (and a locked lesson) in the editor's look: 14 px text, the tasks plain on the page —
+   no cards, no outlines */
 .compact-view {
   --text-body: 0.875rem;
 }
 .compact-view .card {
-  background: color-mix(in srgb, var(--surface) 45%, var(--app-bg));
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 .compact-view .gaps-card {
-  padding: 0.5rem 0.75rem;
+  padding: 0.25rem 0;
 }
 

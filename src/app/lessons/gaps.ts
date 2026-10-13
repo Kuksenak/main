@@ -309,7 +309,8 @@ export function taskProgress(
 }
 
 /**
- * A task's text brought to one look (our own "linter", ⋯ → Format): spaces at the lines' ends and
+ * A task's text brought to one look (our own "linter", ⋯ → Format): items run together on a line
+ * ("1. … 2. …", "a) … b) …") split onto lines of their own; spaces at the lines' ends and
  * runs of spaces dropped; at most one empty line in a row; numbered lines "1)", "1 -", "1:" as
  * "1. "; bullets "•", "*", "–" as "- "; gaps "[ answer ]" as "[answer]"; choices "{ *a | b }" as
  * "{*a|b}"; no space before , . ; and one after them.
@@ -318,6 +319,7 @@ export function tidy(text: string): string {
   return text
     .replace(/\r\n?/g, '\n')
     .split('\n')
+    .flatMap(splitItems)
     .map((line) =>
       line
         .replace(/\s+$/, '')
@@ -333,3 +335,36 @@ export function tidy(text: string): string {
     .replace(/\n{3,}/g, '\n\n')
     .replace(/^\n+|\n+$/g, '');
 }
+
+// A line with items run together ("1. … 2. …", "a) … b) …" — at least two, in order): one line
+// each (the text before the first stays on its own line); markers inside [gaps] / {choices} aside
+function splitItems(line: string): string[] {
+  const marks: { at: number; n: number; letter: boolean }[] = [];
+  const re = /(\[[^[\]\n]*\]|\{[^{}\n]*\})|(?:^|(?<=\s))(\d{1,2}|[a-h])[.)](?=\s+\S)/g;
+  for (const m of line.matchAll(re)) {
+    if (m[1] !== undefined) continue;
+    const letter = /[a-h]/.test(m[2]);
+    marks.push({ at: m.index, n: letter ? m[2].charCodeAt(0) - 96 : Number(m[2]), letter });
+  }
+  // the longest run of consecutive markers of one kind
+  let best: typeof marks = [];
+  for (let i = 0; i < marks.length; i++) {
+    const run = [marks[i]];
+    for (let j = i + 1; j < marks.length; j++) {
+      const last = run[run.length - 1];
+      if (marks[j].letter === last.letter && marks[j].n === last.n + 1) run.push(marks[j]);
+    }
+    if (run.length > best.length) best = run;
+  }
+  if (best.length < 2) return [line];
+  const cuts = best.map((m) => m.at).filter((at) => at > 0);
+  const out: string[] = [];
+  let from = 0;
+  for (const at of cuts) {
+    out.push(line.slice(from, at));
+    from = at;
+  }
+  out.push(line.slice(from));
+  return out.map((x) => x.trim()).filter((x, i) => x || i > 0);
+}
+
