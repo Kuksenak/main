@@ -28,6 +28,14 @@ export function studentPageUrl(token: string): string {
         <span class="min-w-0 flex-1 truncate" [class.opacity-50]="!token()">{{ token() ? url() : '…' }}</span>
         <app-icon [name]="copied() ? 'check' : 'copy'" class="size-5 shrink-0 text-[var(--accent)]" />
       </button>
+      <!-- The PIN the student made up (asked on a new device); forgotten: reset — they make a new one -->
+      <div class="list-row">
+        <app-icon name="lock" class="row-icon" />
+        <span class="flex-1" [class.opacity-50]="!hasPin()">{{ (hasPin() ? 'students.pinSet' : 'students.pinNone') | t }}</span>
+        @if (hasPin()) {
+          <button type="button" (click)="resetPin()" class="text-subhead rounded-full bg-[var(--fill)] px-3 py-1 font-medium text-[var(--danger)] hover:bg-[var(--highlight)]">{{ 'students.resetPin' | t }}</button>
+        }
+      </div>
       <button #resetBtn type="button" (click)="asking.set(resetBtn)" [disabled]="!token()" class="list-row w-full text-left text-[var(--danger)]">
         {{ 'students.newLink' | t }}
       </button>
@@ -50,6 +58,7 @@ export class StudentLink {
 
   private http = inject(HttpClient);
   protected readonly token = signal<string | null>(null);
+  protected readonly hasPin = signal(false);
   protected readonly copied = signal(false);
   protected readonly asking = signal<HTMLElement | null>(null);
   protected readonly choices: ActionChoice[] = [{ value: 'reset', label: 'students.newLink', danger: true }];
@@ -60,10 +69,23 @@ export class StudentLink {
       const id = this.studentId();
       this.token.set(null);
       this.http
-        .post<{ token: string }>(`${environment.apiUrl}/students/${id}/access`, {})
+        .post<{ token: string; hasPin?: boolean }>(`${environment.apiUrl}/students/${id}/access`, {})
         .pipe(catchError(() => of(null)))
-        .subscribe((res) => this.token.set(res?.token ?? null));
+        .subscribe((res) => {
+          this.token.set(res?.token ?? null);
+          this.hasPin.set(!!res?.hasPin);
+        });
     });
+  }
+
+  // Forgotten: the next visit (on any device) makes a new one
+  protected resetPin(): void {
+    this.http
+      .post(`${environment.apiUrl}/students/${this.studentId()}/pin/reset`, {})
+      .pipe(catchError(() => of(null)))
+      .subscribe((res) => {
+        if (res) this.hasPin.set(false);
+      });
   }
 
   protected url(): string {
@@ -86,7 +108,10 @@ export class StudentLink {
       .post<{ token: string }>(`${environment.apiUrl}/students/${this.studentId()}/access/reset`, {})
       .pipe(catchError(() => of(null)))
       .subscribe((res) => {
-        if (res?.token) this.token.set(res.token);
+        if (res?.token) {
+          this.token.set(res.token);
+          this.hasPin.set(false); // a new link: a new PIN too
+        }
       });
   }
 }

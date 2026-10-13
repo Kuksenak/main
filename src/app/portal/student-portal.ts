@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '@environments/environment';
@@ -35,6 +35,21 @@ interface PortalLesson {
  * exercises answered and checklists ticked are saved as theirs (the teacher sees them under
  * their name), a pill at the bottom counts what's answered.
  */
+function stored(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function store(key: string, value: string | null): void {
+  try {
+    if (value === null) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch {}
+}
+
 @Component({
   selector: 'app-student-portal',
   imports: [Icon, LessonContent, TranslatePipe],
@@ -48,6 +63,44 @@ interface PortalLesson {
         }
         @case ('missing') {
           <p class="text-body py-10 text-center opacity-40">{{ 'portal.notFound' | t }}</p>
+        }
+        @case ('pin') {
+          <!-- The PIN: made up on the first visit (twice), asked on a new device -->
+          <form (submit)="sendPin(); $event.preventDefault()" class="mx-auto flex w-full max-w-sm flex-col items-center gap-4 py-10 text-center">
+            <app-icon name="lock" class="size-8 text-[var(--accent)]" />
+            <h1 class="text-xl font-semibold">{{ (pinMode() === 'set' ? 'portal.pinSetTitle' : 'portal.pinEnterTitle') | t }}</h1>
+            <p class="text-body opacity-60">{{ (pinMode() === 'set' ? 'portal.pinSetHint' : 'portal.pinEnterHint') | t }}</p>
+            <input
+              #pin1
+              type="password"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="6"
+              autocomplete="off"
+              [value]="pin()"
+              (input)="pin.set(digits(pin1.value)); pin1.value = pin()"
+              [placeholder]="'portal.pin' | t"
+              class="field h-12 w-48 text-center text-2xl tracking-[0.4em]"
+            />
+            @if (pinMode() === 'set') {
+              <input
+                #pin2
+                type="password"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="6"
+                autocomplete="off"
+                [value]="pinAgain()"
+                (input)="pinAgain.set(digits(pin2.value)); pin2.value = pinAgain()"
+                [placeholder]="'portal.pinAgain' | t"
+                class="field h-12 w-48 text-center text-2xl tracking-[0.4em]"
+              />
+            }
+            @if (pinError(); as e) {
+              <p class="text-footnote text-[var(--danger)]">{{ e }}</p>
+            }
+            <button type="submit" [disabled]="!pinReady() || sending()" class="btn-primary">{{ 'shared.continue' | t }}</button>
+          </form>
         }
         @default {
           @if (open(); as l) {
@@ -138,7 +191,7 @@ export class StudentPortal {
   private i18n = inject(I18nService);
   private readonly base = `${environment.apiUrl}/portal/${encodeURIComponent(inject(ActivatedRoute).snapshot.paramMap.get('token') ?? '')}`;
 
-  protected readonly state = signal<'loading' | 'ready' | 'missing'>('loading');
+  protected readonly state = signal<'loading' | 'ready' | 'missing' | 'pin'>('loading');
   protected readonly name = signal('');
   protected readonly upcoming = signal<PortalClass[]>([]);
   protected readonly lessons = signal<PortalLesson[]>([]);
@@ -146,16 +199,24 @@ export class StudentPortal {
   protected readonly saved = signal(true);
   protected readonly sending = signal(false);
 
+  // The PIN: this device's key once it's right (kept here); what to ask meanwhile
+  private readonly token = inject(ActivatedRoute).snapshot.paramMap.get('token') ?? '';
+  private readonly keyName = `portal.key.${this.token}`;
+  private key: string | null = stored(this.keyName);
+  protected readonly pinMode = signal<'set' | 'enter'>('enter');
+  protected readonly pin = signal('');
+  protected readonly pinAgain = signal('');
+  protected readonly pinError = signal<string | null>(null);
+  protected readonly pinReady = computed(
+    () => this.pin().length >= 4 && (this.pinMode() === 'enter' || this.pinAgain().length >= 4),
+  );
+
+  private headers(): Record<string, string> {
+    return this.key ? { 'X-Portal-Key': this.key } : {};
+  }
+
   constructor() {
-    this.http.get<{ name: string; upcoming: PortalClass[]; lessons: PortalLesson[] }>(this.base).subscribe({
-      next: (p) => {
-        this.name.set(p.name);
-        this.upcoming.set(p.upcoming ?? []);
-        this.lessons.set(p.lessons ?? []);
-        this.state.set('ready');
-      },
-      error: () => this.state.set('missing'),
-    });
+    this.load();
     // Leaving / hiding the page: what's not saved yet goes now (requests that outlive the page)
     const hide = () => {
       if (document.visibilityState === 'hidden') this.flushAll();
@@ -166,6 +227,67 @@ export class StudentPortal {
       this.flushAll();
       document.removeEventListener('visibilitychange', hide);
       window.removeEventListener('pagehide', hide);
+    });
+  }
+
+  private load(): void {
+    this.http
+      .get<{ name: string; upcoming: PortalClass[]; lessons: PortalLesson[] }>(this.base, { headers: this.headers() })
+      .subscribe({
+        next: (p) => {
+          this.name.set(p.name);
+          this.upcoming.set(p.upcoming ?? []);
+          this.lessons.set(p.lessons ?? []);
+          this.state.set('ready');
+        },
+        error: (e: HttpErrorResponse) => (this.askPin(e) ? undefined : this.state.set('missing')),
+      });
+  }
+
+  // The server wants the PIN (none yet: make one up; else: this device isn't let in)
+  private askPin(e: HttpErrorResponse): boolean {
+    const mode = e.error?.pin;
+    if (e.status !== 401 || (mode !== 'set' && mode !== 'enter')) return false;
+    this.key = null;
+    store(this.keyName, null);
+    this.pinMode.set(mode);
+    this.state.set('pin');
+    return true;
+  }
+
+  protected digits(v: string): string {
+    return v.replace(/\D/g, '').slice(0, 6);
+  }
+
+  protected sendPin(): void {
+    if (!this.pinReady() || this.sending()) return;
+    if (this.pinMode() === 'set' && this.pin() !== this.pinAgain()) {
+      this.pinError.set(this.i18n.t('portal.pinMismatch'));
+      return;
+    }
+    this.sending.set(true);
+    this.pinError.set(null);
+    this.http.post<{ key: string }>(`${this.base}/pin`, { pin: this.pin() }).subscribe({
+      next: (r) => {
+        this.key = r.key;
+        store(this.keyName, r.key);
+        this.pin.set('');
+        this.pinAgain.set('');
+        this.sending.set(false);
+        this.state.set('loading');
+        this.load();
+      },
+      error: (e: HttpErrorResponse) => {
+        this.sending.set(false);
+        this.pin.set('');
+        if (e.status === 429 && e.error?.lockedUntil) {
+          this.pinError.set(this.i18n.t('portal.pinLocked').replace('{time}', this.i18n.time(new Date(e.error.lockedUntil))));
+        } else if (e.error?.wrong) {
+          this.pinError.set(this.i18n.t('portal.pinWrong').replace('{n}', String(e.error.left ?? '')));
+        } else {
+          this.pinError.set(this.i18n.t('portal.pinFailed'));
+        }
+      },
     });
   }
 
@@ -192,7 +314,7 @@ export class StudentPortal {
       fetch(`${this.base}/lessons/${l.id}/attempt`, {
         method: 'PUT',
         keepalive: true,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...this.headers() },
         body: JSON.stringify(this.payload(l)),
       }).catch(() => {});
     }
@@ -214,8 +336,8 @@ export class StudentPortal {
         this.timers.delete(l.id);
         this.pending.delete(l.id);
         this.http
-          .put(`${this.base}/lessons/${updated.id}/attempt`, this.payload(updated))
-          .subscribe({ next: () => this.saved.set(true), error: () => {} });
+          .put(`${this.base}/lessons/${updated.id}/attempt`, this.payload(updated), { headers: this.headers() })
+          .subscribe({ next: () => this.saved.set(true), error: (e: HttpErrorResponse) => this.askPin(e) });
       }, 1500),
     );
   }
@@ -232,7 +354,7 @@ export class StudentPortal {
         answers: l.answers,
         ticks: l.ticks,
         fills: l.fills ?? {},
-      })
+      }, { headers: this.headers() })
       .subscribe({
         next: (r) => {
           const sent = { ...l, submittedAt: r.submittedAt ?? new Date().toISOString() };
@@ -240,7 +362,10 @@ export class StudentPortal {
           this.open.set(sent);
           this.sending.set(false);
         },
-        error: () => this.sending.set(false),
+        error: (e: HttpErrorResponse) => {
+          this.sending.set(false);
+          this.askPin(e);
+        },
       });
   }
 
@@ -248,7 +373,7 @@ export class StudentPortal {
   protected reopen(l: PortalLesson): void {
     if (this.sending()) return;
     this.sending.set(true);
-    this.http.post(`${this.base}/lessons/${l.id}/attempt/reopen`, {}).subscribe({
+    this.http.post(`${this.base}/lessons/${l.id}/attempt/reopen`, {}, { headers: this.headers() }).subscribe({
       next: () => {
         const draft = { ...l, submittedAt: null };
         this.lessons.update((list) => list.map((x) => (x.id === l.id ? draft : x)));
