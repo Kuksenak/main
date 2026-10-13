@@ -51,7 +51,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     @for (b of m.blocks; track $index; let i = $index) {
       @if (caret()?.at === i) {
         <!-- The caret between tasks: they part for a line, a text cursor in it and what it's for -->
-        <div data-caret class="flex h-7 items-center gap-1.5 px-2.5 [animation:fadeIn_120ms_ease-out]">
+        <div data-caret class="flex h-7 items-center gap-1.5 [animation:fadeIn_120ms_ease-out]">
           <span class="text-cursor"></span>
           <span class="text-footnote opacity-45">{{ 'lessons.caretHint' | t }}</span>
         </div>
@@ -243,7 +243,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     }
       @if (caret()?.at === m.blocks.length) {
         <!-- The caret between tasks: they part for a line, a text cursor in it and what it's for -->
-        <div data-caret class="flex h-7 items-center gap-1.5 px-2.5 [animation:fadeIn_120ms_ease-out]">
+        <div data-caret class="flex h-7 items-center gap-1.5 [animation:fadeIn_120ms_ease-out]">
           <span class="text-cursor"></span>
           <span class="text-footnote opacity-45">{{ 'lessons.caretHint' | t }}</span>
         </div>
