@@ -60,6 +60,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             [placeholder]="'lessons.caretHint' | t"
             (input)="caretTyped($event)"
             (keydown)="caretKey($event)"
+            (click)="slash() || openAdd()"
             (blur)="caretBlur()"
             class="h-7 w-full bg-transparent text-[0.875rem] outline-none placeholder:opacity-45"
           />
@@ -261,6 +262,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             [placeholder]="'lessons.caretHint' | t"
             (input)="caretTyped($event)"
             (keydown)="caretKey($event)"
+            (click)="slash() || openAdd()"
             (blur)="caretBlur()"
             class="h-7 w-full bg-transparent text-[0.875rem] outline-none placeholder:opacity-45"
           />
