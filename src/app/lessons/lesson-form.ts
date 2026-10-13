@@ -98,7 +98,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 @Component({
   selector: 'app-lesson-form',
   imports: [AiChat, BrandIcon, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
-  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)' },
+  host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
     @if (showTitle()) {
@@ -270,17 +270,20 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       }
     }
       @if (desktop) {
-        <!-- The end of the page: "/" for the commands; anything else typed — a new task with it.
-             Typing on the page outside a task lands here. -->
+        <!-- The end of the page (as in Notion): a line to type on — "/" for the commands, other text
+             a new task on Enter (or on leaving it); its hint shows while it's focused (always on an
+             empty lesson). A click on the page under the tasks puts the cursor here. -->
         <textarea
           #end
           rows="1"
           (input)="onEnd(end)"
-          (keydown)="onSlashKey($event)"
-          (blur)="onBlur()"
+          (keydown)="onEndKey($event, end)"
+          (blur)="onBlur(); commitEnd(end)"
           [placeholder]="'lessons.slashHint' | t"
-          class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none placeholder:opacity-40 [field-sizing:content]"
+          class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none [field-sizing:content] placeholder:opacity-0 focus:placeholder:opacity-40"
+          [class.placeholder:!opacity-40]="!m.blocks.length"
         ></textarea>
+        <div aria-hidden="true" class="-mt-3 min-h-[40vh] cursor-text" (mousedown)="$event.preventDefault(); end.focus()"></div>
       }
       <!-- The end of the page: a new task; the assistant (unless the page has them in its head) -->
       @if (endButtons()) {
@@ -597,23 +600,7 @@ export class LessonForm {
     this.slash.set({ block, start: lineStart, end: caret, query: m[1], x: r.left, y: r.top + r.height + 2, active: was?.block === block ? was.active : 0 });
   }
 
-  private readonly endField = viewChild<ElementRef<HTMLTextAreaElement>>('end');
-
-  // Typing on the page outside any field (nothing open over it): it goes into the page's end
-  protected typeOnPage(e: KeyboardEvent): void {
-    const end = this.endField()?.nativeElement;
-    if (!end || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
-    if (!this.photos() || this.aiOpen() || this.previewing() !== null || this.slash() || this.sel()) return;
-    const a = document.activeElement as HTMLElement | null;
-    const editable = !!a?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])');
-    if (editable || (a && a !== document.body && !this.host.nativeElement.contains(a))) return;
-    e.preventDefault();
-    end.focus();
-    end.value += e.key;
-    this.onEnd(end);
-  }
-
-  // The page's end: "/…" the commands; other text — a new task with it, typed on in it
+  // The page's end: "/…" the commands
   protected onEnd(end: HTMLTextAreaElement): void {
     this.field = end;
     const v = end.value;
@@ -624,9 +611,26 @@ export class LessonForm {
       return;
     }
     this.slash.set(null);
-    if (!v) return;
+  }
+
+  // The end's line: Enter makes it a task (Shift+Enter: a new line in it); the commands' keys
+  protected onEndKey(e: KeyboardEvent, end: HTMLTextAreaElement): void {
+    if (this.slash()) {
+      this.onSlashKey(e);
+      return;
+    }
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
+    e.preventDefault();
+    this.commitEnd(end);
+  }
+
+  // What's typed on the end's line: a new task (the line stays, empty, to type the next one)
+  protected commitEnd(end: HTMLTextAreaElement): void {
+    const v = end.value.trim();
+    if (!v || v.startsWith('/')) return;
     end.value = '';
-    this.insertBlock(this.value().blocks.length, 'gaps', v);
+    const block: LessonBlock = { kind: 'gaps', text: v, url: null, private: false, instruction: null };
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks, block] }));
   }
 
   protected onSlashKey(e: KeyboardEvent): void {
