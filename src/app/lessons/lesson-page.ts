@@ -37,7 +37,7 @@ const SAVE_AT_LEAST_MS = 5000;
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
-      <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-2 pb-10">
+      <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-1 pb-10">
         @if (s.id() && !s.lesson()) {
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
         } @else {

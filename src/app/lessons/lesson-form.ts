@@ -33,7 +33,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 @Component({
   selector: 'app-lesson-form',
   imports: [AiChat, BrandIcon, ConfirmDelete, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
-  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:dragover)': 'autoScroll($event)', '(document:paste)': 'pasteOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
+  host: { class: 'flex flex-col gap-3', '(document:keydown)': 'typeOnPage($event)', '(document:dragover)': 'autoScroll($event)', '(document:paste)': 'pasteOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
     @if (showTitle()) {
@@ -44,7 +44,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
     <!-- (tasks are moved by their ⠿, as in Notion: nothing moves meanwhile, a line shows where it'd go) -->
-    <div #list data-tasks class="relative flex flex-col gap-3" [class.pl-5]="desktop && !selectable()" (dragover)="dragOver($event, list)" (drop)="drop($event)" (mousedown)="placeCaret($event, list)">
+    <div #list data-tasks class="relative flex flex-col gap-2" [class.pl-5]="desktop && !selectable()" (dragover)="dragOver($event, list)" (drop)="drop($event)" (mousedown)="placeCaret($event, list)">
     @if (dropLine(); as y) {
       <div aria-hidden="true" class="drop-line pointer-events-none absolute right-0 z-20" [class.left-5]="desktop && !selectable()" [class.left-0]="!desktop || selectable()" [style.top.px]="y"></div>
     }
