@@ -197,10 +197,10 @@ export class LessonPage {
     this.clipboard.copy(cleanLesson(this.s.draft()).blocks);
   }
 
-  // ⋯ → Paste content: the tasks copied, in place of what's there
+  // ⋯ → Paste content: the tasks copied, at the end
   protected pasteContent(blocks: LessonBlock[]): void {
     this.menuOpen.set(false);
-    this.s.draft.update((d) => ({ ...d, blocks: blocks.map((b) => ({ ...b })) }));
+    this.s.draft.update((d) => ({ ...d, blocks: [...d.blocks, ...blocks.map((b) => ({ ...b }))] }));
   }
 
   protected setLocked(locked: boolean): void {
