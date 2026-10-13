@@ -61,6 +61,14 @@ export function splitInstruction(b: LessonBlock): LessonBlock {
  * label and address.
  */
 export function asTask(b: LessonBlock): LessonBlock {
+  const t = blockAsTask(b);
+  // One text per task: its heading, bold, as the first line
+  if (t.kind !== 'gaps' || !t.instruction?.trim()) return t;
+  const heading = `**${t.instruction.trim().replace(/\*\*/g, '')}**`;
+  return { ...t, instruction: null, text: t.text?.trim() ? `${heading}\n${t.text}` : heading };
+}
+
+function blockAsTask(b: LessonBlock): LessonBlock {
   const base: LessonBlock = { kind: 'gaps', text: null, url: null, private: !!b.private, instruction: null };
   switch (b.kind) {
     case 'gaps':
@@ -81,6 +89,32 @@ export function asTask(b: LessonBlock): LessonBlock {
       // (its first line, if there are more, the heading)
       return splitInstruction({ ...base, text: b.text });
   }
+}
+
+/** A piece of text with its formatting. */
+export interface Styled {
+  t: string;
+  b?: boolean;
+  i?: boolean;
+  u?: boolean;
+}
+
+// **bold**, __underlined__, *italic* (not nested)
+const STYLE = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|\*([^*\n]+)\*/g;
+
+/** Text with **bold**, *italic* and __underlined__ in it, as styled pieces. */
+export function styled(text: string): Styled[] {
+  const out: Styled[] = [];
+  let at = 0;
+  for (const m of text.matchAll(STYLE)) {
+    if (m.index > at) out.push({ t: text.slice(at, m.index) });
+    if (m[1] !== undefined) out.push({ t: m[1], b: true });
+    else if (m[2] !== undefined) out.push({ t: m[2], u: true });
+    else out.push({ t: m[3], i: true });
+    at = m.index + m[0].length;
+  }
+  if (at < text.length || !out.length) out.push({ t: text.slice(at) });
+  return out;
 }
 
 /** Each gap's accepted answers (empty: none set). */

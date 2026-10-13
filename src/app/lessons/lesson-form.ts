@@ -1,14 +1,16 @@
-import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, model, signal, viewChild } from '@angular/core';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
+import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
 import { AiChat } from '../ai/ai-chat';
 import { AiChatService } from '../ai/ai-chat.service';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
+import { caretRect } from '../core/ui/caret';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { asTask } from './gaps';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
@@ -84,15 +86,15 @@ export function cleanLesson(l: LessonInput): LessonInput {
 }
 
 /**
- * Editing a lesson in place: the title, then the blocks — each a card with its kind, who sees it
- * (students / only me: a tap switches), its drag handle and ×: texts, checklists (items), exercises
- * (a question, answers, the right one marked by its circle); older lessons' headings and links
- * too. + Text / Task / Checklist at the end, and the lesson's Assistant (exercises, texts, photos
- * of a book — see AiChat). `photos` off: no assistant / photo part (the preview's own editor).
+ * Editing a lesson in place, Notion-like: the title, then the tasks — each one text (its first
+ * line, bold, is its heading; [answers] to write in, {*right|other} to choose); "/" opens the
+ * commands (a new task, the assistant), a selection the formatting (B, I, U, make it a gap / a
+ * choice). Each task: Preview, who sees it, ?, ×. Older lessons' blocks become tasks when edited;
+ * pictures stay. `photos` off: no assistant part (the preview's own editor).
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, TranslatePipe],
+  imports: [AiChat, BrandIcon, FormsModule, Icon, LessonContent, PageSheet, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
@@ -102,11 +104,18 @@ export function cleanLesson(l: LessonInput): LessonInput {
       </div>
     </div>
 
-    <!-- Blocks, reordered by dragging their handle -->
-    <div cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="move($event)" class="flex flex-col gap-4">
+    <!-- The tasks (no blocks yet: one to start typing in) -->
+    <div class="flex flex-col gap-4">
+    @if (!m.blocks.length) {
+      <div class="card">
+        <div class="list-row items-start pb-3 pt-3">
+          <textarea #first rows="2" (input)="startFirst(first)" [placeholder]="'lessons.slashHint' | t" class="row-input text-subhead min-h-[3lh] resize-none leading-relaxed [field-sizing:content]"></textarea>
+        </div>
+      </div>
+    }
     @for (b of m.blocks; track $index; let i = $index) {
-      <div cdkDrag class="card" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
-        <!-- Head: ⠿ · kind · who sees it · × -->
+      <div class="card" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
+        <!-- Head: (kind) · Preview · who sees it · ? · × -->
         <div class="list-row !min-h-0 gap-2 pb-1 pt-2.5 after:hidden">
           @if (selectable()) {
             <!-- Picked (for Save as a new lesson / Add to a lesson) -->
@@ -116,23 +125,15 @@ export function cleanLesson(l: LessonInput): LessonInput {
               }
             </button>
           }
-          <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
-            <app-icon name="grip" class="size-5" />
+          <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
+            <!-- (Tasks need no label; pictures keep theirs) -->
+            @if (b.kind !== 'gaps') {
+              <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
+            }
           </span>
-          @if (b.kind === 'gaps' && desktop) {
-            <!-- Desktop: the task's heading right in its head row -->
-            <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input text-subhead min-w-0 flex-1 resize-none leading-relaxed [field-sizing:content]"></textarea>
-          } @else {
-            <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
-              <!-- (Tasks need no label; older kinds keep theirs) -->
-              @if (b.kind !== 'gaps') {
-                <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
-              }
-            </span>
-          }
           @if (b.kind === 'gaps') {
             <!-- What the student sees, in a popup -->
-            <button type="button" (click)="previewing.set(i)" [disabled]="!b.instruction?.trim() && !b.text?.trim()" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70 disabled:opacity-30 disabled:hover:bg-[var(--fill)]">{{ 'lessons.studentSees' | t }}</button>
+            <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70 disabled:opacity-30 disabled:hover:bg-[var(--fill)]">{{ 'lessons.studentSees' | t }}</button>
           }
           <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70">
             @if (b.private) {
@@ -209,17 +210,23 @@ export function cleanLesson(l: LessonInput): LessonInput {
             </div>
           }
           @case ('gaps') {
-            @if (!desktop) {
-            <div class="list-row items-start pb-1 pt-1">
-              <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input text-subhead resize-none leading-relaxed [field-sizing:content]"></textarea>
+            <div class="list-row items-start pb-3 pt-1">
+              <textarea
+                #ta
+                [attr.data-task]="i"
+                [ngModel]="b.text"
+                (ngModelChange)="setBlock(i, { text: $event })"
+                (input)="onType(i, ta)"
+                (keydown)="onKey($event, i, ta)"
+                (select)="onSelect(i, ta)"
+                (mouseup)="onSelect(i, ta)"
+                (keyup)="onSelect(i, ta)"
+                (blur)="onBlur()"
+                rows="2"
+                [placeholder]="'lessons.slashHint' | t"
+                class="row-input text-subhead min-h-[3lh] resize-none leading-relaxed [field-sizing:content]"
+              ></textarea>
             </div>
-            }
-            <div class="list-row items-start pb-1 pt-1">
-              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="2" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input text-subhead min-h-[3lh] resize-none leading-relaxed [field-sizing:content]"></textarea>
-            </div>
-            @if (!desktop) {
-              <p class="text-footnote px-4 pb-3 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
-            }
           }
           @case ('heading') {
             <div class="list-row">
@@ -236,18 +243,54 @@ export function cleanLesson(l: LessonInput): LessonInput {
     }
     </div>
 
-    <!-- Add at the end -->
-    <div class="flex flex-wrap justify-center gap-2">
-      <button type="button" (click)="add('gaps')" class="chip gap-1.5 !rounded-full">
-        <app-icon name="plus" class="size-4 text-[var(--accent)]" />{{ 'action.add' | t }}
-      </button>
-      @if (photos()) {
-        <!-- The lesson's assistant (photos go there too) -->
-        <button type="button" (click)="aiOpen.set(true)" class="chip gap-1.5 !rounded-full">
-          <app-brand-icon name="sparkle" class="size-5" />{{ 'nav.ai' | t }}
-        </button>
-      }
-    </div>
+    <!-- "/": the commands at the cursor -->
+    @if (slash(); as sl) {
+      <div class="popover-panel fixed z-[2100] w-64 p-1" [style.left.px]="sl.x" [style.top.px]="sl.y">
+        @for (c of slashItems(); track c.id; let k = $index) {
+          <button
+            type="button"
+            (mousedown)="$event.preventDefault()"
+            (click)="runSlash(c.id)"
+            class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left"
+            [class.bg-[var(--highlight)]]="k === sl.active"
+          >
+            @if (c.id === 'assistant') {
+              <app-brand-icon name="sparkle" class="size-6 shrink-0" />
+            } @else {
+              <span class="flex size-6 shrink-0 items-center justify-center rounded-md bg-[var(--fill)]"><app-icon name="plus" class="size-4" /></span>
+            }
+            <span class="min-w-0 leading-tight">
+              <span class="text-subhead block font-medium">{{ c.label | t }}</span>
+              <span class="text-footnote block opacity-55">{{ c.hint | t }}</span>
+            </span>
+          </button>
+        } @empty {
+          <p class="text-footnote px-2.5 py-2 opacity-50">{{ 'lessons.slashNone' | t }}</p>
+        }
+      </div>
+    }
+
+    <!-- A selection: its formatting -->
+    @if (sel(); as se) {
+      <div class="popover-panel fixed z-[2100] flex items-center gap-0.5 p-1" [style.left.px]="se.x" [style.top.px]="se.y">
+        @for (f of formats; track f.id) {
+          <button
+            type="button"
+            (mousedown)="$event.preventDefault()"
+            (click)="format(f.id)"
+            [attr.aria-label]="f.label | t"
+            [attr.title]="f.label | t"
+            class="flex h-8 min-w-8 items-center justify-center rounded-md px-1.5 text-[0.9375rem] hover:bg-[var(--highlight)]"
+            [class.font-bold]="f.id === 'bold'"
+            [class.italic]="f.id === 'italic'"
+            [class.underline]="f.id === 'underline'"
+            [class.font-mono]="f.id === 'gap' || f.id === 'choice'"
+            [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice'"
+          >{{ f.mark }}</button>
+        }
+      </div>
+    }
+
     @if (aiOpen()) {
       <app-page-sheet [title]="'nav.ai' | t" [actions]="false" [scroll]="false" [large]="true" (closed)="aiOpen.set(false)">
         <h1 class="mb-3 flex items-center gap-2 px-1 text-xl font-semibold mobile:hidden"><app-brand-icon name="sparkle" class="size-6" />{{ 'nav.ai' | t }}</h1>
@@ -315,12 +358,149 @@ export class LessonForm {
   readonly selected = model<number[]>([]);
   protected readonly aiOpen = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  private readonly i18n = inject(I18nService);
   // The task whose "how to write it" is open (desktop's ?)
   protected readonly helpOpen = signal<number | null>(null);
 
-  // Blocks from the AI at the lesson's end
+  // Blocks from the AI at the lesson's end (as tasks: heading and body in one text)
   protected appendBlocks(blocks: LessonBlock[]): void {
-    this.value.update((m) => ({ ...m, blocks: [...m.blocks, ...blocks] }));
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks.filter((b) => b.kind !== 'gaps' || b.text?.trim()), ...blocks.map(asTask)] }));
+  }
+
+  // ---- "/" commands and the selection's formatting
+
+  protected readonly slash = signal<{ block: number; start: number; query: string; x: number; y: number; active: number } | null>(null);
+  protected readonly sel = signal<{ block: number; x: number; y: number } | null>(null);
+  private field: HTMLTextAreaElement | null = null;
+
+  private readonly commands: { id: 'task' | 'assistant'; label: TranslationKey; hint: TranslationKey; words: string }[] = [
+    { id: 'task', label: 'lessons.slashTask', hint: 'lessons.slashTaskHint', words: 'task exercise new add zadanie exercice' },
+    { id: 'assistant', label: 'nav.ai', hint: 'lessons.slashAssistantHint', words: 'assistant ai asystent ia' },
+  ];
+  protected readonly slashItems = computed(() => {
+    const q = (this.slash()?.query ?? '').toLowerCase();
+    return this.commands
+      .filter((c) => this.photos() || c.id !== 'assistant')
+      .filter((c) => !q || c.words.split(' ').some((w) => w.startsWith(q)) || this.i18n.t(c.label).toLowerCase().startsWith(q));
+  });
+
+  protected readonly formats: { id: 'bold' | 'italic' | 'underline' | 'gap' | 'choice'; mark: string; label: TranslationKey }[] = [
+    { id: 'bold', mark: 'B', label: 'lessons.fmtBold' },
+    { id: 'italic', mark: 'I', label: 'lessons.fmtItalic' },
+    { id: 'underline', mark: 'U', label: 'lessons.fmtUnderline' },
+    { id: 'gap', mark: '[ ]', label: 'lessons.fmtGap' },
+    { id: 'choice', mark: '{ }', label: 'lessons.fmtChoice' },
+  ];
+
+  // Typing: "/" at a line's start or after a space opens the commands (the letters after it filter)
+  protected onType(block: number, ta: HTMLTextAreaElement): void {
+    this.field = ta;
+    this.sel.set(null);
+    const pos = ta.selectionStart;
+    const before = ta.value.slice(0, pos);
+    const m = /(^|\s)\/([\p{L}]*)$/u.exec(before);
+    if (!m) {
+      this.slash.set(null);
+      return;
+    }
+    const start = pos - m[2].length - 1;
+    const r = caretRect(ta, start);
+    const was = this.slash();
+    this.slash.set({ block, start, query: m[2], x: r.left, y: r.top + r.height + 4, active: was?.block === block ? was.active : 0 });
+  }
+
+  protected onKey(e: KeyboardEvent, block: number, ta: HTMLTextAreaElement): void {
+    const sl = this.slash();
+    if (!sl || sl.block !== block) return;
+    const n = this.slashItems().length;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (n) this.slash.set({ ...sl, active: (sl.active + (e.key === 'ArrowDown' ? 1 : n - 1)) % n });
+    } else if (e.key === 'Enter') {
+      const c = this.slashItems()[sl.active];
+      if (!c) return;
+      e.preventDefault();
+      this.field = ta;
+      this.runSlash(c.id);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      this.slash.set(null);
+    }
+  }
+
+  // A command: its "/word" taken out of the text, then a new task below / the assistant
+  protected runSlash(id: 'task' | 'assistant'): void {
+    const sl = this.slash();
+    const ta = this.field;
+    this.slash.set(null);
+    if (!sl || !ta) return;
+    const text = ta.value.slice(0, sl.start) + ta.value.slice(ta.selectionStart);
+    this.setBlock(sl.block, { text });
+    if (id === 'assistant') {
+      this.aiOpen.set(true);
+      return;
+    }
+    const task: LessonBlock = { kind: 'gaps', text: null, url: null, private: false, instruction: null };
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, sl.block + 1), task, ...m.blocks.slice(sl.block + 1)] }));
+    this.focusTask(sl.block + 1, 0);
+  }
+
+  // A selection in a task: the formatting toolbar over it
+  protected onSelect(block: number, ta: HTMLTextAreaElement): void {
+    this.field = ta;
+    requestAnimationFrame(() => {
+      if (document.activeElement !== ta || ta.selectionStart === ta.selectionEnd) {
+        this.sel.set(null);
+        return;
+      }
+      const r = caretRect(ta, ta.selectionStart);
+      this.sel.set({ block, x: r.left, y: Math.max(4, r.top - 44) });
+    });
+  }
+
+  protected onBlur(): void {
+    setTimeout(() => {
+      this.slash.set(null);
+      this.sel.set(null);
+    }, 120);
+  }
+
+  // B / I / U: **…**, *…*, __…__; a gap: […] (the selection its answer); a choice: {*…|} (the
+  // selection the right one, the cursor where the others go)
+  protected format(kind: 'bold' | 'italic' | 'underline' | 'gap' | 'choice'): void {
+    const ta = this.field;
+    const se = this.sel();
+    if (!ta || !se) return;
+    const [a, b] = [ta.selectionStart, ta.selectionEnd];
+    const picked = ta.value.slice(a, b);
+    const [open, close] = { bold: ['**', '**'], italic: ['*', '*'], underline: ['__', '__'], gap: ['[', ']'], choice: ['{*', '|}'] }[kind];
+    const text = ta.value.slice(0, a) + open + picked + close + ta.value.slice(b);
+    this.setBlock(se.block, { text });
+    this.sel.set(null);
+    ta.value = text;
+    ta.focus();
+    if (kind === 'choice') ta.setSelectionRange(a + open.length + picked.length + 1, a + open.length + picked.length + 1);
+    else ta.setSelectionRange(a + open.length, a + open.length + picked.length);
+  }
+
+  // The first task of an empty lesson, from what's typed in its stand-in
+  protected startFirst(first: HTMLTextAreaElement): void {
+    const text = first.value;
+    const caret = first.selectionStart;
+    this.value.update((m) => ({ ...m, blocks: [{ kind: 'gaps', text, url: null, private: false, instruction: null }] }));
+    this.focusTask(0, caret, true);
+  }
+
+  // A task's field focused (the cursor at `caret`); `typed`: as if just typed in (a "/" opens the commands)
+  private focusTask(index: number, caret: number, typed = false): void {
+    setTimeout(() => {
+      const ta = this.host.nativeElement.querySelector<HTMLTextAreaElement>(`textarea[data-task="${index}"]`);
+      if (!ta) return;
+      ta.focus();
+      ta.setSelectionRange(caret, caret);
+      if (typed) this.onType(index, ta);
+    });
   }
 
   // The task shown as the student sees it (its place), in a popup
@@ -443,22 +623,6 @@ export class LessonForm {
     // The right answer stays on its option
     if (list === 'options' && b.answer != null) p.answer = b.answer === at ? null : b.answer > at ? b.answer - 1 : b.answer;
     this.setBlock(index, p);
-  }
-
-  protected move(e: CdkDragDrop<unknown>): void {
-    if (e.previousIndex === e.currentIndex) return;
-    this.value.update((m) => {
-      const blocks = [...m.blocks];
-      moveItemInArray(blocks, e.previousIndex, e.currentIndex);
-      return { ...m, blocks };
-    });
-    // The picks follow their blocks
-    if (this.selectable()) {
-      const order = this.value().blocks.map((_, j) => j);
-      moveItemInArray(order, e.currentIndex, e.previousIndex); // new place → old place
-      const was = new Set(this.selected());
-      this.selected.set(order.map((old, now) => (was.has(old) ? now : -1)).filter((x) => x >= 0));
-    }
   }
 
   // A new block at the end: a checklist is the teacher's plan by default; an exercise starts with

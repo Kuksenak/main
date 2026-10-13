@@ -3,6 +3,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { AiResponse } from './ai-response';
+import { asTask } from './gaps';
 import { LessonForm } from './lesson-form';
 import { LessonImport, LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonInput, LessonService } from './lesson.service';
@@ -83,7 +84,7 @@ export class LessonImportPreview {
       (local ? Promise.resolve(local) : this.imports.get(id)).then(
         (x) => {
           if (this.imports.previewing() !== id) return;
-          this.draft = { title: x.draft?.title ?? '', blocks: x.draft?.blocks ?? [] };
+          this.draft = { title: x.draft?.title ?? '', blocks: (x.draft?.blocks ?? []).map(asTask) };
           this.picked.set(this.draft.blocks.map((_, i) => i));
           this.target.set(x.lessonId ?? this.lessonList()[0]?.id ?? null);
           this.imp.set(x);

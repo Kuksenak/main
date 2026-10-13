@@ -4,7 +4,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { Masonry } from '../core/ui/masonry';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
-import { Gap, GapPart, LessonFills, gapLines, gapRight, splitInstruction } from './gaps';
+import { Gap, GapPart, LessonFills, Styled, gapLines, gapRight, splitInstruction, styled } from './gaps';
 import { LessonBlock, imageSrc } from './lesson.service';
 
 /** Exercise answers (block → option) and checklist ticks ("block:item"); blocks by their place in the lesson. */
@@ -168,7 +168,10 @@ export type { LessonFills } from './gaps';
                         }
                       }
                     } @else {
-                      <span class="whitespace-pre-wrap">{{ textOf(p) }}</span>
+                      <!-- **bold**, *italic*, __underlined__ -->
+                      @for (st of style(textOf(p)); track $index) {
+                        <span class="whitespace-pre-wrap" [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>
+                      }
                     }
                   }
                 </p>
@@ -318,6 +321,17 @@ export class LessonContent {
 
   protected gapOf(p: GapPart): Gap | null {
     return 'gap' in p ? p : null;
+  }
+
+  // Styled pieces of a text part (parsed once per text)
+  private readonly styles = new Map<string, Styled[]>();
+  protected style(text: string): Styled[] {
+    let out = this.styles.get(text);
+    if (!out) {
+      if (this.styles.size > 500) this.styles.clear();
+      this.styles.set(text, (out = styled(text)));
+    }
+    return out;
   }
 
   protected textOf(p: GapPart): string {
