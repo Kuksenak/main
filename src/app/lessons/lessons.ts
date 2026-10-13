@@ -214,7 +214,7 @@ export class Lessons {
     const q = this.query().trim().toLocaleLowerCase();
     const has = (v: string | null) => !!v && v.toLocaleLowerCase().includes(q);
     return [...this.service.lessons()]
-      .filter((l) => !q || has(l.title) || l.blocks.some((b) => has(b.text) || has(b.url)))
+      .filter((l) => !q || has(l.title) || has(l.level ?? null) || l.blocks.some((b) => has(b.text) || has(b.url)))
       .sort((a, b) => a.title.localeCompare(b.title, this.i18n.locale()));
   });
 
@@ -229,7 +229,7 @@ export class Lessons {
     const q = this.searchQuery().trim().toLocaleLowerCase();
     const has = (v: string | null) => !!v && v.toLocaleLowerCase().includes(q);
     return [...this.service.lessons()]
-      .filter((l) => !q || has(l.title) || l.blocks.some((b) => has(b.text) || has(b.url)))
+      .filter((l) => !q || has(l.title) || has(l.level ?? null) || l.blocks.some((b) => has(b.text) || has(b.url)))
       .sort((a, b) => (q ? Number(!has(a.title)) - Number(!has(b.title)) : 0) || a.title.localeCompare(b.title, this.i18n.locale()))
       .slice(0, 50);
   });
