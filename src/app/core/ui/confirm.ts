@@ -31,7 +31,7 @@ export interface ActionChoice {
              across its width (no Cancel: a click outside cancels) -->
         <div
           role="alertdialog"
-          class="fixed flex w-70 flex-col gap-3 rounded-xl bg-[var(--dialog-bg)] p-4 text-[var(--text)] shadow-[var(--shadow-dialog)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
+          class="dialog-panel fixed flex w-60 flex-col !rounded-[10px] p-1 text-[var(--text)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
           [style.left.px]="place().left"
@@ -39,14 +39,15 @@ export interface ActionChoice {
           (click)="$event.stopPropagation()"
         >
           <!-- Just the explanation when there is one ("This can't be undone"), else the question -->
-          <p class="text-body text-balance text-center">{{ (message() ?? title()) | t }}</p>
-          <!-- The answers across the full width, labels centered; a click outside cancels -->
-          <div class="grid gap-2">
+          <!-- (in the menus' style: the question small and faded, the answers as rows) -->
+          <p class="text-balance px-2 pb-1 pt-1.5 text-[0.8125rem] leading-snug opacity-55">{{ (message() ?? title()) | t }}</p>
+          <div class="menu-list">
             @for (c of choices(); track c.value) {
               <button
                 type="button"
                 (click)="choose(c.value)"
-                [class]="c.danger ? 'btn-danger' : 'btn-secondary'"
+                class="menu-item font-medium"
+                [class.!text-[var(--danger)]]="c.danger"
                 [class.!text-[var(--accent)]]="c.accent"
               >{{ c.label | t }}</button>
             }
@@ -103,7 +104,7 @@ export class ActionSheet {
     const el = this.origin();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const width = this.desktop ? 280 : 248;
+    const width = this.desktop ? 240 : 248;
     if (!el) return { top: vh / 2 - 80, bottom: null, left: (vw - width) / 2 }; // no button: mid-screen
     const r = el.getBoundingClientRect();
     const left = Math.max(8, Math.min(r.left + r.width / 2 - width / 2, vw - 8 - width));

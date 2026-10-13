@@ -72,28 +72,28 @@ interface Model {
         <div class="flex flex-col">
           <div class="flex min-h-9 items-center gap-3">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.starts' | t }}</span>
-            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.875rem]">
+            <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-date [ngModel]="date()" (ngModelChange)="setDate($event)" [ngModelOptions]="{ standalone: true }" />
               <app-time [ngModel]="m.startTime" (ngModelChange)="onStartChange($event)" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
           <div class="flex min-h-9 items-center gap-3">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.ends' | t }}</span>
-            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.875rem]">
+            <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <span class="px-1" [class.opacity-60]="!invalid()" [class.text-[var(--warning)]]="invalid()" [class.line-through]="invalid()">{{ dateLabel() }}</span>
               <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
           <div class="flex min-h-9 items-center gap-3">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.repeat' | t }}</span>
-            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.875rem]">
+            <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-select [options]="presetOptions()" [ngModel]="preset()" (ngModelChange)="setPreset($event)" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
           @if (m.repeatCustom) {
             <div class="flex min-h-9 items-center gap-3">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.every' | t }}</span>
-            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.875rem]">
+            <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-select [options]="intervalOptions()" [ngModel]="m.repeatInterval" (ngModelChange)="patch({ repeatInterval: +$event })" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
@@ -101,14 +101,14 @@ interface Model {
           @if (m.repeat !== 'Never') {
             <div class="flex min-h-9 items-center gap-3">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.endRepeat' | t }}</span>
-            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.875rem]">
+            <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-select [options]="endOptions()" [ngModel]="m.repeatUntil ? 'date' : 'never'" (ngModelChange)="setEnd($event)" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
             @if (m.repeatUntil) {
               <div class="flex min-h-9 items-center gap-3">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.endDate' | t }}</span>
-            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.875rem]">
+            <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-date [ngModel]="untilDate()" (ngModelChange)="setUntil($event)" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>

@@ -115,12 +115,13 @@ import { ScrollArea } from '../scroll-area/scroll-area';
 
         @if (actions()) {
           <!-- Desktop footer -->
+          <!-- (in the new style: Delete as a head button, orange on hover; Save small and dark) -->
           <div class="mt-4 flex items-center gap-2 mobile:hidden">
             @if (deletable()) {
-              <button type="button" (click)="onDelete($event)" class="btn-secondary !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+              <button type="button" (click)="onDelete($event)" class="head-btn hover:!text-[var(--brand-orange,#f97316)]"><app-icon name="trash" />{{ 'action.delete' | t }}</button>
             }
             <!-- No Cancel: a click outside the card closes it -->
-            <button type="button" (click)="onSave($event)" [disabled]="!canSave()" class="btn-primary ml-auto">{{ 'action.save' | t }}</button>
+            <button type="button" (click)="onSave($event)" [disabled]="!canSave()" class="ml-auto flex h-8 items-center rounded-md bg-[var(--text)] px-3.5 text-[0.875rem] font-medium text-[var(--app-bg)] hover:opacity-85 disabled:opacity-30">{{ 'action.save' | t }}</button>
           </div>
         }
       </div>
