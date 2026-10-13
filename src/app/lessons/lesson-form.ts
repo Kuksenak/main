@@ -48,13 +48,14 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     @if (dropLine(); as y) {
       <div aria-hidden="true" class="drop-line pointer-events-none absolute right-0 z-20" [class.left-5]="desktop && !selectable()" [class.left-0]="!desktop || selectable()" [style.top.px]="y"></div>
     }
-    <!-- A click between tasks: a caret there, and what it's for — Ctrl+V pastes in there, a key
-         ("/" or letters) opens the commands for a new task there -->
-    @if (caret(); as c) {
-      <div aria-hidden="true" class="paste-caret pointer-events-none absolute right-0 z-20" [class.left-5]="desktop && !selectable()" [class.left-0]="!desktop || selectable()" [style.top.px]="c.y"></div>
-      <span aria-hidden="true" class="text-footnote pointer-events-none absolute z-20 -translate-y-1/2 rounded bg-[var(--app-bg)] px-1.5 opacity-45" [class.left-7]="desktop && !selectable()" [class.left-2]="!desktop || selectable()" [style.top.px]="c.y + 1">{{ 'lessons.caretHint' | t }}</span>
-    }
     @for (b of m.blocks; track $index; let i = $index) {
+      @if (caret()?.at === i) {
+        <!-- The caret between tasks: they part for a line, a text cursor in it and what it's for -->
+        <div data-caret class="flex h-7 items-center gap-1.5 px-2.5 [animation:fadeIn_120ms_ease-out]">
+          <span class="text-cursor"></span>
+          <span class="text-footnote opacity-45">{{ 'lessons.caretHint' | t }}</span>
+        </div>
+      }
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
              style marks highlighted under it -->
@@ -240,6 +241,13 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       </div>
       }
     }
+      @if (caret()?.at === m.blocks.length) {
+        <!-- The caret between tasks: they part for a line, a text cursor in it and what it's for -->
+        <div data-caret class="flex h-7 items-center gap-1.5 px-2.5 [animation:fadeIn_120ms_ease-out]">
+          <span class="text-cursor"></span>
+          <span class="text-footnote opacity-45">{{ 'lessons.caretHint' | t }}</span>
+        </div>
+      }
       @if (desktop && !locked()) {
         <!-- The end of the page: "+ Add" (faded) — it, or a click on the page under it, opens the
              commands (Task, Assistant); so does a key typed outside a task (it filters them) -->
@@ -614,7 +622,8 @@ export class LessonForm {
     const list = this.host.nativeElement.querySelector<HTMLElement>('[data-tasks]');
     if (c && list) {
       const box = list.getBoundingClientRect();
-      this.slash.set({ block: -1, start: 0, end: 0, query, x: box.left + 20, y: Math.min(box.top + c.y + 8, window.innerHeight - 140), active: 0 });
+      const line = list.querySelector<HTMLElement>('[data-caret]')?.getBoundingClientRect();
+      this.slash.set({ block: -1, start: 0, end: 0, query, x: (line?.left ?? box.left) + 8, y: Math.min((line?.bottom ?? box.top + c.y) + 4, window.innerHeight - 140), active: 0 });
       return;
     }
     const r = this.addRow()?.nativeElement.getBoundingClientRect();
@@ -1228,7 +1237,7 @@ export class LessonForm {
   // (a click anywhere but between the tasks: gone)
   private clearCaret(e: MouseEvent): void {
     const t = e.target as HTMLElement | null;
-    if (this.caret() && !t?.hasAttribute?.('data-tasks') && !t?.closest?.('[data-commands]')) this.caret.set(null);
+    if (this.caret() && !t?.hasAttribute?.('data-tasks') && !t?.closest?.('[data-commands], [data-caret]')) this.caret.set(null);
   }
 
   protected pasteOnPage(e: ClipboardEvent): void {
