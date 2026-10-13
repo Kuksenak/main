@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input, model, signal, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input, model, signal, untracked, viewChild } from '@angular/core';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
 import { ConfirmDelete } from '../core/ui/confirm';
@@ -267,12 +267,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         </div>
       }
       @if (desktop && !locked()) {
-        <!-- The end of the page: "+ Add" (faded) — it, or a click on the page under it, opens the
-             commands (Task, Assistant); so does a key typed outside a task (it filters them) -->
-        <button #addRow type="button" (click)="openAdd()" class="text-subhead -mt-1 flex items-center gap-2 self-start rounded-lg px-1.5 py-1 opacity-35 hover:bg-[var(--highlight)] hover:opacity-70" [class.!opacity-70]="slash()?.block === -1">
-          <app-icon name="plus" [strokeWidth]="2" class="size-4" />{{ 'action.add' | t }}
-        </button>
-        <div aria-hidden="true" class="-mt-3 min-h-16" (click)="openAdd()"></div>
+        <!-- Under the tasks: a click there puts the caret at the end (an empty lesson has it from the start) -->
+        <div aria-hidden="true" class="-mt-3 min-h-16 cursor-text" (mousedown)="$event.preventDefault(); caretAtEnd(true)"></div>
       }
       <!-- The end of the page: a new task; the assistant (unless the page has them in its head) -->
       @if (endButtons()) {
@@ -639,7 +635,6 @@ export class LessonForm {
     this.slash.set({ block, start: lineStart, end: caret, query: m[1], x: r.left, y: r.top + r.height + 2, active: was?.block === block ? was.active : 0 });
   }
 
-  private readonly addRow = viewChild<ElementRef<HTMLButtonElement>>('addRow');
 
   // "+ Add": the commands under it (`query`: typed to filter them)
   // (the commands opened by "/": letters filter them; by a click: letters start a task)
@@ -656,11 +651,21 @@ export class LessonForm {
       this.slash.set({ block: -1, start: 0, end: 0, query, x: (line?.left ?? box.left) - 4, y: Math.min((line?.bottom ?? box.top + c.y) - 2, window.innerHeight - 140), active: 0 });
       return;
     }
-    const r = this.addRow()?.nativeElement.getBoundingClientRect();
-    if (!r) return;
-    this.addRow()!.nativeElement.scrollIntoView({ block: 'nearest' });
-    const top = this.addRow()!.nativeElement.getBoundingClientRect();
-    this.slash.set({ block: -1, start: 0, end: 0, query, x: top.left, y: Math.min(top.bottom + 4, window.innerHeight - 140), active: 0 });
+    // (none yet: at the end)
+    this.caretAtEnd(false);
+    setTimeout(() => this.openAdd(query));
+  }
+
+  // The caret at the end of the page, its field focused (`menu`: the commands too)
+  protected caretAtEnd(menu: boolean): void {
+    if (!this.desktop || this.locked()) return;
+    this.caret.set({ at: this.value().blocks.length, y: 0 });
+    setTimeout(() => {
+      const field = this.host.nativeElement.querySelector<HTMLInputElement>('[data-caret-input]');
+      field?.focus();
+      field?.scrollIntoView({ block: 'nearest' });
+      if (menu) this.openAdd();
+    });
   }
 
   // Keys on the page outside any field (nothing open over it): open the commands, a letter filtering
@@ -712,7 +717,7 @@ export class LessonForm {
     this.clearCaret(e);
     if (this.slash()?.block !== -1) return;
     const t = e.target as HTMLElement | null;
-    if (t?.closest('[data-commands]') || this.addRow()?.nativeElement.contains(t)) return;
+    if (t?.closest('[data-commands], [data-caret]')) return;
     this.slash.set(null);
   }
 
@@ -1262,6 +1267,12 @@ export class LessonForm {
   // the commands open there at once):
   // Ctrl+V pastes the tasks copied there (else the clipboard's text, a new task); without one, at the end
   protected readonly caret = signal<{ at: number; y: number } | null>(null);
+  // (an empty lesson: the caret there from the start, with its hint)
+  private readonly emptyCaret = effect(() => {
+    if (this.desktop && this.photos() && !this.locked() && !this.value().blocks.length && !this.caret()) {
+      untracked(() => this.caret.set({ at: 0, y: 0 }));
+    }
+  });
 
   // (the place between two tasks nearest to y, and the middle of the gap there)
   private gapAt(list: HTMLElement, clientY: number): { at: number; y: number } {
@@ -1316,13 +1327,16 @@ export class LessonForm {
   protected caretBlur(): void {
     setTimeout(() => {
       if (document.activeElement?.hasAttribute('data-caret-input') || this.aiOpen()) return;
+      if (this.slash()?.block === -1) this.slash.set(null);
+      if (!this.value().blocks.length) return; // (an empty lesson keeps it)
       this.caret.set(null);
       if (this.slash()?.block === -1) this.slash.set(null);
     }, 120);
   }
 
-  // (a click anywhere but between the tasks: gone)
+  // (a click anywhere but between the tasks: gone — an empty lesson keeps it)
   private clearCaret(e: MouseEvent): void {
+    if (!this.value().blocks.length) return;
     const t = e.target as HTMLElement | null;
     if (this.caret() && !t?.hasAttribute?.('data-tasks') && !t?.closest?.('[data-commands], [data-caret]')) this.caret.set(null);
   }
