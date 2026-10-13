@@ -71,12 +71,9 @@ const SAVE_AT_LEAST_MS = 5000;
             <button type="button" (click)="previewAll.set(true)" class="head-btn">
               <app-icon name="popout" />{{ 'lessons.studentSees' | t }}
             </button>
-            <!-- Publish (an open padlock): makes its public link; then Copy link beside it, and Unpublish (a closed one) -->
+            <!-- Publish (an open padlock): makes its public link; then Unpublish (a closed one) in its place -->
             @if (s.lesson(); as l) {
-              @if (l.shareToken; as token) {
-                <button type="button" (click)="copy(token)" class="head-btn">
-                  <app-icon [name]="copied() ? 'check' : 'link'" />{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}
-                </button>
+              @if (l.shareToken) {
                 <button type="button" (click)="lessons.share(l.id, false)" [appTip]="'lessons.unpublishHint' | t" tipSide="bottom" class="head-btn">
                   <app-icon name="lock" />{{ 'lessons.unpublish' | t }}
                 </button>
