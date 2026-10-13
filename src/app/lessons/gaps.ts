@@ -93,6 +93,14 @@ function blockAsTask(b: LessonBlock): LessonBlock {
   }
 }
 
+/** A block as students get it: the answers taken out ([] to write in, choices unstarred). */
+export function forStudents(b: LessonBlock): LessonBlock {
+  const text = (b.text ?? '')
+    .replace(/\[[^[\]\n]*\]/g, '[]')
+    .replace(/\{([^{}\n]*)\}/g, (_, inside: string) => `{${inside.replace(/(^|\|)\s*\*/g, '$1')}}`);
+  return { ...b, text, private: false };
+}
+
 /** A piece of text with its formatting. */
 export interface Styled {
   t: string;

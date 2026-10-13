@@ -10,7 +10,7 @@ import { AiChatService } from '../ai/ai-chat.service';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { caretRect } from '../core/ui/caret';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
-import { asOptions, asTask } from './gaps';
+import { asOptions, asTask, forStudents } from './gaps';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
@@ -738,16 +738,9 @@ export class LessonForm {
     let shown = this.seen.get(key);
     if (!shown) {
       if (this.seen.size > 50) this.seen.clear();
-      this.seen.set(key, (shown = [this.blank(b)]));
+      this.seen.set(key, (shown = [forStudents(b)]));
     }
     return shown;
-  }
-
-  private blank(b: LessonBlock): LessonBlock {
-    const text = (b.text ?? '')
-      .replace(/\[[^[\]\n]*\]/g, '[]')
-      .replace(/\{([^{}\n]*)\}/g, (_, inside: string) => `{${inside.replace(/(^|\|)\s*\*/g, '$1')}}`);
-    return { ...b, text, private: false };
   }
 
   protected removeBlock(index: number): void {

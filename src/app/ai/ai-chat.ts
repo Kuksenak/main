@@ -4,25 +4,18 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
-import { Icon, IconName } from '../core/ui/icon/icon';
+import { Icon } from '../core/ui/icon/icon';
 import { LessonContent } from '../lessons/lesson-content';
+import { asTask, forStudents } from '../lessons/gaps';
 import { LessonImportsService } from '../lessons/lesson-imports.service';
-import { LessonBlock, LessonBlockKind, LessonInput } from '../lessons/lesson.service';
+import { LessonBlock, LessonInput } from '../lessons/lesson.service';
 import { AiChatService, ChatMessage } from './ai-chat.service';
-
-const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] = [
-  { kind: 'text', icon: 'text', label: 'lessons.text' },
-  { kind: 'gaps', icon: 'compose', label: 'lessons.gaps' },
-  { kind: 'exercise', icon: 'exercise', label: 'lessons.exercise' },
-  { kind: 'checklist', icon: 'checklist', label: 'lessons.checklist' },
-  { kind: 'image', icon: 'image', label: 'lessons.image' },
-];
 
 /**
  * A lesson's AI chat, like Claude's, inside the lesson editor (its ✨ AI): ask for material
  * ("10 more like these", "a text about travel, A2, with questions") or send photos (attach,
- * paste, drop); the AI answers with a short reply and lesson blocks — Add to lesson puts them
- * all at the lesson's end, Pick… lets you choose. Only lesson material (the server holds it to
+ * paste, drop); the AI answers with a short reply and what it made, shown as the student will see
+ * it — Accept puts it at the lesson's end, Decline puts it away. Only lesson material (the server holds it to
  * that). One chat per lesson, on this device; New chat starts over.
  */
 @Component({
@@ -66,30 +59,22 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
                 <p class="text-body select-text whitespace-pre-wrap">{{ m.text }}</p>
               }
               @if (m.draft?.blocks?.length) {
-                <div class="card flex flex-col">
-                  <div class="flex flex-wrap items-center gap-1.5 px-3 py-2.5">
-                    @for (c of counts(m); track c.kind) {
-                      <span class="text-footnote inline-flex items-center gap-1 rounded-full bg-[var(--fill)] px-2.5 py-1">
-                        <app-icon [name]="c.icon" class="size-3.5 opacity-60" /><span class="font-semibold tabular-nums">{{ c.n }}</span>{{ c.label | t }}
-                      </span>
-                    }
-                    <span class="flex-1"></span>
-                    <button type="button" (click)="toggle(m.id)" class="text-footnote rounded-full px-2 py-1 font-medium opacity-70 hover:bg-[var(--highlight)]">
-                      {{ (shown().includes(m.id) ? 'ai.hide' : 'ai.show') | t }}
-                    </button>
-                    <button type="button" (click)="pick(m)" class="chip !rounded-full">{{ 'ai.pick' | t }}</button>
+                <!-- What it made, as the student will see it; Accept puts it in the lesson -->
+                @if (declined().includes(m.id)) {
+                  <p class="text-footnote opacity-45">{{ 'ai.declined' | t }}</p>
+                } @else {
+                  <div class="flex flex-col gap-2.5 rounded-[var(--radius-card)] bg-[var(--app-bg)] p-3 shadow-[inset_0_0_0_0.5px_var(--separator)]">
+                    <app-lesson-content [blocks]="preview(m)" mode="student" />
+                  </div>
+                  <div class="flex items-center justify-end gap-2">
                     @if (added().includes(m.id)) {
-                      <span class="text-footnote flex items-center gap-1 px-2 font-medium text-[var(--success)]"><app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'ai.added' | t }}</span>
+                      <span class="text-footnote flex items-center gap-1 font-medium text-[var(--success)]"><app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'ai.added' | t }}</span>
                     } @else {
-                      <button type="button" (click)="addAll(m)" class="btn-primary !rounded-full !px-3.5 !py-1.5">{{ 'lessons.addToLesson' | t }}</button>
+                      <button type="button" (click)="decline(m)" class="btn-secondary">{{ 'ai.decline' | t }}</button>
+                      <button type="button" (click)="addAll(m)" class="btn-primary">{{ 'ai.accept' | t }}</button>
                     }
                   </div>
-                  @if (shown().includes(m.id)) {
-                    <div class="border-t-[0.5px] border-[var(--separator)] bg-[var(--app-bg)] p-3">
-                      <app-lesson-content [blocks]="m.draft!.blocks" />
-                    </div>
-                  }
-                </div>
+                }
               }
             </div>
           }
@@ -171,8 +156,8 @@ export class AiChat {
     return this.chat.messages(this.chatKey());
   });
   protected readonly files = signal<{ blob: Blob; url: string }[]>([]);
-  protected readonly shown = signal<string[]>([]);
   protected readonly added = signal<string[]>([]);
+  protected readonly declined = signal<string[]>([]);
 
   constructor() {
     this.imports.ensureLoaded();
@@ -248,10 +233,6 @@ export class AiChat {
     el.style.height = `${el.scrollHeight}px`;
   }
 
-  protected toggle(id: string): void {
-    this.shown.update((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
-  }
-
   // All of it at the lesson's end
   protected addAll(m: ChatMessage): void {
     if (!m.draft?.blocks.length) return;
@@ -259,18 +240,16 @@ export class AiChat {
     this.added.update((a) => [...a, m.id]);
   }
 
-  // Some of it: the preview's checkboxes, then Add to lesson
-  protected pick(m: ChatMessage): void {
-    if (!m.draft) return;
-    this.imports.previewLocal(m.draft, (blocks) => {
-      this.add.emit(blocks);
-      this.added.update((a) => [...a, m.id]);
-    });
+  // As the student will see it: tasks with their answers taken out (the same object per answer)
+  private readonly previews = new Map<string, LessonBlock[]>();
+  protected preview(m: ChatMessage): LessonBlock[] {
+    let blocks = this.previews.get(m.id);
+    if (!blocks) this.previews.set(m.id, (blocks = (m.draft?.blocks ?? []).map((b) => forStudents(asTask(b)))));
+    return blocks;
   }
 
-  protected counts(m: ChatMessage) {
-    const blocks = m.draft?.blocks ?? [];
-    return KINDS.map((k) => ({ ...k, n: blocks.filter((b) => b.kind === k.kind).length })).filter((c) => c.n > 0);
+  protected decline(m: ChatMessage): void {
+    this.declined.update((d) => [...d, m.id]);
   }
 
   // "gemini-3.5-flash-lite" → "Gemini 3.5 Flash Lite"
