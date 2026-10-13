@@ -41,7 +41,7 @@ const SAVE_AT_LEAST_MS = 5000;
             <!-- Just saved: a cloud with a check, for a moment -->
             @if (justSaved()) {
               <span class="flex shrink-0 items-center [animation:fadeIn_200ms_ease-out]" [attr.title]="'lessons.saved' | t" [attr.aria-label]="'lessons.saved' | t">
-                <app-icon name="cloud-check" class="size-5 opacity-45" />
+                <app-icon name="cloud-check" class="size-7 opacity-45" />
               </span>
             }
             <!-- ☰: the lesson's settings and the rest (level, public link, events, answers, Delete) -->
@@ -83,26 +83,17 @@ const SAVE_AT_LEAST_MS = 5000;
               </div>
             }
             @if (s.lesson(); as l) {
-              <button type="button" (click)="unfold('link')" class="list-row w-full text-left" [attr.aria-expanded]="unfolded() === 'link'">
+              <!-- The public link: its switch right in the row; on, Copy link under it -->
+              <label class="list-row cursor-pointer">
                 <app-icon name="link" class="row-icon" />
                 <span class="flex-1">{{ 'lessons.public' | t }}</span>
-                <span class="opacity-50">{{ (l.shareToken ? 'settings.on' : 'settings.off') | t }}</span>
-                <app-icon name="chevron-right" class="row-chevron -ml-1 transition-transform duration-200" [class.rotate-90]="unfolded() === 'link'" />
-              </button>
-              @if (unfolded() === 'link') {
-                <div class="sub-rows">
-                  <label class="list-row cursor-pointer">
-                    <span class="flex-1">{{ 'lessons.public' | t }}</span>
-                    <app-toggle [checked]="!!l.shareToken" (checkedChange)="lessons.share(l.id, $event)" [attr.aria-label]="'lessons.public' | t" />
-                  </label>
-                  @if (l.shareToken; as token) {
-                    <button type="button" (click)="copy(token)" class="list-row w-full text-left">
-                      <span class="flex-1">{{ 'lessons.copy' | t }}</span>
-                      <app-icon [name]="copied() ? 'check' : 'copy'" class="size-5 opacity-70" />
-                    </button>
-                  }
-                  <p class="list-row text-footnote !min-h-0 py-2 opacity-50">{{ 'lessons.publicHint' | t }}</p>
-                </div>
+                <app-toggle [checked]="!!l.shareToken" (checkedChange)="lessons.share(l.id, $event)" [attr.aria-label]="'lessons.public' | t" />
+              </label>
+              @if (l.shareToken; as token) {
+                <button type="button" (click)="copy(token)" class="list-row w-full text-left">
+                  <app-icon [name]="copied() ? 'check' : 'copy'" class="row-icon" />
+                  <span class="flex-1">{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}</span>
+                </button>
               }
             }
           </div>
@@ -110,7 +101,7 @@ const SAVE_AT_LEAST_MS = 5000;
             <app-event-list [lessonId]="l.id" />
             <app-lesson-attempts [lesson]="l" />
             <div class="card">
-              <button type="button" (click)="askDeleteFromMenu()" class="list-row w-full text-left text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+              <button type="button" (click)="askDeleteFromMenu()" class="list-row w-full justify-center text-[var(--danger)]">{{ 'action.delete' | t }}</button>
             </div>
           }
         </div>
@@ -140,8 +131,8 @@ export class LessonPage {
   protected readonly form = viewChild(LessonForm);
   protected readonly menuOpen = signal(false);
   // ☰'s row unfolded
-  protected readonly unfolded = signal<'level' | 'link' | null>(null);
-  protected unfold(row: 'level' | 'link'): void {
+  protected readonly unfolded = signal<'level' | null>(null);
+  protected unfold(row: 'level'): void {
     this.unfolded.set(this.unfolded() === row ? null : row);
   }
   protected readonly lessons = inject(LessonService);

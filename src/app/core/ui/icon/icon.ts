@@ -9,6 +9,7 @@ export type IconName =
   | 'enter'
   | 'menu'
   | 'cloud-check'
+  | 'play'
   | 'chevrons-up-down'
   | 'chevron-down'
   | 'search'
@@ -106,6 +107,8 @@ export type IconName =
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
+        <!-- Preview: play -->
+        @case ('play') { <path d="M8 5.5v13a.75.75 0 0 0 1.14.64l10.4-6.5a.75.75 0 0 0 0-1.28L9.14 4.86A.75.75 0 0 0 8 5.5z" /> }
         <!-- Saved: a cloud with a check -->
         @case ('cloud-check') { <path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.3 9.6 4.5 4.5 0 0 0 7 18.5z" /><path d="m9.5 13.75 1.75 1.75 3.5-3.5" /> }
         @case ('menu') { <path d="M4 7h16M4 12h16M4 17h16" /> }

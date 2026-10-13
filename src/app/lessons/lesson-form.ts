@@ -135,27 +135,33 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         </div>
       } @else {
       @let slim = desktop && b.kind === 'gaps' && !selectable();
-      <div class="card group relative" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
+      <div
+        #card
+        class="card group relative"
+        [class.!overflow-visible]="desktop && b.kind === 'gaps'"
+        [class.opacity-40]="dragFrom() === i"
+        [style.box-shadow]="dropAt() === i ? '0 -3px 0 var(--accent)' : dropAt() === i + 1 && i === m.blocks.length - 1 ? '0 3px 0 var(--accent)' : null"
+        (dragover)="dragOver($event, i, card)"
+        (drop)="drop($event)"
+      >
         @if (slim) {
-          <!-- Desktop tasks: no head row — its buttons small, at the top right, shown on hover (or
-               while it's being typed in); "only me" always shows -->
+          <!-- Desktop tasks: no head row — its buttons at the top right, shown on hover (or while
+               it's being typed in): ⠿ drag to move it, ▷ as the student sees it, who sees it, ×;
+               "only me" always shows -->
           <div class="absolute right-2 top-1.5 z-10 flex items-center gap-0.5 rounded-full bg-[var(--surface)] p-0.5">
-            <span class="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100" [class.!opacity-100]="helpOpen() === i">
-              <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-7 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
-                <app-icon name="eye" class="size-[1.125rem]" />
+            <span class="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100" [class.!opacity-100]="dragFrom() === i">
+              <button type="button" draggable="true" (dragstart)="dragStart($event, i, card)" (dragend)="dragEnd()" [attr.title]="'lessons.move' | t" [attr.aria-label]="'lessons.move' | t" class="flex size-8 cursor-grab items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 active:cursor-grabbing">
+                <app-icon name="grip" class="size-5" />
               </button>
-              <span class="relative">
-                <button type="button" (click)="$event.stopPropagation(); helpOpen.set(helpOpen() === i ? null : i)" [attr.title]="'lessons.howTo' | t" [attr.aria-label]="'lessons.howTo' | t" class="text-subhead flex size-7 items-center justify-center rounded-full font-semibold opacity-60 hover:bg-[var(--highlight)] hover:opacity-100">?</button>
-                @if (helpOpen() === i) {
-                  <div (click)="$event.stopPropagation()" class="popover-panel text-footnote absolute right-0 top-full z-30 mt-2 w-80 p-3 leading-relaxed">{{ 'lessons.gapsHint' | t }}</div>
-                }
-              </span>
+              <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
+                <app-icon name="play" class="size-5" />
+              </button>
             </span>
-            <button type="button" (click)="setBlock(i, { private: !b.private })" [attr.title]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-7 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
-              <app-icon [name]="b.private ? 'lock' : 'people'" class="size-[1.125rem]" />
+            <button type="button" (click)="setBlock(i, { private: !b.private })" [attr.title]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-8 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
+              <app-icon [name]="b.private ? 'lock' : 'people'" class="size-5" />
             </button>
-            <button type="button" (click)="removeBlock(i)" [attr.title]="'lessons.removeBlock' | t" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-7 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
-              <app-icon name="close" class="size-[1.125rem]" />
+            <button type="button" (click)="removeBlock(i)" [attr.title]="'lessons.removeBlock' | t" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-8 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
+              <app-icon name="close" class="size-5" />
             </button>
           </div>
         } @else {
@@ -1148,6 +1154,44 @@ export class LessonForm {
       this.seen.set(key, (shown = [forStudents(b)]));
     }
     return shown;
+  }
+
+  // ---- Moving a task: dragged by its ⠿; a line shows where it goes (before the card under the
+  // pointer, or after it past its middle)
+  protected readonly dragFrom = signal<number | null>(null);
+  protected readonly dropAt = signal<number | null>(null);
+
+  protected dragStart(e: DragEvent, i: number, card: HTMLElement): void {
+    this.dragFrom.set(i);
+    e.dataTransfer?.setData('text/plain', '');
+    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer?.setDragImage(card, 24, 20);
+  }
+
+  protected dragOver(e: DragEvent, i: number, card: HTMLElement): void {
+    if (this.dragFrom() === null) return;
+    e.preventDefault();
+    const r = card.getBoundingClientRect();
+    this.dropAt.set(e.clientY < r.top + r.height / 2 ? i : i + 1);
+  }
+
+  protected drop(e: DragEvent): void {
+    e.preventDefault();
+    const from = this.dragFrom();
+    const at = this.dropAt();
+    this.dragEnd();
+    if (from === null || at === null || at === from || at === from + 1) return;
+    this.value.update((m) => {
+      const blocks = [...m.blocks];
+      const [moved] = blocks.splice(from, 1);
+      blocks.splice(at > from ? at - 1 : at, 0, moved);
+      return { ...m, blocks };
+    });
+  }
+
+  protected dragEnd(): void {
+    this.dragFrom.set(null);
+    this.dropAt.set(null);
   }
 
   protected removeBlock(index: number): void {
