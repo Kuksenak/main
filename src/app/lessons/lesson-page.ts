@@ -70,15 +70,15 @@ const SAVE_AT_LEAST_MS = 5000;
             <button type="button" (click)="previewAll.set(true)" class="head-btn">
               <app-icon name="popout" />{{ 'lessons.studentSees' | t }}
             </button>
-            <!-- Publish (a lock: private now): the public link on — then Copy link beside it, and Unpublish (a globe) -->
+            <!-- Publish (a globe): the public link on — then Copy link beside it, and Unpublish (a lock) -->
             @if (s.lesson(); as l) {
               @if (l.shareToken; as token) {
                 <button type="button" (click)="copy(token)" class="head-btn">
                   <app-icon [name]="copied() ? 'check' : 'link'" />{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}
                 </button>
-                <button type="button" (click)="lessons.share(l.id, false)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn"><app-icon name="globe" />{{ 'lessons.unpublish' | t }}</button>
+                <button type="button" (click)="lessons.share(l.id, false)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn"><app-icon name="lock" />{{ 'lessons.unpublish' | t }}</button>
               } @else {
-                <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn"><app-icon name="lock" />{{ 'lessons.publish' | t }}</button>
+                <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn"><app-icon name="globe" />{{ 'lessons.publish' | t }}</button>
               }
             }
             <!-- ⋯: Duplicate, Copy page content, Paste content, Lock page, Delete -->
