@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -65,41 +65,39 @@ function store(key: string, value: string | null): void {
           <p class="text-body py-10 text-center opacity-40">{{ 'portal.notFound' | t }}</p>
         }
         @case ('pin') {
-          <!-- The PIN: made up on the first visit (twice), asked on a new device -->
+          <!-- The PIN: 4 digits, a box each (one field over them); made up on the first visit, asked on
+               a new device; sent as the fourth digit is typed -->
           <form (submit)="sendPin(); $event.preventDefault()" class="mx-auto flex w-full max-w-sm flex-col items-center gap-4 py-10 text-center">
             <app-icon name="lock" class="size-8 text-[var(--accent)]" />
             <h1 class="text-xl font-semibold">{{ (pinMode() === 'set' ? 'portal.pinSetTitle' : 'portal.pinEnterTitle') | t }}</h1>
             <p class="text-body opacity-60">{{ (pinMode() === 'set' ? 'portal.pinSetHint' : 'portal.pinEnterHint') | t }}</p>
-            <input
-              #pin1
-              type="password"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              maxlength="6"
-              autocomplete="off"
-              [value]="pin()"
-              (input)="pin.set(digits(pin1.value)); pin1.value = pin()"
-              [placeholder]="'portal.pin' | t"
-              class="field h-12 w-48 text-center text-2xl tracking-[0.4em]"
-            />
-            @if (pinMode() === 'set') {
+            <label class="relative mt-1 flex gap-2">
+              @for (i of [0, 1, 2, 3]; track i) {
+                <span
+                  class="flex size-11 items-center justify-center rounded-lg border-2 bg-[var(--fill)] text-lg transition-colors"
+                  [class.border-transparent]="!(pinFocused() && i === min(pin().length, 3))"
+                  [class.border-[var(--accent)]]="pinFocused() && i === min(pin().length, 3)"
+                >{{ i < pin().length ? '●' : '' }}</span>
+              }
               <input
-                #pin2
-                type="password"
+                #pinField
+                type="text"
                 inputmode="numeric"
                 pattern="[0-9]*"
-                maxlength="6"
-                autocomplete="off"
-                [value]="pinAgain()"
-                (input)="pinAgain.set(digits(pin2.value)); pin2.value = pinAgain()"
-                [placeholder]="'portal.pinAgain' | t"
-                class="field h-12 w-48 text-center text-2xl tracking-[0.4em]"
+                maxlength="4"
+                autocomplete="one-time-code"
+                [attr.aria-label]="'portal.pin' | t"
+                [value]="pin()"
+                [disabled]="sending()"
+                (input)="typePin(pinField)"
+                (focus)="pinFocused.set(true)"
+                (blur)="pinFocused.set(false)"
+                class="absolute inset-0 h-full w-full cursor-default bg-transparent text-transparent caret-transparent opacity-0 outline-none"
               />
-            }
+            </label>
             @if (pinError(); as e) {
               <p class="text-footnote text-[var(--danger)]">{{ e }}</p>
             }
-            <button type="submit" [disabled]="!pinReady() || sending()" class="btn-primary">{{ 'shared.continue' | t }}</button>
           </form>
         }
         @default {
@@ -205,11 +203,10 @@ export class StudentPortal {
   private key: string | null = stored(this.keyName);
   protected readonly pinMode = signal<'set' | 'enter'>('enter');
   protected readonly pin = signal('');
-  protected readonly pinAgain = signal('');
   protected readonly pinError = signal<string | null>(null);
-  protected readonly pinReady = computed(
-    () => this.pin().length >= 4 && (this.pinMode() === 'enter' || this.pinAgain().length >= 4),
-  );
+  protected readonly pinFocused = signal(false);
+  private readonly pinField = viewChild<ElementRef<HTMLInputElement>>('pinField');
+  protected readonly min = Math.min;
 
   private headers(): Record<string, string> {
     return this.key ? { 'X-Portal-Key': this.key } : {};
@@ -252,19 +249,24 @@ export class StudentPortal {
     store(this.keyName, null);
     this.pinMode.set(mode);
     this.state.set('pin');
+    this.focusPin();
     return true;
   }
 
-  protected digits(v: string): string {
-    return v.replace(/\D/g, '').slice(0, 6);
+  // Only digits, 4 of them; the fourth sends it
+  protected typePin(field: HTMLInputElement): void {
+    this.pin.set(field.value.replace(/\D/g, '').slice(0, 4));
+    field.value = this.pin();
+    if (this.pin().length) this.pinError.set(null);
+    if (this.pin().length === 4) this.sendPin();
+  }
+
+  private focusPin(): void {
+    setTimeout(() => this.pinField()?.nativeElement.focus());
   }
 
   protected sendPin(): void {
-    if (!this.pinReady() || this.sending()) return;
-    if (this.pinMode() === 'set' && this.pin() !== this.pinAgain()) {
-      this.pinError.set(this.i18n.t('portal.pinMismatch'));
-      return;
-    }
+    if (this.pin().length !== 4 || this.sending()) return;
     this.sending.set(true);
     this.pinError.set(null);
     this.http.post<{ key: string }>(`${this.base}/pin`, { pin: this.pin() }).subscribe({
@@ -272,7 +274,6 @@ export class StudentPortal {
         this.key = r.key;
         store(this.keyName, r.key);
         this.pin.set('');
-        this.pinAgain.set('');
         this.sending.set(false);
         this.state.set('loading');
         this.load();
@@ -280,6 +281,7 @@ export class StudentPortal {
       error: (e: HttpErrorResponse) => {
         this.sending.set(false);
         this.pin.set('');
+        this.focusPin();
         if (e.status === 429 && e.error?.lockedUntil) {
           this.pinError.set(this.i18n.t('portal.pinLocked').replace('{time}', this.i18n.time(new Date(e.error.lockedUntil))));
         } else if (e.error?.wrong) {
