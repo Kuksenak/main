@@ -124,7 +124,6 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
           (keyup)="onSelect(i, tx)"
           (focus)="field = tx"
           (click)="openFocus(i, tx)"
-          (contextmenu)="onMenu($event, i, tx)"
           [readOnly]="!desktop"
           (blur)="onBlur(); dropIfEmpty(i)"
           rows="1"
@@ -245,7 +244,6 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
                 (click)="openFocus(i, ta)"
                 [readOnly]="!desktop"
                 (blur)="onBlur()"
-                (contextmenu)="onMenu($event, i, ta)"
                 rows="2"
                 [placeholder]="'lessons.gapsPlaceholder' | t"
                 class="row-input text-subhead relative min-h-[3lh] resize-none leading-relaxed text-transparent caret-[var(--text)] [field-sizing:content] placeholder:text-[var(--text)]"
@@ -308,7 +306,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
       </div>
     }
 
-    <!-- A selection or a right click: one menu beside it — B I U in a row, then Fill in, Choice,
+    <!-- A selection: its menu beside it — B I U in a row, then Fill in, Choice,
          Link a row each; Link asks for the address -->
     @if (desktop && sel(); as se) {
       <div appToBody class="popover-panel fixed z-[2100] flex w-48 flex-col p-1" [style.left.px]="se.x" [style.top.px]="se.y" (mousedown)="keepFocus($event)">
@@ -506,7 +504,7 @@ export class LessonForm {
   // The commands, opened by "/" at a line's start: in a text block (`block`; its "/…" from `start`
   // to `end`) or at the page's end (block -1); what's typed after "/" filters them
   protected readonly slash = signal<{ block: number; start: number; end: number; query: string; x: number; y: number; active: number } | null>(null);
-  protected readonly sel = signal<{ block: number; x: number; y: number; menu?: boolean; on?: Mark[] } | null>(null);
+  protected readonly sel = signal<{ block: number; x: number; y: number; on?: Mark[] } | null>(null);
   // Link: its address asked in the toolbar / menu
   protected readonly linking = signal(false);
   protected linkUrl = '';
@@ -655,22 +653,8 @@ export class LessonForm {
         return;
       }
       if (!this.desktop) return; // phones: the bar over the keyboard
-      // Opened by a right click: it stays where it is
-      if (this.sel()?.menu && this.sel()?.block === block) return;
       const r = caretRect(ta, ta.selectionEnd);
       this.sel.set({ block, x: Math.min(r.left + 14, window.innerWidth - 200), y: Math.max(8, Math.min(r.top - 8, window.innerHeight - 180)), on: this.marksOf(ta) });
-    });
-  }
-
-  protected onMenu(e: MouseEvent, block: number, ta: HTMLTextAreaElement): void {
-    if (!this.desktop) return;
-    e.preventDefault();
-    this.field = ta;
-    if (!this.selectWord(ta)) return;
-    requestAnimationFrame(() => {
-      this.linking.set(false);
-      // Beside the pointer, a little up (not over the words clicked)
-      this.sel.set({ block, x: Math.min(e.clientX + 14, window.innerWidth - 200), y: Math.max(8, Math.min(e.clientY - 8, window.innerHeight - 180)), menu: true, on: this.marksOf(ta) });
     });
   }
 
