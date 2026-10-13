@@ -315,8 +315,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div appToBody class="popover-panel fixed z-[2100] flex w-48 flex-col p-1" [style.left.px]="se.x" [style.top.px]="se.y" (mousedown)="keepFocus($event)">
         @if (linking()) {
           <form (submit)="applyLink(); $event.preventDefault()" class="flex items-center gap-1 p-0.5">
-            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
-            <button type="submit" class="btn-primary !h-8 !px-3 !py-0">OK</button>
+            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.enter)="applyLink(); $event.preventDefault()" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
+            <button type="submit" [attr.aria-label]="'action.done' | t" title="Enter" class="btn-primary !h-8 !w-9 !px-0 !py-0 text-base">↵</button>
           </form>
         } @else {
           <div class="flex items-center gap-0.5">
