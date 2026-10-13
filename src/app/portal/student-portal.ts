@@ -66,18 +66,18 @@ function store(key: string, value: string | null): void {
         }
         @case ('pin') {
           <!-- The PIN: 4 digits, a box each (one field over them); made up on the first visit, asked on
-               a new device; sent as the fourth digit is typed -->
+               a new device; its digits shown as typed; sent as the fourth is typed -->
           <form (submit)="sendPin(); $event.preventDefault()" class="mx-auto flex w-full max-w-sm flex-col items-center gap-4 py-10 text-center">
             <app-icon name="lock" class="size-8 text-[var(--accent)]" />
             <h1 class="text-xl font-semibold">{{ (pinMode() === 'set' ? 'portal.pinSetTitle' : 'portal.pinEnterTitle') | t }}</h1>
             <p class="text-body opacity-60">{{ (pinMode() === 'set' ? 'portal.pinSetHint' : 'portal.pinEnterHint') | t }}</p>
-            <label class="relative mt-1 flex gap-2">
+            <label class="relative mt-1 flex gap-1.5">
               @for (i of [0, 1, 2, 3]; track i) {
                 <span
-                  class="flex size-11 items-center justify-center rounded-lg border-2 bg-[var(--fill)] text-lg transition-colors"
+                  class="flex size-9 items-center justify-center rounded-lg border-2 bg-[var(--fill)] text-base font-semibold tabular-nums transition-colors"
                   [class.border-transparent]="!(pinFocused() && i === min(pin().length, 3))"
                   [class.border-[var(--accent)]]="pinFocused() && i === min(pin().length, 3)"
-                >{{ i < pin().length ? '●' : '' }}</span>
+                >{{ pin()[i] ?? '' }}</span>
               }
               <input
                 #pinField
