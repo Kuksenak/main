@@ -1,3 +1,4 @@
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { Component, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -61,6 +62,88 @@ interface Model {
       (delete)="remove()"
       (closed)="closed.emit()"
     >
+      @if (desktop) {
+      <!-- Desktop, in the new style (as a Notion page): the title big, then properties — a gray label
+           with its icon, the value beside it; participants and lessons as rows (× on hover) -->
+      <div class="contents" [class.read-only]="readOnly()">
+      <div class="flex flex-col gap-4 pt-1">
+        <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="w-full bg-transparent px-1 text-[1.375rem] font-semibold outline-none placeholder:opacity-30" />
+
+        <div class="flex flex-col">
+          <div class="flex min-h-9 items-center gap-3">
+            <span class="flex w-32 shrink-0 items-center gap-2 text-[0.9375rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.starts' | t }}</span>
+            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.9375rem]">
+              <app-date [ngModel]="date()" (ngModelChange)="setDate($event)" [ngModelOptions]="{ standalone: true }" />
+              <app-time [ngModel]="m.startTime" (ngModelChange)="onStartChange($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          <div class="flex min-h-9 items-center gap-3">
+            <span class="flex w-32 shrink-0 items-center gap-2 text-[0.9375rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.ends' | t }}</span>
+            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.9375rem]">
+              <span class="px-1" [class.opacity-60]="!invalid()" [class.text-[var(--warning)]]="invalid()" [class.line-through]="invalid()">{{ dateLabel() }}</span>
+              <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          <div class="flex min-h-9 items-center gap-3">
+            <span class="flex w-32 shrink-0 items-center gap-2 text-[0.9375rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.repeat' | t }}</span>
+            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.9375rem]">
+              <app-select [options]="presetOptions()" [ngModel]="preset()" (ngModelChange)="setPreset($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          @if (m.repeatCustom) {
+            <div class="flex min-h-9 items-center gap-3">
+            <span class="flex w-32 shrink-0 items-center gap-2 text-[0.9375rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.every' | t }}</span>
+            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.9375rem]">
+              <app-select [options]="intervalOptions()" [ngModel]="m.repeatInterval" (ngModelChange)="patch({ repeatInterval: +$event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          }
+          @if (m.repeat !== 'Never') {
+            <div class="flex min-h-9 items-center gap-3">
+            <span class="flex w-32 shrink-0 items-center gap-2 text-[0.9375rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.endRepeat' | t }}</span>
+            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.9375rem]">
+              <app-select [options]="endOptions()" [ngModel]="m.repeatUntil ? 'date' : 'never'" (ngModelChange)="setEnd($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+            @if (m.repeatUntil) {
+              <div class="flex min-h-9 items-center gap-3">
+            <span class="flex w-32 shrink-0 items-center gap-2 text-[0.9375rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.endDate' | t }}</span>
+            <div class="flex min-w-0 flex-1 items-center gap-2 text-[0.9375rem]">
+              <app-date [ngModel]="untilDate()" (ngModelChange)="setUntil($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+            }
+          }
+        </div>
+
+        <!-- Participants -->
+        <div class="flex flex-col gap-px">
+          <span class="flex h-8 items-center gap-2 px-1 text-[0.9375rem] opacity-50"><app-icon name="people" class="size-4" />{{ 'event.participants' | t }}</span>
+          @for (p of invited(); track p.id) {
+            <div class="group/r flex h-9 items-center gap-2.5 rounded-md px-1 text-[0.9375rem] hover:bg-[var(--tint)]">
+              <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-semibold uppercase" [class.text-[var(--accent-fg)]]="!!p.color" [style.background]="p.color ?? 'var(--fill-strong)'">{{ initial(p.name) }}</span>
+              <span class="min-w-0 flex-1 truncate">{{ p.name }}</span>
+              <button type="button" (click)="uninvite(p.id)" [attr.aria-label]="'action.remove' | t" class="edit-only flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/r:opacity-60"><app-icon name="close" class="size-3.5" /></button>
+            </div>
+          }
+          <button #inviteRowD type="button" (click)="openPicker('invite', inviteRowD)" [disabled]="isEmpty(inviteSections())" class="edit-only head-btn self-start !px-1 opacity-60 disabled:opacity-30"><app-icon name="plus" />{{ 'event.invite' | t }}</button>
+        </div>
+
+        <!-- Lessons -->
+        <div class="flex flex-col gap-px">
+          <span class="flex h-8 items-center gap-2 px-1 text-[0.9375rem] opacity-50"><app-icon name="page" class="size-4" />{{ 'event.lessons' | t }}</span>
+          @for (l of attached(); track l.id) {
+            <div class="group/r flex h-9 items-center gap-2.5 rounded-md px-1 text-[0.9375rem] hover:bg-[var(--tint)]">
+              <app-icon name="page" class="side-glyph" />
+              <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
+              <button type="button" (click)="detach(l.id)" [attr.aria-label]="'action.remove' | t" class="edit-only flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/r:opacity-60"><app-icon name="close" class="size-3.5" /></button>
+            </div>
+          }
+          <button #lessonRowD type="button" (click)="openPicker('lessons', lessonRowD)" [disabled]="isEmpty(lessonSections())" class="edit-only head-btn self-start !px-1 opacity-60 disabled:opacity-30"><app-icon name="plus" />{{ 'event.attachLesson' | t }}</button>
+        </div>
+      </div>
+      </div>
+      } @else {
       <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-4">
         <div class="card">
@@ -161,6 +244,7 @@ interface Model {
         </div>
       </div>
       </div>
+      }
     </app-page-sheet>
 
     <!-- A repeating event: this one only, or the whole series? -->
@@ -199,6 +283,7 @@ interface Model {
   `,
 })
 export class EventEditor implements OnInit {
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   readonly entry = input.required<StackEntry>();
   // Just for reading: opened from another card (see NavStack), or already over — a past event
   // (for a series: this repeat) can't be changed or deleted.
