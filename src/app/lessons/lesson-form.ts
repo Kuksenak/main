@@ -510,6 +510,7 @@ export class LessonForm {
   protected linkUrl = '';
   protected readonly linkField = viewChild<ElementRef<HTMLInputElement>>('linkField');
   protected field: HTMLTextAreaElement | null = null;
+  private dragging = false;
 
   private readonly commands: { id: 'task' | 'assistant'; label: TranslationKey; hint: TranslationKey; words: string }[] = [
     { id: 'task', label: 'lessons.slashTask', hint: 'lessons.slashTaskHint', words: 'task exercise new add zadanie exercice' },
@@ -649,6 +650,11 @@ export class LessonForm {
     this.field = ta;
     requestAnimationFrame(() => {
       if (document.activeElement !== ta || ta.selectionStart === ta.selectionEnd) {
+        this.sel.set(null);
+        return;
+      }
+      // Still selecting (the mouse held): the menu once it's let go
+      if (this.dragging) {
         this.sel.set(null);
         return;
       }
@@ -869,6 +875,17 @@ export class LessonForm {
       }
     };
     document.addEventListener('selectionchange', selectionChange);
+    // A selection being made with the mouse: no menu till the button's let go (then mouseup shows it)
+    const down = (e: MouseEvent) => {
+      if (e.button === 0 && e.target instanceof HTMLTextAreaElement && this.host.nativeElement.contains(e.target)) this.dragging = true;
+    };
+    const up = () => {
+      if (!this.dragging) return;
+      this.dragging = false;
+      selectionChange();
+    };
+    document.addEventListener('mousedown', down, true);
+    document.addEventListener('mouseup', up, true);
     const placeBar = () => this.placeBar();
     window.visualViewport?.addEventListener('resize', placeBar);
     window.visualViewport?.addEventListener('scroll', placeBar);
@@ -877,6 +894,8 @@ export class LessonForm {
       release();
       document.removeEventListener('click', closeHelp);
       document.removeEventListener('selectionchange', selectionChange);
+      document.removeEventListener('mousedown', down, true);
+      document.removeEventListener('mouseup', up, true);
       window.visualViewport?.removeEventListener('resize', placeBar);
       window.visualViewport?.removeEventListener('scroll', placeBar);
       if (this.photos()) chats.clear(this.lessonId() ?? 'new');
