@@ -23,10 +23,11 @@ import { BrandIcon, BrandIconName } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { SettingsSheet } from '../settings/settings-sheet';
+import { Sidebar } from './sidebar';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe, Sidebar],
   templateUrl: './layout.html',
 })
 export class Layout {
@@ -89,8 +90,8 @@ export class Layout {
   protected readonly i18n = inject(I18nService);
 
   protected readonly accountOpen = signal(false);
-  // Desktop: the side rail's account button (the settings open beside it)
-  protected readonly railAccount = viewChild<ElementRef<HTMLElement>>('railAccount');
+  // Desktop: the sidebar's account row (the settings open by it)
+  protected readonly accountFrom = signal<HTMLElement | null>(null);
   // Settings opened by the app itself (back from Google): why it didn't connect, if it didn't
   protected settingsFailed: string | null = null;
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
