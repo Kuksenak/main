@@ -57,7 +57,7 @@ const SAVE_AT_LEAST_MS = 5000;
               </span>
             }
             <!-- Its level: a chip in its color; a list under it (each level with its color) -->
-            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="head-btn" [class.font-medium]="!!s.draft().level">
+            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [disabled]="!!s.draft().locked" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="head-btn" [class.font-medium]="!!s.draft().level">
               <!-- Set: a dot of its color and its name; none: just "Level", faded -->
               @if (levelColor(s.draft().level); as c) {
                 <span class="size-2.5 shrink-0 rounded-full" [style.background]="c"></span>
@@ -172,7 +172,7 @@ const SAVE_AT_LEAST_MS = 5000;
           </button>
           @if (s.lesson()) {
             <div class="menu-sep"></div>
-            <button type="button" (click)="askDeleteFromMenu()" class="menu-item">
+            <button type="button" (click)="askDeleteFromMenu()" [disabled]="!!s.draft().locked" class="menu-item">
               <app-icon name="trash" />
               <span class="flex-1">{{ 'action.delete' | t }}</span>
             </button>
