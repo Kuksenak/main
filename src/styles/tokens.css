@@ -63,6 +63,13 @@
   --toolbar-hover: color-mix(in srgb, var(--text) 4%, transparent);
   --toolbar-fill-hover: color-mix(in srgb, var(--text) 10%, transparent);
   --separator: rgb(0 0 0 / 0.08);
+  /* Lesson levels (CEFR): a pastel each, A1 → C2 from green through blue to rose */
+  --level-a1: #9fdcae;
+  --level-a2: #92d6cc;
+  --level-b1: #9fc4ef;
+  --level-b2: #b3adec;
+  --level-c1: #dfaedb;
+  --level-c2: #f0b1aa;
   --grabber: rgb(0 0 0 / 0.2);
   --scroll-thumb: rgb(0 0 0 / 0.25);
   --backdrop: rgb(0 0 0 / 0.3); /* desktop dialogs only */
@@ -124,6 +131,12 @@ html.dark {
   --toolbar-hover: #1c1c1e;
   --toolbar-fill-hover: #3a3a3c;
   --separator: rgb(255 255 255 / 0.1);
+  --level-a1: #5d9e70;
+  --level-a2: #509b91;
+  --level-b1: #5b8bc9;
+  --level-b2: #7a73cc;
+  --level-c1: #ad6fa6;
+  --level-c2: #c06f67;
   --grabber: rgb(255 255 255 / 0.25);
   --scroll-thumb: rgb(255 255 255 / 0.3);
 

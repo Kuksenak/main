@@ -44,6 +44,11 @@ export interface Lesson {
 export const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
 export type Level = (typeof LEVELS)[number];
 
+/** A level's color (a pastel; tokens.css), or null for none. */
+export function levelColor(level: Level | null | undefined): string | null {
+  return level ? `var(--level-${level.toLowerCase()})` : null;
+}
+
 /** The public link of a shared lesson. */
 export function shareUrl(token: string): string {
   return `${location.origin}/l/${token}`;

@@ -13,7 +13,7 @@ import { SearchBar } from '../core/ui/search-bar';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { SearchField } from '../core/ui/search-field';
 import { LessonPage } from './lesson-page';
-import { LessonService } from './lesson.service';
+import { LessonService, levelColor } from './lesson.service';
 import { LessonUsage } from './lesson-usage';
 
 /**
@@ -51,12 +51,16 @@ import { LessonUsage } from './lesson-usage';
           <app-scroll-area class="min-h-0 shrink" viewportClass="card">
             @for (l of visible(); track l.id) {
               @let use = usage.of(l.id);
-              <button type="button" (click)="router.navigate(['/lessons', l.id])" class="list-row w-full py-2 text-left" [class.bg-[var(--highlight)]]="desktop && selected() === l.id">
+              <button type="button" (click)="router.navigate(['/lessons', l.id])" class="list-row relative w-full py-2 text-left" [class.bg-[var(--highlight)]]="desktop && selected() === l.id">
+                <!-- Its level's color: a stripe at the left -->
+                @if (levelColor(l.level); as c) {
+                  <span aria-hidden="true" class="absolute inset-y-2 left-1.5 w-1 rounded-full" [style.background]="c"></span>
+                }
                 <div class="min-w-0 flex-1 leading-tight">
                   <p class="flex items-center gap-1.5 font-medium">
                     <span class="truncate">{{ l.title }}</span>
                     @if (l.level) {
-                      <span class="shrink-0 rounded bg-[var(--fill-strong)] px-1 text-[0.6875rem] font-semibold leading-4">{{ l.level }}</span>
+                      <span class="shrink-0 rounded px-1 text-[0.6875rem] font-semibold leading-4" [style.background]="levelColor(l.level)">{{ l.level }}</span>
                     }
                     @if (l.shareToken) {
                       <app-icon name="link" class="size-4 shrink-0 opacity-40" />
@@ -107,6 +111,7 @@ import { LessonUsage } from './lesson-usage';
   `,
 })
 export class Lessons {
+  protected readonly levelColor = levelColor;
   private service = inject(LessonService);
   protected usage = inject(LessonUsage);
   private i18n = inject(I18nService);
