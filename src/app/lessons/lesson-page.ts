@@ -83,17 +83,26 @@ const SAVE_AT_LEAST_MS = 5000;
               </div>
             }
             @if (s.lesson(); as l) {
-              <!-- The public link: its switch right in the row; on, Copy link under it -->
-              <label class="list-row cursor-pointer">
+              <!-- The public link: On / Off; unfolded, its switch (with what it does) and Copy link -->
+              <button type="button" (click)="unfold('link')" class="list-row w-full text-left" [attr.aria-expanded]="unfolded() === 'link'">
                 <app-icon name="link" class="row-icon" />
                 <span class="flex-1">{{ 'lessons.public' | t }}</span>
-                <app-toggle [checked]="!!l.shareToken" (checkedChange)="lessons.share(l.id, $event)" [attr.aria-label]="'lessons.public' | t" />
-              </label>
-              @if (l.shareToken; as token) {
-                <button type="button" (click)="copy(token)" class="list-row w-full text-left">
-                  <app-icon [name]="copied() ? 'check' : 'copy'" class="row-icon" />
-                  <span class="flex-1">{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}</span>
-                </button>
+                <span class="opacity-50">{{ (l.shareToken ? 'settings.on' : 'settings.off') | t }}</span>
+                <app-icon name="chevron-right" class="row-chevron -ml-1 transition-transform duration-200" [class.rotate-90]="unfolded() === 'link'" />
+              </button>
+              @if (unfolded() === 'link') {
+                <div class="sub-rows">
+                  <label class="list-row cursor-pointer">
+                    <span class="text-subhead flex-1 opacity-70">{{ 'lessons.publicShort' | t }}</span>
+                    <app-toggle [checked]="!!l.shareToken" (checkedChange)="lessons.share(l.id, $event)" [attr.aria-label]="'lessons.public' | t" />
+                  </label>
+                  @if (l.shareToken; as token) {
+                    <button type="button" (click)="copy(token)" class="list-row w-full text-left">
+                      <span class="flex-1">{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}</span>
+                      <app-icon [name]="copied() ? 'check' : 'copy'" class="size-5 opacity-70" />
+                    </button>
+                  }
+                </div>
               }
             }
           </div>
@@ -131,8 +140,8 @@ export class LessonPage {
   protected readonly form = viewChild(LessonForm);
   protected readonly menuOpen = signal(false);
   // ☰'s row unfolded
-  protected readonly unfolded = signal<'level' | null>(null);
-  protected unfold(row: 'level'): void {
+  protected readonly unfolded = signal<'level' | 'link' | null>(null);
+  protected unfold(row: 'level' | 'link'): void {
     this.unfolded.set(this.unfolded() === row ? null : row);
   }
   protected readonly lessons = inject(LessonService);
