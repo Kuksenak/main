@@ -10,6 +10,7 @@ import { AiChatService } from '../ai/ai-chat.service';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { caretRect } from '../core/ui/caret';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { ToBody } from '../core/ui/to-body';
 import { asOptions, asTask, forStudents, marked } from './gaps';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
@@ -96,7 +97,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, FormsModule, Icon, LessonContent, PageSheet, TranslatePipe],
+  imports: [AiChat, BrandIcon, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
@@ -121,6 +122,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
           (select)="onSelect(i, tx)"
           (mouseup)="onSelect(i, tx)"
           (keyup)="onSelect(i, tx)"
+          (focus)="onFieldFocus(i, tx)"
           (blur)="onBlur(); dropIfEmpty(i)"
           rows="1"
           class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none [field-sizing:content]"
@@ -236,6 +238,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
                 (select)="onSelect(i, ta)"
                 (mouseup)="onSelect(i, ta)"
                 (keyup)="onSelect(i, ta)"
+                (focus)="onFieldFocus(i, ta)"
                 (blur)="onBlur()"
                 (contextmenu)="onMenu($event, i, ta)"
                 rows="2"
@@ -275,7 +278,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
 
     <!-- "/": the commands at the cursor -->
     @if (slash(); as sl) {
-      <div class="popover-panel fixed z-[2100] w-64 p-1" [style.left.px]="sl.x" [style.top.px]="sl.y">
+      <div appToBody class="popover-panel fixed z-[2100] w-64 p-1" [style.left.px]="sl.x" [style.top.px]="sl.y">
         @for (c of slashItems(); track c.id; let k = $index) {
           <button
             type="button"
@@ -302,8 +305,9 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
 
     <!-- A selection: its formatting — a toolbar over it; a right click: a menu in rows (styles,
          gaps, link); Link asks for the address -->
-    @if (sel(); as se) {
+    @if (desktop && sel(); as se) {
       <div
+        appToBody
         class="popover-panel fixed z-[2100] p-1"
         [class.flex]="!se.menu"
         [class.items-center]="!se.menu"
@@ -354,6 +358,38 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
             [class.underline]="f.id === 'underline'"
             [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
           >{{ f.text ? (f.text | t) : f.mark }}</button>
+          }
+        }
+      </div>
+    }
+
+    @if (!desktop && kbBar(); as kb) {
+      <!-- Phones: over the keyboard while typing — B I U, Fill in, Choice, Link for the selection
+           (or the word the cursor is in); taps keep the keyboard up -->
+      <div
+        appToBody
+        class="fixed inset-x-0 z-[2100] flex items-center gap-1 overflow-x-auto border-t-[0.5px] border-[var(--separator)] bg-[var(--surface)] px-2 py-1.5"
+        [style.bottom.px]="kbOffset()"
+        (pointerdown)="keepFocus($event)"
+        (mousedown)="keepFocus($event)"
+      >
+        @if (linking()) {
+          <form (submit)="applyLink(); $event.preventDefault()" class="flex min-w-0 flex-1 items-center gap-1">
+            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" class="text-body h-9 min-w-0 flex-1 rounded-lg bg-[var(--fill)] px-2.5 outline-none" />
+            <button type="submit" class="btn-primary !h-9 !px-3.5 !py-0">OK</button>
+          </form>
+        } @else {
+          @for (f of formatsFor(kb.block); track f.id) {
+            <button
+              type="button"
+              (click)="mobileFormat(f.id)"
+              [attr.aria-label]="f.label | t"
+              class="flex h-9 min-w-9 shrink-0 items-center justify-center rounded-lg px-2.5 text-[1rem] active:bg-[var(--highlight)]"
+              [class.font-bold]="f.id === 'bold'"
+              [class.italic]="f.id === 'italic'"
+              [class.underline]="f.id === 'underline'"
+              [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
+            >{{ f.text ? (f.text | t) : f.mark }}</button>
           }
         }
       </div>
@@ -593,15 +629,9 @@ export class LessonForm {
         this.sel.set(null);
         return;
       }
-      const width = 300;
-      const x = (r: { left: number }) => Math.max(8, Math.min(r.left, window.innerWidth - width - 8));
-      if (this.desktop) {
-        const r = caretRect(ta, ta.selectionStart);
-        this.sel.set({ block, x: x(r), y: Math.max(4, r.top - 44) });
-      } else {
-        const r = caretRect(ta, ta.selectionEnd);
-        this.sel.set({ block, x: x(r), y: r.top + r.height + 10 });
-      }
+      if (!this.desktop) return; // phones: the bar over the keyboard
+      const r = caretRect(ta, ta.selectionStart);
+      this.sel.set({ block, x: Math.max(8, Math.min(r.left, window.innerWidth - 308)), y: Math.max(4, r.top - 44) });
     });
   }
 
@@ -609,19 +639,49 @@ export class LessonForm {
     if (!this.desktop) return;
     e.preventDefault();
     this.field = ta;
-    if (ta.selectionStart === ta.selectionEnd) {
-      // The word under the pointer
-      const v = ta.value;
-      let [a, b] = [ta.selectionStart, ta.selectionStart];
-      while (a > 0 && /[\p{L}\p{N}'’-]/u.test(v[a - 1])) a--;
-      while (b < v.length && /[\p{L}\p{N}'’-]/u.test(v[b])) b++;
-      if (a === b) return;
-      ta.setSelectionRange(a, b);
-    }
+    if (!this.selectWord(ta)) return;
     requestAnimationFrame(() => {
       this.linking.set(false);
       this.sel.set({ block, x: Math.min(e.clientX, window.innerWidth - 240), y: Math.min(e.clientY, window.innerHeight - 160), menu: true });
     });
+  }
+
+  // Nothing selected: the word the cursor is in (false: none there)
+  private selectWord(ta: HTMLTextAreaElement): boolean {
+    if (ta.selectionStart !== ta.selectionEnd) return true;
+    const v = ta.value;
+    let [a, b] = [ta.selectionStart, ta.selectionStart];
+    while (a > 0 && /[\p{L}\p{N}'’-]/u.test(v[a - 1])) a--;
+    while (b < v.length && /[\p{L}\p{N}'’-]/u.test(v[b])) b++;
+    if (a === b) return false;
+    ta.setSelectionRange(a, b);
+    return true;
+  }
+
+  // ---- Phones: the bar over the keyboard
+
+  protected readonly kbBar = signal<{ block: number } | null>(null);
+  // How high the keyboard is (the bar sits on it)
+  protected readonly kbOffset = signal(0);
+
+  protected onFieldFocus(block: number, ta: HTMLTextAreaElement): void {
+    this.field = ta;
+    if (this.desktop) return;
+    this.kbBar.set({ block });
+    this.placeBar();
+  }
+
+  private placeBar(): void {
+    const vv = window.visualViewport;
+    this.kbOffset.set(vv ? Math.max(0, window.innerHeight - (vv.offsetTop + vv.height)) : 0);
+  }
+
+  protected mobileFormat(kind: FormatId): void {
+    const ta = this.field;
+    const kb = this.kbBar();
+    if (!ta || !kb || !this.selectWord(ta)) return;
+    this.sel.set({ block: kb.block, x: 0, y: 0 });
+    this.pickFormat(kind);
   }
 
   protected onBlur(): void {
@@ -629,11 +689,14 @@ export class LessonForm {
       if (this.linking()) return; // the link's address being typed
       this.slash.set(null);
       this.sel.set(null);
+      // Out of the fields: no bar
+      const el = document.activeElement;
+      if (!(el instanceof HTMLTextAreaElement && this.host.nativeElement.contains(el))) this.kbBar.set(null);
     }, 120);
   }
 
   // Clicks in the toolbar / menu keep the text's selection (but the link's address field takes focus)
-  protected keepFocus(e: MouseEvent): void {
+  protected keepFocus(e: Event): void {
     if (!(e.target instanceof HTMLInputElement)) e.preventDefault();
   }
 
@@ -740,11 +803,16 @@ export class LessonForm {
       }
     };
     document.addEventListener('selectionchange', selectionChange);
+    const placeBar = () => this.placeBar();
+    window.visualViewport?.addEventListener('resize', placeBar);
+    window.visualViewport?.addEventListener('scroll', placeBar);
     const chats = inject(AiChatService);
     inject(DestroyRef).onDestroy(() => {
       release();
       document.removeEventListener('click', closeHelp);
       document.removeEventListener('selectionchange', selectionChange);
+      window.visualViewport?.removeEventListener('resize', placeBar);
+      window.visualViewport?.removeEventListener('scroll', placeBar);
       if (this.photos()) chats.clear(this.lessonId() ?? 'new');
     });
   }
