@@ -85,6 +85,8 @@ export function cleanLesson(l: LessonInput): LessonInput {
   return { title: l.title.trim(), blocks };
 }
 
+type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
+
 /**
  * Editing a lesson in place, Notion-like: the title, then the tasks — each one text (its first
  * line, bold, is its heading; [answers] to write in, {*right|other} to choose); "/" opens the
@@ -235,6 +237,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
                 (mouseup)="onSelect(i, ta)"
                 (keyup)="onSelect(i, ta)"
                 (blur)="onBlur()"
+                (contextmenu)="onMenu($event, i, ta)"
                 rows="2"
                 [placeholder]="'lessons.gapsPlaceholder' | t"
                 class="row-input text-subhead relative min-h-[3lh] resize-none leading-relaxed text-transparent caret-[var(--text)] [field-sizing:content] placeholder:text-[var(--text)]"
@@ -297,22 +300,61 @@ export function cleanLesson(l: LessonInput): LessonInput {
       </div>
     }
 
-    <!-- A selection: its formatting -->
+    <!-- A selection: its formatting — a toolbar over it; a right click: a menu in rows (styles,
+         gaps, link); Link asks for the address -->
     @if (sel(); as se) {
-      <div class="popover-panel fixed z-[2100] flex items-center gap-0.5 p-1" [style.left.px]="se.x" [style.top.px]="se.y">
-        @for (f of formatsFor(se.block); track f.id) {
+      <div
+        class="popover-panel fixed z-[2100] p-1"
+        [class.flex]="!se.menu"
+        [class.items-center]="!se.menu"
+        [class.gap-0.5]="!se.menu"
+        [class.w-56]="se.menu"
+        [style.left.px]="se.x"
+        [style.top.px]="se.y"
+        (mousedown)="keepFocus($event)"
+      >
+        @if (linking()) {
+          <form (submit)="applyLink(); $event.preventDefault()" class="flex items-center gap-1 p-0.5">
+            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.escape)="linking.set(false)" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
+            <button type="submit" class="btn-primary !h-8 !px-3 !py-0">OK</button>
+          </form>
+        } @else if (se.menu) {
+          @for (row of formatRows(se.block); track $index; let last = $last) {
+            <div class="flex items-center gap-0.5">
+              @for (f of row; track f.id) {
           <button
             type="button"
             (mousedown)="$event.preventDefault()"
-            (click)="format(f.id)"
+            (click)="pickFormat(f.id)"
             [attr.aria-label]="f.label | t"
             [attr.title]="f.label | t"
-            class="flex h-8 min-w-8 items-center justify-center rounded-md px-1.5 text-[0.9375rem] hover:bg-[var(--highlight)]"
+            class="flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-[0.9375rem] hover:bg-[var(--highlight)]"
             [class.font-bold]="f.id === 'bold'"
             [class.italic]="f.id === 'italic'"
             [class.underline]="f.id === 'underline'"
-            [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice'"
+            [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
           >{{ f.text ? (f.text | t) : f.mark }}</button>
+              }
+            </div>
+            @if (!last) {
+              <div class="my-1 h-px bg-[var(--separator)]"></div>
+            }
+          }
+        } @else {
+          @for (f of formatsFor(se.block); track f.id) {
+          <button
+            type="button"
+            (mousedown)="$event.preventDefault()"
+            (click)="pickFormat(f.id)"
+            [attr.aria-label]="f.label | t"
+            [attr.title]="f.label | t"
+            class="flex h-8 min-w-8 items-center justify-center rounded-md px-2 text-[0.9375rem] hover:bg-[var(--highlight)]"
+            [class.font-bold]="f.id === 'bold'"
+            [class.italic]="f.id === 'italic'"
+            [class.underline]="f.id === 'underline'"
+            [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
+          >{{ f.text ? (f.text | t) : f.mark }}</button>
+          }
         }
       </div>
     }
@@ -401,7 +443,11 @@ export class LessonForm {
   // The commands, opened by "/" at a line's start: in a text block (`block`; its "/…" from `start`
   // to `end`) or at the page's end (block -1); what's typed after "/" filters them
   protected readonly slash = signal<{ block: number; start: number; end: number; query: string; x: number; y: number; active: number } | null>(null);
-  protected readonly sel = signal<{ block: number; x: number; y: number } | null>(null);
+  protected readonly sel = signal<{ block: number; x: number; y: number; menu?: boolean } | null>(null);
+  // Link: its address asked in the toolbar / menu
+  protected readonly linking = signal(false);
+  protected linkUrl = '';
+  protected readonly linkField = viewChild<ElementRef<HTMLInputElement>>('linkField');
   private field: HTMLTextAreaElement | null = null;
 
   private readonly commands: { id: 'task' | 'assistant'; label: TranslationKey; hint: TranslationKey; words: string }[] = [
@@ -415,13 +461,22 @@ export class LessonForm {
       .filter((c) => !q || c.words.split(' ').some((w) => w.startsWith(q)) || this.i18n.t(c.label).toLowerCase().startsWith(q));
   });
 
-  protected readonly formats: { id: 'bold' | 'italic' | 'underline' | 'gap' | 'choice'; mark: string; text?: TranslationKey; label: TranslationKey }[] = [
+  protected readonly formats: { id: FormatId; mark: string; text?: TranslationKey; label: TranslationKey }[] = [
     { id: 'bold', mark: 'B', label: 'lessons.fmtBold' },
     { id: 'italic', mark: 'I', label: 'lessons.fmtItalic' },
     { id: 'underline', mark: 'U', label: 'lessons.fmtUnderline' },
     { id: 'gap', mark: '[ ]', text: 'lessons.fmtGapShort', label: 'lessons.fmtGap' },
     { id: 'choice', mark: '{ }', text: 'lessons.fmtChoiceShort', label: 'lessons.fmtChoice' },
+    { id: 'link', mark: 'Link', text: 'lessons.fmtLinkShort', label: 'lessons.fmtLink' },
   ];
+
+  // The right click's menu: rows — the styles; gaps and choices (tasks); the link
+  protected formatRows(block: number) {
+    const all = this.formatsFor(block);
+    return [['bold', 'italic', 'underline'], ['gap', 'choice'], ['link']]
+      .map((ids) => all.filter((f) => ids.includes(f.id)))
+      .filter((row) => row.length);
+  }
 
   // A task's text cut at its gaps / choices (the highlighting under its field; once per text)
   private readonly markedCache = new Map<string, ReturnType<typeof marked>>();
@@ -550,16 +605,71 @@ export class LessonForm {
     });
   }
 
+  protected onMenu(e: MouseEvent, block: number, ta: HTMLTextAreaElement): void {
+    if (!this.desktop) return;
+    e.preventDefault();
+    this.field = ta;
+    if (ta.selectionStart === ta.selectionEnd) {
+      // The word under the pointer
+      const v = ta.value;
+      let [a, b] = [ta.selectionStart, ta.selectionStart];
+      while (a > 0 && /[\p{L}\p{N}'’-]/u.test(v[a - 1])) a--;
+      while (b < v.length && /[\p{L}\p{N}'’-]/u.test(v[b])) b++;
+      if (a === b) return;
+      ta.setSelectionRange(a, b);
+    }
+    requestAnimationFrame(() => {
+      this.linking.set(false);
+      this.sel.set({ block, x: Math.min(e.clientX, window.innerWidth - 240), y: Math.min(e.clientY, window.innerHeight - 160), menu: true });
+    });
+  }
+
   protected onBlur(): void {
     setTimeout(() => {
+      if (this.linking()) return; // the link's address being typed
       this.slash.set(null);
       this.sel.set(null);
     }, 120);
   }
 
+  // Clicks in the toolbar / menu keep the text's selection (but the link's address field takes focus)
+  protected keepFocus(e: MouseEvent): void {
+    if (!(e.target instanceof HTMLInputElement)) e.preventDefault();
+  }
+
+  protected pickFormat(kind: FormatId): void {
+    if (kind !== 'link') {
+      this.format(kind);
+      return;
+    }
+    this.linkUrl = '';
+    this.linking.set(true);
+    setTimeout(() => this.linkField()?.nativeElement.focus());
+  }
+
+  // <text|https://…>: a link (the selection its text)
+  protected applyLink(): void {
+    const ta = this.field;
+    const se = this.sel();
+    this.linking.set(false);
+    if (!ta || !se) return;
+    let url = this.linkUrl.trim();
+    if (!url) return;
+    if (!/^[a-z][a-z\d+.-]*:/i.test(url)) url = `https://${url}`;
+    const [a, b] = [ta.selectionStart, ta.selectionEnd];
+    const picked = ta.value.slice(a, b).replace(/[<>|]/g, ' ') || url;
+    const inserted = `<${picked}|${url}>`;
+    const text = ta.value.slice(0, a) + inserted + ta.value.slice(b);
+    this.setBlock(se.block, { text });
+    this.sel.set(null);
+    ta.value = text;
+    ta.focus();
+    ta.setSelectionRange(a + inserted.length, a + inserted.length);
+  }
+
   // B / I / U: **…**, *…*, __…__; a gap: […] (the selection its answer); a choice: {*…|} (the
   // selection the right one, the cursor where the others go)
-  protected format(kind: 'bold' | 'italic' | 'underline' | 'gap' | 'choice'): void {
+  protected format(kind: Exclude<FormatId, 'link'>): void {
     const ta = this.field;
     const se = this.sel();
     if (!ta || !se) return;

@@ -170,7 +170,11 @@ export type { LessonFills } from './gaps';
                     } @else {
                       <!-- **bold**, *italic*, __underlined__ -->
                       @for (st of style(textOf(p)); track $index) {
-                        <span class="whitespace-pre-wrap" [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>
+                        @if (st.href) {
+                          <a [href]="st.href" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline underline-offset-2">{{ st.t }}</a>
+                        } @else {
+                          <span class="whitespace-pre-wrap" [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>
+                        }
                       }
                     }
                   }
@@ -201,7 +205,7 @@ export type { LessonFills } from './gaps';
           <h2 class="px-1 pt-2 text-xl font-semibold">{{ b.text }}</h2>
         }
         @default {
-          <p class="text-body whitespace-pre-wrap px-1 leading-relaxed">@for (st of style(b.text ?? ''); track $index) {<span [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>}</p>
+          <p class="text-body whitespace-pre-wrap px-1 leading-relaxed">@for (st of style(b.text ?? ''); track $index) {@if (st.href) {<a [href]="st.href" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline underline-offset-2">{{ st.t }}</a>} @else {<span [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>}}</p>
         }
       }
     </ng-template>

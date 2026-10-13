@@ -121,10 +121,11 @@ export interface Styled {
   b?: boolean;
   i?: boolean;
   u?: boolean;
+  href?: string;
 }
 
-// **bold**, __underlined__, *italic* (not nested)
-const STYLE = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|\*([^*\n]+)\*/g;
+// **bold**, __underlined__, *italic*, <text|https://link> (not nested)
+const STYLE = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|\*([^*\n]+)\*|<([^<>|\n]+)\|(https?:\/\/[^<>\s]+)>/g;
 
 /** Text with **bold**, *italic* and __underlined__ in it, as styled pieces. */
 export function styled(text: string): Styled[] {
@@ -134,7 +135,8 @@ export function styled(text: string): Styled[] {
     if (m.index > at) out.push({ t: text.slice(at, m.index) });
     if (m[1] !== undefined) out.push({ t: m[1], b: true });
     else if (m[2] !== undefined) out.push({ t: m[2], u: true });
-    else out.push({ t: m[3], i: true });
+    else if (m[3] !== undefined) out.push({ t: m[3], i: true });
+    else out.push({ t: m[4], href: m[5] });
     at = m.index + m[0].length;
   }
   if (at < text.length || !out.length) out.push({ t: text.slice(at) });
