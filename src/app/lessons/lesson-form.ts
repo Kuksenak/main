@@ -6,6 +6,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName } from '../core/ui/icon/icon';
 import { AiChat } from '../ai/ai-chat';
+import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
@@ -80,14 +81,12 @@ export function cleanLesson(l: LessonInput): LessonInput {
  * Editing a lesson in place: the title, then the blocks — each a card with its kind, who sees it
  * (students / only me: a tap switches), its drag handle and ×: texts, checklists (items), exercises
  * (a question, answers, the right one marked by its circle); older lessons' headings and links
- * too. + Text / Exercise / Checklist at the end, and From photo (or an image pasted, Ctrl+V): pages
- * of a book read by the server's AI in the background — "Reading…", then "Ready" opens the
- * preview to fix it and add it here (see LessonImportsService). `photos` off: no photo part (the
- * preview's own editor).
+ * too. + Text / Task / Checklist at the end, and the lesson's Assistant (exercises, texts, photos
+ * of a book — see AiChat). `photos` off: no assistant / photo part (the preview's own editor).
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, TranslatePipe],
+  imports: [AiChat, BrandIcon, CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, TranslatePipe],
   host: { class: 'flex flex-col gap-5' },
   template: `
     @let m = value();
@@ -193,10 +192,10 @@ export function cleanLesson(l: LessonInput): LessonInput {
           }
           @case ('gaps') {
             <div class="list-row items-start pb-1 pt-1">
-              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="5" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input resize-y font-mono text-[0.9375rem] leading-relaxed"></textarea>
+              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="2" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input min-h-[3lh] resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
             </div>
-            <div class="flex items-start gap-3 px-4 pb-3">
-              <p class="text-footnote flex-1 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
+            <div class="flex flex-col items-start gap-1.5 px-4 pb-3 desktop:flex-row desktop:gap-3">
+              <p class="text-footnote w-full opacity-50 desktop:flex-1">{{ 'lessons.gapsHint' | t }}</p>
               <!-- What the student sees, in a popup -->
               <button type="button" (click)="previewing.set(i)" class="text-footnote flex shrink-0 items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
                 <app-icon name="eye" class="size-3.5" />{{ 'lessons.studentSees' | t }}
@@ -210,7 +209,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
           }
           @default {
             <div class="list-row items-start pb-3 pt-1">
-              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="5" [placeholder]="'lessons.text' | t" class="row-input resize-y leading-relaxed"></textarea>
+              <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="2" [placeholder]="'lessons.text' | t" class="row-input min-h-[3lh] resize-none leading-relaxed [field-sizing:content]"></textarea>
             </div>
           }
         }
@@ -226,27 +225,15 @@ export function cleanLesson(l: LessonInput): LessonInput {
         </button>
       }
       @if (photos()) {
-        <!-- Pages of a book (camera or library on phones; or pasted) → blocks, read by the picked model -->
-        @if (imports.models().length > 1) {
-          <select [ngModel]="imports.model()" (ngModelChange)="imports.pickModel($event)" [attr.aria-label]="'lessons.model' | t" class="chip !rounded-full">
-            @for (id of imports.models(); track id) {
-              <option [value]="id">{{ modelName(id) }}</option>
-            }
-          </select>
-        }
-        <!-- The lesson's AI chat -->
+        <!-- The lesson's assistant (photos go there too) -->
         <button type="button" (click)="aiOpen.set(true)" class="chip gap-1.5 !rounded-full">
-          <app-icon name="wand" class="size-4 text-[var(--accent)]" />{{ 'nav.ai' | t }}
+          <app-brand-icon name="sparkle" class="size-5" />{{ 'nav.ai' | t }}
         </button>
-        <button type="button" (click)="photoInput.click()" [disabled]="sending()" class="chip gap-1.5 !rounded-full" [class.opacity-60]="sending()">
-          <app-icon name="image" class="size-4 text-[var(--accent)]" />{{ 'lessons.fromPhoto' | t }}
-        </button>
-        <input #photoInput type="file" accept="image/*" multiple hidden (change)="fromPhotos(photoInput)" />
       }
     </div>
     @if (aiOpen()) {
       <app-page-sheet [title]="'nav.ai' | t" [actions]="false" [scroll]="false" [large]="true" (closed)="aiOpen.set(false)">
-        <h1 class="mb-3 flex items-center gap-2 px-1 text-xl font-semibold mobile:hidden"><app-icon name="wand" class="size-5 text-[var(--accent)]" />{{ 'nav.ai' | t }}</h1>
+        <h1 class="mb-3 flex items-center gap-2 px-1 text-xl font-semibold mobile:hidden"><app-brand-icon name="sparkle" class="size-6" />{{ 'nav.ai' | t }}</h1>
         <!-- Loaded the first time it's opened -->
         @defer {
           <app-ai-chat [chatKey]="lessonId() ?? 'new'" [lesson]="m" (add)="appendBlocks($event)" />
@@ -332,15 +319,6 @@ export class LessonForm {
     });
     this.imports.ensureLoaded();
 
-    // An image pasted anywhere (Ctrl+V, like a screenshot): read like a photo
-    const paste = (e: ClipboardEvent) => {
-      if (!this.photos() || this.aiOpen()) return; // the AI chat takes its own
-      const files = [...(e.clipboardData?.files ?? [])].filter((f) => f.type.startsWith('image/'));
-      if (!files.length) return;
-      e.preventDefault();
-      this.send(files);
-    };
-    document.addEventListener('paste', paste);
     // The preview's "Add" lands here when it's this lesson
     const release = this.imports.take((lessonId, title, blocks) => {
       if (!this.photos() || lessonId !== this.lessonId()) return false;
@@ -348,7 +326,6 @@ export class LessonForm {
       return true;
     });
     inject(DestroyRef).onDestroy(() => {
-      document.removeEventListener('paste', paste);
       release();
     });
   }

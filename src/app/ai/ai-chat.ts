@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
+import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { Icon, IconName } from '../core/ui/icon/icon';
 import { LessonContent } from '../lessons/lesson-content';
 import { LessonImportsService } from '../lessons/lesson-imports.service';
@@ -26,7 +27,7 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
  */
 @Component({
   selector: 'app-ai-chat',
-  imports: [FormsModule, Icon, LessonContent, TranslatePipe],
+  imports: [BrandIcon, FormsModule, Icon, LessonContent, TranslatePipe],
   host: { class: 'flex min-h-0 flex-1 flex-col desktop:h-[min(78vh,46rem)]' },
   template: `
     <div #list class="min-h-0 flex-1 overflow-y-auto">
@@ -34,13 +35,8 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
         @if (!messages().length) {
           <!-- Nothing yet: what to ask -->
           <div class="flex flex-col items-center gap-4 py-8 text-center">
-            <app-icon name="wand" class="size-8 text-[var(--accent)]" />
+            <app-brand-icon name="sparkle" class="size-10" />
             <p class="text-body max-w-md opacity-60">{{ 'ai.empty' | t }}</p>
-            <div class="flex flex-wrap justify-center gap-2">
-              @for (ex of examples; track ex) {
-                <button type="button" (click)="useExample(ex)" class="chip !rounded-full text-left">{{ ex | t }}</button>
-              }
-            </div>
           </div>
         }
         @for (m of messages(); track m.id) {
@@ -135,8 +131,8 @@ const KINDS: { kind: LessonBlockKind; icon: IconName; label: TranslationKey }[] 
           [placeholder]="'ai.placeholder' | t"
           class="text-body max-h-48 min-h-9 flex-1 resize-none bg-transparent px-1 py-1.5 outline-none"
         ></textarea>
-        <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [attr.aria-label]="'ai.send' | t" class="btn-primary flex size-9 shrink-0 items-center justify-center !rounded-full !p-0">
-          <app-icon name="chevron-right" [strokeWidth]="2.5" class="size-5 -rotate-90" />
+        <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [attr.aria-label]="'ai.send' | t" class="btn-confirm disabled:opacity-40">
+          <app-icon name="chevron-right" [strokeWidth]="2.5" class="size-6 -rotate-90" />
         </button>
       </div>
       <div class="mt-1.5 flex items-center gap-2 pb-[env(safe-area-inset-bottom)]">
@@ -177,7 +173,6 @@ export class AiChat {
   protected readonly files = signal<{ blob: Blob; url: string }[]>([]);
   protected readonly shown = signal<string[]>([]);
   protected readonly added = signal<string[]>([]);
-  protected readonly examples: TranslationKey[] = ['ai.example1', 'ai.example2', 'ai.example3'];
 
   constructor() {
     this.imports.ensureLoaded();
@@ -244,14 +239,6 @@ export class AiChat {
     this.files.set([]);
     queueMicrotask(() => this.grow());
     this.chat.send(this.chatKey(), text, files, this.lesson());
-  }
-
-  protected useExample(key: TranslationKey): void {
-    this.draft = this.i18n.t(key);
-    queueMicrotask(() => {
-      this.grow();
-      this.box().nativeElement.focus();
-    });
   }
 
   // The box grows with its text (up to its max height)
