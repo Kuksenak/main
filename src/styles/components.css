@@ -551,22 +551,37 @@ html.dark .btn-white {
   color: var(--text);
 }
 
-/* Moving tasks (CDK drag and drop): the place it'd go — an empty slot its size, a light dashed
-   outline; the others slide to make way; the one held follows the pointer, lifted */
+/* Moving tasks (CDK drag and drop): the one held lifted a little — tilted, bigger, a soft deep
+   shadow; the place it'd go a soft slot (a light fill, a dashed outline); the others glide out of
+   the way, and on letting go it settles into place */
+.cdk-drag-preview {
+  box-shadow:
+    0 0 0 0.5px var(--separator),
+    0 18px 40px -8px rgb(0 0 0 / 0.18),
+    0 4px 12px rgb(0 0 0 / 0.08);
+  border-color: transparent !important;
+  rotate: -1deg;
+  scale: 1.02;
+  cursor: grabbing;
+}
 .cdk-drag-placeholder {
-  background: transparent !important;
+  background: color-mix(in srgb, var(--text) 3%, transparent) !important;
   box-shadow: none !important;
-  border: 1.5px dashed color-mix(in srgb, var(--text) 16%, transparent);
+  border: 1.5px dashed color-mix(in srgb, var(--text) 14%, transparent) !important;
 }
 .cdk-drag-placeholder > * {
   visibility: hidden;
 }
-.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder),
-.cdk-drag-animating {
-  transition: transform 200ms var(--ease-out-quick, ease-out);
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 260ms cubic-bezier(0.2, 0, 0, 1);
 }
-.cdk-drag-preview {
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.14), 0 2px 6px rgb(0 0 0 / 0.08);
-  opacity: 0.96;
+.cdk-drag-animating {
+  transition: transform 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+/* (while dragging: the others' buttons stay hidden, the pointer a closed hand everywhere) */
+.cdk-drop-list-dragging .group:hover .opacity-0 {
+  opacity: 0 !important;
+}
+body:has(.cdk-drag-preview) {
   cursor: grabbing;
 }
