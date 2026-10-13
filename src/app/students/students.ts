@@ -16,6 +16,10 @@ import { primeKeyboard } from '../core/utils/keyboard';
 import { initial } from '../core/utils/text';
 import { Group, GroupService, colorVar } from './group.service';
 import { Student, StudentService } from './student.service';
+import { PersonPage } from './person-page';
+import { ActivatedRoute, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 
 /**
  * Students and groups in one list (iOS Contacts-like: groups first), the search filtering both.
@@ -27,7 +31,7 @@ import { Student, StudentService } from './student.service';
  */
 @Component({
   selector: 'app-students',
-  imports: [NgTemplateOutlet, OverlayModule, GroupView, SearchBar, Icon, LongPress, ScrollArea, SearchField, StudentView, TranslatePipe],
+  imports: [NgTemplateOutlet, OverlayModule, GroupView, SearchBar, Icon, LongPress, PersonPage, ScrollArea, SearchField, StudentView, TranslatePipe],
   templateUrl: './students.html',
 })
 export class Students {
@@ -42,6 +46,17 @@ export class Students {
 
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly colorVar = colorVar;
+  protected readonly router = inject(Router);
+
+  // Desktop: the student / group open (its link: /students/student/:id, /students/group/:id)
+  private readonly params = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => ({ kind: p.get('kind'), id: p.get('id') }))));
+  protected readonly openKind = computed(() => {
+    const k = this.params()?.kind;
+    return k === 'student' || k === 'group' ? k : null;
+  });
+  protected readonly openId = computed(() => (this.openKind() ? (this.params()?.id ?? null) : null));
+  // (one page per one: switching starts it afresh)
+  protected readonly openKey = computed(() => (this.openKind() && this.openId() ? [`${this.openKind()}:${this.openId()}`] : []));
 
   protected readonly query = signal('');
 

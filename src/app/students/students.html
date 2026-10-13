@@ -6,6 +6,39 @@
   <app-search-bar [(value)]="query" [(active)]="searchActive" />
 </ng-template>
 
+@if (desktop) {
+  <!-- Desktop (as the lessons'): the open student / group as a page; none open: all of them, a row each -->
+  <div class="flex min-h-0 w-full flex-1 flex-col desktop:-mt-2 desktop:pr-2">
+    @for (key of openKey(); track key) {
+      <app-person-page [kind]="openKind()!" [id]="openId()!" />
+    } @empty {
+      <div class="flex min-h-0 flex-1 flex-col pl-4">
+        <h1 class="flex h-[var(--control-h)] shrink-0 items-center px-2 text-[1rem] font-medium">{{ 'nav.students' | t }}</h1>
+        <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
+          <div class="flex flex-col gap-px">
+            @for (g of visibleGroups(); track g.id) {
+              <button type="button" (click)="router.navigate(['/students', 'group', g.id])" class="side-row !h-9">
+                <app-icon name="people" class="side-glyph" [style.color]="'color-mix(in srgb, ' + colorVar(g.color) + ' 70%, var(--text))'" />
+                <span class="min-w-0 flex-1 truncate">{{ g.name }}</span>
+                <span class="w-56 shrink-0 truncate text-[0.8125rem] opacity-50">{{ g.studentIds.length }} · {{ 'groups.members' | t }}</span>
+              </button>
+            }
+            @for (s of visible(); track s.id) {
+              <button type="button" (click)="router.navigate(['/students', 'student', s.id])" class="side-row !h-9">
+                <app-icon name="person" class="side-glyph" />
+                <span class="min-w-0 flex-1 truncate">{{ s.name }}</span>
+                <span class="w-56 shrink-0 truncate text-[0.8125rem] opacity-50">{{ subtitle(s) }}</span>
+              </button>
+            }
+            @if (!visibleGroups().length && !visible().length) {
+              <p class="px-2 py-3 text-[0.9375rem] opacity-40">{{ 'students.empty' | t }}</p>
+            }
+          </div>
+        </app-scroll-area>
+      </div>
+    }
+  </div>
+} @else {
 <!-- One list (iOS Contacts-like): groups first, then students. Phones: a tap opens the card on
      top. Desktop: the list on the left, the picked student / group on the right (Edit opens its form). -->
 <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 mobile:pb-0 mobile:pt-0 desktop:flex-row desktop:gap-6 desktop:pb-4">
@@ -195,4 +228,6 @@
     <app-icon name="plus" [strokeWidth]="2" class="size-7" />
     <span class="fab-label">{{ 'action.add' | t }}</span>
   </button>
+}
+
 }

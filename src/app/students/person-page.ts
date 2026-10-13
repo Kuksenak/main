@@ -1,0 +1,252 @@
+import { Component, DestroyRef, ElementRef, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { LessonsCard } from '../cards/person-views';
+import { PickList, PickSection } from '../cards/pick-list';
+import { StudentLink } from '../cards/student-link';
+import { I18nService } from '../core/i18n/i18n.service';
+import { TranslatePipe } from '../core/i18n/t.pipe';
+import { ConfirmDelete } from '../core/ui/confirm';
+import { Icon } from '../core/ui/icon/icon';
+import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { Sheet } from '../core/ui/sheet/sheet';
+import { Tip } from '../core/ui/tip';
+import { GROUP_COLORS, GroupColor, GroupService, colorVar } from './group.service';
+import { StudentService } from './student.service';
+
+/** How long after the last change it's saved; typed on without a pause: at least this often. */
+const SAVE_AFTER_MS = 1500;
+const SAVE_AT_LEAST_MS = 5000;
+
+interface Draft {
+  name: string;
+  email: string | null;
+  phone: string | null;
+  color: GroupColor;
+  studentIds: string[];
+}
+
+/**
+ * A student or a group on desktop, as a lesson's page: always edited in place, saved a moment
+ * after each change (and on leaving). The head: the name; a student's Email / Call; a group's
+ * color; ⋯ (Delete). Then a student's contact (email, phone) and their own page's link, or a
+ * group's members; their lessons and events under it.
+ */
+@Component({
+  selector: 'app-person-page',
+  imports: [ConfirmDelete, FormsModule, Icon, LessonsCard, PickList, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
+  host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
+  template: `
+    <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
+      <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-1 pb-10">
+        @if (!exists()) {
+          <p class="py-10 text-center text-[0.9375rem] opacity-40">{{ 'students.notFound' | t }}</p>
+        } @else {
+          @let d = draft();
+          <!-- The head, always at the top -->
+          <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
+            <input [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+            @if (kind() === 'student') {
+              <a [attr.href]="d.email ? 'mailto:' + d.email : null" [class.pointer-events-none]="!d.email" [class.opacity-35]="!d.email" class="head-btn"><app-icon name="mail" />{{ 'students.actionMail' | t }}</a>
+              <a [attr.href]="d.phone ? 'tel:' + d.phone : null" [class.pointer-events-none]="!d.phone" [class.opacity-35]="!d.phone" class="head-btn"><app-icon name="call" />{{ 'students.actionCall' | t }}</a>
+            } @else {
+              <!-- Its color -->
+              <button #colorBtn type="button" (click)="colorOpen.set(!colorOpen())" [attr.aria-expanded]="colorOpen()" [appTip]="'groups.color' | t" tipSide="bottom" class="head-btn">
+                <span class="size-2.5 rounded-full" [style.background]="colorVar(d.color)"></span>
+                <app-icon name="chevron-down" class="!size-3.5 !opacity-50" />
+              </button>
+            }
+            <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-expanded]="menuOpen()" [appTip]="'lessons.more' | t" tipSide="bottom" class="head-btn !px-1.5">
+              <app-icon name="dots" class="!size-5" />
+            </button>
+          </div>
+
+          <div class="flex flex-col gap-4 pl-5 pt-2">
+            @if (kind() === 'student') {
+              <!-- Contact: a label and its value, edited in place (as a page's properties) -->
+              <div class="flex flex-col">
+                <label class="flex h-9 items-center gap-3 text-[0.9375rem]">
+                  <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="mail" class="size-4" />{{ 'students.email' | t }}</span>
+                  <input [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+                </label>
+                <label class="flex h-9 items-center gap-3 text-[0.9375rem]">
+                  <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="call" class="size-4" />{{ 'students.phone' | t }}</span>
+                  <input [ngModel]="d.phone" (ngModelChange)="patch({ phone: $event || null })" type="tel" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 tabular-nums outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+                </label>
+              </div>
+              <app-student-link [studentId]="id()" />
+              <app-lessons-card [studentId]="id()" />
+            } @else {
+              <!-- Members: a row each (× on hover takes them out); + adds -->
+              <div class="flex flex-col gap-px">
+                <div class="side-head !pl-0">
+                  <span class="flex-1">{{ 'groups.members' | t }} <span class="opacity-60">{{ d.studentIds.length }}</span></span>
+                  <button #addBtn type="button" (click)="picking.set(true)" [appTip]="'groups.addMembers' | t" tipSide="right" class="side-add !opacity-60"><app-icon name="plus" class="size-3.5" /></button>
+                </div>
+                @for (s of members(); track s.id) {
+                  <div class="side-row group/m !px-0">
+                    <app-icon name="person" class="side-glyph" />
+                    <button type="button" (click)="router.navigate(['/students', 'student', s.id])" class="min-w-0 flex-1 truncate text-left">{{ s.name }}</button>
+                    <button type="button" (click)="toggleMember(s.id)" [attr.aria-label]="'action.delete' | t" class="flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/m:opacity-60"><app-icon name="close" class="size-3.5" /></button>
+                  </div>
+                } @empty {
+                  <p class="py-1 text-[0.875rem] opacity-40">{{ 'groups.noMembers' | t }}</p>
+                }
+              </div>
+              <app-lessons-card [groupId]="id()" />
+            }
+          </div>
+        }
+      </app-scroll-area>
+    </main>
+
+    @if (picking() && kind() === 'group') {
+      <app-pick-list [sections]="memberSections()" [selected]="draft().studentIds" (selectedChange)="patch({ studentIds: $event })" [origin]="addAnchor()?.nativeElement ?? null" (closed)="picking.set(false)" />
+    }
+
+    @if (colorOpen()) {
+      <app-sheet [origin]="colorAnchor()?.nativeElement ?? null" [fit]="true" (closed)="colorOpen.set(false)">
+        <div class="flex gap-1">
+          @for (c of colors; track c) {
+            <button type="button" (click)="patch({ color: c }); colorOpen.set(false)" [attr.aria-label]="c" class="flex size-8 items-center justify-center rounded-md hover:bg-[var(--tint)]" [class.bg-[var(--tint-strong)]]="draft().color === c">
+              <span class="size-3.5 rounded-full" [style.background]="colorVar(c)"></span>
+            </button>
+          }
+        </div>
+      </app-sheet>
+    }
+
+    @if (menuOpen()) {
+      <app-sheet [origin]="menuAnchor()?.nativeElement ?? null" [fit]="true" (closed)="menuOpen.set(false)">
+        <div class="menu-list">
+          <button type="button" (click)="askDelete()" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
+        </div>
+      </app-sheet>
+    }
+
+    @if (deleting(); as origin) {
+      <app-confirm-delete [origin]="origin" (confirmed)="remove()" (closed)="deleting.set(null)" />
+    }
+  `,
+})
+export class PersonPage {
+  readonly kind = input.required<'student' | 'group'>();
+  readonly id = input.required<string>();
+
+  protected readonly router = inject(Router);
+  private readonly students = inject(StudentService);
+  private readonly groups = inject(GroupService);
+  private readonly i18n = inject(I18nService);
+  protected readonly colorVar = colorVar;
+  protected readonly colors = GROUP_COLORS;
+
+  protected readonly menuOpen = signal(false);
+  protected readonly colorOpen = signal(false);
+  protected readonly picking = signal(false);
+  protected readonly deleting = signal<HTMLElement | null>(null);
+  protected readonly menuAnchor = viewChild<ElementRef<HTMLElement>>('menuBtn');
+  protected readonly colorAnchor = viewChild<ElementRef<HTMLElement>>('colorBtn');
+  protected readonly addAnchor = viewChild<ElementRef<HTMLElement>>('addBtn');
+
+  private readonly student = computed(() => (this.kind() === 'student' ? this.students.byId(this.id()) : null));
+  private readonly group = computed(() => (this.kind() === 'group' ? this.groups.byId(this.id()) : null));
+  protected readonly exists = computed(() => !!(this.student() || this.group()));
+
+  // The draft edited here, and what it was when last saved
+  protected readonly draft = signal<Draft>({ name: '', email: null, phone: null, color: 'teal', studentIds: [] });
+  private saved = '';
+  private openedId: string | null = null;
+  private timer: ReturnType<typeof setTimeout> | undefined;
+  private pendingSince: number | null = null;
+  private deleted = false;
+
+  protected readonly members = computed(() => {
+    const ids = new Set(this.draft().studentIds);
+    return this.students
+      .students()
+      .filter((s) => ids.has(s.id))
+      .sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale()));
+  });
+  protected readonly memberSections = computed<PickSection[]>(() => [
+    { key: 'nav.students', items: [...this.students.students()].sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale())).map((s) => ({ id: s.id, name: s.name })) },
+  ]);
+
+  constructor() {
+    // Its data into the draft, once per student / group (later reloads after saves leave it)
+    effect(() => {
+      const s = this.student();
+      const g = this.group();
+      untracked(() => {
+        const id = s?.id ?? g?.id ?? null;
+        if (!id || id === this.openedId) return;
+        this.openedId = id;
+        this.draft.set({
+          name: s?.name ?? g?.name ?? '',
+          email: s?.email ?? null,
+          phone: s?.phone ?? null,
+          color: g?.color ?? 'teal',
+          studentIds: [...(g?.studentIds ?? [])],
+        });
+        this.saved = JSON.stringify(this.draft());
+      });
+    });
+    // Each change: saved a moment after the last one (typed on without a pause: every few seconds)
+    effect(() => {
+      const d = this.draft();
+      untracked(() => {
+        clearTimeout(this.timer);
+        if (JSON.stringify(d) === this.saved) {
+          this.pendingSince = null;
+          return;
+        }
+        this.pendingSince ??= Date.now();
+        const left = this.pendingSince + SAVE_AT_LEAST_MS - Date.now();
+        this.timer = setTimeout(() => this.saveNow(), Math.max(0, Math.min(SAVE_AFTER_MS, left)));
+      });
+    });
+    // Leaving (another page, the tab hidden): what's not saved goes now
+    const hide = () => {
+      if (document.visibilityState === 'hidden') this.saveNow();
+    };
+    document.addEventListener('visibilitychange', hide);
+    inject(DestroyRef).onDestroy(() => {
+      this.saveNow();
+      document.removeEventListener('visibilitychange', hide);
+    });
+  }
+
+  protected patch(p: Partial<Draft>): void {
+    this.draft.update((d) => ({ ...d, ...p }));
+  }
+
+  protected toggleMember(id: string): void {
+    this.draft.update((d) => ({ ...d, studentIds: d.studentIds.includes(id) ? d.studentIds.filter((x) => x !== id) : [...d.studentIds, id] }));
+  }
+
+  private saveNow(): void {
+    clearTimeout(this.timer);
+    this.pendingSince = null;
+    const d = this.draft();
+    const now = JSON.stringify(d);
+    if (this.deleted || !this.openedId || now === this.saved || !d.name.trim()) return;
+    this.saved = now;
+    if (this.kind() === 'student') {
+      this.students.update(this.openedId, { name: d.name.trim(), email: d.email?.trim() || null, phone: d.phone?.trim() || null });
+    } else {
+      this.groups.update(this.openedId, { name: d.name.trim(), color: d.color, studentIds: d.studentIds });
+    }
+  }
+
+  protected askDelete(): void {
+    this.menuOpen.set(false);
+    this.deleting.set(this.menuAnchor()?.nativeElement ?? null);
+  }
+
+  protected remove(): void {
+    this.deleted = true;
+    clearTimeout(this.timer);
+    if (this.kind() === 'student') this.students.remove(this.id());
+    else this.groups.remove(this.id());
+    this.router.navigate(['/students']);
+  }
+}

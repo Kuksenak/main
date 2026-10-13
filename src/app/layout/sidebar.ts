@@ -125,14 +125,14 @@ interface Found {
       </div>
       @if (!folded().includes('people')) {
         @for (r of peopleShown(); track r.kind + r.id) {
-          <button type="button" (click)="stack.push({ kind: r.kind, id: r.id })" class="side-row">
+          <a [routerLink]="['/students', r.kind, r.id]" routerLinkActive="is-on" class="side-row">
             @if (r.kind === 'group') {
               <app-icon name="people" class="side-glyph" [style.color]="glyphColor(r.color)" />
             } @else {
               <app-icon name="person" class="side-glyph" />
             }
             <span class="min-w-0 flex-1 truncate">{{ r.name }}</span>
-          </button>
+          </a>
         }
         <a routerLink="/students" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
@@ -420,7 +420,7 @@ export class Sidebar {
   protected pick(f: Found): void {
     this.closeSearch();
     if (f.kind === 'lesson') this.router.navigate(['/lessons', f.id]);
-    else this.stack.push({ kind: f.kind, id: f.id });
+    else this.router.navigate(['/students', f.kind, f.id]);
   }
 
   protected searchKey(e: KeyboardEvent): void {

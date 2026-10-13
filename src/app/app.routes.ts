@@ -18,6 +18,8 @@ export const routes: Routes = [
     children: [
       { path: 'schedule', component: Schedule },
       { path: 'students', loadComponent: () => import('./students/students').then((m) => m.Students) },
+      // A student's / group's page (desktop: on the right, as a lesson's)
+      { path: 'students/:kind/:id', loadComponent: () => import('./students/students').then((m) => m.Students) },
       { path: 'lessons', loadComponent: () => import('./lessons/lessons').then((m) => m.Lessons) },
       // The list with that lesson open on top
       { path: 'lessons/:id', loadComponent: () => import('./lessons/lessons').then((m) => m.Lessons) },
