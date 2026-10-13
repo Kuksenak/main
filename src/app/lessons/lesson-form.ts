@@ -312,7 +312,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
         [class.flex]="!se.menu"
         [class.items-center]="!se.menu"
         [class.gap-0.5]="!se.menu"
-        [class.w-56]="se.menu"
+        [class.w-max]="se.menu"
         [style.left.px]="se.x"
         [style.top.px]="se.y"
         (mousedown)="keepFocus($event)"
@@ -507,10 +507,10 @@ export class LessonForm {
     { id: 'link', mark: 'Link', text: 'lessons.fmtLinkShort', label: 'lessons.fmtLink' },
   ];
 
-  // The right click's menu: rows — the styles; gaps and choices (tasks); the link
+  // The right click's menu: two rows — the styles; gaps, choices (tasks) and the link
   protected formatRows(block: number) {
     const all = this.formatsFor(block);
-    return [['bold', 'italic', 'underline'], ['gap', 'choice'], ['link']]
+    return [['bold', 'italic', 'underline'], ['gap', 'choice', 'link']]
       .map((ids) => all.filter((f) => ids.includes(f.id)))
       .filter((row) => row.length);
   }
@@ -643,7 +643,8 @@ export class LessonForm {
     if (!this.selectWord(ta)) return;
     requestAnimationFrame(() => {
       this.linking.set(false);
-      this.sel.set({ block, x: Math.min(e.clientX, window.innerWidth - 240), y: Math.min(e.clientY, window.innerHeight - 160), menu: true });
+      // Beside the pointer, a little up (not over the words clicked)
+      this.sel.set({ block, x: Math.min(e.clientX + 18, window.innerWidth - 280), y: Math.max(8, Math.min(e.clientY - 36, window.innerHeight - 120)), menu: true });
     });
   }
 
