@@ -74,8 +74,8 @@ function store(key: string, value: string | null): void {
             <label class="relative mt-1 flex gap-1.5" [class.opacity-40]="pinLocked()">
               @for (i of [0, 1, 2, 3]; track i) {
                 <span
-                  class="flex size-9 items-center justify-center rounded-lg border-2 bg-[var(--fill)] text-base font-semibold tabular-nums transition-colors"
-                  [class.border-transparent]="pinLocked() || i !== min(pin().length, 3)"
+                  class="flex size-9 items-center justify-center rounded-lg border-2 bg-[var(--fill-strong)] text-base font-semibold tabular-nums transition-colors"
+                  [class.border-[var(--separator)]]="pinLocked() || i !== min(pin().length, 3)"
                   [class.border-[var(--text-secondary)]]="!pinLocked() && i === min(pin().length, 3)"
                 >{{ pin()[i] }}</span>
               }
