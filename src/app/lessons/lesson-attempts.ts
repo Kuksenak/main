@@ -154,7 +154,7 @@ export class LessonAttempts {
         if (picked === undefined) continue;
         done++;
         if (block.answer != null && block.answer === picked) right++;
-      } else if (block.kind === 'gaps') {
+      } else if (block.kind === 'gaps' && gapAnswers(block.text).length) {
         total++;
         const words = a.fills?.[i];
         if (gapsDone(block, words)) done++;

@@ -70,6 +70,11 @@ export function cleanLesson(l: LessonInput): LessonInput {
         if (url) blocks.push({ ...base, url });
         break;
       }
+      case 'gaps': {
+        const instruction = b.instruction?.trim() || null;
+        if (text || instruction) blocks.push({ ...base, instruction });
+        break;
+      }
       default:
         if (text) blocks.push(base);
     }
@@ -192,6 +197,9 @@ export function cleanLesson(l: LessonInput): LessonInput {
           }
           @case ('gaps') {
             <div class="list-row items-start pb-1 pt-1">
+              <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input resize-none font-semibold leading-snug [field-sizing:content]"></textarea>
+            </div>
+            <div class="list-row items-start pb-1 pt-1">
               <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="2" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input min-h-[3lh] resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
             </div>
             <div class="flex flex-col items-start gap-1.5 px-4 pb-3 desktop:flex-row desktop:gap-3">
@@ -219,11 +227,9 @@ export function cleanLesson(l: LessonInput): LessonInput {
 
     <!-- Add at the end -->
     <div class="flex flex-wrap justify-center gap-2">
-      @for (k of kinds; track k.kind) {
-        <button type="button" (click)="add(k.kind)" class="chip gap-1.5 !rounded-full">
-          <app-icon name="plus" class="size-4 text-[var(--accent)]" />{{ k.label | t }}
-        </button>
-      }
+      <button type="button" (click)="add('gaps')" class="chip gap-1.5 !rounded-full">
+        <app-icon name="plus" class="size-4 text-[var(--accent)]" />{{ 'action.add' | t }}
+      </button>
       @if (photos()) {
         <!-- The lesson's assistant (photos go there too) -->
         <button type="button" (click)="aiOpen.set(true)" class="chip gap-1.5 !rounded-full">
@@ -452,6 +458,7 @@ export class LessonForm {
   }
 
   // A text → a task: "...", "…", "___", "---", "– – –" become gaps to write in ([] — no set answer; fill them in)
+  // (a text block of an older lesson)
   protected toTask(index: number): void {
     const text = (this.value().blocks[index].text ?? '').replace(/_{2,}|\.{3,}|…+|-{3,}|[–—](?: ?[–—]){2,}/g, '[]');
     this.setBlock(index, { kind: 'gaps', text });

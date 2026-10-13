@@ -131,5 +131,7 @@ export class AiChatService {
 
 /** Blocks as plain text, for the model: "[gaps] …", one per line. */
 function blocksAsText(blocks: LessonBlock[]): string {
-  return blocks.map((b) => `[${b.kind}] ${b.text ?? [...(b.items ?? []), ...(b.options ?? [])].join('; ')}`).join('\n');
+  return blocks
+    .map((b) => `[${b.kind}] ${b.instruction ? b.instruction + '\n' : ''}${b.text ?? [...(b.items ?? []), ...(b.options ?? [])].join('; ')}`)
+    .join('\n');
 }

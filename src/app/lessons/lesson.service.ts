@@ -22,6 +22,7 @@ export interface LessonBlock {
   items?: string[] | null;
   options?: string[] | null;
   answer?: number | null;
+  instruction?: string | null; // a task's: what to do (its items in `text`)
 }
 
 /** A picture block's image (its id → the address it's served at). */

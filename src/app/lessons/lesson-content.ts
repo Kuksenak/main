@@ -86,9 +86,12 @@ export type { LessonFills } from './gaps';
         @case ('gaps') {
           <div class="flex flex-col gap-1.5">
             <div class="card gaps-card flex flex-col px-4 py-3">
+              @if (b.instruction) {
+                <p class="text-body whitespace-pre-wrap font-semibold leading-[1.9]">{{ b.instruction }}</p>
+              }
               @for (line of lines(b.text); track $index; let first = $first) {
-                <!-- The first line, when it's just text: the task's instruction, a bit stronger -->
-                <p class="text-body min-h-[1.5em] leading-[1.9]" [class.font-semibold]="first && line.length === 1 && !gapOf(line[0])">
+                <!-- (Older tasks: their first line, when it's just text, is the instruction) -->
+                <p class="text-body min-h-[1.5em] leading-[1.9]" [class.font-semibold]="!b.instruction && first && line.length === 1 && !gapOf(line[0])">
                   @for (p of line; track $index) {
                     @if (gapOf(p); as g) {
                       @let w = word(i, g.gap);

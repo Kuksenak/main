@@ -43,6 +43,17 @@ function itemLines(text: string): string[] {
   return text.split('\n').flatMap((line) => ((line.match(/ \d{1,2}[.)] +\S/g)?.length ?? 0) >= 2 ? line.split(INLINE_ITEM) : [line]));
 }
 
+/**
+ * A task written before tasks had an instruction of their own: its first line, when it's just
+ * text, is the instruction.
+ */
+export function splitInstruction(b: LessonBlock): LessonBlock {
+  if (b.kind !== 'gaps' || b.instruction?.trim()) return b;
+  const [first, ...rest] = (b.text ?? '').split('\n');
+  if (!first.trim() || !rest.length || first.match(GAP)) return b;
+  return { ...b, instruction: first.trim(), text: rest.join('\n') };
+}
+
 /** Each gap's accepted answers (empty: none set). */
 export function gapAnswers(text: string | null): string[][] {
   return [...(text ?? '').matchAll(GAP)].map((m) => spec(m).answers);
@@ -94,7 +105,7 @@ export function taskProgress(
     if (b.kind === 'exercise') {
       total++;
       if (answers[i] !== undefined) done++;
-    } else if (b.kind === 'gaps') {
+    } else if (b.kind === 'gaps' && gapAnswers(b.text).length) {
       total++;
       if (gapsDone(b, fills[i])) done++;
     }
