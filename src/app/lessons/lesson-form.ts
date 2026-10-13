@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { Tip } from '../core/ui/tip';
 import { Sheet } from '../core/ui/sheet/sheet';
-import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -32,7 +32,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDropList, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
+  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDragPlaceholder, CdkDropList, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
   host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
@@ -44,7 +44,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
     <!-- (tasks are moved by their ⠿: the others make way, the place it'd go shown dashed) -->
-    <div class="flex flex-col gap-2" [class.pl-8]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable() || locked()" (cdkDropListDropped)="moved($event)">
+    <div class="flex flex-col gap-2" [class.pl-6]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable() || locked()" (cdkDropListDropped)="moved($event)">
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
@@ -85,7 +85,9 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                "only me" always shows -->
           <!-- At its left, outside it (as in Notion): ⠿ — drag to move it, click for its menu (Preview,
                who sees it, Delete). Shown on hover; "only me": a lock under it, always. -->
-          <div class="task-tools absolute -left-8 top-1.5 z-10 flex flex-col items-center gap-1">
+          <!-- (while moving it: a line where it'd go) -->
+          <div *cdkDragPlaceholder class="drop-line"></div>
+          <div class="task-tools absolute -left-6 top-1.5 z-10 flex flex-col items-center gap-1">
             <button type="button" cdkDragHandle #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="'lessons.moveOrMenu' | t" tipSide="left" [attr.aria-label]="'lessons.moveOrMenu' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="drag-handle flex h-6 w-5 cursor-grab items-center justify-center rounded transition-opacity hover:bg-[var(--highlight)] active:cursor-grabbing" [class]="taskMenu()?.index === i ? 'opacity-100 bg-[var(--highlight)]' : 'opacity-0 group-hover:opacity-50 group-focus-within:opacity-50 hover:!opacity-100'">
               <app-icon name="grip" class="size-[1.125rem]" />
             </button>
@@ -412,7 +414,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     @if (taskMenu(); as tm) {
       @let tb = m.blocks[tm.index];
       @if (tb) {
-        <app-sheet [origin]="tm.from" (closed)="taskMenu.set(null)">
+        <app-sheet [origin]="tm.from" [fit]="true" (closed)="taskMenu.set(null)">
           <div class="menu-list">
             <button type="button" (click)="taskMenu.set(null); previewing.set(tm.index)" [disabled]="!tb.text?.trim()" class="menu-item">
               <app-icon name="popout" />

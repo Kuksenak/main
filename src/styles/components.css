@@ -551,39 +551,30 @@ html.dark .btn-white {
   color: var(--text);
 }
 
-/* Moving tasks (CDK drag and drop), as in Angular's own examples (angular.dev/guide/drag-drop):
-   the one held with a material shadow, its place left empty, the others sliding aside */
+/* Moving tasks (CDK drag and drop), as in Notion: the task stays a faint ghost under the pointer,
+   and a thin line (its placeholder) travels to where it'd go — the others barely move */
 .cdk-drag-preview {
-  /* (solid: nothing under it shows through) */
   background: var(--card) !important;
-  opacity: 1 !important;
   border: none !important;
-  box-sizing: border-box;
-  /* (a light shadow, outlined for dark mode) */
-  box-shadow:
-    0 0 0 0.5px var(--separator),
-    0 3px 10px rgb(0 0 0 / 0.08);
+  box-shadow: none !important;
+  opacity: 0.45 !important;
 }
-.cdk-drag-placeholder {
-  opacity: 0;
+.cdk-drag-preview .task-tools {
+  display: none;
+}
+.drop-line {
+  height: 3px;
+  margin: -2.5px 0; /* (the line in the gap between two tasks; the gap itself kept) */
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 /* (while one is held: the pointer a closed hand everywhere) */
 body:has(.cdk-drag-preview),
 body:has(.cdk-drag-preview) * {
   cursor: grabbing !important;
 }
-/* (the one held: of its buttons at the right, only ⠿ stays) */
-.cdk-drag-preview .task-tools > :not(.drag-handle) {
-  display: none;
-}
-.cdk-drag-preview .drag-handle {
-  opacity: 0.6 !important;
-}
-.cdk-drag-animating {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
 .cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
-  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+  transition: transform 150ms ease-out;
 }
 
 /* A hover hint (Tip): a small dark label, faded in, sliding a little from its element */
@@ -618,9 +609,8 @@ body:has(.cdk-drag-preview) * {
    highlight on hover, groups split by a thin line; a quiet footer under it */
 .menu-list {
   display: flex;
-  min-width: 15rem;
+  min-width: 12rem;
   flex-direction: column;
-  margin: -0.5rem; /* (the popover's own padding is wider than a menu wants) */
 }
 .menu-item {
   display: flex;

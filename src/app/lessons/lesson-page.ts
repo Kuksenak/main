@@ -95,7 +95,7 @@ const SAVE_AT_LEAST_MS = 5000;
           <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" [locked]="!!s.draft().locked" />
           <!-- Under the tasks: where it's used, and the students' answers -->
           @if (s.lesson(); as l) {
-            <div class="flex flex-col gap-4 pl-8 pt-2">
+            <div class="flex flex-col gap-4 pl-6 pt-2">
               <app-event-list [lessonId]="l.id" />
               <app-lesson-attempts [lesson]="l" />
             </div>
@@ -105,8 +105,8 @@ const SAVE_AT_LEAST_MS = 5000;
     </main>
 
     @if (levelOpen()) {
-      <app-sheet [origin]="levelBtn()?.nativeElement ?? null" (closed)="levelOpen.set(false)">
-        <div class="menu-list !min-w-40">
+      <app-sheet [origin]="levelBtn()?.nativeElement ?? null" [fit]="true" (closed)="levelOpen.set(false)">
+        <div class="menu-list !min-w-32">
           @for (o of levelOptions(); track o.value) {
             <button type="button" (click)="setLevel($any(o.value) || null); levelOpen.set(false)" class="menu-item">
               <span class="menu-icon rounded-full !opacity-100" [style.background]="levelColor($any(o.value) || null) ?? 'color-mix(in srgb, var(--text) 22%, transparent)'"></span>
@@ -122,7 +122,7 @@ const SAVE_AT_LEAST_MS = 5000;
 
     <!-- ⋯'s menu, under it -->
     @if (menuOpen()) {
-      <app-sheet [origin]="menuBtn()?.nativeElement ?? null" (closed)="menuOpen.set(false)">
+      <app-sheet [origin]="menuBtn()?.nativeElement ?? null" [fit]="true" (closed)="menuOpen.set(false)">
         <div class="menu-list">
           <button type="button" (click)="duplicate()" [disabled]="!s.lesson()" class="menu-item">
             <app-icon name="duplicate" />

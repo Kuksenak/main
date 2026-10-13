@@ -38,9 +38,13 @@ import { InstallService } from '../../services/install.service';
       >
         <!-- Kept inside the window: pushed back in, and never taller than it (then it scrolls) -->
         <div
-          class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-3rem)] origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] p-3 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
-          [class.w-72]="!wide()"
-          [class.w-96]="wide()"
+          class="dialog-panel flex max-h-[calc(var(--app-h,100dvh)-3rem)] origin-top-right flex-col overflow-y-auto !rounded-[0.875rem] [animation:dropdownIn_160ms_var(--ease-out-quick)]"
+          [class.p-3]="!fit()"
+          [class.p-1]="fit()"
+          [class.!rounded-[0.625rem]]="fit()"
+          [class.w-72]="!wide() && !fit()"
+          [class.w-96]="wide() && !fit()"
+          [class.w-max]="fit()"
         >
           <ng-container [ngTemplateOutlet]="content" />
         </div>
@@ -88,6 +92,8 @@ export class Sheet {
   readonly origin = input<HTMLElement | null>(null);
   /** Desktop dropdown: wider (24rem instead of 18rem). */
   readonly wide = input(false);
+  /** Desktop: as wide as its content, little padding (a menu, as in Notion). */
+  readonly fit = input(false);
   /** Phones: a fixed height, up to the middle of the top bar (not the content's: pages switching
    * inside it don't make it jump). (Desktop dropdowns grow with their content up to the window.) */
   readonly tall = input(false);
