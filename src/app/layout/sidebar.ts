@@ -45,7 +45,7 @@ interface Found {
   host: { class: 'flex w-60 shrink-0 flex-col border-r-[0.5px] border-[var(--separator)] bg-[color-mix(in_srgb,var(--surface)_35%,var(--app-bg))]' },
   template: `
     <div class="flex shrink-0 flex-col gap-px px-2 pb-1 pt-2">
-      <div class="flex items-center gap-1">
+      <div class="mb-2 flex items-center gap-1">
         <button type="button" (click)="openSearch()" class="side-row min-w-0 flex-1">
           <app-icon name="search" />
           <span class="flex-1">{{ 'students.search' | t }}</span>
