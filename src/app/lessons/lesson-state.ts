@@ -1,6 +1,6 @@
 import { computed, inject, signal } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
-import { splitInstruction } from './gaps';
+import { asTask } from './gaps';
 import { cleanLesson, lessonValid } from './lesson-form';
 import { LessonInput, LessonService } from './lesson.service';
 
@@ -40,8 +40,8 @@ export class LessonState {
   edit(): void {
     const l = this.lesson();
     if (!l) return;
-    // (older tasks: their first line becomes their instruction)
-    this.draft.set({ title: l.title, blocks: l.blocks.map((b) => splitInstruction({ ...b })) });
+    // Older lessons: every block becomes a task (a heading and a body; pictures stay)
+    this.draft.set({ title: l.title, blocks: l.blocks.map((b) => asTask({ ...b })) });
     this.snapshot.set(JSON.stringify(this.draft()));
     this.editRequested.set(true);
   }

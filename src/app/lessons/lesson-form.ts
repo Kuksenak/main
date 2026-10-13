@@ -130,12 +130,6 @@ export function cleanLesson(l: LessonInput): LessonInput {
               }
             </span>
           }
-          @if (b.kind === 'gaps' && i > 0 && m.blocks[i - 1].kind === 'text') {
-            <!-- Its instruction as a text block above it: into the task (one piece to move around) -->
-            <button type="button" (click)="joinAbove(i)" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
-              <app-icon name="chevron-down" class="size-3.5 rotate-180" />{{ 'lessons.joinAbove' | t }}
-            </button>
-          }
           @if (b.kind === 'gaps') {
             <!-- What the student sees, in a popup -->
             <button type="button" (click)="previewing.set(i)" [disabled]="!b.instruction?.trim() && !b.text?.trim()" class="text-subhead flex items-center gap-1 rounded-full bg-[var(--fill)] px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-70 disabled:opacity-30 disabled:hover:bg-[var(--fill)]">{{ 'lessons.studentSees' | t }}</button>

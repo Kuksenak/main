@@ -54,6 +54,35 @@ export function splitInstruction(b: LessonBlock): LessonBlock {
   return { ...b, instruction: first.trim(), text: rest.join('\n') };
 }
 
+/**
+ * Any block of an older lesson as a task (a heading and a body) — what lessons are made of now;
+ * pictures stay pictures. A text: its first line the heading (if it has more), the rest the body; a heading: its heading; a checklist: its items as
+ * lines; a one-question exercise: the question with its options to choose from; a link: its
+ * label and address.
+ */
+export function asTask(b: LessonBlock): LessonBlock {
+  const base: LessonBlock = { kind: 'gaps', text: null, url: null, private: !!b.private, instruction: null };
+  switch (b.kind) {
+    case 'gaps':
+      return splitInstruction(b);
+    case 'image':
+      return b;
+    case 'heading':
+      return { ...base, instruction: b.text };
+    case 'checklist':
+      return { ...base, text: (b.items ?? []).join('\n') };
+    case 'exercise': {
+      const options = (b.options ?? []).map((o, i) => (i === b.answer ? '*' : '') + o.replace(/[|{}]/g, ' '));
+      return { ...base, text: options.length ? `${b.text ?? ''} {${options.join('|')}}`.trim() : b.text };
+    }
+    case 'link':
+      return { ...base, text: [b.text, b.url].filter((x) => !!x?.trim()).join(' ') };
+    default:
+      // (its first line, if there are more, the heading)
+      return splitInstruction({ ...base, text: b.text });
+  }
+}
+
 /** Each gap's accepted answers (empty: none set). */
 export function gapAnswers(text: string | null): string[][] {
   return [...(text ?? '').matchAll(GAP)].map((m) => spec(m).answers);
