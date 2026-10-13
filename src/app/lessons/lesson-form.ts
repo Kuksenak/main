@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, model, signal, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input, model, signal, viewChild } from '@angular/core';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -316,7 +316,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div appToBody class="popover-panel fixed z-[2100] flex w-48 flex-col p-1" [style.left.px]="se.x" [style.top.px]="se.y" (mousedown)="keepFocus($event)">
         @if (linking()) {
           <form (submit)="applyLink(); $event.preventDefault()" class="flex items-center gap-1 p-0.5">
-            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.escape)="linking.set(false)" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
+            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="text-subhead h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 outline-none" />
             <button type="submit" class="btn-primary !h-8 !px-3 !py-0">OK</button>
           </form>
         } @else {
@@ -656,6 +656,8 @@ export class LessonForm {
   protected onSelect(block: number, ta: HTMLTextAreaElement): void {
     this.field = ta;
     requestAnimationFrame(() => {
+      // The link's address being typed: the menu stays as it is
+      if (this.linking()) return;
       if (document.activeElement !== ta || ta.selectionStart === ta.selectionEnd) {
         this.sel.set(null);
         return;
@@ -743,6 +745,14 @@ export class LessonForm {
     setTimeout(() => {
       if (this.linking()) return; // the link's address being typed
       this.slash.set(null);
+      this.sel.set(null);
+    }, 120);
+  }
+
+  // The address field left (not for the menu's OK): the menu closes
+  protected onLinkBlur(): void {
+    setTimeout(() => {
+      if (!this.linking() || document.activeElement === this.linkField()?.nativeElement) return;
       this.sel.set(null);
     }, 120);
   }
@@ -875,6 +885,10 @@ export class LessonForm {
   // Editing starts in the title (desktop; on phones the keyboard would cover the form).
   private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
   constructor() {
+    // The menu gone: no address being typed either
+    effect(() => {
+      if (!this.sel()) this.linking.set(false);
+    });
     const desktop = this.desktop;
     afterNextRender(() => {
       if (desktop) this.titleInput()?.nativeElement.focus({ preventScroll: true });
