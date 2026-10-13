@@ -1,5 +1,5 @@
 import { FormsModule } from '@angular/forms';
-import { Component, DestroyRef, computed, effect, inject, input, output, signal, untracked, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, computed, effect, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
+import { Sheet } from '../core/ui/sheet/sheet';
 import { LessonAttempts } from './lesson-attempts';
 import { LessonForm } from './lesson-form';
 import { LessonInfo } from './lesson-info';
@@ -20,13 +21,13 @@ const SAVE_AT_LEAST_MS = 5000;
 
 /**
  * A lesson on desktop, on the right of the list (/lessons/:id; /lessons/new starts one): always
- * edited in place, saved a moment after each change (and on leaving): the name, Task, Assistant and
- * whether it's saved in one row; the tasks; beside them its level, the students' answers, its events
- * and the public link. Phones open lessons as cards instead (LessonCard), read only.
+ * edited in place, saved a moment after each change (and on leaving): the name, whether it's saved,
+ * Task, Assistant and ☰ in one row; the tasks the whole width under it; ☰ opens the rest (its level,
+ * events, public link, the students' answers, Delete) in a panel under it. Phones open lessons as cards instead (LessonCard), read only.
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [SelectField, BrandIcon, ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
+  imports: [SelectField, BrandIcon, ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, LessonInfo, ScrollArea, Sheet, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -50,35 +51,40 @@ const SAVE_AT_LEAST_MS = 5000;
             <button type="button" (click)="form()?.openAssistant()" class="btn-secondary gap-1.5 pl-2.5">
               <app-brand-icon name="sparkle" class="size-[1.125rem]" />{{ 'nav.ai' | t }}
             </button>
+            <!-- ☰: the lesson's settings and the rest (level, public link, events, answers, Delete) -->
+            <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-label]="'nav.settings' | t" [attr.aria-expanded]="menuOpen()" class="btn-secondary !px-2.5" [class.!bg-[var(--highlight)]]="menuOpen()">
+              <app-icon name="menu" [strokeWidth]="2" class="size-5" />
+            </button>
           </div>
 
           @if (s.saveError(); as e) {
             <p class="text-footnote select-text break-words rounded-xl bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-3 py-2 text-[var(--danger)]">{{ 'lessons.saveFailed' | t }} {{ e }}</p>
           }
-          <div class="flex items-start gap-6">
-            <div class="flex min-w-0 flex-1 flex-col gap-4">
-              <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" />
-              @if (s.id()) {
-                <button #deleteBtn type="button" (click)="askDelete.set(deleteBtn)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
-              }
-            </div>
-            <!-- Beside the tasks: its level; once saved, the students' answers, its events, the public link -->
-            <div class="flex w-72 shrink-0 flex-col gap-4">
-              <div class="card">
-                <div class="list-row">
-                  <span class="flex-1">{{ 'lessons.level' | t }}</span>
-                  <app-select [options]="levelOptions()" [ngModel]="s.draft().level ?? ''" (ngModelChange)="setLevel($event || null)" [ngModelOptions]="{ standalone: true }" />
-                </div>
-              </div>
-              @if (s.lesson(); as l) {
-                <app-lesson-attempts [lesson]="l" />
-                <app-lesson-info [lesson]="l" />
-              }
-            </div>
-          </div>
+          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" />
         }
       </app-scroll-area>
     </main>
+
+    <!-- ☰'s panel, under it (like the account's settings) -->
+    @if (menuOpen()) {
+      <app-sheet [origin]="menuBtn()?.nativeElement ?? null" [wide]="true" [tall]="true" (closed)="menuOpen.set(false)">
+        <div class="flex flex-col gap-4 desktop:gap-3">
+          <div class="card">
+            <div class="list-row">
+              <span class="flex-1">{{ 'lessons.level' | t }}</span>
+              <app-select [options]="levelOptions()" [ngModel]="s.draft().level ?? ''" (ngModelChange)="setLevel($event || null)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          @if (s.lesson(); as l) {
+            <app-lesson-info [lesson]="l" />
+            <app-lesson-attempts [lesson]="l" />
+            <div class="card">
+              <button type="button" (click)="askDeleteFromMenu()" class="list-row w-full text-left text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+            </div>
+          }
+        </div>
+      </app-sheet>
+    }
 
     @if (askDelete(); as origin) {
       <app-confirm-delete [origin]="origin" (confirmed)="remove()" (closed)="askDelete.set(null)" />
@@ -101,6 +107,14 @@ export class LessonPage {
     ...LEVELS.map((l) => ({ label: l, value: l })),
   ]);
   protected readonly form = viewChild(LessonForm);
+  protected readonly menuOpen = signal(false);
+  protected readonly menuBtn = viewChild<ElementRef<HTMLButtonElement>>('menuBtn');
+
+  // Delete, from ☰: the menu closes, the question asked by ☰
+  protected askDeleteFromMenu(): void {
+    this.menuOpen.set(false);
+    this.askDelete.set(this.menuBtn()?.nativeElement ?? null);
+  }
 
   private timer: ReturnType<typeof setTimeout> | undefined;
   private deleted = false;
