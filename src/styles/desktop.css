@@ -48,8 +48,10 @@
 }
 html:root,
 html:root body {
-  /* Doubled-up selectors: styles.css loads after this file and would win otherwise */
-  font-family: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  /* Doubled-up selectors: styles.css loads after this file and would win otherwise.
+     For now the system's own font, as Notion's (Segoe UI on Windows, SF Pro on a Mac); Geist
+     (above, not downloaded while unused) stays for later — see docs/ideas.md. */
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', Helvetica, Arial, sans-serif;
 }
 
 /* Desktop controls, Claude-like: flat and crisp — no glass, blur or shadows.
