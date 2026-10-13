@@ -71,12 +71,12 @@ function store(key: string, value: string | null): void {
             <app-icon name="lock" class="size-8 text-[var(--accent)]" />
             <h1 class="text-xl font-semibold">{{ (pinMode() === 'set' ? 'portal.pinSetTitle' : 'portal.pinEnterTitle') | t }}</h1>
             <p class="text-body opacity-60">{{ (pinMode() === 'set' ? 'portal.pinSetHint' : 'portal.pinEnterHint') | t }}</p>
-            <label class="relative mt-1 flex gap-1.5">
+            <label class="relative mt-1 flex gap-1.5" [class.opacity-40]="pinLocked()">
               @for (i of [0, 1, 2, 3]; track i) {
                 <span
                   class="flex size-9 items-center justify-center rounded-lg border-2 bg-[var(--fill)] text-base font-semibold tabular-nums transition-colors"
-                  [class.border-transparent]="i !== min(pin().length, 3)"
-                  [class.border-[var(--accent)]]="i === min(pin().length, 3)"
+                  [class.border-transparent]="pinLocked() || i !== min(pin().length, 3)"
+                  [class.border-[var(--accent)]]="!pinLocked() && i === min(pin().length, 3)"
                 >{{ pin()[i] }}</span>
               }
               <input
@@ -88,7 +88,7 @@ function store(key: string, value: string | null): void {
                 autocomplete="one-time-code"
                 [attr.aria-label]="'portal.pin' | t"
                 [value]="pin()"
-                [disabled]="sending()"
+                [disabled]="sending() || pinLocked()"
                 (input)="typePin(pinField)"
                 autofocus
                 class="absolute inset-0 h-full w-full cursor-default bg-transparent text-transparent caret-transparent opacity-0 outline-none"
@@ -203,6 +203,8 @@ export class StudentPortal {
   protected readonly pinMode = signal<'set' | 'enter'>('enter');
   protected readonly pin = signal('');
   protected readonly pinError = signal<string | null>(null);
+  // Too many wrong tries: the boxes locked until the server lets in again
+  protected readonly pinLocked = signal(false);
   private readonly pinField = viewChild<ElementRef<HTMLInputElement>>('pinField');
   protected readonly min = Math.min;
 
@@ -283,7 +285,14 @@ export class StudentPortal {
         this.pin.set('');
         this.focusPin();
         if (e.status === 429 && e.error?.lockedUntil) {
-          this.pinError.set(this.i18n.t('portal.pinLocked').replace('{time}', this.i18n.time(new Date(e.error.lockedUntil))));
+          const until = new Date(e.error.lockedUntil);
+          this.pinError.set(this.i18n.t('portal.pinLocked').replace('{time}', this.i18n.time(until)));
+          this.pinLocked.set(true);
+          setTimeout(() => {
+            this.pinLocked.set(false);
+            this.pinError.set(null);
+            this.focusPin();
+          }, Math.max(0, until.getTime() - Date.now()) + 1000);
         } else if (e.error?.wrong) {
           this.pinError.set(this.i18n.t('portal.pinWrong').replace('{n}', String(e.error.left ?? '')));
         } else {
