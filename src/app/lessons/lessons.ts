@@ -144,11 +144,11 @@ import { LessonUsage } from './lesson-usage';
 export class Lessons {
   protected readonly levelColor = levelColor;
 
-  // Where it's used: "Next Mon 14 · Anna" (else last; else unscheduled), a row's hint
+  // Where it's used: "Next Mon 14 · Anna" (else last; never: no hint), a row's hint
   protected useHint(id: string): string {
     const use = this.usage.of(id);
     const e = use.next ?? use.last;
-    if (!e) return this.i18n.t('lessons.unscheduled');
+    if (!e) return '';
     return `${this.i18n.t(use.next ? 'lessons.next' : 'lessons.last')} ${this.usage.day(e)} · ${this.usage.who(e)}`;
   }
   private service = inject(LessonService);
