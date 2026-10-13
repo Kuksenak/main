@@ -665,10 +665,10 @@ html.dark .btn-white {
   opacity: 0.45;
 }
 .head-btn > app-icon {
-  width: 1rem;
-  height: 1rem;
+  width: 1.125rem;
+  height: 1.125rem;
   flex-shrink: 0;
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 /* The lesson editor's tasks: nearly the page's own color, a thin outline */
