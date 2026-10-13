@@ -128,9 +128,24 @@ function spec(m: RegExpMatchArray): { answers: string[]; options?: string[] } {
   if (m[1] !== undefined) return { answers: split(m[1]) };
   const raw = split(m[2]);
   return {
-    options: raw.map((o) => o.replace(/^\*/, '').trim()),
-    answers: raw.filter((o) => o.startsWith('*')).map((o) => o.slice(1).trim()),
+    options: raw.map((o) => unnumbered(o.replace(/^\*/, ''))),
+    answers: raw.filter((o) => o.startsWith('*')).map((o) => unnumbered(o.slice(1))),
   };
+}
+
+// An option without the list mark it came with: "1. va", "b) vas", "в. ..." → "va", "vas", "..."
+const MARK = /^\s*(?:\d{1,2}|[a-zа-яё])[.)]\s+/i;
+export function unnumbered(option: string): string {
+  return option.replace(MARK, '').trim();
+}
+
+/** A selection made into a choice's options: split at "/", "|", lines or list marks (a) b) …). */
+export function asOptions(selection: string): string[] {
+  const parts = selection
+    .split(/\s*(?:\||\/|\n)\s*|\s+(?=(?:\d{1,2}|[a-zа-яё])[.)]\s)/i)
+    .map(unnumbered)
+    .filter((x) => !!x);
+  return parts.length ? parts : [selection.trim()];
 }
 
 function split(inside: string): string[] {
