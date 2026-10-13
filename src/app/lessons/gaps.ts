@@ -106,7 +106,7 @@ export type MarkedKind = 'gap' | 'choice' | 'link' | 'syntax';
 
 // A gap, a choice or a link; then the style marks in the plain parts
 const PIECE = /\[[^[\]\n]*\]|\{[^{}\n]*\}|<([^<>|\n]+)(\|https?:\/\/[^<>\s]+>)/g;
-const STYLE_MARK = /\*\*(?=[^*\n]+\*\*)|(?<=\*\*[^*\n]+)\*\*|__(?=[^_\n]+__)|(?<=__[^_\n]+)__/g;
+const STYLE_MARK = /\*\*(?=[^*\n]+\*\*)|(?<=\*\*[^*\n]+)\*\*|__(?=[^_\n]+__)|(?<=__[^_\n]+)__|~~(?=[^~\n]+~~)|(?<=~~[^~\n]+)~~/g;
 
 export function marked(text: string): { t: string; kind?: MarkedKind }[] {
   const out: { t: string; kind?: MarkedKind }[] = [];
@@ -136,7 +136,7 @@ export function marked(text: string): { t: string; kind?: MarkedKind }[] {
   return out;
 }
 
-export type Mark = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
+export type Mark = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 'link';
 
 // A piece of markup around [a, b) (or the selection is that piece): where it starts and ends
 interface Found {
@@ -176,6 +176,7 @@ export function marksAt(text: string, a: number, b: number): Mark[] {
   if (around(text, a, b, '**', '**')) out.push('bold');
   else if (around(text, a, b, '*', '*')) out.push('italic');
   if (around(text, a, b, '__', '__')) out.push('underline');
+  if (around(text, a, b, '~~', '~~')) out.push('strike');
   if (inside(text, a, b, WRITE)) out.push('gap');
   if (inside(text, a, b, CHOICE)) out.push('choice');
   if (inside(text, a, b, LINK)) out.push('link');
@@ -184,7 +185,7 @@ export function marksAt(text: string, a: number, b: number): Mark[] {
 
 /** The text with the selection's `mark` taken off: the new text and where the plain part now is. */
 export function unmark(text: string, a: number, b: number, mark: Mark): { text: string; a: number; b: number } | null {
-  const pair = { bold: ['**', '**'], italic: ['*', '*'], underline: ['__', '__'] } as Record<string, [string, string]>;
+  const pair = { bold: ['**', '**'], italic: ['*', '*'], underline: ['__', '__'], strike: ['~~', '~~'] } as Record<string, [string, string]>;
   if (pair[mark]) {
     const f = around(text, a, b, ...pair[mark]);
     if (!f) return null;
@@ -209,11 +210,12 @@ export interface Styled {
   b?: boolean;
   i?: boolean;
   u?: boolean;
+  s?: boolean;
   href?: string;
 }
 
-// **bold**, __underlined__, *italic*, <text|https://link> (not nested)
-const STYLE = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|\*([^*\n]+)\*|<([^<>|\n]+)\|(https?:\/\/[^<>\s]+)>/g;
+// **bold**, __underlined__, *italic*, <text|https://link>, ~~struck through~~ (not nested)
+const STYLE = /\*\*([^*\n]+)\*\*|__([^_\n]+)__|\*([^*\n]+)\*|<([^<>|\n]+)\|(https?:\/\/[^<>\s]+)>|~~([^~\n]+)~~/g;
 
 /** Text with **bold**, *italic* and __underlined__ in it, as styled pieces. */
 export function styled(text: string): Styled[] {
@@ -224,6 +226,7 @@ export function styled(text: string): Styled[] {
     if (m[1] !== undefined) out.push({ t: m[1], b: true });
     else if (m[2] !== undefined) out.push({ t: m[2], u: true });
     else if (m[3] !== undefined) out.push({ t: m[3], i: true });
+    else if (m[6] !== undefined) out.push({ t: m[6], s: true });
     else out.push({ t: m[4], href: m[5] });
     at = m.index + m[0].length;
   }

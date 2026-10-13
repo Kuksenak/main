@@ -87,7 +87,7 @@ export type { LessonFills } from './gaps';
           <div class="flex flex-col gap-1.5">
             <div class="card gaps-card flex flex-col px-4 py-3">
               @if (b.instruction) {
-                <p class="text-body whitespace-pre-wrap font-semibold leading-[1.9]">@for (st of style(b.instruction); track $index) {@if (st.href) {<a [href]="st.href" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline underline-offset-2">{{ st.t }}</a>} @else {<span [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>}}</p>
+                <p class="text-body whitespace-pre-wrap font-semibold leading-[1.9]">@for (st of style(b.instruction); track $index) {@if (st.href) {<a [href]="st.href" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline underline-offset-2">{{ st.t }}</a>} @else {<span [class.italic]="st.i" [class.underline]="st.u" [class.line-through]="st.s" [class.underline-offset-2]="st.u">{{ st.t }}</span>}}</p>
               }
               @for (line of lines(b.text); track $index) {
                 <p class="text-body min-h-[1.5em] leading-[1.9]">
@@ -172,7 +172,7 @@ export type { LessonFills } from './gaps';
                         @if (st.href) {
                           <a [href]="st.href" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline underline-offset-2">{{ st.t }}</a>
                         } @else {
-                          <span class="whitespace-pre-wrap" [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>
+                          <span class="whitespace-pre-wrap" [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.line-through]="st.s" [class.underline-offset-2]="st.u">{{ st.t }}</span>
                         }
                       }
                     }
@@ -204,7 +204,7 @@ export type { LessonFills } from './gaps';
           <h2 class="px-1 pt-2 text-xl font-semibold">{{ b.text }}</h2>
         }
         @default {
-          <p class="text-body whitespace-pre-wrap px-1 leading-relaxed">@for (st of style(b.text ?? ''); track $index) {@if (st.href) {<a [href]="st.href" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline underline-offset-2">{{ st.t }}</a>} @else {<span [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>}}</p>
+          <p class="text-body whitespace-pre-wrap px-1 leading-relaxed">@for (st of style(b.text ?? ''); track $index) {@if (st.href) {<a [href]="st.href" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline underline-offset-2">{{ st.t }}</a>} @else {<span [class.font-bold]="st.b" [class.italic]="st.i" [class.underline]="st.u" [class.line-through]="st.s" [class.underline-offset-2]="st.u">{{ st.t }}</span>}}</p>
         }
       }
     </ng-template>

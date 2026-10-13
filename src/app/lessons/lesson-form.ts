@@ -86,7 +86,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
   return { title: l.title.trim(), blocks };
 }
 
-type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
+type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 'link';
 
 /**
  * Editing a lesson in place, Notion-like: the title, then the tasks — each one text (its first
@@ -333,6 +333,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
                 [class.font-bold]="f.id === 'bold'"
                 [class.italic]="f.id === 'italic'"
                 [class.underline]="f.id === 'underline'"
+                [class.line-through]="f.id === 'strike'"
               >{{ f.mark }}</button>
             }
           </div>
@@ -383,6 +384,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
                   [class.font-bold]="f.id === 'bold'"
                   [class.italic]="f.id === 'italic'"
                   [class.underline]="f.id === 'underline'"
+                [class.line-through]="f.id === 'strike'"
                   [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
                 >{{ f.text ? (f.text | t) : f.mark }}</button>
               }
@@ -531,13 +533,14 @@ export class LessonForm {
     { id: 'bold', mark: 'B', label: 'lessons.fmtBold' },
     { id: 'italic', mark: 'I', label: 'lessons.fmtItalic' },
     { id: 'underline', mark: 'U', label: 'lessons.fmtUnderline' },
+    { id: 'strike', mark: 'S', label: 'lessons.fmtStrike' },
     { id: 'gap', mark: '[ ]', text: 'lessons.fmtGapShort', label: 'lessons.fmtGap' },
     { id: 'choice', mark: '{ }', text: 'lessons.fmtChoiceShort', label: 'lessons.fmtChoice' },
     { id: 'link', mark: 'Link', text: 'lessons.fmtLinkShort', label: 'lessons.fmtLink' },
   ];
 
   // The menu: B I U in a row; then a row each — Fill in, Choice (tasks), Link
-  protected readonly styleFormats = this.formats.filter((f) => f.id === 'bold' || f.id === 'italic' || f.id === 'underline');
+  protected readonly styleFormats = this.formats.filter((f) => !f.text);
   protected itemFormats(block: number) {
     return this.formatsFor(block).filter((f) => f.text);
   }
@@ -759,6 +762,8 @@ export class LessonForm {
       this.unformat(kind);
       return;
     }
+    // One at a time: what it already is comes off first
+    for (const other of this.sel()?.on ?? []) this.strip(other);
     if (kind !== 'link') {
       this.format(kind);
       return;
@@ -766,6 +771,19 @@ export class LessonForm {
     this.linkUrl = '';
     this.linking.set(true);
     setTimeout(() => this.linkField()?.nativeElement.focus());
+  }
+
+  // A mark taken off the selection, the selection kept on the plain text (the menu stays)
+  private strip(kind: Mark): void {
+    const ta = this.field;
+    const se = this.sel();
+    if (!ta || !se) return;
+    const r = unmark(ta.value, ta.selectionStart, ta.selectionEnd, kind);
+    if (!r) return;
+    this.setBlock(se.block, { text: r.text });
+    ta.value = r.text;
+    ta.setSelectionRange(r.a, r.b);
+    this.sel.set({ ...se, on: (se.on ?? []).filter((m) => m !== kind) });
   }
 
   private unformat(kind: Mark): void {
@@ -817,7 +835,7 @@ export class LessonForm {
         ? options.length > 1
           ? `{*${options.join('|')}}`
           : `{*${options[0] ?? picked}|}`
-        : (({ bold: ['**', '**'], italic: ['*', '*'], underline: ['__', '__'], gap: ['[', ']'] }) as Record<string, string[]>)[kind].join(picked);
+        : (({ bold: ['**', '**'], italic: ['*', '*'], underline: ['__', '__'], strike: ['~~', '~~'], gap: ['[', ']'] }) as Record<string, string[]>)[kind].join(picked);
     const text = ta.value.slice(0, a) + inserted + ta.value.slice(b);
     this.setBlock(se.block, { text });
     this.sel.set(null);
@@ -827,7 +845,7 @@ export class LessonForm {
       const at = options.length > 1 ? a + inserted.length : a + inserted.length - 1;
       ta.setSelectionRange(at, at);
     } else {
-      const open = kind === 'bold' || kind === 'underline' ? 2 : 1;
+      const open = kind === 'bold' || kind === 'underline' || kind === 'strike' ? 2 : 1;
       ta.setSelectionRange(a + open, a + open + picked.length);
     }
   }
