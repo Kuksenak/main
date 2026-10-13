@@ -132,7 +132,7 @@ import { LessonUsage } from './lesson-usage';
         @if (searchOpen()) {
           <div class="fixed inset-0 z-[2200] flex items-start justify-center bg-[var(--backdrop)] pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeSearch()">
             <div class="dialog-panel flex max-h-[70vh] w-[36rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
-              <label class="flex h-12 shrink-0 items-center gap-2.5 border-b border-[var(--separator)] px-4">
+              <label class="flex h-12 shrink-0 items-center gap-2.5 px-4">
                 <app-icon name="search" class="size-[1.125rem] shrink-0 opacity-50" />
                 <input
                   #searchField
