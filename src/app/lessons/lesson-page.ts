@@ -107,7 +107,7 @@ const SAVE_AT_LEAST_MS = 5000;
         <div class="menu-list !min-w-40">
           @for (o of levelOptions(); track o.value) {
             <button type="button" (click)="setLevel($any(o.value) || null); levelOpen.set(false)" class="menu-item">
-              <span class="menu-icon rounded-full !opacity-100" [style.background]="levelColor($any(o.value) || null) ?? 'transparent'" [class.border]="!o.value" [class.border-[var(--separator)]]="!o.value"></span>
+              <span class="menu-icon rounded-full !opacity-100" [style.background]="levelColor($any(o.value) || null) ?? 'color-mix(in srgb, var(--text) 22%, transparent)'"></span>
               <span class="flex-1">{{ o.label }}</span>
               @if ((s.draft().level ?? '') === o.value) {
                 <app-icon name="check" class="size-4 text-[var(--accent)]" />
