@@ -74,7 +74,10 @@ interface Found {
     <!-- (room at the right for its scroll thumb: inside the sidebar, not over its edge) -->
     <app-scroll-area class="min-h-0 flex-1 pr-2" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-2 pt-2">
       <!-- Calendar: the schedule -->
-      <a routerLink="/schedule" routerLinkActive="is-on" class="side-row">{{ 'sidebar.calendar' | t }}</a>
+      <a routerLink="/schedule" routerLinkActive="is-on" class="side-row">
+        <span class="flex-1">{{ 'sidebar.calendar' | t }}</span>
+        <app-icon name="arrow-up-right" class="size-4 shrink-0 opacity-45" />
+      </a>
 
       <!-- Sections (as Notion's): a head folds them (+ on hover adds); the first 5, then View all -->
       <div class="side-head group mt-2">

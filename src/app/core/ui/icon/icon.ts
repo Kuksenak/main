@@ -15,6 +15,7 @@ export type IconName =
   | 'clipboard'
   | 'arrow-up'
   | 'page'
+  | 'arrow-up-right'
   | 'sidebar'
   | 'inbox'
   | 'unlock'
@@ -134,6 +135,8 @@ export type IconName =
         @case ('sidebar') { <rect x="3.5" y="5" width="17" height="14" rx="2.5" /><path d="M9.5 5v14" /> }
         <!-- The inbox: a tray -->
         @case ('inbox') { <path d="M4 13.5 6.2 6.4A2 2 0 0 1 8.1 5h7.8a2 2 0 0 1 1.9 1.4L20 13.5V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" /><path d="M4 13.5h4.5a3.5 3.5 0 0 0 7 0H20" /> }
+        <!-- Go to (a page): a diagonal arrow -->
+        @case ('arrow-up-right') { <path d="M7.5 16.5 16.5 7.5M9 7.5h7.5V15" /> }
         <!-- Send: an arrow up -->
         @case ('arrow-up') { <path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" /> }
         <!-- Copy contents: a clipboard with lines -->
