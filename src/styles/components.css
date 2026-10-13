@@ -758,3 +758,33 @@ html.dark .btn-white {
   opacity: 1 !important;
 }
 
+/* The sidebar's icons (as Notion's): 20 px, thin, a soft gray (a lesson's: its level's color) */
+.side-glyph {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  color: color-mix(in srgb, var(--text) 50%, transparent);
+}
+.side-glyph svg {
+  stroke-width: 1.5;
+}
+.side-icon {
+  display: flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  color: color-mix(in srgb, var(--text) 55%, transparent);
+}
+.side-icon:hover {
+  background: var(--highlight);
+}
+.side-icon > app-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.side-icon > app-icon svg {
+  stroke-width: 1.5;
+}
+

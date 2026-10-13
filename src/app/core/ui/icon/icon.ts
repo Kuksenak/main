@@ -14,6 +14,7 @@ export type IconName =
   | 'paste'
   | 'clipboard'
   | 'arrow-up'
+  | 'page'
   | 'unlock'
   | 'trash'
   | 'popout'
@@ -125,6 +126,8 @@ export type IconName =
         <!-- Paste: a clipboard -->
         <!-- Paste (as Notion's): a plain clipboard -->
         @case ('paste') { <path d="M15 4.5h1.5A2.5 2.5 0 0 1 19 7v11.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 18.5V7a2.5 2.5 0 0 1 2.5-2.5H9" /><rect x="9" y="2.75" width="6" height="3.5" rx="1.25" /> }
+        <!-- A page (as Notion's): a sheet with a folded corner and lines -->
+        @case ('page') { <path d="M13.5 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-10z" /><path d="M13.5 3.5v5h5" /><path d="M9 13h6M9 16.5h6" /> }
         <!-- Send: an arrow up -->
         @case ('arrow-up') { <path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" /> }
         <!-- Copy contents: a clipboard with lines -->

@@ -44,34 +44,32 @@ interface Found {
   imports: [Icon, RouterLink, RouterLinkActive, ScrollArea, Sheet, Tip, TranslatePipe],
   host: { class: 'flex w-60 shrink-0 flex-col border-r-[0.5px] border-[var(--separator)] bg-[color-mix(in_srgb,var(--surface)_35%,var(--app-bg))]' },
   template: `
-    <div class="flex shrink-0 flex-col gap-px px-2 pb-1 pt-2">
-      <div class="mb-2 flex items-center gap-1">
-        <button type="button" (click)="openSearch()" class="side-row min-w-0 flex-1">
-          <app-icon name="search" />
-          <span class="flex-1">{{ 'students.search' | t }}</span>
-          <span class="text-footnote opacity-40">Ctrl K</span>
-        </button>
-        <!-- ✎ (as Notion's): new — an event, a group, a student, a lesson -->
-        <button #newBtn type="button" (click)="newOpen.set(!newOpen())" [appTip]="'sidebar.new' | t" tipSide="bottom" [attr.aria-label]="'sidebar.new' | t" [attr.aria-expanded]="newOpen()" class="head-btn !h-[1.875rem] !px-1.5">
+    <div class="flex shrink-0 flex-col gap-2 px-2 pb-1 pt-2">
+      <!-- ✎ (as Notion's, at the top right): new — an event, a group, a student, a lesson -->
+      <div class="flex h-7 items-center justify-end">
+        <button #newBtn type="button" (click)="newOpen.set(!newOpen())" [appTip]="'sidebar.new' | t" tipSide="bottom" [attr.aria-label]="'sidebar.new' | t" [attr.aria-expanded]="newOpen()" class="side-icon">
           <app-icon name="compose" />
         </button>
       </div>
-      @if (newOpen()) {
-        <app-sheet [origin]="newBtn" [fit]="true" (closed)="newOpen.set(false)">
-          <div class="menu-list">
-            <button type="button" (click)="create('event')" class="menu-item"><app-icon name="calendar" /><span class="flex-1">{{ 'sidebar.newEvent' | t }}</span></button>
-            <button type="button" (click)="create('group')" class="menu-item"><app-icon name="people" /><span class="flex-1">{{ 'sidebar.newGroup' | t }}</span></button>
-            <button type="button" (click)="create('student')" class="menu-item"><app-icon name="person" /><span class="flex-1">{{ 'sidebar.newStudent' | t }}</span></button>
-            <button type="button" (click)="create('lesson')" class="menu-item"><app-icon name="book" /><span class="flex-1">{{ 'lessons.add' | t }}</span></button>
-          </div>
-        </app-sheet>
-      }
-      @for (p of pages; track p.path) {
-        <a [routerLink]="p.path" routerLinkActive="is-on" class="side-row">
-          <app-icon [name]="p.icon" />
-          <span class="flex-1">{{ p.label | t }}</span>
-        </a>
-      }
+      <!-- Search: a field (as Notion's), its shortcut in a chip -->
+      <button type="button" (click)="openSearch()" class="flex h-8 w-full items-center gap-2 rounded-lg border-[0.5px] border-[var(--separator)] bg-[var(--surface)] px-2.5 text-left text-[0.875rem] hover:bg-[var(--highlight)]">
+        <span class="flex-1 opacity-50">{{ 'students.search' | t }}</span>
+        <span class="rounded bg-[var(--fill-strong)] px-1.5 py-px text-[0.6875rem] font-medium opacity-60">Ctrl+K</span>
+      </button>
+      <!-- The pages: the open one a pill (its icon and name), the others just their icon -->
+      <div class="flex items-center gap-1">
+        @for (p of pages; track p.path) {
+          <a [routerLink]="p.path" routerLinkActive #rla="routerLinkActive" [appTip]="rla.isActive ? null : (p.label | t)" tipSide="bottom" [attr.aria-label]="p.label | t"
+             class="flex h-8 items-center gap-1.5 rounded-lg text-[0.875rem] hover:bg-[var(--highlight)]"
+             [class.px-2.5]="rla.isActive" [class.w-8]="!rla.isActive" [class.justify-center]="!rla.isActive"
+             [class.bg-[var(--highlight)]]="rla.isActive" [class.font-medium]="rla.isActive">
+            <app-icon [name]="p.icon" class="side-glyph" />
+            @if (rla.isActive) {
+              <span>{{ p.label | t }}</span>
+            }
+          </a>
+        }
+      </div>
     </div>
 
     <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-3 px-2 pb-3 pt-2">
@@ -106,13 +104,13 @@ interface Found {
         @if (!folded().includes('people')) {
           @for (g of groups.groups(); track g.id) {
             <button type="button" (click)="stack.push({ kind: 'group', id: g.id })" class="side-row">
-              <span class="ml-1 mr-0.5 size-2 shrink-0 rounded-full" [style.background]="colorVar(g.color)"></span>
+              <app-icon name="people" class="side-glyph" [style.color]="glyphColor(colorVar(g.color))" />
               <span class="min-w-0 flex-1 truncate">{{ g.name }}</span>
             </button>
           }
           @for (s of studentsSorted(); track s.id) {
             <button type="button" (click)="stack.push({ kind: 'student', id: s.id })" class="side-row">
-              <span class="flex size-4 shrink-0 items-center justify-center rounded-full bg-[var(--fill-strong)] text-[0.625rem] font-semibold uppercase opacity-70">{{ s.name.charAt(0) }}</span>
+              <app-icon name="person" class="side-glyph" />
               <span class="min-w-0 flex-1 truncate">{{ s.name }}</span>
             </button>
           }
@@ -130,7 +128,7 @@ interface Found {
         @if (!folded().includes('lessons')) {
           @for (l of lessonsSorted(); track l.id) {
             <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row" [class.is-on]="openLesson() === l.id">
-              <span class="ml-1 mr-0.5 size-2 shrink-0 rounded-full" [style.background]="levelColor(l.level) ?? 'color-mix(in srgb, var(--text) 22%, transparent)'"></span>
+              <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
               <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
             </a>
           }
@@ -150,6 +148,18 @@ interface Found {
         <span class="min-w-0 flex-1 truncate">{{ auth.email() }}</span>
       </button>
     </div>
+
+    <!-- ✎'s menu (out of the column: no room taken in it) -->
+    @if (newOpen()) {
+      <app-sheet [origin]="newBtn()?.nativeElement ?? null" [fit]="true" (closed)="newOpen.set(false)">
+        <div class="menu-list">
+          <button type="button" (click)="create('event')" class="menu-item"><app-icon name="calendar" /><span class="flex-1">{{ 'sidebar.newEvent' | t }}</span></button>
+          <button type="button" (click)="create('group')" class="menu-item"><app-icon name="people" /><span class="flex-1">{{ 'sidebar.newGroup' | t }}</span></button>
+          <button type="button" (click)="create('student')" class="menu-item"><app-icon name="person" /><span class="flex-1">{{ 'sidebar.newStudent' | t }}</span></button>
+          <button type="button" (click)="create('lesson')" class="menu-item"><app-icon name="page" /><span class="flex-1">{{ 'lessons.add' | t }}</span></button>
+        </div>
+      </app-sheet>
+    }
 
     <!-- The search window (as Notion's): in the middle, near the top -->
     @if (searchOpen()) {
@@ -245,6 +255,7 @@ export class Sidebar {
 
   // ✎'s menu: a new event (today), group, student, lesson
   protected readonly newOpen = signal(false);
+  protected readonly newBtn = viewChild<ElementRef<HTMLButtonElement>>('newBtn');
   protected create(kind: 'event' | 'group' | 'student' | 'lesson'): void {
     this.newOpen.set(false);
     if (kind === 'lesson') {
@@ -254,6 +265,11 @@ export class Sidebar {
     const today = new Date();
     const date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     this.stack.push(kind === 'event' ? { kind, id: null, date } : { kind, id: null });
+  }
+
+  // A row icon's color from a pastel: deepened (thin lines in a pastel are hard to see)
+  protected glyphColor(c: string | null | undefined): string | null {
+    return c ? `color-mix(in srgb, ${c} 70%, var(--text))` : null;
   }
 
   protected openEvent(e: ScheduleEvent): void {
