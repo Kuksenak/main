@@ -136,8 +136,17 @@ export function cleanLesson(l: LessonInput): LessonInput {
               <app-icon name="compose" class="size-3.5" />{{ 'lessons.toTask' | t }}
             </button>
           }
+          @if (b.kind === 'gaps') {
+            <!-- What the student sees, in a popup -->
+            <button type="button" (click)="previewing.set(i)" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
+              <app-icon name="eye" class="size-3.5" />{{ 'lessons.studentSees' | t }}
+            </button>
+          }
           <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 opacity-60 hover:bg-[var(--highlight)]">
-            <app-icon [name]="b.private ? 'lock' : 'eye'" class="size-3.5" />{{ (b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t }}
+            @if (b.private) {
+              <app-icon name="lock" class="size-3.5" />
+            }
+            {{ (b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t }}
           </button>
           <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
             <app-icon name="close" class="size-5" />
@@ -200,18 +209,12 @@ export function cleanLesson(l: LessonInput): LessonInput {
           }
           @case ('gaps') {
             <div class="list-row items-start pb-1 pt-1">
-              <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input resize-none font-semibold leading-snug [field-sizing:content]"></textarea>
+              <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
             </div>
             <div class="list-row items-start pb-1 pt-1">
               <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="2" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input min-h-[3lh] resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
             </div>
-            <div class="flex flex-col items-start gap-1.5 px-4 pb-3 desktop:flex-row desktop:gap-3">
-              <p class="text-footnote w-full opacity-50 desktop:flex-1">{{ 'lessons.gapsHint' | t }}</p>
-              <!-- What the student sees, in a popup -->
-              <button type="button" (click)="previewing.set(i)" class="text-footnote flex shrink-0 items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
-                <app-icon name="eye" class="size-3.5" />{{ 'lessons.studentSees' | t }}
-              </button>
-            </div>
+            <p class="text-footnote px-4 pb-3 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
           }
           @case ('heading') {
             <div class="list-row">
