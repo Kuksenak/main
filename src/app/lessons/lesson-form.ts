@@ -277,9 +277,11 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div appToBody data-commands class="dialog-panel fixed z-[2100] w-max !rounded-[0.625rem] p-1 [animation:dropdownIn_160ms_var(--ease-out-quick)]" [style.left.px]="sl.x" [style.top.px]="sl.y">
         <div class="menu-list">
           @for (c of slashItems(); track c.id; let k = $index) {
-            <button type="button" (mousedown)="$event.preventDefault()" (click)="runSlash(c.id)" class="menu-item" [class.!bg-[var(--highlight)]]="k === sl.active">
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="runSlash(c.id)" [disabled]="c.id === 'paste' && !clipboard.blocks()?.length" class="menu-item" [class.!bg-[var(--highlight)]]="k === sl.active">
               @if (c.id === 'assistant') {
                 <app-brand-icon name="sparkle" class="menu-icon !opacity-100" />
+              } @else if (c.id === 'paste') {
+                <app-icon name="paste" />
               } @else {
                 <app-icon name="plus" />
               }
@@ -441,10 +443,6 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               <app-icon name="copy" />
               <span class="flex-1">{{ 'action.copy' | t }}</span>
             </button>
-            <button type="button" (click)="pasteAfter(tm.index)" [disabled]="!clipboard.blocks()?.length" class="menu-item">
-              <app-icon name="paste" />
-              <span class="flex-1">{{ 'action.paste' | t }}</span>
-            </button>
             <button type="button" (click)="formatTask(tm.index)" [disabled]="!tb.text?.trim()" class="menu-item">
               <app-icon name="wand" />
               <span class="flex-1">{{ 'lessons.format' | t }}</span>
@@ -568,14 +566,16 @@ export class LessonForm {
   protected field: HTMLTextAreaElement | null = null;
   private dragging = false;
 
-  private readonly commands: { id: 'task' | 'assistant'; label: TranslationKey; hint: TranslationKey; words: string }[] = [
+  private readonly commands: { id: 'task' | 'assistant' | 'paste'; label: TranslationKey; hint: TranslationKey; words: string }[] = [
     { id: 'task', label: 'lessons.slashTask', hint: 'lessons.slashTaskHint', words: 'task exercise new add zadanie exercice' },
     { id: 'assistant', label: 'nav.ai', hint: 'lessons.slashAssistantHint', words: 'assistant ai asystent ia' },
+    { id: 'paste', label: 'action.paste', hint: 'lessons.slashPasteHint', words: 'paste insert wklej coller' },
   ];
   protected readonly slashItems = computed(() => {
     const q = (this.slash()?.query ?? '').toLowerCase();
     return this.commands
       .filter((c) => this.photos() || c.id !== 'assistant')
+      .filter((c) => c.id !== 'paste' || this.slash()?.block === -1)
       .filter((c) => !q || c.words.split(' ').some((w) => w.startsWith(q)) || this.i18n.t(c.label).toLowerCase().startsWith(q));
   });
 
@@ -694,7 +694,7 @@ export class LessonForm {
       if (n) this.slash.set({ ...sl, active: (sl.active + (e.key === 'ArrowDown' ? 1 : n - 1)) % n });
     } else if (e.key === 'Enter') {
       const c = this.slashItems()[sl.active];
-      if (!c) return;
+      if (!c || (c.id === 'paste' && !this.clipboard.blocks()?.length)) return;
       e.preventDefault();
       this.runSlash(c.id);
     } else if (e.key === 'Escape') {
@@ -705,7 +705,7 @@ export class LessonForm {
 
   // A command: its "/…" taken out; a task goes right there (the text around it split: above it,
   // under it), or the assistant opens
-  protected runSlash(id: 'task' | 'assistant'): void {
+  protected runSlash(id: 'task' | 'assistant' | 'paste'): void {
     const sl = this.slash();
     this.slash.set(null);
     if (!sl) return;
@@ -715,7 +715,11 @@ export class LessonForm {
       this.aiAt = this.caret() ? at : null;
       this.caret.set(null);
       if (id === 'assistant') this.aiOpen.set(true);
-      else this.insertBlock(at, 'gaps', '');
+      else if (id === 'paste') {
+        // (the tasks copied, there)
+        const copied = this.clipboard.blocks() ?? [];
+        this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), ...copied.map((b) => ({ ...b })), ...m.blocks.slice(at)] }));
+      } else this.insertBlock(at, 'gaps', '');
       return;
     }
     const text = this.value().blocks[sl.block]?.text ?? '';
@@ -1303,13 +1307,6 @@ export class LessonForm {
   // text to the clipboard too
   protected readonly clipboard = inject(LessonClipboard);
 
-  // Its menu → Paste: the tasks copied, right after it
-  protected pasteAfter(index: number): void {
-    this.taskMenu.set(null);
-    const copied = this.clipboard.blocks();
-    if (!copied?.length) return;
-    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, index + 1), ...copied.map((b) => ({ ...b })), ...m.blocks.slice(index + 1)] }));
-  }
   protected copyTask(index: number): void {
     this.taskMenu.set(null);
     const b = this.value().blocks[index];
