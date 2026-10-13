@@ -101,6 +101,20 @@ export function forStudents(b: LessonBlock): LessonBlock {
   return { ...b, text, private: false };
 }
 
+/** A task's text cut at its gaps (`kind`: 'gap' to write in, 'choice'), for highlighting them as typed. */
+export function marked(text: string): { t: string; kind?: 'gap' | 'choice' }[] {
+  const out: { t: string; kind?: 'gap' | 'choice' }[] = [];
+  let at = 0;
+  for (const m of text.matchAll(GAP)) {
+    if (m.index > at) out.push({ t: text.slice(at, m.index) });
+    out.push({ t: m[0], kind: m[1] !== undefined ? 'gap' : 'choice' });
+    at = m.index + m[0].length;
+  }
+  // (a last empty line still takes its height)
+  out.push({ t: text.slice(at) + (text.endsWith('\n') ? ' ' : '') });
+  return out;
+}
+
 /** A piece of text with its formatting. */
 export interface Styled {
   t: string;

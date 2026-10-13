@@ -294,6 +294,22 @@
   }
 
 
+  /* The lesson editor: a task's [gaps] and {choices} highlighted under its text (backgrounds only) */
+  .mark-gap,
+  .mark-choice {
+    border-radius: 0.25rem;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .mark-gap {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+    color: var(--accent);
+  }
+  .mark-choice {
+    background: color-mix(in srgb, var(--brand-orange, #f97316) 18%, transparent);
+    color: color-mix(in srgb, var(--brand-orange, #f97316) 80%, var(--text));
+  }
+
   /* A student's lesson page, dense like a textbook page: lower rows, tighter text and cards */
   .lesson-dense {
     --row-h: 2.25rem;

@@ -10,7 +10,7 @@ import { AiChatService } from '../ai/ai-chat.service';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { caretRect } from '../core/ui/caret';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
-import { asOptions, asTask, forStudents } from './gaps';
+import { asOptions, asTask, forStudents, marked } from './gaps';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
@@ -221,6 +221,10 @@ export function cleanLesson(l: LessonInput): LessonInput {
           }
           @case ('gaps') {
             <div class="list-row items-start pb-3 pt-1">
+              <div class="relative min-w-0 flex-1">
+              <!-- Under the field: the same text, its [gaps] and {choices} highlighted (only
+                   backgrounds — nothing that would move the text) -->
+              <div aria-hidden="true" class="text-subhead pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'">{{ k.t }}</span>}</div>
               <textarea
                 #ta
                 [attr.data-task]="i"
@@ -233,8 +237,9 @@ export function cleanLesson(l: LessonInput): LessonInput {
                 (blur)="onBlur()"
                 rows="2"
                 [placeholder]="'lessons.gapsPlaceholder' | t"
-                class="row-input text-subhead min-h-[3lh] resize-none leading-relaxed [field-sizing:content]"
+                class="row-input text-subhead relative min-h-[3lh] resize-none leading-relaxed text-transparent caret-[var(--text)] [field-sizing:content] placeholder:text-[var(--text)]"
               ></textarea>
+              </div>
             </div>
           }
           @case ('heading') {
@@ -306,9 +311,8 @@ export function cleanLesson(l: LessonInput): LessonInput {
             [class.font-bold]="f.id === 'bold'"
             [class.italic]="f.id === 'italic'"
             [class.underline]="f.id === 'underline'"
-            [class.font-mono]="f.id === 'gap' || f.id === 'choice'"
             [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice'"
-          >{{ f.mark }}</button>
+          >{{ f.text ? (f.text | t) : f.mark }}</button>
         }
       </div>
     }
@@ -411,13 +415,25 @@ export class LessonForm {
       .filter((c) => !q || c.words.split(' ').some((w) => w.startsWith(q)) || this.i18n.t(c.label).toLowerCase().startsWith(q));
   });
 
-  protected readonly formats: { id: 'bold' | 'italic' | 'underline' | 'gap' | 'choice'; mark: string; label: TranslationKey }[] = [
+  protected readonly formats: { id: 'bold' | 'italic' | 'underline' | 'gap' | 'choice'; mark: string; text?: TranslationKey; label: TranslationKey }[] = [
     { id: 'bold', mark: 'B', label: 'lessons.fmtBold' },
     { id: 'italic', mark: 'I', label: 'lessons.fmtItalic' },
     { id: 'underline', mark: 'U', label: 'lessons.fmtUnderline' },
-    { id: 'gap', mark: '[ ]', label: 'lessons.fmtGap' },
-    { id: 'choice', mark: '{ }', label: 'lessons.fmtChoice' },
+    { id: 'gap', mark: '[ ]', text: 'lessons.fmtGapShort', label: 'lessons.fmtGap' },
+    { id: 'choice', mark: '{ }', text: 'lessons.fmtChoiceShort', label: 'lessons.fmtChoice' },
   ];
+
+  // A task's text cut at its gaps / choices (the highlighting under its field; once per text)
+  private readonly markedCache = new Map<string, ReturnType<typeof marked>>();
+  protected marks(text: string | null): ReturnType<typeof marked> {
+    const key = text ?? '';
+    let out = this.markedCache.get(key);
+    if (!out) {
+      if (this.markedCache.size > 200) this.markedCache.clear();
+      this.markedCache.set(key, (out = marked(key)));
+    }
+    return out;
+  }
 
   // Text on the page: "/" at the start of a line (and the letters after it) opens the commands
   protected onText(block: number, ta: HTMLTextAreaElement): void {
@@ -522,8 +538,15 @@ export class LessonForm {
         this.sel.set(null);
         return;
       }
-      const r = caretRect(ta, ta.selectionStart);
-      this.sel.set({ block, x: r.left, y: Math.max(4, r.top - 44) });
+      const width = 300;
+      const x = (r: { left: number }) => Math.max(8, Math.min(r.left, window.innerWidth - width - 8));
+      if (this.desktop) {
+        const r = caretRect(ta, ta.selectionStart);
+        this.sel.set({ block, x: x(r), y: Math.max(4, r.top - 44) });
+      } else {
+        const r = caretRect(ta, ta.selectionEnd);
+        this.sel.set({ block, x: x(r), y: r.top + r.height + 10 });
+      }
     });
   }
 
@@ -599,10 +622,19 @@ export class LessonForm {
     });
     const closeHelp = () => this.helpOpen.set(null);
     document.addEventListener('click', closeHelp);
+    // A selection made by touch (phones): the toolbar too
+    const selectionChange = () => {
+      const el = document.activeElement;
+      if (el instanceof HTMLTextAreaElement && el.dataset['task'] !== undefined && this.host.nativeElement.contains(el)) {
+        this.onSelect(Number(el.dataset['task']), el);
+      }
+    };
+    document.addEventListener('selectionchange', selectionChange);
     const chats = inject(AiChatService);
     inject(DestroyRef).onDestroy(() => {
       release();
       document.removeEventListener('click', closeHelp);
+      document.removeEventListener('selectionchange', selectionChange);
       if (this.photos()) chats.clear(this.lessonId() ?? 'new');
     });
   }
