@@ -3,6 +3,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { FormsModule } from '@angular/forms';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { Tip } from '../core/ui/tip';
+import { Sheet } from '../core/ui/sheet/sheet';
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -31,7 +32,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDropList, FormsModule, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
+  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDropList, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
   host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
@@ -73,12 +74,12 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div
         class="card group relative"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
-        [class.min-h-[7.75rem]]="slim"
+        [class.min-h-[3.75rem]]="slim"
         cdkDrag
         [cdkDragDisabled]="!slim"
       >
         @if (slim) {
-          <!-- Desktop tasks: no head row — its buttons in a column outside it at the right (⠿, ↗, who sees it, bin; a task at least as tall as it), shown on hover (or while
+          <!-- Desktop tasks: no head row — ⠿ and ▾ outside it at the right (▾: Preview, who sees it, Delete; a lock instead for "only me"), shown on hover (or while
                it's being typed in): ↗ as the student sees it (in a window), who sees it, ×;
                "only me" always shows -->
           <div class="task-tools absolute -right-10 top-1 z-10 flex flex-col items-center gap-0.5 p-0.5">
@@ -86,14 +87,9 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             <button type="button" cdkDragHandle [appTip]="'lessons.move' | t" tipSide="left" [attr.aria-label]="'lessons.move' | t" class="drag-handle flex size-7 cursor-grab items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 active:cursor-grabbing">
               <app-icon name="grip" class="size-[1.125rem]" />
             </button>
-            <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [appTip]="'lessons.studentSees' | t" tipSide="left" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-7 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 disabled:!opacity-20">
-              <app-icon name="popout" class="size-[1.125rem]" />
-            </button>
-            <button type="button" (click)="setBlock(i, { private: !b.private })" [appTip]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" tipSide="left" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-7 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
-              <app-icon [name]="b.private ? 'lock' : 'people'" class="size-[1.125rem]" />
-            </button>
-            <button type="button" #rm (click)="askRemove(i, rm)" [appTip]="'lessons.removeBlock' | t" tipSide="left" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-7 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
-              <app-icon name="trash" class="size-[1.125rem]" />
+            <!-- ▾: the rest in a menu (Preview, who sees it, Delete); "only me": a lock instead -->
+            <button type="button" #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="(b.private ? 'lessons.onlyMe' : 'nav.settings') | t" tipSide="left" [attr.aria-label]="'nav.settings' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="flex size-7 items-center justify-center rounded-full transition-opacity hover:bg-[var(--highlight)] hover:!opacity-100" [class]="b.private ? 'text-[var(--accent)]' : taskMenu()?.index === i ? 'opacity-100' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
+              <app-icon [name]="b.private ? 'lock' : 'chevron-down'" class="size-[1.125rem]" />
             </button>
           </div>
         } @else {
@@ -407,6 +403,32 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           <p class="text-body py-10 text-center opacity-40">{{ 'app.loading' | t }}</p>
         }
       </app-page-sheet>
+    }
+
+    <!-- A task's ▾ menu: Preview, who sees it, Delete -->
+    @if (taskMenu(); as tm) {
+      @let tb = m.blocks[tm.index];
+      @if (tb) {
+        <app-sheet [origin]="tm.from" (closed)="taskMenu.set(null)">
+          <div class="card">
+            <button type="button" (click)="taskMenu.set(null); previewing.set(tm.index)" [disabled]="!tb.text?.trim()" class="list-row w-full text-left disabled:opacity-40">
+              <app-icon name="popout" class="row-icon" />
+              <span class="flex-1">{{ 'lessons.studentSees' | t }}</span>
+            </button>
+            <button type="button" (click)="setBlock(tm.index, { private: !tb.private })" class="list-row w-full text-left">
+              <app-icon name="lock" class="row-icon" />
+              <span class="flex-1">{{ 'lessons.onlyMe' | t }}</span>
+              @if (tb.private) {
+                <app-icon name="check" class="size-5 text-[var(--accent)]" />
+              }
+            </button>
+            <button type="button" (click)="removeFromMenu(tm.index, tm.from)" class="list-row w-full text-left text-[var(--danger)]">
+              <app-icon name="trash" class="row-icon" />
+              <span class="flex-1">{{ 'lessons.removeBlock' | t }}</span>
+            </button>
+          </div>
+        </app-sheet>
+      }
     }
 
     <!-- × on a task with something in it: asked first -->
@@ -1112,6 +1134,13 @@ export class LessonForm {
       moveItemInArray(blocks, e.previousIndex, e.currentIndex);
       return { ...m, blocks };
     });
+  }
+
+  // A task's ▾ menu (which one, and its button)
+  protected readonly taskMenu = signal<{ index: number; from: HTMLElement } | null>(null);
+  protected removeFromMenu(index: number, from: HTMLElement): void {
+    this.taskMenu.set(null);
+    this.askRemove(index, from);
   }
 
   // ×: an empty block goes at once; one with something in it, once confirmed
