@@ -1,3 +1,4 @@
+import { EscStack } from '../esc-stack';
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
@@ -108,7 +109,12 @@ export class Sheet {
   protected readonly overDialog = this.desktop && this.layers.overPage(this.layer);
 
   constructor() {
-    inject(DestroyRef).onDestroy(() => this.layer && this.layers.remove(this.layer));
+    // (Esc closes it, when it's on top)
+    const offEsc = inject(EscStack).push(() => this.close());
+    inject(DestroyRef).onDestroy(() => {
+      offEsc();
+      if (this.layer) this.layers.remove(this.layer);
+    });
   }
 
   // Under the anchor, right-aligned; flips above when there's no room below; an anchor at the

@@ -1,4 +1,5 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { EscStack } from './esc-stack';
+import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
 import { DeviceDetectionService } from '../services/device-detection.service';
 import { TranslatePipe } from '../i18n/t.pipe';
 import { TranslationKey } from '../i18n/translations';
@@ -81,6 +82,9 @@ export interface ActionChoice {
   `,
 })
 export class ActionSheet {
+  // (Esc closes it, when it's on top)
+  private readonly offEsc = inject(EscStack).push(() => this.close());
+  private readonly offOnDestroy = inject(DestroyRef).onDestroy(() => this.offEsc());
   readonly title = input.required<TranslationKey>();
   readonly message = input<TranslationKey | null>(null);
   readonly choices = input.required<ActionChoice[]>();

@@ -1,3 +1,4 @@
+import { EscStack } from '../esc-stack';
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, ElementRef, afterNextRender, inject, input, output, signal } from '@angular/core';
 import { TranslatePipe } from '../../i18n/t.pipe';
@@ -186,6 +187,9 @@ export class PageSheet {
   protected readonly overPage = this.layers.overPage(this.layer); // the page is already dimmed
 
   constructor() {
+    // (Esc: as its back / ✕ — asking first about unsaved changes)
+    const offEsc = inject(EscStack).push(() => this.back(null));
+    inject(DestroyRef).onDestroy(offEsc);
     // Over the whole window wherever it's declared: moved to <body>, so no ancestor (a scroll
     // area's mask / isolate, a transform) turns `fixed` into "inside that box" — e.g. a
     // student's answers opened from within a lesson's column
