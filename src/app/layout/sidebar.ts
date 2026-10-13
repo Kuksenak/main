@@ -64,7 +64,7 @@ interface Found {
         </button>
       </div>
       <!-- Search: a field (as Notion's), its shortcut in a chip -->
-      <button type="button" (click)="openSearch()" class="flex h-8 w-full items-center gap-2 rounded-lg border-[0.5px] border-[var(--separator)] bg-[var(--surface)] px-2.5 text-left text-[0.9375rem] hover:bg-[var(--highlight)]">
+      <button type="button" (click)="openSearch()" class="flex h-8 w-full items-center gap-2 rounded-lg border-[0.5px] border-[var(--separator)] bg-[var(--app-bg)] px-2.5 text-left text-[0.9375rem] hover:bg-[var(--tint)]">
         <span class="flex-1 opacity-50">{{ 'students.search' | t }}</span>
         <span class="rounded bg-[var(--fill-strong)] px-1.5 py-px text-[0.6875rem] font-medium opacity-60">Ctrl+K</span>
       </button>
