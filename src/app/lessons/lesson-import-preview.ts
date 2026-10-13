@@ -1,3 +1,5 @@
+import { DeviceDetectionService } from '../core/services/device-detection.service';
+import { LessonContent } from './lesson-content';
 import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -17,7 +19,7 @@ import { LessonBlock, LessonInput, LessonService } from './lesson.service';
  */
 @Component({
   selector: 'app-lesson-import-preview',
-  imports: [AiResponse, LessonForm, PageSheet, TranslatePipe],
+  imports: [AiResponse, LessonContent, LessonForm, PageSheet, TranslatePipe],
   template: `
     @if (imports.previewing()) {
       <app-page-sheet #page [title]="'lessons.preview' | t" [wide]="true" [actions]="false" (closed)="imports.previewing.set(null)">
@@ -29,10 +31,15 @@ import { LessonBlock, LessonInput, LessonService } from './lesson.service';
               <p class="text-footnote select-text break-words opacity-60">{{ x.error }}</p>
             } @else if (x.draft; as d) {
               <app-ai-response [model]="d.model" [seconds]="d.seconds" [raw]="d.raw" [blocks]="d.blocks" (closed)="0" />
-              <p class="text-footnote px-1 opacity-60">{{ 'lessons.pickHint' | t }}</p>
-              <!-- (the editor loads when first needed) -->
-              @defer {
-                <app-lesson-form [(value)]="draft" [photos]="false" [selectable]="true" [(selected)]="picked" />
+              @if (desktop) {
+                <p class="text-footnote px-1 opacity-60">{{ 'lessons.pickHint' | t }}</p>
+                <!-- (the editor loads when first needed) -->
+                @defer {
+                  <app-lesson-form [(value)]="draft" [photos]="false" [selectable]="true" [(selected)]="picked" />
+                }
+              } @else {
+                <!-- Phones: read only (lessons are made on a computer) -->
+                <app-lesson-content [blocks]="draft.blocks" />
               }
             } @else {
               <p class="text-body py-10 text-center opacity-40">{{ 'lessons.reading' | t }}</p>
@@ -40,7 +47,9 @@ import { LessonBlock, LessonInput, LessonService } from './lesson.service';
             <!-- The picked ones: a new lesson, or into a lesson; then the rest stays here -->
             <div class="flex flex-wrap items-center justify-end gap-2 pt-2">
               <button type="button" (click)="discard(x)" class="btn-secondary mr-auto !text-[var(--danger)]">{{ 'lessons.discard' | t }}</button>
-              @if (x.draft && draft.blocks.length && x.id === 'local' && imports.localInto(); as into) {
+              @if (!desktop) {
+                <!-- (phones: nothing saved from here) -->
+              } @else if (x.draft && draft.blocks.length && x.id === 'local' && imports.localInto(); as into) {
                 <!-- From the lesson's AI chat: into that lesson -->
                 <button type="button" (click)="intoOpen(x, into)" [disabled]="!picked().length" class="btn-primary">{{ 'lessons.addToLesson' | t }} ({{ picked().length }})</button>
               } @else if (x.draft && draft.blocks.length) {
@@ -64,6 +73,7 @@ import { LessonBlock, LessonInput, LessonService } from './lesson.service';
   `,
 })
 export class LessonImportPreview {
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly imports = inject(LessonImportsService);
   private readonly page = viewChild<PageSheet>('page');
   protected readonly imp = signal<LessonImport | null>(null);
