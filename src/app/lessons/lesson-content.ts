@@ -87,7 +87,7 @@ export type { LessonFills } from './gaps';
           <div class="flex flex-col gap-1.5">
             <div class="card gaps-card flex flex-col px-4 py-3">
               @if (b.instruction) {
-                <p class="text-body whitespace-pre-wrap font-semibold leading-[1.9]">{{ b.instruction }}</p>
+                <p class="text-body whitespace-pre-wrap font-semibold leading-[1.9]">@for (st of style(b.instruction); track $index) {@if (st.href) {<a [href]="st.href" target="_blank" rel="noopener noreferrer" class="text-[var(--accent)] underline underline-offset-2">{{ st.t }}</a>} @else {<span [class.italic]="st.i" [class.underline]="st.u" [class.underline-offset-2]="st.u">{{ st.t }}</span>}}</p>
               }
               @for (line of lines(b.text); track $index; let first = $first) {
                 <!-- (Older tasks: their first line, when it's just text, is the instruction) -->

@@ -102,16 +102,37 @@ export function forStudents(b: LessonBlock): LessonBlock {
 }
 
 /** A task's text cut at its gaps (`kind`: 'gap' to write in, 'choice'), for highlighting them as typed. */
-export function marked(text: string): { t: string; kind?: 'gap' | 'choice' }[] {
-  const out: { t: string; kind?: 'gap' | 'choice' }[] = [];
+export type MarkedKind = 'gap' | 'choice' | 'link' | 'syntax';
+
+// A gap, a choice or a link; then the style marks in the plain parts
+const PIECE = /\[[^[\]\n]*\]|\{[^{}\n]*\}|<([^<>|\n]+)(\|https?:\/\/[^<>\s]+>)/g;
+const STYLE_MARK = /\*\*(?=[^*\n]+\*\*)|(?<=\*\*[^*\n]+)\*\*|__(?=[^_\n]+__)|(?<=__[^_\n]+)__/g;
+
+export function marked(text: string): { t: string; kind?: MarkedKind }[] {
+  const out: { t: string; kind?: MarkedKind }[] = [];
+  const plain = (t: string) => {
+    let at = 0;
+    for (const m of t.matchAll(STYLE_MARK)) {
+      if (m.index > at) out.push({ t: t.slice(at, m.index) });
+      out.push({ t: m[0], kind: 'syntax' });
+      at = m.index + m[0].length;
+    }
+    if (at < t.length) out.push({ t: t.slice(at) });
+  };
   let at = 0;
-  for (const m of text.matchAll(GAP)) {
-    if (m.index > at) out.push({ t: text.slice(at, m.index) });
-    out.push({ t: m[0], kind: m[1] !== undefined ? 'gap' : 'choice' });
+  for (const m of text.matchAll(PIECE)) {
+    if (m.index > at) plain(text.slice(at, m.index));
+    if (m[1] !== undefined) {
+      // A link: "<" and "|https://…>" faded, its text like a link
+      out.push({ t: '<', kind: 'syntax' }, { t: m[1], kind: 'link' }, { t: m[2], kind: 'syntax' });
+    } else {
+      out.push({ t: m[0], kind: m[0].startsWith('[') ? 'gap' : 'choice' });
+    }
     at = m.index + m[0].length;
   }
+  plain(text.slice(at));
   // (a last empty line still takes its height)
-  out.push({ t: text.slice(at) + (text.endsWith('\n') ? ' ' : '') });
+  out.push({ t: text.endsWith('\n') || !text ? ' ' : '' });
   return out;
 }
 

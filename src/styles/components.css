@@ -309,6 +309,15 @@
     background: color-mix(in srgb, var(--brand-orange, #f97316) 18%, transparent);
     color: color-mix(in srgb, var(--brand-orange, #f97316) 80%, var(--text));
   }
+  /* A link's text like a link; the markup around it and the style marks (**, __) faded */
+  .mark-link {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .mark-syntax {
+    opacity: 0.3;
+  }
 
   /* A student's lesson page, dense like a textbook page: lower rows, tighter text and cards */
   .lesson-dense {

@@ -111,7 +111,10 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
     <div class="flex flex-col gap-3">
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
-        <!-- Text right on the page (no card): typed where it is; emptied, it goes -->
+        <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
+             style marks highlighted under it -->
+        <div class="relative">
+        <div aria-hidden="true" class="text-body pointer-events-none absolute inset-0 whitespace-pre-wrap break-words px-1 leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
         <textarea
           #tx
           [attr.data-task]="i"
@@ -127,8 +130,9 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
           [readOnly]="!desktop"
           (blur)="onBlur(); dropIfEmpty(i)"
           rows="1"
-          class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none [field-sizing:content]"
+          class="text-body relative w-full resize-none bg-transparent px-1 leading-relaxed text-transparent caret-[var(--text)] outline-none [field-sizing:content]"
         ></textarea>
+        </div>
       } @else {
       <div class="card" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
         <!-- Head: (kind) · Preview · who sees it · ? · × -->
@@ -230,7 +234,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
               <div class="relative min-w-0 flex-1">
               <!-- Under the field: the same text, its [gaps] and {choices} highlighted (only
                    backgrounds — nothing that would move the text) -->
-              <div aria-hidden="true" class="text-subhead pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'">{{ k.t }}</span>}</div>
+              <div aria-hidden="true" class="text-subhead pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
               <textarea
                 #ta
                 [attr.data-task]="i"
@@ -391,8 +395,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
         <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
           <div class="relative" [class.card]="fb.kind === 'gaps'" [class.px-4]="fb.kind === 'gaps'" [class.py-3]="fb.kind === 'gaps'">
             <div class="relative">
-              @if (fb.kind === 'gaps') {
-                <div aria-hidden="true" class="text-body pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(fb.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'">{{ k.t }}</span>}</div>
+              @if (true) {
+                <div aria-hidden="true" class="text-body pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(fb.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
               }
               <textarea
                 #ft
@@ -406,9 +410,9 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
                 rows="3"
                 [placeholder]="(fb.kind === 'gaps' ? 'lessons.gapsPlaceholder' : 'lessons.slashHint') | t"
                 class="text-body relative w-full resize-none bg-transparent leading-relaxed outline-none [field-sizing:content] placeholder:opacity-40"
-                [class.text-transparent]="fb.kind === 'gaps'"
-                [class.caret-[var(--text)]]="fb.kind === 'gaps'"
-                [class.placeholder:text-[var(--text)]]="fb.kind === 'gaps'"
+                [class.text-transparent]="true"
+                [class.caret-[var(--text)]]="true"
+                [class.placeholder:text-[var(--text)]]="true"
               ></textarea>
             </div>
           </div>
