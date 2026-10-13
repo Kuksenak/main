@@ -43,7 +43,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
     <!-- (tasks are moved by their ⠿: the others make way, the place it'd go shown dashed) -->
-    <div class="flex flex-col gap-3" [class.pr-10]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable()" (cdkDropListDropped)="moved($event)">
+    <div class="flex flex-col gap-3" [class.pr-16]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable()" (cdkDropListDropped)="moved($event)">
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
@@ -73,28 +73,27 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div
         class="card group relative"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
+        [class.min-h-[3.75rem]]="slim"
         cdkDrag
         [cdkDragDisabled]="!slim"
       >
         @if (slim) {
-          <!-- Desktop tasks: no head row — its buttons in a column outside it at the right (⠿, ↗, who sees it, ×), shown on hover (or while
+          <!-- Desktop tasks: no head row — its buttons two by two outside it at the right (⠿ ↗ / who sees it, bin; a short task is at least as tall), shown on hover (or while
                it's being typed in): ↗ as the student sees it (in a window), who sees it, ×;
                "only me" always shows -->
-          <div class="task-tools absolute -right-10 top-1 z-10 flex flex-col items-center gap-0.5 p-0.5">
+          <div class="task-tools absolute -right-16 top-1 z-10 grid grid-cols-2 gap-0.5 p-0.5">
             <!-- ⠿ first: drag to move it (kept on the one being moved) -->
-            <button type="button" cdkDragHandle [appTip]="'lessons.move' | t" tipSide="left" [attr.aria-label]="'lessons.move' | t" class="drag-handle flex size-8 cursor-grab items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 active:cursor-grabbing">
-              <app-icon name="grip" class="size-5" />
+            <button type="button" cdkDragHandle [appTip]="'lessons.move' | t" tipSide="left" [attr.aria-label]="'lessons.move' | t" class="drag-handle flex size-7 cursor-grab items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 active:cursor-grabbing">
+              <app-icon name="grip" class="size-[1.125rem]" />
             </button>
-            <span class="flex flex-col items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
-              <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [appTip]="'lessons.studentSees' | t" tipSide="left" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
-                <app-icon name="popout" class="size-5" />
-              </button>
-            </span>
-            <button type="button" (click)="setBlock(i, { private: !b.private })" [appTip]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" tipSide="left" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-8 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
-              <app-icon [name]="b.private ? 'lock' : 'people'" class="size-5" />
+            <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [appTip]="'lessons.studentSees' | t" tipSide="left" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-7 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100 disabled:!opacity-20">
+              <app-icon name="popout" class="size-[1.125rem]" />
             </button>
-            <button type="button" #rm (click)="askRemove(i, rm)" [appTip]="'lessons.removeBlock' | t" tipSide="left" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-8 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
-              <app-icon name="trash" class="size-5" />
+            <button type="button" (click)="setBlock(i, { private: !b.private })" [appTip]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" tipSide="left" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-7 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
+              <app-icon [name]="b.private ? 'lock' : 'people'" class="size-[1.125rem]" />
+            </button>
+            <button type="button" #rm (click)="askRemove(i, rm)" [appTip]="'lessons.removeBlock' | t" tipSide="left" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-7 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
+              <app-icon name="trash" class="size-[1.125rem]" />
             </button>
           </div>
         } @else {

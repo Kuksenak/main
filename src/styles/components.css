@@ -559,10 +559,10 @@ html.dark .btn-white {
   opacity: 1 !important;
   border: none !important;
   box-sizing: border-box;
+  /* (a light shadow, outlined for dark mode) */
   box-shadow:
-    0 5px 5px -3px rgba(0, 0, 0, 0.2),
-    0 8px 10px 1px rgba(0, 0, 0, 0.14),
-    0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    0 0 0 0.5px var(--separator),
+    0 3px 10px rgb(0 0 0 / 0.08);
 }
 .cdk-drag-placeholder {
   opacity: 0;
