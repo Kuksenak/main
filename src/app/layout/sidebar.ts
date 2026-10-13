@@ -68,27 +68,21 @@ interface Found {
         <span class="flex-1 opacity-50">{{ 'students.search' | t }}</span>
         <span class="rounded bg-[var(--fill-strong)] px-1.5 py-px text-[0.6875rem] font-medium opacity-60">Ctrl+K</span>
       </button>
-      <!-- The pages, one under another -->
-      <div class="flex flex-col gap-px">
-        @for (p of pages; track p.path) {
-          <a [routerLink]="p.path" routerLinkActive="is-on" class="side-row">
-            <app-icon [name]="p.icon" class="side-glyph" />
-            <span class="flex-1">{{ p.label | t }}</span>
-          </a>
-        }
-      </div>
     </div>
 
-    <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-3 px-2 pb-3 pt-2">
-      <!-- Upcoming: the next few events -->
-      <div class="flex flex-col gap-px">
-        <div class="side-head group">
-          <button type="button" (click)="fold('upcoming')" class="flex flex-1 items-center gap-1 text-left">
-            {{ 'sidebar.upcoming' | t }}
-            <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('upcoming')" />
-          </button>
-        </div>
-        @if (!folded().includes('upcoming')) {
+    <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-px px-2 pb-3 pt-2">
+      <!-- The pages as Notion's tree: a click on a name opens it; its icon (an arrow on hover) folds
+           what's in it, shown under it, set in -->
+      <!-- Schedule: the next few events -->
+      <div class="side-row group/row" [class.is-on]="rlaS.isActive">
+        <button type="button" (click)="fold('upcoming')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('upcoming')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
+          <app-icon name="calendar" class="side-glyph group-hover/row:hidden" />
+          <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('upcoming')" />
+        </button>
+        <a routerLink="/schedule" routerLinkActive #rlaS="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.schedule' | t }}</a>
+      </div>
+      @if (!folded().includes('upcoming')) {
+        <div class="flex flex-col gap-px pl-4">
           @for (e of upcoming(); track e.id + e.startsAt) {
             <button type="button" (click)="openEvent(e)" class="side-row">
               <span class="w-[4.5rem] shrink-0 text-[0.8125rem] tabular-nums opacity-50">{{ when(e) }}</span>
@@ -97,18 +91,19 @@ interface Found {
           } @empty {
             <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
           }
-        }
-      </div>
-
-      <!-- Students and groups -->
-      <div class="flex flex-col gap-px">
-        <div class="side-head group">
-          <button type="button" (click)="fold('people')" class="flex flex-1 items-center gap-1 text-left">
-            {{ 'nav.students' | t }}
-            <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('people')" />
-          </button>
         </div>
-        @if (!folded().includes('people')) {
+      }
+
+      <!-- Students: groups and students -->
+      <div class="side-row group/row" [class.is-on]="rlaP.isActive">
+        <button type="button" (click)="fold('people')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('people')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
+          <app-icon name="people" class="side-glyph group-hover/row:hidden" />
+          <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('people')" />
+        </button>
+        <a routerLink="/students" routerLinkActive #rlaP="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.students' | t }}</a>
+      </div>
+      @if (!folded().includes('people')) {
+        <div class="flex flex-col gap-px pl-4">
           @for (r of peopleShown(); track r.kind + r.id) {
             <button type="button" (click)="stack.push({ kind: r.kind, id: r.id })" class="side-row">
               @if (r.kind === 'group') {
@@ -122,18 +117,19 @@ interface Found {
           @if (peopleAll().length > shown) {
             <a routerLink="/students" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
           }
-        }
-      </div>
+        </div>
+      }
 
       <!-- Lessons -->
-      <div class="flex flex-col gap-px">
-        <div class="side-head group">
-          <button type="button" (click)="fold('lessons')" class="flex flex-1 items-center gap-1 text-left">
-            {{ 'nav.lessons' | t }}
-            <app-icon name="chevron-down" class="size-3 opacity-0 transition group-hover:opacity-60" [class.-rotate-90]="folded().includes('lessons')" />
-          </button>
-        </div>
-        @if (!folded().includes('lessons')) {
+      <div class="side-row group/row" [class.is-on]="rlaL.isActive">
+        <button type="button" (click)="fold('lessons')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('lessons')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
+          <app-icon name="book" class="side-glyph group-hover/row:hidden" />
+          <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('lessons')" />
+        </button>
+        <a routerLink="/lessons" routerLinkActive #rlaL="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.lessons' | t }}</a>
+      </div>
+      @if (!folded().includes('lessons')) {
+        <div class="flex flex-col gap-px pl-4">
           @for (l of lessonsShown(); track l.id) {
             <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row" [class.is-on]="openLesson() === l.id">
               <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
@@ -143,8 +139,8 @@ interface Found {
           @if (lessonsSorted().length > shown) {
             <a routerLink="/lessons" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
           }
-        }
-      </div>
+        </div>
+      }
     </app-scroll-area>
 
     <!-- The account: its email; the settings open by it -->
