@@ -98,7 +98,7 @@ export class LessonState {
     const l = this.lesson();
     if (!l) return;
     // Older lessons: every block becomes a task (a heading and a body; pictures stay)
-    this.draft.set({ title: l.title, blocks: l.blocks.map((b) => asTask({ ...b })), level: l.level ?? null });
+    this.draft.set({ title: l.title, blocks: l.blocks.map((b) => asTask({ ...b })), level: l.level ?? null, locked: !!l.locked });
     this.snapshot.set(JSON.stringify(this.draft()));
     this.editRequested.set(true);
   }

@@ -38,6 +38,7 @@ export interface Lesson {
   updatedAt: string;
   shareToken: string | null; // public link token (/l/:token); null = private
   level?: Level | null;
+  locked?: boolean; // shown, not edited (until unlocked)
 }
 
 /** The students' level a lesson is for (CEFR). */
@@ -58,6 +59,7 @@ export interface LessonInput {
   title: string;
   blocks: LessonBlock[];
   level?: Level | null;
+  locked?: boolean;
 }
 
 /** The account's lesson library (API: /lessons). */

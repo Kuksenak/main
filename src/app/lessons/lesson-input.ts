@@ -69,5 +69,5 @@ export function cleanLesson(l: LessonInput): LessonInput {
         if (text) blocks.push(base);
     }
   }
-  return { title: l.title.trim(), blocks, level: l.level ?? null };
+  return { title: l.title.trim(), blocks, level: l.level ?? null, locked: !!l.locked };
 }

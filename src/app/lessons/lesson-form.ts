@@ -44,7 +44,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
     <!-- (tasks are moved by their ⠿: the others make way, the place it'd go shown dashed) -->
-    <div class="flex flex-col gap-3" [class.pr-10]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable()" (cdkDropListDropped)="moved($event)">
+    <div class="flex flex-col gap-3" [class.pr-10]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable() || locked()" (cdkDropListDropped)="moved($event)">
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
@@ -63,7 +63,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           (keyup)="onSelect(i, tx)"
           (focus)="field = tx"
           (click)="openFocus(i, tx)"
-          [readOnly]="!desktop"
+          [readOnly]="!desktop || locked()"
           (blur)="onBlur(); dropIfEmpty(i)"
           rows="1"
           class="text-body relative w-full resize-none bg-transparent px-1 leading-relaxed text-transparent caret-[var(--text)] outline-none [field-sizing:content]"
@@ -78,7 +78,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         cdkDrag
         [cdkDragDisabled]="!slim"
       >
-        @if (slim) {
+        @if (slim && !locked()) {
           <!-- Desktop tasks: no head row — ⠿ and ▾ outside it at the right (▾: Preview, who sees it, Delete; a lock instead for "only me"), shown on hover (or while
                it's being typed in): ↗ as the student sees it (in a window), who sees it, ×;
                "only me" always shows -->
@@ -205,7 +205,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                 (keyup)="onSelect(i, ta)"
                 (focus)="field = ta"
                 (click)="openFocus(i, ta)"
-                [readOnly]="!desktop"
+                [readOnly]="!desktop || locked()"
                 (blur)="onBlur()"
                 rows="2"
                 [placeholder]="'lessons.gapsPlaceholder' | t"
@@ -228,13 +228,13 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       </div>
       }
     }
-      @if (desktop) {
+      @if (desktop && !locked()) {
         <!-- The end of the page: "+ Add" (faded) — it, or a click on the page under it, opens the
              commands (Task, Assistant); so does a key typed outside a task (it filters them) -->
         <button #addRow type="button" (click)="openAdd()" class="text-subhead -mt-1 flex items-center gap-2 self-start rounded-lg px-1.5 py-1 opacity-35 hover:bg-[var(--highlight)] hover:opacity-70" [class.!opacity-70]="slash()?.block === -1">
           <app-icon name="plus" [strokeWidth]="2" class="size-4" />{{ 'action.add' | t }}
         </button>
-        <div aria-hidden="true" class="-mt-3 min-h-[40vh]" (click)="openAdd()"></div>
+        <div aria-hidden="true" class="-mt-3 min-h-16" (click)="openAdd()"></div>
       }
       <!-- The end of the page: a new task; the assistant (unless the page has them in its head) -->
       @if (endButtons()) {
@@ -410,20 +410,21 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       @let tb = m.blocks[tm.index];
       @if (tb) {
         <app-sheet [origin]="tm.from" (closed)="taskMenu.set(null)">
-          <div class="card">
-            <button type="button" (click)="taskMenu.set(null); previewing.set(tm.index)" [disabled]="!tb.text?.trim()" class="list-row w-full text-left disabled:opacity-40">
-              <app-icon name="popout" class="row-icon" />
+          <div class="menu-list">
+            <button type="button" (click)="taskMenu.set(null); previewing.set(tm.index)" [disabled]="!tb.text?.trim()" class="menu-item">
+              <app-icon name="popout" />
               <span class="flex-1">{{ 'lessons.studentSees' | t }}</span>
             </button>
-            <button type="button" (click)="setBlock(tm.index, { private: !tb.private })" class="list-row w-full text-left">
-              <app-icon name="lock" class="row-icon" />
+            <button type="button" (click)="setBlock(tm.index, { private: !tb.private })" class="menu-item">
+              <app-icon name="lock" />
               <span class="flex-1">{{ 'lessons.onlyMe' | t }}</span>
               @if (tb.private) {
-                <app-icon name="check" class="size-5 text-[var(--accent)]" />
+                <app-icon name="check" class="size-4 text-[var(--accent)]" />
               }
             </button>
-            <button type="button" (click)="removeFromMenu(tm.index, tm.from)" class="list-row w-full text-left text-[var(--danger)]">
-              <app-icon name="trash" class="row-icon" />
+            <div class="menu-sep"></div>
+            <button type="button" (click)="removeFromMenu(tm.index, tm.from)" class="menu-item is-danger">
+              <app-icon name="trash" />
               <span class="flex-1">{{ 'lessons.removeBlock' | t }}</span>
             </button>
           </div>
@@ -490,6 +491,8 @@ export class LessonForm {
   readonly showTitle = input(true);
   /** Task / Assistant at the page's end (off: the page has them in its head — addTask(), openAssistant()). */
   readonly endButtons = input(true);
+  /** Locked: shown as it is, nothing edited, added or moved. */
+  readonly locked = input(false);
 
   /** A new task at the end, the cursor in it. */
   addTask(): void {
@@ -598,7 +601,7 @@ export class LessonForm {
   // Enter runs, Esc closes, letters / Backspace change the filter
   protected typeOnPage(e: KeyboardEvent): void {
     if (!this.desktop || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (!this.photos() || this.aiOpen() || this.previewing() !== null || this.sel()) return;
+    if (!this.photos() || this.locked() || this.aiOpen() || this.previewing() !== null || this.sel()) return;
     const a = document.activeElement as HTMLElement | null;
     if (a?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
     if (a && a !== document.body && !this.host.nativeElement.contains(a)) return;
@@ -696,6 +699,7 @@ export class LessonForm {
   // A selection in a task: the formatting toolbar over it
   protected onSelect(block: number, ta: HTMLTextAreaElement): void {
     this.field = ta;
+    if (this.locked()) return; // (locked: no formatting)
     requestAnimationFrame(() => {
       // The link's address being typed: the menu stays as it is
       if (this.linking()) return;

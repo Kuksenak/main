@@ -15,7 +15,8 @@ import { LessonContent } from './lesson-content';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { forStudents } from './gaps';
 import { cleanLesson } from './lesson-input';
-import { LEVELS, Level, LessonService, levelColor, shareUrl } from './lesson.service';
+import { LEVELS, Level, LessonBlock, LessonService, levelColor, shareUrl } from './lesson.service';
+import { LessonClipboard } from './lesson-clipboard';
 import { Tip } from '../core/ui/tip';
 import { EventList } from '../cards/event-list';
 
@@ -41,7 +42,13 @@ const SAVE_AT_LEAST_MS = 5000;
         } @else {
           <!-- One row, always at the top: the name; saved; the level; Preview; Publish (Copy link); ☰ -->
           <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-3 bg-[var(--app-bg)] px-1">
-            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
+            @if (s.draft().locked) {
+              <!-- Locked: a lock before the name; a click unlocks -->
+              <button type="button" (click)="setLocked(false)" [appTip]="'lessons.unlock' | t" tipSide="bottom" [attr.aria-label]="'lessons.unlock' | t" class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-full opacity-50 hover:bg-[var(--highlight)] hover:opacity-100">
+                <app-icon name="lock" class="size-5" />
+              </button>
+            }
+            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
             <!-- Just saved: a cloud with a check, for a moment -->
             @if (justSaved()) {
               <span class="flex shrink-0 items-center [animation:fadeIn_200ms_ease-out]" [attr.title]="'lessons.saved' | t" [attr.aria-label]="'lessons.saved' | t">
@@ -68,29 +75,36 @@ const SAVE_AT_LEAST_MS = 5000;
                 <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="btn-primary">{{ 'lessons.publish' | t }}</button>
               }
             }
-            <!-- ☰: the rest (events, answers, Delete) -->
-            <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-label]="'nav.settings' | t" [attr.aria-expanded]="menuOpen()" class="btn-secondary !px-2.5" [class.!bg-[var(--highlight)]]="menuOpen()">
-              <app-icon name="menu" [strokeWidth]="2" class="size-5" />
+            <!-- ⋯: Duplicate, Copy page content, Paste content, Lock page, Delete -->
+            <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [appTip]="'lessons.more' | t" tipSide="bottom" [attr.aria-label]="'lessons.more' | t" [attr.aria-expanded]="menuOpen()" class="btn-secondary !px-2.5" [class.!bg-[var(--highlight)]]="menuOpen()">
+              <app-icon name="dots" class="size-5" />
             </button>
           </div>
 
           @if (s.saveError(); as e) {
             <p class="text-footnote select-text break-words rounded-xl bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-3 py-2 text-[var(--danger)]">{{ 'lessons.saveFailed' | t }} {{ e }}</p>
           }
-          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" />
+          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" [locked]="!!s.draft().locked" />
+          <!-- Under the tasks: where it's used, and the students' answers -->
+          @if (s.lesson(); as l) {
+            <div class="flex flex-col gap-4 pr-10 pt-2">
+              <app-event-list [lessonId]="l.id" />
+              <app-lesson-attempts [lesson]="l" />
+            </div>
+          }
         }
       </app-scroll-area>
     </main>
 
     @if (levelOpen()) {
       <app-sheet [origin]="levelBtn()?.nativeElement ?? null" (closed)="levelOpen.set(false)">
-        <div class="flex min-w-40 flex-col">
+        <div class="menu-list !min-w-40">
           @for (o of levelOptions(); track o.value) {
-            <button type="button" (click)="setLevel($any(o.value) || null); levelOpen.set(false)" class="text-body flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left hover:bg-[var(--highlight)]">
-              <span class="size-3.5 shrink-0 rounded-full" [style.background]="levelColor($any(o.value) || null) ?? 'transparent'" [class.border]="!o.value" [class.border-[var(--separator)]]="!o.value"></span>
+            <button type="button" (click)="setLevel($any(o.value) || null); levelOpen.set(false)" class="menu-item">
+              <span class="menu-icon rounded-full !opacity-100" [style.background]="levelColor($any(o.value) || null) ?? 'transparent'" [class.border]="!o.value" [class.border-[var(--separator)]]="!o.value"></span>
               <span class="flex-1">{{ o.label }}</span>
               @if ((s.draft().level ?? '') === o.value) {
-                <app-icon name="check" class="size-[1.125rem] text-[var(--accent)]" />
+                <app-icon name="check" class="size-4 text-[var(--accent)]" />
               }
             </button>
           }
@@ -98,16 +112,36 @@ const SAVE_AT_LEAST_MS = 5000;
       </app-sheet>
     }
 
-    <!-- ☰'s panel, under it (like the account's settings) -->
+    <!-- ⋯'s menu, under it -->
     @if (menuOpen()) {
-      <app-sheet [origin]="menuBtn()?.nativeElement ?? null" [wide]="true" [tall]="true" (closed)="menuOpen.set(false)">
-        <div class="flex flex-col gap-4 desktop:gap-3">
-          @if (s.lesson(); as l) {
-            <app-event-list [lessonId]="l.id" />
-            <app-lesson-attempts [lesson]="l" />
-            <div class="card">
-              <button type="button" (click)="askDeleteFromMenu()" class="list-row w-full justify-center text-[var(--danger)]">{{ 'action.delete' | t }}</button>
-            </div>
+      <app-sheet [origin]="menuBtn()?.nativeElement ?? null" (closed)="menuOpen.set(false)">
+        <div class="menu-list">
+          <button type="button" (click)="duplicate()" [disabled]="!s.lesson()" class="menu-item">
+            <app-icon name="duplicate" />
+            <span class="flex-1">{{ 'lessons.duplicate' | t }}</span>
+          </button>
+          <button type="button" (click)="copyContent()" [disabled]="!s.draft().blocks.length" class="menu-item">
+            <app-icon name="copy" />
+            <span class="flex-1">{{ 'lessons.copyContent' | t }}</span>
+          </button>
+          @if (clipboard.blocks(); as clip) {
+            <button type="button" (click)="pasteContent(clip)" [disabled]="!!s.draft().locked" class="menu-item">
+              <app-icon name="paste" />
+              <span class="flex-1">{{ 'lessons.pasteContent' | t }}</span>
+              <span class="text-footnote opacity-45">{{ clip.length }}</span>
+            </button>
+          }
+          <div class="menu-sep"></div>
+          <button type="button" (click)="setLocked(!s.draft().locked)" class="menu-item">
+            <app-icon name="lock" />
+            <span class="flex-1">{{ (s.draft().locked ? 'lessons.unlock' : 'lessons.lock') | t }}</span>
+          </button>
+          @if (s.lesson()) {
+            <div class="menu-sep"></div>
+            <button type="button" (click)="askDeleteFromMenu()" class="menu-item is-danger">
+              <app-icon name="trash" />
+              <span class="flex-1">{{ 'action.delete' | t }}</span>
+            </button>
           }
         </div>
       </app-sheet>
@@ -145,6 +179,32 @@ export class LessonPage {
   ]);
   protected readonly form = viewChild(LessonForm);
   protected readonly menuOpen = signal(false);
+  protected readonly clipboard = inject(LessonClipboard);
+
+  // ⋯ → Duplicate: a copy of it, opened (saved first if it's changed)
+  protected duplicate(): void {
+    this.menuOpen.set(false);
+    const d = this.s.draft();
+    const title = this.i18n.t('lessons.copyOf').replace('{title}', d.title.trim() || this.i18n.t('lessons.new'));
+    this.lessons.create(cleanLesson({ ...d, title, locked: false }), (id) => this.router.navigate(['/lessons', id]));
+  }
+
+  // ⋯ → Copy page content: its tasks kept to paste into another lesson (their text to the clipboard too)
+  protected copyContent(): void {
+    this.menuOpen.set(false);
+    this.clipboard.copy(cleanLesson(this.s.draft()).blocks);
+  }
+
+  // ⋯ → Paste content: the tasks copied, at the end
+  protected pasteContent(blocks: LessonBlock[]): void {
+    this.menuOpen.set(false);
+    this.s.draft.update((d) => ({ ...d, blocks: [...d.blocks, ...blocks.map((b) => ({ ...b }))] }));
+  }
+
+  protected setLocked(locked: boolean): void {
+    this.menuOpen.set(false);
+    this.s.draft.update((d) => ({ ...d, locked }));
+  }
   protected readonly levelOpen = signal(false);
   protected readonly levelBtn = viewChild<ElementRef<HTMLButtonElement>>('levelBtn');
   protected readonly levelColor = levelColor;
