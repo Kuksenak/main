@@ -80,6 +80,7 @@ interface Found {
           <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('upcoming')" />
         </button>
         <a routerLink="/schedule" routerLinkActive #rlaS="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.schedule' | t }}</a>
+        <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('upcoming')) {
         <div class="flex flex-col gap-px pl-4">
@@ -94,6 +95,29 @@ interface Found {
         </div>
       }
 
+      <!-- Lessons -->
+      <div class="side-row group/row" [class.is-on]="rlaL.isActive">
+        <button type="button" (click)="fold('lessons')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('lessons')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
+          <app-icon name="book" class="side-glyph group-hover/row:hidden" />
+          <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('lessons')" />
+        </button>
+        <a routerLink="/lessons" routerLinkActive #rlaL="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.lessons' | t }}</a>
+        <button type="button" (click)="create('lesson')" [appTip]="'lessons.add' | t" tipSide="right" [attr.aria-label]="'lessons.add' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
+      </div>
+      @if (!folded().includes('lessons')) {
+        <div class="flex flex-col gap-px pl-4">
+          @for (l of lessonsShown(); track l.id) {
+            <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row" [class.is-on]="openLesson() === l.id">
+              <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
+              <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
+            </a>
+          }
+          @if (lessonsSorted().length > shown) {
+            <a routerLink="/lessons" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+          }
+        </div>
+      }
+
       <!-- Students: groups and students -->
       <div class="side-row group/row" [class.is-on]="rlaP.isActive">
         <button type="button" (click)="fold('people')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('people')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
@@ -101,6 +125,7 @@ interface Found {
           <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('people')" />
         </button>
         <a routerLink="/students" routerLinkActive #rlaP="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.students' | t }}</a>
+        <button type="button" (click)="create('student')" [appTip]="'sidebar.newStudent' | t" tipSide="right" [attr.aria-label]="'sidebar.newStudent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('people')) {
         <div class="flex flex-col gap-px pl-4">
@@ -120,27 +145,6 @@ interface Found {
         </div>
       }
 
-      <!-- Lessons -->
-      <div class="side-row group/row" [class.is-on]="rlaL.isActive">
-        <button type="button" (click)="fold('lessons')" [attr.aria-label]="'sidebar.fold' | t" [attr.aria-expanded]="!folded().includes('lessons')" class="-ml-0.5 flex size-5 shrink-0 items-center justify-center rounded hover:bg-[var(--highlight)]">
-          <app-icon name="book" class="side-glyph group-hover/row:hidden" />
-          <app-icon name="chevron-down" class="hidden size-3.5 opacity-60 transition-transform group-hover/row:block" [class.-rotate-90]="folded().includes('lessons')" />
-        </button>
-        <a routerLink="/lessons" routerLinkActive #rlaL="routerLinkActive" [routerLinkActiveOptions]="{ exact: true }" class="flex h-full min-w-0 flex-1 items-center">{{ 'nav.lessons' | t }}</a>
-      </div>
-      @if (!folded().includes('lessons')) {
-        <div class="flex flex-col gap-px pl-4">
-          @for (l of lessonsShown(); track l.id) {
-            <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row" [class.is-on]="openLesson() === l.id">
-              <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
-              <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
-            </a>
-          }
-          @if (lessonsSorted().length > shown) {
-            <a routerLink="/lessons" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
-          }
-        </div>
-      }
     </app-scroll-area>
 
     <!-- The account: its email; the settings open by it -->

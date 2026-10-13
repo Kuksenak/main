@@ -750,6 +750,7 @@ html.dark .btn-white {
   border-radius: 0.25rem;
   opacity: 0;
 }
+.side-row:hover > .side-add,
 .side-head:hover .side-add {
   opacity: 0.7;
 }
