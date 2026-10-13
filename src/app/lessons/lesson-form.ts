@@ -1227,7 +1227,8 @@ export class LessonForm {
     this.dropLine.set(y - box.top - 1.5);
   }
 
-  // ---- A caret between tasks (a click in the gap between them, above the first, under the last):
+  // ---- A caret between tasks (a click in the gap between them, above the first, under the last;
+  // the commands open there at once):
   // Ctrl+V pastes the tasks copied there (else the clipboard's text, a new task); without one, at the end
   protected readonly caret = signal<{ at: number; y: number } | null>(null);
 
@@ -1247,6 +1248,8 @@ export class LessonForm {
     e.preventDefault();
     (document.activeElement as HTMLElement | null)?.blur();
     this.caret.set(this.gapAt(list, e.clientY));
+    // (and the commands right away, under it, once it's drawn)
+    setTimeout(() => this.openAdd());
   }
 
   // (a click anywhere but between the tasks: gone)
