@@ -92,7 +92,14 @@ const SAVE_AT_LEAST_MS = 5000;
           @if (s.saveError(); as e) {
             <p class="text-footnote select-text break-words rounded-xl bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-3 py-2 text-[var(--danger)]">{{ 'lessons.saveFailed' | t }} {{ e }}</p>
           }
-          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" [locked]="!!s.draft().locked" />
+          @if (s.draft().locked) {
+            <!-- Locked: shown as in Preview (its tasks as the student sees them) -->
+            <div class="pl-5 pt-1">
+              <app-lesson-content [blocks]="lockedBlocks()" mode="student" />
+            </div>
+          } @else {
+            <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" />
+          }
           <!-- Under the tasks: where it's used, and the students' answers -->
           @if (s.lesson(); as l) {
             <div class="flex flex-col gap-4 pl-6 pt-2">
@@ -244,6 +251,8 @@ export class LessonPage {
   protected readonly levelBtn = viewChild<ElementRef<HTMLButtonElement>>('levelBtn');
   protected readonly levelColor = levelColor;
   protected readonly previewAll = signal(false);
+  // Locked: all its tasks (the teacher's own too) as in Preview
+  protected readonly lockedBlocks = computed(() => cleanLesson(this.s.draft()).blocks.map(forStudents));
   protected readonly studentBlocks = computed(() =>
     cleanLesson(this.s.draft()).blocks.filter((b) => !b.private).map(forStudents),
   );
