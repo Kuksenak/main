@@ -40,8 +40,8 @@ const SAVE_AT_LEAST_MS = 5000;
         @if (s.id() && !s.lesson()) {
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
         } @else {
-          <!-- One row: the name, Task, Assistant; whether it's saved -->
-          <div class="flex h-[var(--control-h)] items-center gap-3">
+          <!-- One row, always at the top: the name; saved; the level; ☰ -->
+          <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-3 bg-[var(--app-bg)] px-1">
             <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
             <!-- Just saved: a cloud with a check, for a moment -->
             @if (justSaved()) {
