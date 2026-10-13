@@ -636,8 +636,9 @@ html.dark .btn-white {
 .head-btn > app-icon svg {
   stroke-width: 1.6;
 }
-.menu-item.is-danger {
-  color: var(--danger);
+/* (Delete: like the rest; orange on hover) */
+.menu-item.is-danger:hover:not(:disabled) {
+  color: var(--brand-orange, #f97316);
 }
 .menu-sep {
   margin: 0.25rem -0.25rem;

@@ -159,7 +159,7 @@ const SAVE_AT_LEAST_MS = 5000;
           </button>
           @if (s.lesson()) {
             <div class="menu-sep"></div>
-            <button type="button" (click)="askDeleteFromMenu()" [disabled]="!!s.draft().locked" class="menu-item">
+            <button type="button" (click)="askDeleteFromMenu()" [disabled]="!!s.draft().locked" class="menu-item is-danger">
               <app-icon name="trash" />
               <span class="flex-1">{{ 'action.delete' | t }}</span>
             </button>
