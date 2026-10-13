@@ -36,7 +36,7 @@ import { LessonUsage } from './lesson-usage';
 
     <!-- Desktop: the list on the left (as wide as the schedule's calendar), the lesson on the right
          (like Students). Phones: the list; a lesson opens as a card over it. -->
-    <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4">
+    <main class="flex min-h-0 w-full flex-1 flex-col gap-3 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 desktop:flex-row desktop:gap-6 desktop:pb-4 desktop:pt-0">
       <section class="flex min-h-0 w-full flex-1 flex-col gap-3 mobile:pb-14 desktop:max-w-[25rem]">
         <!-- Desktop: the search and Add in one row -->
         <div class="flex items-center gap-3 mobile:hidden">

@@ -17,6 +17,7 @@ import { forStudents } from './gaps';
 import { cleanLesson } from './lesson-input';
 import { LEVELS, Level, LessonBlock, LessonService, levelColor, shareUrl } from './lesson.service';
 import { LessonClipboard } from './lesson-clipboard';
+import { Toggle } from '../core/ui/toggle';
 import { Tip } from '../core/ui/tip';
 import { EventList } from '../cards/event-list';
 
@@ -32,11 +33,11 @@ const SAVE_AT_LEAST_MS = 5000;
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, LessonContent, PageSheet, Tip],
+  imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, LessonContent, PageSheet, Tip, Toggle],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4">
-      <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-4 pb-10">
+      <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-2 pb-10">
         @if (s.id() && !s.lesson()) {
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
         } @else {
@@ -138,17 +139,26 @@ const SAVE_AT_LEAST_MS = 5000;
             </button>
           }
           <div class="menu-sep"></div>
-          <button type="button" (click)="setLocked(!s.draft().locked)" class="menu-item">
+          <button type="button" (click)="setLocked(!s.draft().locked)" role="switch" [attr.aria-checked]="!!s.draft().locked" class="menu-item">
             <app-icon name="lock" />
-            <span class="flex-1">{{ (s.draft().locked ? 'lessons.unlock' : 'lessons.lock') | t }}</span>
+            <span class="flex-1">{{ 'lessons.lock' | t }}</span>
+            <app-toggle class="pointer-events-none scale-[0.8] origin-right" [checked]="!!s.draft().locked" />
           </button>
           @if (s.lesson()) {
             <div class="menu-sep"></div>
-            <button type="button" (click)="askDeleteFromMenu()" class="menu-item is-danger">
+            <button type="button" (click)="askDeleteFromMenu()" class="menu-item">
               <app-icon name="trash" />
               <span class="flex-1">{{ 'action.delete' | t }}</span>
             </button>
           }
+          <!-- (how much is in it; when it was last saved) -->
+          <div class="menu-sep"></div>
+          <div class="menu-foot">
+            <div>{{ 'lessons.taskCount' | t }}: {{ s.draft().blocks.length }}</div>
+            @if (s.lesson(); as l) {
+              <div>{{ 'lessons.lastEdited' | t }} {{ edited(l.updatedAt) }}</div>
+            }
+          </div>
         </div>
       </app-sheet>
     }
@@ -205,6 +215,13 @@ export class LessonPage {
   protected pasteContent(blocks: LessonBlock[]): void {
     this.menuOpen.set(false);
     this.s.draft.update((d) => ({ ...d, blocks: [...d.blocks, ...blocks.map((b) => ({ ...b }))] }));
+  }
+
+  // "Today at 11:29", else the day and time
+  protected edited(at: string): string {
+    const d = new Date(at);
+    const today = new Date().toDateString() === d.toDateString();
+    return today ? `${this.i18n.t('lessons.todayAt')} ${this.i18n.time(d)}` : `${this.i18n.date(d, { day: 'numeric', month: 'short' })} ${this.i18n.time(d)}`;
   }
 
   protected setLocked(locked: boolean): void {

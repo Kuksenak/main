@@ -615,19 +615,21 @@ body:has(.cdk-drag-preview) * {
 }
 
 /* Menus (as in Notion, Claude): a plain list in a popover — an icon and a label a row, a light
-   highlight on hover, groups split by a thin line */
+   highlight on hover, groups split by a thin line; a quiet footer under it */
 .menu-list {
   display: flex;
-  min-width: 13rem;
+  min-width: 15rem;
   flex-direction: column;
+  margin: -0.5rem; /* (the popover's own padding is wider than a menu wants) */
 }
 .menu-item {
   display: flex;
   width: 100%;
+  min-height: 2rem;
   align-items: center;
   gap: 0.625rem;
   border-radius: 0.375rem;
-  padding: 0.375rem 0.5rem;
+  padding: 0.25rem 0.5rem;
   text-align: left;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -640,21 +642,29 @@ body:has(.cdk-drag-preview) * {
 }
 .menu-item > app-icon:first-child,
 .menu-item > .menu-icon {
-  width: 1rem;
-  height: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
   flex-shrink: 0;
-  opacity: 0.7;
+  opacity: 0.85;
+}
+/* (thin lines, as Notion's) */
+.menu-item > app-icon:first-child svg,
+.head-btn > app-icon svg {
+  stroke-width: 1.6;
 }
 .menu-item.is-danger {
   color: var(--danger);
-}
-.menu-item.is-danger > app-icon:first-child {
-  opacity: 1;
 }
 .menu-sep {
   margin: 0.25rem -0.25rem;
   height: 1px;
   background: var(--separator);
+}
+.menu-foot {
+  padding: 0.25rem 0.5rem 0.375rem;
+  font-size: 0.75rem;
+  line-height: 1.1rem;
+  opacity: 0.5;
 }
 
 /* The lesson head's buttons, in the menus' style: no fill, a small label and icon, a light
