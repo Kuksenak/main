@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -75,9 +75,9 @@ function store(key: string, value: string | null): void {
               @for (i of [0, 1, 2, 3]; track i) {
                 <span
                   class="flex size-9 items-center justify-center rounded-lg border-2 bg-[var(--fill)] text-base font-semibold tabular-nums transition-colors"
-                  [class.border-transparent]="!(pinFocused() && i === min(pin().length, 3))"
-                  [class.border-[var(--accent)]]="pinFocused() && i === min(pin().length, 3)"
-                >{{ pin()[i] ?? '' }}</span>
+                  [class.border-transparent]="i !== min(pin().length, 3)"
+                  [class.border-[var(--accent)]]="i === min(pin().length, 3)"
+                >{{ pin()[i] }}</span>
               }
               <input
                 #pinField
@@ -90,8 +90,7 @@ function store(key: string, value: string | null): void {
                 [value]="pin()"
                 [disabled]="sending()"
                 (input)="typePin(pinField)"
-                (focus)="pinFocused.set(true)"
-                (blur)="pinFocused.set(false)"
+                autofocus
                 class="absolute inset-0 h-full w-full cursor-default bg-transparent text-transparent caret-transparent opacity-0 outline-none"
               />
             </label>
@@ -204,7 +203,6 @@ export class StudentPortal {
   protected readonly pinMode = signal<'set' | 'enter'>('enter');
   protected readonly pin = signal('');
   protected readonly pinError = signal<string | null>(null);
-  protected readonly pinFocused = signal(false);
   private readonly pinField = viewChild<ElementRef<HTMLInputElement>>('pinField');
   protected readonly min = Math.min;
 
@@ -213,6 +211,8 @@ export class StudentPortal {
   }
 
   constructor() {
+    // The PIN's boxes shown: the first one ready to type in
+    effect(() => this.pinField()?.nativeElement.focus());
     this.load();
     // Leaving / hiding the page: what's not saved yet goes now (requests that outlive the page)
     const hide = () => {
@@ -262,7 +262,7 @@ export class StudentPortal {
   }
 
   private focusPin(): void {
-    setTimeout(() => this.pinField()?.nativeElement.focus());
+    setTimeout(() => this.pinField()?.nativeElement.focus(), 50);
   }
 
   protected sendPin(): void {
