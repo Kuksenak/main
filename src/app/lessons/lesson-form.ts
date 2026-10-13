@@ -523,6 +523,7 @@ export class LessonForm {
   }
 
   openAssistant(): void {
+    this.aiAt = null;
     this.aiOpen.set(true);
   }
   /** Blocks can be picked (a checkbox each): `selected` — their places. */
@@ -537,8 +538,17 @@ export class LessonForm {
   protected readonly helpOpen = signal<number | null>(null);
 
   // Blocks from the AI at the lesson's end (as tasks: heading and body in one text)
+  // (at the caret it was opened from, else at the end; several answers in a row, one after another)
+  private aiAt: number | null = null;
   protected appendBlocks(blocks: LessonBlock[]): void {
-    this.value.update((m) => ({ ...m, blocks: [...m.blocks.filter((b) => b.kind !== 'gaps' || b.text?.trim()), ...blocks.map(asTask)] }));
+    const added = blocks.map(asTask);
+    if (this.aiAt === null) {
+      this.value.update((m) => ({ ...m, blocks: [...m.blocks.filter((b) => b.kind !== 'gaps' || b.text?.trim()), ...added] }));
+      return;
+    }
+    const at = Math.min(this.aiAt, this.value().blocks.length);
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), ...added, ...m.blocks.slice(at)] }));
+    this.aiAt = at + added.length;
   }
 
   // ---- "/" commands and the selection's formatting
@@ -645,9 +655,10 @@ export class LessonForm {
     const sl = this.slash();
     if (sl && sl.block !== -1) return;
     if (!sl) {
-      if (!letter) return;
+      // (only "/" opens them — its key on any keyboard layout)
+      if (e.key !== '/' && e.code !== 'Slash' && e.code !== 'NumpadDivide') return;
       e.preventDefault();
-      this.openAdd(letter === '/' ? '' : letter);
+      this.openAdd();
       return;
     }
     if (e.key === 'Backspace') {
@@ -697,6 +708,7 @@ export class LessonForm {
     if (sl.block < 0) {
       // (at the caret between tasks, else at the end)
       const at = this.caret()?.at ?? this.value().blocks.length;
+      this.aiAt = this.caret() ? at : null;
       this.caret.set(null);
       if (id === 'assistant') this.aiOpen.set(true);
       else this.insertBlock(at, 'gaps', '');
