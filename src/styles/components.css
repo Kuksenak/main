@@ -551,30 +551,11 @@ html.dark .btn-white {
   color: var(--text);
 }
 
-/* Moving tasks (CDK drag and drop), as in Notion: the task stays a faint ghost under the pointer,
-   and a thin line (its placeholder) travels to where it'd go — the others barely move */
-.cdk-drag-preview {
-  background: var(--card) !important;
-  border: none !important;
-  box-shadow: none !important;
-  opacity: 0.45 !important;
-}
-.cdk-drag-preview .task-tools {
-  display: none;
-}
+/* Moving tasks (as in Notion): where it'd go, a thin line between the tasks */
 .drop-line {
   height: 3px;
-  margin: -2.5px 0; /* (the line in the gap between two tasks; the gap itself kept) */
   border-radius: 2px;
   background: color-mix(in srgb, var(--accent) 55%, transparent);
-}
-/* (while one is held: the pointer a closed hand everywhere) */
-body:has(.cdk-drag-preview),
-body:has(.cdk-drag-preview) * {
-  cursor: grabbing !important;
-}
-.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
-  transition: transform 150ms ease-out;
 }
 
 /* A hover hint (Tip): a small dark label, faded in, sliding a little from its element */
@@ -609,7 +590,7 @@ body:has(.cdk-drag-preview) * {
    highlight on hover, groups split by a thin line; a quiet footer under it */
 .menu-list {
   display: flex;
-  min-width: 12rem;
+  min-width: 9rem;
   flex-direction: column;
 }
 .menu-item {
@@ -689,5 +670,11 @@ body:has(.cdk-drag-preview) * {
 .task-card {
   background: color-mix(in srgb, var(--surface) 45%, var(--app-bg));
   border-color: transparent;
+}
+
+/* A task only for the teacher: its first line set in for the lock before it */
+.only-me > div[aria-hidden],
+.only-me > textarea {
+  text-indent: 1.35em;
 }
 

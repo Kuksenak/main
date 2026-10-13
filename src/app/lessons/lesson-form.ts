@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { Tip } from '../core/ui/tip';
 import { Sheet } from '../core/ui/sheet/sheet';
-import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDragPlaceholder, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -15,7 +14,7 @@ import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { caretRect } from '../core/ui/caret';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { ToBody } from '../core/ui/to-body';
-import { Mark, asOptions, asTask, forStudents, marked, marksAt, unmark } from './gaps';
+import { Mark, asOptions, asTask, forStudents, marked, marksAt, tidy, unmark } from './gaps';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
@@ -32,7 +31,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, CdkDrag, ConfirmDelete, CdkDragHandle, CdkDragPlaceholder, CdkDropList, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
+  imports: [AiChat, BrandIcon, ConfirmDelete, FormsModule, Sheet, Tip, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
   host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
@@ -43,13 +42,16 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
-    <!-- (tasks are moved by their ⠿: the others make way, the place it'd go shown dashed) -->
-    <div class="flex flex-col gap-2" [class.pl-6]="desktop && !selectable()" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable() || locked()" (cdkDropListDropped)="moved($event)">
+    <!-- (tasks are moved by their ⠿, as in Notion: nothing moves meanwhile, a line shows where it'd go) -->
+    <div #list class="relative flex flex-col gap-2" [class.pl-5]="desktop && !selectable()" (dragover)="dragOver($event, list)" (drop)="drop($event)">
+    @if (dropLine(); as y) {
+      <div aria-hidden="true" class="drop-line pointer-events-none absolute right-0 z-20" [class.left-5]="desktop && !selectable()" [class.left-0]="!desktop || selectable()" [style.top.px]="y"></div>
+    }
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
              style marks highlighted under it -->
-        <div class="relative" cdkDrag [cdkDragDisabled]="true">
+        <div class="relative" data-block>
         <div aria-hidden="true" class="text-body pointer-events-none absolute inset-0 whitespace-pre-wrap break-words px-1 leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
         <textarea
           #tx
@@ -76,8 +78,9 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         [class.task-card]="slim"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
         [class.min-h-14]="slim"
-        cdkDrag
-        [cdkDragDisabled]="!slim"
+        [class.opacity-40]="dragFrom() === i"
+        data-block
+        #card
       >
         @if (slim && !locked()) {
           <!-- Desktop tasks: no head row — ⠿ and ▾ outside it at the right (▾: Preview, who sees it, Delete; a lock instead for "only me"), shown on hover (or while
@@ -85,17 +88,10 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                "only me" always shows -->
           <!-- At its left, outside it (as in Notion): ⠿ — drag to move it, click for its menu (Preview,
                who sees it, Delete). Shown on hover; "only me": a lock under it, always. -->
-          <!-- (while moving it: a line where it'd go) -->
-          <div *cdkDragPlaceholder class="drop-line"></div>
-          <div class="task-tools absolute -left-6 top-1.5 z-10 flex flex-col items-center gap-1">
-            <button type="button" cdkDragHandle #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="'lessons.moveOrMenu' | t" tipSide="left" [attr.aria-label]="'lessons.moveOrMenu' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="drag-handle flex h-6 w-5 cursor-grab items-center justify-center rounded transition-opacity hover:bg-[var(--highlight)] active:cursor-grabbing" [class]="taskMenu()?.index === i ? 'opacity-100 bg-[var(--highlight)]' : 'opacity-0 group-hover:opacity-50 group-focus-within:opacity-50 hover:!opacity-100'">
+          <div class="task-tools absolute -left-5 top-1.5 z-10 flex flex-col items-center gap-1">
+            <button type="button" draggable="true" (dragstart)="dragStart($event, i, card)" (dragend)="dragEnd()" #more (click)="taskMenu.set(taskMenu()?.index === i ? null : { index: i, from: more })" [appTip]="'lessons.moveOrMenu' | t" tipSide="left" [attr.aria-label]="'lessons.moveOrMenu' | t" [attr.aria-expanded]="taskMenu()?.index === i" class="drag-handle flex h-6 w-5 cursor-grab items-center justify-center rounded transition-opacity hover:bg-[var(--highlight)] active:cursor-grabbing" [class]="taskMenu()?.index === i ? 'opacity-100 bg-[var(--highlight)]' : 'opacity-0 group-hover:opacity-50 group-focus-within:opacity-50 hover:!opacity-100'">
               <app-icon name="grip" class="size-[1.125rem]" />
             </button>
-            @if (b.private) {
-              <span [appTip]="'lessons.onlyMe' | t" tipSide="left" class="flex size-5 items-center justify-center text-[var(--accent)]">
-                <app-icon name="lock" class="size-4" />
-              </span>
-            }
           </div>
         } @else {
         <!-- Head: (kind) · Preview · who sees it · ? · × -->
@@ -195,7 +191,13 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           }
           @case ('gaps') {
             <div class="list-row items-start" [class.pb-3]="!slim" [class.pt-1]="!slim" [class.py-2]="slim">
-              <div class="relative min-w-0 flex-1">
+              <div class="relative min-w-0 flex-1" [class.only-me]="b.private">
+              <!-- Only me: a gray lock before its first letter (its first line set in for it) -->
+              @if (b.private) {
+                <span [appTip]="'lessons.onlyMe' | t" tipSide="top" class="absolute left-0 top-[0.2em] z-10 flex size-4 items-center justify-center opacity-45">
+                  <app-icon name="lock" class="size-3.5" />
+                </span>
+              }
               <!-- Under the field: the same text, its [gaps] and {choices} highlighted (only
                    backgrounds — nothing that would move the text) -->
               <div aria-hidden="true" class="text-[0.875rem] pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
@@ -426,6 +428,10 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               @if (tb.private) {
                 <app-icon name="check" class="size-4 text-[var(--accent)]" />
               }
+            </button>
+            <button type="button" (click)="formatTask(tm.index)" [disabled]="!tb.text?.trim()" class="menu-item">
+              <app-icon name="wand" />
+              <span class="flex-1">{{ 'lessons.format' | t }}</span>
             </button>
             <div class="menu-sep"></div>
             <button type="button" (click)="removeFromMenu(tm.index, tm.from)" class="menu-item is-danger">
@@ -1135,14 +1141,64 @@ export class LessonForm {
     return shown;
   }
 
-  // ---- Moving a task (by its ⠿)
-  protected moved(e: CdkDragDrop<unknown>): void {
-    if (e.previousIndex === e.currentIndex) return;
+  // ---- Moving a task (by its ⠿), as in Notion: the browser's own drag — a faint picture of it
+  // under the pointer, nothing else moving; a line between the tasks where it'd go
+  protected readonly dragFrom = signal<number | null>(null);
+  private dropAt: number | null = null;
+  protected readonly dropLine = signal<number | null>(null);
+
+  protected dragStart(e: DragEvent, i: number, card: HTMLElement): void {
+    this.taskMenu.set(null);
+    this.dragFrom.set(i);
+    e.dataTransfer?.setData('text/plain', '');
+    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer?.setDragImage(card, 16, 16);
+  }
+
+  protected dragOver(e: DragEvent, list: HTMLElement): void {
+    if (this.dragFrom() === null) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    const box = list.getBoundingClientRect();
+    const cards = [...list.querySelectorAll<HTMLElement>(':scope > [data-block]')].map((c) => c.getBoundingClientRect());
+    let at = cards.findIndex((r) => e.clientY < r.top + r.height / 2);
+    if (at < 0) at = cards.length;
+    this.dropAt = at;
+    // (the line in the middle of the gap above that task; after the last, under it)
+    const y = at < cards.length ? cards[at].top - (at ? (cards[at].top - cards[at - 1].bottom) / 2 : 4) : cards[cards.length - 1].bottom + 4;
+    this.dropLine.set(y - box.top - 1.5);
+  }
+
+  protected drop(e: DragEvent): void {
+    e.preventDefault();
+    const from = this.dragFrom();
+    const at = this.dropAt;
+    this.dragEnd();
+    if (from === null || at === null || at === from || at === from + 1) return;
     this.value.update((m) => {
       const blocks = [...m.blocks];
-      moveItemInArray(blocks, e.previousIndex, e.currentIndex);
+      const [moved] = blocks.splice(from, 1);
+      blocks.splice(at > from ? at - 1 : at, 0, moved);
       return { ...m, blocks };
     });
+  }
+
+  protected dragEnd(): void {
+    this.dragFrom.set(null);
+    this.dropAt = null;
+    this.dropLine.set(null);
+  }
+
+  // ⋯ → Format: its text brought to one look (see tidy)
+  protected formatTask(index: number): void {
+    this.taskMenu.set(null);
+    const b = this.value().blocks[index];
+    if (b?.text) this.setBlock(index, { text: tidy(b.text) });
+  }
+
+  /** Every task's text brought to one look (the page's ⋯ → Format). */
+  formatAll(): void {
+    this.value.update((m) => ({ ...m, blocks: m.blocks.map((b) => (b.text && (b.kind === 'gaps' || b.kind === 'text') ? { ...b, text: tidy(b.text) } : b)) }));
   }
 
   // A task's ⋯ menu (which one, and its button)

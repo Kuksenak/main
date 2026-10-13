@@ -139,6 +139,10 @@ const SAVE_AT_LEAST_MS = 5000;
               <span class="text-footnote opacity-45">{{ clip.length }}</span>
             </button>
           }
+          <button type="button" (click)="menuOpen.set(false); form()?.formatAll()" [disabled]="!!s.draft().locked || !s.draft().blocks.length" class="menu-item">
+            <app-icon name="wand" />
+            <span class="flex-1">{{ 'lessons.formatAll' | t }}</span>
+          </button>
           <div class="menu-sep"></div>
           <button type="button" (click)="setLocked(!s.draft().locked)" role="switch" [attr.aria-checked]="!!s.draft().locked" class="menu-item">
             <app-icon [name]="s.draft().locked ? 'lock' : 'unlock'" />

@@ -307,3 +307,29 @@ export function taskProgress(
   });
   return { done, total };
 }
+
+/**
+ * A task's text brought to one look (our own "linter", ⋯ → Format): spaces at the lines' ends and
+ * runs of spaces dropped; at most one empty line in a row; numbered lines "1)", "1 -", "1:" as
+ * "1. "; bullets "•", "*", "–" as "- "; gaps "[ answer ]" as "[answer]"; choices "{ *a | b }" as
+ * "{*a|b}"; no space before , . ; and one after them.
+ */
+export function tidy(text: string): string {
+  return text
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) =>
+      line
+        .replace(/\s+$/, '')
+        .replace(/(\S) {2,}/g, '$1 ')
+        .replace(/^(\s*)(\d+)\s*[).:-]\s+/, '$1$2. ')
+        .replace(/^(\s*)[•*–—]\s+/, '$1- ')
+        .replace(/\[\s*([^[\]\n]*?)\s*\]/g, '[$1]')
+        .replace(/\{\s*([^{}\n]*?)\s*\}/g, (_, inside: string) => `{${inside.split('|').map((o) => o.trim()).join('|')}}`)
+        .replace(/ +([,.;])(?!\d)/g, '$1')
+        .replace(/([,;])(?=[^\s\d])/g, '$1 '),
+    )
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/^\n+|\n+$/g, '');
+}
