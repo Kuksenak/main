@@ -609,7 +609,7 @@ html.dark .btn-white {
   line-height: 1.375rem;
 }
 .menu-item:hover:not(:disabled) {
-  background: var(--highlight);
+  background: var(--tint);
 }
 /* (a menu picked by keys too: the pointer moves its one highlight instead of adding a second) */
 .menu-item.no-hover:hover:not(:disabled) {
@@ -662,7 +662,7 @@ html.dark .btn-white {
 }
 .head-btn:hover:not(:disabled),
 .head-btn[aria-expanded='true'] {
-  background: var(--highlight);
+  background: var(--tint);
 }
 .head-btn:disabled {
   opacity: 0.45;
@@ -714,9 +714,11 @@ html.dark .btn-white {
   font-size: 0.9375rem;
   color: color-mix(in srgb, var(--text) 85%, transparent);
 }
-.side-row:hover,
+.side-row:hover {
+  background: var(--tint);
+}
 .side-row.is-on {
-  background: var(--highlight);
+  background: var(--tint-strong);
 }
 .side-row.is-on {
   color: var(--text);

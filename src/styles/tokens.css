@@ -58,6 +58,10 @@
   --glass-edge: rgb(255 255 255 / 0.6);
   --fill-strong: rgb(0 0 0 / 0.06); /* badges */
   --highlight: rgb(0 0 0 / 0.05); /* hover / pressed rows */
+  /* The new (desktop) style's own tint: the sidebar a faint blue, hovers and the open row bluish */
+  --side-bg: #f2f5fa;
+  --tint: color-mix(in srgb, var(--accent) 8%, transparent);
+  --tint-strong: color-mix(in srgb, var(--accent) 13%, transparent);
   /* Toolbar (desktop tabs, account pill): the current / pill fill, a hovered tab, a hovered pill */
   --toolbar-fill: color-mix(in srgb, var(--text) 6%, transparent);
   --toolbar-hover: color-mix(in srgb, var(--text) 4%, transparent);
@@ -126,6 +130,9 @@ html.dark {
   --glass-edge: rgb(255 255 255 / 0.14);
   --fill-strong: rgb(255 255 255 / 0.1);
   --highlight: rgb(255 255 255 / 0.08);
+  --side-bg: #12151b;
+  --tint: color-mix(in srgb, var(--accent) 14%, transparent);
+  --tint-strong: color-mix(in srgb, var(--accent) 22%, transparent);
   /* On black a few % of white vanishes: iOS's grays */
   --toolbar-fill: #2c2c2e;
   --toolbar-hover: #1c1c1e;
