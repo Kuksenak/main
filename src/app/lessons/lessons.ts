@@ -1,4 +1,4 @@
-import { Component, DestroyRef, TemplateRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, TemplateRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
@@ -8,6 +8,7 @@ import { NavStack } from '../core/services/nav-stack.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui/icon/icon';
 import { Tip } from '../core/ui/tip';
+import { EscStack } from '../core/ui/esc-stack';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { SearchBar } from '../core/ui/search-bar';
 import { ToolbarService } from '../core/services/toolbar.service';
@@ -42,10 +43,12 @@ import { LessonUsage } from './lesson-usage';
              dot and its name; the open one gray; where it's used in a hint -->
         <section class="flex min-h-0 w-64 shrink-0 flex-col gap-1 border-r border-[var(--separator)] pr-2">
           <div class="flex h-[var(--control-h)] shrink-0 items-center gap-1">
-            <label class="flex h-8 min-w-0 flex-1 items-center gap-1.5 rounded-md bg-[var(--fill)] px-2">
-              <app-icon name="search" class="size-4 shrink-0 opacity-45" />
-              <input [value]="query()" (input)="query.set($any($event.target).value)" type="search" [placeholder]="'students.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.875rem] outline-none placeholder:opacity-45" />
-            </label>
+            <!-- Search (as Notion's): a row; it (or Ctrl+K) opens the search window -->
+            <button type="button" (click)="openSearch()" class="flex h-8 min-w-0 flex-1 items-center gap-2 rounded-md border border-[var(--separator)] px-2 text-left text-[0.875rem] hover:bg-[var(--highlight)]">
+              <app-icon name="search" class="size-4 shrink-0 opacity-60" />
+              <span class="flex-1 opacity-70">{{ 'students.search' | t }}</span>
+              <span class="text-footnote opacity-40">Ctrl K</span>
+            </button>
             <button type="button" (click)="add()" [appTip]="'lessons.add' | t" tipSide="bottom" [attr.aria-label]="'lessons.add' | t" class="head-btn !px-1.5">
               <app-icon name="plus" />
             </button>
@@ -124,6 +127,47 @@ import { LessonUsage } from './lesson-usage';
       }
 
       @if (desktop) {
+        <!-- The search window (as Notion's): in the middle, near the top; what's typed finds lessons
+             by name and content; ↑ ↓ pick, Enter opens, Esc closes -->
+        @if (searchOpen()) {
+          <div class="fixed inset-0 z-[2200] flex items-start justify-center bg-[var(--backdrop)] pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeSearch()">
+            <div class="dialog-panel flex max-h-[70vh] w-[36rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
+              <label class="flex h-12 shrink-0 items-center gap-2.5 border-b border-[var(--separator)] px-4">
+                <app-icon name="search" class="size-[1.125rem] shrink-0 opacity-50" />
+                <input
+                  #searchField
+                  [value]="searchQuery()"
+                  (input)="searchQuery.set($any($event.target).value); searchIndex.set(0)"
+                  (keydown)="searchKey($event)"
+                  type="text"
+                  [placeholder]="'students.search' | t"
+                  autocomplete="off"
+                  class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45"
+                />
+              </label>
+              <div class="min-h-0 overflow-y-auto p-1.5">
+                @for (l of searchResults(); track l.id; let k = $index) {
+                  <button
+                    type="button"
+                    (click)="pickSearch(l.id)"
+                    (mouseenter)="searchIndex.set(k)"
+                    class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.875rem]"
+                    [class.bg-[var(--highlight)]]="k === searchIndex()"
+                  >
+                    <span class="size-2 shrink-0 rounded-full" [style.background]="levelColor(l.level) ?? 'color-mix(in srgb, var(--text) 22%, transparent)'"></span>
+                    <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
+                    @if (useHint(l.id); as h) {
+                      <span class="text-footnote shrink-0 opacity-45">{{ h }}</span>
+                    }
+                  </button>
+                } @empty {
+                  <p class="text-footnote px-2.5 py-3 opacity-45">{{ 'students.notFound' | t }}</p>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
         <section class="flex min-h-0 flex-1 flex-col">
           <!-- One page per lesson (switching lessons starts it afresh: not in the previous one's editing) -->
           @for (key of selectedKey(); track key) {
@@ -174,7 +218,67 @@ export class Lessons {
       .sort((a, b) => a.title.localeCompare(b.title, this.i18n.locale()));
   });
 
+  // ---- The search window (desktop)
+  protected readonly searchOpen = signal(false);
+  protected readonly searchQuery = signal('');
+  protected readonly searchIndex = signal(0);
+  private readonly searchField = viewChild<ElementRef<HTMLInputElement>>('searchField');
+  private readonly esc = inject(EscStack);
+  private offEsc: (() => void) | null = null;
+  protected readonly searchResults = computed(() => {
+    const q = this.searchQuery().trim().toLocaleLowerCase();
+    const has = (v: string | null) => !!v && v.toLocaleLowerCase().includes(q);
+    return [...this.service.lessons()]
+      .filter((l) => !q || has(l.title) || l.blocks.some((b) => has(b.text) || has(b.url)))
+      .sort((a, b) => (q ? Number(!has(a.title)) - Number(!has(b.title)) : 0) || a.title.localeCompare(b.title, this.i18n.locale()))
+      .slice(0, 50);
+  });
+
+  protected openSearch(): void {
+    if (this.searchOpen()) return;
+    this.searchQuery.set('');
+    this.searchIndex.set(0);
+    this.searchOpen.set(true);
+    this.offEsc = this.esc.push(() => this.closeSearch());
+    setTimeout(() => this.searchField()?.nativeElement.focus());
+  }
+
+  protected closeSearch(): void {
+    this.searchOpen.set(false);
+    this.offEsc?.();
+    this.offEsc = null;
+  }
+
+  protected pickSearch(id: string): void {
+    this.closeSearch();
+    this.router.navigate(['/lessons', id]);
+  }
+
+  protected searchKey(e: KeyboardEvent): void {
+    const n = this.searchResults().length;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (n) this.searchIndex.set((this.searchIndex() + (e.key === 'ArrowDown' ? 1 : n - 1)) % n);
+    } else if (e.key === 'Enter') {
+      const l = this.searchResults()[this.searchIndex()];
+      if (l) this.pickSearch(l.id);
+    }
+  }
+
   constructor() {
+    // Ctrl+K / ⌘K: the search window (desktop)
+    const onKey = (e: KeyboardEvent) => {
+      if (this.desktop && (e.ctrlKey || e.metaKey) && e.code === 'KeyK') {
+        e.preventDefault();
+        this.openSearch();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    inject(DestroyRef).onDestroy(() => {
+      document.removeEventListener('keydown', onKey);
+      this.offEsc?.();
+    });
+
     // Phones: the search field in the top bar (searching: the menu and account step aside)
     const toolbar = inject(ToolbarService);
     if (!this.desktop) effect(() => toolbar.content.set(this.searchBar() ?? null));
