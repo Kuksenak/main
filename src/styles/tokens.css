@@ -72,8 +72,9 @@
   --shadow-accent: 0 2px 12px rgb(0 0 0 / 0.12);
   --shadow-popover: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 8px 30px rgb(0 0 0 / 0.12);
   --shadow-dialog: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 24px 64px rgb(0 0 0 / 0.22);
+  /* small: a big blur spread up over the top bar */
   --shadow-sheet: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 0.5px rgb(0 0 0 / 0.08),
-    0 2px 6px rgb(0 0 0 / 0.06), 0 16px 48px rgb(0 0 0 / 0.18);
+    0 -1px 6px rgb(0 0 0 / 0.06);
   --rim-accent: inset 0 1px 0.5px rgb(255 255 255 / 0.55), inset 0 0 0 0.5px rgb(255 255 255 / 0.2);
   --rim-neutral: inset 0 0 0 1px rgb(255 255 255 / 0.9);
   --sheet-border: rgb(255 255 255 / 0.7);
@@ -131,7 +132,7 @@ html.dark {
   --shadow-popover: 0 0 0 0.5px rgb(255 255 255 / 0.06), 0 8px 30px rgb(0 0 0 / 0.5);
   --shadow-dialog: 0 0 0 0.5px rgb(255 255 255 / 0.08), 0 24px 64px rgb(0 0 0 / 0.6);
   --shadow-sheet: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 0.5px rgb(0 0 0 / 0.6),
-    0 16px 48px rgb(0 0 0 / 0.55);
+    0 -1px 6px rgb(0 0 0 / 0.3);
   --rim-accent: inset 0 1px 0.5px rgb(255 255 255 / 0.35), inset 0 0 0 0.5px rgb(255 255 255 / 0.12);
   --rim-neutral: 0 0 #0000;
   --sheet-border: rgb(255 255 255 / 0.1);
