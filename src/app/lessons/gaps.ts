@@ -115,6 +115,73 @@ export function marked(text: string): { t: string; kind?: 'gap' | 'choice' }[] {
   return out;
 }
 
+export type Mark = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
+
+// A piece of markup around [a, b) (or the selection is that piece): where it starts and ends
+interface Found {
+  start: number;
+  end: number;
+  inner: string;
+}
+
+function around(text: string, a: number, b: number, open: string, close: string): Found | null {
+  // The marks just outside the selection
+  if (text.slice(a - open.length, a) === open && text.slice(b, b + close.length) === close) {
+    return { start: a - open.length, end: b + close.length, inner: text.slice(a, b) };
+  }
+  // …or the selection includes them
+  const sel = text.slice(a, b);
+  if (sel.length >= open.length + close.length && sel.startsWith(open) && sel.endsWith(close)) {
+    return { start: a, end: b, inner: sel.slice(open.length, sel.length - close.length) };
+  }
+  return null;
+}
+
+// A gap / choice / link the selection is inside of
+function inside(text: string, a: number, b: number, re: RegExp): RegExpMatchArray | null {
+  for (const m of text.matchAll(re)) {
+    if ((m.index ?? 0) <= a && b <= (m.index ?? 0) + m[0].length) return m;
+  }
+  return null;
+}
+
+const LINK = /<([^<>|\n]+)\|(https?:\/\/[^<>\s]+)>/g;
+const CHOICE = /\{([^{}\n]*)\}/g;
+const WRITE = /\[([^[\]\n]*)\]/g;
+
+/** The markup the selection [a, b) already has (for the editor's menu). */
+export function marksAt(text: string, a: number, b: number): Mark[] {
+  const out: Mark[] = [];
+  if (around(text, a, b, '**', '**')) out.push('bold');
+  else if (around(text, a, b, '*', '*')) out.push('italic');
+  if (around(text, a, b, '__', '__')) out.push('underline');
+  if (inside(text, a, b, WRITE)) out.push('gap');
+  if (inside(text, a, b, CHOICE)) out.push('choice');
+  if (inside(text, a, b, LINK)) out.push('link');
+  return out;
+}
+
+/** The text with the selection's `mark` taken off: the new text and where the plain part now is. */
+export function unmark(text: string, a: number, b: number, mark: Mark): { text: string; a: number; b: number } | null {
+  const pair = { bold: ['**', '**'], italic: ['*', '*'], underline: ['__', '__'] } as Record<string, [string, string]>;
+  if (pair[mark]) {
+    const f = around(text, a, b, ...pair[mark]);
+    if (!f) return null;
+    return { text: text.slice(0, f.start) + f.inner + text.slice(f.end), a: f.start, b: f.start + f.inner.length };
+  }
+  const m = inside(text, a, b, mark === 'gap' ? WRITE : mark === 'choice' ? CHOICE : LINK);
+  if (!m) return null;
+  // A gap: its answer; a choice: the right option (else the first); a link: its text
+  const plain =
+    mark === 'gap'
+      ? m[1].split('|')[0].trim()
+      : mark === 'choice'
+        ? unnumbered((m[1].split('|').find((o) => o.trim().startsWith('*')) ?? m[1].split('|')[0] ?? '').replace(/^\s*\*/, ''))
+        : m[1];
+  const at = m.index ?? 0;
+  return { text: text.slice(0, at) + plain + text.slice(at + m[0].length), a: at, b: at + plain.length };
+}
+
 /** A piece of text with its formatting. */
 export interface Styled {
   t: string;

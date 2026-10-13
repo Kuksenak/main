@@ -11,7 +11,7 @@ import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { caretRect } from '../core/ui/caret';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { ToBody } from '../core/ui/to-body';
-import { asOptions, asTask, forStudents, marked } from './gaps';
+import { Mark, asOptions, asTask, forStudents, marked, marksAt, unmark } from './gaps';
 import { LessonContent } from './lesson-content';
 import { LessonImportsService } from './lesson-imports.service';
 import { LessonBlock, LessonBlockKind, LessonInput, imageSrc } from './lesson.service';
@@ -326,6 +326,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
                 [attr.aria-label]="f.label | t"
                 [attr.title]="f.label | t"
                 class="flex h-8 flex-1 items-center justify-center rounded-md text-[0.9375rem] hover:bg-[var(--highlight)]"
+                [class.!bg-[color-mix(in_srgb,var(--accent)_16%,transparent)]]="se.on?.includes(f.id)"
+                [class.text-[var(--accent)]]="se.on?.includes(f.id)"
                 [class.font-bold]="f.id === 'bold'"
                 [class.italic]="f.id === 'italic'"
                 [class.underline]="f.id === 'underline'"
@@ -339,6 +341,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
               (click)="pickFormat(f.id)"
               [attr.title]="f.label | t"
               class="text-subhead flex h-8 w-full items-center rounded-md px-2.5 text-left hover:bg-[var(--highlight)]"
+              [class.!bg-[color-mix(in_srgb,var(--accent)_16%,transparent)]]="se.on?.includes(f.id)"
+              [class.text-[var(--accent)]]="se.on?.includes(f.id)"
             >{{ f.text! | t }}</button>
           }
         }
@@ -502,7 +506,7 @@ export class LessonForm {
   // The commands, opened by "/" at a line's start: in a text block (`block`; its "/…" from `start`
   // to `end`) or at the page's end (block -1); what's typed after "/" filters them
   protected readonly slash = signal<{ block: number; start: number; end: number; query: string; x: number; y: number; active: number } | null>(null);
-  protected readonly sel = signal<{ block: number; x: number; y: number; menu?: boolean } | null>(null);
+  protected readonly sel = signal<{ block: number; x: number; y: number; menu?: boolean; on?: Mark[] } | null>(null);
   // Link: its address asked in the toolbar / menu
   protected readonly linking = signal(false);
   protected linkUrl = '';
@@ -654,7 +658,7 @@ export class LessonForm {
       // Opened by a right click: it stays where it is
       if (this.sel()?.menu && this.sel()?.block === block) return;
       const r = caretRect(ta, ta.selectionEnd);
-      this.sel.set({ block, x: Math.min(r.left + 14, window.innerWidth - 200), y: Math.max(8, Math.min(r.top - 8, window.innerHeight - 180)) });
+      this.sel.set({ block, x: Math.min(r.left + 14, window.innerWidth - 200), y: Math.max(8, Math.min(r.top - 8, window.innerHeight - 180)), on: this.marksOf(ta) });
     });
   }
 
@@ -666,7 +670,7 @@ export class LessonForm {
     requestAnimationFrame(() => {
       this.linking.set(false);
       // Beside the pointer, a little up (not over the words clicked)
-      this.sel.set({ block, x: Math.min(e.clientX + 14, window.innerWidth - 200), y: Math.max(8, Math.min(e.clientY - 8, window.innerHeight - 180)), menu: true });
+      this.sel.set({ block, x: Math.min(e.clientX + 14, window.innerWidth - 200), y: Math.max(8, Math.min(e.clientY - 8, window.innerHeight - 180)), menu: true, on: this.marksOf(ta) });
     });
   }
 
@@ -734,7 +738,7 @@ export class LessonForm {
     const ta = this.field;
     const kb = this.kbBar();
     if (!ta || !kb || !this.selectWord(ta)) return;
-    this.sel.set({ block: kb.block, x: 0, y: 0 });
+    this.sel.set({ block: kb.block, x: 0, y: 0, on: this.marksOf(ta) });
     this.pickFormat(kind);
   }
 
@@ -751,7 +755,16 @@ export class LessonForm {
     if (!(e.target instanceof HTMLInputElement)) e.preventDefault();
   }
 
+  protected marksOf(ta: HTMLTextAreaElement): Mark[] {
+    return marksAt(ta.value, ta.selectionStart, ta.selectionEnd);
+  }
+
   protected pickFormat(kind: FormatId): void {
+    // Already so: taken off (a choice keeps its right option, a link its text)
+    if (this.sel()?.on?.includes(kind)) {
+      this.unformat(kind);
+      return;
+    }
     if (kind !== 'link') {
       this.format(kind);
       return;
@@ -759,6 +772,19 @@ export class LessonForm {
     this.linkUrl = '';
     this.linking.set(true);
     setTimeout(() => this.linkField()?.nativeElement.focus());
+  }
+
+  private unformat(kind: Mark): void {
+    const ta = this.field;
+    const se = this.sel();
+    if (!ta || !se) return;
+    const r = unmark(ta.value, ta.selectionStart, ta.selectionEnd, kind);
+    this.sel.set(null);
+    if (!r) return;
+    this.setBlock(se.block, { text: r.text });
+    ta.value = r.text;
+    ta.focus();
+    ta.setSelectionRange(r.a, r.b);
   }
 
   // <text|https://…>: a link (the selection its text)
