@@ -154,13 +154,13 @@ export function cleanLesson(l: LessonInput): LessonInput {
           @if (b.kind === 'gaps' && desktop) {
             <!-- ?: how to write a task, in a popup -->
             <span class="relative shrink-0">
-              <button type="button" (click)="helpOpen.set(helpOpen() === i ? null : i)" [attr.aria-label]="'lessons.howTo' | t" class="text-subhead flex h-8 w-6 items-center justify-center font-semibold opacity-50 hover:opacity-90" [class.!opacity-100]="helpOpen() === i">?</button>
+              <button type="button" (click)="$event.stopPropagation(); helpOpen.set(helpOpen() === i ? null : i)" [attr.aria-label]="'lessons.howTo' | t" class="text-subhead flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--fill)] hover:bg-[var(--highlight)] font-semibold opacity-70" [class.!opacity-100]="helpOpen() === i">?</button>
               @if (helpOpen() === i) {
-                <div class="popover-panel text-footnote absolute right-0 top-full z-30 mt-2 w-80 p-3 leading-relaxed">{{ 'lessons.gapsHint' | t }}</div>
+                <div (click)="$event.stopPropagation()" class="popover-panel text-footnote absolute right-0 top-full z-30 mt-2 w-80 p-3 leading-relaxed">{{ 'lessons.gapsHint' | t }}</div>
               }
             </span>
           }
-          <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" class="icon-plain -mr-2">
+          <button type="button" (click)="removeBlock(i)" [attr.aria-label]="'lessons.removeBlock' | t" [class]="b.kind === 'gaps' && desktop ? 'flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--fill)] hover:bg-[var(--highlight)] -mr-1 opacity-70' : 'icon-plain -mr-2'">
             <app-icon name="close" class="size-5" />
           </button>
         </div>
@@ -356,8 +356,11 @@ export class LessonForm {
       this.value.update((m) => ({ title: m.title.trim() ? m.title : title, blocks: [...m.blocks, ...blocks] }));
       return true;
     });
+    const closeHelp = () => this.helpOpen.set(null);
+    document.addEventListener('click', closeHelp);
     inject(DestroyRef).onDestroy(() => {
       release();
+      document.removeEventListener('click', closeHelp);
     });
   }
 
