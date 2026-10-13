@@ -172,6 +172,23 @@ interface Found {
       </app-sheet>
     }
 
+    <!-- New (Ctrl+Alt+N): a window in the middle — Event, Group, Student, Lesson; ↑ ↓ Enter, or a
+         first letter -->
+    @if (newWindow()) {
+      <div class="fixed inset-0 z-[2200] flex items-start justify-center bg-[var(--backdrop)] pt-[18vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeNewWindow()">
+        <div #newBox tabindex="-1" (keydown)="newKey($event)" class="dialog-panel flex w-80 max-w-[90vw] flex-col !rounded-xl p-1.5 outline-none [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
+          <p class="px-2.5 pb-1 pt-1.5 text-[0.75rem] font-medium opacity-50">{{ 'sidebar.new' | t }}</p>
+          @for (c of newChoices; track c.kind; let k = $index) {
+            <button type="button" (click)="closeNewWindow(); create(c.kind)" (mouseenter)="newIndex.set(k)" class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.875rem]" [class.bg-[var(--highlight)]]="k === newIndex()">
+              <app-icon [name]="c.icon" class="side-glyph" />
+              <span class="flex-1">{{ c.label | t }}</span>
+              <span class="rounded bg-[var(--fill-strong)] px-1.5 py-px text-[0.6875rem] font-medium opacity-55">{{ c.key }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
     <!-- The search window (as Notion's): in the middle, near the top -->
     @if (searchOpen()) {
       <div class="fixed inset-0 z-[2200] flex items-start justify-center bg-[var(--backdrop)] pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeSearch()">
@@ -280,6 +297,47 @@ export class Sidebar {
     const d = new Date(e.startsAt);
     const time = this.i18n.time(d);
     return new Date().toDateString() === d.toDateString() ? time : `${this.i18n.date(d, { weekday: 'short' })} ${time}`;
+  }
+
+  // Ctrl+Alt+N: the New window
+  protected readonly newChoices: { kind: 'event' | 'group' | 'student' | 'lesson'; label: TranslationKey; icon: IconName; key: string }[] = [
+    { kind: 'event', label: 'sidebar.newEvent', icon: 'calendar', key: 'E' },
+    { kind: 'group', label: 'sidebar.newGroup', icon: 'people', key: 'G' },
+    { kind: 'student', label: 'sidebar.newStudent', icon: 'person', key: 'S' },
+    { kind: 'lesson', label: 'lessons.add', icon: 'page', key: 'L' },
+  ];
+  protected readonly newWindow = signal(false);
+  protected readonly newIndex = signal(0);
+  private readonly newBox = viewChild<ElementRef<HTMLElement>>('newBox');
+  private offNewEsc: (() => void) | null = null;
+
+  protected openNewWindow(): void {
+    if (this.newWindow()) return;
+    this.newOpen.set(false);
+    this.newIndex.set(0);
+    this.newWindow.set(true);
+    this.offNewEsc = this.esc.push(() => this.closeNewWindow());
+    setTimeout(() => this.newBox()?.nativeElement.focus());
+  }
+
+  protected closeNewWindow(): void {
+    this.newWindow.set(false);
+    this.offNewEsc?.();
+    this.offNewEsc = null;
+  }
+
+  protected newKey(e: KeyboardEvent): void {
+    const n = this.newChoices.length;
+    const byKey = this.newChoices.find((c) => e.code === `Key${c.key}`);
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      this.newIndex.set((this.newIndex() + (e.key === 'ArrowDown' ? 1 : n - 1)) % n);
+    } else if (e.key === 'Enter' || (byKey && !e.ctrlKey && !e.metaKey && !e.altKey)) {
+      e.preventDefault();
+      const c = byKey ?? this.newChoices[this.newIndex()];
+      this.closeNewWindow();
+      this.create(c.kind);
+    }
   }
 
   // ✎'s menu: a new event (today), group, student, lesson
@@ -397,7 +455,7 @@ export class Sidebar {
       // Ctrl+Alt+N / ⌘⌥N: ✎'s menu (Ctrl+N is the browser's own: a new window)
       if ((e.ctrlKey || e.metaKey) && e.altKey && e.code === 'KeyN') {
         e.preventDefault();
-        this.newOpen.set(true);
+        this.openNewWindow();
       }
     };
     document.addEventListener('keydown', onKey);
