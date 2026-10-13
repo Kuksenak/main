@@ -622,6 +622,10 @@ html.dark .btn-white {
 .menu-item:hover:not(:disabled) {
   background: var(--highlight);
 }
+/* (a menu picked by keys too: the pointer moves its one highlight instead of adding a second) */
+.menu-item.no-hover:hover:not(:disabled) {
+  background: transparent;
+}
 .menu-item:disabled {
   opacity: 0.4;
 }

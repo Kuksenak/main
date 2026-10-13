@@ -277,7 +277,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div appToBody data-commands class="dialog-panel fixed z-[2100] w-max !rounded-[0.625rem] p-1 [animation:dropdownIn_160ms_var(--ease-out-quick)]" [style.left.px]="sl.x" [style.top.px]="sl.y">
         <div class="menu-list">
           @for (c of slashItems(); track c.id; let k = $index) {
-            <button type="button" (mousedown)="$event.preventDefault()" (click)="runSlash(c.id)" [disabled]="c.id === 'paste' && !clipboard.blocks()?.length" class="menu-item" [class.!bg-[var(--highlight)]]="k === sl.active">
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="runSlash(c.id)" (mouseenter)="slash.set({ ...sl, active: k })" [disabled]="c.id === 'paste' && !clipboard.blocks()?.length" class="menu-item no-hover" [class.!bg-[var(--highlight)]]="k === sl.active">
               @if (c.id === 'assistant') {
                 <app-brand-icon name="sparkle" class="menu-icon !opacity-100" />
               } @else if (c.id === 'paste') {
