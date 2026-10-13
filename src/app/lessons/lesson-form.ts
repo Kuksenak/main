@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input, model, signal, viewChild } from '@angular/core';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
+import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -97,7 +98,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
  */
 @Component({
   selector: 'app-lesson-form',
-  imports: [AiChat, BrandIcon, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
+  imports: [AiChat, BrandIcon, CdkDrag, CdkDragHandle, CdkDropList, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
   host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)', '(document:mousedown)': 'clickOnPage($event)' },
   template: `
     @let m = value();
@@ -108,12 +109,13 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 
     <!-- The page: text typed right on it, and the tasks; "/" at the start of a line opens the
          commands (a task goes in right there); at the end, a place to type on -->
-    <div class="flex flex-col gap-3">
+    <!-- (tasks are moved by their ⠿: the others make way, the place it'd go shown dashed) -->
+    <div class="flex flex-col gap-3" cdkDropList cdkDropListLockAxis="y" [cdkDropListDisabled]="!desktop || selectable()" (cdkDropListDropped)="moved($event)">
     @for (b of m.blocks; track $index; let i = $index) {
       @if (b.kind === 'text') {
         <!-- Text right on the page (no card): typed where it is; emptied, it goes; its links and
              style marks highlighted under it -->
-        <div class="relative">
+        <div class="relative" cdkDrag [cdkDragDisabled]="true">
         <div aria-hidden="true" class="text-body pointer-events-none absolute inset-0 whitespace-pre-wrap break-words px-1 leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
         <textarea
           #tx
@@ -136,21 +138,18 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       } @else {
       @let slim = desktop && b.kind === 'gaps' && !selectable();
       <div
-        #card
         class="card group relative"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
-        [class.opacity-40]="dragFrom() === i"
-        [style.box-shadow]="dropAt() === i ? '0 -3px 0 var(--text-secondary)' : dropAt() === i + 1 && i === m.blocks.length - 1 ? '0 3px 0 var(--text-secondary)' : null"
-        (dragover)="dragOver($event, i, card)"
-        (drop)="drop($event)"
+        cdkDrag
+        [cdkDragDisabled]="!slim"
       >
         @if (slim) {
           <!-- Desktop tasks: no head row — its buttons at the top right, shown on hover (or while
                it's being typed in): ⠿ drag to move it, the page with a magnifier: as the student sees it, who sees it, ×;
                "only me" always shows -->
           <div class="absolute right-2 top-1.5 z-10 flex items-center gap-0.5 rounded-full bg-[var(--surface)] p-0.5">
-            <span class="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100" [class.!opacity-100]="dragFrom() === i">
-              <button type="button" draggable="true" (dragstart)="dragStart($event, i, card)" (dragend)="dragEnd()" [attr.title]="'lessons.move' | t" [attr.aria-label]="'lessons.move' | t" class="flex size-8 cursor-grab items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 active:cursor-grabbing">
+            <span class="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100" >
+              <button type="button" cdkDragHandle [attr.title]="'lessons.move' | t" [attr.aria-label]="'lessons.move' | t" class="flex size-8 cursor-grab items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 active:cursor-grabbing">
                 <app-icon name="grip" class="size-5" />
               </button>
               <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
@@ -1160,42 +1159,14 @@ export class LessonForm {
     return shown;
   }
 
-  // ---- Moving a task: dragged by its ⠿; a line shows where it goes (before the card under the
-  // pointer, or after it past its middle)
-  protected readonly dragFrom = signal<number | null>(null);
-  protected readonly dropAt = signal<number | null>(null);
-
-  protected dragStart(e: DragEvent, i: number, card: HTMLElement): void {
-    this.dragFrom.set(i);
-    e.dataTransfer?.setData('text/plain', '');
-    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer?.setDragImage(card, 24, 20);
-  }
-
-  protected dragOver(e: DragEvent, i: number, card: HTMLElement): void {
-    if (this.dragFrom() === null) return;
-    e.preventDefault();
-    const r = card.getBoundingClientRect();
-    this.dropAt.set(e.clientY < r.top + r.height / 2 ? i : i + 1);
-  }
-
-  protected drop(e: DragEvent): void {
-    e.preventDefault();
-    const from = this.dragFrom();
-    const at = this.dropAt();
-    this.dragEnd();
-    if (from === null || at === null || at === from || at === from + 1) return;
+  // ---- Moving a task (by its ⠿)
+  protected moved(e: CdkDragDrop<unknown>): void {
+    if (e.previousIndex === e.currentIndex) return;
     this.value.update((m) => {
       const blocks = [...m.blocks];
-      const [moved] = blocks.splice(from, 1);
-      blocks.splice(at > from ? at - 1 : at, 0, moved);
+      moveItemInArray(blocks, e.previousIndex, e.currentIndex);
       return { ...m, blocks };
     });
-  }
-
-  protected dragEnd(): void {
-    this.dragFrom.set(null);
-    this.dropAt.set(null);
   }
 
   protected removeBlock(index: number): void {
