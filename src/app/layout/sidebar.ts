@@ -151,7 +151,7 @@ interface Found {
 
     <!-- ✎'s menu (out of the column: no room taken in it) -->
     @if (newOpen()) {
-      <app-sheet [origin]="newBtn()?.nativeElement ?? null" [fit]="true" (closed)="newOpen.set(false)">
+      <app-sheet [origin]="newAnchor()?.nativeElement ?? null" [fit]="true" (closed)="newOpen.set(false)">
         <div class="menu-list">
           <button type="button" (click)="create('event')" class="menu-item"><app-icon name="calendar" /><span class="flex-1">{{ 'sidebar.newEvent' | t }}</span></button>
           <button type="button" (click)="create('group')" class="menu-item"><app-icon name="people" /><span class="flex-1">{{ 'sidebar.newGroup' | t }}</span></button>
@@ -255,7 +255,7 @@ export class Sidebar {
 
   // ✎'s menu: a new event (today), group, student, lesson
   protected readonly newOpen = signal(false);
-  protected readonly newBtn = viewChild<ElementRef<HTMLButtonElement>>('newBtn');
+  protected readonly newAnchor = viewChild<ElementRef<HTMLButtonElement>>('newBtn');
   protected create(kind: 'event' | 'group' | 'student' | 'lesson'): void {
     this.newOpen.set(false);
     if (kind === 'lesson') {
