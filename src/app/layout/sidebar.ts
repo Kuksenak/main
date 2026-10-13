@@ -96,7 +96,6 @@ interface Found {
         } @empty {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
         }
-        <a routerLink="/schedule" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
 
       <div class="side-head group mt-2">
@@ -104,6 +103,7 @@ interface Found {
           {{ 'nav.lessons' | t }}
           <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('lessons')" />
         </button>
+        <a routerLink="/lessons" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add !opacity-45 hover:!opacity-100"><app-icon name="arrow-up-right" class="size-4" /></a>
         <button type="button" (click)="create('lesson')" [appTip]="'lessons.add' | t" tipSide="right" [attr.aria-label]="'lessons.add' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('lessons')) {
@@ -121,6 +121,7 @@ interface Found {
           {{ 'nav.students' | t }}
           <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('people')" />
         </button>
+        <a routerLink="/students" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add !opacity-45 hover:!opacity-100"><app-icon name="arrow-up-right" class="size-4" /></a>
         <button type="button" (click)="create('student')" [appTip]="'sidebar.newStudent' | t" tipSide="right" [attr.aria-label]="'sidebar.newStudent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('people')) {
