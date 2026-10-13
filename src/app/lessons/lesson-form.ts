@@ -251,7 +251,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       </div>
       }
     }
-      @if (caret()?.at === m.blocks.length) {
+      <!-- (always there, under the last task: the end's line) -->
+      @if (desktop && !locked() && photos()) {
         <!-- The caret between tasks: they part for a line — a plain field with its hint; what's typed
              becomes a task there, "/" the commands, Ctrl+V pastes -->
         <div data-caret class="flex h-7 items-center [animation:fadeIn_120ms_ease-out]">
@@ -262,7 +263,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             [placeholder]="'lessons.caretHint' | t"
             (input)="caretTyped($event)"
             (keydown)="caretKey($event)"
-            (click)="slash() || openAdd()"
+            (click)="slash() || caretAtEnd(true)"
             (blur)="caretBlur()"
             class="h-7 w-full bg-transparent text-[0.875rem] outline-none placeholder:opacity-45"
           />
