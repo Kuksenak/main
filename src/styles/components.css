@@ -695,8 +695,9 @@ body:has(.cdk-drag-preview) * {
   opacity: 0.7;
 }
 
-/* The lesson editor's tasks: nearly the page's own color, a thin outline */
+/* The lesson editor's tasks: nearly the page's own color, no outline */
 .task-card {
   background: color-mix(in srgb, var(--surface) 45%, var(--app-bg));
+  border-color: transparent;
 }
 
