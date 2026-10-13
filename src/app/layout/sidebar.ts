@@ -43,7 +43,7 @@ interface Found {
 @Component({
   selector: 'app-sidebar',
   imports: [Icon, RouterLink, RouterLinkActive, ScrollArea, Sheet, Tip, TranslatePipe],
-  host: { class: 'flex w-60 shrink-0 flex-col border-r-[0.5px] border-[var(--separator)] bg-[var(--side-bg)]' },
+  host: { class: 'flex w-60 shrink-0 flex-col bg-[var(--side-bg)]' },
   template: `
     <div class="flex shrink-0 flex-col gap-2 px-2 pb-1 pt-2">
       <!-- The top row (as Notion's): hide the sidebar; the inbox (notifications; a dot for a new one),
