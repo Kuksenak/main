@@ -50,12 +50,6 @@ const SAVE_AT_LEAST_MS = 5000;
               </button>
             }
             <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" [style.margin-left.px]="s.draft().locked ? null : 14" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--highlight)] focus:bg-[var(--highlight)]" />
-            <!-- Just saved: a cloud with a check, for a moment -->
-            @if (justSaved()) {
-              <span class="head-btn pointer-events-none !px-2 opacity-60 [animation:fadeIn_200ms_ease-out]" role="status" [attr.aria-label]="'lessons.saved' | t">
-                <app-icon name="cloud-check" />
-              </span>
-            }
             <!-- Its level: a chip in its color; a list under it (each level with its color) -->
             <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [disabled]="!!s.draft().locked" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="head-btn" [class.font-medium]="!!s.draft().level">
               <!-- Set: a dot of its color and its name; none: just "Level", faded -->
@@ -94,7 +88,7 @@ const SAVE_AT_LEAST_MS = 5000;
           }
           @if (s.draft().locked) {
             <!-- Locked: shown as in Preview (its tasks as the student sees them) -->
-            <div class="pl-5 pt-1">
+            <div class="compact-view pl-5 pt-1">
               <app-lesson-content [blocks]="lockedBlocks()" mode="student" />
             </div>
           } @else {
@@ -184,8 +178,8 @@ const SAVE_AT_LEAST_MS = 5000;
     <!-- The whole lesson as the student sees it (their tasks only, answers taken out) -->
     @if (previewAll()) {
       <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [large]="true" (closed)="previewAll.set(false)">
-        <div class="flex flex-col gap-3">
-          <h1 class="px-1 text-xl font-semibold">{{ s.draft().title || ('lessons.new' | t) }}</h1>
+        <div class="compact-view flex flex-col gap-2">
+          <h1 class="flex items-center gap-2 px-1 text-[0.9375rem] font-medium"><app-icon name="popout" class="size-4 opacity-70" />{{ s.draft().title || ('lessons.new' | t) }}</h1>
           <app-lesson-content [blocks]="studentBlocks()" mode="student" />
         </div>
       </app-page-sheet>
@@ -269,9 +263,6 @@ export class LessonPage {
     );
   }
 
-  // A save just done: its mark shown for a moment
-  protected readonly justSaved = signal(false);
-  private savedTimer: ReturnType<typeof setTimeout> | undefined;
   protected readonly menuBtn = viewChild<ElementRef<HTMLButtonElement>>('menuBtn');
 
   // Delete, from ☰: the menu closes, the question asked by ☰
@@ -288,19 +279,6 @@ export class LessonPage {
     // The lesson in the editor as soon as it's there (once: later reloads don't touch the draft)
     effect(() => {
       if (this.s.lesson()) untracked(() => this.s.open());
-    });
-    // A save done (and nothing refused): the mark for 2 s
-    let wasSaving = false;
-    effect(() => {
-      const saving = this.s.saving();
-      untracked(() => {
-        if (wasSaving && !saving && !this.s.saveError()) {
-          this.justSaved.set(true);
-          clearTimeout(this.savedTimer);
-          this.savedTimer = setTimeout(() => this.justSaved.set(false), 2000);
-        }
-        wasSaving = saving;
-      });
     });
     // Each change: saved a moment after the last one — or, typed on without a pause, a few seconds
     // after the first one not saved

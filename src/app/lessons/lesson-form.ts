@@ -483,8 +483,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
     <!-- A task as the student sees it (answers taken out, choices unmarked) -->
     @if (previewing() !== null && m.blocks[previewing()!]; as b) {
       <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [large]="true" (closed)="previewing.set(null)">
-        <div class="flex flex-col gap-3">
-          <h1 class="px-1 text-xl font-semibold mobile:hidden">{{ 'lessons.studentSees' | t }}</h1>
+        <div class="compact-view flex flex-col gap-2">
+          <h1 class="flex items-center gap-2 px-1 text-[0.9375rem] font-medium mobile:hidden"><app-icon name="popout" class="size-4 opacity-70" />{{ 'lessons.studentSees' | t }}</h1>
           <app-lesson-content [blocks]="asStudentSees(b)" mode="student" />
         </div>
       </app-page-sheet>
