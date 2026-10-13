@@ -364,12 +364,13 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
     }
 
     @if (!desktop && kbBar(); as kb) {
-      <!-- Phones: over the keyboard while typing — B I U, Fill in, Choice, Link for the selection
-           (or the word the cursor is in); taps keep the keyboard up -->
+      <!-- Phones: while typing — B I U, Fill in, Choice, Link for the selection (or the word the
+           cursor is in); a floating capsule under the top bar (the keyboard's edge belongs to the
+           system's own bar, which a page can't hide); taps keep the keyboard up -->
       <div
         appToBody
-        class="fixed inset-x-0 z-[2100] flex items-center gap-1 overflow-x-auto border-t-[0.5px] border-[var(--separator)] bg-[var(--surface)] px-2 py-1.5"
-        [style.bottom.px]="kbOffset()"
+        class="glass-neutral fixed inset-x-3 z-[2100] mx-auto flex max-w-md items-center gap-0.5 overflow-x-auto rounded-full px-1.5 py-1 shadow-[0_6px_20px_rgb(0_0_0/0.15)]"
+        [style.top]="'calc(env(safe-area-inset-top) + 4.25rem + ' + kbOffset() + 'px)'"
         (pointerdown)="keepFocus($event)"
         (mousedown)="keepFocus($event)"
       >
@@ -661,7 +662,7 @@ export class LessonForm {
   // ---- Phones: the bar over the keyboard
 
   protected readonly kbBar = signal<{ block: number } | null>(null);
-  // How high the keyboard is (the bar sits on it)
+  // How far iOS has scrolled the window (the bar stays at the visible top)
   protected readonly kbOffset = signal(0);
 
   protected onFieldFocus(block: number, ta: HTMLTextAreaElement): void {
@@ -671,9 +672,9 @@ export class LessonForm {
     this.placeBar();
   }
 
+  // (iOS scrolls the window under the keyboard: the bar follows what's visible)
   private placeBar(): void {
-    const vv = window.visualViewport;
-    this.kbOffset.set(vv ? Math.max(0, window.innerHeight - (vv.offsetTop + vv.height)) : 0);
+    this.kbOffset.set(Math.max(0, window.visualViewport?.offsetTop ?? 0));
   }
 
   protected mobileFormat(kind: FormatId): void {
