@@ -49,7 +49,7 @@ const SAVE_AT_LEAST_MS = 5000;
                 <app-icon name="lock" />
               </button>
             }
-            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" [style.margin-left.px]="s.draft().locked ? null : 14" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--highlight)] focus:bg-[var(--highlight)]" />
+            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" [style.margin-left.px]="s.draft().locked ? null : 14" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--highlight)] focus:bg-[var(--highlight)]" />
             <!-- Its level: a chip in its color; a list under it (each level with its color) -->
             <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [disabled]="!!s.draft().locked" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="head-btn" [class.font-medium]="!!s.draft().level">
               <!-- Set: a dot of its color and its name; none: just "Level", faded -->
@@ -179,7 +179,7 @@ const SAVE_AT_LEAST_MS = 5000;
     @if (previewAll()) {
       <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [fit]="true" (closed)="previewAll.set(false)">
         <div class="compact-view flex flex-col gap-2">
-          <h1 class="px-1 text-[0.9375rem] font-medium">{{ s.draft().title || ('lessons.new' | t) }}</h1>
+          <h1 class="px-1 text-[1rem] font-medium">{{ s.draft().title || ('lessons.new' | t) }}</h1>
           <app-lesson-content [blocks]="studentBlocks()" mode="student" />
         </div>
       </app-page-sheet>

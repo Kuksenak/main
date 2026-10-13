@@ -62,7 +62,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             (keydown)="caretKey($event)"
             (click)="slash() || openAdd()"
             (blur)="caretBlur()"
-            class="h-7 w-full bg-transparent text-[0.875rem] outline-none placeholder:opacity-45"
+            class="h-7 w-full bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45"
           />
         </div>
       }
@@ -216,7 +216,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               }
               <!-- Under the field: the same text, its [gaps] and {choices} highlighted (only
                    backgrounds — nothing that would move the text) -->
-              <div aria-hidden="true" class="text-[0.875rem] pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
+              <div aria-hidden="true" class="text-[0.9375rem] pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
               <textarea
                 #ta
                 [attr.data-task]="i"
@@ -232,7 +232,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                 (blur)="onBlur()"
                 rows="2"
                 [placeholder]="'lessons.gapsPlaceholder' | t"
-                class="row-input relative min-h-[3lh] !text-[0.875rem] resize-none leading-relaxed text-transparent caret-[var(--text)] [field-sizing:content] placeholder:text-[var(--text)]"
+                class="row-input relative min-h-[3lh] !text-[0.9375rem] resize-none leading-relaxed text-transparent caret-[var(--text)] [field-sizing:content] placeholder:text-[var(--text)]"
               ></textarea>
               </div>
             </div>
@@ -265,7 +265,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             (keydown)="caretKey($event)"
             (click)="slash() || caretAtEnd(true)"
             (blur)="caretBlur()"
-            class="h-7 w-full bg-transparent text-[0.875rem] outline-none placeholder:opacity-45"
+            class="h-7 w-full bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45"
           />
         </div>
       }
@@ -319,7 +319,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       <div appToBody class="dialog-panel fixed z-[2100] flex w-max min-w-44 flex-col !rounded-[10px] p-1 [animation:dropdownIn_160ms_var(--ease-out-quick)]" [style.left.px]="se.x" [style.top.px]="se.y" (mousedown)="keepFocus($event)">
         @if (linking()) {
           <form (submit)="applyLink(); $event.preventDefault()" class="flex w-64 items-center gap-1">
-            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.enter)="applyLink(); $event.preventDefault()" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 text-[0.875rem] outline-none placeholder:opacity-45" />
+            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" (keydown.enter)="applyLink(); $event.preventDefault()" (keydown.escape)="sel.set(null); field?.focus()" (blur)="onLinkBlur()" class="h-8 min-w-0 flex-1 rounded-md bg-[var(--fill)] px-2 text-[0.9375rem] outline-none placeholder:opacity-45" />
             <button type="submit" [appTip]="'action.done' | t" tipSide="bottom" [attr.aria-label]="'action.done' | t" class="head-btn !px-1.5"><app-icon name="enter" /></button>
           </form>
         } @else {
@@ -331,7 +331,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                 [attr.aria-label]="f.label | t"
                 [appTip]="f.label | t"
                 tipSide="top"
-                class="flex h-8 flex-1 items-center justify-center rounded-md text-[0.875rem] hover:bg-[var(--highlight)]"
+                class="flex h-8 flex-1 items-center justify-center rounded-md text-[0.9375rem] hover:bg-[var(--highlight)]"
                 [class.!bg-[var(--highlight)]]="se.on?.includes(f.id)"
                 [class.font-bold]="f.id === 'bold'"
                 [class.italic]="f.id === 'italic'"
@@ -431,7 +431,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 
     @if (aiOpen()) {
       <app-page-sheet [title]="'nav.ai' | t" [actions]="false" [scroll]="false" [large]="true" (closed)="aiOpen.set(false)">
-        <h1 class="mb-2 flex items-center gap-2 px-1 text-[0.9375rem] font-medium mobile:hidden"><app-brand-icon name="sparkle" class="size-5" />{{ 'nav.ai' | t }}</h1>
+        <h1 class="mb-2 flex items-center gap-2 px-1 text-[1rem] font-medium mobile:hidden"><app-brand-icon name="sparkle" class="size-5" />{{ 'nav.ai' | t }}</h1>
         <!-- Loaded the first time it's opened -->
         @defer {
           <app-ai-chat [chatKey]="lessonId() ?? 'new'" [lesson]="m" (add)="appendBlocks($event)" />

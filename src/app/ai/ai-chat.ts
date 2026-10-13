@@ -25,7 +25,7 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
   host: { class: 'flex min-h-0 flex-1 flex-col desktop:h-[min(78vh,46rem)]' },
   template: `
     <div #list class="min-h-0 flex-1 overflow-y-auto">
-      <div class="flex w-full flex-col gap-4 pb-4 text-[0.875rem] leading-relaxed">
+      <div class="flex w-full flex-col gap-4 pb-4 text-[0.9375rem] leading-relaxed">
         @if (!messages().length) {
           <!-- Nothing yet: what to ask -->
           <div class="flex flex-col items-center gap-3 py-10 text-center">
@@ -113,7 +113,7 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
           (input)="grow()"
           rows="2"
           [placeholder]="'ai.placeholder' | t"
-          class="max-h-48 min-h-[calc(2lh+0.5rem)] w-full resize-none bg-transparent px-1.5 py-1 text-[0.875rem] leading-relaxed outline-none placeholder:opacity-45"
+          class="max-h-48 min-h-[calc(2lh+0.5rem)] w-full resize-none bg-transparent px-1.5 py-1 text-[0.9375rem] leading-relaxed outline-none placeholder:opacity-45"
         ></textarea>
         <div class="flex items-center gap-1">
           <button type="button" (click)="picker.click()" [appTip]="'ai.attach' | t" tipSide="top" [attr.aria-label]="'ai.attach' | t" class="head-btn !px-1.5">
