@@ -63,6 +63,14 @@ import { LEVELS, Level } from './lesson.service';
               <div class="flex flex-col gap-1.5">
                 <p class="text-footnote px-1 font-semibold uppercase tracking-wide opacity-50">{{ 'lessons.level' | t }}</p>
                 <div class="card flex gap-1 p-1">
+                  <button
+                    type="button"
+                    (click)="setLevel(null)"
+                    [attr.aria-pressed]="!s.draft().level"
+                    class="text-subhead h-8 flex-[1.4] rounded-lg font-medium hover:bg-[var(--highlight)]"
+                    [class.!bg-[var(--accent)]]="!s.draft().level"
+                    [class.text-white]="!s.draft().level"
+                  >{{ 'lessons.levelNone' | t }}</button>
                   @for (lv of levels; track lv) {
                     <button
                       type="button"
@@ -110,9 +118,9 @@ export class LessonPage {
 
   protected readonly levels = LEVELS;
 
-  // The level picked; picked again, none
-  protected setLevel(level: Level): void {
-    this.s.draft.update((d) => ({ ...d, level: d.level === level ? null : level }));
+  // The level picked (null: none)
+  protected setLevel(level: Level | null): void {
+    this.s.draft.update((d) => ({ ...d, level }));
   }
 
   protected setTitle(title: string): void {
