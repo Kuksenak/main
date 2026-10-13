@@ -554,6 +554,9 @@ html.dark .btn-white {
 /* Moving tasks (CDK drag and drop), as in Angular's own examples (angular.dev/guide/drag-drop):
    the one held with a material shadow, its place left empty, the others sliding aside */
 .cdk-drag-preview {
+  /* (solid: nothing under it shows through) */
+  background: var(--card) !important;
+  opacity: 1 !important;
   border: none !important;
   box-sizing: border-box;
   box-shadow:
