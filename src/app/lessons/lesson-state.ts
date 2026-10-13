@@ -1,7 +1,7 @@
 import { computed, inject, signal } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { asTask } from './gaps';
-import { cleanLesson, lessonValid } from './lesson-form';
+import { cleanLesson, lessonValid } from './lesson-input';
 import { LessonInput, LessonService } from './lesson.service';
 
 /**

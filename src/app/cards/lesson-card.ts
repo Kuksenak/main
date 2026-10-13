@@ -48,7 +48,10 @@ import { LessonState } from '../lessons/lesson-state';
           @if (s.saveError(); as e) {
             <p class="text-footnote select-text break-words rounded-xl bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-3 py-2 text-[var(--danger)]">{{ 'lessons.saveFailed' | t }} {{ e }}</p>
           }
-          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" />
+          <!-- (the editor loads when first needed) -->
+          @defer {
+            <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" />
+          }
         } @else if (s.lesson(); as l) {
           <!-- Where it is next (else last) and its public link, then the content (the title is in
                the top bar) -->

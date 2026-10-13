@@ -30,7 +30,10 @@ import { LessonBlock, LessonInput, LessonService } from './lesson.service';
             } @else if (x.draft; as d) {
               <app-ai-response [model]="d.model" [seconds]="d.seconds" [raw]="d.raw" [blocks]="d.blocks" (closed)="0" />
               <p class="text-footnote px-1 opacity-60">{{ 'lessons.pickHint' | t }}</p>
-              <app-lesson-form [(value)]="draft" [photos]="false" [selectable]="true" [(selected)]="picked" />
+              <!-- (the editor loads when first needed) -->
+              @defer {
+                <app-lesson-form [(value)]="draft" [photos]="false" [selectable]="true" [(selected)]="picked" />
+              }
             } @else {
               <p class="text-body py-10 text-center opacity-40">{{ 'lessons.reading' | t }}</p>
             }
