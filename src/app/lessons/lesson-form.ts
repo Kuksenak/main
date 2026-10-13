@@ -441,6 +441,10 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               <app-icon name="copy" />
               <span class="flex-1">{{ 'action.copy' | t }}</span>
             </button>
+            <button type="button" (click)="pasteAfter(tm.index)" [disabled]="!clipboard.blocks()?.length" class="menu-item">
+              <app-icon name="paste" />
+              <span class="flex-1">{{ 'action.paste' | t }}</span>
+            </button>
             <button type="button" (click)="formatTask(tm.index)" [disabled]="!tb.text?.trim()" class="menu-item">
               <app-icon name="wand" />
               <span class="flex-1">{{ 'lessons.format' | t }}</span>
@@ -1297,7 +1301,15 @@ export class LessonForm {
 
   // Its menu → Copy: the task kept to paste (⋯ → Paste content, here or in another lesson); its
   // text to the clipboard too
-  private readonly clipboard = inject(LessonClipboard);
+  protected readonly clipboard = inject(LessonClipboard);
+
+  // Its menu → Paste: the tasks copied, right after it
+  protected pasteAfter(index: number): void {
+    this.taskMenu.set(null);
+    const copied = this.clipboard.blocks();
+    if (!copied?.length) return;
+    this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, index + 1), ...copied.map((b) => ({ ...b })), ...m.blocks.slice(index + 1)] }));
+  }
   protected copyTask(index: number): void {
     this.taskMenu.set(null);
     const b = this.value().blocks[index];

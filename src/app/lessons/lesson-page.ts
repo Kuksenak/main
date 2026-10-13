@@ -139,13 +139,13 @@ const SAVE_AT_LEAST_MS = 5000;
             <app-icon name="clipboard" />
             <span class="flex-1">{{ 'lessons.copyContent' | t }}</span>
           </button>
-          @if (clipboard.blocks(); as clip) {
-            <button type="button" (click)="pasteContent(clip)" [disabled]="!!s.draft().locked" class="menu-item">
-              <app-icon name="paste" />
-              <span class="flex-1">{{ 'lessons.pasteContent' | t }}</span>
-              <span class="text-footnote opacity-45">{{ clip.length }}</span>
-            </button>
-          }
+          <button type="button" (click)="pasteContent(clipboard.blocks() ?? [])" [disabled]="!!s.draft().locked || !clipboard.blocks()?.length" class="menu-item">
+            <app-icon name="paste" />
+            <span class="flex-1">{{ 'lessons.pasteContent' | t }}</span>
+            @if (clipboard.blocks()?.length; as n) {
+              <span class="text-footnote opacity-45">{{ n }}</span>
+            }
+          </button>
           <button type="button" (click)="menuOpen.set(false); form()?.formatAll()" [disabled]="!!s.draft().locked || !s.draft().blocks.length" class="menu-item">
             <app-icon name="wand" />
             <span class="flex-1">{{ 'lessons.formatAll' | t }}</span>
