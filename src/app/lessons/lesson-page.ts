@@ -2,7 +2,6 @@ import { FormsModule } from '@angular/forms';
 import { Component, DestroyRef, ElementRef, computed, effect, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { SelectField, SelectOption } from '../core/ui/select/select';
-import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -21,13 +20,13 @@ const SAVE_AT_LEAST_MS = 5000;
 
 /**
  * A lesson on desktop, on the right of the list (/lessons/:id; /lessons/new starts one): always
- * edited in place, saved a moment after each change (and on leaving): the name, whether it's saved,
- * Task, Assistant and ☰ in one row; the tasks the whole width under it; ☰ opens the rest (its level,
+ * edited in place, saved a moment after each change (and on leaving): the name, whether it's saved (a floppy)
+ * and ☰ in one row; the tasks the whole width under it; ☰ opens the rest (its level,
  * events, public link, the students' answers, Delete) in a panel under it. Phones open lessons as cards instead (LessonCard), read only.
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [SelectField, BrandIcon, ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, LessonInfo, ScrollArea, Sheet, TranslatePipe],
+  imports: [SelectField, ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, LessonInfo, ScrollArea, Sheet, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -38,19 +37,12 @@ const SAVE_AT_LEAST_MS = 5000;
           <!-- One row: the name, Task, Assistant; whether it's saved -->
           <div class="flex h-[var(--control-h)] items-center gap-3">
             <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
-            <span class="text-footnote shrink-0 opacity-45">
-              @if (s.saving() || s.dirty()) {
-                {{ 'lessons.saving' | t }}
-              } @else if (s.id()) {
-                {{ 'lessons.saved' | t }}
-              }
-            </span>
-            <button type="button" (click)="form()?.addTask()" class="btn-secondary gap-1.5 pl-2.5">
-              <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />{{ 'lessons.slashTask' | t }}
-            </button>
-            <button type="button" (click)="form()?.openAssistant()" class="btn-secondary gap-1.5 pl-2.5">
-              <app-brand-icon name="sparkle" class="size-[1.125rem]" />{{ 'nav.ai' | t }}
-            </button>
+            <!-- Saved: a floppy (faded; while saving, pulsing) -->
+            @if (s.id() || s.saving() || s.dirty()) {
+              <span class="flex shrink-0 items-center" [attr.title]="((s.saving() || s.dirty()) ? 'lessons.saving' : 'lessons.saved') | t" [attr.aria-label]="((s.saving() || s.dirty()) ? 'lessons.saving' : 'lessons.saved') | t">
+                <app-icon name="save" class="size-5 opacity-35" [class.animate-pulse]="s.saving() || s.dirty()" />
+              </span>
+            }
             <!-- ☰: the lesson's settings and the rest (level, public link, events, answers, Delete) -->
             <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-label]="'nav.settings' | t" [attr.aria-expanded]="menuOpen()" class="btn-secondary !px-2.5" [class.!bg-[var(--highlight)]]="menuOpen()">
               <app-icon name="menu" [strokeWidth]="2" class="size-5" />

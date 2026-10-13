@@ -134,7 +134,31 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
         ></textarea>
         </div>
       } @else {
-      <div class="card" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
+      @let slim = desktop && b.kind === 'gaps' && !selectable();
+      <div class="card group relative" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
+        @if (slim) {
+          <!-- Desktop tasks: no head row — its buttons small, at the top right, shown on hover (or
+               while it's being typed in); "only me" always shows -->
+          <div class="absolute right-2 top-1.5 z-10 flex items-center gap-0.5 rounded-full bg-[var(--surface)] p-0.5">
+            <span class="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100" [class.!opacity-100]="helpOpen() === i">
+              <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-7 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
+                <app-icon name="eye" class="size-[1.125rem]" />
+              </button>
+              <span class="relative">
+                <button type="button" (click)="$event.stopPropagation(); helpOpen.set(helpOpen() === i ? null : i)" [attr.title]="'lessons.howTo' | t" [attr.aria-label]="'lessons.howTo' | t" class="text-subhead flex size-7 items-center justify-center rounded-full font-semibold opacity-60 hover:bg-[var(--highlight)] hover:opacity-100">?</button>
+                @if (helpOpen() === i) {
+                  <div (click)="$event.stopPropagation()" class="popover-panel text-footnote absolute right-0 top-full z-30 mt-2 w-80 p-3 leading-relaxed">{{ 'lessons.gapsHint' | t }}</div>
+                }
+              </span>
+            </span>
+            <button type="button" (click)="setBlock(i, { private: !b.private })" [attr.title]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" [attr.aria-label]="(b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t" class="flex size-7 items-center justify-center rounded-full hover:bg-[var(--highlight)] hover:opacity-100" [class]="b.private ? 'text-[var(--accent)]' : 'opacity-0 group-hover:opacity-60 group-focus-within:opacity-60'">
+              <app-icon [name]="b.private ? 'lock' : 'people'" class="size-[1.125rem]" />
+            </button>
+            <button type="button" (click)="removeBlock(i)" [attr.title]="'lessons.removeBlock' | t" [attr.aria-label]="'lessons.removeBlock' | t" class="flex size-7 items-center justify-center rounded-full opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-60 group-hover:opacity-60 hover:!opacity-100">
+              <app-icon name="close" class="size-[1.125rem]" />
+            </button>
+          </div>
+        } @else {
         <!-- Head: (kind) · Preview · who sees it · ? · × -->
         <div class="list-row !min-h-0 gap-2 pb-1 pt-2.5 after:hidden">
           @if (selectable()) {
@@ -174,6 +198,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             <app-icon name="close" class="size-5" />
           </button>
         </div>
+        }
 
         @switch (b.kind) {
           @case ('checklist') {
@@ -230,7 +255,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
             </div>
           }
           @case ('gaps') {
-            <div class="list-row items-start pb-3 pt-1">
+            <div class="list-row items-start pb-3" [class.pt-1]="!slim" [class.pt-3]="slim">
               <div class="relative min-w-0 flex-1">
               <!-- Under the field: the same text, its [gaps] and {choices} highlighted (only
                    backgrounds — nothing that would move the text) -->
