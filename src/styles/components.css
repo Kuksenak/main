@@ -569,6 +569,10 @@ body:has(.cdk-drag-preview),
 body:has(.cdk-drag-preview) * {
   cursor: grabbing !important;
 }
+/* (the one held: its buttons at the right hidden) */
+.cdk-drag-preview .task-tools {
+  display: none;
+}
 /* (the handle stays on the one held) */
 .cdk-drag-preview .drag-handle {
   opacity: 0.5 !important;

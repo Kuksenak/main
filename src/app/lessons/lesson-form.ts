@@ -83,7 +83,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           <button type="button" cdkDragHandle [attr.title]="'lessons.move' | t" [attr.aria-label]="'lessons.move' | t" class="drag-handle absolute left-1 top-2.5 z-10 flex h-7 w-6 cursor-grab items-center justify-center rounded-md opacity-0 transition-opacity hover:bg-[var(--highlight)] group-focus-within:opacity-50 group-hover:opacity-50 hover:!opacity-100 active:cursor-grabbing">
             <app-icon name="grip" class="size-5" />
           </button>
-          <div class="absolute right-2 top-1.5 z-10 flex items-center gap-0.5 rounded-full bg-[var(--surface)] p-0.5">
+          <div class="task-tools absolute right-2 top-1.5 z-10 flex items-center gap-0.5 p-0.5">
             <span class="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100" >
               <button type="button" (click)="previewing.set(i)" [disabled]="!b.text?.trim()" [attr.title]="'lessons.studentSees' | t" [attr.aria-label]="'lessons.studentSees' | t" class="flex size-8 items-center justify-center rounded-full opacity-60 hover:bg-[var(--highlight)] hover:opacity-100 disabled:opacity-20">
                 <app-icon name="popout" class="size-5" />
