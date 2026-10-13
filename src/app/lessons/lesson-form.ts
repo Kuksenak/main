@@ -625,7 +625,11 @@ export class LessonForm {
   private readonly addRow = viewChild<ElementRef<HTMLButtonElement>>('addRow');
 
   // "+ Add": the commands under it (`query`: typed to filter them)
+  // (the commands opened by "/": letters filter them; by a click: letters start a task)
+  private bySlash = false;
+
   protected openAdd(query = ''): void {
+    this.bySlash = false;
     // (a caret between tasks: the commands open at it)
     const c = this.caret();
     const list = this.host.nativeElement.querySelector<HTMLElement>('[data-tasks]');
@@ -663,6 +667,16 @@ export class LessonForm {
       if (e.key !== '/' && e.code !== 'Slash' && e.code !== 'NumpadDivide') return;
       e.preventDefault();
       this.openAdd();
+      this.bySlash = true;
+      return;
+    }
+    // Opened by a click (not "/"): what's typed is a new task, right there
+    if (sl.block === -1 && !this.bySlash && e.key.length === 1 && e.key !== '/' && e.key !== ' ') {
+      e.preventDefault();
+      const at = this.caret()?.at ?? this.value().blocks.length;
+      this.caret.set(null);
+      this.slash.set(null);
+      this.insertBlock(at, 'gaps', e.key);
       return;
     }
     if (e.key === 'Backspace') {
@@ -1270,6 +1284,7 @@ export class LessonForm {
     const at = this.caret()?.at ?? this.value().blocks.length;
     this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), ...blocks, ...m.blocks.slice(at)] }));
     this.caret.set(null);
+    this.slash.set(null);
   }
 
   // Near the top / bottom of what scrolls while moving one: it scrolls (faster the closer)
