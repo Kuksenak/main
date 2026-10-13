@@ -45,7 +45,7 @@ const SAVE_AT_LEAST_MS = 5000;
           <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
             @if (s.draft().locked) {
               <!-- Locked: a lock (a square button, as the head's) before the name, the name moved along; a click unlocks -->
-              <button type="button" (click)="setLocked(false)" [appTip]="'lessons.unlock' | t" tipSide="bottom" [attr.aria-label]="'lessons.unlock' | t" class="head-btn ml-3 !px-1.5">
+              <button type="button" (click)="setLocked(false)" [appTip]="'lessons.unlock' | t" tipSide="bottom" [attr.aria-label]="'lessons.unlock' | t" class="head-btn ml-5 !px-1.5">
                 <app-icon name="lock" />
               </button>
             }
