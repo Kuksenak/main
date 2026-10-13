@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, model, signal, viewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, model, signal, viewChild } from '@angular/core';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -122,7 +122,9 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
           (select)="onSelect(i, tx)"
           (mouseup)="onSelect(i, tx)"
           (keyup)="onSelect(i, tx)"
-          (focus)="onFieldFocus(i, tx)"
+          (focus)="field = tx"
+          (click)="openFocus(i, tx)"
+          [readOnly]="!desktop"
           (blur)="onBlur(); dropIfEmpty(i)"
           rows="1"
           class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none [field-sizing:content]"
@@ -238,7 +240,9 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
                 (select)="onSelect(i, ta)"
                 (mouseup)="onSelect(i, ta)"
                 (keyup)="onSelect(i, ta)"
-                (focus)="onFieldFocus(i, ta)"
+                (focus)="field = ta"
+                (click)="openFocus(i, ta)"
+                [readOnly]="!desktop"
                 (blur)="onBlur()"
                 (contextmenu)="onMenu($event, i, ta)"
                 rows="2"
@@ -363,36 +367,75 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'gap' | 'choice' | 'link';
       </div>
     }
 
-    @if (!desktop && kbBar(); as kb) {
-      <!-- Phones: while typing — B I U, Fill in, Choice, Link for the selection (or the word the
-           cursor is in); a floating capsule under the top bar (the keyboard's edge belongs to the
-           system's own bar, which a page can't hide); taps keep the keyboard up -->
+    @if (!desktop) {
+      <!-- (always there, hidden: a tap focuses its field at once — iOS opens the keyboard only
+           then; moving a focused field would drop the focus) -->
+      <div appToBody [class.hidden]="!kbBar()">
+      @if (kbBar(); as kb) {
+      @let fb = m.blocks[kb.block];
+      @if (fb) {
+      <!-- Phones: a tap in a task / text opens it alone, the whole screen above the keyboard —
+           our buttons on top (B I U, Fill in, Choice, Link; ✓ closes), the field under them;
+           leaving the field closes it too -->
       <div
-        appToBody
-        class="glass-neutral fixed inset-x-3 z-[2100] mx-auto flex max-w-md items-center gap-0.5 overflow-x-auto rounded-full px-1.5 py-1 shadow-[0_6px_20px_rgb(0_0_0/0.15)]"
-        [style.top]="'calc(env(safe-area-inset-top) + 4.25rem + ' + kbOffset() + 'px)'"
-        (pointerdown)="keepFocus($event)"
-        (mousedown)="keepFocus($event)"
+        class="fixed inset-x-0 z-[2050] flex flex-col bg-[var(--app-bg)]"
+        [style.top.px]="kbOffset()"
+        [style.height.px]="kbHeight()"
       >
-        @if (linking()) {
-          <form (submit)="applyLink(); $event.preventDefault()" class="flex min-w-0 flex-1 items-center gap-1">
-            <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" class="text-body h-9 min-w-0 flex-1 rounded-lg bg-[var(--fill)] px-2.5 outline-none" />
-            <button type="submit" class="btn-primary !h-9 !px-3.5 !py-0">OK</button>
-          </form>
-        } @else {
-          @for (f of formatsFor(kb.block); track f.id) {
-            <button
-              type="button"
-              (click)="mobileFormat(f.id)"
-              [attr.aria-label]="f.label | t"
-              class="flex h-9 min-w-9 shrink-0 items-center justify-center rounded-lg px-2.5 text-[1rem] active:bg-[var(--highlight)]"
-              [class.font-bold]="f.id === 'bold'"
-              [class.italic]="f.id === 'italic'"
-              [class.underline]="f.id === 'underline'"
-              [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
-            >{{ f.text ? (f.text | t) : f.mark }}</button>
+        <div class="flex shrink-0 items-center gap-1 px-2 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]" (pointerdown)="keepFocus($event)" (mousedown)="keepFocus($event)">
+          @if (linking()) {
+            <form (submit)="applyLink(); $event.preventDefault()" class="flex min-w-0 flex-1 items-center gap-1">
+              <input #linkField type="url" inputmode="url" [(ngModel)]="linkUrl" name="url" placeholder="https://…" autocomplete="off" class="text-body h-10 min-w-0 flex-1 rounded-full bg-[var(--fill)] px-3.5 outline-none" />
+              <button type="submit" class="btn-primary !h-10 !px-4 !py-0">OK</button>
+            </form>
+          } @else {
+            <div class="glass-neutral flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto rounded-full px-1.5 py-1">
+              @for (f of formatsFor(kb.block); track f.id) {
+                <button
+                  type="button"
+                  (click)="mobileFormat(f.id)"
+                  [attr.aria-label]="f.label | t"
+                  class="flex h-9 min-w-9 shrink-0 items-center justify-center rounded-full px-2.5 text-[1rem] active:bg-[var(--highlight)]"
+                  [class.font-bold]="f.id === 'bold'"
+                  [class.italic]="f.id === 'italic'"
+                  [class.underline]="f.id === 'underline'"
+                  [class.text-[var(--accent)]]="f.id === 'gap' || f.id === 'choice' || f.id === 'link'"
+                >{{ f.text ? (f.text | t) : f.mark }}</button>
+              }
+            </div>
+            <button type="button" (click)="closeFocus()" [attr.aria-label]="'action.done' | t" class="btn-confirm shrink-0">
+              <app-icon name="check" [strokeWidth]="2" class="size-7" />
+            </button>
           }
-        }
+        </div>
+        <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+          <div class="relative" [class.card]="fb.kind === 'gaps'" [class.px-4]="fb.kind === 'gaps'" [class.py-3]="fb.kind === 'gaps'">
+            <div class="relative">
+              @if (fb.kind === 'gaps') {
+                <div aria-hidden="true" class="text-body pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(fb.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'">{{ k.t }}</span>}</div>
+              }
+              <textarea
+                #ft
+                data-focus
+                [ngModel]="fb.text"
+                (ngModelChange)="setBlock(kb.block, { text: $event })"
+                (focus)="field = ft"
+                (input)="sel.set(null); fb.kind === 'text' ? onText(kb.block, ft) : null"
+                (keydown)="onSlashKey($event)"
+                (blur)="onFocusBlur()"
+                rows="3"
+                [placeholder]="(fb.kind === 'gaps' ? 'lessons.gapsPlaceholder' : 'lessons.slashHint') | t"
+                class="text-body relative w-full resize-none bg-transparent leading-relaxed outline-none [field-sizing:content] placeholder:opacity-40"
+                [class.text-transparent]="fb.kind === 'gaps'"
+                [class.caret-[var(--text)]]="fb.kind === 'gaps'"
+                [class.placeholder:text-[var(--text)]]="fb.kind === 'gaps'"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      }
+      }
       </div>
     }
 
@@ -466,6 +509,7 @@ export class LessonForm {
   protected readonly aiOpen = signal(false);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   private readonly host: ElementRef<HTMLElement> = inject(ElementRef);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly i18n = inject(I18nService);
   // The task whose "how to write it" is open (desktop's ?)
   protected readonly helpOpen = signal<number | null>(null);
@@ -485,7 +529,7 @@ export class LessonForm {
   protected readonly linking = signal(false);
   protected linkUrl = '';
   protected readonly linkField = viewChild<ElementRef<HTMLInputElement>>('linkField');
-  private field: HTMLTextAreaElement | null = null;
+  protected field: HTMLTextAreaElement | null = null;
 
   private readonly commands: { id: 'task' | 'assistant'; label: TranslationKey; hint: TranslationKey; words: string }[] = [
     { id: 'task', label: 'lessons.slashTask', hint: 'lessons.slashTaskHint', words: 'task exercise new add zadanie exercice' },
@@ -665,17 +709,47 @@ export class LessonForm {
   protected readonly kbBar = signal<{ block: number } | null>(null);
   // How far iOS has scrolled the window (the bar stays at the visible top)
   protected readonly kbOffset = signal(0);
+  protected readonly kbHeight = signal(0);
 
-  protected onFieldFocus(block: number, ta: HTMLTextAreaElement): void {
-    this.field = ta;
+  // Phones: a tap on a task / text — it alone on the screen, the keyboard up, the cursor where tapped
+  protected openFocus(block: number, ta: HTMLTextAreaElement): void {
     if (this.desktop) return;
+    const caret = ta.selectionStart || (ta.value ?? '').length;
     this.kbBar.set({ block });
     this.placeBar();
+    this.cdr.detectChanges();
+    const ft = document.querySelector<HTMLTextAreaElement>('textarea[data-focus]');
+    if (!ft) return;
+    ft.focus();
+    ft.setSelectionRange(caret, caret);
+    this.field = ft;
+    // (the keyboard comes up: what's visible shrinks)
+    setTimeout(() => this.placeBar(), 300);
   }
 
-  // (iOS scrolls the window under the keyboard: the bar follows what's visible)
+  // Phones: leaving the block's field (not for our buttons / the link's address) closes it
+  protected onFocusBlur(): void {
+    setTimeout(() => {
+      if (this.linking()) return;
+      if (document.activeElement?.hasAttribute('data-focus')) return;
+      this.closeFocus();
+    }, 150);
+  }
+
+  protected closeFocus(): void {
+    const kb = this.kbBar();
+    this.kbBar.set(null);
+    this.slash.set(null);
+    this.sel.set(null);
+    (document.activeElement as HTMLElement | null)?.blur();
+    if (kb) this.dropIfEmpty(kb.block);
+  }
+
+  // The visible part of the window (above the keyboard; iOS may scroll it)
   private placeBar(): void {
-    this.kbOffset.set(Math.max(0, window.visualViewport?.offsetTop ?? 0));
+    const vv = window.visualViewport;
+    this.kbOffset.set(Math.max(0, vv?.offsetTop ?? 0));
+    this.kbHeight.set(vv?.height ?? window.innerHeight);
   }
 
   protected mobileFormat(kind: FormatId): void {
@@ -691,9 +765,6 @@ export class LessonForm {
       if (this.linking()) return; // the link's address being typed
       this.slash.set(null);
       this.sel.set(null);
-      // Out of the fields: no bar
-      const el = document.activeElement;
-      if (!(el instanceof HTMLTextAreaElement && this.host.nativeElement.contains(el))) this.kbBar.set(null);
     }, 120);
   }
 
@@ -768,6 +839,11 @@ export class LessonForm {
     setTimeout(() => {
       const ta = this.host.nativeElement.querySelector<HTMLTextAreaElement>(`textarea[data-task="${index}"]`);
       if (!ta) return;
+      if (!this.desktop) {
+        ta.setSelectionRange(caret, caret);
+        this.openFocus(index, ta);
+        return;
+      }
       ta.focus();
       ta.setSelectionRange(caret, caret);
     });
