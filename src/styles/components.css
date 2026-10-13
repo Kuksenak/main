@@ -564,6 +564,10 @@ html.dark .btn-white {
 .cdk-drag-placeholder {
   opacity: 0;
 }
+/* (the handle stays on the one held) */
+.cdk-drag-preview .drag-handle {
+  opacity: 0.5 !important;
+}
 .cdk-drag-animating {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
