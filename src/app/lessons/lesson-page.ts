@@ -83,7 +83,7 @@ const SAVE_AT_LEAST_MS = 5000;
                 </button>
               }
             }
-            <!-- ⋯: Duplicate, Copy page content, Paste content, Lock page, Delete -->
+            <!-- ⋯: Copy link (published), Duplicate, Copy page content, Paste content, Format, Lock page, Delete -->
             <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [appTip]="'lessons.more' | t" tipSide="bottom" [attr.aria-label]="'lessons.more' | t" [attr.aria-expanded]="menuOpen()" class="head-btn !px-1.5">
               <app-icon name="dots" class="!size-5 !opacity-80" />
             </button>
@@ -124,6 +124,14 @@ const SAVE_AT_LEAST_MS = 5000;
     @if (menuOpen()) {
       <app-sheet [origin]="menuBtn()?.nativeElement ?? null" [fit]="true" (closed)="menuOpen.set(false)">
         <div class="menu-list">
+          <!-- Published: its link to copy -->
+          @if (s.lesson()?.shareToken; as token) {
+            <button type="button" (click)="copy(token)" class="menu-item">
+              <app-icon [name]="copied() ? 'check' : 'link'" />
+              <span class="flex-1">{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}</span>
+            </button>
+            <div class="menu-sep"></div>
+          }
           <button type="button" (click)="duplicate()" [disabled]="!s.lesson()" class="menu-item">
             <app-icon name="duplicate" />
             <span class="flex-1">{{ 'lessons.duplicate' | t }}</span>
