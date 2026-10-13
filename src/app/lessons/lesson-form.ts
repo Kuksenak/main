@@ -3,6 +3,7 @@ import { DeviceDetectionService } from '../core/services/device-detection.servic
 import { FormsModule } from '@angular/forms';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { Tip } from '../core/ui/tip';
+import { LessonClipboard } from './lesson-clipboard';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -427,6 +428,10 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               @if (tb.private) {
                 <app-icon name="check" class="size-4 text-[var(--accent)]" />
               }
+            </button>
+            <button type="button" (click)="copyTask(tm.index)" [disabled]="!tb.text?.trim()" class="menu-item">
+              <app-icon name="copy" />
+              <span class="flex-1">{{ 'action.copy' | t }}</span>
             </button>
             <button type="button" (click)="formatTask(tm.index)" [disabled]="!tb.text?.trim()" class="menu-item">
               <app-icon name="wand" />
@@ -1195,6 +1200,15 @@ export class LessonForm {
     this.dragFrom.set(null);
     this.dropAt = null;
     this.dropLine.set(null);
+  }
+
+  // Its menu → Copy: the task kept to paste (⋯ → Paste content, here or in another lesson); its
+  // text to the clipboard too
+  private readonly clipboard = inject(LessonClipboard);
+  protected copyTask(index: number): void {
+    this.taskMenu.set(null);
+    const b = this.value().blocks[index];
+    if (b) this.clipboard.copy([{ ...b }]);
   }
 
   // ⋯ → Format: its text brought to one look (see tidy)
