@@ -70,7 +70,8 @@ interface Found {
       </button>
     </div>
 
-    <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-px px-2 pb-3 pt-2">
+    <!-- (room at the right for its scroll thumb: inside the sidebar, not over its edge) -->
+    <app-scroll-area class="min-h-0 flex-1 pr-2" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-2 pt-2">
       <!-- The pages as Notion's tree: a click on a name opens it; its icon (an arrow on hover) folds
            what's in it, shown under it, set in -->
       <!-- Schedule: the next few events -->
