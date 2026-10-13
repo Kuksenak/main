@@ -1,4 +1,5 @@
 import { EscStack } from './esc-stack';
+import { Icon } from './icon/icon';
 import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
 import { DeviceDetectionService } from '../services/device-detection.service';
 import { TranslatePipe } from '../i18n/t.pipe';
@@ -19,7 +20,7 @@ export interface ActionChoice {
  */
 @Component({
   selector: 'app-action-sheet',
-  imports: [TranslatePipe],
+  imports: [Icon, TranslatePipe],
   template: `
     <div
       class="fixed inset-0 z-50 flex transition-opacity duration-200 [animation:fadeIn_200ms_ease-out]"
@@ -31,7 +32,7 @@ export interface ActionChoice {
              across its width (no Cancel: a click outside cancels) -->
         <div
           role="alertdialog"
-          class="dialog-panel fixed flex w-60 flex-col !rounded-[10px] p-1 text-[var(--text)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
+          class="dialog-panel fixed flex w-72 flex-col !rounded-[10px] p-1 text-[var(--text)] transition-[opacity,scale] duration-200 [animation:dropdownIn_160ms_var(--ease-out-quick)]"
           [style.top.px]="place().top"
           [style.bottom.px]="place().bottom"
           [style.left.px]="place().left"
@@ -39,17 +40,24 @@ export interface ActionChoice {
           (click)="$event.stopPropagation()"
         >
           <!-- Just the explanation when there is one ("This can't be undone"), else the question -->
-          <!-- (in the menus' style: the question small and faded, the answers as rows) -->
-          <p class="text-balance px-2 pb-1 pt-1.5 text-[0.8125rem] leading-snug opacity-55">{{ (message() ?? title()) | t }}</p>
-          <div class="menu-list">
+          <!-- (in the new style: the question, then its buttons at the right as the head's — Cancel, the
+               answers; a destructive one red with a bin) -->
+          <p class="text-balance px-2 pb-2 pt-2 text-[0.875rem] leading-snug">{{ (message() ?? title()) | t }}</p>
+          <div class="flex flex-wrap items-center justify-end gap-1 px-1 pb-1">
+            <button type="button" (click)="close()" class="head-btn opacity-70">{{ 'action.cancel' | t }}</button>
             @for (c of choices(); track c.value) {
               <button
                 type="button"
                 (click)="choose(c.value)"
-                class="menu-item font-medium"
+                class="head-btn font-semibold"
                 [class.!text-[var(--danger)]]="c.danger"
                 [class.!text-[var(--accent)]]="c.accent"
-              >{{ c.label | t }}</button>
+              >
+                @if (c.danger) {
+                  <app-icon name="trash" />
+                }
+                {{ c.label | t }}
+              </button>
             }
           </div>
         </div>
@@ -104,7 +112,7 @@ export class ActionSheet {
     const el = this.origin();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const width = this.desktop ? 240 : 248;
+    const width = this.desktop ? 288 : 248;
     if (!el) return { top: vh / 2 - 80, bottom: null, left: (vw - width) / 2 }; // no button: mid-screen
     const r = el.getBoundingClientRect();
     const left = Math.max(8, Math.min(r.left + r.width / 2 - width / 2, vw - 8 - width));
