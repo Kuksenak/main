@@ -73,6 +73,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       @let slim = desktop && b.kind === 'gaps' && !selectable();
       <div
         class="card group relative"
+        [class.task-card]="slim"
         [class.!overflow-visible]="desktop && b.kind === 'gaps'"
         [class.min-h-14]="slim"
         cdkDrag
@@ -193,7 +194,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               <div class="relative min-w-0 flex-1">
               <!-- Under the field: the same text, its [gaps] and {choices} highlighted (only
                    backgrounds — nothing that would move the text) -->
-              <div aria-hidden="true" class="text-subhead pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
+              <div aria-hidden="true" class="text-[0.875rem] pointer-events-none absolute inset-0 whitespace-pre-wrap break-words leading-relaxed">@for (k of marks(b.text); track $index) {<span [class.mark-gap]="k.kind === 'gap'" [class.mark-choice]="k.kind === 'choice'" [class.mark-link]="k.kind === 'link'" [class.mark-syntax]="k.kind === 'syntax'">{{ k.t }}</span>}</div>
               <textarea
                 #ta
                 [attr.data-task]="i"
@@ -209,7 +210,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                 (blur)="onBlur()"
                 rows="2"
                 [placeholder]="'lessons.gapsPlaceholder' | t"
-                class="row-input text-subhead relative min-h-[3lh] resize-none leading-relaxed text-transparent caret-[var(--text)] [field-sizing:content] placeholder:text-[var(--text)]"
+                class="row-input relative min-h-[3lh] !text-[0.875rem] resize-none leading-relaxed text-transparent caret-[var(--text)] [field-sizing:content] placeholder:text-[var(--text)]"
               ></textarea>
               </div>
             </div>
