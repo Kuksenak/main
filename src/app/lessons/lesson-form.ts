@@ -104,7 +104,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
     <!-- Blocks, reordered by dragging their handle -->
     <div cdkDropList cdkDropListLockAxis="y" (cdkDropListDropped)="move($event)" class="flex flex-col gap-4">
     @for (b of m.blocks; track $index; let i = $index) {
-      <div cdkDrag class="card">
+      <div cdkDrag class="card" [class.!overflow-visible]="desktop && b.kind === 'gaps'">
         <!-- Head: ⠿ · kind · who sees it · × -->
         <div class="list-row !min-h-0 gap-2 pb-1 pt-2.5 after:hidden">
           @if (selectable()) {
@@ -118,12 +118,24 @@ export function cleanLesson(l: LessonInput): LessonInput {
           <span cdkDragHandle class="-ml-1 flex shrink-0 cursor-grab touch-none items-center text-[var(--text-secondary)] active:cursor-grabbing" [attr.aria-label]="'lessons.move' | t">
             <app-icon name="grip" class="size-5" />
           </span>
-          <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
-            <!-- (Tasks need no label; older kinds keep theirs) -->
-            @if (b.kind !== 'gaps') {
-              <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
-            }
-          </span>
+          @if (b.kind === 'gaps' && desktop) {
+            <!-- Desktop: the task's heading right in its head row -->
+            <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input min-w-0 flex-1 resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
+            <!-- ?: how to write a task, in a popup -->
+            <span class="relative shrink-0">
+              <button type="button" (click)="helpOpen.set(helpOpen() === i ? null : i)" [attr.aria-label]="'lessons.howTo' | t" class="flex size-7 items-center justify-center rounded-full text-[0.9375rem] font-semibold opacity-60 shadow-[inset_0_0_0_1.5px_currentColor] hover:opacity-90" [class.!opacity-100]="helpOpen() === i">?</button>
+              @if (helpOpen() === i) {
+                <div class="popover-panel text-footnote absolute right-0 top-full z-30 mt-2 w-80 p-3 leading-relaxed">{{ 'lessons.gapsHint' | t }}</div>
+              }
+            </span>
+          } @else {
+            <span class="text-footnote flex flex-1 items-center gap-1.5 font-semibold">
+              <!-- (Tasks need no label; older kinds keep theirs) -->
+              @if (b.kind !== 'gaps') {
+                <app-icon [name]="kindIcon(b.kind)" class="size-4 opacity-70" />{{ kindLabel(b.kind) | t }}
+              }
+            </span>
+          }
           @if (b.kind === 'gaps' && i > 0 && m.blocks[i - 1].kind === 'text') {
             <!-- Its instruction as a text block above it: into the task (one piece to move around) -->
             <button type="button" (click)="joinAbove(i)" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
@@ -138,13 +150,11 @@ export function cleanLesson(l: LessonInput): LessonInput {
           }
           @if (b.kind === 'gaps') {
             <!-- What the student sees, in a popup -->
-            <button type="button" (click)="previewing.set(i)" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 font-medium text-[var(--accent)] hover:bg-[var(--highlight)]">
-              <app-icon name="eye" class="size-3.5" />{{ 'lessons.studentSees' | t }}
-            </button>
+            <button type="button" (click)="previewing.set(i)" class="text-subhead flex items-center gap-1 rounded-full px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 font-medium text-[var(--accent)]">{{ 'lessons.studentSees' | t }}</button>
           }
-          <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-footnote flex items-center gap-1 rounded-full px-2 py-1 opacity-60 hover:bg-[var(--highlight)]">
+          <button type="button" (click)="setBlock(i, { private: !b.private })" class="text-subhead flex items-center gap-1 rounded-full px-3 py-1.5 hover:bg-[var(--highlight)] shrink-0 opacity-60">
             @if (b.private) {
-              <app-icon name="lock" class="size-3.5" />
+              <app-icon name="lock" class="size-4" />
             }
             {{ (b.private ? 'lessons.onlyMe' : 'lessons.studentsSee') | t }}
           </button>
@@ -208,13 +218,17 @@ export function cleanLesson(l: LessonInput): LessonInput {
             </div>
           }
           @case ('gaps') {
+            @if (!desktop) {
             <div class="list-row items-start pb-1 pt-1">
               <textarea [ngModel]="b.instruction" (ngModelChange)="setBlock(i, { instruction: $event })" rows="1" [placeholder]="'lessons.instructionPlaceholder' | t" class="row-input resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
             </div>
+            }
             <div class="list-row items-start pb-1 pt-1">
               <textarea [ngModel]="b.text" (ngModelChange)="setBlock(i, { text: $event })" rows="2" [placeholder]="'lessons.gapsPlaceholder' | t" class="row-input min-h-[3lh] resize-none font-mono text-[0.9375rem] leading-relaxed [field-sizing:content]"></textarea>
             </div>
-            <p class="text-footnote px-4 pb-3 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
+            @if (!desktop) {
+              <p class="text-footnote px-4 pb-3 opacity-50">{{ 'lessons.gapsHint' | t }}</p>
+            }
           }
           @case ('heading') {
             <div class="list-row">
@@ -309,6 +323,9 @@ export class LessonForm {
   readonly selectable = input(false);
   readonly selected = model<number[]>([]);
   protected readonly aiOpen = signal(false);
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  // The task whose "how to write it" is open (desktop's ?)
+  protected readonly helpOpen = signal<number | null>(null);
 
   // Blocks from the AI at the lesson's end
   protected appendBlocks(blocks: LessonBlock[]): void {
@@ -325,7 +342,7 @@ export class LessonForm {
   // Editing starts in the title (desktop; on phones the keyboard would cover the form).
   private readonly titleInput = viewChild<ElementRef<HTMLInputElement>>('titleInput');
   constructor() {
-    const desktop = !inject(DeviceDetectionService).isMobile();
+    const desktop = this.desktop;
     afterNextRender(() => {
       if (desktop) this.titleInput()?.nativeElement.focus({ preventScroll: true });
     });
