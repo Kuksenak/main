@@ -269,7 +269,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       </div>
       }
     }
-      <!-- The end of the page: a new task; the assistant -->
+      <!-- The end of the page: a new task; the assistant (unless the page has them in its head) -->
+      @if (endButtons()) {
       <div class="flex items-center gap-2">
         <button type="button" (click)="insertBlock(m.blocks.length, 'gaps', '')" class="btn-secondary gap-1.5 pl-2.5">
           <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />{{ 'lessons.slashTask' | t }}
@@ -280,6 +281,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           </button>
         }
       </div>
+      }
     </div>
 
     <!-- "/": the commands at the cursor -->
@@ -488,6 +490,17 @@ export class LessonForm {
   readonly photos = input(true);
   /** The name field at the top (off: the page shows it in its own head — the desktop lesson page). */
   readonly showTitle = input(true);
+  /** Task / Assistant at the page's end (off: the page has them in its head — addTask(), openAssistant()). */
+  readonly endButtons = input(true);
+
+  /** A new task at the end, the cursor in it. */
+  addTask(): void {
+    this.insertBlock(this.value().blocks.length, 'gaps', '');
+  }
+
+  openAssistant(): void {
+    this.aiOpen.set(true);
+  }
   /** Blocks can be picked (a checkbox each): `selected` — their places. */
   readonly selectable = input(false);
   readonly selected = model<number[]>([]);

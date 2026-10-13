@@ -1,5 +1,7 @@
 import { FormsModule } from '@angular/forms';
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal, viewChild } from '@angular/core';
+import { BrandIcon } from '../core/ui/icon/brand-icon';
+import { Icon } from '../core/ui/icon/icon';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ConfirmDelete } from '../core/ui/confirm';
@@ -19,7 +21,7 @@ import { LEVELS, Level } from './lesson.service';
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [ConfirmDelete, FormsModule, LessonAttempts, LessonContent, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
+  imports: [BrandIcon, ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonContent, LessonForm, LessonInfo, ScrollArea, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -39,6 +41,14 @@ import { LEVELS, Level } from './lesson.service';
               </h1>
             }
             @if (s.editing()) {
+              <!-- A new task, the assistant; then Cancel, Save -->
+              <button type="button" (click)="form()?.addTask()" class="btn-secondary gap-1.5 pl-2.5">
+                <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />{{ 'lessons.slashTask' | t }}
+              </button>
+              <button type="button" (click)="form()?.openAssistant()" class="btn-secondary gap-1.5 pl-2.5">
+                <app-brand-icon name="sparkle" class="size-[1.125rem]" />{{ 'nav.ai' | t }}
+              </button>
+              <span class="mx-1 h-6 w-px bg-[var(--separator)]"></span>
               <button type="button" (click)="cancel()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
               <button type="button" (click)="save()" [disabled]="!s.canSave()" class="btn-primary">{{ 'action.save' | t }}</button>
             } @else if (s.lesson()) {
@@ -53,7 +63,7 @@ import { LEVELS, Level } from './lesson.service';
           }
           <div class="flex items-start gap-6">
             <div class="flex min-w-0 flex-1 flex-col gap-4">
-              <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" />
+              <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" [endButtons]="false" />
               @if (s.id()) {
                 <button #deleteBtn type="button" (click)="askDelete.set(deleteBtn)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
               }
@@ -117,6 +127,7 @@ export class LessonPage {
   protected readonly askDelete = signal<HTMLElement | null>(null); // the Delete button, while asking
 
   protected readonly levels = LEVELS;
+  protected readonly form = viewChild(LessonForm);
 
   // The level picked (null: none)
   protected setLevel(level: Level | null): void {
