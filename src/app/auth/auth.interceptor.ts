@@ -16,7 +16,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status !== 401 || req.url.includes('/refresh')) {
+      // Public pages (a student's portal, a shared lesson) handle their own 401 (e.g. the PIN):
+      // no session to refresh, no login page
+      const isPublic = req.url.startsWith(`${environment.apiUrl}/portal/`) || req.url.startsWith(`${environment.apiUrl}/shared/`);
+      if (error.status !== 401 || req.url.includes('/refresh') || isPublic) {
         return throwError(() => error);
       }
 
