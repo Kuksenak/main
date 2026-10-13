@@ -80,7 +80,7 @@ interface Found {
       </a>
 
       <!-- Sections (as Notion's): a head folds them (+ on hover adds); the first 5, then View all -->
-      <div class="side-head group mt-2">
+      <div class="side-head group mt-1.5">
         <button type="button" (click)="fold('upcoming')" [attr.aria-expanded]="!folded().includes('upcoming')" class="flex flex-1 items-center gap-1 text-left">
           {{ 'sidebar.upcoming' | t }}
           <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('upcoming')" />
@@ -97,7 +97,7 @@ interface Found {
         }
       }
 
-      <div class="side-head group mt-2">
+      <div class="side-head group mt-1.5">
         <button type="button" (click)="fold('lessons')" [attr.aria-expanded]="!folded().includes('lessons')" class="flex flex-1 items-center gap-1 text-left">
           {{ 'nav.lessons' | t }}
           <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('lessons')" />
@@ -115,7 +115,7 @@ interface Found {
         <a routerLink="/lessons" class="side-row opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
 
-      <div class="side-head group mt-2">
+      <div class="side-head group mt-1.5">
         <button type="button" (click)="fold('people')" [attr.aria-expanded]="!folded().includes('people')" class="flex flex-1 items-center gap-1 text-left">
           {{ 'nav.students' | t }}
           <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('people')" />

@@ -704,7 +704,7 @@ html.dark .btn-white {
    and when it's the open one; section heads small and faded, their + on hover */
 .side-row {
   display: flex;
-  height: 1.875rem;
+  height: 1.75rem;
   width: 100%;
   align-items: center;
   gap: 0.5rem;
@@ -722,7 +722,7 @@ html.dark .btn-white {
 }
 .side-row.is-on {
   color: var(--text);
-  font-weight: 500;
+  font-weight: 450;
 }
 .side-row > app-icon:first-child {
   width: 1.125rem;
@@ -735,12 +735,12 @@ html.dark .btn-white {
 }
 .side-head {
   display: flex;
-  height: 1.875rem;
+  height: 1.75rem;
   align-items: center;
   gap: 0.25rem;
   padding: 0 0.25rem 0 0.5rem;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 400;
   color: color-mix(in srgb, var(--text) 50%, transparent);
 }
 /* (a section's head: highlighted on hover, as a row) */
