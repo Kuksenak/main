@@ -11,6 +11,10 @@ import { Sheet } from '../core/ui/sheet/sheet';
 import { LessonAttempts } from './lesson-attempts';
 import { LessonForm } from './lesson-form';
 import { LessonState } from './lesson-state';
+import { LessonContent } from './lesson-content';
+import { PageSheet } from '../core/ui/page-sheet/page-sheet';
+import { forStudents } from './gaps';
+import { cleanLesson } from './lesson-input';
 import { LEVELS, Level, LessonService, shareUrl } from './lesson.service';
 import { EventList } from '../cards/event-list';
 import { Toggle } from '../core/ui/toggle';
@@ -27,7 +31,7 @@ const SAVE_AT_LEAST_MS = 5000;
  */
 @Component({
   selector: 'app-lesson-page',
-  imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, Toggle],
+  imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, Toggle, LessonContent, PageSheet],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4 pt-1">
@@ -62,6 +66,13 @@ const SAVE_AT_LEAST_MS = 5000;
     @if (menuOpen()) {
       <app-sheet [origin]="menuBtn()?.nativeElement ?? null" [wide]="true" [tall]="true" (closed)="menuOpen.set(false)">
         <div class="flex flex-col gap-4 desktop:gap-3">
+          <!-- The whole lesson as the student sees it -->
+          <div class="card">
+            <button type="button" (click)="menuOpen.set(false); previewAll.set(true)" class="list-row w-full text-left">
+              <app-icon name="popout" class="row-icon" />
+              <span class="flex-1">{{ 'lessons.studentSees' | t }}</span>
+            </button>
+          </div>
           <!-- Rows as in the account's menu: each unfolds its choices under it (› turns down) -->
           <div class="card">
             <button type="button" (click)="unfold('level')" class="list-row w-full text-left" [attr.aria-expanded]="unfolded() === 'level'">
@@ -117,6 +128,16 @@ const SAVE_AT_LEAST_MS = 5000;
       </app-sheet>
     }
 
+    <!-- The whole lesson as the student sees it (their tasks only, answers taken out) -->
+    @if (previewAll()) {
+      <app-page-sheet [title]="'lessons.studentSees' | t" [actions]="false" [large]="true" (closed)="previewAll.set(false)">
+        <div class="flex flex-col gap-3">
+          <h1 class="px-1 text-xl font-semibold">{{ s.draft().title || ('lessons.new' | t) }}</h1>
+          <app-lesson-content [blocks]="studentBlocks()" mode="student" />
+        </div>
+      </app-page-sheet>
+    }
+
     @if (askDelete(); as origin) {
       <app-confirm-delete [origin]="origin" (confirmed)="remove()" (closed)="askDelete.set(null)" />
     }
@@ -139,6 +160,10 @@ export class LessonPage {
   ]);
   protected readonly form = viewChild(LessonForm);
   protected readonly menuOpen = signal(false);
+  protected readonly previewAll = signal(false);
+  protected readonly studentBlocks = computed(() =>
+    cleanLesson(this.s.draft()).blocks.filter((b) => !b.private).map(forStudents),
+  );
   // ☰'s row unfolded
   protected readonly unfolded = signal<'level' | 'link' | null>(null);
   protected unfold(row: 'level' | 'link'): void {
