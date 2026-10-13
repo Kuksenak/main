@@ -4,7 +4,7 @@ import { LessonBlock } from './lesson.service';
 const KEY = 'lessons.clipboard';
 
 /**
- * A lesson's tasks copied (⋯ → Copy page content), to paste into another one (⋯ → Paste content).
+ * A lesson's tasks copied (⋯ → Copy page content), to paste into another one in place of its own (⋯ → Paste content).
  * Kept in this browser, so it outlives a reload; its text goes to the system clipboard too.
  */
 @Injectable({ providedIn: 'root' })

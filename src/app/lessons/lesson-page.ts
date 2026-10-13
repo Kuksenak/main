@@ -41,14 +41,14 @@ const SAVE_AT_LEAST_MS = 5000;
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
         } @else {
           <!-- One row, always at the top: the name; saved; the level; Preview; Publish (Copy link); ☰ -->
-          <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-3 bg-[var(--app-bg)] px-1">
+          <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
             @if (s.draft().locked) {
               <!-- Locked: a lock before the name; a click unlocks -->
               <button type="button" (click)="setLocked(false)" [appTip]="'lessons.unlock' | t" tipSide="bottom" [attr.aria-label]="'lessons.unlock' | t" class="-mr-1 flex size-8 shrink-0 items-center justify-center rounded-full opacity-50 hover:bg-[var(--highlight)] hover:opacity-100">
                 <app-icon name="lock" class="size-5" />
               </button>
             }
-            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
+            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="mr-2 min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
             <!-- Just saved: a cloud with a check, for a moment -->
             @if (justSaved()) {
               <span class="flex shrink-0 items-center [animation:fadeIn_200ms_ease-out]" [attr.title]="'lessons.saved' | t" [attr.aria-label]="'lessons.saved' | t">
@@ -56,28 +56,30 @@ const SAVE_AT_LEAST_MS = 5000;
               </span>
             }
             <!-- Its level: a chip in its color; a list under it (each level with its color) -->
-            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="btn-secondary gap-2 !px-3 font-semibold" [style.background]="levelColor(s.draft().level)">
+            <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="head-btn font-medium">
+              <!-- (its color as a dot) -->
+              <span class="size-2.5 shrink-0 rounded-full" [style.background]="levelColor(s.draft().level) ?? 'transparent'" [class.border]="!s.draft().level" [class.border-[var(--text-secondary)]]="!s.draft().level"></span>
               {{ s.draft().level ?? ('lessons.level' | t) }}
-              <app-icon name="chevron-down" class="-mr-0.5 size-4 opacity-50" />
+              <app-icon name="chevron-down" class="!size-3.5 !opacity-50" />
             </button>
             <!-- The whole lesson as the student sees it -->
-            <button type="button" (click)="previewAll.set(true)" class="btn-secondary gap-1.5 pl-2.5">
-              <app-icon name="popout" class="size-[1.125rem]" />{{ 'lessons.studentSees' | t }}
+            <button type="button" (click)="previewAll.set(true)" class="head-btn">
+              <app-icon name="popout" />{{ 'lessons.studentSees' | t }}
             </button>
             <!-- Publish: the public link on (then Copy link beside it, and Unpublish) -->
             @if (s.lesson(); as l) {
               @if (l.shareToken; as token) {
-                <button type="button" (click)="copy(token)" class="btn-secondary gap-1.5 pl-2.5">
-                  <app-icon [name]="copied() ? 'check' : 'link'" class="size-[1.125rem]" />{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}
+                <button type="button" (click)="copy(token)" class="head-btn">
+                  <app-icon [name]="copied() ? 'check' : 'link'" />{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}
                 </button>
-                <button type="button" (click)="lessons.share(l.id, false)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="btn-secondary">{{ 'lessons.unpublish' | t }}</button>
+                <button type="button" (click)="lessons.share(l.id, false)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn">{{ 'lessons.unpublish' | t }}</button>
               } @else {
-                <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="btn-primary">{{ 'lessons.publish' | t }}</button>
+                <button type="button" (click)="lessons.share(l.id, true)" [appTip]="'lessons.publicShort' | t" tipSide="bottom" class="head-btn font-medium text-[var(--accent)]">{{ 'lessons.publish' | t }}</button>
               }
             }
             <!-- ⋯: Duplicate, Copy page content, Paste content, Lock page, Delete -->
-            <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [appTip]="'lessons.more' | t" tipSide="bottom" [attr.aria-label]="'lessons.more' | t" [attr.aria-expanded]="menuOpen()" class="btn-secondary !px-2.5" [class.!bg-[var(--highlight)]]="menuOpen()">
-              <app-icon name="dots" class="size-5" />
+            <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [appTip]="'lessons.more' | t" tipSide="bottom" [attr.aria-label]="'lessons.more' | t" [attr.aria-expanded]="menuOpen()" class="head-btn !px-1.5">
+              <app-icon name="dots" class="!size-5 !opacity-80" />
             </button>
           </div>
 
@@ -195,10 +197,10 @@ export class LessonPage {
     this.clipboard.copy(cleanLesson(this.s.draft()).blocks);
   }
 
-  // ⋯ → Paste content: the tasks copied, at the end
+  // ⋯ → Paste content: the tasks copied, in place of what's there
   protected pasteContent(blocks: LessonBlock[]): void {
     this.menuOpen.set(false);
-    this.s.draft.update((d) => ({ ...d, blocks: [...d.blocks, ...blocks.map((b) => ({ ...b }))] }));
+    this.s.draft.update((d) => ({ ...d, blocks: blocks.map((b) => ({ ...b })) }));
   }
 
   protected setLocked(locked: boolean): void {
