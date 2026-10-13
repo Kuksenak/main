@@ -130,7 +130,6 @@ const SAVE_AT_LEAST_MS = 5000;
               <app-icon [name]="copied() ? 'check' : 'link'" />
               <span class="flex-1">{{ (copied() ? 'lessons.copied' : 'lessons.copy') | t }}</span>
             </button>
-            <div class="menu-sep"></div>
           }
           <button type="button" (click)="duplicate()" [disabled]="!s.lesson()" class="menu-item">
             <app-icon name="duplicate" />
@@ -158,7 +157,6 @@ const SAVE_AT_LEAST_MS = 5000;
             <app-toggle class="pointer-events-none scale-[0.8] origin-right" [checked]="!!s.draft().locked" />
           </button>
           @if (s.lesson()) {
-            <div class="menu-sep"></div>
             <button type="button" (click)="askDeleteFromMenu()" [disabled]="!!s.draft().locked" class="menu-item is-danger">
               <app-icon name="trash" />
               <span class="flex-1">{{ 'action.delete' | t }}</span>
