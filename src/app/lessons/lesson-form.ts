@@ -83,7 +83,7 @@ export function cleanLesson(l: LessonInput): LessonInput {
         if (text) blocks.push(base);
     }
   }
-  return { title: l.title.trim(), blocks };
+  return { title: l.title.trim(), blocks, level: l.level ?? null };
 }
 
 type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 'link';
@@ -120,7 +120,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
           [attr.data-task]="i"
           [ngModel]="b.text"
           (ngModelChange)="setBlock(i, { text: $event })"
-          (input)="sel.set(null); onText(i, tx)"
+          (input)="sel.set(null)"
           (keydown)="onSlashKey($event)"
           (select)="onSelect(i, tx)"
           (mouseup)="onSelect(i, tx)"
@@ -269,18 +269,17 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       </div>
       }
     }
-      @if (m.blocks.at(-1)?.kind !== 'text') {
-        <!-- The end of the page: type here (text), or "/" for a command -->
-        <textarea
-          #end
-          rows="1"
-          (input)="onEnd(end)"
-          (keydown)="onSlashKey($event)"
-          (blur)="onBlur()"
-          [placeholder]="'lessons.slashHint' | t"
-          class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none placeholder:opacity-40 [field-sizing:content]"
-        ></textarea>
-      }
+      <!-- The end of the page: a new task; the assistant -->
+      <div class="flex items-center gap-2">
+        <button type="button" (click)="insertBlock(m.blocks.length, 'gaps', '')" class="btn-secondary gap-1.5 pl-2.5">
+          <app-icon name="plus" [strokeWidth]="2" class="size-[1.125rem]" />{{ 'lessons.slashTask' | t }}
+        </button>
+        @if (photos()) {
+          <button type="button" (click)="aiOpen.set(true)" class="btn-secondary gap-1.5 pl-2.5">
+            <app-brand-icon name="sparkle" class="size-[1.125rem]" />{{ 'nav.ai' | t }}
+          </button>
+        }
+      </div>
     </div>
 
     <!-- "/": the commands at the cursor -->
@@ -634,7 +633,7 @@ export class LessonForm {
   }
 
   // A new block at `at` (a task, or text on the page), its text `text`, the cursor at its end
-  private insertBlock(at: number, kind: 'gaps' | 'text', text: string): void {
+  protected insertBlock(at: number, kind: 'gaps' | 'text', text: string): void {
     const block: LessonBlock = { kind, text, url: null, private: false, instruction: null };
     this.value.update((m) => ({ ...m, blocks: [...m.blocks.slice(0, at), block, ...m.blocks.slice(at)] }));
     this.focusTask(at, text.length);

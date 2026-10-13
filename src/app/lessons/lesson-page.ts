@@ -9,6 +9,7 @@ import { LessonContent } from './lesson-content';
 import { LessonForm } from './lesson-form';
 import { LessonInfo } from './lesson-info';
 import { LessonState } from './lesson-state';
+import { LEVELS, Level } from './lesson.service';
 
 /**
  * A lesson on desktop, on the right of the list (/lessons/:id; /lessons/new starts one): the title
@@ -30,7 +31,12 @@ import { LessonState } from './lesson-state';
               <!-- The name, edited right in the head -->
               <input #nameInput [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-xl font-semibold outline-none placeholder:opacity-35" />
             } @else {
-              <h1 class="min-w-0 flex-1 truncate text-xl font-semibold">{{ s.heading() }}</h1>
+              <h1 class="flex min-w-0 flex-1 items-center gap-2 text-xl font-semibold">
+                <span class="truncate">{{ s.heading() }}</span>
+                @if (s.lesson()?.level; as lv) {
+                  <span class="text-footnote shrink-0 rounded-md bg-[var(--fill-strong)] px-1.5 py-0.5 font-semibold">{{ lv }}</span>
+                }
+              </h1>
             }
             @if (s.editing()) {
               <button type="button" (click)="cancel()" class="btn-secondary">{{ 'action.cancel' | t }}</button>
@@ -45,10 +51,35 @@ import { LessonState } from './lesson-state';
           @if (s.saveError(); as e) {
             <p class="text-footnote select-text break-words rounded-xl bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-3 py-2 text-[var(--danger)]">{{ 'lessons.saveFailed' | t }} {{ e }}</p>
           }
-          <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" />
-          @if (s.id()) {
-            <button #deleteBtn type="button" (click)="askDelete.set(deleteBtn)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
-          }
+          <div class="flex items-start gap-6">
+            <div class="flex min-w-0 flex-1 flex-col gap-4">
+              <app-lesson-form [(value)]="s.draft" [lessonId]="s.id()" [showTitle]="false" />
+              @if (s.id()) {
+                <button #deleteBtn type="button" (click)="askDelete.set(deleteBtn)" class="btn-secondary self-start !text-[var(--danger)]">{{ 'action.delete' | t }}</button>
+              }
+            </div>
+            <!-- The lesson's settings: its level; its public link (once it's saved) -->
+            <div class="flex w-72 shrink-0 flex-col gap-4">
+              <div class="flex flex-col gap-1.5">
+                <p class="text-footnote px-1 font-semibold uppercase tracking-wide opacity-50">{{ 'lessons.level' | t }}</p>
+                <div class="card flex gap-1 p-1">
+                  @for (lv of levels; track lv) {
+                    <button
+                      type="button"
+                      (click)="setLevel(lv)"
+                      [attr.aria-pressed]="s.draft().level === lv"
+                      class="text-subhead h-8 flex-1 rounded-lg font-medium hover:bg-[var(--highlight)]"
+                      [class.!bg-[var(--accent)]]="s.draft().level === lv"
+                      [class.text-white]="s.draft().level === lv"
+                    >{{ lv }}</button>
+                  }
+                </div>
+              </div>
+              @if (s.lesson(); as l) {
+                <app-lesson-info [lesson]="l" [linkOnly]="true" />
+              }
+            </div>
+          </div>
         } @else if (s.lesson(); as l) {
           <!-- The content, and beside it its events and public link -->
           <div class="flex items-start gap-6">
@@ -76,6 +107,13 @@ export class LessonPage {
   protected readonly s = new LessonState(() => this.lessonId());
   private router = inject(Router);
   protected readonly askDelete = signal<HTMLElement | null>(null); // the Delete button, while asking
+
+  protected readonly levels = LEVELS;
+
+  // The level picked; picked again, none
+  protected setLevel(level: Level): void {
+    this.s.draft.update((d) => ({ ...d, level: d.level === level ? null : level }));
+  }
 
   protected setTitle(title: string): void {
     this.s.draft.update((d) => ({ ...d, title }));

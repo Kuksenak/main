@@ -55,6 +55,9 @@ import { LessonUsage } from './lesson-usage';
                 <div class="min-w-0 flex-1 leading-tight">
                   <p class="flex items-center gap-1.5 font-medium">
                     <span class="truncate">{{ l.title }}</span>
+                    @if (l.level) {
+                      <span class="shrink-0 rounded bg-[var(--fill-strong)] px-1 text-[0.6875rem] font-semibold leading-4">{{ l.level }}</span>
+                    }
                     @if (l.shareToken) {
                       <app-icon name="link" class="size-4 shrink-0 opacity-40" />
                     }
@@ -95,7 +98,8 @@ import { LessonUsage } from './lesson-usage';
       }
     </main>
 
-    @if (!desktop) {
+    <!-- (phones: lessons are only read for now — made and edited on a computer) -->
+    @if (false) {
       <button type="button" (click)="add()" [attr.aria-label]="'lessons.add' | t" class="fab float-bottom right-4" [class.invisible]="searchActive()">
         <app-icon name="plus" [strokeWidth]="2" class="size-7" />
       </button>

@@ -76,9 +76,9 @@ function blockAsTask(b: LessonBlock): LessonBlock {
     case 'image':
       return b;
     case 'text':
-      return b;
+      return { ...b, kind: 'gaps' };
     case 'heading':
-      return { ...b, kind: 'text', text: b.text?.trim() ? `**${b.text.trim()}**` : b.text };
+      return { ...b, kind: 'gaps', text: b.text?.trim() ? `**${b.text.trim()}**` : b.text };
     case 'checklist':
       return { ...base, text: (b.items ?? []).join('\n') };
     case 'exercise': {
@@ -86,7 +86,7 @@ function blockAsTask(b: LessonBlock): LessonBlock {
       return { ...base, text: options.length ? `${b.text ?? ''} {${options.join('|')}}`.trim() : b.text };
     }
     case 'link':
-      return { ...b, kind: 'text', url: null, text: [b.text, b.url].filter((x) => !!x?.trim()).join(' ') };
+      return { ...b, kind: 'gaps', url: null, text: [b.text, b.url].filter((x) => !!x?.trim()).join(' ') };
     default:
       // (its first line, if there are more, the heading)
       return splitInstruction({ ...base, text: b.text });

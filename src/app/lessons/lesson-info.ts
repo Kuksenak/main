@@ -32,7 +32,12 @@ import { LessonUsage } from './lesson-usage';
       </label>
     </ng-template>
 
-    @if (compact()) {
+    @if (linkOnly()) {
+      <div class="flex flex-col gap-1.5">
+        <div class="card"><ng-container [ngTemplateOutlet]="linkRow" /></div>
+        <p class="text-footnote px-1 opacity-50">{{ 'lessons.publicHint' | t }}</p>
+      </div>
+    } @else if (compact()) {
       <div class="card">
         @if (use().next ?? use().last; as e) {
           <div class="list-row">
@@ -55,6 +60,8 @@ import { LessonUsage } from './lesson-usage';
 export class LessonInfo {
   readonly lesson = input.required<Lesson>();
   readonly compact = input(false);
+  /** Only the public link (the lesson's settings, beside the editor). */
+  readonly linkOnly = input(false);
 
   protected lessons = inject(LessonService);
   protected usage = inject(LessonUsage);

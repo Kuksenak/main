@@ -1,3 +1,4 @@
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { Component, DestroyRef, OnInit, inject, input, output, viewChild } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
@@ -38,7 +39,7 @@ import { LessonState } from '../lessons/lesson-state';
       (closed)="onClosed()"
     >
       <!-- Top bar (reading): Edit -->
-      @if (!s.editing() && !entry().readOnly) {
+      @if (!s.editing() && !entry().readOnly && desktop) {
         <button barEnd type="button" (click)="s.edit()" class="btn-white">{{ 'action.edit' | t }}</button>
       }
 
@@ -64,6 +65,8 @@ export class LessonCard implements OnInit {
   readonly closed = output<void>();
 
   protected readonly s = new LessonState(() => this.entry().id);
+  // Phones: lessons are read here, made and edited on a computer (for now)
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private readonly page = viewChild.required<PageSheet>('page');

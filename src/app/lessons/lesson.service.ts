@@ -37,7 +37,12 @@ export interface Lesson {
   blocks: LessonBlock[];
   updatedAt: string;
   shareToken: string | null; // public link token (/l/:token); null = private
+  level?: Level | null;
 }
+
+/** The students' level a lesson is for (CEFR). */
+export const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const;
+export type Level = (typeof LEVELS)[number];
 
 /** The public link of a shared lesson. */
 export function shareUrl(token: string): string {
@@ -47,6 +52,7 @@ export function shareUrl(token: string): string {
 export interface LessonInput {
   title: string;
   blocks: LessonBlock[];
+  level?: Level | null;
 }
 
 /** The account's lesson library (API: /lessons). */
