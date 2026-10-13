@@ -5,6 +5,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { BrandIcon } from '../core/ui/icon/brand-icon';
 import { Icon } from '../core/ui/icon/icon';
+import { Tip } from '../core/ui/tip';
 import { LessonContent } from '../lessons/lesson-content';
 import { asTask, forStudents } from '../lessons/gaps';
 import { LessonImportsService } from '../lessons/lesson-imports.service';
@@ -20,58 +21,58 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
  */
 @Component({
   selector: 'app-ai-chat',
-  imports: [BrandIcon, FormsModule, Icon, LessonContent, TranslatePipe],
+  imports: [BrandIcon, FormsModule, Icon, LessonContent, Tip, TranslatePipe],
   host: { class: 'flex min-h-0 flex-1 flex-col desktop:h-[min(78vh,46rem)]' },
   template: `
     <div #list class="min-h-0 flex-1 overflow-y-auto">
-      <div class="flex w-full flex-col gap-5 pb-4">
+      <div class="flex w-full flex-col gap-4 pb-4 text-[0.875rem] leading-relaxed">
         @if (!messages().length) {
           <!-- Nothing yet: what to ask -->
-          <div class="flex flex-col items-center gap-4 py-8 text-center">
-            <app-brand-icon name="sparkle" class="size-10" />
-            <p class="text-body max-w-md opacity-60">{{ 'ai.empty' | t }}</p>
+          <div class="flex flex-col items-center gap-3 py-10 text-center">
+            <app-brand-icon name="sparkle" class="size-8" />
+            <p class="max-w-sm opacity-55">{{ 'ai.empty' | t }}</p>
           </div>
         }
         @for (m of messages(); track m.id) {
           @if (m.role === 'user') {
-            <!-- The teacher's: on the right -->
+            <!-- The teacher's: on the right, in a light bubble -->
             <div class="flex flex-col items-end gap-1.5">
               @if (m.images?.length) {
                 <div class="flex flex-wrap justify-end gap-1.5">
                   @for (src of m.images; track src) {
-                    <img [src]="src" alt="" class="h-24 rounded-xl border-[0.5px] border-[var(--separator)] object-cover" />
+                    <img [src]="src" alt="" class="h-20 rounded-lg border-[0.5px] border-[var(--separator)] object-cover" />
                   }
                 </div>
               } @else if (m.imageCount) {
                 <span class="text-footnote flex items-center gap-1 opacity-50"><app-icon name="image" class="size-4" />{{ m.imageCount }}</span>
               }
               @if (m.text) {
-                <p class="text-body max-w-[85%] select-text whitespace-pre-wrap rounded-2xl bg-[var(--fill)] px-4 py-2.5">{{ m.text }}</p>
+                <p class="max-w-[85%] select-text whitespace-pre-wrap rounded-xl bg-[var(--fill-strong)] px-3 py-1.5">{{ m.text }}</p>
               }
             </div>
           } @else {
-            <!-- The AI's: its reply, then what it made -->
-            <div class="flex flex-col gap-2.5">
+            <!-- The AI's: its reply as plain text, then what it made -->
+            <div class="flex flex-col gap-2">
               @if (m.error) {
                 <p class="text-footnote select-text break-words text-[var(--danger)]">{{ 'ai.failed' | t }} {{ m.error }}</p>
               }
               @if (m.text) {
-                <p class="text-body select-text whitespace-pre-wrap">{{ m.text }}</p>
+                <p class="select-text whitespace-pre-wrap">{{ m.text }}</p>
               }
               @if (m.draft?.blocks?.length) {
                 <!-- What it made, as the student will see it; Accept puts it in the lesson -->
                 @if (declined().includes(m.id)) {
                   <p class="text-footnote opacity-45">{{ 'ai.declined' | t }}</p>
                 } @else {
-                  <div class="flex flex-col gap-2.5 rounded-[var(--radius-card)] bg-[var(--app-bg)] p-3 shadow-[inset_0_0_0_0.5px_var(--separator)]">
+                  <div class="flex flex-col gap-2 rounded-[10px] border-[0.5px] border-[var(--separator)] p-2.5">
                     <app-lesson-content [blocks]="preview(m)" mode="student" />
                   </div>
-                  <div class="flex items-center justify-end gap-2">
+                  <div class="flex items-center justify-end gap-1">
                     @if (added().includes(m.id)) {
-                      <span class="text-footnote flex items-center gap-1 font-medium text-[var(--success)]"><app-icon name="check" [strokeWidth]="2.5" class="size-4" />{{ 'ai.added' | t }}</span>
+                      <span class="head-btn pointer-events-none text-[var(--success)]"><app-icon name="check" class="!opacity-100" />{{ 'ai.added' | t }}</span>
                     } @else {
-                      <button type="button" (click)="decline(m)" class="btn-secondary">{{ 'ai.decline' | t }}</button>
-                      <button type="button" (click)="addAll(m)" class="btn-primary">{{ 'ai.accept' | t }}</button>
+                      <button type="button" (click)="decline(m)" class="head-btn"><app-icon name="close" />{{ 'ai.decline' | t }}</button>
+                      <button type="button" (click)="addAll(m)" class="head-btn font-medium"><app-icon name="check" />{{ 'ai.accept' | t }}</button>
                     }
                   </div>
                 }
@@ -80,33 +81,30 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
           }
         }
         @if (chat.pending() === chatKey()) {
-          <div class="flex items-center gap-2 opacity-60">
-            <span class="size-4 animate-spin rounded-full border-2 border-[var(--accent)] border-t-transparent"></span>
+          <div class="flex items-center gap-2 opacity-55">
+            <span class="size-3.5 animate-spin rounded-full border-[1.5px] border-[var(--text)] border-t-transparent"></span>
             <span class="text-footnote">{{ 'ai.thinking' | t }}</span>
           </div>
         }
       </div>
     </div>
 
-    <!-- The message being written: pictures, text, Send; the model; New chat -->
-    <div class="pt-2">
-      @if (files().length) {
-        <div class="mb-2 flex flex-wrap gap-1.5">
-          @for (f of files(); track f.url; let k = $index) {
-            <span class="relative">
-              <img [src]="f.url" alt="" class="h-16 rounded-lg border-[0.5px] border-[var(--separator)] object-cover" />
-              <button type="button" (click)="unattach(k)" [attr.aria-label]="'lessons.removeBlock' | t" class="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-[var(--text)] text-[var(--app-bg)]">
-                <app-icon name="close" [strokeWidth]="2.5" class="size-3" />
-              </button>
-            </span>
-          }
-        </div>
-      }
-      <div class="card flex items-end gap-1.5 p-1.5">
-        <button type="button" (click)="picker.click()" [attr.aria-label]="'ai.attach' | t" class="icon-plain shrink-0">
-          <app-icon name="image" class="size-5" />
-        </button>
-        <input #picker type="file" accept="image/*" multiple hidden (change)="attach(picker.files); picker.value = ''" />
+    <!-- The message being written (as in Claude): one rounded box — the text on top; under it
+         attach, the model, New chat and Send -->
+    <div class="pt-2 pb-[env(safe-area-inset-bottom)]">
+      <div class="flex flex-col rounded-2xl border-[0.5px] border-[var(--separator)] bg-[var(--surface)] p-2 shadow-[0_1px_4px_rgb(0_0_0/0.04)]">
+        @if (files().length) {
+          <div class="mb-1.5 flex flex-wrap gap-1.5 px-1 pt-1">
+            @for (f of files(); track f.url; let k = $index) {
+              <span class="relative">
+                <img [src]="f.url" alt="" class="h-14 rounded-lg border-[0.5px] border-[var(--separator)] object-cover" />
+                <button type="button" (click)="unattach(k)" [attr.aria-label]="'lessons.removeBlock' | t" class="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-[var(--text)] text-[var(--app-bg)]">
+                  <app-icon name="close" [strokeWidth]="2.5" class="size-3" />
+                </button>
+              </span>
+            }
+          </div>
+        }
         <textarea
           #box
           [(ngModel)]="draft"
@@ -114,24 +112,28 @@ import { AiChatService, ChatMessage } from './ai-chat.service';
           (input)="grow()"
           rows="2"
           [placeholder]="'ai.placeholder' | t"
-          class="text-body max-h-48 min-h-[calc(2lh+0.75rem)] flex-1 resize-none bg-transparent px-1 py-1.5 outline-none"
+          class="max-h-48 min-h-[calc(2lh+0.5rem)] w-full resize-none bg-transparent px-1.5 py-1 text-[0.875rem] leading-relaxed outline-none placeholder:opacity-45"
         ></textarea>
-        <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [attr.aria-label]="'ai.send' | t" title="Enter" class="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-white hover:opacity-90 disabled:opacity-40">
-          <app-icon name="enter" [strokeWidth]="2.25" class="size-5" />
-        </button>
-      </div>
-      <div class="mt-1.5 flex items-center gap-2 pb-[env(safe-area-inset-bottom)]">
-        @if (imports.models().length > 1) {
-          <select [ngModel]="imports.model()" (ngModelChange)="imports.pickModel($event)" [attr.aria-label]="'lessons.model' | t" class="text-footnote rounded-full bg-transparent px-1 py-0.5 opacity-70">
-            @for (id of imports.models(); track id) {
-              <option [value]="id">{{ modelName(id) }}</option>
-            }
-          </select>
-        }
-        <span class="flex-1"></span>
-        @if (messages().length) {
-          <button type="button" (click)="chat.clear(chatKey())" [disabled]="chat.pending() === chatKey()" class="text-footnote rounded-full px-2 py-1 font-medium opacity-70 hover:bg-[var(--highlight)]">{{ 'ai.newChat' | t }}</button>
-        }
+        <div class="flex items-center gap-1">
+          <button type="button" (click)="picker.click()" [appTip]="'ai.attach' | t" tipSide="top" [attr.aria-label]="'ai.attach' | t" class="head-btn !px-1.5">
+            <app-icon name="paperclip" />
+          </button>
+          <input #picker type="file" accept="image/*" multiple hidden (change)="attach(picker.files); picker.value = ''" />
+          <span class="flex-1"></span>
+          @if (imports.models().length > 1) {
+            <select [ngModel]="imports.model()" (ngModelChange)="imports.pickModel($event)" [attr.aria-label]="'lessons.model' | t" class="head-btn cursor-pointer appearance-none bg-transparent opacity-70">
+              @for (id of imports.models(); track id) {
+                <option [value]="id">{{ modelName(id) }}</option>
+              }
+            </select>
+          }
+          @if (messages().length) {
+            <button type="button" (click)="chat.clear(chatKey())" [disabled]="chat.pending() === chatKey()" class="head-btn opacity-70">{{ 'ai.newChat' | t }}</button>
+          }
+          <button type="button" (click)="send()" [disabled]="!!chat.pending() || (!draft.trim() && !files().length)" [appTip]="'ai.send' | t" tipSide="top" [attr.aria-label]="'ai.send' | t" class="ml-1 flex size-8 shrink-0 items-center justify-center rounded-lg bg-[var(--text)] text-[var(--app-bg)] hover:opacity-85 disabled:opacity-25">
+            <app-icon name="enter" [strokeWidth]="2" class="size-4" />
+          </button>
+        </div>
       </div>
     </div>
   `,

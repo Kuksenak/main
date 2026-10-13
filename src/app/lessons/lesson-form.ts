@@ -412,7 +412,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 
     @if (aiOpen()) {
       <app-page-sheet [title]="'nav.ai' | t" [actions]="false" [scroll]="false" [large]="true" (closed)="aiOpen.set(false)">
-        <h1 class="mb-3 flex items-center gap-2 px-1 text-xl font-semibold mobile:hidden"><app-brand-icon name="sparkle" class="size-6" />{{ 'nav.ai' | t }}</h1>
+        <h1 class="mb-2 flex items-center gap-2 px-1 text-[0.9375rem] font-medium mobile:hidden"><app-brand-icon name="sparkle" class="size-5" />{{ 'nav.ai' | t }}</h1>
         <!-- Loaded the first time it's opened -->
         @defer {
           <app-ai-chat [chatKey]="lessonId() ?? 'new'" [lesson]="m" (add)="appendBlocks($event)" />
