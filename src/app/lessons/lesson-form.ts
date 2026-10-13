@@ -194,8 +194,8 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               <div class="relative min-w-0 flex-1" [class.only-me]="b.private">
               <!-- Only me: a gray lock before its first letter (its first line set in for it) -->
               @if (b.private) {
-                <span [appTip]="'lessons.onlyMe' | t" tipSide="top" class="absolute left-0 top-[0.2em] z-10 flex size-4 items-center justify-center opacity-45">
-                  <app-icon name="lock" class="size-3.5" />
+                <span [appTip]="'lessons.onlyMe' | t" tipSide="top" class="absolute left-0 top-[0.15em] z-10 flex size-[1.125rem] items-center justify-center opacity-45">
+                  <app-icon name="lock" class="size-4" />
                 </span>
               }
               <!-- Under the field: the same text, its [gaps] and {choices} highlighted (only

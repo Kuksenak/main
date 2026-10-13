@@ -675,6 +675,6 @@ html.dark .btn-white {
 /* A task only for the teacher: its first line set in for the lock before it */
 .only-me > div[aria-hidden],
 .only-me > textarea {
-  text-indent: 1.35em;
+  text-indent: 1.55em;
 }
 
