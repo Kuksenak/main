@@ -98,7 +98,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 @Component({
   selector: 'app-lesson-form',
   imports: [AiChat, BrandIcon, FormsModule, Icon, LessonContent, PageSheet, ToBody, TranslatePipe],
-  host: { class: 'flex flex-col gap-5' },
+  host: { class: 'flex flex-col gap-5', '(document:keydown)': 'typeOnPage($event)' },
   template: `
     @let m = value();
     @if (showTitle()) {
@@ -270,15 +270,15 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
       }
     }
       @if (desktop) {
-        <!-- The end of the page (as in Notion): a line to type on — "/" for the commands, other text
-             a new task on Enter (or on leaving it); its hint shows while it's focused (always on an
-             empty lesson). A click on the page under the tasks puts the cursor here. -->
+        <!-- The end of the page: the commands' line — "/" and what's typed after it picks one (Task,
+             Assistant). Typing on the page outside a task starts it; so does a click under the
+             tasks. Its hint shows while it's focused (always on an empty lesson); left, it's emptied. -->
         <textarea
           #end
           rows="1"
           (input)="onEnd(end)"
           (keydown)="onEndKey($event, end)"
-          (blur)="onBlur(); commitEnd(end)"
+          (blur)="onBlur(); end.value = ''"
           [placeholder]="'lessons.slashHint' | t"
           class="text-body w-full resize-none bg-transparent px-1 leading-relaxed outline-none [field-sizing:content] placeholder:opacity-0 focus:placeholder:opacity-40"
           [class.placeholder:!opacity-40]="!m.blocks.length"
@@ -604,7 +604,7 @@ export class LessonForm {
   protected onEnd(end: HTMLTextAreaElement): void {
     this.field = end;
     const v = end.value;
-    if (/^\/[\p{L}]*$/u.test(v)) {
+    if (/^\/\S*$/u.test(v)) {
       const r = end.getBoundingClientRect();
       const was = this.slash();
       this.slash.set({ block: -1, start: 0, end: v.length, query: v.slice(1), x: r.left, y: r.bottom + 2, active: was?.block === -1 ? was.active : 0 });
@@ -613,24 +613,31 @@ export class LessonForm {
     this.slash.set(null);
   }
 
-  // The end's line: Enter makes it a task (Shift+Enter: a new line in it); the commands' keys
+  // The commands' line: their keys (arrows, Enter, Escape); no new lines in it
   protected onEndKey(e: KeyboardEvent, end: HTMLTextAreaElement): void {
     if (this.slash()) {
       this.onSlashKey(e);
+      if (e.key === 'Escape') end.value = '';
       return;
     }
-    if (e.key !== 'Enter' || e.shiftKey || e.isComposing) return;
-    e.preventDefault();
-    this.commitEnd(end);
+    if (e.key === 'Enter') e.preventDefault();
   }
 
-  // What's typed on the end's line: a new task (the line stays, empty, to type the next one)
-  protected commitEnd(end: HTMLTextAreaElement): void {
-    const v = end.value.trim();
-    if (!v || v.startsWith('/')) return;
-    end.value = '';
-    const block: LessonBlock = { kind: 'gaps', text: v, url: null, private: false, instruction: null };
-    this.value.update((m) => ({ ...m, blocks: [...m.blocks, block] }));
+  private readonly endField = viewChild<ElementRef<HTMLTextAreaElement>>('end');
+
+  // Typing on the page outside any field (nothing open over it): the commands open at the page's
+  // end, what's typed filtering them ("/" itself or not)
+  protected typeOnPage(e: KeyboardEvent): void {
+    const end = this.endField()?.nativeElement;
+    if (!end || e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1 || e.key === ' ') return;
+    if (!this.photos() || this.aiOpen() || this.previewing() !== null || this.slash() || this.sel()) return;
+    const a = document.activeElement as HTMLElement | null;
+    if (a?.closest('input, textarea, select, [contenteditable]:not([contenteditable="false"])')) return;
+    if (a && a !== document.body && !this.host.nativeElement.contains(a)) return;
+    e.preventDefault();
+    end.focus();
+    end.value = e.key === '/' ? '/' : `/${e.key}`;
+    this.onEnd(end);
   }
 
   protected onSlashKey(e: KeyboardEvent): void {
