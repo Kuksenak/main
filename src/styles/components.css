@@ -560,9 +560,9 @@ html.dark .btn-white {
 
 /* The caret between tasks (where Ctrl+V pastes): a blinking text cursor */
 .text-cursor {
-  width: 1.5px;
-  height: 1.1em;
-  background: var(--text);
+  width: 1px;
+  height: 1.05em;
+  background: color-mix(in srgb, var(--text) 85%, transparent);
   animation: caretBlink 1.1s steps(1) infinite;
 }
 @keyframes caretBlink {

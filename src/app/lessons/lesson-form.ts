@@ -273,28 +273,23 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
 
     <!-- "/": the commands at the cursor -->
     @if (slash(); as sl) {
-      <div appToBody data-commands class="popover-panel fixed z-[2100] w-64 p-1" [style.left.px]="sl.x" [style.top.px]="sl.y">
-        @for (c of slashItems(); track c.id; let k = $index) {
-          <button
-            type="button"
-            (mousedown)="$event.preventDefault()"
-            (click)="runSlash(c.id)"
-            class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left"
-            [class.bg-[var(--highlight)]]="k === sl.active"
-          >
-            @if (c.id === 'assistant') {
-              <app-brand-icon name="sparkle" class="size-6 shrink-0" />
-            } @else {
-              <span class="flex size-6 shrink-0 items-center justify-center rounded-md bg-[var(--fill)]"><app-icon name="plus" class="size-4" /></span>
-            }
-            <span class="min-w-0 leading-tight">
-              <span class="text-subhead block font-medium">{{ c.label | t }}</span>
-              <span class="text-footnote block opacity-55">{{ c.hint | t }}</span>
-            </span>
-          </button>
-        } @empty {
-          <p class="text-footnote px-2.5 py-2 opacity-50">{{ 'lessons.slashNone' | t }}</p>
-        }
+      <!-- (in the menus' style: a plain list, an icon and a label a row) -->
+      <div appToBody data-commands class="dialog-panel fixed z-[2100] w-max !rounded-[0.625rem] p-1 [animation:dropdownIn_160ms_var(--ease-out-quick)]" [style.left.px]="sl.x" [style.top.px]="sl.y">
+        <div class="menu-list">
+          @for (c of slashItems(); track c.id; let k = $index) {
+            <button type="button" (mousedown)="$event.preventDefault()" (click)="runSlash(c.id)" class="menu-item" [class.!bg-[var(--highlight)]]="k === sl.active">
+              @if (c.id === 'assistant') {
+                <app-brand-icon name="sparkle" class="menu-icon !opacity-100" />
+              } @else {
+                <app-icon name="plus" />
+              }
+              <span class="flex-1">{{ c.label | t }}</span>
+              <span class="text-footnote pl-3 opacity-45">{{ c.hint | t }}</span>
+            </button>
+          } @empty {
+            <p class="menu-foot">{{ 'lessons.slashNone' | t }}</p>
+          }
+        </div>
       </div>
     }
 
