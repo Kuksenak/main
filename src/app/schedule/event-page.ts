@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { EventEditor } from '../cards/event-editor';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { EventService } from './event.service';
+import { toDateInput } from '../core/utils/time';
 
 /**
  * An event on a page of its own (desktop: its card's Open in full page): the same editor, not
@@ -28,6 +29,8 @@ export class EventPage {
 
   protected readonly entry = computed<StackEntry[]>(() => {
     const id = this.params()?.get('id');
+    // ('new': a new one, today — its card's form carried over, see EventEditor.openFull)
+    if (id === 'new') return [{ key: 0, kind: 'event', id: null, date: toDateInput(new Date()) }];
     if (!id || !this.events.events().some((e) => e.id === id)) return [];
     return [{ key: 0, kind: 'event', id, at: this.query()?.get('at') ?? undefined }];
   });

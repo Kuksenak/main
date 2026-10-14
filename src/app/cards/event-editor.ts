@@ -51,6 +51,9 @@ import { RowMenu } from '../core/ui/row-menu';
 import { Router } from '@angular/router';
 import { Tip } from '../core/ui/tip';
 import { CreateDialog } from './create-dialog';
+
+// A new event's form, taken from its card to its full page (see openFull)
+let carried: Model | null = null;
 @Component({
   selector: 'app-event-editor',
   host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
@@ -76,8 +79,8 @@ import { CreateDialog } from './create-dialog';
       <div class="flex flex-col gap-2.5 pt-1">
         <div class="flex items-center gap-1">
           <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent px-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
-          <!-- (a saved one: Open in full page, Ctrl+Enter) -->
-          @if (entry().id && !inline()) {
+          <!-- (Open in full page, Ctrl+Enter; a new one takes what's typed along) -->
+          @if (!inline()) {
             <button type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
           }
         </div>
@@ -528,6 +531,11 @@ export class EventEditor implements OnInit {
     this.snapshot.set(EventEditor.key(this.model()));
     const m = this.model();
     this.repeatSnapshot = JSON.stringify([m.repeat, m.repeatInterval, m.repeatUntil]);
+    // A new one opened in full page from its card: what was typed there (still to be saved)
+    if (this.inline() && !this.entry().id && carried) {
+      this.model.set(carried);
+      carried = null;
+    }
   }
 
   // A new event's hour: today from now (rounded up to 5 minutes), any other day from the
@@ -582,7 +590,14 @@ export class EventEditor implements OnInit {
   private readonly router = inject(Router);
   protected openFull(): void {
     const id = this.entry().id;
-    if (!id || this.inline() || !this.desktop) return;
+    if (this.inline() || !this.desktop) return;
+    if (!id) {
+      // a new one: what's typed goes along (saved there)
+      carried = this.model();
+      this.page().close();
+      this.router.navigate(['/events', 'new']);
+      return;
+    }
     if (this.dirty() && this.canSave() && !this.series()) this.save();
     else this.page().close();
     const at = this.entry().at;
