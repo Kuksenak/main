@@ -46,7 +46,7 @@ export class TrashService {
       .pipe(catchError(() => of(null)))
       .subscribe(() => {
         this.reloadList(item);
-        this.toast.show('toast.restored');
+        this.toast.show('toast.restored', { icon: 'restore' });
         // (and opened: its page)
         this.router.navigate(item.kind === 'lesson' ? ['/lessons', item.id] : ['/students', 'student', item.id]);
       });
