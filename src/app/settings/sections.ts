@@ -109,7 +109,7 @@ export class IntegrationsSettings {
       <button type="button" (click)="pick(lang.code)" class="list-row w-full text-left">
         <span class="flex-1">{{ lang.label }}</span>
         @if (i18n.lang() === lang.code) {
-          <app-icon name="check" class="size-5 text-[var(--accent)]" />
+          <app-icon name="check" class="menu-check" />
         }
       </button>
     }

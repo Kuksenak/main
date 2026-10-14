@@ -52,7 +52,7 @@ export interface PickSection {
                   >{{ initial(item.name) }}</span>
                   <p class="min-w-0 flex-1 truncate">{{ item.name }}</p>
                   @if (picked().includes(item.id)) {
-                    <app-icon name="check" class="size-5 text-[var(--accent)]" />
+                    <app-icon name="check" class="menu-check" />
                   }
                 </button>
               }
