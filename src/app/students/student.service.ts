@@ -9,6 +9,7 @@ export interface Student {
   email: string | null;
   phone: string | null;
   notes?: string | null; // the teacher's notes about them
+  favorite?: boolean; // in the sidebar's Favorites
   lessonIds: string[]; // attached lessons (their materials), in order
 }
 

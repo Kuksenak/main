@@ -31,7 +31,7 @@ import { EventPeople } from '../schedule/event-people';
 import { GROUPS_ON, GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 
-type Section = 'upcoming' | 'people' | 'lessons';
+type Section = 'upcoming' | 'people' | 'lessons' | 'favorites';
 const FOLDED_KEY = 'sidebar.folded';
 
 /** A row's ⋯ menu: which one, where it opened. */
@@ -90,6 +90,33 @@ interface Found {
 
     <!-- (246 wide, 12 at each side; the scroll thumb in the right one) -->
     <app-scroll-area class="min-h-0 flex-1 pr-3" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-3 pt-2">
+      <!-- Favorites (pages and people marked so in their ⋯): first, when there are any -->
+      @if (favorites().length) {
+        <div class="side-head group">
+          <button type="button" (click)="fold('favorites')" [attr.aria-expanded]="!folded().includes('favorites')" class="flex flex-1 items-center gap-2 text-left">
+            <span class="relative size-5 shrink-0">
+              <app-icon name="star" class="side-glyph absolute inset-0 group-hover:opacity-0" />
+              <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('favorites')" />
+            </span>
+            {{ 'item.favorites' | t }}
+          </button>
+        </div>
+        @if (!folded().includes('favorites')) {
+          @for (f of favorites(); track f.kind + f.id) {
+            <a [routerLink]="f.kind === 'lesson' ? ['/lessons', f.id] : ['/students', 'student', f.id]" routerLinkActive="is-on" class="side-row !pl-[1.125rem]">
+              @if (f.kind === 'lesson') {
+                <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(f.level))" />
+              } @else {
+                <app-icon name="person" class="side-glyph" />
+              }
+              <span class="min-w-0 flex-1 truncate">{{ f.name }}</span>
+              <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, f.kind, f.id)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === f.id"><app-icon name="dots" class="size-4" /></button>
+            </a>
+          }
+        }
+        <div class="mt-1.5"></div>
+      }
+
       <!-- Sections (as Notion's): a head folds them (↗ and + on hover); the first few, then View all.
            Calendar: the upcoming events -->
       <div class="side-head group">
@@ -273,14 +300,17 @@ interface Found {
 
     <!-- A row's ⋯ (as Notion's): its actions; a page's last edit -->
     @if (itemMenu(); as im) {
-      <app-sheet [origin]="im.origin" [fit]="true" (closed)="itemMenu.set(null)">
+      <app-sheet [origin]="im.origin" [fit]="true" [side]="true" (closed)="itemMenu.set(null)">
         <div class="menu-list min-w-56">
           @if (im.kind !== 'event') {
-            <button type="button" (click)="copyItemLink(im)" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
+            <button type="button" (click)="toggleFavorite(im)" class="menu-item"><app-icon name="star" /><span class="flex-1">{{ (isFavorite(im) ? 'item.unfavorite' : 'item.favorite') | t }}</span></button>
+            <div class="menu-sep"></div>
           }
-          <!-- (a published page: its public link too) -->
-          @if (im.kind === 'lesson' && publicToken(im.id); as token) {
-            <button type="button" (click)="copyPublicLink(token)" class="menu-item"><app-icon name="globe" /><span class="flex-1">{{ 'item.copyPublicLink' | t }}</span></button>
+          <!-- (Copy link: a person's own page; a page's public link — only when it's published) -->
+          @if (im.kind === 'student') {
+            <button type="button" (click)="copyItemLink(im)" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
+          } @else if (im.kind === 'lesson' && publicToken(im.id); as token) {
+            <button type="button" (click)="copyPublicLink(token)" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
           }
           @if (im.kind === 'lesson') {
             <button type="button" (click)="duplicateItem(im)" class="menu-item"><app-icon name="duplicate" /><span class="flex-1">{{ 'lessons.duplicate' | t }}</span></button>
@@ -364,12 +394,28 @@ export class Sidebar {
   protected copyItemLink(im: ItemMenu): void {
     this.itemMenu.set(null);
     const done = (url: string) => navigator.clipboard?.writeText(url).then(() => this.toast.show('toast.linkCopied', { icon: 'link' }), () => {});
-    if (im.kind === 'lesson') done(location.origin + this.router.serializeUrl(this.router.createUrlTree(this.itemPath(im))));
-    else
-      this.http
+    this.http
         .post<{ token: string }>(`${environment.apiUrl}/students/${im.id}/access`, {})
         .pipe(catchError(() => of(null)))
         .subscribe((res) => res?.token && done(studentPageUrl(res.token)));
+  }
+
+  // ---- Favorites: pages and people, the sidebar's first section
+  protected readonly favorites = computed(() => [
+    ...this.lessonsSorted().filter((l) => l.favorite).map((l) => ({ kind: 'lesson' as const, id: l.id, name: l.title, level: l.level ?? null })),
+    ...this.students.students().filter((s) => s.favorite).map((s) => ({ kind: 'student' as const, id: s.id, name: s.name, level: null })),
+  ]);
+
+  protected isFavorite(im: ItemMenu): boolean {
+    return !!(im.kind === 'lesson' ? this.lessons.byId(im.id)?.favorite : this.students.byId(im.id)?.favorite);
+  }
+
+  protected toggleFavorite(im: ItemMenu): void {
+    this.itemMenu.set(null);
+    const on = !this.isFavorite(im);
+    if (im.kind === 'lesson') this.lessons.setLocal(im.id, { favorite: on });
+    else this.students.setLocal(im.id, { favorite: on });
+    this.http.put(`${environment.apiUrl}/favorites/${im.kind}/${im.id}`, { favorite: on }).pipe(catchError(() => of(null))).subscribe();
   }
 
   protected publicToken(id: string): string | null {

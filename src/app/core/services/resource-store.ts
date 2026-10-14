@@ -50,6 +50,11 @@ export abstract class ResourceStore<T extends { id: string }, Input> {
     this.send(this.http.put(`${this.base}/${id}`, input), () => onDone?.(), onFailed);
   }
 
+  /** A change shown right away (its request sent elsewhere). */
+  setLocal(id: string, patch: Partial<T>): void {
+    this._items.update((list) => list.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+  }
+
   /** PUT {base}/{id}/{sub} (e.g. a student's lessons); `local` shows the change right away. */
   protected putSub(id: string, sub: string, body: unknown, local?: Partial<T>): void {
     if (local) this._items.update((list) => list.map((x) => (x.id === id ? { ...x, ...local } : x)));

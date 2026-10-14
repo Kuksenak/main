@@ -29,7 +29,7 @@ import { InstallService } from '../../services/install.service';
         cdkConnectedOverlay
         [cdkConnectedOverlayOrigin]="origin()!"
         [cdkConnectedOverlayOpen]="!closing()"
-        [cdkConnectedOverlayPositions]="positions"
+        [cdkConnectedOverlayPositions]="side() ? sidePositions : positions"
         [cdkConnectedOverlayPush]="true"
         [cdkConnectedOverlayViewportMargin]="24"
         [cdkConnectedOverlayHasBackdrop]="true"
@@ -94,6 +94,8 @@ export class Sheet implements OnInit {
   readonly wide = input(false);
   /** Desktop: as wide as its content, little padding (a menu, as in Notion). */
   readonly fit = input(false);
+  /** Desktop: at the anchor's right (tops aligned; no room below: bottoms), not under it. */
+  readonly side = input(false);
   /** Phones: a fixed height, up to the middle of the top bar (not the content's: pages switching
    * inside it don't make it jump). (Desktop dropdowns grow with their content up to the window.) */
   readonly tall = input(false);
@@ -129,6 +131,12 @@ export class Sheet implements OnInit {
     { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 4 },
     { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -4 },
     { originX: 'end', originY: 'bottom', overlayX: 'start', overlayY: 'bottom', offsetX: 10 },
+  ];
+
+  protected readonly sidePositions: ConnectedPosition[] = [
+    { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top', offsetX: 6 },
+    { originX: 'end', originY: 'bottom', overlayX: 'start', overlayY: 'bottom', offsetX: 6 },
+    ...this.positions,
   ];
 
   protected readonly closing = signal(false);

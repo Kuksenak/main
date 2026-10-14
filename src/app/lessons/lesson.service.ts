@@ -39,6 +39,7 @@ export interface Lesson {
   shareToken: string | null; // public link token (/l/:token); null = private
   level?: Level | null;
   locked?: boolean; // shown, not edited (until unlocked)
+  favorite?: boolean; // in the sidebar's Favorites
 }
 
 /** The students' level a lesson is for (CEFR). */
