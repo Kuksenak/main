@@ -87,10 +87,10 @@ interface Found {
         <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('upcoming')) {
-        <!-- No icon: the name (in line with the lessons' titles), when at the right (today: the time;
+        <!-- No icon: the name (indented as the other rows), when at the right (today: the time;
              later: the day too) -->
         @for (e of upcoming(); track e.id + e.startsAt) {
-          <button type="button" (click)="openEvent(e)" class="side-row !pl-[2.875rem]">
+          <button type="button" (click)="openEvent(e)" class="side-row !pl-[1.125rem]">
             <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
             <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(e) }}</span>
           </button>
