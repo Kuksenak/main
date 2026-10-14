@@ -33,7 +33,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:p-4"
       [class.desktop:!p-2]="wide()"
       [class.desktop:!items-start]="doc() && !inline()"
-      [class.desktop:!pt-[8vh]]="doc() && !inline()"
+      [class.desktop:!pt-[12vh]]="doc() && !inline()"
       [class.!relative]="inline()"
       [class.!z-auto]="inline()"
       [class.desktop:!block]="inline()"
