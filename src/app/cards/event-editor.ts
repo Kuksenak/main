@@ -134,7 +134,7 @@ import { CreateDialog } from './create-dialog';
              under the properties' icons, texts under their labels (their tint reaching out to near the card's edges) -->
         <div class="flex flex-col gap-px">
           @for (p of invited(); track p.id) {
-            <div class="group/r -mx-3 flex min-h-10 items-center gap-2 rounded-md px-3 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
+            <div class="group/r -mx-3 flex min-h-10 items-center gap-2 rounded-[0.625rem] px-3 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
               <span class="flex min-w-0 flex-1 flex-col pl-6">
                 <span class="truncate">{{ p.name }}</span>
                 @if (hintOf(p); as h) {
@@ -149,7 +149,7 @@ import { CreateDialog } from './create-dialog';
 
         <div class="flex flex-col gap-px">
           @for (l of attached(); track l.id) {
-            <div class="group/r -mx-3 flex min-h-10 items-center gap-2 rounded-md px-3 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
+            <div class="group/r -mx-3 flex min-h-10 items-center gap-2 rounded-[0.625rem] px-3 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
               <app-icon name="page" class="size-4 shrink-0 opacity-50" />
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="truncate">{{ l.title }}</span>
