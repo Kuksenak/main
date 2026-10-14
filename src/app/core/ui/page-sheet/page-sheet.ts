@@ -31,7 +31,6 @@ import { ScrollArea } from '../scroll-area/scroll-area';
   template: `
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:p-4"
-      [class.desktop:bg-[var(--backdrop)]]="!overPage && dim()"
       [class.desktop:!p-2]="wide()"
       [class.!relative]="inline()"
       [class.!z-auto]="inline()"
@@ -62,13 +61,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
       >
-        <!-- Desktop: dimmed while something is open over it (instead of the whole window darkening) -->
-        @if (desktop) {
-          <div
-            class="pointer-events-none absolute inset-0 z-20 rounded-[inherit] bg-[var(--backdrop)] transition-opacity duration-200"
-            [class.opacity-0]="!covered()"
-          ></div>
-        }
+        <!-- (desktop: nothing dims — not the page under it, not it under what opens over it) -->
         <!-- Mobile top bar: same side inset as the cards, round controls. It floats over the
              content (which scrolls under it), fading from the page color to transparent; only
              its buttons take taps. -->

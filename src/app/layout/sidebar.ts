@@ -197,7 +197,7 @@ interface Found {
     <!-- New (Ctrl+Alt+N): a window in the middle — Event, Group, Student, Lesson; ↑ ↓ Enter, or a
          first letter -->
     @if (newWindow()) {
-      <div class="fixed inset-0 z-[2200] flex items-start justify-center bg-[var(--backdrop)] pt-[18vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeNewWindow()">
+      <div class="fixed inset-0 z-[2200] flex items-start justify-center pt-[18vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeNewWindow()">
         <div #newBox tabindex="-1" (keydown)="newKey($event)" class="dialog-panel flex w-80 max-w-[90vw] flex-col !rounded-xl p-1.5 outline-none [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
           <p class="px-2.5 pb-1 pt-1.5 text-[0.75rem] font-medium opacity-50">{{ 'sidebar.new' | t }}</p>
           @for (c of newChoices; track c.kind; let k = $index) {
@@ -213,7 +213,7 @@ interface Found {
 
     <!-- The search window (as Notion's): in the middle, near the top -->
     @if (searchOpen()) {
-      <div class="fixed inset-0 z-[2200] flex items-start justify-center bg-[var(--backdrop)] pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeSearch()">
+      <div class="fixed inset-0 z-[2200] flex items-start justify-center pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeSearch()">
         <div class="dialog-panel flex max-h-[70vh] w-[36rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
           <label class="flex h-12 shrink-0 items-center gap-2.5 px-4">
             <app-icon name="search" class="size-[1.125rem] shrink-0 opacity-50" />

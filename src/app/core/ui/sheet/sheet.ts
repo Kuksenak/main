@@ -54,7 +54,6 @@ import { InstallService } from '../../services/install.service';
       <div class="fixed inset-0 z-40 desktop:flex desktop:items-center desktop:justify-center desktop:p-4">
         <div
           class="absolute inset-0 [animation:fadeIn_280ms_ease-out]"
-          [class.desktop:bg-[var(--backdrop)]]="!overDialog"
           [style.opacity]="closing() ? 0 : null"
           [style.transition]="'opacity 340ms ease-out'"
           (click)="close()"

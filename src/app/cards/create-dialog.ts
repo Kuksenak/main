@@ -14,7 +14,7 @@ import { ToastService } from '../core/ui/toast';
   selector: 'app-create-dialog',
   imports: [TranslatePipe],
   template: `
-    <div class="fixed inset-0 z-[2400] flex items-start justify-center bg-[var(--backdrop)] pt-[16vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="leave()">
+    <div class="fixed inset-0 z-[2400] flex items-start justify-center pt-[16vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="leave()">
       <form class="dialog-panel flex w-[26rem] flex-col gap-4 !rounded-xl p-5" (mousedown)="$event.stopPropagation()" (submit)="$event.preventDefault(); create()">
         <!-- (the name / title big and plain, as the event's title; what it's for under it) -->
         <div class="flex flex-col gap-1">
