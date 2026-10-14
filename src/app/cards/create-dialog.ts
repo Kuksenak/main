@@ -5,15 +5,15 @@ import { LessonService } from '../lessons/lesson.service';
 import { StudentService } from '../students/student.service';
 
 /**
- * Making a student or a page from an add field (as Notion Calendar's Create page): a small dialog —
- * a student's name or a page's title (what was typed); Create makes it, and `created`
+ * Making a student or a page (as Notion Calendar's Create page): a small dialog, no buttons —
+ * a student's name or a page's title (what was typed); Enter or closing it makes it, and `created`
  * gives its id (added where it was asked).
  */
 @Component({
   selector: 'app-create-dialog',
   imports: [TranslatePipe],
   template: `
-    <div class="fixed inset-0 z-[2400] flex items-start justify-center bg-[var(--backdrop)] pt-[16vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closed.emit()">
+    <div class="fixed inset-0 z-[2400] flex items-start justify-center bg-[var(--backdrop)] pt-[16vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="leave()">
       <form class="dialog-panel flex w-[26rem] flex-col gap-4 !rounded-xl p-5" (mousedown)="$event.stopPropagation()" (submit)="$event.preventDefault(); create()">
         <!-- (the name / title big and plain, as the event's title; what it's for under it) -->
         <div class="flex flex-col gap-1">
@@ -21,10 +21,6 @@ import { StudentService } from '../students/student.service';
           @if (hint()) {
             <p class="text-[0.8125rem] opacity-55">{{ hint() }}</p>
           }
-        </div>
-        <div class="flex items-center justify-end gap-2 pt-1">
-          <button type="button" (click)="closed.emit()" class="head-btn">{{ 'action.cancel' | t }}</button>
-          <button type="submit" [disabled]="!canCreate()" class="head-btn font-semibold disabled:opacity-30">{{ 'action.create' | t }}</button>
         </div>
       </form>
     </div>
@@ -47,13 +43,20 @@ export class CreateDialog {
   private readonly nameInput = viewChild.required<ElementRef<HTMLInputElement>>('nameInput');
 
   constructor() {
-    const off = inject(EscStack).push(() => this.closed.emit());
+    const off = inject(EscStack).push(() => this.leave());
     inject(DestroyRef).onDestroy(off);
     afterNextRender(() => {
       this.name.set(this.initialName());
       this.nameInput().nativeElement.value = this.initialName();
       this.nameInput().nativeElement.focus();
     });
+  }
+
+  // No buttons: closing (a click outside, Esc) keeps it when it has a name; Enter too
+  protected leave(): void {
+    if (this.busy()) return;
+    if (this.name().trim()) this.create();
+    else this.closed.emit();
   }
 
   protected create(): void {
