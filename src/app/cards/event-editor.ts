@@ -1,5 +1,5 @@
 import { DeviceDetectionService } from '../core/services/device-detection.service';
-import { Component, OnInit, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, effect, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -7,7 +7,8 @@ import { TranslationKey } from '../core/i18n/translations';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { DateField } from '../core/ui/date/date';
 import { Icon } from '../core/ui/icon/icon';
-import { ActionChoice, ActionSheet } from '../core/ui/confirm';
+import { ActionChoice, ActionSheet, ConfirmDelete } from '../core/ui/confirm';
+import { Sheet } from '../core/ui/sheet/sheet';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { SelectField, SelectOption } from '../core/ui/select/select';
 import { TimeField } from '../core/ui/time/time';
@@ -57,15 +58,17 @@ let carried: Model | null = null;
 @Component({
   selector: 'app-event-editor',
   host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
-  imports: [AddField, CreateDialog, RowMenu, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [AddField, ConfirmDelete, CreateDialog, RowMenu, Sheet, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
       #page
       [bleed]="desktop"
       [inline]="inline()"
-      [actions]="!readOnly()"
-      [dirty]="dirty()"
+      [actions]="!readOnly() && (!desktop || inline())"
+      [dirty]="(!desktop || inline()) && dirty()"
+      [cancelCloses]="!desktop || inline()"
+      (cancel)="leave()"
       [canSave]="canSave()"
       [deletable]="!!entry().id"
       [confirmDelete]="!series()"
@@ -83,6 +86,20 @@ let carried: Model | null = null;
           <!-- (Open in full page, Ctrl+Enter; a new one takes what's typed along) -->
           @if (!inline()) {
             <button type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
+          }
+          <!-- (a saved one, on a card: ⋯ — Delete) -->
+          @if (entry().id && !readOnly() && !inline()) {
+            <button #moreBtn type="button" (click)="moreOpen.set(!moreOpen())" [attr.aria-expanded]="moreOpen()" [appTip]="'lessons.more' | t" tipSide="bottom" [attr.aria-label]="'lessons.more' | t" class="head-btn !px-1.5"><app-icon name="dots" /></button>
+            @if (moreOpen()) {
+              <app-sheet [origin]="moreBtn" [fit]="true" (closed)="moreOpen.set(false)">
+                <div class="menu-list">
+                  <button type="button" (click)="moreOpen.set(false); series() ? remove() : deleting.set(moreBtn)" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
+                </div>
+              </app-sheet>
+            }
+            @if (deleting(); as origin) {
+              <app-confirm-delete [origin]="origin" (confirmed)="remove()" (closed)="deleting.set(null)" />
+            }
           }
         </div>
 
@@ -509,6 +526,18 @@ export class EventEditor implements OnInit {
     { value: 'following', label: 'series.deleteFollowing', danger: true },
   ];
 
+  constructor() {
+    // Desktop: a saved single event saves itself a moment after each change
+    effect(() => {
+      this.model();
+      untracked(() => {
+        clearTimeout(this.autosaveTimer);
+        if (this.desktop && this.entry().id) this.autosaveTimer = setTimeout(() => this.autosave(), 1000);
+      });
+    });
+    inject(DestroyRef).onDestroy(() => clearTimeout(this.autosaveTimer));
+  }
+
   ngOnInit(): void {
     const event = this.opened();
     if (event) {
@@ -640,6 +669,43 @@ export class EventEditor implements OnInit {
     const m = this.model();
     const duration = Math.max(0, timeToMin(m.endTime) - timeToMin(m.startTime));
     this.patch({ startTime: value, endTime: minToTime(timeToMin(value) + duration) });
+  }
+
+  // ---- Desktop: saved by itself
+  protected readonly moreOpen = signal(false);
+  protected readonly deleting = signal<HTMLElement | null>(null);
+  private autosaveTimer: ReturnType<typeof setTimeout> | undefined;
+
+  // Closing (a click outside, Esc): changed — saved (a new one created, a series asked first);
+  // nothing to save (empty, or the times wrong): just closed
+  protected leave(): void {
+    clearTimeout(this.autosaveTimer);
+    if (this.readOnly() || !this.dirty() || !this.canSave()) this.page().close();
+    else this.save();
+  }
+
+  // A saved single event: each change saved a moment after it (the card stays open)
+  private autosave(): void {
+    const id = this.entry().id;
+    if (!id || this.series() || this.readOnly() || !this.dirty() || !this.canSave()) return;
+    this.events.update(id, this.toInput());
+    this.snapshot.set(EventEditor.key(this.model()));
+  }
+
+  private toInput(): EventInput {
+    const m = this.model();
+    return {
+      title: m.title.trim() || null,
+      repeat: m.repeat,
+      repeatInterval: m.repeat === 'Never' ? 1 : m.repeatInterval,
+      // the end of that day, local time
+      repeatUntil: m.repeat !== 'Never' && m.repeatUntil ? new Date(`${m.repeatUntil}T23:59:59.999`).toISOString() : null,
+      studentIds: m.invitees.studentIds,
+      groupIds: m.invitees.groupIds,
+      lessonIds: m.lessonIds,
+      startsAt: new Date(`${m.date}T${m.startTime}`).toISOString(),
+      durationMinutes: timeToMin(m.endTime) - timeToMin(m.startTime),
+    };
   }
 
   protected save(): void {
