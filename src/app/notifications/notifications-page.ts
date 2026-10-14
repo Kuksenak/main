@@ -30,19 +30,19 @@ interface Item {
   imports: [Icon, ScrollArea, TranslatePipe],
   template: `
     @if (desktop) {
-      <!-- Desktop (as Notion's inbox): the head, then a row a line — its icon, the title, what it said,
-           when at the right; new ones with a blue dot -->
+      <!-- Desktop (as Notion's inbox): the head, then a row a line — the title, what it said, when at
+           the right; new ones with a blue dot (opening nothing for now) -->
       <main class="flex min-h-0 w-full flex-1 flex-col px-2 pb-4">
         <h1 class="flex h-12 shrink-0 items-center px-2 text-[1.25rem] font-semibold">{{ 'sidebar.inbox' | t }}</h1>
         <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
           @if (items(); as list) {
             <div class="flex flex-col gap-px">
               @for (n of list; track n.id) {
-                <button type="button" (click)="open(n.url)" class="side-row relative !h-9 !gap-2.5 !pl-5">
+                <!-- (not opening anything for now) -->
+                <div class="side-row relative !h-9 !gap-2.5 !pl-5 hover:!bg-transparent">
                   @if (isNew(n)) {
                     <span class="absolute left-1.5 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-[var(--accent)]"></span>
                   }
-                  <app-icon name="bell" class="side-glyph" />
                   <span class="min-w-0 flex-1 truncate">
                     <span [class.font-semibold]="isNew(n)" [class.font-medium]="!isNew(n)">{{ n.title }}</span>
                     @if (n.body) {
@@ -50,7 +50,7 @@ interface Item {
                     }
                   </span>
                   <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(n.createdAt) }}</span>
-                </button>
+                </div>
               } @empty {
                 <p class="px-2 py-10 text-[0.875rem] opacity-40">{{ 'notifications.empty' | t }}</p>
               }
