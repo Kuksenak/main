@@ -115,8 +115,8 @@ html.dark:root {
   box-shadow: none;
 }
 
-/* Settings as a menu (the new style): no cards — rows as menu items, its groups apart by a
-   hairline, the email a small gray line on top */
+/* Settings as a menu (the new style): no cards, no lines — rows as menu items, the email a small
+   gray line on top */
 .settings-menu {
   width: 18rem;
 }
@@ -127,9 +127,15 @@ html.dark:root {
 }
 .settings-menu > div + div,
 .settings-menu > div + .card {
-  border-top: 1px solid var(--separator);
   margin-top: 0.25rem;
-  padding-top: 0.25rem;
+}
+/* (no lines inside: not between its groups, not under its rows) */
+.settings-menu .menu-sep,
+.settings-menu .sub-rows .list-row::after {
+  display: none;
+}
+.settings-menu * {
+  border-color: transparent;
 }
 .settings-menu .list-row {
   min-height: 2rem;
