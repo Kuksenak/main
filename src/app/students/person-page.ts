@@ -72,8 +72,10 @@ import { CreateDialog } from '../cards/create-dialog';
 
           <div class="flex flex-col gap-4 px-5 pt-2">
             @if (kind() === 'student') {
-              <!-- Email: a gray line under the name (as a subtitle), edited in place -->
-              <input [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'students.addEmail' | t" class="-mt-3 w-full bg-transparent text-[0.875rem] opacity-60 outline-none placeholder:opacity-60 focus:opacity-100" />
+              <!-- Email: a gray line under the name (as a subtitle), edited in place; none: ⋯ → Add email -->
+              @if (d.email || emailShown()) {
+              <input data-email [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'students.addEmail' | t" class="-mt-3 w-full bg-transparent text-[0.875rem] opacity-60 outline-none placeholder:opacity-60 focus:opacity-100" />
+              }
               @if (realId(); as sid) {
                 <app-student-link [studentId]="sid" />
                 <app-lessons-card [studentId]="sid" />
@@ -122,6 +124,9 @@ import { CreateDialog } from '../cards/create-dialog';
     @if (menuOpen()) {
       <app-sheet [origin]="menuAnchor()?.nativeElement ?? null" [fit]="true" (closed)="menuOpen.set(false)">
         <div class="menu-list">
+          @if (kind() === 'student' && !draft().email && !emailShown()) {
+            <button type="button" (click)="addEmail()" class="menu-item"><app-icon name="mail" /><span class="flex-1">{{ 'students.addEmail' | t }}</span></button>
+          }
           @if (link(); as k) {
             <button type="button" (click)="menuOpen.set(false); k.copy()" [disabled]="!k.token()" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
             <button type="button" (click)="menuOpen.set(false); k.askNewLink(menuAnchor()!.nativeElement)" [disabled]="!k.token()" class="menu-item"><app-icon name="repeat" /><span class="flex-1">{{ 'students.newLink' | t }}</span></button>
@@ -161,6 +166,13 @@ export class PersonPage {
   protected readonly menuOpen = signal(false);
   // The student's link (its Copy link / New link are in the head)
   protected readonly link = viewChild(StudentLink);
+  // ⋯ → Add email: its line under the name, ready to type in
+  protected readonly emailShown = signal(false);
+  protected addEmail(): void {
+    this.menuOpen.set(false);
+    this.emailShown.set(true);
+    setTimeout(() => document.querySelector<HTMLInputElement>('[data-email]')?.focus());
+  }
   protected readonly colorOpen = signal(false);
   protected readonly deleting = signal<HTMLElement | null>(null);
   protected readonly menuAnchor = viewChild<ElementRef<HTMLElement>>('menuBtn');
