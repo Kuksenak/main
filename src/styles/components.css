@@ -728,6 +728,20 @@ html.dark .btn-white {
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
+.add-opt.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+.add-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.add-icon svg {
+  stroke-width: 1.6;
+}
 .add-opt b {
   font-weight: 650;
 }

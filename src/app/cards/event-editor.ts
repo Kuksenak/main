@@ -47,6 +47,7 @@ interface Model {
 
 /** Event card (new or existing), opened on the NavStack. */
 import { AddField, AddItem } from '../core/ui/add-field';
+import { PeekService } from '../layout/peek.service';
 @Component({
   selector: 'app-event-editor',
   imports: [AddField, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
@@ -147,7 +148,7 @@ import { AddField, AddItem } from '../core/ui/add-field';
               <button type="button" (click)="detach(l.id)" [attr.aria-label]="'action.remove' | t" class="edit-only flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/r:opacity-60"><app-icon name="close" class="size-3.5" /></button>
             </div>
           }
-          <app-add-field class="edit-only" [class.pl-[1.9375rem]]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.addLesson' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" />
+          <app-add-field class="edit-only" [class.pl-[1.9375rem]]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newLesson()" [section]="'event.fromLibrary' | t" itemIcon="page" />
         </div>
       </div>
       </div>
@@ -554,6 +555,12 @@ export class EventEditor implements OnInit {
 
   protected attach(id: string): void {
     this.patch({ lessonIds: [...this.model().lessonIds, id] });
+  }
+
+  // New lesson (from the lessons' field): written in a popup over this card, attached once saved
+  private readonly peek = inject(PeekService);
+  protected newLesson(): void {
+    this.peek.open('lesson', null, { over: true, onCreated: (id) => this.attach(id) });
   }
 
   protected uninvite(id: string): void {

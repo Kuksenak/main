@@ -23,16 +23,36 @@ export interface AddItem {
       @if (icon(); as i) {
         <app-icon [name]="i" class="size-4 shrink-0 opacity-45" />
       }
-      <input #inp [value]="query()" (input)="query.set(inp.value); index.set(0); show()" (blur)="hide()" (keydown)="key($event)" [placeholder]="placeholder()" autocomplete="off" class="min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-45" />
+      <input #inp [value]="query()" (input)="query.set(inp.value); index.set(0); show()" (focus)="openOnFocus() && show()" (blur)="hide()" (keydown)="key($event)" [placeholder]="placeholder()" autocomplete="off" class="min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-45" />
     </label>
     @if (pos(); as p) {
-      @if (query().trim() && matches().length) {
+      @if ((query().trim() || openOnFocus()) && (matches().length || action())) {
         <div appToBody class="add-drop" [style.left.px]="p.left" [style.top.px]="p.top" [style.width.px]="p.width">
+          <!-- (an action first, e.g. New lesson; then the section's items) -->
+          @if (action(); as a) {
+            <button type="button" (mousedown)="$event.preventDefault(); act()" (mouseenter)="index.set(0)" class="add-opt with-icon" [class.is-on]="index() === 0">
+              <app-icon [name]="a.icon" class="add-icon" />{{ a.label }}
+            </button>
+            @if (matches().length) {
+              <div class="menu-sep"></div>
+            }
+          }
+          @if (section() && matches().length) {
+            <p class="px-2.5 pb-0.5 pt-1 text-[0.75rem] font-medium opacity-50">{{ section() }}</p>
+          }
           @for (m of matches(); track m.id; let i = $index) {
-            <button type="button" (mousedown)="$event.preventDefault(); pick(m)" (mouseenter)="index.set(i)" class="add-opt" [class.is-on]="i === index()">
-              <span class="block truncate">{{ m.before }}<b>{{ m.hit }}</b>{{ m.after }}</span>
-              @if (m.hint) {
-                <span class="block truncate text-[0.75rem] opacity-60">{{ m.hint }}</span>
+            <button type="button" (mousedown)="$event.preventDefault(); pick(m)" (mouseenter)="index.set(i + shift())" class="add-opt" [class.is-on]="i + shift() === index()" [class.with-icon]="!!itemIcon()">
+              @if (itemIcon(); as ic) {
+                <app-icon [name]="ic" class="add-icon" />
+                <span class="min-w-0 flex-1 truncate">{{ m.before }}<b>{{ m.hit }}</b>{{ m.after }}</span>
+                @if (m.hint) {
+                  <span class="shrink-0 text-[0.75rem] opacity-50">{{ m.hint }}</span>
+                }
+              } @else {
+                <span class="block truncate">{{ m.before }}<b>{{ m.hit }}</b>{{ m.after }}</span>
+                @if (m.hint) {
+                  <span class="block truncate text-[0.75rem] opacity-60">{{ m.hint }}</span>
+                }
               }
             </button>
           }
@@ -49,6 +69,17 @@ export class AddField {
   /** Already added: not offered. */
   readonly exclude = input<readonly string[]>([]);
   readonly picked = output<string>();
+  /** The list on focus too, before typing (a library to pick from). */
+  readonly openOnFocus = input(false);
+  /** An action at the top of the list (e.g. New lesson): `acted` when picked. */
+  readonly action = input<{ label: string; icon: IconName } | null>(null);
+  readonly acted = output<void>();
+  /** A label over the items (e.g. "From the library"). */
+  readonly section = input<string | null>(null);
+  /** An icon before each item (its hint then at the right). */
+  readonly itemIcon = input<IconName | null>(null);
+  // (the action, when there's one, is the first row: the items' indexes after it)
+  protected readonly shift = computed(() => (this.action() ? 1 : 0));
 
   protected readonly query = signal('');
   protected readonly index = signal(0);
@@ -92,7 +123,7 @@ export class AddField {
   }
 
   protected key(e: KeyboardEvent): void {
-    const n = this.matches().length;
+    const n = this.matches().length + this.shift();
     if (e.key === 'ArrowDown' && n) {
       e.preventDefault();
       this.index.set((this.index() + 1) % n);
@@ -101,8 +132,16 @@ export class AddField {
       this.index.set((this.index() - 1 + n) % n);
     } else if (e.key === 'Enter' && n) {
       e.preventDefault();
-      this.pick(this.matches()[Math.min(this.index(), n - 1)]);
+      const i = Math.min(this.index(), n - 1);
+      if (i < this.shift()) this.act();
+      else this.pick(this.matches()[i - this.shift()]);
     }
+  }
+
+  protected act(): void {
+    this.acted.emit();
+    this.query.set('');
+    (this.box().nativeElement.querySelector('input') as HTMLInputElement).blur();
   }
 
   protected pick(m: AddItem): void {
