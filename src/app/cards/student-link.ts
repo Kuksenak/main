@@ -23,15 +23,12 @@ export function studentPageUrl(token: string): string {
   host: { class: 'flex flex-col gap-1.5' },
   template: `
     @if (desktop) {
-      <!-- Desktop, in the new style (as the page's properties): the PIN — set or not, Reset when set;
-           the hint under it. (The link: Copy link and New link in the page's head, see PersonPage) -->
+      <!-- Desktop, in the new style (as the page's properties): the PIN — set or not; the hint under
+           it. (Copy link, New link, Reset PIN: in the page's head and ⋯, see PersonPage) -->
       <div class="flex flex-col">
         <div class="flex h-9 items-center gap-3 text-[0.875rem]">
           <span class="flex w-36 shrink-0 items-center gap-2 opacity-50"><app-icon name="lock" class="size-4" />PIN</span>
           <span class="min-w-0 flex-1 px-1.5" [class.opacity-40]="!hasPin()">{{ (hasPin() ? 'students.pinSet' : 'students.pinNone') | t }}</span>
-          @if (hasPin()) {
-            <button type="button" (click)="resetPin()" class="head-btn">{{ 'students.resetPin' | t }}</button>
-          }
         </div>
         <p class="pt-1 text-[0.75rem] opacity-45">{{ 'students.linkHint' | t }}</p>
       </div>
@@ -75,7 +72,7 @@ export class StudentLink {
   private http = inject(HttpClient);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   readonly token = signal<string | null>(null);
-  protected readonly hasPin = signal(false);
+  readonly hasPin = signal(false);
   readonly copied = signal(false);
   protected readonly asking = signal<HTMLElement | null>(null);
   protected readonly choices: ActionChoice[] = [{ value: 'reset', label: 'students.newLink', danger: true }];
@@ -96,7 +93,7 @@ export class StudentLink {
   }
 
   // Forgotten: the next visit (on any device) makes a new one
-  protected resetPin(): void {
+  resetPin(): void {
     this.http
       .post(`${environment.apiUrl}/students/${this.studentId()}/pin/reset`, {})
       .pipe(catchError(() => of(null)))

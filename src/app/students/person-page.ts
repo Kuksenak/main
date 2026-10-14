@@ -39,7 +39,7 @@ import { CreateDialog } from '../cards/create-dialog';
   imports: [AddField, CreateDialog, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
-    <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
+    <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4">
       <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-1 pb-10">
         @if (!exists()) {
           <p class="py-10 text-center text-[0.875rem] opacity-40">{{ 'students.notFound' | t }}</p>
@@ -70,7 +70,7 @@ import { CreateDialog } from '../cards/create-dialog';
             </button>
           </div>
 
-          <div class="flex flex-col gap-4 pl-5 pt-2">
+          <div class="flex flex-col gap-4 px-5 pt-2">
             @if (kind() === 'student') {
               <!-- Email (plain, as the title), edited in place -->
               <label class="flex h-9 items-center gap-3 text-[0.875rem]">
@@ -128,6 +128,8 @@ import { CreateDialog } from '../cards/create-dialog';
           @if (link(); as k) {
             <button type="button" (click)="menuOpen.set(false); k.copy()" [disabled]="!k.token()" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
             <button type="button" (click)="menuOpen.set(false); k.askNewLink(menuAnchor()!.nativeElement)" [disabled]="!k.token()" class="menu-item"><app-icon name="repeat" /><span class="flex-1">{{ 'students.newLink' | t }}</span></button>
+            <!-- (no PIN yet: nothing to reset) -->
+            <button type="button" (click)="menuOpen.set(false); k.resetPin()" [disabled]="!k.hasPin()" class="menu-item"><app-icon name="lock" /><span class="flex-1">{{ 'students.resetPin' | t }}</span></button>
             <div class="menu-sep"></div>
           }
           <button type="button" (click)="askDelete()" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
