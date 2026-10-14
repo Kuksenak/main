@@ -64,7 +64,8 @@ import { TrashService } from '../core/services/trash.service';
               <app-icon name="chevron-down" class="!size-3.5 !opacity-50" />
             </button>
             <!-- The whole lesson as the student sees it -->
-            <button type="button" (click)="previewAll.set(true)" class="head-btn">
+            <!-- (nothing on it yet: nothing to preview) -->
+            <button type="button" (click)="previewAll.set(true)" [disabled]="empty()" class="head-btn disabled:opacity-30">
               <app-icon name="popout" />{{ 'lessons.studentSees' | t }}
             </button>
             <!-- Publish (an open padlock): makes its public link; then Unpublish (a closed one) in its place -->
@@ -251,6 +252,7 @@ export class LessonPage {
   protected readonly levelOpen = signal(false);
   protected readonly levelBtn = viewChild<ElementRef<HTMLButtonElement>>('levelBtn');
   protected readonly levelColor = levelColor;
+  protected readonly empty = computed(() => !this.s.draft().blocks.some((b) => b.text?.trim() || b.url || b.items?.some((x) => x.trim()) || b.options?.some((x) => x.trim())));
   protected readonly previewAll = signal(false);
   // Locked: all its tasks (the teacher's own too) as in Preview
   protected readonly lockedBlocks = computed(() => cleanLesson(this.s.draft()).blocks.map(forStudents));
