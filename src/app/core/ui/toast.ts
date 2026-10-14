@@ -29,18 +29,19 @@ export class ToastService {
   }
 }
 
-/** The notes, at the bottom right: small, solid, a hairline and a soft shadow. */
+/** The notes, at the bottom right: dark (light in the dark theme), Undo as a button on it. */
 @Component({
   selector: 'app-toasts',
   imports: [Icon, TranslatePipe],
   template: `
     <div class="pointer-events-none fixed bottom-4 right-4 z-[2600] flex flex-col items-end gap-2">
       @for (t of service.toasts(); track t.id) {
-        <div class="pointer-events-auto flex items-center gap-2 rounded-lg bg-[var(--dialog-bg)] py-2 pl-3 pr-3 text-[0.8125rem] font-[450] text-[var(--text)] shadow-[var(--shadow-popover)] [animation:dropdownIn_180ms_var(--ease-out-quick)]">
-          <app-icon [name]="t.icon" class="size-4 shrink-0 opacity-70" />
+        <!-- (dark on the light page and light on the dark one: clear at a glance) -->
+        <div class="pointer-events-auto flex min-h-11 items-center gap-2.5 rounded-xl bg-[color-mix(in_srgb,var(--text)_92%,var(--app-bg))] py-2.5 pl-4 pr-4 text-[0.875rem] font-medium text-[var(--app-bg)] shadow-[0_8px_24px_rgb(0_0_0/0.2)] [animation:dropdownIn_180ms_var(--ease-out-quick)]" [class.!pr-2]="!!t.action">
+          <app-icon [name]="t.icon" class="size-[1.125rem] shrink-0 opacity-80" />
           <span>{{ t.text | t }}</span>
           @if (t.action; as a) {
-            <button type="button" (click)="a.run(); service.dismiss(t.id)" class="-my-1 ml-1 rounded-md px-1.5 py-0.5 font-semibold hover:bg-[var(--tint)]">{{ a.label | t }}</button>
+            <button type="button" (click)="a.run(); service.dismiss(t.id)" class="ml-2 rounded-lg bg-[color-mix(in_srgb,var(--app-bg)_16%,transparent)] px-3 py-1 font-semibold hover:bg-[color-mix(in_srgb,var(--app-bg)_26%,transparent)]">{{ a.label | t }}</button>
           }
         </div>
       }

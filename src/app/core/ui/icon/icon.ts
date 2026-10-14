@@ -93,7 +93,7 @@ export type IconName =
         @case ('wand') { <path d="m4 20 11-11M13.5 7.5l3 3" /><path d="M17 3v3M15.5 4.5h3M20 8.5v2.5M18.75 9.75h2.5M10 3.5v2M9 4.5h2" /> }
         <!-- (Notion Calendar's: today's date on the page, a page behind) -->
         @case ('calendar-day') { <path d="M4.5 16.5V6a1.5 1.5 0 0 1 1.5-1.5h10.5" /><rect x="7" y="7" width="13.5" height="13.5" rx="2" /><path d="M7 10.5h13.5" /><text x="13.75" y="18.4" text-anchor="middle" font-size="7.5" font-weight="600" fill="currentColor" stroke="none">{{ day }}</text> }
-        @case ('restore') { <path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5" /> }
+        @case ('restore') { <path d="M9.5 14.5 4.5 9.5l5-5" /><path d="M4.5 9.5h10a5 5 0 0 1 0 10H12" /> }
         @case ('expand') { <path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5" /> }
         @case ('library') { <rect x="3.9" y="4" width="4" height="16" rx="0.75" /><rect x="7.9" y="4" width="4" height="16" rx="0.75" /><rect x="16.2" y="4" width="4" height="16" rx="0.75" transform="rotate(-14 16.2 20)" /> }
         @case ('clock') { <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /> }
