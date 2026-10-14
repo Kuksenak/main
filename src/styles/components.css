@@ -562,15 +562,16 @@ html.dark .btn-white {
 .tip {
   position: fixed;
   z-index: 3000;
-  max-width: 16rem;
+  max-width: 13rem;
   padding: 0.3rem 0.55rem;
   border-radius: 0.45rem;
   background: color-mix(in srgb, var(--text) 76%, var(--app-bg)); /* (as the notes in the corner) */
-  white-space: pre-line; /* (a line break in it: a new line) */
   color: var(--app-bg);
+  /* (one font in every hint: the app's, 12 px, one weight) */
+  font-family: inherit;
   font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1.25;
+  font-weight: 450;
+  line-height: 1.3;
   white-space: pre-line; /* (a line break in its text: a new line) */
   pointer-events: none;
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.16);
