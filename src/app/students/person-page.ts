@@ -34,7 +34,6 @@ interface Draft {
 import { AddField, AddItem } from '../core/ui/add-field';
 import { RowMenu } from '../core/ui/row-menu';
 import { CreateDialog } from '../cards/create-dialog';
-import { emailOk } from '../core/utils/text';
 @Component({
   selector: 'app-person-page',
   imports: [AddField, CreateDialog, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
@@ -50,10 +49,7 @@ import { emailOk } from '../core/utils/text';
           <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
             <input #nameInput [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
             @if (kind() === 'student') {
-              <!-- (Email: when there's one; Copy link — their page's) -->
-              @if (d.email) {
-                <a [attr.href]="'mailto:' + d.email" class="head-btn"><app-icon name="mail" />{{ 'students.actionMail' | t }}</a>
-              }
+              <!-- (Copy link — their page's) -->
               @if (link(); as k) {
                 <button type="button" (click)="k.copy()" [disabled]="!k.token()" [appTip]="(k.copied() ? 'lessons.copied' : 'students.copyLink') | t" tipSide="bottom" [attr.aria-label]="'students.copyLink' | t" class="head-btn !px-1.5 disabled:opacity-30"><app-icon [name]="k.copied() ? 'check' : 'link'" /></button>
               }
@@ -73,14 +69,6 @@ import { emailOk } from '../core/utils/text';
 
           <div class="flex flex-col gap-4 px-5 pt-2">
             @if (kind() === 'student') {
-              <!-- Email: a gray line under the name (as a subtitle), edited in place; none: ⋯ → Add email -->
-              @if (d.email || emailShown()) {
-              <input data-email [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'students.addEmail' | t" class="-mt-3 w-full bg-transparent text-[0.875rem] opacity-60 outline-none placeholder:opacity-60 focus:opacity-100" (focus)="emailFocus.set(true)" (blur)="emailFocus.set(false)" [class.!opacity-100]="emailWrong()" [class.text-[var(--danger)]]="emailWrong()" />
-              <!-- (not an email: said once typed — left; not saved until it is) -->
-              @if (emailWrong()) {
-                <p class="-mt-3 text-[0.75rem] text-[var(--danger)] opacity-80">{{ 'students.badEmail' | t }}</p>
-              }
-              }
               @if (realId(); as sid) {
                 <app-student-link [studentId]="sid" />
                 <app-lessons-card [studentId]="sid" />
@@ -129,9 +117,6 @@ import { emailOk } from '../core/utils/text';
     @if (menuOpen()) {
       <app-sheet [origin]="menuAnchor()?.nativeElement ?? null" [fit]="true" (closed)="menuOpen.set(false)">
         <div class="menu-list">
-          @if (kind() === 'student' && !draft().email && !emailShown()) {
-            <button type="button" (click)="addEmail()" class="menu-item"><app-icon name="mail" /><span class="flex-1">{{ 'students.addEmail' | t }}</span></button>
-          }
           @if (link(); as k) {
             <button type="button" (click)="menuOpen.set(false); k.copy()" [disabled]="!k.token()" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
             <button type="button" (click)="menuOpen.set(false); k.askNewLink(menuAnchor()!.nativeElement)" [disabled]="!k.token()" class="menu-item"><app-icon name="repeat" /><span class="flex-1">{{ 'students.newLink' | t }}</span></button>
@@ -171,15 +156,6 @@ export class PersonPage {
   protected readonly menuOpen = signal(false);
   // The student's link (its Copy link / New link are in the head)
   protected readonly link = viewChild(StudentLink);
-  // ⋯ → Add email: its line under the name, ready to type in
-  protected readonly emailShown = signal(false);
-  protected readonly emailFocus = signal(false);
-  protected readonly emailWrong = computed(() => !emailOk(this.draft().email) && !this.emailFocus());
-  protected addEmail(): void {
-    this.menuOpen.set(false);
-    this.emailShown.set(true);
-    setTimeout(() => document.querySelector<HTMLInputElement>('[data-email]')?.focus());
-  }
   protected readonly colorOpen = signal(false);
   protected readonly deleting = signal<HTMLElement | null>(null);
   protected readonly menuAnchor = viewChild<ElementRef<HTMLElement>>('menuBtn');
@@ -206,7 +182,7 @@ export class PersonPage {
   });
   // New student (from the members' field): asked in a small dialog, then added
   protected readonly newStudent = signal<string | null>(null);
-  protected readonly memberItems = computed<AddItem[]>(() => this.students.students().map((s) => ({ id: s.id, name: s.name, hint: s.email })));
+  protected readonly memberItems = computed<AddItem[]>(() => this.students.students().map((s) => ({ id: s.id, name: s.name, })));
 
   constructor() {
     // A new one: typing its name straight away
@@ -269,7 +245,7 @@ export class PersonPage {
     this.pendingSince = null;
     const d = this.draft();
     const now = JSON.stringify(d);
-    if (this.deleted || now === this.saved || !d.name.trim() || !emailOk(d.email)) return;
+    if (this.deleted || now === this.saved || !d.name.trim()) return;
     if (!this.openedId) {
       // A new one: created (once); what changed meanwhile is saved after
       if (this.id() || this.creating) return;
