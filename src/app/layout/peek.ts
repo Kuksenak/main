@@ -20,7 +20,7 @@ import { PeekService } from './peek.service';
   template: `
     @for (p of shown(); track p.n) {
       <!-- (under the menus and cards it opens: z 25; opened from a card: above it, 35) -->
-      <div class="fixed inset-0 z-[25] flex items-center justify-center" (mousedown)="peek.close()" [class.!z-[35]]="p.over">
+      <div class="fixed inset-0 z-[25] flex items-start justify-center pt-[8vh]" (mousedown)="peek.close()" [class.!z-[35]]="p.over">
         <div class="dialog-panel flex max-h-[85vh] w-[min(45rem,92vw)] flex-col overflow-hidden !rounded-xl pt-3" (mousedown)="$event.stopPropagation()">
           @if (p.kind === 'lesson') {
             <app-lesson-page [lessonId]="p.id" (created)="created($event)">
