@@ -74,16 +74,17 @@ interface Found {
     <!-- (room at the right for its scroll thumb: inside the sidebar, not over its edge) -->
     <app-scroll-area class="min-h-0 flex-1 pr-2" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-2 pt-2">
       <!-- Calendar: the schedule -->
-      <a routerLink="/schedule" routerLinkActive="is-on" class="side-row">
+      <div routerLink="/schedule" routerLinkActive="is-on" role="link" tabindex="0" class="side-row cursor-pointer">
         <span class="flex-1">{{ 'sidebar.calendar' | t }}</span>
-        <app-icon name="arrow-up-right" class="size-4 shrink-0 opacity-45" />
-      </a>
+        <a routerLink="/schedule" (click)="$event.stopPropagation()" [appTip]="'sidebar.calendar' | t" tipSide="right" [attr.aria-label]="'sidebar.calendar' | t" class="side-add"><app-icon name="arrow-up-right" class="size-4" /></a>
+        <button type="button" (click)="$event.stopPropagation(); create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
+      </div>
 
       <!-- Sections (as Notion's): a head folds them (+ on hover adds); the first 5, then View all -->
       <div class="side-head group mt-1.5">
         <button type="button" (click)="fold('upcoming')" [attr.aria-expanded]="!folded().includes('upcoming')" class="flex flex-1 items-center gap-1 text-left">
+          <app-icon name="chevron-down" class="size-4 shrink-0 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('upcoming')" />
           {{ 'sidebar.upcoming' | t }}
-          <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('upcoming')" />
         </button>
       </div>
       @if (!folded().includes('upcoming')) {
@@ -99,10 +100,10 @@ interface Found {
 
       <div class="side-head group mt-1.5">
         <button type="button" (click)="fold('lessons')" [attr.aria-expanded]="!folded().includes('lessons')" class="flex flex-1 items-center gap-1 text-left">
-          {{ 'nav.lessons' | t }}
-          <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('lessons')" />
+          <app-icon name="chevron-down" class="size-4 shrink-0 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('lessons')" />
+          {{ 'sidebar.library' | t }}
         </button>
-        <a routerLink="/lessons" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add !opacity-45 hover:!opacity-100"><app-icon name="arrow-up-right" class="size-4" /></a>
+        <a routerLink="/lessons" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add"><app-icon name="arrow-up-right" class="size-4" /></a>
         <button type="button" (click)="create('lesson')" [appTip]="'lessons.add' | t" tipSide="right" [attr.aria-label]="'lessons.add' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('lessons')) {
@@ -117,10 +118,10 @@ interface Found {
 
       <div class="side-head group mt-1.5">
         <button type="button" (click)="fold('people')" [attr.aria-expanded]="!folded().includes('people')" class="flex flex-1 items-center gap-1 text-left">
+          <app-icon name="chevron-down" class="size-4 shrink-0 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('people')" />
           {{ 'nav.students' | t }}
-          <app-icon name="chevron-down" class="size-4 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('people')" />
         </button>
-        <a routerLink="/students" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add !opacity-45 hover:!opacity-100"><app-icon name="arrow-up-right" class="size-4" /></a>
+        <a routerLink="/students" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add"><app-icon name="arrow-up-right" class="size-4" /></a>
         <button type="button" (click)="create('student')" [appTip]="'sidebar.newStudent' | t" tipSide="right" [attr.aria-label]="'sidebar.newStudent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('people')) {
