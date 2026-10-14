@@ -17,9 +17,10 @@ function pad(n: number): string {
   return String(n).padStart(2, '0');
 }
 
-const CLS_SELECTED = 'option option-selected';
-const CLS_CURRENT = 'option option-current';
-const CLS_PLAIN = 'option';
+// (the new style: the chosen one a gray fill, the current one in blue)
+const CLS_SELECTED = 'pick-cell is-on';
+const CLS_CURRENT = 'pick-cell is-now';
+const CLS_PLAIN = 'pick-cell';
 
 @Component({
   selector: 'app-time',

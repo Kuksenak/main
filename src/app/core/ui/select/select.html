@@ -107,31 +107,21 @@
         </app-scroll-area>
       </div>
     } @else {
-      <!-- Desktop: a compact dropdown; overflow-visible: the scroll indicator sits just outside -->
-      <div class="popover-panel min-w-40 !overflow-visible p-3"><!-- 12px around, like the calendar -->
-        <app-scroll-area class="max-h-72" contentClass="gap-0.5">
+      <!-- Desktop: a menu as the others (the new style) — a row each, ✓ at the right of the chosen one -->
+      <div class="pick-panel min-w-40 !overflow-visible">
+        <app-scroll-area class="max-h-72" contentClass="gap-px">
         @for (sec of sections(); track $index) {
           @if (sec.label) {
-            <div class="text-footnote px-3 pb-1 pt-2 opacity-50">{{ sec.label }}</div>
+            <div class="px-2 pb-1 pt-2 text-[0.75rem] font-medium opacity-50">{{ sec.label }}</div>
           }
           @for (opt of sec.options; track opt.value) {
-          <button
-            type="button"
-            (click)="select(opt)"
-            class="w-full flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-md text-subhead text-left transition-[transform,background-color] active:scale-[0.98] [-webkit-tap-highlight-color:transparent]"
-            [class]="isSelected(opt)
-              ? 'option-selected'
-              : 'option'"
-          >
-            <!-- Dropdowns: the check on the left (lists in cards have it on the right) -->
-            <span class="flex w-4 shrink-0 justify-center">
+            <button type="button" (click)="select(opt)" class="menu-item" [class.font-medium]="isSelected(opt)">
+              <span class="min-w-0 flex-1 truncate">{{ opt.label }}</span>
               @if (isSelected(opt)) {
-                <app-icon name="check" [strokeWidth]="2.5" class="size-4" />
+                <app-icon name="check" [strokeWidth]="2" class="size-4 shrink-0 opacity-70" />
               }
-            </span>
-            <span>{{ opt.label }}</span>
-          </button>
-        }
+            </button>
+          }
         }
         </app-scroll-area>
       </div>

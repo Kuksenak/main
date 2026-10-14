@@ -634,6 +634,48 @@ html.dark .btn-white {
 .menu-item.is-danger:hover:not(:disabled) {
   color: var(--brand-orange, #f97316);
 }
+/* Pickers (desktop: select, date, time) as the menus: the dialogs' color, a 4 px inset */
+.pick-panel {
+  border-radius: 10px;
+  background: var(--dialog-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-dialog);
+  padding: 0.25rem;
+  animation: dropdownIn 160ms var(--ease-out-quick);
+}
+.pick-cell:hover {
+  background: var(--tint);
+}
+.pick-cell.is-on {
+  background: var(--tint-strong);
+  font-weight: 500;
+}
+.pick-cell.is-now:not(.is-on) {
+  color: var(--accent);
+}
+.pick-day {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+.pick-day:hover {
+  background: var(--tint);
+}
+.pick-day.is-now {
+  color: var(--accent);
+  font-weight: 500;
+}
+.pick-day.is-on {
+  background: var(--text);
+  color: var(--app-bg);
+  font-weight: 500;
+}
+
 .menu-sep {
   margin: 0.25rem -0.25rem;
   height: 1px;

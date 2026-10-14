@@ -36,7 +36,7 @@
       (detach)="close()"
     >
       <!-- Two narrow columns, edges fading out (they loop), no scrollbars -->
-      <div class="popover-panel w-max p-2.5"><!-- as wide as the columns; compact like the date picker -->
+      <div class="pick-panel w-max !p-1.5"><!-- as wide as the columns; compact like the date picker -->
 
         <div class="flex gap-1">
           <!-- Hours -->
@@ -46,7 +46,7 @@
                 type="button"
                 (click)="selectHour(h)"
                 [attr.data-active]="activeHour() === h ? '' : null"
-                class="w-14 rounded-md py-1 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
+                class="w-14 rounded-md py-1 text-center text-[0.875rem] tabular-nums"
                 [class]="hourClass(h)"
               >{{ h.toString().padStart(2, '0') }}</button>
             }
@@ -61,7 +61,7 @@
                 type="button"
                 (click)="selectMinute(m)"
                 [attr.data-active]="activeMinute() === m ? '' : null"
-                class="w-14 rounded-md py-1 text-center text-[0.9375rem] tabular-nums transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
+                class="w-14 rounded-md py-1 text-center text-[0.875rem] tabular-nums"
                 [class]="minuteClass(m)"
               >{{ m.toString().padStart(2, '0') }}</button>
             }

@@ -33,47 +33,24 @@
       (backdropClick)="close()"
       (detach)="close()"
     >
-      <!-- Compact: the font as elsewhere, tighter cells -->
-      <div class="popover-panel w-64 p-2.5">
-
-        <!-- Header: month nav -->
-        <div class="flex items-center justify-between mb-1">
-          <button type="button" (click)="prevMonth()" [attr.aria-label]="'picker.prevMonth' | t"
-            class="size-8 flex items-center justify-center rounded-full hover:bg-[var(--highlight)] transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]">
-            <app-icon name="chevron-left" [strokeWidth]="2.5" class="size-4 opacity-70" />
-          </button>
-          <span class="text-subhead font-semibold text-balance">{{ monthLabel() }}</span>
-          <button type="button" (click)="nextMonth()" [attr.aria-label]="'picker.nextMonth' | t"
-            class="size-8 flex items-center justify-center rounded-full hover:bg-[var(--highlight)] transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]">
-            <app-icon name="chevron-right" [strokeWidth]="2.5" class="size-4 opacity-70" />
-          </button>
+      <!-- The new style (as the schedule's month): the month at the left, ‹ › at the right; the chosen
+           day a dark circle, today in blue -->
+      <div class="pick-panel w-[15.5rem] !p-2">
+        <div class="mb-1 flex items-center gap-0.5 pl-1.5">
+          <span class="flex-1 text-[0.875rem] font-medium">{{ monthLabel() }}</span>
+          <button type="button" (click)="prevMonth()" [attr.aria-label]="'picker.prevMonth' | t" class="head-btn !h-7 !px-1"><app-icon name="chevron-left" class="!size-4" /></button>
+          <button type="button" (click)="nextMonth()" [attr.aria-label]="'picker.nextMonth' | t" class="head-btn !h-7 !px-1"><app-icon name="chevron-right" class="!size-4" /></button>
         </div>
-
-        <!-- Weekday labels -->
-        <div class="grid grid-cols-7 mb-1">
+        <div class="grid grid-cols-7">
           @for (wd of weekdays(); track $index) {
-            <div class="h-6 flex items-center justify-center text-xs font-medium opacity-40">{{ wd }}</div>
+            <div class="flex h-7 items-center justify-center text-[0.75rem] opacity-45">{{ wd }}</div>
           }
         </div>
-
-        <!-- Days -->
         @for (week of weeks(); track $index) {
           <div class="grid grid-cols-7">
             @for (cell of week; track cell.date.getTime()) {
-              <div class="flex items-center justify-center py-px">
-                <button
-                  type="button"
-                  (click)="selectDay(cell)"
-                  class="size-8 rounded-full text-subhead tabular-nums flex items-center justify-center transition-[transform,background-color] active:scale-[0.96] [-webkit-tap-highlight-color:transparent]"
-                  [class.opacity-30]="!cell.inMonth"
-                  [class]="isSelected(cell.date)
-                    ? 'option-selected'
-                    : isToday(cell.date)
-                      ? 'option option-current'
-                      : 'option'"
-                >
-                  {{ cell.date.getDate() }}
-                </button>
+              <div class="flex items-center justify-center">
+                <button type="button" (click)="selectDay(cell)" class="pick-day" [class.opacity-35]="!cell.inMonth" [class.is-on]="isSelected(cell.date)" [class.is-now]="isToday(cell.date)">{{ cell.date.getDate() }}</button>
               </div>
             }
           </div>
