@@ -327,10 +327,10 @@ interface Found {
     @if (trashOpen()) {
       <app-sheet [origin]="trashAnchor()?.nativeElement ?? null" [fit]="true" (closed)="trashOpen.set(false)">
         <div class="flex w-[22rem] flex-col">
-          <!-- (its search as the search window's) -->
-          <label class="flex h-12 shrink-0 items-center gap-2.5 px-3">
-            <app-icon name="search" class="size-6 shrink-0 opacity-50" />
-            <input data-autofocus [value]="trashQuery()" (input)="trashQuery.set($any($event.target).value)" type="text" [placeholder]="'trash.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45" />
+          <!-- (its search as the search window's, smaller: a small menu) -->
+          <label class="flex h-10 shrink-0 items-center gap-2 px-2.5">
+            <app-icon name="search" class="size-[1.125rem] shrink-0 opacity-50" />
+            <input data-autofocus [value]="trashQuery()" (input)="trashQuery.set($any($event.target).value)" type="text" [placeholder]="'trash.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.875rem] outline-none placeholder:opacity-45" />
           </label>
           <div class="flex max-h-80 flex-col gap-px overflow-y-auto">
             @for (x of trashShown(); track x.kind + x.id) {
