@@ -114,13 +114,18 @@ export class AddField {
   }
 
   // At the field's left (as Notion Calendar's: beside the card, its top at the field's), kept in the
-  // window; no room at the left: under the field
+  // window; no room at the left: under it (over it when there's no room below)
   protected show(): void {
     const r = this.box().nativeElement.getBoundingClientRect();
     const width = 280;
     const top = Math.max(8, Math.min(r.top - 4, window.innerHeight - 8 - 320));
     if (r.left - 8 - width >= 8) this.pos.set({ left: r.left - 8 - width, top, width });
-    else this.pos.set({ left: r.left, top: r.bottom + 4, width: Math.max(r.width, 240) });
+    else {
+      // (no room at the left: under the field — or over it when there's no room below; as wide as
+      // a menu, not the field)
+      const below = window.innerHeight - r.bottom - 8 >= 320 + 4;
+      this.pos.set({ left: r.left, top: below ? r.bottom + 4 : Math.max(8, r.top - 4 - 320), width });
+    }
     this.offEsc ??= this.esc.push(() => (this.box().nativeElement.querySelector('input') as HTMLInputElement).blur());
   }
 
