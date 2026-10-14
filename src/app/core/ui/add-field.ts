@@ -1,0 +1,113 @@
+import { Component, DestroyRef, ElementRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { EscStack } from './esc-stack';
+import { Icon, IconName } from './icon/icon';
+import { ToBody } from './to-body';
+
+export interface AddItem {
+  id: string;
+  name: string;
+  hint?: string | null; // a second line (an email, "Group", a level)
+}
+
+/**
+ * Adding people / lessons (as Notion Calendar's): a field with its icon; typing
+ * lists what matches under it — as the menus, the typed part in bold, a hint below each — ↑ ↓ and Enter
+ * or a click add one, and the field is ready for the next.
+ */
+@Component({
+  selector: 'app-add-field',
+  imports: [Icon, ToBody],
+  host: { class: 'block' },
+  template: `
+    <label #box class="add-field">
+      @if (icon(); as i) {
+        <app-icon [name]="i" class="size-4 shrink-0 opacity-45" />
+      }
+      <input #inp [value]="query()" (input)="query.set(inp.value); index.set(0); show()" (blur)="hide()" (keydown)="key($event)" [placeholder]="placeholder()" autocomplete="off" class="min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-45" />
+    </label>
+    @if (pos(); as p) {
+      @if (query().trim() && matches().length) {
+        <div appToBody class="add-drop" [style.left.px]="p.left" [style.top.px]="p.top" [style.width.px]="p.width">
+          @for (m of matches(); track m.id; let i = $index) {
+            <button type="button" (mousedown)="$event.preventDefault(); pick(m)" (mouseenter)="index.set(i)" class="add-opt" [class.is-on]="i === index()">
+              <span class="block truncate">{{ m.before }}<b>{{ m.hit }}</b>{{ m.after }}</span>
+              @if (m.hint) {
+                <span class="block truncate text-[0.75rem] opacity-60">{{ m.hint }}</span>
+              }
+            </button>
+          }
+        </div>
+      }
+    }
+  `,
+})
+export class AddField {
+  /** null: none (under rows: the field in line with their names). */
+  readonly icon = input<IconName | null>('plus');
+  readonly placeholder = input('');
+  readonly items = input<AddItem[]>([]);
+  /** Already added: not offered. */
+  readonly exclude = input<readonly string[]>([]);
+  readonly picked = output<string>();
+
+  protected readonly query = signal('');
+  protected readonly index = signal(0);
+  protected readonly pos = signal<{ left: number; top: number; width: number } | null>(null);
+  private readonly box = viewChild.required<ElementRef<HTMLElement>>('box');
+  private readonly esc = inject(EscStack);
+  private offEsc: (() => void) | null = null;
+
+  // What matches the typed text (anywhere in the name), split for the bold part; the first 8
+  protected readonly matches = computed(() => {
+    const q = this.query().trim().toLocaleLowerCase();
+    const out = new Set(this.exclude());
+    return this.items()
+      .filter((it) => !out.has(it.id))
+      .map((it) => {
+        const at = q ? it.name.toLocaleLowerCase().indexOf(q) : 0;
+        return { ...it, at };
+      })
+      .filter((it) => it.at >= 0)
+      .sort((a, b) => a.at - b.at)
+      .slice(0, 8)
+      .map((it) => ({ ...it, before: it.name.slice(0, it.at), hit: it.name.slice(it.at, it.at + q.length), after: it.name.slice(it.at + q.length) }));
+  });
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.offEsc?.());
+  }
+
+  // Under the field (above it when there's no room below)
+  protected show(): void {
+    const r = this.box().nativeElement.getBoundingClientRect();
+    const below = window.innerHeight - r.bottom > 260;
+    this.pos.set({ left: r.left, top: below ? r.bottom + 4 : Math.max(8, r.top - 4 - Math.min(8, this.matches().length) * 52), width: Math.max(r.width, 240) });
+    this.offEsc ??= this.esc.push(() => (this.box().nativeElement.querySelector('input') as HTMLInputElement).blur());
+  }
+
+  protected hide(): void {
+    this.pos.set(null);
+    this.offEsc?.();
+    this.offEsc = null;
+  }
+
+  protected key(e: KeyboardEvent): void {
+    const n = this.matches().length;
+    if (e.key === 'ArrowDown' && n) {
+      e.preventDefault();
+      this.index.set((this.index() + 1) % n);
+    } else if (e.key === 'ArrowUp' && n) {
+      e.preventDefault();
+      this.index.set((this.index() - 1 + n) % n);
+    } else if (e.key === 'Enter' && n) {
+      e.preventDefault();
+      this.pick(this.matches()[Math.min(this.index(), n - 1)]);
+    }
+  }
+
+  protected pick(m: AddItem): void {
+    this.picked.emit(m.id);
+    this.query.set('');
+    this.index.set(0);
+  }
+}

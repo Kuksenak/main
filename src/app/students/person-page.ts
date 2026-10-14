@@ -2,7 +2,6 @@ import { Component, DestroyRef, ElementRef, afterNextRender, computed, effect, i
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LessonsCard } from '../cards/person-views';
-import { PickList, PickSection } from '../cards/pick-list';
 import { StudentLink } from '../cards/student-link';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -32,9 +31,10 @@ interface Draft {
  * color; ⋯ (Delete). Then a student's contact (email, phone) and their own page's link, or a
  * group's members; their lessons and events under it.
  */
+import { AddField, AddItem } from '../core/ui/add-field';
 @Component({
   selector: 'app-person-page',
-  imports: [ConfirmDelete, FormsModule, Icon, LessonsCard, PickList, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
+  imports: [AddField, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
@@ -85,7 +85,6 @@ interface Draft {
               <div class="flex flex-col gap-px">
                 <div class="side-head !pl-0">
                   <span class="flex-1">{{ 'groups.members' | t }} <span class="opacity-60">{{ d.studentIds.length }}</span></span>
-                  <button #addBtn type="button" (click)="picking.set(true)" [appTip]="'groups.addMembers' | t" tipSide="right" class="side-add !opacity-60"><app-icon name="plus" class="size-3.5" /></button>
                 </div>
                 @for (s of members(); track s.id) {
                   <div class="side-row group/m !px-0">
@@ -93,9 +92,9 @@ interface Draft {
                     <button type="button" (click)="router.navigate(['/students', 'student', s.id])" class="min-w-0 flex-1 truncate text-left">{{ s.name }}</button>
                     <button type="button" (click)="toggleMember(s.id)" [attr.aria-label]="'action.delete' | t" class="flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/m:opacity-60"><app-icon name="close" class="size-3.5" /></button>
                   </div>
-                } @empty {
-                  <p class="py-1 text-[0.875rem] opacity-40">{{ 'groups.noMembers' | t }}</p>
                 }
+                <!-- (adding: as the event's participants) -->
+                <app-add-field class="-ml-2" [class.pl-[1.6875rem]]="members().length" [icon]="members().length ? null : 'person'" [placeholder]="'groups.addMembers' | t" [items]="memberItems()" [exclude]="d.studentIds" (picked)="toggleMember($event)" />
               </div>
               @if (realId(); as gid) {
                 <app-lessons-card [groupId]="gid" />
@@ -105,10 +104,6 @@ interface Draft {
         }
       </app-scroll-area>
     </main>
-
-    @if (picking() && kind() === 'group') {
-      <app-pick-list [sections]="memberSections()" [selected]="draft().studentIds" (selectedChange)="patch({ studentIds: $event })" [origin]="addAnchor()?.nativeElement ?? null" (closed)="picking.set(false)" />
-    }
 
     @if (colorOpen()) {
       <app-sheet [origin]="colorAnchor()?.nativeElement ?? null" [fit]="true" (closed)="colorOpen.set(false)">
@@ -155,11 +150,9 @@ export class PersonPage {
 
   protected readonly menuOpen = signal(false);
   protected readonly colorOpen = signal(false);
-  protected readonly picking = signal(false);
   protected readonly deleting = signal<HTMLElement | null>(null);
   protected readonly menuAnchor = viewChild<ElementRef<HTMLElement>>('menuBtn');
   protected readonly colorAnchor = viewChild<ElementRef<HTMLElement>>('colorBtn');
-  protected readonly addAnchor = viewChild<ElementRef<HTMLElement>>('addBtn');
 
   private readonly student = computed(() => (this.kind() === 'student' ? this.students.byId(this.realId()) : null));
   private readonly group = computed(() => (this.kind() === 'group' ? this.groups.byId(this.realId()) : null));
@@ -180,9 +173,7 @@ export class PersonPage {
       .filter((s) => ids.has(s.id))
       .sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale()));
   });
-  protected readonly memberSections = computed<PickSection[]>(() => [
-    { key: 'nav.students', items: [...this.students.students()].sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale())).map((s) => ({ id: s.id, name: s.name })) },
-  ]);
+  protected readonly memberItems = computed<AddItem[]>(() => this.students.students().map((s) => ({ id: s.id, name: s.name, hint: s.email })));
 
   constructor() {
     // A new one: typing its name straight away

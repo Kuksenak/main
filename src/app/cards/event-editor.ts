@@ -46,9 +46,10 @@ interface Model {
 }
 
 /** Event card (new or existing), opened on the NavStack. */
+import { AddField, AddItem } from '../core/ui/add-field';
 @Component({
   selector: 'app-event-editor',
-  imports: [ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [AddField, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -116,30 +117,37 @@ interface Model {
           }
         </div>
 
-        <!-- Participants -->
+        <!-- Participants, then lessons (as Notion Calendar's): a row each (a second line under the
+             name; × on hover), then a field adding more (none yet: the field with its icon) -->
         <div class="flex flex-col gap-px">
-          <span class="flex h-8 items-center gap-2 px-1 text-[0.875rem] opacity-50"><app-icon name="people" class="size-4" />{{ 'event.participants' | t }}</span>
           @for (p of invited(); track p.id) {
-            <div class="group/r flex h-9 items-center gap-2.5 rounded-md px-1 text-[0.875rem] hover:bg-[var(--tint)]">
-              <span class="flex size-6 shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-semibold uppercase" [class.text-[var(--accent-fg)]]="!!p.color" [style.background]="p.color ?? 'var(--fill-strong)'">{{ initial(p.name) }}</span>
-              <span class="min-w-0 flex-1 truncate">{{ p.name }}</span>
+            <div class="group/r flex min-h-10 items-center gap-2.5 rounded-md px-1.5 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
+              <span class="flex min-w-0 flex-1 flex-col">
+                <span class="truncate">{{ p.name }}</span>
+                @if (hintOf(p); as h) {
+                  <span class="truncate text-[0.75rem] opacity-50">{{ h }}</span>
+                }
+              </span>
               <button type="button" (click)="uninvite(p.id)" [attr.aria-label]="'action.remove' | t" class="edit-only flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/r:opacity-60"><app-icon name="close" class="size-3.5" /></button>
             </div>
           }
-          <button #inviteRowD type="button" (click)="openPicker('invite', inviteRowD)" [disabled]="isEmpty(inviteSections())" class="edit-only head-btn self-start !px-1 opacity-60 disabled:opacity-30"><app-icon name="plus" />{{ 'event.invite' | t }}</button>
+          <app-add-field class="edit-only" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" />
         </div>
 
-        <!-- Lessons -->
         <div class="flex flex-col gap-px">
-          <span class="flex h-8 items-center gap-2 px-1 text-[0.875rem] opacity-50"><app-icon name="page" class="size-4" />{{ 'event.lessons' | t }}</span>
           @for (l of attached(); track l.id) {
-            <div class="group/r flex h-9 items-center gap-2.5 rounded-md px-1 text-[0.875rem] hover:bg-[var(--tint)]">
+            <div class="group/r flex min-h-10 items-center gap-2.5 rounded-md px-1.5 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
               <app-icon name="page" class="side-glyph" />
-              <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
+              <span class="flex min-w-0 flex-1 flex-col">
+                <span class="truncate">{{ l.title }}</span>
+                @if (l.level) {
+                  <span class="truncate text-[0.75rem] opacity-50">{{ l.level }}</span>
+                }
+              </span>
               <button type="button" (click)="detach(l.id)" [attr.aria-label]="'action.remove' | t" class="edit-only flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/r:opacity-60"><app-icon name="close" class="size-3.5" /></button>
             </div>
           }
-          <button #lessonRowD type="button" (click)="openPicker('lessons', lessonRowD)" [disabled]="isEmpty(lessonSections())" class="edit-only head-btn self-start !px-1 opacity-60 disabled:opacity-30"><app-icon name="plus" />{{ 'event.attachLesson' | t }}</button>
+          <app-add-field class="edit-only" [class.pl-[1.9375rem]]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.addLesson' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" />
         </div>
       </div>
       </div>
@@ -526,6 +534,26 @@ export class EventEditor implements OnInit {
 
   protected initial(name: string): string {
     return initial(name, this.i18n.locale());
+  }
+
+  // The add fields' lists: groups ("Group") and students (their email); lessons (their level)
+  protected readonly inviteItems = computed<AddItem[]>(() => [
+    ...this.groups.groups().map((g) => ({ id: g.id, name: g.name, hint: this.i18n.t('sidebar.group') })),
+    ...this.students.students().map((s) => ({ id: s.id, name: s.name, hint: s.email })),
+  ]);
+  protected readonly lessonItems = computed<AddItem[]>(() => this.lessons.lessons().map((l) => ({ id: l.id, name: l.title, hint: l.level ?? null })));
+
+  // A participant's second line: a group's "Group", a student's email
+  protected hintOf(p: { kind: 'group' | 'student'; id: string }): string | null {
+    return p.kind === 'group' ? this.i18n.t('sidebar.group') : (this.students.byId(p.id)?.email ?? null);
+  }
+
+  protected invite(id: string): void {
+    this.setInvitees([...this.inviteIds(), id]);
+  }
+
+  protected attach(id: string): void {
+    this.patch({ lessonIds: [...this.model().lessonIds, id] });
   }
 
   protected uninvite(id: string): void {
