@@ -90,32 +90,6 @@ interface Found {
 
     <!-- (246 wide, 12 at each side; the scroll thumb in the right one) -->
     <app-scroll-area class="min-h-0 flex-1 pr-3" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-3 pt-2">
-      <!-- Favorites (pages and people marked so in their ⋯): first, when there are any -->
-      @if (favorites().length) {
-        <div class="side-head group">
-          <button type="button" (click)="fold('favorites')" [attr.aria-expanded]="!folded().includes('favorites')" class="flex flex-1 items-center gap-2 text-left">
-            <span class="relative size-5 shrink-0">
-              <app-icon name="star" class="side-glyph absolute inset-0 group-hover:opacity-0" />
-              <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('favorites')" />
-            </span>
-            {{ 'item.favorites' | t }}
-          </button>
-        </div>
-        @if (!folded().includes('favorites')) {
-          @for (f of favorites(); track f.kind + f.id) {
-            <a [routerLink]="f.kind === 'lesson' ? ['/lessons', f.id] : ['/students', 'student', f.id]" routerLinkActive="is-on" class="side-row !pl-[1.125rem]">
-              @if (f.kind === 'lesson') {
-                <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(f.level))" />
-              } @else {
-                <app-icon name="person" class="side-glyph" />
-              }
-              <span class="min-w-0 flex-1 truncate">{{ f.name }}</span>
-              <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, f.kind, f.id)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === f.id"><app-icon name="dots" class="size-4" /></button>
-            </a>
-          }
-        }
-        <div class="mt-1.5"></div>
-      }
 
       <!-- Sections (as Notion's): a head folds them (↗ and + on hover); the first few, then View all.
            Calendar: the upcoming events -->
@@ -138,10 +112,6 @@ interface Found {
           <div role="button" tabindex="0" (click)="openEvent(e)" (keydown.enter)="openEvent(e)" class="side-row cursor-pointer !pl-[1.125rem]">
             <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
             <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(e) }}</span>
-            <!-- (a repeating one: nothing in ⋯ here — deleted from its card, asked which) -->
-            @if (e.repeat === 'Never') {
-              <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, 'event', e.id, e)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === e.id"><app-icon name="dots" class="size-4" /></button>
-            }
           </div>
         } @empty {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
@@ -149,6 +119,32 @@ interface Found {
         <!-- (View all only when not all are shown) -->
         @if (upcomingAll().length > 3) {
           <a routerLink="/schedule" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        }
+      }
+
+      <!-- Favorites (pages and people marked so in their ⋯): after the calendar, when there are any -->
+      @if (favorites().length) {
+        <div class="side-head group mt-1.5">
+          <button type="button" (click)="fold('favorites')" [attr.aria-expanded]="!folded().includes('favorites')" class="flex flex-1 items-center gap-2 text-left">
+            <span class="relative size-5 shrink-0">
+              <app-icon name="star" class="side-glyph absolute inset-0 group-hover:opacity-0" />
+              <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('favorites')" />
+            </span>
+            {{ 'item.favorites' | t }}
+          </button>
+        </div>
+        @if (!folded().includes('favorites')) {
+          @for (f of favorites(); track f.kind + f.id) {
+            <a [routerLink]="f.kind === 'lesson' ? ['/lessons', f.id] : ['/students', 'student', f.id]" routerLinkActive="is-on" class="side-row !pl-[1.125rem]">
+              @if (f.kind === 'lesson') {
+                <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(f.level))" />
+              } @else {
+                <app-icon name="person" class="side-glyph" />
+              }
+              <span class="min-w-0 flex-1 truncate">{{ f.name }}</span>
+              <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, f.kind, f.id)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === f.id"><app-icon name="dots" class="size-4" /></button>
+            </a>
+          }
         }
       }
 
