@@ -24,13 +24,15 @@ export function studentPageUrl(token: string): string {
   host: { class: 'flex flex-col gap-1.5' },
   template: `
     @if (desktop) {
-      <!-- Desktop, in the new style (as the page's properties): Student's page — the link, Copy and
-           ⋯ (New link); PIN — set or not, Reset when set; the hint under them -->
+      <!-- Desktop, in the new style (as the page's properties): Student's page — the link and ⋯
+           (Copy, New link; copied: ✓ Copied beside it); PIN — set or not, Reset when set; the hint under them -->
       <div class="flex flex-col">
         <div class="flex h-9 items-center gap-3 text-[0.875rem]">
           <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="link" class="size-4" />{{ 'students.link' | t }}</span>
           <span class="min-w-0 flex-1 truncate px-1.5" [class.opacity-40]="!token()">{{ token() ? url() : '…' }}</span>
-          <button type="button" (click)="copy()" [disabled]="!token()" class="head-btn disabled:opacity-30"><app-icon [name]="copied() ? 'check' : 'copy'" />{{ (copied() ? 'lessons.copied' : 'action.copy') | t }}</button>
+          @if (copied()) {
+            <span class="flex shrink-0 items-center gap-1 text-[0.8125rem] opacity-50"><app-icon name="check" class="size-4" />{{ 'lessons.copied' | t }}</span>
+          }
           <button #moreBtn type="button" (click)="moreOpen.set(!moreOpen())" [attr.aria-expanded]="moreOpen()" [attr.aria-label]="'lessons.more' | t" class="head-btn !px-1.5"><app-icon name="dots" /></button>
         </div>
         <div class="flex h-9 items-center gap-3 text-[0.875rem]">
@@ -45,6 +47,7 @@ export function studentPageUrl(token: string): string {
       @if (moreOpen()) {
         <app-sheet [origin]="moreBtn" [fit]="true" (closed)="moreOpen.set(false)">
           <div class="menu-list">
+            <button type="button" (click)="moreOpen.set(false); copy()" [disabled]="!token()" class="menu-item"><app-icon name="copy" /><span class="flex-1">{{ 'action.copy' | t }}</span></button>
             <button type="button" (click)="moreOpen.set(false); asking.set(moreBtn)" [disabled]="!token()" class="menu-item is-danger"><app-icon name="repeat" /><span class="flex-1">{{ 'students.newLink' | t }}</span></button>
           </div>
         </app-sheet>
