@@ -49,13 +49,17 @@ interface Model {
 import { AddField, AddItem } from '../core/ui/add-field';
 import { PeekService } from '../layout/peek.service';
 import { RowMenu } from '../core/ui/row-menu';
+import { Router } from '@angular/router';
+import { Tip } from '../core/ui/tip';
 @Component({
   selector: 'app-event-editor',
-  imports: [AddField, RowMenu, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
+  imports: [AddField, RowMenu, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
       #page
+      [inline]="inline()"
       [actions]="!readOnly()"
       [dirty]="dirty()"
       [canSave]="canSave()"
@@ -70,7 +74,13 @@ import { RowMenu } from '../core/ui/row-menu';
            with its icon, the value beside it; participants and lessons as rows (⋯ on hover: Open in new tab, Remove) -->
       <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-2.5 pt-1">
-        <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="w-full bg-transparent px-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
+        <div class="flex items-center gap-1">
+          <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent px-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
+          <!-- (a saved one: Open in full page, Ctrl+Enter) -->
+          @if (entry().id && !inline()) {
+            <button type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
+          }
+        </div>
 
         <div class="flex flex-col">
           <div class="flex min-h-9 items-center gap-3">
@@ -302,6 +312,8 @@ export class EventEditor implements OnInit {
     return !!this.entry().readOnly || (!!e && eventEnd(e).getTime() < Date.now());
   });
   readonly closed = output<void>();
+  /** Desktop: on a page of its own (EventPage), not a card. */
+  readonly inline = input(false);
 
   private events = inject(EventService);
   private groups = inject(GroupService);
@@ -552,6 +564,17 @@ export class EventEditor implements OnInit {
 
   protected invite(id: string): void {
     this.setInvitees([...this.inviteIds(), id]);
+  }
+
+  // Open in full page (a saved one): its page; changed — saved first (a series: asks there)
+  private readonly router = inject(Router);
+  protected openFull(): void {
+    const id = this.entry().id;
+    if (!id || this.inline() || !this.desktop) return;
+    if (this.dirty() && this.canSave() && !this.series()) this.save();
+    else this.page().close();
+    const at = this.entry().at;
+    this.router.navigate(['/events', id], at ? { queryParams: { at } } : {});
   }
 
   protected attach(id: string): void {

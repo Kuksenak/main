@@ -33,11 +33,22 @@ import { ScrollArea } from '../scroll-area/scroll-area';
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:p-4"
       [class.desktop:bg-[var(--backdrop)]]="!overPage && dim()"
       [class.desktop:!p-2]="wide()"
+      [class.!relative]="inline()"
+      [class.!z-auto]="inline()"
+      [class.desktop:!block]="inline()"
+      [class.desktop:!p-0]="inline()"
+      [class.h-full]="inline()"
       (click)="back(null)"
     >
       <div
         class="relative flex h-full w-full flex-col text-[var(--text)] [animation:pageInRight_360ms_var(--ease-out-quick)] mobile:bg-[var(--app-bg)] desktop:h-auto desktop:max-h-[calc(var(--app-h,100dvh)-2rem)] desktop:max-w-md desktop:p-4"
-        [class.dialog-panel]="desktop"
+        [class.dialog-panel]="desktop && !inline()"
+        [class.!animate-none]="inline()"
+        [class.desktop:!mx-auto]="inline()"
+        [class.desktop:!max-w-2xl]="inline()"
+        [class.desktop:!h-full]="inline()"
+        [class.desktop:!max-h-none]="inline()"
+        [class.desktop:!pt-8]="inline()"
         [class.desktop:!h-full]="wide()"
         [class.desktop:!max-h-none]="wide()"
         [class.desktop:!max-w-none]="wide()"
@@ -164,6 +175,8 @@ export class PageSheet {
   // Desktop: the window behind darkened (false: left as it is — e.g. a student's answers over
   // the lesson, which stays readable)
   readonly dim = input(true);
+  /** Desktop: a page of its own (in the page, not floating over it; Esc doesn't close it). */
+  readonly inline = input(false);
   // Desktop: a wider dialog (room for two columns, e.g. a student's details and events).
   readonly large = input(false);
   /** Desktop: as big as its content, up to 85% of the window either way (then it scrolls). */
@@ -197,11 +210,19 @@ export class PageSheet {
     // (Esc: as its back / ✕ — asking first about unsaved changes)
     const offEsc = inject(EscStack).push(() => this.back(null));
     inject(DestroyRef).onDestroy(offEsc);
+    // (a page of its own: no Esc, not a layer over the page)
+    afterNextRender(() => {
+      if (!this.inline()) return;
+      offEsc();
+      this.layers.remove(this.layer);
+    });
     // Over the whole window wherever it's declared: moved to <body>, so no ancestor (a scroll
     // area's mask / isolate, a transform) turns `fixed` into "inside that box" — e.g. a
     // student's answers opened from within a lesson's column
     const el = this.host.nativeElement;
-    afterNextRender(() => document.body.appendChild(el));
+    afterNextRender(() => {
+      if (!this.inline()) document.body.appendChild(el);
+    });
     inject(DestroyRef).onDestroy(() => {
       this.layers.remove(this.layer);
       el.remove();

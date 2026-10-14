@@ -17,6 +17,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: 'schedule', component: Schedule },
+      { path: 'events/:id', loadComponent: () => import('./schedule/event-page').then((m) => m.EventPage) },
       { path: 'students', loadComponent: () => import('./students/students').then((m) => m.Students) },
       // A student's / group's page (desktop: on the right, as a lesson's)
       { path: 'students/:kind/:id', loadComponent: () => import('./students/students').then((m) => m.Students) },
