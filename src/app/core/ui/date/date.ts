@@ -1,4 +1,4 @@
-import { Component, Input, computed, forwardRef, inject, signal } from '@angular/core';
+import { Component, Input, computed, forwardRef, inject, signal, DestroyRef, effect, untracked } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { I18nService } from '../../i18n/i18n.service';
@@ -15,6 +15,7 @@ function startOfMonth(d: Date): Date {
   return new Date(d.getFullYear(), d.getMonth(), 1);
 }
 
+import { EscStack } from '../esc-stack';
 @Component({
   selector: 'app-date',
   imports: [OverlayModule, Icon, TranslatePipe],
@@ -47,6 +48,20 @@ export class DateField implements ControlValueAccessor {
   readonly value = signal<Date | null>(null);
   readonly view = signal(startOfMonth(new Date()));
   readonly isOpen = signal(false);
+  // (Esc while it's open: closes just it, not the card it's in)
+  private readonly escStack = inject(EscStack);
+  private offEsc: (() => void) | null = null;
+  private readonly escSync = effect(() => {
+    const open = this.isOpen();
+    untracked(() => {
+      if (open && !this.offEsc) this.offEsc = this.escStack.push(() => this.close());
+      if (!open && this.offEsc) {
+        this.offEsc();
+        this.offEsc = null;
+      }
+    });
+  });
+  private readonly escGone = inject(DestroyRef).onDestroy(() => this.offEsc?.());
 
   private readonly today = new Date();
 

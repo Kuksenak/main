@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, booleanAttribute, computed, forwardRef, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, Input, booleanAttribute, computed, forwardRef, inject, signal, viewChild, DestroyRef, effect, untracked } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { I18nService } from '../../i18n/i18n.service';
@@ -23,6 +23,7 @@ interface SelectSection {
  */
 const NATIVE_ON_PHONES = true;
 
+import { EscStack } from '../esc-stack';
 @Component({
   selector: 'app-select',
   imports: [OverlayModule, Icon, ScrollArea],
@@ -76,6 +77,20 @@ export class SelectField implements ControlValueAccessor {
 
   readonly value = signal<string | number | null>(null);
   readonly isOpen = signal(false);
+  // (Esc while it's open: closes just it, not the card it's in)
+  private readonly escStack = inject(EscStack);
+  private offEsc: (() => void) | null = null;
+  private readonly escSync = effect(() => {
+    const open = this.isOpen();
+    untracked(() => {
+      if (open && !this.offEsc) this.offEsc = this.escStack.push(() => this.close());
+      if (!open && this.offEsc) {
+        this.offEsc();
+        this.offEsc = null;
+      }
+    });
+  });
+  private readonly escGone = inject(DestroyRef).onDestroy(() => this.offEsc?.());
 
   private onChange: (value: string | number | null) => void = () => {};
   private onTouched: () => void = () => {};

@@ -1,13 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  Input,
-  ViewChild,
-  computed,
-  forwardRef,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, ElementRef, Input, ViewChild, computed, forwardRef, inject, signal, DestroyRef, effect, untracked } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { I18nService } from '../../i18n/i18n.service';
@@ -22,6 +13,7 @@ const CLS_SELECTED = 'pick-cell is-on';
 const CLS_CURRENT = 'pick-cell is-now';
 const CLS_PLAIN = 'pick-cell';
 
+import { EscStack } from '../esc-stack';
 @Component({
   selector: 'app-time',
   imports: [OverlayModule],
@@ -60,6 +52,20 @@ export class TimeField implements ControlValueAccessor {
 
   readonly value = signal<string | null>(null);
   readonly isOpen = signal(false);
+  // (Esc while it's open: closes just it, not the card it's in)
+  private readonly escStack = inject(EscStack);
+  private offEsc: (() => void) | null = null;
+  private readonly escSync = effect(() => {
+    const open = this.isOpen();
+    untracked(() => {
+      if (open && !this.offEsc) this.offEsc = this.escStack.push(() => this.close());
+      if (!open && this.offEsc) {
+        this.offEsc();
+        this.offEsc = null;
+      }
+    });
+  });
+  private readonly escGone = inject(DestroyRef).onDestroy(() => this.offEsc?.());
   readonly now = signal(new Date());
   readonly activeCol = signal<'h' | 'm'>('h');
 
