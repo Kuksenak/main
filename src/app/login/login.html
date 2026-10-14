@@ -1,10 +1,9 @@
-<!-- The background (as craft.do's, in layers, all our own drawings): a sky gradient, a white haze
-     towards the bottom, a paper grain over it, clouds peeking in at the sides and a hand-drawn line
+<!-- The background (as craft.do's, in layers, all our own drawings): the app's background at the
+     top (as the status bar's / the manifest's color) into a sky lower down, a paper grain over it, clouds peeking in at the sides and a hand-drawn line
      along the bottom -->
 <div aria-hidden="true" class="login-bg pointer-events-none fixed inset-0 -z-0 overflow-hidden">
-  <div class="absolute inset-0 bg-[linear-gradient(to_bottom,var(--login-sky-top),var(--login-sky-bottom))]"></div>
-  <div class="login-haze absolute inset-0 bg-[linear-gradient(to_bottom,transparent,white)] opacity-30"></div>
-  <div class="login-grain absolute inset-0 opacity-50 mix-blend-overlay"></div>
+  <div class="absolute inset-0 bg-[linear-gradient(to_bottom,var(--app-bg)_0%,var(--login-sky-top)_45%,var(--login-sky-bottom)_100%)]"></div>
+  <div class="login-grain absolute inset-0 mix-blend-overlay"></div>
 
   <!-- Clouds: soft white puffs, one low at the left, one high at the right -->
   <svg class="login-cloud absolute -left-24 bottom-[18%] w-[360px] md:w-[480px]" viewBox="0 0 480 250" fill="none">

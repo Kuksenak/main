@@ -281,7 +281,7 @@ import { PeekService } from '../layout/peek.service';
                   <span class="truncate text-[0.75rem] opacity-50">{{ h }}</span>
                 }
               </span>
-              <app-row-menu class="edit-only" [link]="['/students', p.kind, p.id]" (removed)="uninvite(p.id)" />
+              <app-row-menu class="edit-only" [link]="['/students', p.kind, p.id]" [peekKind]="p.kind === 'student' ? 'student' : null" [id]="p.id" (removed)="uninvite(p.id)" />
             </div>
           }
           <app-add-field class="edit-only add-wide -mx-1.5" icon="people" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudentPopup($event)" [section]="'event.fromPeople' | t" />
@@ -297,7 +297,7 @@ import { PeekService } from '../layout/peek.service';
                   <span class="truncate text-[0.75rem] opacity-50">{{ l.level }}</span>
                 }
               </span>
-              <app-row-menu class="edit-only" [link]="['/lessons', l.id]" (removed)="detach(l.id)" />
+              <app-row-menu class="edit-only" [link]="['/lessons', l.id]" peekKind="lesson" [id]="l.id" (removed)="detach(l.id)" />
             </div>
           }
           <app-add-field class="edit-only add-wide -mx-1.5" icon="page" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newPage.set($event)" [section]="'event.fromLibrary' | t" itemIcon="page" />
