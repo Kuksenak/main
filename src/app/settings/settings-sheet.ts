@@ -28,7 +28,7 @@ type Section = 'language' | 'schedule' | 'google' | 'notifications';
   selector: 'app-settings-sheet',
   imports: [Icon, IntegrationsSettings, LanguageList, NotificationSettings, ScheduleSettings, Sheet, TranslatePipe],
   template: `
-    <app-sheet #sheet [origin]="origin()" [wide]="true" [tall]="true" (closed)="closed.emit()">
+    <app-sheet #sheet [origin]="origin()" [wide]="!desktop" [fit]="desktop" [tall]="true" (closed)="closed.emit()">
       <!-- Phones, a row's page: ‹ back to the list and its title in the middle -->
       @if (page(); as p) {
         <div class="relative mb-3 flex h-[var(--control-round)] shrink-0 items-center justify-center">
@@ -47,7 +47,7 @@ type Section = 'language' | 'schedule' | 'google' | 'notifications';
         </div>
       } @else {
       <!-- Desktop: compact — no section labels, cards close together -->
-      <div class="flex flex-1 flex-col gap-6 desktop:gap-2" [class.[animation:paneBack_280ms_var(--ease-out-quick)]]="cameBack">
+      <div class="flex flex-1 flex-col gap-6 desktop:gap-0" [class.settings-menu]="desktop" [class.[animation:paneBack_280ms_var(--ease-out-quick)]]="cameBack">
         <div class="card">
           <!-- 5 taps on the email show the app version (hidden; for support) -->
           <button type="button" (click)="versionTap()" class="list-row w-full text-left">
@@ -118,13 +118,21 @@ type Section = 'language' | 'schedule' | 'google' | 'notifications';
           </div>
         }
 
-        <!-- At the bottom -->
+        <!-- At the bottom (desktop: menu items) -->
+        @if (desktop) {
+          <div class="menu-sep"></div>
+          @if (updates.updateReady()) {
+            <button type="button" (click)="updates.apply()" class="menu-item !text-[var(--accent)]"><app-icon name="install" /><span class="flex-1">{{ 'account.update' | t }}</span></button>
+          }
+          <button type="button" (click)="auth.logout()" class="menu-item"><app-icon name="logout" /><span class="flex-1">{{ 'account.logout' | t }}</span></button>
+        } @else {
         <div class="mt-auto flex flex-col gap-3 desktop:gap-2">
           @if (updates.updateReady()) {
             <button type="button" (click)="updates.apply()" class="card-btn text-[var(--accent)]">{{ 'account.update' | t }}</button>
           }
           <button type="button" (click)="auth.logout()" class="card-btn text-[var(--danger)]">{{ 'account.logout' | t }}</button>
         </div>
+        }
       </div>
       }
     </app-sheet>

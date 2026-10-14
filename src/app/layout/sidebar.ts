@@ -209,21 +209,21 @@ interface Found {
 
     <!-- The account: its email; the settings open by it -->
     <div class="shrink-0 border-t-[0.5px] border-[var(--separator)] px-3 py-2">
-      <!-- Trash: deleted pages and students (restore / delete for good) -->
-      <button #trashBtn type="button" (click)="openTrash()" [attr.aria-expanded]="trashOpen()" class="side-row">
-        <app-icon name="trash" class="side-glyph" />
-        <span class="flex-1">{{ 'trash.title' | t }}</span>
-      </button>
-      <!-- The account: its menu (as Notion's) — Settings, an update, Log out -->
-      <button #accountBtn type="button" (click)="userMenu.set(!userMenu())" [attr.aria-expanded]="userMenu()" class="side-row">
-        <span class="relative flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[0.6875rem] font-semibold uppercase text-white">
-          {{ (auth.email() ?? '?').charAt(0) }}
-          @if (updates.updateReady()) {
-            <span class="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-[var(--success)] ring-2 ring-[var(--app-bg)]"></span>
-          }
-        </span>
-        <span class="min-w-0 flex-1 truncate">{{ auth.email() }}</span>
-      </button>
+      <!-- The account (as Notion's): a letter in a rounded square, the email, a chevron — opens
+           Settings; the trash beside it, a square button -->
+      <div class="flex items-center gap-1">
+        <button #accountBtn type="button" (click)="account.emit(accountBtn)" class="side-row min-w-0 flex-1 !gap-2 font-medium">
+          <span class="relative flex size-5 shrink-0 items-center justify-center rounded-[5px] bg-[var(--tint-strong)] text-[0.6875rem] font-semibold uppercase">
+            {{ (auth.email() ?? '?').charAt(0) }}
+            @if (updates.updateReady()) {
+              <span class="absolute -right-1 -top-1 size-2 rounded-full bg-[var(--success)] ring-2 ring-[var(--side-bg)]"></span>
+            }
+          </span>
+          <span class="min-w-0 flex-1 truncate">{{ auth.email() }}</span>
+          <app-icon name="chevron-down" class="size-3.5 shrink-0 opacity-50" />
+        </button>
+        <button #trashBtn type="button" (click)="openTrash()" [attr.aria-expanded]="trashOpen()" [appTip]="'trash.title' | t" tipSide="top" [attr.aria-label]="'trash.title' | t" class="side-icon shrink-0"><app-icon name="trash" class="size-[1.125rem]" /></button>
+      </div>
     </div>
 
     <!-- ✎'s menu (out of the column: no room taken in it) -->
@@ -324,19 +324,6 @@ interface Found {
         </div>
       </app-sheet>
     }
-    @if (userMenu()) {
-      <app-sheet [origin]="accountAnchor()?.nativeElement ?? null" [fit]="true" (closed)="userMenu.set(false)">
-        <div class="menu-list min-w-60">
-          <p class="truncate px-2 pb-1 pt-1 text-[0.75rem] font-medium opacity-50">{{ auth.email() }}</p>
-          <button type="button" (click)="userMenu.set(false); account.emit(accountAnchor()!.nativeElement)" class="menu-item"><app-icon name="settings" /><span class="flex-1">{{ 'nav.settings' | t }}</span></button>
-          @if (updates.updateReady()) {
-            <button type="button" (click)="updates.apply()" class="menu-item !text-[var(--accent)]"><app-icon name="install" /><span class="flex-1">{{ 'account.update' | t }}</span></button>
-          }
-          <div class="menu-sep"></div>
-          <button type="button" (click)="userMenu.set(false); auth.logout()" class="menu-item"><app-icon name="logout" /><span class="flex-1">{{ 'account.logout' | t }}</span></button>
-        </div>
-      </app-sheet>
-    }
     @if (trashOpen()) {
       <app-sheet [origin]="trashAnchor()?.nativeElement ?? null" [fit]="true" (closed)="trashOpen.set(false)">
         <div class="flex w-[22rem] flex-col">
@@ -383,10 +370,6 @@ export class Sidebar {
   private readonly peekPages = inject(PeekService);
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
-
-  // ---- The account's menu
-  protected readonly userMenu = signal(false);
-  protected readonly accountAnchor = viewChild<ElementRef<HTMLElement>>('accountBtn');
 
   // ---- A row's ⋯ menu (pages, people, events)
   protected readonly itemMenu = signal<ItemMenu | null>(null);
