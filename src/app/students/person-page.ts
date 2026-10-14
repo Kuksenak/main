@@ -72,11 +72,8 @@ import { CreateDialog } from '../cards/create-dialog';
 
           <div class="flex flex-col gap-4 px-5 pt-2">
             @if (kind() === 'student') {
-              <!-- Email (plain, as the title), edited in place -->
-              <label class="flex h-9 items-center gap-3 text-[0.875rem]">
-                <span class="flex w-36 shrink-0 items-center gap-2 opacity-50"><app-icon name="mail" class="size-4" />{{ 'students.email' | t }}</span>
-                <input [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 bg-transparent px-1.5 py-1 outline-none placeholder:opacity-30" />
-              </label>
+              <!-- Email: a gray line under the name (as a subtitle), edited in place -->
+              <input [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'students.addEmail' | t" class="-mt-3 w-full bg-transparent text-[0.875rem] opacity-60 outline-none placeholder:opacity-60 focus:opacity-100" />
               @if (realId(); as sid) {
                 <app-student-link [studentId]="sid" />
                 <app-lessons-card [studentId]="sid" />

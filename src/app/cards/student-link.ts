@@ -20,18 +20,11 @@ export function studentPageUrl(token: string): string {
 @Component({
   selector: 'app-student-link',
   imports: [ActionSheet, Icon, TranslatePipe],
-  host: { class: 'flex flex-col gap-1.5' },
+  host: { '[class]': "desktop ? 'contents' : 'flex flex-col gap-1.5'" },
   template: `
     @if (desktop) {
-      <!-- Desktop, in the new style (as the page's properties): the PIN — set or not; the hint under
-           it. (Copy link, New link, Reset PIN: in the page's head and ⋯, see PersonPage) -->
-      <div class="flex flex-col">
-        <div class="flex h-9 items-center gap-3 text-[0.875rem]">
-          <span class="flex w-36 shrink-0 items-center gap-2 opacity-50"><app-icon name="lock" class="size-4" />PIN</span>
-          <span class="min-w-0 flex-1 px-1.5" [class.opacity-40]="!hasPin()">{{ (hasPin() ? 'students.pinSet' : 'students.pinNone') | t }}</span>
-        </div>
-        <p class="pt-1 text-[0.75rem] opacity-45">{{ 'students.linkHint' | t }}</p>
-      </div>
+      <!-- Desktop: nothing shown — Copy link, New link and Reset PIN are in the page's head and ⋯
+           (see PersonPage); this keeps the link and asks before a new one -->
     } @else {
     <span class="card-label">{{ 'students.link' | t }}</span>
     <div class="card">
