@@ -37,7 +37,7 @@ export class ToastService {
     <div class="pointer-events-none fixed bottom-4 right-4 z-[2600] flex flex-col items-end gap-2">
       @for (t of service.toasts(); track t.id) {
         <!-- (dark on the light page and light on the dark one: clear at a glance) -->
-        <div class="pointer-events-auto flex min-h-11 items-center gap-2.5 rounded-xl bg-[color-mix(in_srgb,var(--text)_92%,var(--app-bg))] py-2.5 pl-4 pr-4 text-[0.875rem] font-normal text-[var(--app-bg)] shadow-[0_8px_24px_rgb(0_0_0/0.2)] [animation:dropdownIn_180ms_var(--ease-out-quick)]" [class.!pr-2]="!!t.action">
+        <div class="pointer-events-auto flex min-h-11 items-center gap-2.5 rounded-xl bg-[color-mix(in_srgb,var(--text)_76%,var(--app-bg))] py-2.5 pl-4 pr-4 text-[0.875rem] font-normal text-[var(--app-bg)] shadow-[0_8px_24px_rgb(0_0_0/0.2)] [animation:dropdownIn_180ms_var(--ease-out-quick)]" [class.!pr-2]="!!t.action">
           <app-icon [name]="t.icon" class="size-[1.125rem] shrink-0 opacity-80" />
           <span>{{ t.text | t }}</span>
           @if (t.action; as a) {
