@@ -7,6 +7,8 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { NotificationsService } from '../core/services/notifications.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
+import { EscStack } from '../core/ui/esc-stack';
+import { InboxService } from '../layout/inbox.service';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 
@@ -105,14 +107,21 @@ export class NotificationsPage {
     // A new one meanwhile: the list again
     const sub = this.notifications.received.subscribe(() => this.load());
 
-    // Phones: ✕ in the top bar
+    // Phones: ✕ in the top bar; desktop (the inbox panel): Esc closes it
     const toolbar = inject(ToolbarService);
-    toolbar.back.set(true);
-    toolbar.close.set(true);
+    const inboxPanel = inject(InboxService);
+    const offEsc = this.desktop ? inject(EscStack).push(() => inboxPanel.open.set(false)) : null;
+    if (!this.desktop) {
+      toolbar.back.set(true);
+      toolbar.close.set(true);
+    }
     inject(DestroyRef).onDestroy(() => {
       sub.unsubscribe();
-      toolbar.back.set(false);
-      toolbar.close.set(false);
+      offEsc?.();
+      if (!this.desktop) {
+        toolbar.back.set(false);
+        toolbar.close.set(false);
+      }
     });
   }
 

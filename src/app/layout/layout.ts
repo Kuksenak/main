@@ -26,12 +26,14 @@ import { SettingsSheet } from '../settings/settings-sheet';
 import { Sidebar } from './sidebar';
 import { Peek } from './peek';
 import { PeekService } from './peek.service';
+import { InboxService } from './inbox.service';
+import { NotificationsPage } from '../notifications/notifications-page';
 import { CreateDialog, CreateService } from '../cards/create-dialog';
 
 import { Toasts } from '../core/ui/toast';
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe, Sidebar, Peek, CreateDialog, Toasts],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe, Sidebar, Peek, CreateDialog, Toasts, NotificationsPage],
   templateUrl: './layout.html',
 })
 export class Layout {
@@ -93,6 +95,7 @@ export class Layout {
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly peek = inject(PeekService);
   protected readonly creating = inject(CreateService);
+  protected readonly inbox = inject(InboxService);
   protected readonly i18n = inject(I18nService);
 
   protected readonly accountOpen = signal(false);

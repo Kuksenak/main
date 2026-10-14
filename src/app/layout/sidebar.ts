@@ -24,6 +24,7 @@ import { ConfirmDelete } from '../core/ui/confirm';
 import { TrashItem, TrashService } from '../core/services/trash.service';
 import { Tip } from '../core/ui/tip';
 import { PeekService } from './peek.service';
+import { InboxService } from './inbox.service';
 import { LessonUsage } from '../lessons/lesson-usage';
 import { LessonService, levelColor } from '../lessons/lesson.service';
 import { EventService, ScheduleEvent } from '../schedule/event.service';
@@ -71,13 +72,13 @@ interface Found {
           <app-icon name="sidebar" />
         </button>
         <span class="flex-1"></span>
-        <a routerLink="/notifications" (click)="unread.set(0)" [appTip]="'sidebar.inbox' | t" tipSide="bottom" [attr.aria-label]="'sidebar.inbox' | t" class="side-icon relative">
+        <button type="button" (click)="unread.set(0); inbox.open.set(!inbox.open())" [attr.aria-expanded]="inbox.open()" [appTip]="'sidebar.inbox' | t" tipSide="bottom" [attr.aria-label]="'sidebar.inbox' | t" class="side-icon relative">
           <app-icon name="inbox" />
           <!-- (new since the inbox was last open: how many, white in a red badge) -->
           @if (unread()) {
             <span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--danger)] px-1 text-[0.625rem] font-semibold tabular-nums text-white">{{ unread() > 9 ? '9+' : unread() }}</span>
           }
-        </a>
+        </button>
         <button #newBtn type="button" (click)="newOpen.set(!newOpen())" [appTip]="('sidebar.new' | t) + '  Ctrl+Alt+N'" tipSide="bottom" [attr.aria-label]="'sidebar.new' | t" [attr.aria-expanded]="newOpen()" class="side-icon">
           <app-icon name="compose" />
         </button>
@@ -360,6 +361,7 @@ export class Sidebar {
 
   // A notification come in since the inbox was last opened
   protected readonly unread = signal(0);
+  protected readonly inbox = inject(InboxService);
 
   // New since the inbox was last open (its page keeps when: inbox.seenAt)
   private countUnread(): void {
