@@ -133,6 +133,18 @@ import { TrashService } from '../core/services/trash.service';
           @if (realId()) {
           <button type="button" (click)="menuOpen.set(false); remove()" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'trash.move' | t }}</span></button>
           }
+          <!-- (when it was last changed, when made) -->
+          @if (savedStudent(); as st) {
+            <div class="menu-sep"></div>
+            <div class="menu-foot">
+              @if (st.updatedAt) {
+                <div>{{ 'lessons.lastEdited' | t }} {{ stamp(st.updatedAt) }}</div>
+              }
+              @if (st.createdAt) {
+                <div>{{ 'item.created' | t }} {{ stamp(st.createdAt) }}</div>
+              }
+            </div>
+          }
         </div>
       </app-sheet>
     }
@@ -292,6 +304,15 @@ export class PersonPage {
   flush(): boolean {
     this.saveNow();
     return this.creating;
+  }
+
+  protected readonly savedStudent = computed(() => this.student());
+
+  // "Today at 11:29", else the day and time
+  protected stamp(at: string): string {
+    const d = new Date(at);
+    const today = new Date().toDateString() === d.toDateString();
+    return today ? `${this.i18n.t('lessons.todayAt')} ${this.i18n.time(d)}` : `${this.i18n.date(d, { day: 'numeric', month: 'short' })} ${this.i18n.time(d)}`;
   }
 
   protected askDelete(): void {

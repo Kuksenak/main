@@ -22,9 +22,10 @@ import { LessonUsage } from './lesson-usage';
  * full-screen card over it. + starts a new one (desktop: /lessons/new on the right).
  */
 import { PeekService } from '../layout/peek.service';
+import { Tip } from '../core/ui/tip';
 @Component({
   selector: 'app-lessons',
-  imports: [Icon, LessonPage, ScrollArea, SearchBar, SearchField, TranslatePipe],
+  imports: [Tip, Icon, LessonPage, ScrollArea, SearchBar, SearchField, TranslatePipe],
   template: `
     <ng-template #search>
       <app-search-field [(value)]="query" />
@@ -105,6 +106,11 @@ import { PeekService } from '../layout/peek.service';
                         <span class="w-12 shrink-0">
                           @if (l.level) {
                             <span class="level-tag" [style.background]="levelTint(l.level)">{{ l.level }}</span>
+                          }
+                        </span>
+                        <span class="flex w-5 shrink-0 justify-center">
+                          @if (l.shareToken) {
+                            <app-icon name="globe" class="size-4 opacity-50" [appTip]="'lessons.publicShort' | t" tipSide="top" />
                           }
                         </span>
                         <span class="w-56 shrink-0 truncate text-[0.8125rem] opacity-50">{{ useHint(l.id) }}</span>

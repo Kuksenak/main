@@ -29,6 +29,7 @@
                 <app-icon name="person" class="side-glyph" />
                 <span class="min-w-0 flex-1 truncate">{{ s.name }}</span>
                 <span class="w-56 shrink-0 truncate text-right text-[0.8125rem] opacity-50">{{ nextClass(s.id) }}</span>
+                <span class="w-20 shrink-0 text-right text-[0.8125rem] tabular-nums opacity-50">{{ changed(s.updatedAt) }}</span>
               </button>
             }
             @if (!visibleGroups().length && !visible().length) {

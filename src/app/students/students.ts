@@ -105,6 +105,13 @@ export class Students {
     return `${this.i18n.date(d, { weekday: 'short', day: 'numeric', month: 'short' })}, ${this.i18n.time(d)}`;
   }
 
+  // When last changed: today the time, else the day
+  protected changed(iso?: string): string {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return new Date().toDateString() === d.toDateString() ? this.i18n.time(d) : this.i18n.date(d, { day: 'numeric', month: 'short' });
+  }
+
   protected subtitle(s: Student): string {
     const groups = this.groupService
       .groups()

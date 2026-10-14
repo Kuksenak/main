@@ -175,6 +175,9 @@ import { TrashService } from '../core/services/trash.service';
             <div>{{ 'lessons.taskCount' | t }}: {{ s.draft().blocks.length }}</div>
             @if (s.lesson(); as l) {
               <div>{{ 'lessons.lastEdited' | t }} {{ edited(l.updatedAt) }}</div>
+              @if (l.createdAt) {
+                <div>{{ 'item.created' | t }} {{ edited(l.createdAt) }}</div>
+              }
             }
           </div>
         </div>

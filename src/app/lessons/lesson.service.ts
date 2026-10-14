@@ -40,6 +40,7 @@ export interface Lesson {
   level?: Level | null;
   locked?: boolean; // shown, not edited (until unlocked)
   favorite?: boolean; // in the sidebar's Favorites
+  createdAt?: string;
 }
 
 /** The students' level a lesson is for (CEFR). */

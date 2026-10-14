@@ -310,9 +310,16 @@ interface Found {
           } @else if (im.event?.repeat === 'Never') {
             <button type="button" (click)="deleteEvent(im)" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
           }
-          @if (im.kind === 'lesson' && lessonEdited(im.id); as when) {
+          @if (itemDates(im); as dates) {
             <div class="menu-sep"></div>
-            <p class="menu-foot">{{ 'lessons.lastEdited' | t }} {{ when }}</p>
+            <div class="menu-foot">
+              @if (dates.edited) {
+                <div>{{ 'lessons.lastEdited' | t }} {{ dates.edited }}</div>
+              }
+              @if (dates.created) {
+                <div>{{ 'item.created' | t }} {{ dates.created }}</div>
+              }
+            </div>
           }
         </div>
       </app-sheet>
@@ -466,6 +473,19 @@ export class Sidebar {
           this.events.create({ title: e.title, repeat: e.repeat, repeatInterval: e.repeatInterval, repeatUntil: e.repeatUntil, studentIds: e.studentIds, groupIds: e.groupIds, lessonIds: e.lessonIds, startsAt: e.startsAt, durationMinutes: e.durationMinutes }),
       },
     });
+  }
+
+  // A page's / person's last edit and making, "14 Oct, 12:36" (none: null)
+  protected itemDates(im: ItemMenu): { edited: string | null; created: string | null } | null {
+    const fmt = (iso?: string | null) => {
+      if (!iso) return null;
+      const d = new Date(iso);
+      return `${this.i18n.date(d, { day: 'numeric', month: 'short' })}, ${this.i18n.time(d)}`;
+    };
+    const x = im.kind === 'lesson' ? this.lessons.byId(im.id) : im.kind === 'student' ? this.students.byId(im.id) : null;
+    if (!x) return null;
+    const dates = { edited: fmt(x.updatedAt), created: fmt(x.createdAt) };
+    return dates.edited || dates.created ? dates : null;
   }
 
   // "14 Oct, 12:36"
