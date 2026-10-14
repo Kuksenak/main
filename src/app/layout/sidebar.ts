@@ -102,7 +102,10 @@ interface Found {
         } @empty {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
         }
-        <a routerLink="/schedule" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        <!-- (View all only when not all are shown) -->
+        @if (upcomingAll().length > 5) {
+          <a routerLink="/schedule" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        }
       }
 
       <div class="side-head group mt-1.5">
@@ -124,7 +127,10 @@ interface Found {
             <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
           </a>
         }
-        <a routerLink="/lessons" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        <!-- (View all only when not all are shown) -->
+        @if (lessonsSorted().length > shown) {
+          <a routerLink="/lessons" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        }
       }
 
       <div class="side-head group mt-1.5">
@@ -150,7 +156,10 @@ interface Found {
             <span class="min-w-0 flex-1 truncate">{{ r.name }}</span>
           </a>
         }
-        <a routerLink="/students" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        <!-- (View all only when not all are shown) -->
+        @if (peopleAll().length > shown) {
+          <a routerLink="/students" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        }
       }
     </app-scroll-area>
 
@@ -290,14 +299,14 @@ export class Sidebar {
   protected readonly lessonsSorted = computed(() => [...this.lessons.lessons()].sort((a, b) => a.title.localeCompare(b.title, this.i18n.locale())));
 
   // The next five events not over yet
-  protected readonly upcoming = computed(() => {
+  protected readonly upcomingAll = computed(() => {
     const now = Date.now();
     return this.events
       .events()
       .filter((e) => new Date(e.startsAt).getTime() + e.durationMinutes * 60000 > now)
-      .sort((a, b) => a.startsAt.localeCompare(b.startsAt))
-      .slice(0, 5);
+      .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
   });
+  protected readonly upcoming = computed(() => this.upcomingAll().slice(0, 5));
 
   // The upcoming ones by day: Today, Tomorrow, then "Thu 16 Oct"
   protected readonly upcomingDays = computed(() => {

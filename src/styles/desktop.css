@@ -71,26 +71,32 @@ html:root body {
   --accent-label: #ffffff;
   --control-border: rgb(0 0 0 / 0.1);
 }
-/* The desktop's own look (the new style), warm as Anthropic's / Claude's: a cream page, the sidebar
-   a shade deeper, hovers a warm gray. (html:root: over tokens.css's :root, which loads after this
-   file) */
+/* The desktop's own look (the new style), as Craft's: one cool near-white canvas (the sidebar and
+   the page alike), hovers and the chosen row a light gray, blocks (cards) a shade deeper, floating
+   buttons white. (html:root: over tokens.css's :root, which loads after this file) */
 html:root {
-  --app-bg: #faf9f5;
-  --surface: #fffefb;
-  --card: #fffefb;
-  --side-bg: #f2f0e8;
-  --tint: rgb(31 30 29 / 0.05);
-  --tint-strong: rgb(31 30 29 / 0.085);
+  --text: #1a1c1e;
+  --app-bg: #fcfdfe;
+  --side-bg: #fcfdfe;
+  --surface: #ffffff;
+  --card: #f5f6f7;
+  --separator: #eaebec;
+  --tint: rgb(26 28 30 / 0.04);
+  --tint-strong: rgb(26 28 30 / 0.065);
+  --highlight: rgb(26 28 30 / 0.05);
 }
 
 html.dark:root {
-  /* (dark: Claude's warm graphite) */
-  --app-bg: #262624;
-  --side-bg: #1f1e1d;
-  --surface: #30302e;
-  --card: #30302e;
-  --tint: rgb(255 255 255 / 0.06);
-  --tint-strong: rgb(255 255 255 / 0.1);
+  /* (dark: a neutral graphite, as Craft's) */
+  --text: #ececed;
+  --app-bg: #1c1d1f;
+  --side-bg: #1c1d1f;
+  --surface: #26272a;
+  --card: #232427;
+  --separator: rgb(255 255 255 / 0.08);
+  --tint: rgb(255 255 255 / 0.05);
+  --tint-strong: rgb(255 255 255 / 0.085);
+  --highlight: rgb(255 255 255 / 0.07);
   --control-border: rgb(255 255 255 / 0.15);
   /* Gray buttons (Today, Cancel…): on black a few % of white vanishes — iOS's grays */
   --glass-neutral: #2c2c2e;
