@@ -51,10 +51,11 @@ import { PeekService } from '../layout/peek.service';
 import { RowMenu } from '../core/ui/row-menu';
 import { Router } from '@angular/router';
 import { Tip } from '../core/ui/tip';
+import { NewStudentDialog } from './new-student-dialog';
 @Component({
   selector: 'app-event-editor',
   host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
-  imports: [AddField, RowMenu, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [AddField, NewStudentDialog, RowMenu, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -143,7 +144,7 @@ import { Tip } from '../core/ui/tip';
               <app-row-menu class="edit-only" [link]="['/students', p.kind, p.id]" (removed)="uninvite(p.id)" />
             </div>
           }
-          <app-add-field class="edit-only" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" />
+          <app-add-field class="edit-only" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" [section]="'event.fromPeople' | t" />
         </div>
 
         <div class="flex flex-col gap-px">
@@ -276,6 +277,10 @@ import { Tip } from '../core/ui/tip';
         (chosen)="seriesChosen(ask, $event)"
         (closed)="askSeries.set(null)"
       />
+    }
+
+    @if (newStudent(); as n) {
+      <app-new-student-dialog [initialName]="n" [hint]="'newStudent.toEvent' | t" (created)="invite($event)" (closed)="newStudent.set(null)" />
     }
 
     @switch (picking()) {
@@ -552,8 +557,8 @@ export class EventEditor implements OnInit {
 
   // The add fields' lists: groups ("Group") and students (their email); lessons (their level)
   protected readonly inviteItems = computed<AddItem[]>(() => [
-    ...this.groups.groups().map((g) => ({ id: g.id, name: g.name, hint: this.i18n.t('sidebar.group') })),
-    ...this.students.students().map((s) => ({ id: s.id, name: s.name, hint: s.email })),
+    ...this.groups.groups().map((g) => ({ id: g.id, name: g.name, hint: this.i18n.t('sidebar.group'), icon: 'people' as const })),
+    ...this.students.students().map((s) => ({ id: s.id, name: s.name, hint: s.email, icon: 'person' as const })),
   ]);
   protected readonly lessonItems = computed<AddItem[]>(() => this.lessons.lessons().map((l) => ({ id: l.id, name: l.title, hint: l.level ?? null })));
 
@@ -561,6 +566,9 @@ export class EventEditor implements OnInit {
   protected hintOf(p: { kind: 'group' | 'student'; id: string }): string | null {
     return p.kind === 'group' ? this.i18n.t('sidebar.group') : (this.students.byId(p.id)?.email ?? null);
   }
+
+  // New student (from the participants' field): asked in a small dialog, then invited
+  protected readonly newStudent = signal<string | null>(null);
 
   protected invite(id: string): void {
     this.setInvitees([...this.inviteIds(), id]);

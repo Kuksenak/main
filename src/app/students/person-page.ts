@@ -33,9 +33,10 @@ interface Draft {
  */
 import { AddField, AddItem } from '../core/ui/add-field';
 import { RowMenu } from '../core/ui/row-menu';
+import { NewStudentDialog } from '../cards/new-student-dialog';
 @Component({
   selector: 'app-person-page',
-  imports: [AddField, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
+  imports: [AddField, NewStudentDialog, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
@@ -95,7 +96,7 @@ import { RowMenu } from '../core/ui/row-menu';
                   </div>
                 }
                 <!-- (adding: as the event's participants) -->
-                <app-add-field class="-ml-2" [class.pl-[1.6875rem]]="members().length" [icon]="members().length ? null : 'person'" [placeholder]="'groups.addMembers' | t" [items]="memberItems()" [exclude]="d.studentIds" (picked)="toggleMember($event)" />
+                <app-add-field class="-ml-2" [class.pl-[1.6875rem]]="members().length" [icon]="members().length ? null : 'person'" [placeholder]="'groups.addMembers' | t" [items]="memberItems()" [exclude]="d.studentIds" (picked)="toggleMember($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" itemIcon="person" />
               </div>
               @if (realId(); as gid) {
                 <app-lessons-card [groupId]="gid" />
@@ -105,6 +106,10 @@ import { RowMenu } from '../core/ui/row-menu';
         }
       </app-scroll-area>
     </main>
+
+    @if (newStudent(); as n) {
+      <app-new-student-dialog [initialName]="n" [hint]="'newStudent.toGroup' | t" (created)="toggleMember($event)" (closed)="newStudent.set(null)" />
+    }
 
     @if (colorOpen()) {
       <app-sheet [origin]="colorAnchor()?.nativeElement ?? null" [fit]="true" (closed)="colorOpen.set(false)">
@@ -174,6 +179,8 @@ export class PersonPage {
       .filter((s) => ids.has(s.id))
       .sort((a, b) => a.name.localeCompare(b.name, this.i18n.locale()));
   });
+  // New student (from the members' field): asked in a small dialog, then added
+  protected readonly newStudent = signal<string | null>(null);
   protected readonly memberItems = computed<AddItem[]>(() => this.students.students().map((s) => ({ id: s.id, name: s.name, hint: s.email })));
 
   constructor() {

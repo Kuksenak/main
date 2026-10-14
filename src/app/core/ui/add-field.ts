@@ -6,7 +6,8 @@ import { ToBody } from './to-body';
 export interface AddItem {
   id: string;
   name: string;
-  hint?: string | null; // a second line (an email, "Group", a level)
+  hint?: string | null; // a second line (an email, "Group", a level); with icons: at the right
+  icon?: IconName; // its own icon (else the field's itemIcon)
 }
 
 /**
@@ -41,8 +42,8 @@ export interface AddItem {
             <p class="px-2.5 pb-0.5 pt-1 text-[0.75rem] font-medium opacity-50">{{ section() }}</p>
           }
           @for (m of matches(); track m.id; let i = $index) {
-            <button type="button" (mousedown)="$event.preventDefault(); pick(m)" (mouseenter)="index.set(i + shift())" class="add-opt" [class.is-on]="i + shift() === index()" [class.with-icon]="!!itemIcon()">
-              @if (itemIcon(); as ic) {
+            <button type="button" (mousedown)="$event.preventDefault(); pick(m)" (mouseenter)="index.set(i + shift())" class="add-opt" [class.is-on]="i + shift() === index()" [class.with-icon]="!!(m.icon ?? itemIcon())">
+              @if (m.icon ?? itemIcon(); as ic) {
                 <app-icon [name]="ic" class="add-icon" />
                 <span class="min-w-0 flex-1 truncate">{{ m.before }}<b>{{ m.hit }}</b>{{ m.after }}</span>
                 @if (m.hint) {
@@ -73,7 +74,7 @@ export class AddField {
   readonly openOnFocus = input(false);
   /** An action at the top of the list (e.g. New lesson): `acted` when picked. */
   readonly action = input<{ label: string; icon: IconName } | null>(null);
-  readonly acted = output<void>();
+  readonly acted = output<string>(); // what was typed (e.g. the new one's name)
   /** A label over the items (e.g. "From the library"). */
   readonly section = input<string | null>(null);
   /** An icon before each item (its hint then at the right). */
@@ -139,7 +140,7 @@ export class AddField {
   }
 
   protected act(): void {
-    this.acted.emit();
+    this.acted.emit(this.query().trim());
     this.query.set('');
     (this.box().nativeElement.querySelector('input') as HTMLInputElement).blur();
   }
