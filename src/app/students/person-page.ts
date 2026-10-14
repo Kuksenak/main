@@ -49,8 +49,13 @@ import { CreateDialog } from '../cards/create-dialog';
           <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
             <input #nameInput [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
             @if (kind() === 'student') {
-              <a [attr.href]="d.email ? 'mailto:' + d.email : null" [class.pointer-events-none]="!d.email" [class.opacity-35]="!d.email" class="head-btn"><app-icon name="mail" />{{ 'students.actionMail' | t }}</a>
-              <a [attr.href]="d.phone ? 'tel:' + d.phone : null" [class.pointer-events-none]="!d.phone" [class.opacity-35]="!d.phone" class="head-btn"><app-icon name="call" />{{ 'students.actionCall' | t }}</a>
+              <!-- (Email / Call: when there's one) -->
+              @if (d.email) {
+                <a [attr.href]="'mailto:' + d.email" class="head-btn"><app-icon name="mail" />{{ 'students.actionMail' | t }}</a>
+              }
+              @if (d.phone) {
+                <a [attr.href]="'tel:' + d.phone" class="head-btn"><app-icon name="call" />{{ 'students.actionCall' | t }}</a>
+              }
             } @else {
               <!-- Its color -->
               <button #colorBtn type="button" (click)="colorOpen.set(!colorOpen())" [attr.aria-expanded]="colorOpen()" [appTip]="'groups.color' | t" tipSide="bottom" class="head-btn">
@@ -67,16 +72,24 @@ import { CreateDialog } from '../cards/create-dialog';
 
           <div class="flex flex-col gap-4 pl-5 pt-2">
             @if (kind() === 'student') {
-              <!-- Contact: a label and its value, edited in place (as a page's properties) -->
+              <!-- Contact: only the properties it has (a label and its value, edited in place); then
+                   "Add a property" — a menu of the others, as the lessons' Task / Assistant -->
               <div class="flex flex-col">
+                @if (props().has('email')) {
                 <label class="flex h-9 items-center gap-3 text-[0.875rem]">
                   <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="mail" class="size-4" />{{ 'students.email' | t }}</span>
-                  <input [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+                  <input data-prop="email" [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
                 </label>
+                }
+                @if (props().has('phone')) {
                 <label class="flex h-9 items-center gap-3 text-[0.875rem]">
                   <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="call" class="size-4" />{{ 'students.phone' | t }}</span>
-                  <input [ngModel]="d.phone" (ngModelChange)="patch({ phone: $event || null })" type="tel" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 tabular-nums outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+                  <input data-prop="phone" [ngModel]="d.phone" (ngModelChange)="patch({ phone: $event || null })" type="tel" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 tabular-nums outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
                 </label>
+                }
+                @if (props().size < 2) {
+                  <button #propBtn type="button" (click)="propOpen.set(!propOpen())" [attr.aria-expanded]="propOpen()" class="flex h-9 items-center gap-2 text-left text-[0.875rem] opacity-45 hover:opacity-70"><app-icon name="plus" class="size-4" />{{ 'person.addProperty' | t }}</button>
+                }
               </div>
               @if (realId(); as sid) {
                 <app-student-link [studentId]="sid" />
@@ -109,6 +122,19 @@ import { CreateDialog } from '../cards/create-dialog';
 
     @if (newStudent() !== null) {
       <app-create-dialog [initialName]="newStudent()!" [hint]="'newStudent.toGroup' | t" (created)="toggleMember($event)" (closed)="newStudent.set(null)" />
+    }
+
+    @if (propOpen()) {
+      <app-sheet [origin]="propAnchor()?.nativeElement ?? null" [fit]="true" (closed)="propOpen.set(false)">
+        <div class="menu-list">
+          @if (!props().has('email')) {
+            <button type="button" (click)="addProp('email')" class="menu-item"><app-icon name="mail" /><span class="flex-1">{{ 'students.email' | t }}</span></button>
+          }
+          @if (!props().has('phone')) {
+            <button type="button" (click)="addProp('phone')" class="menu-item"><app-icon name="call" /><span class="flex-1">{{ 'students.phone' | t }}</span></button>
+          }
+        </div>
+      </app-sheet>
     }
 
     @if (colorOpen()) {
@@ -155,6 +181,10 @@ export class PersonPage {
   protected readonly colors = GROUP_COLORS;
 
   protected readonly menuOpen = signal(false);
+  // The properties shown (the ones it has, and the ones added here); Add a property's menu
+  protected readonly props = signal<ReadonlySet<'email' | 'phone'>>(new Set());
+  protected readonly propOpen = signal(false);
+  protected readonly propAnchor = viewChild<ElementRef<HTMLElement>>('propBtn');
   protected readonly colorOpen = signal(false);
   protected readonly deleting = signal<HTMLElement | null>(null);
   protected readonly menuAnchor = viewChild<ElementRef<HTMLElement>>('menuBtn');
@@ -204,6 +234,7 @@ export class PersonPage {
           studentIds: [...(g?.studentIds ?? [])],
         });
         this.saved = JSON.stringify(this.draft());
+        this.props.set(new Set([...(s?.email ? ['email' as const] : []), ...(s?.phone ? ['phone' as const] : [])]));
       });
     });
     // Each change: saved a moment after the last one (typed on without a pause: every few seconds)
@@ -233,6 +264,13 @@ export class PersonPage {
 
   protected patch(p: Partial<Draft>): void {
     this.draft.update((d) => ({ ...d, ...p }));
+  }
+
+  // A property added: its row, its field ready to type in
+  protected addProp(p: 'email' | 'phone'): void {
+    this.propOpen.set(false);
+    this.props.update((s) => new Set([...s, p]));
+    setTimeout(() => document.querySelector<HTMLInputElement>(`[data-prop="${p}"]`)?.focus());
   }
 
   protected toggleMember(id: string): void {
