@@ -79,7 +79,7 @@ interface Found {
         <button type="button" (click)="fold('upcoming')" [attr.aria-expanded]="!folded().includes('upcoming')" class="flex flex-1 items-center gap-2 text-left">
           <!-- (its icon; on hover, the fold chevron in its place) -->
           <span class="relative size-5 shrink-0">
-            <app-icon name="calendar" class="side-glyph absolute inset-0 group-hover:opacity-0" />
+            <app-icon name="calendar-day" class="side-glyph absolute inset-0 group-hover:opacity-0" />
             <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('upcoming')" />
           </span>
           {{ 'sidebar.calendar' | t }}
