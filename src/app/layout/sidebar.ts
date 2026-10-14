@@ -253,7 +253,7 @@ interface Found {
     <!-- The search window (as Notion's): in the middle, near the top -->
     @if (searchOpen()) {
       <div class="fixed inset-0 z-[2200] flex items-start justify-center pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeSearch()">
-        <div class="dialog-panel flex max-h-[70vh] w-[36rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
+        <div class="dialog-panel flex h-[70vh] w-[36rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
           <label class="flex h-12 shrink-0 items-center gap-2.5 px-4">
             <app-icon name="search" class="size-6 shrink-0 opacity-50" />
             <input
@@ -270,7 +270,8 @@ interface Found {
               <button type="button" (mousedown)="$event.preventDefault()" (click)="query.set(''); index.set(0); $any($event.currentTarget).parentElement.querySelector('input')?.focus()" [attr.aria-label]="'action.clear' | t" class="flex size-6 shrink-0 items-center justify-center rounded-md opacity-45 hover:bg-[var(--tint)] hover:opacity-80"><app-icon name="close" class="size-4" /></button>
             }
           </label>
-          <div class="min-h-0 overflow-y-auto p-1.5">
+          <!-- (one height, as the inbox's; nothing found: said in the middle) -->
+          <div class="flex min-h-0 flex-1 flex-col overflow-y-auto p-1.5">
             @for (f of found(); track f.kind + f.id; let k = $index) {
               <button type="button" (click)="pick(f)" (mouseenter)="index.set(k)" class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.875rem]" [class.bg-[var(--highlight)]]="k === index()">
                 @if (f.kind === 'student') {
@@ -284,7 +285,7 @@ interface Found {
                 }
               </button>
             } @empty {
-              <p class="text-footnote px-2.5 py-3 opacity-45">{{ 'students.notFound' | t }}</p>
+              <p class="m-auto text-center text-[0.875rem] opacity-45">{{ 'students.notFound' | t }}</p>
             }
           </div>
         </div>

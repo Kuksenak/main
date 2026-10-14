@@ -45,7 +45,7 @@ interface Item {
         </label>
         <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
           @if (items(); as list) {
-            <div class="flex flex-col gap-px">
+            <div class="flex min-h-full flex-col gap-px">
               @for (n of filtered(list); track n.id) {
                 <!-- (not opening anything for now) -->
                 <div class="side-row relative !h-9 !gap-2.5 !pl-5 hover:!bg-transparent">
@@ -61,7 +61,8 @@ interface Item {
                   <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(n.createdAt) }}</span>
                 </div>
               } @empty {
-                <p class="px-2 py-10 text-[0.875rem] opacity-40">{{ 'notifications.empty' | t }}</p>
+                <!-- (nothing / nothing found: said in the middle) -->
+                <p class="m-auto py-10 text-center text-[0.875rem] opacity-40">{{ (query().trim() ? 'students.notFound' : 'notifications.empty') | t }}</p>
               }
             </div>
           }
