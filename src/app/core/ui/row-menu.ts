@@ -17,9 +17,6 @@ import { Sheet } from './sheet/sheet';
     @if (open()) {
       <app-sheet [origin]="btn" [fit]="true" (closed)="open.set(false)">
         <div class="menu-list">
-          @if (link(); as l) {
-            <button type="button" (click)="newTab(l)" class="menu-item"><app-icon name="popout" /><span class="flex-1">{{ 'action.openNewTab' | t }}</span></button>
-          }
           <button type="button" (click)="open.set(false); removed.emit()" class="menu-item"><app-icon name="close" /><span class="flex-1">{{ 'action.remove' | t }}</span></button>
         </div>
       </app-sheet>

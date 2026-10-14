@@ -110,7 +110,10 @@ interface Found {
           <div role="button" tabindex="0" (click)="openEvent(e)" (keydown.enter)="openEvent(e)" class="side-row cursor-pointer !pl-[1.125rem]">
             <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
             <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(e) }}</span>
-            <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, 'event', e.id, e)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === e.id"><app-icon name="dots" class="size-4" /></button>
+            <!-- (a repeating one: nothing in ⋯ here — deleted from its card, asked which) -->
+            @if (e.repeat === 'Never') {
+              <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, 'event', e.id, e)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === e.id"><app-icon name="dots" class="size-4" /></button>
+            }
           </div>
         } @empty {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
@@ -267,11 +270,10 @@ interface Found {
       </div>
     }
 
-    <!-- A row's ⋯ (as Notion's): what it is, its actions, Open in new tab / in a popup; a page's last edit -->
+    <!-- A row's ⋯ (as Notion's): its actions; a page's last edit -->
     @if (itemMenu(); as im) {
       <app-sheet [origin]="im.origin" [fit]="true" (closed)="itemMenu.set(null)">
         <div class="menu-list min-w-56">
-          <p class="px-2 pb-1 pt-1 text-[0.75rem] font-medium opacity-50">{{ (im.kind === 'lesson' ? 'item.page' : im.kind === 'student' ? 'item.person' : 'item.event') | t }}</p>
           @if (im.kind !== 'event') {
             <button type="button" (click)="copyItemLink(im)" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
           }
@@ -283,9 +285,6 @@ interface Found {
           } @else if (im.event?.repeat === 'Never') {
             <button type="button" (click)="deleteEvent(im)" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
           }
-          <div class="menu-sep"></div>
-          <button type="button" (click)="openItemTab(im)" class="menu-item"><app-icon name="arrow-up-right" /><span class="flex-1">{{ 'action.openNewTab' | t }}</span></button>
-          <button type="button" (click)="openItemPopup(im)" class="menu-item"><app-icon name="popout" /><span class="flex-1">{{ 'item.openPopup' | t }}</span></button>
           @if (im.kind === 'lesson' && lessonEdited(im.id); as when) {
             <div class="menu-sep"></div>
             <p class="menu-foot">{{ 'lessons.lastEdited' | t }} {{ when }}</p>
@@ -344,7 +343,6 @@ export class Sidebar {
   protected readonly itemMenu = signal<ItemMenu | null>(null);
   private readonly http = inject(HttpClient);
   private readonly toast = inject(ToastService);
-  private readonly peekPages2 = inject(PeekService);
 
   protected openItemMenu(e: Event, kind: ItemMenu['kind'], id: string, event?: ScheduleEvent): void {
     const origin = e.currentTarget as HTMLElement;
@@ -401,19 +399,6 @@ export class Sidebar {
           this.events.create({ title: e.title, repeat: e.repeat, repeatInterval: e.repeatInterval, repeatUntil: e.repeatUntil, studentIds: e.studentIds, groupIds: e.groupIds, lessonIds: e.lessonIds, startsAt: e.startsAt, durationMinutes: e.durationMinutes }),
       },
     });
-  }
-
-  protected openItemTab(im: ItemMenu): void {
-    this.itemMenu.set(null);
-    const tree = this.router.createUrlTree(this.itemPath(im), im.kind === 'event' && im.event ? { queryParams: { at: im.event.startsAt } } : {});
-    window.open(this.router.serializeUrl(tree), '_blank');
-  }
-
-  protected openItemPopup(im: ItemMenu): void {
-    this.itemMenu.set(null);
-    if (im.kind === 'event') {
-      if (im.event) this.openEvent(im.event);
-    } else this.peekPages2.open(im.kind, im.id);
   }
 
   // "14 Oct, 12:36"
