@@ -33,7 +33,7 @@ import { GROUPS_ON, GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 
 type Section = 'upcoming' | 'people' | 'lessons' | 'favorites';
-const FOLDED_KEY = 'sidebar.folded';
+const FOLDED_KEY = 'sidebar.folded.v2'; // (all unfolded at first)
 
 /** A row's ⋯ menu: which one, where it opened. */
 interface ItemMenu {
@@ -93,18 +93,16 @@ interface Found {
     <!-- (246 wide, 12 at each side; the scroll thumb in the right one) -->
     <app-scroll-area class="min-h-0 flex-1 pr-3" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-3 pt-2">
 
-      <!-- Sections (as Notion's): a head folds them (↗ and + on hover); the first few, then View all.
+      <!-- Sections (as Notion's): a head's icon folds them, its name opens them all (+ on hover adds); the
+           first few, then View all.
            Calendar: the upcoming events -->
       <div class="side-head group">
-        <button type="button" (click)="fold('upcoming')" [attr.aria-expanded]="!folded().includes('upcoming')" class="flex flex-1 items-center gap-2 text-left">
-          <!-- (its icon; on hover, the fold chevron in its place) -->
-          <span class="relative size-5 shrink-0">
+        <!-- (its icon — on hover the chevron — folds it; its name opens all of them) -->
+          <button type="button" (click)="fold('upcoming')" [attr.aria-expanded]="!folded().includes('upcoming')"  class="relative size-5 shrink-0">
             <app-icon name="calendar-day" class="side-glyph absolute inset-0 group-hover:opacity-0" />
             <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('upcoming')" />
-          </span>
-          {{ 'sidebar.calendar' | t }}
-        </button>
-        <a routerLink="/schedule" [appTip]="'sidebar.calendar' | t" tipSide="right" [attr.aria-label]="'sidebar.calendar' | t" class="side-add"><app-icon name="arrow-up-right" class="size-4" /></a>
+          </button>
+        <a routerLink="/schedule" class="min-w-0 flex-1 truncate pl-1">{{ 'sidebar.calendar' | t }}</a>
         <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('upcoming')) {
@@ -127,13 +125,12 @@ interface Found {
       <!-- Favorites (pages and people marked so in their ⋯): after the calendar, when there are any -->
       @if (favorites().length) {
         <div class="side-head group mt-1.5">
-          <button type="button" (click)="fold('favorites')" [attr.aria-expanded]="!folded().includes('favorites')" class="flex flex-1 items-center gap-2 text-left">
-            <span class="relative size-5 shrink-0">
+          <!-- (its icon — on hover the chevron — folds it; its name opens all of them) -->
+            <button type="button" (click)="fold('favorites')" [attr.aria-expanded]="!folded().includes('favorites')"  class="relative size-5 shrink-0">
               <app-icon name="star" class="side-glyph absolute inset-0 group-hover:opacity-0" />
               <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('favorites')" />
-            </span>
-            {{ 'item.favorites' | t }}
-          </button>
+            </button>
+          <button type="button" (click)="fold('favorites')" class="min-w-0 flex-1 truncate pl-1 text-left">{{ 'item.favorites' | t }}</button>
         </div>
         @if (!folded().includes('favorites')) {
           @for (f of favorites(); track f.kind + f.id) {
@@ -151,15 +148,12 @@ interface Found {
       }
 
       <div class="side-head group mt-1.5">
-        <button type="button" (click)="fold('lessons')" [attr.aria-expanded]="!folded().includes('lessons')" class="flex flex-1 items-center gap-2 text-left">
-          <!-- (its icon; on hover, the fold chevron in its place) -->
-          <span class="relative size-5 shrink-0">
+        <!-- (its icon — on hover the chevron — folds it; its name opens all of them) -->
+          <button type="button" (click)="fold('lessons')" [attr.aria-expanded]="!folded().includes('lessons')"  class="relative size-5 shrink-0">
             <app-icon name="library" class="side-glyph absolute inset-0 group-hover:opacity-0" />
             <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('lessons')" />
-          </span>
-          {{ 'sidebar.library' | t }}
-        </button>
-        <a routerLink="/lessons" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add"><app-icon name="arrow-up-right" class="size-4" /></a>
+          </button>
+        <a routerLink="/lessons" class="min-w-0 flex-1 truncate pl-1">{{ 'sidebar.library' | t }}</a>
         <button type="button" (click)="create('lesson')" [appTip]="'lessons.add' | t" tipSide="right" [attr.aria-label]="'lessons.add' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('lessons')) {
@@ -177,15 +171,12 @@ interface Found {
       }
 
       <div class="side-head group mt-1.5">
-        <button type="button" (click)="fold('people')" [attr.aria-expanded]="!folded().includes('people')" class="flex flex-1 items-center gap-2 text-left">
-          <!-- (its icon; on hover, the fold chevron in its place) -->
-          <span class="relative size-5 shrink-0">
+        <!-- (its icon — on hover the chevron — folds it; its name opens all of them) -->
+          <button type="button" (click)="fold('people')" [attr.aria-expanded]="!folded().includes('people')"  class="relative size-5 shrink-0">
             <app-icon name="people" class="side-glyph absolute inset-0 group-hover:opacity-0" />
             <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('people')" />
-          </span>
-          {{ 'sidebar.people' | t }}
-        </button>
-        <a routerLink="/students" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add"><app-icon name="arrow-up-right" class="size-4" /></a>
+          </button>
+        <a routerLink="/students" class="min-w-0 flex-1 truncate pl-1">{{ 'sidebar.people' | t }}</a>
         <button type="button" (click)="create('student')" [appTip]="'sidebar.newStudent' | t" tipSide="right" [attr.aria-label]="'sidebar.newStudent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('people')) {
