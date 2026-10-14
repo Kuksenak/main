@@ -607,9 +607,12 @@ html.dark .btn-white {
   text-align: left;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  /* (crisp, as the examples': the text's full color, a touch heavier) */
+  color: var(--text);
+  font-weight: 450;
 }
 .menu-item:hover:not(:disabled) {
-  background: var(--tint);
+  background: var(--tint-strong);
 }
 /* (a menu picked by keys too: the pointer moves its one highlight instead of adding a second) */
 .menu-item.no-hover:hover:not(:disabled) {
@@ -623,7 +626,7 @@ html.dark .btn-white {
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;
-  opacity: 0.85;
+  opacity: 0.95;
 }
 /* (thin lines, as Notion's) */
 .menu-item > app-icon:first-child svg,
@@ -729,6 +732,8 @@ html.dark .btn-white {
   text-align: left;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  color: var(--text);
+  font-weight: 450;
 }
 .add-opt.with-icon {
   display: flex;
@@ -739,7 +744,7 @@ html.dark .btn-white {
   width: 1.25rem;
   height: 1.25rem;
   flex-shrink: 0;
-  opacity: 0.7;
+  opacity: 0.95;
 }
 .add-icon svg {
   stroke-width: 1.6;
@@ -748,7 +753,7 @@ html.dark .btn-white {
   font-weight: 650;
 }
 .add-opt.is-on {
-  background: var(--tint);
+  background: var(--tint-strong);
 }
 
 /* A row's ⋯ (RowMenu): shown on the row's hover and while its menu is open */
