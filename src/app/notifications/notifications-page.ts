@@ -39,6 +39,9 @@ interface Item {
         <label class="flex h-12 shrink-0 items-center gap-2.5 px-3">
           <app-icon name="search" class="size-6 shrink-0 opacity-50" />
           <input [value]="query()" (input)="query.set($any($event.target).value)" type="text" [placeholder]="'inbox.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45" />
+          @if (query()) {
+              <button type="button" (mousedown)="$event.preventDefault()" (click)="query.set(''); $any($event.currentTarget).parentElement.querySelector('input')?.focus()" [attr.aria-label]="'action.clear' | t" class="flex size-6 shrink-0 items-center justify-center rounded-md opacity-45 hover:bg-[var(--tint)] hover:opacity-80"><app-icon name="close" class="size-4" /></button>
+            }
         </label>
         <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
           @if (items(); as list) {

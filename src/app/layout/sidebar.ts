@@ -266,6 +266,9 @@ interface Found {
               autocomplete="off"
               class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45"
             />
+            @if (query()) {
+              <button type="button" (mousedown)="$event.preventDefault()" (click)="query.set(''); index.set(0); $any($event.currentTarget).parentElement.querySelector('input')?.focus()" [attr.aria-label]="'action.clear' | t" class="flex size-6 shrink-0 items-center justify-center rounded-md opacity-45 hover:bg-[var(--tint)] hover:opacity-80"><app-icon name="close" class="size-4" /></button>
+            }
           </label>
           <div class="min-h-0 overflow-y-auto p-1.5">
             @for (f of found(); track f.kind + f.id; let k = $index) {
@@ -331,6 +334,9 @@ interface Found {
           <label class="flex h-10 shrink-0 items-center gap-2 px-2.5">
             <app-icon name="search" class="size-[1.125rem] shrink-0 opacity-50" />
             <input data-autofocus [value]="trashQuery()" (input)="trashQuery.set($any($event.target).value)" type="text" [placeholder]="'trash.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.875rem] outline-none placeholder:opacity-45" />
+            @if (trashQuery()) {
+              <button type="button" (mousedown)="$event.preventDefault()" (click)="trashQuery.set(''); $any($event.currentTarget).parentElement.querySelector('input')?.focus()" [attr.aria-label]="'action.clear' | t" class="flex size-6 shrink-0 items-center justify-center rounded-md opacity-45 hover:bg-[var(--tint)] hover:opacity-80"><app-icon name="close" class="size-4" /></button>
+            }
           </label>
           <div class="flex max-h-80 flex-col gap-px overflow-y-auto">
             @for (x of trashShown(); track x.kind + x.id) {
