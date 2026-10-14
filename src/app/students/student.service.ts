@@ -8,6 +8,7 @@ export interface Student {
   name: string;
   email: string | null;
   phone: string | null;
+  notes?: string | null; // the teacher's notes about them
   lessonIds: string[]; // attached lessons (their materials), in order
 }
 
@@ -15,6 +16,7 @@ export interface StudentInput {
   name: string;
   email: string | null;
   phone: string | null;
+  notes?: string | null; // left out: kept as they are; '' clears them
 }
 
 /** The account's students (API: /students). */

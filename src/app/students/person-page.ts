@@ -21,6 +21,7 @@ interface Draft {
   name: string;
   email: string | null;
   phone: string | null;
+  notes: string;
   color: GroupColor;
   studentIds: string[];
 }
@@ -71,6 +72,8 @@ import { TrashService } from '../core/services/trash.service';
 
           <div class="flex flex-col gap-4 px-5 pt-2">
             @if (kind() === 'student') {
+              <!-- Notes: free text under the name, plain (as the title), growing as it's written -->
+              <textarea [ngModel]="d.notes" (ngModelChange)="patch({ notes: $event })" rows="1" [placeholder]="'students.notes' | t" class="-mt-2 w-full resize-none bg-transparent text-[0.9375rem] leading-relaxed outline-none [field-sizing:content] placeholder:opacity-35"></textarea>
               @if (realId(); as sid) {
                 <app-student-link [studentId]="sid" />
                 <app-lessons-card [studentId]="sid" />
@@ -170,7 +173,7 @@ export class PersonPage {
   protected readonly exists = computed(() => !this.realId() || !!(this.student() || this.group()));
 
   // The draft edited here, and what it was when last saved
-  protected readonly draft = signal<Draft>({ name: '', email: null, phone: null, color: 'teal', studentIds: [] });
+  protected readonly draft = signal<Draft>({ name: '', email: null, phone: null, notes: '', color: 'teal', studentIds: [] });
   private saved = '';
   private openedId: string | null = null;
   private timer: ReturnType<typeof setTimeout> | undefined;
@@ -205,6 +208,7 @@ export class PersonPage {
           name: s?.name ?? g?.name ?? '',
           email: s?.email ?? null,
           phone: s?.phone ?? null,
+          notes: s?.notes ?? '',
           color: g?.color ?? 'teal',
           studentIds: [...(g?.studentIds ?? [])],
         });
@@ -272,7 +276,7 @@ export class PersonPage {
     }
     this.saved = now;
     if (this.kind() === 'student') {
-      this.students.update(this.openedId, { name: d.name.trim(), email: d.email?.trim() || null, phone: d.phone?.trim() || null });
+      this.students.update(this.openedId, { name: d.name.trim(), email: d.email?.trim() || null, phone: d.phone?.trim() || null, notes: d.notes });
     } else {
       this.groups.update(this.openedId, { name: d.name.trim(), color: d.color, studentIds: d.studentIds });
     }
