@@ -96,10 +96,10 @@
   }
 
   <router-outlet></router-outlet>
-<!-- The inbox (desktop): a panel at the right, over the page (its list as the page's) -->
+<!-- The inbox (desktop): a panel right beside the sidebar, over the page (its list as the page's) -->
 @if (desktop && inbox.open()) {
   <div class="fixed inset-0 z-[24]" (mousedown)="inbox.open.set(false)"></div>
-  <div class="dialog-panel fixed bottom-2 right-2 top-2 z-[24] flex w-[26rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl pt-2 [animation:dropdownIn_160ms_var(--ease-out-quick)]">
+  <div class="dialog-panel fixed bottom-2 top-2 z-[24] flex w-[26rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl pt-2 [animation:dropdownIn_160ms_var(--ease-out-quick)]" [style.left.px]="sidebarOpen() ? 274 : 52">
     <app-notifications-page />
   </div>
 }
