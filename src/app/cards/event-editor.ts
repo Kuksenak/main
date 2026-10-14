@@ -69,7 +69,7 @@ import { RowMenu } from '../core/ui/row-menu';
       <!-- Desktop, in the new style (as a Notion page): the title big, then properties — a gray label
            with its icon, the value beside it; participants and lessons as rows (⋯ on hover: Open in new tab, Remove) -->
       <div class="contents" [class.read-only]="readOnly()">
-      <div class="flex flex-col gap-4 pt-1">
+      <div class="flex flex-col gap-2.5 pt-1">
         <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="w-full bg-transparent px-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
 
         <div class="flex flex-col">
@@ -135,9 +135,6 @@ import { RowMenu } from '../core/ui/row-menu';
           }
           <app-add-field class="edit-only" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" />
         </div>
-
-        <!-- (a line between participants and lessons) -->
-        <div class="h-px bg-[var(--separator)]"></div>
 
         <div class="flex flex-col gap-px">
           @for (l of attached(); track l.id) {

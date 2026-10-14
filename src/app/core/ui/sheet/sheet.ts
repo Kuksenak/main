@@ -1,6 +1,6 @@
 import { EscStack } from '../esc-stack';
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, output, OnInit, signal } from '@angular/core';
 import { ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 import { LayerStack } from '../../services/layer-stack.service';
@@ -88,7 +88,7 @@ import { InstallService } from '../../services/install.service';
     }
   `,
 })
-export class Sheet {
+export class Sheet implements OnInit {
   /** Desktop anchor: the button that opened the menu. */
   readonly origin = input<HTMLElement | null>(null);
   /** Desktop dropdown: wider (24rem instead of 18rem). */
@@ -104,9 +104,16 @@ export class Sheet {
   // A phone's browser (not the installed app): a bit higher, clear of its bottom bar.
   protected readonly inBrowser = !this.desktop && !inject(InstallService).standalone;
   // Desktop: a layer over the cards (the card under it dims itself; no extra window dimming).
+  // A dropdown (a menu at its button) dims nothing, as Notion's.
   private readonly layers = inject(LayerStack);
-  private readonly layer = this.desktop ? this.layers.add(false) : 0;
-  protected readonly overDialog = this.desktop && this.layers.overPage(this.layer);
+  private layer = 0;
+  protected overDialog = false;
+
+  ngOnInit(): void {
+    if (!this.desktop || this.origin()) return;
+    this.layer = this.layers.add(false);
+    this.overDialog = this.layers.overPage(this.layer);
+  }
 
   constructor() {
     // (Esc closes it, when it's on top)
