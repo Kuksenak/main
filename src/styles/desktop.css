@@ -118,7 +118,7 @@ html.dark:root {
 /* Settings as a menu (the new style): no cards, no lines — rows as menu items, the email a small
    gray line on top */
 .settings-menu {
-  width: 18rem;
+  width: 16rem;
   font-size: 0.8125rem;
 }
 /* (everything in it the menus' size, the settings unfolded in it too) */
@@ -172,6 +172,10 @@ html.dark:root {
 }
 .settings-menu > .card:first-child .row-icon {
   display: none;
+}
+/* (the email: a label, no hover) */
+.settings-menu > .card:first-child button.list-row:hover {
+  background: transparent;
 }
 /* No circles on desktop: round buttons get the regular corners */
 .icon-btn,
