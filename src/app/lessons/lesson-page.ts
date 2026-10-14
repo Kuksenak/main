@@ -38,13 +38,13 @@ import { TrashService } from '../core/services/trash.service';
   imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, LessonContent, PageSheet, Tip, Toggle],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
-    <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
+    <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4">
       <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-1 pb-10">
         @if (s.id() && !s.lesson()) {
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
         } @else {
           <!-- One row, always at the top: the name; saved; the level; Preview; Publish (Copy link); ☰ -->
-          <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--head-bg,var(--app-bg))] px-1">
+          <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--head-bg,var(--app-bg))] pl-1 pr-4">
             @if (s.draft().locked) {
               <!-- Locked: a lock (a square button, as the head's) before the name, the name moved along; a click unlocks -->
               <button type="button" (click)="setLocked(false)" [appTip]="'lessons.unlock' | t" tipSide="bottom" [attr.aria-label]="'lessons.unlock' | t" class="head-btn ml-5 !px-1.5">

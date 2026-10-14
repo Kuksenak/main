@@ -84,7 +84,7 @@ import { ToastService } from '../core/ui/toast';
       <div class="contents" [class.read-only]="readOnly()">
       <!-- (as the pages': the head — the title, its buttons, ⋯ last — then the body under the title) -->
       <div class="flex flex-col gap-2.5 [&>*:not(:first-child)]:px-5">
-        <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--head-bg,var(--app-bg))] px-1">
+        <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--head-bg,var(--app-bg))] pl-1 pr-4">
           <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
           <!-- (Open in full page, Ctrl+Enter; a new one takes what's typed along) -->
           @if (!inline()) {
