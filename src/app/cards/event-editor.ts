@@ -47,15 +47,14 @@ interface Model {
 
 /** Event card (new or existing), opened on the NavStack. */
 import { AddField, AddItem } from '../core/ui/add-field';
-import { PeekService } from '../layout/peek.service';
 import { RowMenu } from '../core/ui/row-menu';
 import { Router } from '@angular/router';
 import { Tip } from '../core/ui/tip';
-import { NewStudentDialog } from './new-student-dialog';
+import { CreateDialog } from './create-dialog';
 @Component({
   selector: 'app-event-editor',
   host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
-  imports: [AddField, NewStudentDialog, RowMenu, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [AddField, CreateDialog, RowMenu, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -160,7 +159,7 @@ import { NewStudentDialog } from './new-student-dialog';
               <app-row-menu class="edit-only" [link]="['/lessons', l.id]" (removed)="detach(l.id)" />
             </div>
           }
-          <app-add-field class="edit-only" [class.pl-[1.9375rem]]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newLesson()" [section]="'event.fromLibrary' | t" itemIcon="page" />
+          <app-add-field class="edit-only" [class.pl-[1.9375rem]]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newPage.set($event)" [section]="'event.fromLibrary' | t" itemIcon="page" />
         </div>
       </div>
       </div>
@@ -280,7 +279,10 @@ import { NewStudentDialog } from './new-student-dialog';
     }
 
     @if (newStudent(); as n) {
-      <app-new-student-dialog [initialName]="n" [hint]="'newStudent.toEvent' | t" (created)="invite($event)" (closed)="newStudent.set(null)" />
+      <app-create-dialog [initialName]="n" [hint]="'newStudent.toEvent' | t" (created)="invite($event)" (closed)="newStudent.set(null)" />
+    }
+    @if (newPage(); as n) {
+      <app-create-dialog kind="page" [initialName]="n" [hint]="'create.pageToEvent' | t" (created)="attach($event)" (closed)="newPage.set(null)" />
     }
 
     @switch (picking()) {
@@ -589,11 +591,8 @@ export class EventEditor implements OnInit {
     this.patch({ lessonIds: [...this.model().lessonIds, id] });
   }
 
-  // New lesson (from the lessons' field): written in a popup over this card, attached once saved
-  private readonly peek = inject(PeekService);
-  protected newLesson(): void {
-    this.peek.open('lesson', null, { over: true, onCreated: (id) => this.attach(id) });
-  }
+  // New page (from the pages' field): just its title, in a small dialog; attached once made
+  protected readonly newPage = signal<string | null>(null);
 
   protected uninvite(id: string): void {
     const { groupIds, studentIds } = this.model().invitees;

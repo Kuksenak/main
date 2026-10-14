@@ -33,10 +33,10 @@ interface Draft {
  */
 import { AddField, AddItem } from '../core/ui/add-field';
 import { RowMenu } from '../core/ui/row-menu';
-import { NewStudentDialog } from '../cards/new-student-dialog';
+import { CreateDialog } from '../cards/create-dialog';
 @Component({
   selector: 'app-person-page',
-  imports: [AddField, NewStudentDialog, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
+  imports: [AddField, CreateDialog, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
@@ -108,7 +108,7 @@ import { NewStudentDialog } from '../cards/new-student-dialog';
     </main>
 
     @if (newStudent(); as n) {
-      <app-new-student-dialog [initialName]="n" [hint]="'newStudent.toGroup' | t" (created)="toggleMember($event)" (closed)="newStudent.set(null)" />
+      <app-create-dialog [initialName]="n" [hint]="'newStudent.toGroup' | t" (created)="toggleMember($event)" (closed)="newStudent.set(null)" />
     }
 
     @if (colorOpen()) {
