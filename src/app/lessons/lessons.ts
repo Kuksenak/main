@@ -97,6 +97,15 @@ import { Tip } from '../core/ui/tip';
             <div class="flex min-h-0 flex-1 flex-col px-2">
               <h1 class="flex h-12 shrink-0 items-center px-2 text-[1.25rem] font-semibold">{{ 'sidebar.library' | t }}</h1>
               @if (visible().length) {
+                <!-- (the columns' names, faint, over the rows) -->
+                <div class="flex h-7 shrink-0 items-center gap-3 px-2 text-[0.75rem] font-medium opacity-45">
+                  <span class="w-5 shrink-0"></span>
+                  <span class="min-w-0 flex-1">{{ 'table.name' | t }}</span>
+                  <span class="w-12 shrink-0">{{ 'lessons.level' | t }}</span>
+                  <span class="w-20 shrink-0"></span>
+                  <span class="w-56 shrink-0">{{ 'table.used' | t }}</span>
+                  <span class="w-20 shrink-0 text-right">{{ 'table.edited' | t }}</span>
+                </div>
                 <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
                   <div class="flex flex-col gap-px">
                     @for (l of visible(); track l.id) {
