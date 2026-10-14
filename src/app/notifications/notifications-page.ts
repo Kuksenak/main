@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, afterNextRender, inject, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { catchError, of } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -35,12 +35,15 @@ interface Item {
       <!-- Desktop (as Notion's inbox): the head, then a row a line — the title, what it said, when at
            the right; new ones with a blue dot (opening nothing for now) -->
       <main class="flex min-h-0 w-full flex-1 flex-col px-2 pb-4">
-        <!-- (in line with the rows' titles) -->
-        <h1 class="flex h-12 shrink-0 items-center px-5 text-[1.25rem] font-semibold">{{ 'sidebar.inbox' | t }}</h1>
+        <!-- (a search on top, as the search window's) -->
+        <label class="flex h-12 shrink-0 items-center gap-2.5 px-3">
+          <app-icon name="search" class="size-6 shrink-0 opacity-50" />
+          <input [value]="query()" (input)="query.set($any($event.target).value)" type="text" [placeholder]="'inbox.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45" />
+        </label>
         <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
           @if (items(); as list) {
             <div class="flex flex-col gap-px">
-              @for (n of list; track n.id) {
+              @for (n of filtered(list); track n.id) {
                 <!-- (not opening anything for now) -->
                 <div class="side-row relative !h-9 !gap-2.5 !pl-5 hover:!bg-transparent">
                   @if (isNew(n)) {
@@ -97,12 +100,21 @@ export class NotificationsPage {
   // When the inbox was last open: newer ones are new (a blue dot); now is then, from here on
   private readonly seenBefore = readSeen();
 
+  // The search: in the title and what it said
+  protected readonly query = signal('');
+  protected filtered(list: Item[]): Item[] {
+    const q = this.query().trim().toLocaleLowerCase();
+    return q ? list.filter((n) => `${n.title} ${n.body}`.toLocaleLowerCase().includes(q)) : list;
+  }
+
   protected isNew(n: Item): boolean {
     return !!this.seenBefore && n.createdAt > this.seenBefore;
   }
 
   constructor() {
     this.load();
+    // (the search: typing straight away)
+    if (this.desktop) afterNextRender(() => document.querySelector<HTMLInputElement>('app-notifications-page input')?.focus());
     writeSeen(new Date().toISOString());
     // A new one meanwhile: the list again
     const sub = this.notifications.received.subscribe(() => this.load());

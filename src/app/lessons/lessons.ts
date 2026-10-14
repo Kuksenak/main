@@ -108,9 +108,10 @@ import { Tip } from '../core/ui/tip';
                             <span class="level-tag" [style.background]="levelTint(l.level)">{{ l.level }}</span>
                           }
                         </span>
-                        <span class="flex w-5 shrink-0 justify-center">
+                        <!-- (published: said in a word, a small tag) -->
+                        <span class="w-20 shrink-0">
                           @if (l.shareToken) {
-                            <app-icon name="globe" class="size-4 opacity-50" [appTip]="'lessons.publicShort' | t" tipSide="top" />
+                            <span class="level-tag !font-medium bg-[var(--tint-strong)] opacity-80" [appTip]="'lessons.publicShort' | t" tipSide="top">{{ 'item.published' | t }}</span>
                           }
                         </span>
                         <span class="w-56 shrink-0 truncate text-[0.8125rem] opacity-50">{{ useHint(l.id) }}</span>

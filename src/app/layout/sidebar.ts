@@ -327,7 +327,11 @@ interface Found {
     @if (trashOpen()) {
       <app-sheet [origin]="trashAnchor()?.nativeElement ?? null" [fit]="true" (closed)="trashOpen.set(false)">
         <div class="flex w-[22rem] flex-col">
-          <input [value]="trashQuery()" (input)="trashQuery.set($any($event.target).value)" [placeholder]="'trash.search' | t" autocomplete="off" class="mx-1 mb-1 mt-0.5 h-8 rounded-md bg-[var(--tint)] px-2.5 text-[0.875rem] outline-none placeholder:opacity-45" />
+          <!-- (its search as the search window's) -->
+          <label class="flex h-12 shrink-0 items-center gap-2.5 px-3">
+            <app-icon name="search" class="size-6 shrink-0 opacity-50" />
+            <input data-autofocus [value]="trashQuery()" (input)="trashQuery.set($any($event.target).value)" type="text" [placeholder]="'trash.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45" />
+          </label>
           <div class="flex max-h-80 flex-col gap-px overflow-y-auto">
             @for (x of trashShown(); track x.kind + x.id) {
               <div class="menu-item">
@@ -510,6 +514,7 @@ export class Sidebar {
     this.trashQuery.set('');
     this.trash.load();
     this.trashOpen.set(!this.trashOpen());
+    if (this.trashOpen()) setTimeout(() => document.querySelector<HTMLInputElement>('input[data-autofocus]')?.focus(), 50);
   }
   // When it was deleted: "14 Oct"
   protected deletedOn(x: TrashItem): string {
