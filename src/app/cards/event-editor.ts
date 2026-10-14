@@ -61,7 +61,7 @@ import { ToastService } from '../core/ui/toast';
 import { PeekService } from '../layout/peek.service';
 @Component({
   selector: 'app-event-editor',
-  host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
+  host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()', '[class]': "inline() ? 'flex min-h-0 w-full flex-1 flex-col' : ''" },
   imports: [NgTemplateOutlet, ScrollArea, AddField, CreateDialog, RowMenu, Sheet, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
