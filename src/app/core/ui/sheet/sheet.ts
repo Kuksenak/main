@@ -130,7 +130,7 @@ export class Sheet implements OnInit {
   protected readonly positions: ConnectedPosition[] = [
     { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 4 },
     { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -4 },
-    { originX: 'end', originY: 'bottom', overlayX: 'start', overlayY: 'bottom', offsetX: 10 },
+    { originX: 'end', originY: 'bottom', overlayX: 'start', overlayY: 'bottom', offsetX: 4 },
   ];
 
   protected readonly sidePositions: ConnectedPosition[] = [
