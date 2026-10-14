@@ -43,9 +43,9 @@ interface Found {
 @Component({
   selector: 'app-sidebar',
   imports: [Icon, RouterLink, RouterLinkActive, ScrollArea, Sheet, Tip, TranslatePipe],
-  host: { class: 'flex w-60 shrink-0 flex-col bg-[var(--side-bg)]' },
+  host: { class: 'flex w-[270px] shrink-0 flex-col bg-[var(--side-bg)]' },
   template: `
-    <div class="flex shrink-0 flex-col gap-2 px-2 pb-1 pt-2">
+    <div class="flex shrink-0 flex-col gap-2 px-3 pb-1 pt-2">
       <!-- The top row (as Notion's): hide the sidebar; the inbox (notifications; a dot for a new one),
            ✎ — new: an event, a group, a student, a lesson -->
       <div class="flex h-7 items-center gap-0.5">
@@ -70,9 +70,8 @@ interface Found {
       </button>
     </div>
 
-    <!-- (room at the right for its scroll thumb: inside the sidebar, not over its edge) -->
-    <!-- (room at the right for its scroll thumb: inside the sidebar, not over its edge) -->
-    <app-scroll-area class="min-h-0 flex-1 pr-2" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-2 pt-2">
+    <!-- (246 wide, 12 at each side; the scroll thumb in the right one) -->
+    <app-scroll-area class="min-h-0 flex-1 pr-3" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-3 pt-2">
       <!-- Sections (as Notion's): a head folds them (↗ and + on hover); the first few, then View all.
            Calendar: the upcoming events -->
       <div class="side-head group">
@@ -161,7 +160,7 @@ interface Found {
     </app-scroll-area>
 
     <!-- The account: its email; the settings open by it -->
-    <div class="shrink-0 border-t-[0.5px] border-[var(--separator)] px-2 py-2">
+    <div class="shrink-0 border-t-[0.5px] border-[var(--separator)] px-3 py-2">
       <button #accountBtn type="button" (click)="account.emit(accountBtn)" class="side-row">
         <span class="relative flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[0.6875rem] font-semibold uppercase text-white">
           {{ (auth.email() ?? '?').charAt(0) }}
