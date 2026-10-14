@@ -50,11 +50,13 @@ function store(key: string, value: string | null): void {
   } catch {}
 }
 
+import { Sky } from '../core/ui/sky';
 @Component({
   selector: 'app-student-portal',
-  imports: [Icon, LessonContent, TranslatePipe],
+  imports: [Sky, Icon, LessonContent, TranslatePipe],
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
+    <app-sky />
     <!-- Desktop: a lesson open takes the width (its blocks in tiles) -->
     <div class="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]" [class.desktop:max-w-none]="!!open()" [class.desktop:px-6]="!!open()">
       @switch (state()) {

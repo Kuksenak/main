@@ -1,3 +1,4 @@
+import { Sky } from '../core/ui/sky';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
@@ -6,7 +7,7 @@ import { Icon } from '../core/ui/icon/icon';
 
 @Component({
   selector: 'app-login',
-  imports: [TranslatePipe, Icon],
+  imports: [Sky, TranslatePipe, Icon],
   templateUrl: './login.html',
 })
 export class Login {

@@ -65,11 +65,13 @@ interface Attempt {
  * continues it; another name on the same device has its own); the teacher sees them with the
  * lesson. A pill at the bottom counts what's answered.
  */
+import { Sky } from '../core/ui/sky';
 @Component({
   selector: 'app-shared-lesson',
-  imports: [FormsModule, Icon, LessonContent, TranslatePipe],
+  imports: [Sky, FormsModule, Icon, LessonContent, TranslatePipe],
   host: { class: 'block h-full overflow-y-auto bg-[var(--app-bg)] text-[var(--text)]' },
   template: `
+    <app-sky />
     <div class="mx-auto flex w-full max-w-2xl flex-col gap-3 px-4 desktop:max-w-none desktop:px-6 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]">
       <!-- One compact row: the lesson's title; what's answered and kept, Send (the teacher gets it
            then; sent: closed); the visitor's name (a tap changes it) -->
