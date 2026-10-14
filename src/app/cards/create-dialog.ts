@@ -1,6 +1,7 @@
 import { Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { EscStack } from '../core/ui/esc-stack';
+import { emailOk } from '../core/utils/text';
 import { LessonService } from '../lessons/lesson.service';
 import { StudentService } from '../students/student.service';
 
@@ -26,7 +27,10 @@ import { StudentService } from '../students/student.service';
         @if (kind() === 'student') {
           <label class="flex flex-col gap-1.5">
             <span class="text-[0.8125rem] font-medium opacity-70">{{ 'students.email' | t }}</span>
-            <input #emailInput type="email" [value]="email()" (input)="email.set(emailInput.value)" autocomplete="off" class="h-9 rounded-md bg-[var(--tint)] px-2.5 text-[0.875rem] outline-none" />
+            <input #emailInput type="email" [value]="email()" (input)="email.set(emailInput.value)" autocomplete="off" class="h-9 rounded-md bg-[var(--tint)] px-2.5 text-[0.875rem] outline-none" [class.text-[var(--danger)]]="!emailValid()" />
+            @if (!emailValid()) {
+              <span class="text-[0.75rem] text-[var(--danger)] opacity-80">{{ 'students.badEmail' | t }}</span>
+            }
           </label>
         }
         <div class="flex items-center justify-end gap-2 pt-1">
@@ -49,7 +53,8 @@ export class CreateDialog {
   protected readonly name = signal('');
   protected readonly email = signal('');
   protected readonly busy = signal(false);
-  protected readonly canCreate = computed(() => !!this.name().trim() && !this.busy());
+  protected readonly emailValid = computed(() => emailOk(this.email()));
+  protected readonly canCreate = computed(() => !!this.name().trim() && this.emailValid() && !this.busy());
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
   private readonly nameInput = viewChild.required<ElementRef<HTMLInputElement>>('nameInput');

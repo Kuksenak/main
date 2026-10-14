@@ -34,6 +34,7 @@ interface Draft {
 import { AddField, AddItem } from '../core/ui/add-field';
 import { RowMenu } from '../core/ui/row-menu';
 import { CreateDialog } from '../cards/create-dialog';
+import { emailOk } from '../core/utils/text';
 @Component({
   selector: 'app-person-page',
   imports: [AddField, CreateDialog, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
@@ -74,7 +75,11 @@ import { CreateDialog } from '../cards/create-dialog';
             @if (kind() === 'student') {
               <!-- Email: a gray line under the name (as a subtitle), edited in place; none: ⋯ → Add email -->
               @if (d.email || emailShown()) {
-              <input data-email [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'students.addEmail' | t" class="-mt-3 w-full bg-transparent text-[0.875rem] opacity-60 outline-none placeholder:opacity-60 focus:opacity-100" />
+              <input data-email [ngModel]="d.email" (ngModelChange)="patch({ email: $event || null })" type="email" autocomplete="off" [placeholder]="'students.addEmail' | t" class="-mt-3 w-full bg-transparent text-[0.875rem] opacity-60 outline-none placeholder:opacity-60 focus:opacity-100" (focus)="emailFocus.set(true)" (blur)="emailFocus.set(false)" [class.!opacity-100]="emailWrong()" [class.text-[var(--danger)]]="emailWrong()" />
+              <!-- (not an email: said once typed — left; not saved until it is) -->
+              @if (emailWrong()) {
+                <p class="-mt-3 text-[0.75rem] text-[var(--danger)] opacity-80">{{ 'students.badEmail' | t }}</p>
+              }
               }
               @if (realId(); as sid) {
                 <app-student-link [studentId]="sid" />
@@ -168,6 +173,8 @@ export class PersonPage {
   protected readonly link = viewChild(StudentLink);
   // ⋯ → Add email: its line under the name, ready to type in
   protected readonly emailShown = signal(false);
+  protected readonly emailFocus = signal(false);
+  protected readonly emailWrong = computed(() => !emailOk(this.draft().email) && !this.emailFocus());
   protected addEmail(): void {
     this.menuOpen.set(false);
     this.emailShown.set(true);
@@ -262,7 +269,7 @@ export class PersonPage {
     this.pendingSince = null;
     const d = this.draft();
     const now = JSON.stringify(d);
-    if (this.deleted || now === this.saved || !d.name.trim()) return;
+    if (this.deleted || now === this.saved || !d.name.trim() || !emailOk(d.email)) return;
     if (!this.openedId) {
       // A new one: created (once); what changed meanwhile is saved after
       if (this.id() || this.creating) return;
