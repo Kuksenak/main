@@ -138,7 +138,7 @@ let carried: Model | null = null;
              under the properties' icons, texts under their labels (their tint reaching out to near the card's edges) -->
         <div class="flex flex-col gap-px">
           @for (p of invited(); track p.id) {
-            <div class="group/r -mx-3 flex min-h-10 items-center gap-2 rounded-[0.625rem] px-3 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
+            <div class="group/r -mx-2 flex min-h-10 items-center gap-2 rounded-[0.625rem] px-2 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
               <app-icon [name]="p.kind === 'group' ? 'people' : 'person'" class="size-4 shrink-0 opacity-50" />
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="truncate">{{ p.name }}</span>
@@ -149,12 +149,12 @@ let carried: Model | null = null;
               <app-row-menu class="edit-only" [link]="['/students', p.kind, p.id]" (removed)="uninvite(p.id)" />
             </div>
           }
-          <app-add-field class="edit-only add-wide -mx-3" icon="people" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" [section]="'event.fromPeople' | t" />
+          <app-add-field class="edit-only add-wide -mx-2" icon="people" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" [section]="'event.fromPeople' | t" />
         </div>
 
         <div class="flex flex-col gap-px">
           @for (l of attached(); track l.id) {
-            <div class="group/r -mx-3 flex min-h-10 items-center gap-2 rounded-[0.625rem] px-3 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
+            <div class="group/r -mx-2 flex min-h-10 items-center gap-2 rounded-[0.625rem] px-2 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
               <app-icon name="page" class="size-4 shrink-0 opacity-50" />
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="truncate">{{ l.title }}</span>
@@ -165,7 +165,7 @@ let carried: Model | null = null;
               <app-row-menu class="edit-only" [link]="['/lessons', l.id]" (removed)="detach(l.id)" />
             </div>
           }
-          <app-add-field class="edit-only add-wide -mx-3" icon="page" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newPage.set($event)" [section]="'event.fromLibrary' | t" itemIcon="page" />
+          <app-add-field class="edit-only add-wide -mx-2" icon="page" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newPage.set($event)" [section]="'event.fromLibrary' | t" itemIcon="page" />
         </div>
       </div>
       </div>
