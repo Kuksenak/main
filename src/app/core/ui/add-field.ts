@@ -163,5 +163,6 @@ export class AddField {
     this.picked.emit(m.id);
     this.query.set('');
     this.index.set(0);
+    (this.box().nativeElement.querySelector('input') as HTMLInputElement).blur();
   }
 }

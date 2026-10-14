@@ -107,8 +107,8 @@ import { CreateDialog } from '../cards/create-dialog';
       </app-scroll-area>
     </main>
 
-    @if (newStudent(); as n) {
-      <app-create-dialog [initialName]="n" [hint]="'newStudent.toGroup' | t" (created)="toggleMember($event)" (closed)="newStudent.set(null)" />
+    @if (newStudent() !== null) {
+      <app-create-dialog [initialName]="newStudent()!" [hint]="'newStudent.toGroup' | t" (created)="toggleMember($event)" (closed)="newStudent.set(null)" />
     }
 
     @if (colorOpen()) {

@@ -278,11 +278,12 @@ import { CreateDialog } from './create-dialog';
       />
     }
 
-    @if (newStudent(); as n) {
-      <app-create-dialog [initialName]="n" [hint]="'newStudent.toEvent' | t" (created)="invite($event)" (closed)="newStudent.set(null)" />
+    <!-- ('' is a name too: nothing typed yet) -->
+    @if (newStudent() !== null) {
+      <app-create-dialog [initialName]="newStudent()!" [hint]="'newStudent.toEvent' | t" (created)="invite($event)" (closed)="newStudent.set(null)" />
     }
-    @if (newPage(); as n) {
-      <app-create-dialog kind="page" [initialName]="n" [hint]="'create.pageToEvent' | t" (created)="attach($event)" (closed)="newPage.set(null)" />
+    @if (newPage() !== null) {
+      <app-create-dialog kind="page" [initialName]="newPage()!" [hint]="'create.pageToEvent' | t" (created)="attach($event)" (closed)="newPage.set(null)" />
     }
 
     @switch (picking()) {
