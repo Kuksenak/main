@@ -13,6 +13,12 @@ import { EscStack } from '../core/ui/esc-stack';
 import { Icon, IconName } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { Sheet } from '../core/ui/sheet/sheet';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@environments/environment';
+import { catchError, of } from 'rxjs';
+import { ToastService } from '../core/ui/toast';
+import { studentPageUrl } from '../cards/student-link';
+import { cleanLesson } from '../lessons/lesson-input';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { TrashItem, TrashService } from '../core/services/trash.service';
 import { Tip } from '../core/ui/tip';
@@ -26,6 +32,14 @@ import { StudentService } from '../students/student.service';
 
 type Section = 'upcoming' | 'people' | 'lessons';
 const FOLDED_KEY = 'sidebar.folded';
+
+/** A row's ⋯ menu: which one, where it opened. */
+interface ItemMenu {
+  kind: 'lesson' | 'student' | 'event';
+  id: string;
+  origin: HTMLElement;
+  event?: ScheduleEvent;
+}
 
 /** A search result: a lesson, a student or a group. */
 interface Found {
@@ -93,10 +107,11 @@ interface Found {
         <!-- No icon: the name (indented as the other rows), when at the right (today: the time;
              later: the day too) -->
         @for (e of upcoming(); track e.id + e.startsAt) {
-          <button type="button" (click)="openEvent(e)" class="side-row !pl-[1.125rem]">
+          <div role="button" tabindex="0" (click)="openEvent(e)" (keydown.enter)="openEvent(e)" class="side-row cursor-pointer !pl-[1.125rem]">
             <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
             <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(e) }}</span>
-          </button>
+            <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, 'event', e.id, e)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === e.id"><app-icon name="dots" class="size-4" /></button>
+          </div>
         } @empty {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
         }
@@ -123,6 +138,7 @@ interface Found {
           <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row !pl-[1.125rem]" [class.is-on]="openLesson() === l.id">
             <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
             <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
+            <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, 'lesson', l.id)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === l.id"><app-icon name="dots" class="size-4" /></button>
           </a>
         }
         <!-- (View all only when not all are shown) -->
@@ -152,6 +168,9 @@ interface Found {
               <app-icon name="person" class="side-glyph" />
             }
             <span class="min-w-0 flex-1 truncate">{{ r.name }}</span>
+            @if (r.kind === 'student') {
+              <button type="button" (click)="$event.preventDefault(); $event.stopPropagation(); openItemMenu($event, 'student', r.id)" [attr.aria-label]="'lessons.more' | t" class="side-add" [class.!opacity-70]="itemMenu()?.id === r.id"><app-icon name="dots" class="size-4" /></button>
+            }
           </a>
         }
         <!-- (View all only when not all are shown) -->
@@ -248,6 +267,32 @@ interface Found {
       </div>
     }
 
+    <!-- A row's ⋯ (as Notion's): what it is, its actions, Open in new tab / in a popup; a page's last edit -->
+    @if (itemMenu(); as im) {
+      <app-sheet [origin]="im.origin" [fit]="true" (closed)="itemMenu.set(null)">
+        <div class="menu-list min-w-56">
+          <p class="px-2 pb-1 pt-1 text-[0.75rem] font-medium opacity-50">{{ (im.kind === 'lesson' ? 'item.page' : im.kind === 'student' ? 'item.person' : 'item.event') | t }}</p>
+          @if (im.kind !== 'event') {
+            <button type="button" (click)="copyItemLink(im)" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
+          }
+          @if (im.kind === 'lesson') {
+            <button type="button" (click)="duplicateItem(im)" class="menu-item"><app-icon name="duplicate" /><span class="flex-1">{{ 'lessons.duplicate' | t }}</span></button>
+          }
+          @if (im.kind !== 'event') {
+            <button type="button" (click)="trashItem(im)" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'trash.move' | t }}</span></button>
+          } @else if (im.event?.repeat === 'Never') {
+            <button type="button" (click)="deleteEvent(im)" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
+          }
+          <div class="menu-sep"></div>
+          <button type="button" (click)="openItemTab(im)" class="menu-item"><app-icon name="arrow-up-right" /><span class="flex-1">{{ 'action.openNewTab' | t }}</span></button>
+          <button type="button" (click)="openItemPopup(im)" class="menu-item"><app-icon name="popout" /><span class="flex-1">{{ 'item.openPopup' | t }}</span></button>
+          @if (im.kind === 'lesson' && lessonEdited(im.id); as when) {
+            <div class="menu-sep"></div>
+            <p class="menu-foot">{{ 'lessons.lastEdited' | t }} {{ when }}</p>
+          }
+        </div>
+      </app-sheet>
+    }
     @if (trashOpen()) {
       <app-sheet [origin]="trashAnchor()?.nativeElement ?? null" [fit]="true" (closed)="trashOpen.set(false)">
         <div class="flex w-[22rem] flex-col">
@@ -294,6 +339,90 @@ export class Sidebar {
   private readonly peekPages = inject(PeekService);
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
+
+  // ---- A row's ⋯ menu (pages, people, events)
+  protected readonly itemMenu = signal<ItemMenu | null>(null);
+  private readonly http = inject(HttpClient);
+  private readonly toast = inject(ToastService);
+  private readonly peekPages2 = inject(PeekService);
+
+  protected openItemMenu(e: Event, kind: ItemMenu['kind'], id: string, event?: ScheduleEvent): void {
+    const origin = e.currentTarget as HTMLElement;
+    this.itemMenu.set(this.itemMenu()?.id === id ? null : { kind, id, origin, event });
+  }
+
+  private itemPath(im: ItemMenu): unknown[] {
+    if (im.kind === 'lesson') return ['/lessons', im.id];
+    if (im.kind === 'student') return ['/students', 'student', im.id];
+    return ['/events', im.id];
+  }
+
+  // A page: its link in the app; a person: their own page's link (made the first time)
+  protected copyItemLink(im: ItemMenu): void {
+    this.itemMenu.set(null);
+    const done = (url: string) => navigator.clipboard?.writeText(url).then(() => this.toast.show('toast.linkCopied', { icon: 'link' }), () => {});
+    if (im.kind === 'lesson') done(location.origin + this.router.serializeUrl(this.router.createUrlTree(this.itemPath(im))));
+    else
+      this.http
+        .post<{ token: string }>(`${environment.apiUrl}/students/${im.id}/access`, {})
+        .pipe(catchError(() => of(null)))
+        .subscribe((res) => res?.token && done(studentPageUrl(res.token)));
+  }
+
+  protected duplicateItem(im: ItemMenu): void {
+    this.itemMenu.set(null);
+    const l = this.lessons.byId(im.id);
+    if (!l) return;
+    const title = this.i18n.t('lessons.copyOf').replace('{title}', l.title);
+    this.lessons.create(cleanLesson({ title, blocks: l.blocks, level: l.level ?? null, locked: false }), (id) => this.router.navigate(['/lessons', id]));
+  }
+
+  protected trashItem(im: ItemMenu): void {
+    this.itemMenu.set(null);
+    if (im.kind === 'lesson') this.lessons.remove(im.id);
+    else this.students.remove(im.id);
+    // (open: left for its list)
+    if (this.router.url.includes(im.id)) this.router.navigate([im.kind === 'lesson' ? '/lessons' : '/students']);
+    const kind = im.kind === 'lesson' ? 'lesson' : 'student';
+    this.toast.show('toast.trashed', { icon: 'trash', action: { label: 'trash.restore', run: () => this.trash.restore({ kind, id: im.id, name: '', deletedAt: '' }) } });
+  }
+
+  // An event (a single one): deleted, Undo makes it again as it was
+  protected deleteEvent(im: ItemMenu): void {
+    this.itemMenu.set(null);
+    const e = im.event;
+    if (!e) return;
+    this.events.remove(e.id);
+    this.toast.show('toast.deleted', {
+      icon: 'trash',
+      action: {
+        label: 'toast.undo',
+        run: () =>
+          this.events.create({ title: e.title, repeat: e.repeat, repeatInterval: e.repeatInterval, repeatUntil: e.repeatUntil, studentIds: e.studentIds, groupIds: e.groupIds, lessonIds: e.lessonIds, startsAt: e.startsAt, durationMinutes: e.durationMinutes }),
+      },
+    });
+  }
+
+  protected openItemTab(im: ItemMenu): void {
+    this.itemMenu.set(null);
+    const tree = this.router.createUrlTree(this.itemPath(im), im.kind === 'event' && im.event ? { queryParams: { at: im.event.startsAt } } : {});
+    window.open(this.router.serializeUrl(tree), '_blank');
+  }
+
+  protected openItemPopup(im: ItemMenu): void {
+    this.itemMenu.set(null);
+    if (im.kind === 'event') {
+      if (im.event) this.openEvent(im.event);
+    } else this.peekPages2.open(im.kind, im.id);
+  }
+
+  // "14 Oct, 12:36"
+  protected lessonEdited(id: string): string | null {
+    const l = this.lessons.byId(id);
+    if (!l?.updatedAt) return null;
+    const d = new Date(l.updatedAt);
+    return `${this.i18n.date(d, { day: 'numeric', month: 'short' })}, ${this.i18n.time(d)}`;
+  }
 
   // ---- Trash (a menu at its row: search, a row each — restore, delete for good, asked first)
   protected readonly trash = inject(TrashService);

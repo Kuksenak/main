@@ -565,7 +565,7 @@ html.dark .btn-white {
   max-width: 16rem;
   padding: 0.3rem 0.55rem;
   border-radius: 0.45rem;
-  background: color-mix(in srgb, var(--text) 88%, var(--app-bg));
+  background: color-mix(in srgb, var(--text) 76%, var(--app-bg)); /* (as the notes in the corner) */
   color: var(--app-bg);
   font-size: 0.75rem;
   font-weight: 500;
