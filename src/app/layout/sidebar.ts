@@ -535,8 +535,7 @@ export class Sidebar {
   // "14:00" today, "Tmrw 14:00", then "Thu 14:00"
   // Its hint (under it): the full title (bold), then who's in it, one a line
   protected eventTip(e: ScheduleEvent): string {
-    const names = this.people.names(e).join('
-');
+    const names = this.people.names(e).join('\n');
     const title = e.title?.trim();
     return title ? `**${title}**${names ? '\n' + names : ''}` : names ? `**${names}**` : '';
   }
