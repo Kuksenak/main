@@ -31,6 +31,8 @@ const SAVE_AT_LEAST_MS = 5000;
  * and ☰ in one row; the tasks the whole width under it; ☰ opens the rest (its level,
  * events, public link, the students' answers, Delete) in a panel under it. Phones open lessons as cards instead (LessonCard), read only.
  */
+import { ToastService } from '../core/ui/toast';
+import { TrashService } from '../core/services/trash.service';
 @Component({
   selector: 'app-lesson-page',
   imports: [ConfirmDelete, FormsModule, Icon, LessonAttempts, LessonForm, ScrollArea, Sheet, TranslatePipe, EventList, LessonContent, PageSheet, Tip, Toggle],
@@ -201,6 +203,8 @@ export class LessonPage {
 
   protected readonly s = new LessonState(() => this.lessonId(), true);
   private router = inject(Router);
+  private readonly toast = inject(ToastService);
+  private readonly trash = inject(TrashService);
   protected readonly askDelete = signal<HTMLElement | null>(null); // the Delete button, while asking
 
   private i18n = inject(I18nService);
@@ -336,7 +340,9 @@ export class LessonPage {
   protected remove(): void {
     this.deleted = true;
     clearTimeout(this.timer);
+    const id = this.s.id();
     this.s.remove();
+    if (id) this.toast.show('toast.trashed', { icon: 'trash', action: { label: 'toast.undo', run: () => this.trash.restore({ kind: 'lesson', id, name: '', deletedAt: '' }) } });
     this.router.navigate(['/lessons']);
   }
 }

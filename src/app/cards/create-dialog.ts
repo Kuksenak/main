@@ -9,6 +9,7 @@ import { StudentService } from '../students/student.service';
  * a student's name or a page's title (what was typed); Enter or closing it makes it, and `created`
  * gives its id (added where it was asked).
  */
+import { ToastService } from '../core/ui/toast';
 @Component({
   selector: 'app-create-dialog',
   imports: [TranslatePipe],
@@ -40,6 +41,7 @@ export class CreateDialog {
   protected readonly canCreate = computed(() => !!this.name().trim() && !this.busy());
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
+  private readonly toast = inject(ToastService);
   private readonly nameInput = viewChild.required<ElementRef<HTMLInputElement>>('nameInput');
 
   constructor() {
@@ -64,6 +66,7 @@ export class CreateDialog {
     if (!this.canCreate()) return;
     this.busy.set(true);
     const done = (id: string) => {
+      this.toast.show(this.kind() === 'page' ? 'toast.pageCreated' : 'toast.studentAdded');
       this.created.emit(id);
       this.closed.emit();
     };

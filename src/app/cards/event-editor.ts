@@ -55,6 +55,7 @@ import { CreateDialog } from './create-dialog';
 
 // A new event's form, taken from its card to its full page (see openFull)
 let carried: Model | null = null;
+import { ToastService } from '../core/ui/toast';
 @Component({
   selector: 'app-event-editor',
   host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
@@ -673,6 +674,7 @@ export class EventEditor implements OnInit {
 
   // ---- Desktop: saved by itself
   protected readonly moreOpen = signal(false);
+  private readonly toast = inject(ToastService);
   protected readonly deleting = signal<HTMLElement | null>(null);
   private autosaveTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -690,6 +692,7 @@ export class EventEditor implements OnInit {
     if (!id || this.series() || this.readOnly() || !this.dirty() || !this.canSave()) return;
     this.events.update(id, this.toInput());
     this.snapshot.set(EventEditor.key(this.model()));
+    this.toast.show('toast.saved');
   }
 
   private toInput(): EventInput {
@@ -724,8 +727,13 @@ export class EventEditor implements OnInit {
       startsAt: new Date(`${m.date}T${m.startTime}`).toISOString(),
       durationMinutes: timeToMin(m.endTime) - timeToMin(m.startTime),
     };
-    if (!id) this.events.create(input);
-    else if (!this.series()) this.events.update(id, input);
+    if (!id) {
+      this.events.create(input);
+      this.toast.show('toast.eventCreated');
+    } else if (!this.series()) {
+      this.events.update(id, input);
+      this.toast.show('toast.saved');
+    }
     else if (this.repeatChanged()) this.saveSeries(input); // a new rule is for the whole series
     else {
       this.pendingInput = input;
@@ -770,6 +778,7 @@ export class EventEditor implements OnInit {
       return;
     }
     this.events.remove(id);
+    this.toast.show('toast.deleted', { icon: 'trash' });
     this.page().close();
   }
 }

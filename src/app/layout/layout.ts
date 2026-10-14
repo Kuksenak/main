@@ -28,9 +28,10 @@ import { Peek } from './peek';
 import { PeekService } from './peek.service';
 import { CreateDialog, CreateService } from '../cards/create-dialog';
 
+import { Toasts } from '../core/ui/toast';
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe, Sidebar, Peek, CreateDialog],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe, Sidebar, Peek, CreateDialog, Toasts],
   templateUrl: './layout.html',
 })
 export class Layout {

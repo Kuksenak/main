@@ -34,6 +34,8 @@ interface Draft {
 import { AddField, AddItem } from '../core/ui/add-field';
 import { RowMenu } from '../core/ui/row-menu';
 import { CreateDialog } from '../cards/create-dialog';
+import { ToastService } from '../core/ui/toast';
+import { TrashService } from '../core/services/trash.service';
 @Component({
   selector: 'app-person-page',
   imports: [AddField, CreateDialog, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
@@ -147,6 +149,8 @@ export class PersonPage {
   private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
 
   protected readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+  private readonly trash = inject(TrashService);
   private readonly students = inject(StudentService);
   private readonly groups = inject(GroupService);
   private readonly i18n = inject(I18nService);
@@ -289,8 +293,10 @@ export class PersonPage {
     this.deleted = true;
     clearTimeout(this.timer);
     const id = this.realId();
-    if (id && this.kind() === 'student') this.students.remove(id);
-    else if (id) this.groups.remove(id);
+    if (id && this.kind() === 'student') {
+      this.students.remove(id);
+      this.toast.show('toast.trashed', { icon: 'trash', action: { label: 'toast.undo', run: () => this.trash.restore({ kind: 'student', id, name: '', deletedAt: '' }) } });
+    } else if (id) this.groups.remove(id);
     this.router.navigate(['/students']);
   }
 }
