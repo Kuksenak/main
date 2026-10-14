@@ -342,7 +342,7 @@ export class LessonPage {
     clearTimeout(this.timer);
     const id = this.s.id();
     this.s.remove();
-    if (id) this.toast.show('toast.trashed', { icon: 'trash', action: { label: 'toast.undo', run: () => this.trash.restore({ kind: 'lesson', id, name: '', deletedAt: '' }) } });
+    if (id) this.toast.show('toast.trashed', { icon: 'trash', action: { label: 'trash.restore', run: () => this.trash.restore({ kind: 'lesson', id, name: '', deletedAt: '' }) } });
     this.router.navigate(['/lessons']);
   }
 }

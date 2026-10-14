@@ -305,7 +305,7 @@ export class PersonPage {
     const id = this.realId();
     if (id && this.kind() === 'student') {
       this.students.remove(id);
-      this.toast.show('toast.trashed', { icon: 'trash', action: { label: 'toast.undo', run: () => this.trash.restore({ kind: 'student', id, name: '', deletedAt: '' }) } });
+      this.toast.show('toast.trashed', { icon: 'trash', action: { label: 'trash.restore', run: () => this.trash.restore({ kind: 'student', id, name: '', deletedAt: '' }) } });
     } else if (id) this.groups.remove(id);
     this.router.navigate(['/students']);
   }
