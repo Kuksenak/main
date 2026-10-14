@@ -36,7 +36,7 @@ export class ToastService {
   template: `
     <div class="pointer-events-none fixed bottom-4 right-4 z-[2600] flex flex-col items-end gap-2">
       @for (t of service.toasts(); track t.id) {
-        <div class="pointer-events-auto flex items-center gap-2 rounded-lg border-[0.5px] border-[var(--separator)] bg-[var(--dialog-bg)] py-2 pl-3 pr-3 text-[0.8125rem] font-[450] text-[var(--text)] shadow-[0_6px_20px_rgb(0_0_0/0.12)] [animation:dropdownIn_180ms_var(--ease-out-quick)]">
+        <div class="pointer-events-auto flex items-center gap-2 rounded-lg bg-[var(--dialog-bg)] py-2 pl-3 pr-3 text-[0.8125rem] font-[450] text-[var(--text)] shadow-[var(--shadow-popover)] [animation:dropdownIn_180ms_var(--ease-out-quick)]">
           <app-icon [name]="t.icon" class="size-4 shrink-0 opacity-70" />
           <span>{{ t.text | t }}</span>
           @if (t.action; as a) {
