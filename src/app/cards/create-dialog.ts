@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, afterNextRender, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, Injectable, afterNextRender, computed, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { EscStack } from '../core/ui/esc-stack';
 import { LessonService } from '../lessons/lesson.service';
@@ -14,15 +14,14 @@ import { StudentService } from '../students/student.service';
   imports: [TranslatePipe],
   template: `
     <div class="fixed inset-0 z-[2400] flex items-start justify-center bg-[var(--backdrop)] pt-[16vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closed.emit()">
-      <form class="dialog-panel flex w-[26rem] flex-col gap-4 !rounded-xl p-6" (mousedown)="$event.stopPropagation()" (submit)="$event.preventDefault(); create()">
+      <form class="dialog-panel flex w-[26rem] flex-col gap-4 !rounded-xl p-5" (mousedown)="$event.stopPropagation()" (submit)="$event.preventDefault(); create()">
+        <!-- (the name / title big and plain, as the event's title; what it's for under it) -->
         <div class="flex flex-col gap-1">
-          <h2 class="text-[1.0625rem] font-semibold">{{ (kind() === 'page' ? 'event.newLesson' : 'sidebar.newStudent') | t }}</h2>
-          <p class="text-[0.8125rem] opacity-55">{{ hint() }}</p>
+          <input #nameInput [value]="name()" (input)="name.set(nameInput.value)" [placeholder]="(kind() === 'page' ? 'event.newLesson' : 'sidebar.newStudent') | t" autocomplete="off" class="w-full bg-transparent text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
+          @if (hint()) {
+            <p class="text-[0.8125rem] opacity-55">{{ hint() }}</p>
+          }
         </div>
-        <label class="flex flex-col gap-1.5">
-          <span class="text-[0.8125rem] font-medium opacity-70">{{ (kind() === 'page' ? 'create.title' : 'newStudent.name') | t }}</span>
-          <input #nameInput [value]="name()" (input)="name.set(nameInput.value)" autocomplete="off" class="h-9 rounded-md bg-[var(--tint)] px-2.5 text-[0.875rem] outline-none" />
-        </label>
         <div class="flex items-center justify-end gap-2 pt-1">
           <button type="button" (click)="closed.emit()" class="head-btn">{{ 'action.cancel' | t }}</button>
           <button type="submit" [disabled]="!canCreate()" class="head-btn font-semibold disabled:opacity-30">{{ 'action.create' | t }}</button>
@@ -68,5 +67,19 @@ export class CreateDialog {
     const failed = () => this.busy.set(false);
     if (this.kind() === 'page') this.lessons.create({ title: name, blocks: [] }, done, failed);
     else this.students.create({ name, email: null, phone: null }, done, failed);
+  }
+}
+
+/** Opens the create dialog from anywhere (the layout shows it): a new student / page, then `onCreated`. */
+@Injectable({ providedIn: 'root' })
+export class CreateService {
+  readonly current = signal<{ kind: 'student' | 'page'; hint: string; onCreated?: (id: string) => void } | null>(null);
+
+  open(kind: 'student' | 'page', hint = '', onCreated?: (id: string) => void): void {
+    this.current.set({ kind, hint, onCreated });
+  }
+
+  close(): void {
+    this.current.set(null);
   }
 }

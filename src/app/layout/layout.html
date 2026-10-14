@@ -96,6 +96,10 @@
   }
 
   <router-outlet></router-outlet>
+<!-- A new student (or page) asked from anywhere: the small create dialog -->
+@if (creating.current(); as c) {
+  <app-create-dialog [kind]="c.kind" [hint]="c.hint" (created)="c.onCreated?.($event)" (closed)="creating.close()" />
+}
 <!-- Desktop: a page in a popup (what + creates; loaded once first opened) -->
 @if (desktop && peek.current()) {
   @defer {
