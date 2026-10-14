@@ -108,12 +108,12 @@ interface Found {
       </div>
       @if (!folded().includes('lessons')) {
         @for (l of lessonsShown(); track l.id) {
-          <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row !pl-7" [class.is-on]="openLesson() === l.id">
+          <a [routerLink]="['/lessons', l.id]" [appTip]="useHint(l.id)" tipSide="right" class="side-row !pl-[1.125rem]" [class.is-on]="openLesson() === l.id">
             <app-icon name="page" class="side-glyph" [style.color]="glyphColor(levelColor(l.level))" />
             <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
           </a>
         }
-        <a routerLink="/lessons" class="side-row !pl-7 opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        <a routerLink="/lessons" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
 
       <div class="side-head group mt-1.5">
@@ -126,7 +126,7 @@ interface Found {
       </div>
       @if (!folded().includes('people')) {
         @for (r of peopleShown(); track r.kind + r.id) {
-          <a [routerLink]="['/students', r.kind, r.id]" routerLinkActive="is-on" class="side-row !pl-7">
+          <a [routerLink]="['/students', r.kind, r.id]" routerLinkActive="is-on" class="side-row !pl-[1.125rem]">
             @if (r.kind === 'group') {
               <app-icon name="people" class="side-glyph" [style.color]="glyphColor(r.color)" />
             } @else {
@@ -135,7 +135,7 @@ interface Found {
             <span class="min-w-0 flex-1 truncate">{{ r.name }}</span>
           </a>
         }
-        <a routerLink="/students" class="side-row !pl-7 opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
+        <a routerLink="/students" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
     </app-scroll-area>
 
