@@ -73,9 +73,9 @@ interface Found {
         <span class="flex-1"></span>
         <a routerLink="/notifications" (click)="unread.set(0)" [appTip]="'sidebar.inbox' | t" tipSide="bottom" [attr.aria-label]="'sidebar.inbox' | t" class="side-icon relative">
           <app-icon name="inbox" />
-          <!-- (new since the inbox was last open: how many, in a pale red badge) -->
+          <!-- (new since the inbox was last open: how many, white in a red badge) -->
           @if (unread()) {
-            <span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--danger)_18%,var(--side-bg))] px-1 text-[0.625rem] font-semibold tabular-nums text-[var(--danger)]">{{ unread() > 9 ? '9+' : unread() }}</span>
+            <span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--danger)] px-1 text-[0.625rem] font-semibold tabular-nums text-white">{{ unread() > 9 ? '9+' : unread() }}</span>
           }
         </a>
         <button #newBtn type="button" (click)="newOpen.set(!newOpen())" [appTip]="('sidebar.new' | t) + '  Ctrl+Alt+N'" tipSide="bottom" [attr.aria-label]="'sidebar.new' | t" [attr.aria-expanded]="newOpen()" class="side-icon">

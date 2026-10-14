@@ -7,6 +7,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { NotificationsService } from '../core/services/notifications.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
+import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 
 interface Item {
@@ -25,35 +26,37 @@ interface Item {
  */
 @Component({
   selector: 'app-notifications-page',
-  imports: [Icon, TranslatePipe],
+  host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
+  imports: [Icon, ScrollArea, TranslatePipe],
   template: `
     @if (desktop) {
-      <!-- Desktop (as Notion's inbox): the head, then a row each — new ones with a blue dot -->
+      <!-- Desktop (as Notion's inbox): the head, then a row a line — its icon, the title, what it said,
+           when at the right; new ones with a blue dot -->
       <main class="flex min-h-0 w-full flex-1 flex-col px-2 pb-4">
-        <h1 class="flex h-12 shrink-0 items-center px-3 text-[1.25rem] font-semibold">{{ 'sidebar.inbox' | t }}</h1>
-        <div class="min-h-0 flex-1 overflow-y-auto">
+        <h1 class="flex h-12 shrink-0 items-center px-2 text-[1.25rem] font-semibold">{{ 'sidebar.inbox' | t }}</h1>
+        <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
           @if (items(); as list) {
-            <div class="flex max-w-3xl flex-col gap-px">
+            <div class="flex flex-col gap-px">
               @for (n of list; track n.id) {
-                <button type="button" (click)="open(n.url)" class="relative flex w-full items-start gap-3 rounded-lg py-2.5 pl-6 pr-3 text-left hover:bg-[var(--tint)]">
+                <button type="button" (click)="open(n.url)" class="side-row relative !h-9 !gap-2.5 !pl-5">
                   @if (isNew(n)) {
-                    <span class="absolute left-2 top-[1.1rem] size-2 rounded-full bg-[var(--accent)]"></span>
+                    <span class="absolute left-1.5 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-[var(--accent)]"></span>
                   }
-                  <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--tint-strong)]"><app-icon name="bell" class="size-4 opacity-70" /></span>
-                  <span class="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <span class="text-[0.875rem]" [class.font-semibold]="isNew(n)" [class.font-medium]="!isNew(n)">{{ n.title }}</span>
+                  <app-icon name="bell" class="side-glyph" />
+                  <span class="min-w-0 flex-1 truncate">
+                    <span [class.font-semibold]="isNew(n)" [class.font-medium]="!isNew(n)">{{ n.title }}</span>
                     @if (n.body) {
-                      <span class="text-[0.8125rem] opacity-60">{{ n.body }}</span>
+                      <span class="opacity-55"> · {{ n.body }}</span>
                     }
-                    <span class="text-[0.75rem] tabular-nums opacity-40">{{ when(n.createdAt) }}</span>
                   </span>
+                  <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(n.createdAt) }}</span>
                 </button>
               } @empty {
-                <p class="px-3 py-10 text-[0.875rem] opacity-40">{{ 'notifications.empty' | t }}</p>
+                <p class="px-2 py-10 text-[0.875rem] opacity-40">{{ 'notifications.empty' | t }}</p>
               }
             </div>
           }
-        </div>
+        </app-scroll-area>
       </main>
     } @else {
     <main class="min-h-0 w-full flex-1 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-1 desktop:pt-6">

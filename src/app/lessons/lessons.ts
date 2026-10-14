@@ -91,26 +91,24 @@ import { PeekService } from '../layout/peek.service';
           @for (key of selectedKey(); track key) {
             <app-lesson-page [lessonId]="selected() === 'new' ? null : selected()" (created)="adopt($event)" />
           } @empty {
-            <!-- None picked (the sidebar's View all): every page as a table (as a Notion database) — its
-                 name, level (a colored tag), where it's used, when it was edited -->
+            <!-- None picked (the sidebar's View all): every page, a row each — its name, level (a colored
+                 tag), where it's used, when it was edited -->
             <div class="flex min-h-0 flex-1 flex-col px-2">
-              <h1 class="flex h-12 shrink-0 items-center px-3 text-[1.25rem] font-semibold">{{ 'sidebar.library' | t }}</h1>
+              <h1 class="flex h-12 shrink-0 items-center px-2 text-[1.25rem] font-semibold">{{ 'sidebar.library' | t }}</h1>
               @if (visible().length) {
-                <div class="table-head grid-cols-[minmax(0,1fr)_5.5rem_16rem_7rem]">
-                  <span>{{ 'table.name' | t }}</span><span>{{ 'lessons.level' | t }}</span><span>{{ 'table.used' | t }}</span><span>{{ 'table.edited' | t }}</span>
-                </div>
                 <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
-                  <div class="flex flex-col">
+                  <div class="flex flex-col gap-px">
                     @for (l of visible(); track l.id) {
-                      <button type="button" (click)="router.navigate(['/lessons', l.id])" class="table-row grid-cols-[minmax(0,1fr)_5.5rem_16rem_7rem]">
-                        <span class="flex min-w-0 items-center gap-2"><app-icon name="page" class="side-glyph" /><span class="truncate font-medium">{{ l.title }}</span></span>
-                        <span>
+                      <button type="button" (click)="router.navigate(['/lessons', l.id])" class="side-row !h-9 !gap-3">
+                        <app-icon name="page" class="side-glyph" />
+                        <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
+                        <span class="w-12 shrink-0">
                           @if (l.level) {
                             <span class="level-tag" [style.background]="levelTint(l.level)">{{ l.level }}</span>
                           }
                         </span>
-                        <span class="truncate opacity-60">{{ useHint(l.id) }}</span>
-                        <span class="tabular-nums opacity-60">{{ edited(l.updatedAt) }}</span>
+                        <span class="w-56 shrink-0 truncate text-[0.8125rem] opacity-50">{{ useHint(l.id) }}</span>
+                        <span class="w-20 shrink-0 text-right text-[0.8125rem] tabular-nums opacity-50">{{ edited(l.updatedAt) }}</span>
                       </button>
                     }
                   </div>

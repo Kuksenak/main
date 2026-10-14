@@ -12,14 +12,11 @@
     @for (key of openKey(); track key) {
       <app-person-page [kind]="openKind()!" [id]="openId()!" />
     } @empty {
-      <!-- (a table, as a Notion database: the name, the next class) -->
+      <!-- (a row each: the name, the next class at the right) -->
       <div class="flex min-h-0 flex-1 flex-col px-2">
-        <h1 class="flex h-12 shrink-0 items-center px-3 text-[1.25rem] font-semibold">{{ 'sidebar.people' | t }}</h1>
-        <div class="table-head grid-cols-[minmax(0,1fr)_16rem]">
-          <span>{{ 'table.name' | t }}</span><span>{{ 'table.nextClass' | t }}</span>
-        </div>
+        <h1 class="flex h-12 shrink-0 items-center px-2 text-[1.25rem] font-semibold">{{ 'sidebar.people' | t }}</h1>
         <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
-          <div class="flex flex-col">
+          <div class="flex flex-col gap-px">
             @for (g of visibleGroups(); track g.id) {
               <button type="button" (click)="router.navigate(['/students', 'group', g.id])" class="side-row !h-9">
                 <app-icon name="people" class="side-glyph" [style.color]="'color-mix(in srgb, ' + colorVar(g.color) + ' 70%, var(--text))'" />
@@ -28,9 +25,10 @@
               </button>
             }
             @for (s of visible(); track s.id) {
-              <button type="button" (click)="router.navigate(['/students', 'student', s.id])" class="table-row grid-cols-[minmax(0,1fr)_16rem]">
-                <span class="flex min-w-0 items-center gap-2"><app-icon name="person" class="side-glyph" /><span class="truncate font-medium">{{ s.name }}</span></span>
-                <span class="truncate opacity-60">{{ nextClass(s.id) }}</span>
+              <button type="button" (click)="router.navigate(['/students', 'student', s.id])" class="side-row !h-9 !gap-3">
+                <app-icon name="person" class="side-glyph" />
+                <span class="min-w-0 flex-1 truncate">{{ s.name }}</span>
+                <span class="w-56 shrink-0 truncate text-right text-[0.8125rem] opacity-50">{{ nextClass(s.id) }}</span>
               </button>
             }
             @if (!visibleGroups().length && !visible().length) {
