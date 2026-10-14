@@ -21,14 +21,16 @@ import { PeekService } from './peek.service';
     @for (p of shown(); track p.n) {
       <!-- (under the menus and cards it opens: z 25) -->
       <div class="fixed inset-0 z-[25] flex items-center justify-center bg-[var(--backdrop)] [animation:fadeIn_150ms_ease-out]" (mousedown)="peek.close()">
-        <div class="flex h-[86vh] w-[min(56rem,92vw)] flex-col overflow-hidden rounded-xl border border-[var(--separator)] bg-[var(--app-bg)] pt-1 shadow-[0_16px_48px_rgb(0_0_0/0.18)]" (mousedown)="$event.stopPropagation()">
-          <div class="flex h-9 shrink-0 items-center px-2">
-            <button type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+Enter'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn"><app-icon name="expand" />{{ 'peek.openFull' | t }}</button>
-          </div>
+        <div class="flex h-[86vh] w-[min(56rem,92vw)] flex-col overflow-hidden rounded-xl border border-[var(--separator)] bg-[var(--app-bg)] pt-3 shadow-[0_16px_48px_rgb(0_0_0/0.18)]" (mousedown)="$event.stopPropagation()">
           @if (p.kind === 'lesson') {
-            <app-lesson-page [lessonId]="p.id" (created)="created($event)" />
+            <app-lesson-page [lessonId]="p.id" (created)="created($event)">
+              <!-- (in the page's head, beside its other buttons) -->
+              <button pageHeadExtra type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
+            </app-lesson-page>
           } @else {
-            <app-person-page [kind]="p.kind" [id]="p.id" (created)="created($event)" />
+            <app-person-page [kind]="p.kind" [id]="p.id" (created)="created($event)">
+              <button pageHeadExtra type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
+            </app-person-page>
           }
         </div>
       </div>

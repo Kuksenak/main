@@ -78,6 +78,8 @@ const SAVE_AT_LEAST_MS = 5000;
               }
             }
             <!-- ⋯: Copy link (published), Duplicate, Copy page content, Paste content, Format, Lock page, Delete -->
+            <!-- (in a popup: Open in full page, put here by it) -->
+            <ng-content select="[pageHeadExtra]" />
             <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [appTip]="'lessons.more' | t" tipSide="bottom" [attr.aria-label]="'lessons.more' | t" [attr.aria-expanded]="menuOpen()" class="head-btn !px-1.5">
               <app-icon name="dots" class="!size-5 !opacity-80" />
             </button>

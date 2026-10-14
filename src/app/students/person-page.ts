@@ -56,6 +56,8 @@ interface Draft {
                 <app-icon name="chevron-down" class="!size-3.5 !opacity-50" />
               </button>
             }
+            <!-- (in a popup: Open in full page, put here by it) -->
+            <ng-content select="[pageHeadExtra]" />
             <button #menuBtn type="button" (click)="menuOpen.set(!menuOpen())" [attr.aria-expanded]="menuOpen()" [appTip]="'lessons.more' | t" tipSide="bottom" class="head-btn !px-1.5">
               <app-icon name="dots" class="!size-5" />
             </button>
