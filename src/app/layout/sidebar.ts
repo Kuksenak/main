@@ -218,7 +218,8 @@ interface Found {
         <app-icon name="trash" class="side-glyph" />
         <span class="flex-1">{{ 'trash.title' | t }}</span>
       </button>
-      <button #accountBtn type="button" (click)="account.emit(accountBtn)" class="side-row">
+      <!-- The account: its menu (as Notion's) — Settings, an update, Log out -->
+      <button #accountBtn type="button" (click)="userMenu.set(!userMenu())" [attr.aria-expanded]="userMenu()" class="side-row">
         <span class="relative flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[0.6875rem] font-semibold uppercase text-white">
           {{ (auth.email() ?? '?').charAt(0) }}
           @if (updates.updateReady()) {
@@ -327,6 +328,19 @@ interface Found {
         </div>
       </app-sheet>
     }
+    @if (userMenu()) {
+      <app-sheet [origin]="accountAnchor()?.nativeElement ?? null" [fit]="true" (closed)="userMenu.set(false)">
+        <div class="menu-list min-w-60">
+          <p class="truncate px-2 pb-1 pt-1 text-[0.75rem] font-medium opacity-50">{{ auth.email() }}</p>
+          <button type="button" (click)="userMenu.set(false); account.emit(accountAnchor()!.nativeElement)" class="menu-item"><app-icon name="settings" /><span class="flex-1">{{ 'nav.settings' | t }}</span></button>
+          @if (updates.updateReady()) {
+            <button type="button" (click)="updates.apply()" class="menu-item !text-[var(--accent)]"><app-icon name="install" /><span class="flex-1">{{ 'account.update' | t }}</span></button>
+          }
+          <div class="menu-sep"></div>
+          <button type="button" (click)="userMenu.set(false); auth.logout()" class="menu-item"><app-icon name="logout" /><span class="flex-1">{{ 'account.logout' | t }}</span></button>
+        </div>
+      </app-sheet>
+    }
     @if (trashOpen()) {
       <app-sheet [origin]="trashAnchor()?.nativeElement ?? null" [fit]="true" (closed)="trashOpen.set(false)">
         <div class="flex w-[22rem] flex-col">
@@ -373,6 +387,10 @@ export class Sidebar {
   private readonly peekPages = inject(PeekService);
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
+
+  // ---- The account's menu
+  protected readonly userMenu = signal(false);
+  protected readonly accountAnchor = viewChild<ElementRef<HTMLElement>>('accountBtn');
 
   // ---- A row's ⋯ menu (pages, people, events)
   protected readonly itemMenu = signal<ItemMenu | null>(null);
