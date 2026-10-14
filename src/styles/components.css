@@ -779,6 +779,40 @@ html.dark .btn-white {
   opacity: 1 !important;
 }
 
+/* Lists as tables (as a Notion database): a faint head, rows split by hairlines, columns set by
+   the page (grid-cols-[…]) */
+.table-head {
+  display: grid;
+  align-items: center;
+  gap: 0.75rem;
+  height: 2rem;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid var(--separator);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--text) 50%, transparent);
+}
+.table-row {
+  display: grid;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  padding: 0 0.75rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--separator) 60%, transparent);
+  text-align: left;
+  font-size: 0.875rem;
+}
+.table-row:hover {
+  background: var(--tint);
+}
+.level-tag {
+  display: inline-flex;
+  border-radius: 0.3rem;
+  padding: 0.0625rem 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 .menu-sep {
   margin: 0.25rem -0.25rem;
   height: 1px;

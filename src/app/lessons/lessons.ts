@@ -91,18 +91,26 @@ import { PeekService } from '../layout/peek.service';
           @for (key of selectedKey(); track key) {
             <app-lesson-page [lessonId]="selected() === 'new' ? null : selected()" (created)="adopt($event)" />
           } @empty {
-            <!-- None picked (the sidebar's View all): every lesson, a row each — its level, name, where it's used -->
-            <div class="flex min-h-0 flex-1 flex-col">
-              <h1 class="flex h-[var(--control-h)] shrink-0 items-center px-2 text-[0.9375rem] font-medium">{{ 'sidebar.library' | t }}</h1>
+            <!-- None picked (the sidebar's View all): every page as a table (as a Notion database) — its
+                 name, level (a colored tag), where it's used, when it was edited -->
+            <div class="flex min-h-0 flex-1 flex-col px-2">
+              <h1 class="flex h-12 shrink-0 items-center px-3 text-[1.25rem] font-semibold">{{ 'sidebar.library' | t }}</h1>
               @if (visible().length) {
+                <div class="table-head grid-cols-[minmax(0,1fr)_5.5rem_16rem_7rem]">
+                  <span>{{ 'table.name' | t }}</span><span>{{ 'lessons.level' | t }}</span><span>{{ 'table.used' | t }}</span><span>{{ 'table.edited' | t }}</span>
+                </div>
                 <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
-                  <div class="flex flex-col gap-px">
+                  <div class="flex flex-col">
                     @for (l of visible(); track l.id) {
-                      <button type="button" (click)="router.navigate(['/lessons', l.id])" class="side-row !h-9">
-                        <app-icon name="page" class="side-glyph" [style.color]="l.level ? 'color-mix(in srgb, ' + levelColor(l.level) + ' 70%, var(--text))' : null" />
-                        <span class="min-w-0 flex-1 truncate">{{ l.title }}</span>
-                        <span class="w-10 shrink-0 text-[0.8125rem] opacity-50">{{ l.level }}</span>
-                        <span class="w-56 shrink-0 truncate text-[0.8125rem] opacity-50">{{ useHint(l.id) }}</span>
+                      <button type="button" (click)="router.navigate(['/lessons', l.id])" class="table-row grid-cols-[minmax(0,1fr)_5.5rem_16rem_7rem]">
+                        <span class="flex min-w-0 items-center gap-2"><app-icon name="page" class="side-glyph" /><span class="truncate font-medium">{{ l.title }}</span></span>
+                        <span>
+                          @if (l.level) {
+                            <span class="level-tag" [style.background]="levelTint(l.level)">{{ l.level }}</span>
+                          }
+                        </span>
+                        <span class="truncate opacity-60">{{ useHint(l.id) }}</span>
+                        <span class="tabular-nums opacity-60">{{ edited(l.updatedAt) }}</span>
                       </button>
                     }
                   </div>
@@ -126,6 +134,19 @@ import { PeekService } from '../layout/peek.service';
 })
 export class Lessons {
   protected readonly levelColor = levelColor;
+
+  // A level's tag: its color, light
+  protected levelTint(level: string): string {
+    return `color-mix(in srgb, ${levelColor(level as never)} 45%, transparent)`;
+  }
+
+  // Edited: today the time, this year the day, else the day and year
+  protected edited(iso: string): string {
+    const d = new Date(iso);
+    const now = new Date();
+    if (d.toDateString() === now.toDateString()) return this.i18n.time(d);
+    return this.i18n.date(d, d.getFullYear() === now.getFullYear() ? { day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short', year: 'numeric' });
+  }
 
   // Where it's used: "Next Mon 14 · Anna" (else last; never: no hint), a row's hint
   protected useHint(id: string): string {

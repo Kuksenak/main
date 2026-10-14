@@ -30,6 +30,8 @@ import { map } from 'rxjs';
  * Phones: groups and students behind Groups | Students tabs (desktop: both in one list).
  */
 import { PeekService } from '../layout/peek.service';
+import { EventService } from '../schedule/event.service';
+import { EventPeople } from '../schedule/event-people';
 @Component({
   selector: 'app-students',
   imports: [NgTemplateOutlet, OverlayModule, GroupView, SearchBar, Icon, LongPress, PersonPage, ScrollArea, SearchField, StudentView, TranslatePipe],
@@ -89,6 +91,20 @@ export class Students {
   });
 
   /** Under a student's name: their groups, else how to reach them. */
+  // Their next class: "Thu 16 Oct, 14:00" (none: empty)
+  private readonly events = inject(EventService);
+  private readonly eventPeople = inject(EventPeople);
+  protected nextClass(id: string): string {
+    const now = Date.now();
+    const next = this.events
+      .events()
+      .filter((e) => new Date(e.startsAt).getTime() > now && this.eventPeople.invites(e, id))
+      .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
+    if (!next) return '';
+    const d = new Date(next.startsAt);
+    return `${this.i18n.date(d, { weekday: 'short', day: 'numeric', month: 'short' })}, ${this.i18n.time(d)}`;
+  }
+
   protected subtitle(s: Student): string {
     const groups = this.groupService
       .groups()
