@@ -85,7 +85,7 @@ const en = {
   'people.materials': 'Materials',
   'people.history': 'History',
   'people.next': 'Next',
-  'people.pastLessons': 'Past lessons',
+  'people.pastLessons': 'Past classes',
   'people.nothingAttached': 'Nothing attached',
   'students.empty': 'No people',
   'students.notFound': 'Nothing found',
