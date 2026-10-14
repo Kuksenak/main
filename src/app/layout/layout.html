@@ -96,6 +96,12 @@
   }
 
   <router-outlet></router-outlet>
+<!-- Desktop: a page in a popup (what + creates; loaded once first opened) -->
+@if (desktop && peek.current()) {
+  @defer {
+    <app-peek />
+  }
+}
   </div>
 
   <!-- A notification while the app is open -->

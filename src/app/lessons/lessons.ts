@@ -21,6 +21,7 @@ import { LessonUsage } from './lesson-usage';
  * desktop: on the right of the list (LessonPage; the first one when none is picked); phones: as a
  * full-screen card over it. + starts a new one (desktop: /lessons/new on the right).
  */
+import { PeekService } from '../layout/peek.service';
 @Component({
   selector: 'app-lessons',
   imports: [Icon, LessonPage, ScrollArea, SearchBar, SearchField, TranslatePipe],
@@ -137,6 +138,7 @@ export class Lessons {
   protected usage = inject(LessonUsage);
   private i18n = inject(I18nService);
   protected stack = inject(NavStack);
+  private readonly peek = inject(PeekService);
   protected router = inject(Router);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
   protected readonly linkedId = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('id'))));
@@ -185,7 +187,7 @@ export class Lessons {
   protected add(): void {
     this.newCount.update((n) => n + 1);
     this.adopted.set(null);
-    if (this.desktop) this.router.navigate(['/lessons', 'new']);
+    if (this.desktop) this.peek.open('lesson');
     else this.stack.push({ kind: 'lesson', id: null });
   }
 

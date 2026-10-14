@@ -14,6 +14,7 @@ import { Icon, IconName } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { Tip } from '../core/ui/tip';
+import { PeekService } from './peek.service';
 import { LessonUsage } from '../lessons/lesson-usage';
 import { LessonService, levelColor } from '../lessons/lesson.service';
 import { EventService, ScheduleEvent } from '../schedule/event.service';
@@ -254,6 +255,7 @@ export class Sidebar {
   protected readonly stack = inject(NavStack);
   protected readonly people = inject(EventPeople);
   protected readonly groups = inject(GroupService);
+  private readonly peekPages = inject(PeekService);
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
   private readonly events = inject(EventService);
@@ -360,8 +362,8 @@ export class Sidebar {
   protected readonly newAnchor = viewChild<ElementRef<HTMLButtonElement>>('newBtn');
   protected create(kind: 'event' | 'group' | 'student' | 'lesson'): void {
     this.newOpen.set(false);
-    if (kind === 'lesson') {
-      this.router.navigate(['/lessons', 'new']);
+    if (kind !== 'event') {
+      this.peekPages.open(kind);
       return;
     }
     const today = new Date();

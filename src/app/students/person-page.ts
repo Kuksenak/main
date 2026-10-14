@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, afterNextRender, computed, effect, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LessonsCard } from '../cards/person-views';
@@ -45,7 +45,7 @@ interface Draft {
           @let d = draft();
           <!-- The head, always at the top -->
           <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
-            <input [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+            <input #nameInput [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
             @if (kind() === 'student') {
               <a [attr.href]="d.email ? 'mailto:' + d.email : null" [class.pointer-events-none]="!d.email" [class.opacity-35]="!d.email" class="head-btn"><app-icon name="mail" />{{ 'students.actionMail' | t }}</a>
               <a [attr.href]="d.phone ? 'tel:' + d.phone : null" [class.pointer-events-none]="!d.phone" [class.opacity-35]="!d.phone" class="head-btn"><app-icon name="call" />{{ 'students.actionCall' | t }}</a>
@@ -74,8 +74,10 @@ interface Draft {
                   <input [ngModel]="d.phone" (ngModelChange)="patch({ phone: $event || null })" type="tel" autocomplete="off" [placeholder]="'sidebar.empty' | t" class="min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 tabular-nums outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
                 </label>
               </div>
-              <app-student-link [studentId]="id()" />
-              <app-lessons-card [studentId]="id()" />
+              @if (realId(); as sid) {
+                <app-student-link [studentId]="sid" />
+                <app-lessons-card [studentId]="sid" />
+              }
             } @else {
               <!-- Members: a row each (× on hover takes them out); + adds -->
               <div class="flex flex-col gap-px">
@@ -93,7 +95,9 @@ interface Draft {
                   <p class="py-1 text-[0.875rem] opacity-40">{{ 'groups.noMembers' | t }}</p>
                 }
               </div>
-              <app-lessons-card [groupId]="id()" />
+              @if (realId(); as gid) {
+                <app-lessons-card [groupId]="gid" />
+              }
             }
           </div>
         }
@@ -131,7 +135,14 @@ interface Draft {
 })
 export class PersonPage {
   readonly kind = input.required<'student' | 'group'>();
-  readonly id = input.required<string>();
+  /** null: a new one (created once it has a name; its id comes by `created`). */
+  readonly id = input<string | null>(null);
+  readonly created = output<string>();
+  // Its id: the given one, or the new one's once created
+  private readonly createdId = signal<string | null>(null);
+  protected readonly realId = computed(() => this.id() ?? this.createdId());
+  private creating = false;
+  private readonly nameInput = viewChild<ElementRef<HTMLInputElement>>('nameInput');
 
   protected readonly router = inject(Router);
   private readonly students = inject(StudentService);
@@ -148,9 +159,9 @@ export class PersonPage {
   protected readonly colorAnchor = viewChild<ElementRef<HTMLElement>>('colorBtn');
   protected readonly addAnchor = viewChild<ElementRef<HTMLElement>>('addBtn');
 
-  private readonly student = computed(() => (this.kind() === 'student' ? this.students.byId(this.id()) : null));
-  private readonly group = computed(() => (this.kind() === 'group' ? this.groups.byId(this.id()) : null));
-  protected readonly exists = computed(() => !!(this.student() || this.group()));
+  private readonly student = computed(() => (this.kind() === 'student' ? this.students.byId(this.realId()) : null));
+  private readonly group = computed(() => (this.kind() === 'group' ? this.groups.byId(this.realId()) : null));
+  protected readonly exists = computed(() => !this.realId() || !!(this.student() || this.group()));
 
   // The draft edited here, and what it was when last saved
   protected readonly draft = signal<Draft>({ name: '', email: null, phone: null, color: 'teal', studentIds: [] });
@@ -172,6 +183,10 @@ export class PersonPage {
   ]);
 
   constructor() {
+    // A new one: typing its name straight away
+    afterNextRender(() => {
+      if (!this.id()) this.nameInput()?.nativeElement.focus();
+    });
     // Its data into the draft, once per student / group (later reloads after saves leave it)
     effect(() => {
       const s = this.student();
@@ -228,13 +243,39 @@ export class PersonPage {
     this.pendingSince = null;
     const d = this.draft();
     const now = JSON.stringify(d);
-    if (this.deleted || !this.openedId || now === this.saved || !d.name.trim()) return;
+    if (this.deleted || now === this.saved || !d.name.trim()) return;
+    if (!this.openedId) {
+      // A new one: created (once); what changed meanwhile is saved after
+      if (this.id() || this.creating) return;
+      this.creating = true;
+      this.saved = now;
+      const done = (id: string) => {
+        this.creating = false;
+        this.openedId = id;
+        this.createdId.set(id);
+        this.created.emit(id);
+        this.saveNow();
+      };
+      const failed = () => {
+        this.creating = false;
+        this.saved = '';
+      };
+      if (this.kind() === 'student') this.students.create({ name: d.name.trim(), email: d.email?.trim() || null, phone: d.phone?.trim() || null }, done, failed);
+      else this.groups.create({ name: d.name.trim(), color: d.color, studentIds: d.studentIds }, done, failed);
+      return;
+    }
     this.saved = now;
     if (this.kind() === 'student') {
       this.students.update(this.openedId, { name: d.name.trim(), email: d.email?.trim() || null, phone: d.phone?.trim() || null });
     } else {
       this.groups.update(this.openedId, { name: d.name.trim(), color: d.color, studentIds: d.studentIds });
     }
+  }
+
+  /** Saves now (Open in full page); whether a new one's being created (its id comes by `created`). */
+  flush(): boolean {
+    this.saveNow();
+    return this.creating;
   }
 
   protected askDelete(): void {
@@ -245,8 +286,9 @@ export class PersonPage {
   protected remove(): void {
     this.deleted = true;
     clearTimeout(this.timer);
-    if (this.kind() === 'student') this.students.remove(this.id());
-    else this.groups.remove(this.id());
+    const id = this.realId();
+    if (id && this.kind() === 'student') this.students.remove(id);
+    else if (id) this.groups.remove(id);
     this.router.navigate(['/students']);
   }
 }

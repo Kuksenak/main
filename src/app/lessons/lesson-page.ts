@@ -315,6 +315,12 @@ export class LessonPage {
     this.s.autosave((id) => this.created.emit(id));
   }
 
+  /** Saves now (Open in full page); whether a new lesson's being created (its id comes by `created`). */
+  flush(): boolean {
+    this.saveNow();
+    return this.s.creating();
+  }
+
   // The level picked (null: none)
   protected setLevel(level: Level | null): void {
     this.s.draft.update((d) => ({ ...d, level }));

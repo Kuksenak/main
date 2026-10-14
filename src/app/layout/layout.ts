@@ -24,10 +24,12 @@ import { Icon } from '../core/ui/icon/icon';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { SettingsSheet } from '../settings/settings-sheet';
 import { Sidebar } from './sidebar';
+import { Peek } from './peek';
+import { PeekService } from './peek.service';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe, Sidebar],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgTemplateOutlet, Sheet, Icon, BrandIcon, LessonImportPreview, NotificationBanner, SettingsSheet, StackHost, TranslatePipe, Sidebar, Peek],
   templateUrl: './layout.html',
 })
 export class Layout {
@@ -87,6 +89,7 @@ export class Layout {
     });
   }
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  protected readonly peek = inject(PeekService);
   protected readonly i18n = inject(I18nService);
 
   protected readonly accountOpen = signal(false);
