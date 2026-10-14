@@ -21,12 +21,12 @@ import { StudentService } from '../students/student.service';
         </div>
         <label class="flex flex-col gap-1.5">
           <span class="text-[0.8125rem] font-medium opacity-70">{{ (kind() === 'page' ? 'create.title' : 'newStudent.name') | t }}</span>
-          <input #nameInput [value]="name()" (input)="name.set(nameInput.value)" autocomplete="off" class="h-9 rounded-md bg-[var(--tint-strong)] px-2.5 text-[0.875rem] outline-none" />
+          <input #nameInput [value]="name()" (input)="name.set(nameInput.value)" autocomplete="off" class="h-9 rounded-md bg-[var(--tint)] px-2.5 text-[0.875rem] outline-none" />
         </label>
         @if (kind() === 'student') {
           <label class="flex flex-col gap-1.5">
             <span class="text-[0.8125rem] font-medium opacity-70">{{ 'students.email' | t }}</span>
-            <input #emailInput type="email" [value]="email()" (input)="email.set(emailInput.value)" autocomplete="off" class="h-9 rounded-md border border-[var(--separator)] bg-transparent px-2.5 text-[0.875rem] outline-none focus:bg-[var(--tint)]" />
+            <input #emailInput type="email" [value]="email()" (input)="email.set(emailInput.value)" autocomplete="off" class="h-9 rounded-md bg-[var(--tint)] px-2.5 text-[0.875rem] outline-none" />
           </label>
         }
         <div class="flex items-center justify-end gap-2 pt-1">
