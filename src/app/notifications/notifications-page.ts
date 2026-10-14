@@ -136,12 +136,12 @@ export class NotificationsPage {
     this.notifications.open(url);
   }
 
-  // Today: the time; else the day
+  // Today: the time; else the day and the time
   protected when(iso: string): string {
     const d = new Date(iso);
     return new Date().toDateString() === d.toDateString()
       ? this.i18n.time(d)
-      : this.i18n.date(d, { day: 'numeric', month: 'short' });
+      : `${this.i18n.date(d, { day: 'numeric', month: 'short' })}, ${this.i18n.time(d)}`;
   }
 }
 
