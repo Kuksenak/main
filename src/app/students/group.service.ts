@@ -20,12 +20,15 @@ export function colorVar(color: GroupColor): string {
   return `var(--palette-${color})`;
 }
 
+/** Groups are off for now: not listed, not made (what's saved stays). */
+export const GROUPS_ON = false;
+
 /** The account's student groups (API: /groups). */
 @Injectable({ providedIn: 'root' })
 export class GroupService extends ResourceStore<Group, GroupInput> {
   private events = inject(EventService);
 
-  readonly groups = computed(() => this.items());
+  readonly groups = computed(() => (GROUPS_ON ? this.items() : []));
 
   constructor() {
     super('groups', 'groups');

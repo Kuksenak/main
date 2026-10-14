@@ -96,7 +96,7 @@
 
     <!-- Phones: Groups | Students under the top bar (the search field in it); they stay while
          searching — it filters the open tab -->
-    @if (!desktop) {
+    @if (!desktop && groupsOn) {
       <div class="segmented shrink-0">
         <button type="button" (click)="tab.set('groups')" [attr.aria-pressed]="tab() === 'groups'">{{ 'groups.title' | t }}</button>
         <button type="button" (click)="tab.set('students')" [attr.aria-pressed]="tab() === 'students'">{{ 'nav.students' | t }}</button>
@@ -183,10 +183,12 @@
       <app-icon name="person" class="size-4 opacity-60" />
       {{ 'students.add' | t }}
     </button>
-    <button type="button" (click)="adding.set(false); openNew('group')" class="option flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-subhead">
-      <app-icon name="people" class="size-4 opacity-60" />
-      {{ 'groups.add' | t }}
-    </button>
+    @if (groupsOn) {
+      <button type="button" (click)="adding.set(false); openNew('group')" class="option flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-subhead">
+        <app-icon name="people" class="size-4 opacity-60" />
+        {{ 'groups.add' | t }}
+      </button>
+    }
   </div>
 </ng-template>
 @if (adding() && !desktop) {

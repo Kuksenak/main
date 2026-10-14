@@ -14,7 +14,7 @@ import { SearchBar } from '../core/ui/search-bar';
 import { SearchField } from '../core/ui/search-field';
 import { primeKeyboard } from '../core/utils/keyboard';
 import { initial } from '../core/utils/text';
-import { Group, GroupService, colorVar } from './group.service';
+import { Group, GroupService, colorVar, GROUPS_ON } from './group.service';
 import { Student, StudentService } from './student.service';
 import { PersonPage } from './person-page';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -63,7 +63,8 @@ export class Students {
   // Phones: which tab is showing (desktop lists both).
   protected readonly tab = signal<'groups' | 'students'>('students');
   // Phones: the open tab (searching too: it filters that tab); desktop: both
-  protected readonly showGroups = computed(() => this.desktop || this.tab() === 'groups');
+  protected readonly groupsOn = GROUPS_ON;
+  protected readonly showGroups = computed(() => GROUPS_ON && (this.desktop || this.tab() === 'groups'));
   protected readonly showStudents = computed(() => this.desktop || this.tab() === 'students');
 
   private readonly byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name, this.i18n.locale());
@@ -169,7 +170,7 @@ export class Students {
 
   // Entered by long-pressing a student (who starts checked).
   protected startSelect(s: Student): void {
-    if (this.selecting()) return;
+    if (this.selecting() || !GROUPS_ON) return;
     this.selecting.set(true);
     this.checked.set(new Set([s.id]));
   }

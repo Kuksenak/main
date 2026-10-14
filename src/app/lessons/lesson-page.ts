@@ -42,14 +42,14 @@ const SAVE_AT_LEAST_MS = 5000;
           <p class="text-body py-10 text-center opacity-40">{{ 'lessons.notFound' | t }}</p>
         } @else {
           <!-- One row, always at the top: the name; saved; the level; Preview; Publish (Copy link); ☰ -->
-          <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
+          <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
             @if (s.draft().locked) {
               <!-- Locked: a lock (a square button, as the head's) before the name, the name moved along; a click unlocks -->
               <button type="button" (click)="setLocked(false)" [appTip]="'lessons.unlock' | t" tipSide="bottom" [attr.aria-label]="'lessons.unlock' | t" class="head-btn ml-5 !px-1.5">
                 <app-icon name="lock" />
               </button>
             }
-            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" [style.margin-left.px]="s.draft().locked ? null : 14" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--highlight)] focus:bg-[var(--highlight)]" />
+            <input [ngModel]="s.draft().title" (ngModelChange)="setTitle($event)" [readOnly]="!!s.draft().locked" [style.margin-left.px]="s.draft().locked ? null : 14" type="text" [placeholder]="'lessons.new' | t" autocomplete="off" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-35 hover:bg-[var(--highlight)] focus:bg-[var(--highlight)]" />
             <!-- Its level: a chip in its color; a list under it (each level with its color) -->
             <button #levelBtn type="button" (click)="levelOpen.set(!levelOpen())" [disabled]="!!s.draft().locked" [appTip]="'lessons.level' | t" tipSide="bottom" [attr.aria-label]="'lessons.level' | t" [attr.aria-expanded]="levelOpen()" class="head-btn" [class.font-medium]="!!s.draft().level">
               <!-- Set: a dot of its color and its name; none: just "Level", faded -->

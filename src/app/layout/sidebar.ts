@@ -19,7 +19,7 @@ import { LessonUsage } from '../lessons/lesson-usage';
 import { LessonService, levelColor } from '../lessons/lesson.service';
 import { EventService, ScheduleEvent } from '../schedule/event.service';
 import { EventPeople } from '../schedule/event-people';
-import { GroupService, colorVar } from '../students/group.service';
+import { GROUPS_ON, GroupService, colorVar } from '../students/group.service';
 import { StudentService } from '../students/student.service';
 
 type Section = 'upcoming' | 'people' | 'lessons';
@@ -177,7 +177,9 @@ interface Found {
       <app-sheet [origin]="newAnchor()?.nativeElement ?? null" [fit]="true" (closed)="newOpen.set(false)">
         <div class="menu-list">
           <button type="button" (click)="create('event')" class="menu-item"><app-icon name="calendar" /><span class="flex-1">{{ 'sidebar.newEvent' | t }}</span></button>
-          <button type="button" (click)="create('group')" class="menu-item"><app-icon name="people" /><span class="flex-1">{{ 'sidebar.newGroup' | t }}</span></button>
+          @if (groupsOn) {
+            <button type="button" (click)="create('group')" class="menu-item"><app-icon name="people" /><span class="flex-1">{{ 'sidebar.newGroup' | t }}</span></button>
+          }
           <button type="button" (click)="create('student')" class="menu-item"><app-icon name="person" /><span class="flex-1">{{ 'sidebar.newStudent' | t }}</span></button>
           <button type="button" (click)="create('lesson')" class="menu-item"><app-icon name="page" /><span class="flex-1">{{ 'lessons.add' | t }}</span></button>
         </div>
@@ -255,6 +257,7 @@ export class Sidebar {
   protected readonly stack = inject(NavStack);
   protected readonly people = inject(EventPeople);
   protected readonly groups = inject(GroupService);
+  protected readonly groupsOn = GROUPS_ON;
   private readonly peekPages = inject(PeekService);
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
@@ -319,7 +322,7 @@ export class Sidebar {
   // Ctrl+Alt+N: the New window
   protected readonly newChoices: { kind: 'event' | 'group' | 'student' | 'lesson'; label: TranslationKey; icon: IconName; key: string }[] = [
     { kind: 'event', label: 'sidebar.newEvent', icon: 'calendar', key: 'E' },
-    { kind: 'group', label: 'sidebar.newGroup', icon: 'people', key: 'G' },
+    ...(GROUPS_ON ? [{ kind: 'group' as const, label: 'sidebar.newGroup' as const, icon: 'people' as const, key: 'G' }] : []),
     { kind: 'student', label: 'sidebar.newStudent', icon: 'person', key: 'S' },
     { kind: 'lesson', label: 'lessons.add', icon: 'page', key: 'L' },
   ];

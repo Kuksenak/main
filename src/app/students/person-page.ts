@@ -46,8 +46,8 @@ import { NewStudentDialog } from '../cards/new-student-dialog';
         } @else {
           @let d = draft();
           <!-- The head, always at the top -->
-          <div class="sticky top-0 z-20 -mx-1 flex h-[var(--control-h)] shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
-            <input #nameInput [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[0.9375rem] font-medium outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
+          <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
+            <input #nameInput [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-35 hover:bg-[var(--tint)] focus:bg-[var(--tint)]" />
             @if (kind() === 'student') {
               <a [attr.href]="d.email ? 'mailto:' + d.email : null" [class.pointer-events-none]="!d.email" [class.opacity-35]="!d.email" class="head-btn"><app-icon name="mail" />{{ 'students.actionMail' | t }}</a>
               <a [attr.href]="d.phone ? 'tel:' + d.phone : null" [class.pointer-events-none]="!d.phone" [class.opacity-35]="!d.phone" class="head-btn"><app-icon name="call" />{{ 'students.actionCall' | t }}</a>
