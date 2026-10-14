@@ -144,7 +144,7 @@ import { CreateDialog } from './create-dialog';
               <app-row-menu class="edit-only" [link]="['/students', p.kind, p.id]" (removed)="uninvite(p.id)" />
             </div>
           }
-          <app-add-field class="edit-only -mx-3 [&_.add-field]:px-3" [class.pl-6]="invited().length" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" [section]="'event.fromPeople' | t" />
+          <app-add-field class="edit-only add-wide -mx-3" [class.pl-6]="invited().length" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" [section]="'event.fromPeople' | t" />
         </div>
 
         <div class="flex flex-col gap-px">
@@ -160,7 +160,7 @@ import { CreateDialog } from './create-dialog';
               <app-row-menu class="edit-only" [link]="['/lessons', l.id]" (removed)="detach(l.id)" />
             </div>
           }
-          <app-add-field class="edit-only -mx-3 [&_.add-field]:px-3" [class.pl-6]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newPage.set($event)" [section]="'event.fromLibrary' | t" itemIcon="page" />
+          <app-add-field class="edit-only add-wide -mx-3" [class.pl-6]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newPage.set($event)" [section]="'event.fromLibrary' | t" itemIcon="page" />
         </div>
       </div>
       </div>
