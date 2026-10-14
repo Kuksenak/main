@@ -1,6 +1,8 @@
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 import { Component, DestroyRef, OnInit, computed, effect, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { NgTemplateOutlet } from '@angular/common';
+import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
@@ -60,9 +62,17 @@ import { PeekService } from '../layout/peek.service';
 @Component({
   selector: 'app-event-editor',
   host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
-  imports: [AddField, CreateDialog, RowMenu, Sheet, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [NgTemplateOutlet, ScrollArea, AddField, CreateDialog, RowMenu, Sheet, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
+    @if (inline()) {
+      <!-- Its own page (desktop): as the other pages — the same column, its head pinned -->
+      <main class="flex min-h-0 w-full flex-1 flex-col px-2 pb-4">
+        <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-1 pb-10">
+          <ng-container [ngTemplateOutlet]="deskBody" />
+        </app-scroll-area>
+      </main>
+    } @else {
     <app-page-sheet
       #page
       [bleed]="desktop"
@@ -80,6 +90,113 @@ import { PeekService } from '../layout/peek.service';
       (closed)="closed.emit()"
     >
       @if (desktop) {
+        <ng-container [ngTemplateOutlet]="deskBody" />
+      } @else {
+      <div class="contents" [class.read-only]="readOnly()">
+      <div class="flex flex-col gap-4">
+        <div class="card">
+          <div class="list-row">
+            <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="row-input" />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="list-row">
+            <span>{{ 'event.starts' | t }}</span>
+            <div class="ml-auto flex items-center gap-2">
+              <app-date [ngModel]="date()" (ngModelChange)="setDate($event)" [ngModelOptions]="{ standalone: true }" />
+              <app-time [ngModel]="m.startTime" (ngModelChange)="onStartChange($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          <div class="list-row">
+            <span>{{ 'event.ends' | t }}</span>
+            <div class="ml-auto flex items-center gap-2">
+              <!-- End before start: warning orange -->
+              <span [class.opacity-60]="!invalid()" [class.text-[var(--warning)]]="invalid()" [class.line-through]="invalid()">{{ dateLabel() }}</span>
+              <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          </div>
+          <!-- Repeat (iOS-like), in the same card: Never / every day, week, 2 weeks, month, year /
+               Custom (every N days); then when it ends -->
+          <div class="list-row">
+            <span>{{ 'event.repeat' | t }}</span>
+            <app-select class="ml-auto" stretch [options]="presetOptions()" [ngModel]="preset()" (ngModelChange)="setPreset($event)" [ngModelOptions]="{ standalone: true }" />
+          </div>
+          @if (m.repeatCustom) {
+            <!-- Custom: every N days -->
+            <div class="list-row">
+              <span>{{ 'event.every' | t }}</span>
+              <app-select class="ml-auto" stretch [options]="intervalOptions()" [ngModel]="m.repeatInterval" (ngModelChange)="patch({ repeatInterval: +$event })" [ngModelOptions]="{ standalone: true }" />
+            </div>
+          }
+          <!-- End repeat: never, or on a date -->
+          @if (m.repeat !== 'Never') {
+            <div class="list-row">
+              <span>{{ 'event.endRepeat' | t }}</span>
+              <app-select class="ml-auto" stretch [options]="endOptions()" [ngModel]="m.repeatUntil ? 'date' : 'never'" (ngModelChange)="setEnd($event)" [ngModelOptions]="{ standalone: true }" />
+            </div>
+            @if (m.repeatUntil) {
+              <div class="list-row">
+                <span>{{ 'event.endDate' | t }}</span>
+                <app-date class="ml-auto" [ngModel]="untilDate()" (ngModelChange)="setUntil($event)" [ngModelOptions]="{ standalone: true }" />
+              </div>
+            }
+          }
+        </div>
+
+
+        <!-- Participants: groups and students, then Invite (rows don't open anything for now) -->
+        <div class="flex flex-col gap-1.5">
+        <span class="card-label">{{ 'event.participants' | t }}</span>
+        <div class="card">
+          <!-- × takes them out of the event -->
+          @for (p of invited(); track p.id) {
+            <div class="list-row !gap-1 py-2">
+              <div class="flex min-w-0 flex-1 items-center gap-3 self-stretch">
+                <span class="avatar" [class.text-[var(--accent-fg)]]="!!p.color" [style.background]="p.color">{{ initial(p.name) }}</span>
+                <p class="min-w-0 flex-1 truncate">{{ p.name }}</p>
+              </div>
+              <button type="button" (click)="uninvite(p.id)" [attr.aria-label]="'action.remove' | t" class="edit-only icon-plain -mr-2">
+                <app-icon name="close" class="size-5" />
+              </button>
+            </div>
+          }
+          <!-- Gray when there's no one at all to invite -->
+          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" [disabled]="isEmpty(inviteSections())" class="edit-only list-row add-row">
+            <span>{{ 'event.invite' | t }}</span>
+            <!-- In the same box as the rows' ×, so they line up -->
+            <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
+          </button>
+        </div>
+        </div>
+
+        <!-- Lessons: the attached ones, then Attach (rows don't open anything for now) -->
+        <div class="flex flex-col gap-1.5">
+        <span class="card-label">{{ 'event.lessons' | t }}</span>
+        <div class="card">
+          @for (l of attached(); track l.id) {
+            <div class="list-row !gap-1">
+              <p class="min-w-0 flex-1 self-center truncate">{{ l.title }}</p>
+              <button type="button" (click)="detach(l.id)" [attr.aria-label]="'action.remove' | t" class="edit-only icon-plain -mr-2">
+                <app-icon name="close" class="size-5" />
+              </button>
+            </div>
+          }
+          <!-- Gray when there are no lessons yet -->
+          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" [disabled]="isEmpty(lessonSections())" class="edit-only list-row add-row">
+            <span>{{ 'event.attachLesson' | t }}</span>
+            <!-- In the same box as the rows' ×, so they line up -->
+            <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
+          </button>
+        </div>
+        </div>
+      </div>
+      </div>
+      }
+    </app-page-sheet>
+    }
+
+    <ng-template #deskBody>
       <!-- Desktop, in the new style (as a Notion page): the title big, then properties — a gray label
            with its icon, the value beside it; participants and lessons as rows (⋯ on hover: Open in new tab, Remove) -->
       <div class="contents" [class.read-only]="readOnly()">
@@ -187,116 +304,14 @@ import { PeekService } from '../layout/peek.service';
         </div>
       </div>
       </div>
-      } @else {
-      <div class="contents" [class.read-only]="readOnly()">
-      <div class="flex flex-col gap-4">
-        <div class="card">
-          <div class="list-row">
-            <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="row-input" />
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="list-row">
-            <span>{{ 'event.starts' | t }}</span>
-            <div class="ml-auto flex items-center gap-2">
-              <app-date [ngModel]="date()" (ngModelChange)="setDate($event)" [ngModelOptions]="{ standalone: true }" />
-              <app-time [ngModel]="m.startTime" (ngModelChange)="onStartChange($event)" [ngModelOptions]="{ standalone: true }" />
-            </div>
-          </div>
-          <div class="list-row">
-            <span>{{ 'event.ends' | t }}</span>
-            <div class="ml-auto flex items-center gap-2">
-              <!-- End before start: warning orange -->
-              <span [class.opacity-60]="!invalid()" [class.text-[var(--warning)]]="invalid()" [class.line-through]="invalid()">{{ dateLabel() }}</span>
-              <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
-            </div>
-          </div>
-          <!-- Repeat (iOS-like), in the same card: Never / every day, week, 2 weeks, month, year /
-               Custom (every N days); then when it ends -->
-          <div class="list-row">
-            <span>{{ 'event.repeat' | t }}</span>
-            <app-select class="ml-auto" stretch [options]="presetOptions()" [ngModel]="preset()" (ngModelChange)="setPreset($event)" [ngModelOptions]="{ standalone: true }" />
-          </div>
-          @if (m.repeatCustom) {
-            <!-- Custom: every N days -->
-            <div class="list-row">
-              <span>{{ 'event.every' | t }}</span>
-              <app-select class="ml-auto" stretch [options]="intervalOptions()" [ngModel]="m.repeatInterval" (ngModelChange)="patch({ repeatInterval: +$event })" [ngModelOptions]="{ standalone: true }" />
-            </div>
-          }
-          <!-- End repeat: never, or on a date -->
-          @if (m.repeat !== 'Never') {
-            <div class="list-row">
-              <span>{{ 'event.endRepeat' | t }}</span>
-              <app-select class="ml-auto" stretch [options]="endOptions()" [ngModel]="m.repeatUntil ? 'date' : 'never'" (ngModelChange)="setEnd($event)" [ngModelOptions]="{ standalone: true }" />
-            </div>
-            @if (m.repeatUntil) {
-              <div class="list-row">
-                <span>{{ 'event.endDate' | t }}</span>
-                <app-date class="ml-auto" [ngModel]="untilDate()" (ngModelChange)="setUntil($event)" [ngModelOptions]="{ standalone: true }" />
-              </div>
-            }
-          }
-        </div>
-
-
-        <!-- Participants: groups and students, then Invite (rows don't open anything for now) -->
-        <div class="flex flex-col gap-1.5">
-        <span class="card-label">{{ 'event.participants' | t }}</span>
-        <div class="card">
-          <!-- × takes them out of the event -->
-          @for (p of invited(); track p.id) {
-            <div class="list-row !gap-1 py-2">
-              <div class="flex min-w-0 flex-1 items-center gap-3 self-stretch">
-                <span class="avatar" [class.text-[var(--accent-fg)]]="!!p.color" [style.background]="p.color">{{ initial(p.name) }}</span>
-                <p class="min-w-0 flex-1 truncate">{{ p.name }}</p>
-              </div>
-              <button type="button" (click)="uninvite(p.id)" [attr.aria-label]="'action.remove' | t" class="edit-only icon-plain -mr-2">
-                <app-icon name="close" class="size-5" />
-              </button>
-            </div>
-          }
-          <!-- Gray when there's no one at all to invite -->
-          <button #inviteRow type="button" (click)="openPicker('invite', inviteRow)" [disabled]="isEmpty(inviteSections())" class="edit-only list-row add-row">
-            <span>{{ 'event.invite' | t }}</span>
-            <!-- In the same box as the rows' ×, so they line up -->
-            <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
-          </button>
-        </div>
-        </div>
-
-        <!-- Lessons: the attached ones, then Attach (rows don't open anything for now) -->
-        <div class="flex flex-col gap-1.5">
-        <span class="card-label">{{ 'event.lessons' | t }}</span>
-        <div class="card">
-          @for (l of attached(); track l.id) {
-            <div class="list-row !gap-1">
-              <p class="min-w-0 flex-1 self-center truncate">{{ l.title }}</p>
-              <button type="button" (click)="detach(l.id)" [attr.aria-label]="'action.remove' | t" class="edit-only icon-plain -mr-2">
-                <app-icon name="close" class="size-5" />
-              </button>
-            </div>
-          }
-          <!-- Gray when there are no lessons yet -->
-          <button #lessonRow type="button" (click)="openPicker('lessons', lessonRow)" [disabled]="isEmpty(lessonSections())" class="edit-only list-row add-row">
-            <span>{{ 'event.attachLesson' | t }}</span>
-            <!-- In the same box as the rows' ×, so they line up -->
-            <span class="icon-plain -mr-2 !text-current"><app-icon name="plus" class="size-5" /></span>
-          </button>
-        </div>
-        </div>
-      </div>
-      </div>
-      }
-    </app-page-sheet>
+    </ng-template>
 
     <!-- A repeating event: this one only, or the whole series? -->
     @if (askSeries(); as ask) {
       <app-action-sheet
         title="series.title"
         [choices]="ask === 'save' ? saveChoices : deleteChoices"
-        [origin]="page.actionOrigin()"
+        [origin]="page()?.actionOrigin() ?? null"
         (chosen)="seriesChosen(ask, $event)"
         (closed)="askSeries.set(null)"
       />
@@ -354,7 +369,13 @@ export class EventEditor implements OnInit {
   private i18n = inject(I18nService);
   private prefs = inject(PreferencesService);
 
-  private readonly page = viewChild.required<PageSheet>('page');
+  protected readonly page = viewChild<PageSheet>('page');
+  // Closed: the card slides away; its own page tells its host (back to the schedule)
+  private closeView(): void {
+    const pg = this.page();
+    if (pg) pg.close();
+    else this.closed.emit();
+  }
 
   protected readonly picking = signal<'invite' | 'lessons' | null>(null);
   protected readonly pickOrigin = signal<HTMLElement | null>(null); // the row it opened from
@@ -636,12 +657,12 @@ export class EventEditor implements OnInit {
     if (!id) {
       // a new one: what's typed goes along (saved there)
       carried = this.model();
-      this.page().close();
+      this.closeView();
       this.router.navigate(['/events', 'new']);
       return;
     }
     if (this.dirty() && this.canSave() && !this.series()) this.save();
-    else this.page().close();
+    else this.closeView();
     const at = this.entry().at;
     this.router.navigate(['/events', id], at ? { queryParams: { at } } : {});
   }
@@ -691,7 +712,7 @@ export class EventEditor implements OnInit {
   // nothing to save (empty, or the times wrong): just closed
   protected leave(): void {
     clearTimeout(this.autosaveTimer);
-    if (this.readOnly() || !this.dirty() || !this.canSave()) this.page().close();
+    if (this.readOnly() || !this.dirty() || !this.canSave()) this.closeView();
     else this.save();
   }
 
@@ -766,7 +787,7 @@ export class EventEditor implements OnInit {
       this.askSeries.set('save');
       return;
     }
-    this.page().close();
+    this.closeView();
   }
 
   private pendingInput: EventInput | null = null;
@@ -793,7 +814,7 @@ export class EventEditor implements OnInit {
     } else {
       this.events.occurrence(event.id, event.startsAt, null, choice === 'following');
     }
-    this.page().close();
+    this.closeView();
   }
 
   protected remove(): void {
@@ -826,6 +847,6 @@ export class EventEditor implements OnInit {
           }
         : undefined,
     });
-    this.page().close();
+    this.closeView();
   }
 }
