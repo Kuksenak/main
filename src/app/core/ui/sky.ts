@@ -5,8 +5,7 @@ import { Component } from '@angular/core';
  * layers, all our own drawings: the app's background at the top (as the status bar's / the
  * manifest's color) into a sky lower down, a paper grain over it, halftone clouds (our own: long and
  * low, a diagonal grid of fine dots over it, as a print) peeking in at the sides and a small one
- * further off, a sun of the same dots, a paper plane with its dashed trail, two birds, a drawn line
- * along the bottom.
+ * further off, two birds, a drawn line along the bottom.
  */
 @Component({
   selector: 'app-sky',
@@ -19,18 +18,16 @@ import { Component } from '@angular/core';
     <svg width="0" height="0" class="absolute">
       <defs>
         <filter id="skyBlur" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="9" /></filter>
-        <filter id="skyShade" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="16" /></filter>
         <!-- (the print's dots: a fine grid) -->
         <pattern id="skyDots" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
           <circle cx="3" cy="3" r="1.1" class="sky-dot" />
         </pattern>
         <g id="skyPuffs">
           <!-- (ours: long and low, three caps on a flat bottom) -->
-          <ellipse cx="260" cy="190" rx="225" ry="38" />
-          <ellipse cx="150" cy="150" rx="78" ry="52" />
-          <ellipse cx="265" cy="118" rx="70" ry="62" />
-          <ellipse cx="365" cy="148" rx="66" ry="46" />
-          <ellipse cx="430" cy="175" rx="48" ry="30" />
+          <ellipse cx="260" cy="190" rx="220" ry="36" />
+          <ellipse cx="170" cy="150" rx="80" ry="50" />
+          <ellipse cx="290" cy="128" rx="80" ry="58" />
+          <ellipse cx="395" cy="160" rx="62" ry="40" />
         </g>
         <mask id="skyShape" maskUnits="userSpaceOnUse" x="0" y="0" width="520" height="270">
           <use href="#skyPuffs" fill="white" filter="url(#skyBlur)" />
@@ -38,11 +35,6 @@ import { Component } from '@angular/core';
         <symbol id="skyCloud" viewBox="0 0 520 270">
           <!-- the cloud: white, soft at the edges -->
           <use href="#skyPuffs" class="sky-cloud-body" filter="url(#skyBlur)" />
-          <!-- shade underneath and inside, for its volume -->
-          <g mask="url(#skyShape)" filter="url(#skyShade)" class="sky-cloud-shade">
-            <ellipse cx="270" cy="212" rx="190" ry="26" />
-            <ellipse cx="300" cy="150" rx="34" ry="22" />
-          </g>
           <!-- the print's dots, only on the cloud -->
           <rect width="520" height="270" fill="url(#skyDots)" mask="url(#skyShape)" class="sky-cloud-dots" />
         </symbol>
@@ -52,30 +44,6 @@ import { Component } from '@angular/core';
     <svg class="absolute -right-32 top-[13%] w-[380px] -scale-x-100 md:w-[520px]" viewBox="0 0 520 270"><use href="#skyCloud" /></svg>
     <!-- A small one, further off -->
     <svg class="absolute right-[18%] top-[46%] w-[150px] opacity-80 md:w-[200px]" viewBox="0 0 520 270"><use href="#skyCloud" /></svg>
-
-    <!-- The sun: a warm disc of the print's dots, high at the left, half behind the haze -->
-    <svg class="absolute left-[9%] top-[7%] w-[120px] md:w-[160px]" viewBox="0 0 160 160">
-      <defs>
-        <radialGradient id="skySunFade">
-          <stop offset="0.55" stop-color="white" />
-          <stop offset="1" stop-color="white" stop-opacity="0" />
-        </radialGradient>
-        <mask id="skySunMask"><circle cx="80" cy="80" r="78" fill="url(#skySunFade)" /></mask>
-        <pattern id="skySunDots" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <circle cx="3" cy="3" r="1.5" class="sky-sun-dot" />
-        </pattern>
-      </defs>
-      <rect width="160" height="160" fill="url(#skySunDots)" mask="url(#skySunMask)" />
-    </svg>
-
-    <!-- A paper plane on its way, a dashed trail behind it -->
-    <svg class="sky-plane absolute left-[22%] top-[30%] hidden w-[300px] md:block" viewBox="0 0 300 140" fill="none">
-      <path d="M6 120 C 60 126, 92 70, 140 82 C 178 92, 172 128, 140 120 C 112 112, 150 60, 222 42" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="2 7" />
-      <g transform="translate(232 36) rotate(-18)">
-        <path d="M0 0 L36 -14 L14 14 Z" class="sky-plane-wing" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
-        <path d="M0 0 L36 -14 L10 4 L8 12" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" />
-      </g>
-    </svg>
 
     <!-- Two birds far away -->
     <svg class="sky-birds absolute right-[30%] top-[20%] w-[70px]" viewBox="0 0 70 30" fill="none">

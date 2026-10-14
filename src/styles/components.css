@@ -963,10 +963,6 @@ html.dark .sky {
 .sky-cloud-body {
   fill: #ffffff;
 }
-.sky-cloud-shade {
-  fill: #9dbbe0;
-  opacity: 0.55;
-}
 .sky-dot {
   fill: #6f93c4;
 }
@@ -976,34 +972,16 @@ html.dark .sky {
 html.dark .sky-cloud-body {
   fill: #2a3a52;
 }
-html.dark .sky-cloud-shade {
-  fill: #0e1828;
-}
 html.dark .sky-dot {
   fill: #ffffff;
 }
 html.dark .sky-cloud-dots {
   opacity: 0.08;
 }
-.sky-sun-dot {
-  fill: #f2b866;
-}
-html.dark .sky-sun-dot {
-  fill: #e8c890;
-  opacity: 0.25;
-}
-/* (the plane and the birds: a bit stronger than the line, the plane's wing white) */
-.sky-plane,
+/* (the birds: a bit stronger than the line) */
 .sky-birds {
   color: rgb(30 45 70 / 0.28);
 }
-html.dark .sky-plane,
 html.dark .sky-birds {
   color: rgb(255 255 255 / 0.18);
-}
-.sky-plane-wing {
-  fill: #ffffff;
-}
-html.dark .sky-plane-wing {
-  fill: #2a3a52;
 }
