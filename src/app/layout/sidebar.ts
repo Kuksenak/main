@@ -13,6 +13,8 @@ import { EscStack } from '../core/ui/esc-stack';
 import { Icon, IconName } from '../core/ui/icon/icon';
 import { ScrollArea } from '../core/ui/scroll-area/scroll-area';
 import { Sheet } from '../core/ui/sheet/sheet';
+import { ConfirmDelete } from '../core/ui/confirm';
+import { TrashItem, TrashService } from '../core/services/trash.service';
 import { Tip } from '../core/ui/tip';
 import { PeekService } from './peek.service';
 import { LessonUsage } from '../lessons/lesson-usage';
@@ -43,7 +45,7 @@ interface Found {
  */
 @Component({
   selector: 'app-sidebar',
-  imports: [Icon, RouterLink, RouterLinkActive, ScrollArea, Sheet, Tip, TranslatePipe],
+  imports: [ConfirmDelete, Icon, RouterLink, RouterLinkActive, ScrollArea, Sheet, Tip, TranslatePipe],
   host: { class: 'flex w-[270px] shrink-0 flex-col bg-[var(--side-bg)]' },
   template: `
     <div class="flex shrink-0 flex-col gap-2 px-3 pb-1 pt-2">
@@ -161,6 +163,11 @@ interface Found {
 
     <!-- The account: its email; the settings open by it -->
     <div class="shrink-0 border-t-[0.5px] border-[var(--separator)] px-3 py-2">
+      <!-- Trash: deleted pages and students (restore / delete for good) -->
+      <button #trashBtn type="button" (click)="openTrash()" [attr.aria-expanded]="trashOpen()" class="side-row">
+        <app-icon name="trash" class="side-glyph" />
+        <span class="flex-1">{{ 'trash.title' | t }}</span>
+      </button>
       <button #accountBtn type="button" (click)="account.emit(accountBtn)" class="side-row">
         <span class="relative flex size-5 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[0.6875rem] font-semibold uppercase text-white">
           {{ (auth.email() ?? '?').charAt(0) }}
@@ -240,6 +247,32 @@ interface Found {
         </div>
       </div>
     }
+
+    @if (trashOpen()) {
+      <app-sheet [origin]="trashAnchor()?.nativeElement ?? null" [fit]="true" (closed)="trashOpen.set(false)">
+        <div class="flex w-[22rem] flex-col">
+          <input [value]="trashQuery()" (input)="trashQuery.set($any($event.target).value)" [placeholder]="'trash.search' | t" autocomplete="off" class="mx-1 mb-1 mt-0.5 h-8 rounded-md bg-[var(--tint)] px-2.5 text-[0.875rem] outline-none placeholder:opacity-45" />
+          <div class="flex max-h-80 flex-col gap-px overflow-y-auto">
+            @for (x of trashShown(); track x.kind + x.id) {
+              <div class="menu-item">
+                <app-icon [name]="x.kind === 'lesson' ? 'page' : 'person'" />
+                <span class="min-w-0 flex-1 truncate">{{ x.name }}</span>
+                <span class="shrink-0 text-[0.75rem] opacity-40">{{ deletedOn(x) }}</span>
+                <button type="button" (click)="trash.restore(x)" [appTip]="'trash.restore' | t" tipSide="bottom" [attr.aria-label]="'trash.restore' | t" class="row-dots !opacity-60 hover:!opacity-100"><app-icon name="restore" class="size-4" /></button>
+                <button #purgeBtn type="button" (click)="purging.set({ item: x, origin: purgeBtn })" [appTip]="'trash.deleteForever' | t" tipSide="bottom" [attr.aria-label]="'trash.deleteForever' | t" class="row-dots !opacity-60 hover:!opacity-100 hover:text-[var(--brand-orange,#f97316)]"><app-icon name="trash" class="size-4" /></button>
+              </div>
+            } @empty {
+              <p class="px-2.5 py-3 text-[0.875rem] opacity-45">{{ (trash.loading() ? 'trash.loading' : trashQuery() ? 'students.notFound' : 'trash.empty') | t }}</p>
+            }
+          </div>
+          <div class="menu-sep"></div>
+          <p class="menu-foot">{{ 'trash.hint' | t }}</p>
+        </div>
+      </app-sheet>
+    }
+    @if (purging(); as p) {
+      <app-confirm-delete [origin]="p.origin" (confirmed)="trash.purge(p.item)" (closed)="purging.set(null)" />
+    }
   `,
 })
 export class Sidebar {
@@ -261,6 +294,26 @@ export class Sidebar {
   private readonly peekPages = inject(PeekService);
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
+
+  // ---- Trash (a menu at its row: search, a row each — restore, delete for good, asked first)
+  protected readonly trash = inject(TrashService);
+  protected readonly trashOpen = signal(false);
+  protected readonly trashQuery = signal('');
+  protected readonly trashAnchor = viewChild<ElementRef<HTMLElement>>('trashBtn');
+  protected readonly purging = signal<{ item: TrashItem; origin: HTMLElement } | null>(null);
+  protected readonly trashShown = computed(() => {
+    const q = this.trashQuery().trim().toLocaleLowerCase();
+    return this.trash.items().filter((x) => !q || x.name.toLocaleLowerCase().includes(q));
+  });
+  protected openTrash(): void {
+    this.trashQuery.set('');
+    this.trash.load();
+    this.trashOpen.set(!this.trashOpen());
+  }
+  // When it was deleted: "14 Oct"
+  protected deletedOn(x: TrashItem): string {
+    return this.i18n.date(new Date(x.deletedAt), { day: 'numeric', month: 'short' });
+  }
   private readonly events = inject(EventService);
   private readonly usage = inject(LessonUsage);
   private readonly i18n = inject(I18nService);
