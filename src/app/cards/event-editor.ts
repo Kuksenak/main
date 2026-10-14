@@ -56,6 +56,7 @@ import { CreateDialog } from './create-dialog';
 // A new event's form, taken from its card to its full page (see openFull)
 let carried: Model | null = null;
 import { ToastService } from '../core/ui/toast';
+import { PeekService } from '../layout/peek.service';
 @Component({
   selector: 'app-event-editor',
   host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
@@ -166,7 +167,7 @@ import { ToastService } from '../core/ui/toast';
               <app-row-menu class="edit-only" [link]="['/students', p.kind, p.id]" (removed)="uninvite(p.id)" />
             </div>
           }
-          <app-add-field class="edit-only add-wide -mx-1.5" icon="people" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" [section]="'event.fromPeople' | t" />
+          <app-add-field class="edit-only add-wide -mx-1.5" icon="people" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudentPopup($event)" [section]="'event.fromPeople' | t" />
         </div>
 
         <div class="flex flex-col gap-px">
@@ -610,8 +611,13 @@ export class EventEditor implements OnInit {
     return p.kind === 'group' ? this.i18n.t('sidebar.group') : null;
   }
 
-  // New student (from the participants' field): asked in a small dialog, then invited
+  // New student (from the participants' field): their popup over this card (what was typed their
+  // name), invited once saved
   protected readonly newStudent = signal<string | null>(null);
+  private readonly peek = inject(PeekService);
+  protected newStudentPopup(name: string): void {
+    this.peek.open('student', null, { over: true, name, onCreated: (id) => this.invite(id) });
+  }
 
   protected invite(id: string): void {
     this.setInvitees([...this.inviteIds(), id]);

@@ -29,7 +29,7 @@ import { map } from 'rxjs';
  * group of.
  * Phones: groups and students behind Groups | Students tabs (desktop: both in one list).
  */
-import { CreateService } from '../cards/create-dialog';
+import { PeekService } from '../layout/peek.service';
 @Component({
   selector: 'app-students',
   imports: [NgTemplateOutlet, OverlayModule, GroupView, SearchBar, Icon, LongPress, PersonPage, ScrollArea, SearchField, StudentView, TranslatePipe],
@@ -64,7 +64,7 @@ export class Students {
   // Phones: which tab is showing (desktop lists both).
   protected readonly tab = signal<'groups' | 'students'>('students');
   // Phones: the open tab (searching too: it filters that tab); desktop: both
-  private readonly creating = inject(CreateService);
+  private readonly peek = inject(PeekService);
   protected readonly groupsOn = GROUPS_ON;
   protected readonly showGroups = computed(() => GROUPS_ON && (this.desktop || this.tab() === 'groups'));
   protected readonly showStudents = computed(() => this.desktop || this.tab() === 'students');
@@ -164,7 +164,7 @@ export class Students {
 
   // Phones: the keyboard comes up right in the tap (the form's name field gets it once it's in).
   protected openNew(kind: 'student' | 'group'): void {
-    if (this.desktop && kind === 'student') return this.creating.open('student');
+    if (this.desktop && kind === 'student') return this.peek.open('student');
     if (!this.desktop) primeKeyboard();
     this.stack.push({ kind, id: null });
   }

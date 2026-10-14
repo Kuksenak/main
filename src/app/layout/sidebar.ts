@@ -17,7 +17,6 @@ import { ConfirmDelete } from '../core/ui/confirm';
 import { TrashItem, TrashService } from '../core/services/trash.service';
 import { Tip } from '../core/ui/tip';
 import { PeekService } from './peek.service';
-import { CreateService } from '../cards/create-dialog';
 import { LessonUsage } from '../lessons/lesson-usage';
 import { LessonService, levelColor } from '../lessons/lesson.service';
 import { EventService, ScheduleEvent } from '../schedule/event.service';
@@ -293,7 +292,6 @@ export class Sidebar {
   protected readonly groups = inject(GroupService);
   protected readonly groupsOn = GROUPS_ON;
   private readonly peekPages = inject(PeekService);
-  private readonly creating = inject(CreateService);
   private readonly students = inject(StudentService);
   private readonly lessons = inject(LessonService);
 
@@ -420,10 +418,6 @@ export class Sidebar {
   protected readonly newAnchor = viewChild<ElementRef<HTMLButtonElement>>('newBtn');
   protected create(kind: 'event' | 'group' | 'student' | 'lesson'): void {
     this.newOpen.set(false);
-    if (kind === 'student') {
-      this.creating.open('student');
-      return;
-    }
     if (kind !== 'event') {
       this.peekPages.open(kind);
       return;

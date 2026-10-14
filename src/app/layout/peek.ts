@@ -28,7 +28,7 @@ import { PeekService } from './peek.service';
               <button pageHeadExtra type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
             </app-lesson-page>
           } @else {
-            <app-person-page [kind]="p.kind" [id]="p.id" (created)="created($event)">
+            <app-person-page [kind]="p.kind" [id]="p.id" [initialName]="p.name" (created)="created($event)">
               <button pageHeadExtra type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
             </app-person-page>
           }

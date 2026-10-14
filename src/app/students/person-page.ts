@@ -129,8 +129,10 @@ import { TrashService } from '../core/services/trash.service';
             <button type="button" (click)="menuOpen.set(false); k.resetPin()" [disabled]="!k.hasPin()" class="menu-item"><app-icon name="lock" /><span class="flex-1">{{ 'students.resetPin' | t }}</span></button>
             <div class="menu-sep"></div>
           }
-          <!-- (to the trash: restorable there, so not asked first) -->
+          <!-- (to the trash, once saved: restorable there, so not asked first) -->
+          @if (realId()) {
           <button type="button" (click)="menuOpen.set(false); remove()" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'trash.move' | t }}</span></button>
+          }
         </div>
       </app-sheet>
     }
@@ -145,6 +147,8 @@ export class PersonPage {
   /** null: a new one (created once it has a name; its id comes by `created`). */
   readonly id = input<string | null>(null);
   readonly created = output<string>();
+  /** A new one: the name to start from (what was typed where it was asked). */
+  readonly initialName = input('');
   // Its id: the given one, or the new one's once created
   private readonly createdId = signal<string | null>(null);
   protected readonly realId = computed(() => this.id() ?? this.createdId());
@@ -194,7 +198,9 @@ export class PersonPage {
   constructor() {
     // A new one: typing its name straight away
     afterNextRender(() => {
-      if (!this.id()) this.nameInput()?.nativeElement.focus();
+      if (this.id()) return;
+      if (this.initialName()) this.patch({ name: this.initialName() });
+      this.nameInput()?.nativeElement.focus();
     });
     // Its data into the draft, once per student / group (later reloads after saves leave it)
     effect(() => {
