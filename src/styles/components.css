@@ -676,6 +676,18 @@ html.dark .btn-white {
   font-weight: 500;
 }
 
+/* A menu's ✓ (the chosen one / an option on): at the right, as the text, a little faded — in
+   every menu and picker alike */
+.menu-check {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+.menu-check svg {
+  stroke-width: 2;
+}
+
 .menu-sep {
   margin: 0.25rem -0.25rem;
   height: 1px;

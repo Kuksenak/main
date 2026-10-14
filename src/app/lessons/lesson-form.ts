@@ -347,7 +347,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
                 <app-icon [name]="f.id === 'gap' ? 'text' : f.id === 'choice' ? 'checklist' : 'link'" />
                 <span class="flex-1">{{ f.text! | t }}</span>
                 @if (se.on?.includes(f.id)) {
-                  <app-icon name="check" class="size-4 text-[var(--accent)]" />
+                  <app-icon name="check" class="menu-check" />
                 }
               </button>
             }
@@ -455,7 +455,7 @@ type FormatId = 'bold' | 'italic' | 'underline' | 'strike' | 'gap' | 'choice' | 
               <app-icon name="lock" />
               <span class="flex-1">{{ 'lessons.onlyMe' | t }}</span>
               @if (tb.private) {
-                <app-icon name="check" class="size-4 text-[var(--accent)]" />
+                <app-icon name="check" class="menu-check" />
               }
             </button>
             <button type="button" (click)="copyTask(tm.index)" [disabled]="!tb.text?.trim()" class="menu-item">

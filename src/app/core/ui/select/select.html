@@ -107,7 +107,7 @@
         </app-scroll-area>
       </div>
     } @else {
-      <!-- Desktop: a menu as the others (the new style) — a row each, ✓ at the right of the chosen one -->
+      <!-- Desktop: a menu as the others (the new style) — a row each, ✓ (.menu-check) at the right of the chosen one -->
       <div class="pick-panel min-w-40 !overflow-visible">
         <app-scroll-area class="max-h-72" contentClass="gap-px">
         @for (sec of sections(); track $index) {
@@ -115,10 +115,10 @@
             <div class="px-2 pb-1 pt-2 text-[0.75rem] font-medium opacity-50">{{ sec.label }}</div>
           }
           @for (opt of sec.options; track opt.value) {
-            <button type="button" (click)="select(opt)" class="menu-item" [class.font-medium]="isSelected(opt)">
+            <button type="button" (click)="select(opt)" class="menu-item">
               <span class="min-w-0 flex-1 truncate">{{ opt.label }}</span>
               @if (isSelected(opt)) {
-                <app-icon name="check" [strokeWidth]="2" class="size-4 shrink-0 opacity-70" />
+                <app-icon name="check" class="menu-check" />
               }
             </button>
           }

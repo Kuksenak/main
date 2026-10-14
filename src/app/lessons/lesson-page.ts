@@ -115,7 +115,7 @@ const SAVE_AT_LEAST_MS = 5000;
               <span class="menu-icon rounded-full !opacity-100" [style.background]="levelColor($any(o.value) || null) ?? 'color-mix(in srgb, var(--text) 22%, transparent)'"></span>
               <span class="flex-1">{{ o.label }}</span>
               @if ((s.draft().level ?? '') === o.value) {
-                <app-icon name="check" class="size-4 text-[var(--accent)]" />
+                <app-icon name="check" class="menu-check" />
               }
             </button>
           }
