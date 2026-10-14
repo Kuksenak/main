@@ -86,28 +86,28 @@ let carried: Model | null = null;
         </div>
 
         <div class="flex flex-col">
-          <div class="flex min-h-9 items-center gap-3">
+          <div class="-mx-3 flex min-h-9 items-center gap-3 rounded-[0.625rem] px-3 hover:bg-[var(--tint)]">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.starts' | t }}</span>
             <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-date [ngModel]="date()" (ngModelChange)="setDate($event)" [ngModelOptions]="{ standalone: true }" />
               <app-time [ngModel]="m.startTime" (ngModelChange)="onStartChange($event)" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
-          <div class="flex min-h-9 items-center gap-3">
+          <div class="-mx-3 flex min-h-9 items-center gap-3 rounded-[0.625rem] px-3 hover:bg-[var(--tint)]">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.ends' | t }}</span>
             <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <span class="px-1" [class.opacity-60]="!invalid()" [class.text-[var(--warning)]]="invalid()" [class.line-through]="invalid()">{{ dateLabel() }}</span>
               <app-time [ngModel]="m.endTime" (ngModelChange)="patch({ endTime: $event })" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
-          <div class="flex min-h-9 items-center gap-3">
+          <div class="-mx-3 flex min-h-9 items-center gap-3 rounded-[0.625rem] px-3 hover:bg-[var(--tint)]">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.repeat' | t }}</span>
             <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-select [options]="presetOptions()" [ngModel]="preset()" (ngModelChange)="setPreset($event)" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
           @if (m.repeatCustom) {
-            <div class="flex min-h-9 items-center gap-3">
+            <div class="-mx-3 flex min-h-9 items-center gap-3 rounded-[0.625rem] px-3 hover:bg-[var(--tint)]">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.every' | t }}</span>
             <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-select [options]="intervalOptions()" [ngModel]="m.repeatInterval" (ngModelChange)="patch({ repeatInterval: +$event })" [ngModelOptions]="{ standalone: true }" />
@@ -115,14 +115,14 @@ let carried: Model | null = null;
           </div>
           }
           @if (m.repeat !== 'Never') {
-            <div class="flex min-h-9 items-center gap-3">
+            <div class="-mx-3 flex min-h-9 items-center gap-3 rounded-[0.625rem] px-3 hover:bg-[var(--tint)]">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="repeat" class="size-4" />{{ 'event.endRepeat' | t }}</span>
             <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-select [options]="endOptions()" [ngModel]="m.repeatUntil ? 'date' : 'never'" (ngModelChange)="setEnd($event)" [ngModelOptions]="{ standalone: true }" />
             </div>
           </div>
             @if (m.repeatUntil) {
-              <div class="flex min-h-9 items-center gap-3">
+              <div class="-mx-3 flex min-h-9 items-center gap-3 rounded-[0.625rem] px-3 hover:bg-[var(--tint)]">
             <span class="flex w-32 shrink-0 items-center gap-2 text-[0.875rem] opacity-50"><app-icon name="calendar" class="size-4" />{{ 'event.endDate' | t }}</span>
             <div class="flex min-w-0 flex-1 items-center justify-end gap-2 text-[0.875rem]">
               <app-date [ngModel]="untilDate()" (ngModelChange)="setUntil($event)" [ngModelOptions]="{ standalone: true }" />
@@ -134,7 +134,7 @@ let carried: Model | null = null;
 
         <!-- Participants, then lessons (as Notion Calendar's): a row each (a second line under the
              name; ⋯ on hover), then a field adding more (none yet: the field with its icon). Icons
-             under the properties' icons, texts under their labels (their tint reaching out to near the card's edges) -->
+             under the properties' icons, texts under their labels; every row's tint (the dates' too) reaching out to near the card's edges -->
         <div class="flex flex-col gap-px">
           @for (p of invited(); track p.id) {
             <div class="group/r -mx-3 flex min-h-10 items-center gap-2 rounded-[0.625rem] px-3 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
