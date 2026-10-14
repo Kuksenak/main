@@ -338,7 +338,8 @@ interface Found {
               <button type="button" (mousedown)="$event.preventDefault()" (click)="trashQuery.set(''); $any($event.currentTarget).parentElement.querySelector('input')?.focus()" [attr.aria-label]="'action.clear' | t" class="flex size-6 shrink-0 items-center justify-center rounded-md opacity-45 hover:bg-[var(--tint)] hover:opacity-80"><app-icon name="close" class="size-4" /></button>
             }
           </label>
-          <div class="flex max-h-80 flex-col gap-px overflow-y-auto">
+          <!-- (one height, found or not; nothing: said in the middle) -->
+          <div class="flex h-80 flex-col gap-px overflow-y-auto">
             @for (x of trashShown(); track x.kind + x.id) {
               <div class="menu-item">
                 <app-icon [name]="x.kind === 'lesson' ? 'page' : 'person'" />
@@ -348,7 +349,7 @@ interface Found {
                 <button #purgeBtn type="button" (click)="purging.set({ item: x, origin: purgeBtn })" [appTip]="'trash.deleteForever' | t" tipSide="bottom" [attr.aria-label]="'trash.deleteForever' | t" class="row-dots !opacity-60 hover:!opacity-100 hover:text-[var(--brand-orange,#f97316)]"><app-icon name="trash" class="size-4" /></button>
               </div>
             } @empty {
-              <p class="px-2.5 py-3 text-[0.875rem] opacity-45">{{ (trash.loading() ? 'trash.loading' : trashQuery() ? 'students.notFound' : 'trash.empty') | t }}</p>
+              <p class="m-auto px-2.5 text-center text-[0.875rem] opacity-45">{{ (trash.loading() ? 'trash.loading' : trashQuery() ? 'students.notFound' : 'trash.empty') | t }}</p>
             }
           </div>
           <div class="menu-sep"></div>
