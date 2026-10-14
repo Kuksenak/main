@@ -119,7 +119,7 @@ interface Found {
       <div class="side-head group mt-1.5">
         <button type="button" (click)="fold('people')" [attr.aria-expanded]="!folded().includes('people')" class="flex flex-1 items-center gap-1 text-left">
           <app-icon name="chevron-down" class="size-4 shrink-0 opacity-40 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('people')" />
-          {{ 'nav.students' | t }}
+          {{ 'sidebar.people' | t }}
         </button>
         <a routerLink="/students" [appTip]="'sidebar.viewAll' | t" tipSide="right" [attr.aria-label]="'sidebar.viewAll' | t" class="side-add"><app-icon name="arrow-up-right" class="size-4" /></a>
         <button type="button" (click)="create('student')" [appTip]="'sidebar.newStudent' | t" tipSide="right" [attr.aria-label]="'sidebar.newStudent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
