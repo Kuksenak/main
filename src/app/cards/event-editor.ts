@@ -7,7 +7,7 @@ import { TranslationKey } from '../core/i18n/translations';
 import { StackEntry } from '../core/services/nav-stack.service';
 import { DateField } from '../core/ui/date/date';
 import { Icon } from '../core/ui/icon/icon';
-import { ActionChoice, ActionSheet, ConfirmDelete } from '../core/ui/confirm';
+import { ActionChoice, ActionSheet } from '../core/ui/confirm';
 import { Sheet } from '../core/ui/sheet/sheet';
 import { PageSheet } from '../core/ui/page-sheet/page-sheet';
 import { SelectField, SelectOption } from '../core/ui/select/select';
@@ -59,7 +59,7 @@ import { ToastService } from '../core/ui/toast';
 @Component({
   selector: 'app-event-editor',
   host: { '(document:keydown.control.enter)': 'openFull()', '(document:keydown.meta.enter)': 'openFull()' },
-  imports: [AddField, ConfirmDelete, CreateDialog, RowMenu, Sheet, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [AddField, CreateDialog, RowMenu, Sheet, Tip, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -88,18 +88,15 @@ import { ToastService } from '../core/ui/toast';
           @if (!inline()) {
             <button type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
           }
-          <!-- (a saved one, on a card: ⋯ — Delete) -->
+          <!-- (a saved one, on a card: ⋯ — Delete; not asked first: Undo in its note; a series asks which) -->
           @if (entry().id && !readOnly() && !inline()) {
             <button #moreBtn type="button" (click)="moreOpen.set(!moreOpen())" [attr.aria-expanded]="moreOpen()" [appTip]="'lessons.more' | t" tipSide="bottom" [attr.aria-label]="'lessons.more' | t" class="head-btn !px-1.5"><app-icon name="dots" /></button>
             @if (moreOpen()) {
               <app-sheet [origin]="moreBtn" [fit]="true" (closed)="moreOpen.set(false)">
                 <div class="menu-list">
-                  <button type="button" (click)="moreOpen.set(false); series() ? remove() : deleting.set(moreBtn)" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
+                  <button type="button" (click)="moreOpen.set(false); remove()" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
                 </div>
               </app-sheet>
-            }
-            @if (deleting(); as origin) {
-              <app-confirm-delete [origin]="origin" (confirmed)="remove()" (closed)="deleting.set(null)" />
             }
           }
         </div>
@@ -675,7 +672,6 @@ export class EventEditor implements OnInit {
   // ---- Desktop: saved by itself
   protected readonly moreOpen = signal(false);
   private readonly toast = inject(ToastService);
-  protected readonly deleting = signal<HTMLElement | null>(null);
   private autosaveTimer: ReturnType<typeof setTimeout> | undefined;
 
   // Closing (a click outside, Esc): changed — saved (a new one created, a series asked first);
@@ -777,8 +773,29 @@ export class EventEditor implements OnInit {
       this.askSeries.set('delete');
       return;
     }
+    // (Undo: made again as it was — a new one, the same in every way)
+    const e = this.opened();
     this.events.remove(id);
-    this.toast.show('toast.deleted', { icon: 'trash' });
+    this.toast.show('toast.deleted', {
+      icon: 'trash',
+      action: e
+        ? {
+            label: 'toast.undo',
+            run: () =>
+              this.events.create({
+                title: e.title,
+                repeat: e.repeat,
+                repeatInterval: e.repeatInterval,
+                repeatUntil: e.repeatUntil,
+                studentIds: e.studentIds,
+                groupIds: e.groupIds,
+                lessonIds: e.lessonIds,
+                startsAt: e.startsAt,
+                durationMinutes: e.durationMinutes,
+              }),
+          }
+        : undefined,
+    });
     this.page().close();
   }
 }
