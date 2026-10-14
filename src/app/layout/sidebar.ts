@@ -102,13 +102,14 @@ interface Found {
         } @empty {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
         }
+        <a routerLink="/schedule" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
       }
 
       <div class="side-head group mt-1.5">
         <button type="button" (click)="fold('lessons')" [attr.aria-expanded]="!folded().includes('lessons')" class="flex flex-1 items-center gap-2 text-left">
           <!-- (its icon; on hover, the fold chevron in its place) -->
           <span class="relative size-5 shrink-0">
-            <app-icon name="book" class="side-glyph absolute inset-0 group-hover:opacity-0" />
+            <app-icon name="library" class="side-glyph absolute inset-0 group-hover:opacity-0" />
             <app-icon name="chevron-down" class="absolute inset-0 m-auto size-4 opacity-0 transition group-hover:opacity-70" [class.-rotate-90]="folded().includes('lessons')" />
           </span>
           {{ 'sidebar.library' | t }}
