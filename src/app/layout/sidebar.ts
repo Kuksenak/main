@@ -19,6 +19,7 @@ import { catchError, of } from 'rxjs';
 import { ToastService } from '../core/ui/toast';
 import { studentPageUrl } from '../cards/student-link';
 import { cleanLesson } from '../lessons/lesson-input';
+import { shareUrl } from '../lessons/lesson.service';
 import { ConfirmDelete } from '../core/ui/confirm';
 import { TrashItem, TrashService } from '../core/services/trash.service';
 import { Tip } from '../core/ui/tip';
@@ -277,6 +278,10 @@ interface Found {
           @if (im.kind !== 'event') {
             <button type="button" (click)="copyItemLink(im)" class="menu-item"><app-icon name="link" /><span class="flex-1">{{ 'students.copyLink' | t }}</span></button>
           }
+          <!-- (a published page: its public link too) -->
+          @if (im.kind === 'lesson' && publicToken(im.id); as token) {
+            <button type="button" (click)="copyPublicLink(token)" class="menu-item"><app-icon name="globe" /><span class="flex-1">{{ 'item.copyPublicLink' | t }}</span></button>
+          }
           @if (im.kind === 'lesson') {
             <button type="button" (click)="duplicateItem(im)" class="menu-item"><app-icon name="duplicate" /><span class="flex-1">{{ 'lessons.duplicate' | t }}</span></button>
           }
@@ -365,6 +370,15 @@ export class Sidebar {
         .post<{ token: string }>(`${environment.apiUrl}/students/${im.id}/access`, {})
         .pipe(catchError(() => of(null)))
         .subscribe((res) => res?.token && done(studentPageUrl(res.token)));
+  }
+
+  protected publicToken(id: string): string | null {
+    return this.lessons.byId(id)?.shareToken ?? null;
+  }
+
+  protected copyPublicLink(token: string): void {
+    this.itemMenu.set(null);
+    navigator.clipboard?.writeText(shareUrl(token)).then(() => this.toast.show('toast.linkCopied', { icon: 'link' }), () => {});
   }
 
   protected duplicateItem(im: ItemMenu): void {
