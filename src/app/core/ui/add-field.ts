@@ -2,6 +2,7 @@ import { Component, DestroyRef, ElementRef, computed, inject, input, output, sig
 import { EscStack } from './esc-stack';
 import { Icon, IconName } from './icon/icon';
 import { ToBody } from './to-body';
+import { TranslatePipe } from '../i18n/t.pipe';
 
 export interface AddItem {
   id: string;
@@ -17,7 +18,7 @@ export interface AddItem {
  */
 @Component({
   selector: 'app-add-field',
-  imports: [Icon, ToBody],
+  imports: [Icon, ToBody, TranslatePipe],
   host: { class: 'block' },
   template: `
     <label #box class="add-field">
@@ -27,17 +28,17 @@ export interface AddItem {
       <input #inp [value]="query()" (input)="query.set(inp.value); index.set(0); show()" (focus)="openOnFocus() && show()" (blur)="hide()" (keydown)="key($event)" [placeholder]="placeholder()" autocomplete="off" class="min-w-0 flex-1 bg-transparent outline-none placeholder:opacity-45" />
     </label>
     @if (pos(); as p) {
-      @if ((query().trim() || openOnFocus()) && (matches().length || action())) {
+      @if (query().trim() || openOnFocus()) {
+        <!-- (one height while typing: the items scroll under the action; none: "Nothing found") -->
         <div appToBody class="add-drop" [style.left.px]="p.left" [style.top.px]="p.top" [style.width.px]="p.width">
           <!-- (an action first, e.g. New lesson; then the section's items) -->
           @if (action(); as a) {
             <button type="button" (mousedown)="$event.preventDefault(); act()" (mouseenter)="index.set(0)" class="add-opt with-icon" [class.is-on]="index() === 0">
               <app-icon [name]="a.icon" class="add-icon" />{{ a.label }}
             </button>
-            @if (matches().length) {
-              <div class="menu-sep"></div>
-            }
+            <div class="menu-sep"></div>
           }
+          <div class="flex min-h-0 flex-1 flex-col gap-px overflow-y-auto">
           @if (section() && matches().length) {
             <p class="px-2.5 pb-0.5 pt-1 text-[0.75rem] font-medium opacity-50">{{ section() }}</p>
           }
@@ -56,7 +57,10 @@ export interface AddItem {
                 }
               }
             </button>
+          } @empty {
+            <p class="px-2.5 py-2 text-[0.875rem] opacity-45">{{ 'students.notFound' | t }}</p>
           }
+          </div>
         </div>
       }
     }
@@ -101,7 +105,7 @@ export class AddField {
       })
       .filter((it) => it.at >= 0)
       .sort((a, b) => a.at - b.at)
-      .slice(0, 8)
+      .slice(0, 60)
       .map((it) => ({ ...it, before: it.name.slice(0, it.at), hit: it.name.slice(it.at, it.at + q.length), after: it.name.slice(it.at + q.length) }));
   });
 
@@ -114,7 +118,7 @@ export class AddField {
   protected show(): void {
     const r = this.box().nativeElement.getBoundingClientRect();
     const width = 280;
-    const top = Math.max(8, Math.min(r.top - 4, window.innerHeight - 380));
+    const top = Math.max(8, Math.min(r.top - 4, window.innerHeight - 8 - 320));
     if (r.left - 8 - width >= 8) this.pos.set({ left: r.left - 8 - width, top, width });
     else this.pos.set({ left: r.left, top: r.bottom + 4, width: Math.max(r.width, 240) });
     this.offEsc ??= this.esc.push(() => (this.box().nativeElement.querySelector('input') as HTMLInputElement).blur());
@@ -131,15 +135,22 @@ export class AddField {
     if (e.key === 'ArrowDown' && n) {
       e.preventDefault();
       this.index.set((this.index() + 1) % n);
+      this.reveal();
     } else if (e.key === 'ArrowUp' && n) {
       e.preventDefault();
       this.index.set((this.index() - 1 + n) % n);
+      this.reveal();
     } else if (e.key === 'Enter' && n) {
       e.preventDefault();
       const i = Math.min(this.index(), n - 1);
       if (i < this.shift()) this.act();
       else this.pick(this.matches()[i - this.shift()]);
     }
+  }
+
+  // (the highlighted row scrolled into view)
+  private reveal(): void {
+    setTimeout(() => document.querySelector('.add-drop .add-opt.is-on')?.scrollIntoView({ block: 'nearest' }));
   }
 
   protected act(): void {
