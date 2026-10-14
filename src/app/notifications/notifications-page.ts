@@ -36,9 +36,9 @@ interface Item {
            the right; new ones with a blue dot (opening nothing for now) -->
       <main class="flex min-h-0 w-full flex-1 flex-col px-2 pb-4">
         <!-- (a search on top, as the search window's) -->
-        <label class="flex h-12 shrink-0 items-center gap-2.5 px-3">
-          <app-icon name="search" class="size-6 shrink-0 opacity-50" />
-          <input [value]="query()" (input)="query.set($any($event.target).value)" type="text" [placeholder]="'inbox.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45" />
+        <label class="palette-search !px-3">
+          <app-icon name="search" class="size-5 shrink-0 opacity-50" />
+          <input [value]="query()" (input)="query.set($any($event.target).value)" type="text" [placeholder]="'inbox.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[1.0625rem] outline-none placeholder:opacity-40" />
           @if (query()) {
               <button type="button" (mousedown)="$event.preventDefault()" (click)="query.set(''); $any($event.currentTarget).parentElement.querySelector('input')?.focus()" [attr.aria-label]="'action.clear' | t" class="flex size-6 shrink-0 items-center justify-center rounded-md opacity-45 hover:bg-[var(--tint)] hover:opacity-80"><app-icon name="close" class="size-4" /></button>
             }

@@ -99,7 +99,7 @@
 <!-- The inbox (desktop): opened as the search window — in the middle near the top, its size and look -->
 @if (desktop && inbox.open()) {
   <div class="fixed inset-0 z-[2200] flex items-start justify-center pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="inbox.open.set(false)">
-    <div class="dialog-panel flex h-[70vh] w-[36rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl pt-1 [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
+    <div class="palette h-[70vh] w-[42rem] max-w-[92vw] [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
       <app-notifications-page />
     </div>
   </div>

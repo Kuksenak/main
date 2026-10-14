@@ -237,15 +237,23 @@ interface Found {
          first letter -->
     @if (newWindow()) {
       <div class="fixed inset-0 z-[2200] flex items-start justify-center pt-[18vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeNewWindow()">
-        <div #newBox tabindex="-1" (keydown)="newKey($event)" class="dialog-panel flex w-80 max-w-[90vw] flex-col !rounded-xl p-1.5 outline-none [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
-          <p class="px-2.5 pb-1 pt-1.5 text-[0.75rem] font-medium opacity-50">{{ 'sidebar.new' | t }}</p>
-          @for (c of newChoices; track c.kind; let k = $index) {
-            <button type="button" (click)="closeNewWindow(); create(c.kind)" (mouseenter)="newIndex.set(k)" class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.875rem]" [class.bg-[var(--highlight)]]="k === newIndex()">
-              <app-icon [name]="c.icon" class="side-glyph" />
-              <span class="flex-1">{{ c.label | t }}</span>
-              <span class="rounded bg-[var(--fill-strong)] px-1.5 py-px text-[0.6875rem] font-medium opacity-55">{{ c.key }}</span>
-            </button>
-          }
+        <div #newBox tabindex="-1" (keydown)="newKey($event)" class="palette w-[26rem] max-w-[92vw] outline-none [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
+          <div class="px-2 pb-2">
+            <p class="palette-section">{{ 'sidebar.new' | t }}</p>
+            @for (c of newChoices; track c.kind; let k = $index) {
+              <button type="button" (click)="closeNewWindow(); create(c.kind)" (mouseenter)="newIndex.set(k)" class="palette-row" [class.is-on]="k === newIndex()">
+                <app-icon [name]="c.icon" class="size-[1.125rem] shrink-0 opacity-55" />
+                <span class="flex-1">{{ c.label | t }}</span>
+                <kbd class="kbd">{{ c.key }}</kbd>
+              </button>
+            }
+          </div>
+          <!-- (the keys, at the bottom) -->
+          <div class="palette-foot">
+            <span><app-icon name="chevrons-up-down" class="size-4" />{{ 'palette.navigate' | t }}</span>
+            <span><app-icon name="enter" class="size-4" />{{ 'palette.select' | t }}</span>
+            <span><kbd class="kbd">Esc</kbd>{{ 'palette.close' | t }}</span>
+          </div>
         </div>
       </div>
     }
@@ -253,9 +261,10 @@ interface Found {
     <!-- The search window (as Notion's): in the middle, near the top -->
     @if (searchOpen()) {
       <div class="fixed inset-0 z-[2200] flex items-start justify-center pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeSearch()">
-        <div class="dialog-panel flex h-[70vh] w-[36rem] max-w-[90vw] flex-col overflow-hidden !rounded-xl [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
-          <label class="flex h-12 shrink-0 items-center gap-2.5 px-4">
-            <app-icon name="search" class="size-6 shrink-0 opacity-50" />
+        <!-- (as Notion Calendar's command window: frosted, a big field, results by kind, the keys at the bottom) -->
+        <div class="palette h-[70vh] w-[42rem] max-w-[92vw] [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
+          <label class="palette-search">
+            <app-icon name="search" class="size-5 shrink-0 opacity-50" />
             <input
               #searchField
               [value]="query()"
@@ -264,29 +273,41 @@ interface Found {
               type="text"
               [placeholder]="'students.search' | t"
               autocomplete="off"
-              class="min-w-0 flex-1 bg-transparent text-[0.9375rem] outline-none placeholder:opacity-45"
+              class="min-w-0 flex-1 bg-transparent text-[1.0625rem] outline-none placeholder:opacity-40"
             />
             @if (query()) {
               <button type="button" (mousedown)="$event.preventDefault()" (click)="query.set(''); index.set(0); $any($event.currentTarget).parentElement.querySelector('input')?.focus()" [attr.aria-label]="'action.clear' | t" class="flex size-6 shrink-0 items-center justify-center rounded-md opacity-45 hover:bg-[var(--tint)] hover:opacity-80"><app-icon name="close" class="size-4" /></button>
             }
           </label>
           <!-- (one height, as the inbox's; nothing found: said in the middle) -->
-          <div class="flex min-h-0 flex-1 flex-col overflow-y-auto p-1.5">
+          <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 pb-2">
             @for (f of found(); track f.kind + f.id; let k = $index) {
-              <button type="button" (click)="pick(f)" (mouseenter)="index.set(k)" class="flex h-9 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[0.875rem]" [class.bg-[var(--highlight)]]="k === index()">
+              <!-- (a kind's first one: its section's name) -->
+              @if (k === 0 || found()[k - 1].kind !== f.kind) {
+                <p class="palette-section">{{ (f.kind === 'lesson' ? 'nav.lessons' : f.kind === 'student' ? 'nav.students' : 'groups.title') | t }}</p>
+              }
+              <button type="button" (click)="pick(f)" (mouseenter)="index.set(k)" class="palette-row" [class.is-on]="k === index()">
                 @if (f.kind === 'student') {
-                  <app-icon name="person" class="size-4 shrink-0 opacity-55" />
+                  <app-icon name="person" class="size-[1.125rem] shrink-0 opacity-55" />
+                } @else if (f.kind === 'lesson') {
+                  <app-icon name="page" class="size-[1.125rem] shrink-0 opacity-55" [style.color]="f.dot" />
                 } @else {
                   <span class="mx-1 size-2 shrink-0 rounded-full" [style.background]="f.dot ?? 'color-mix(in srgb, var(--text) 22%, transparent)'"></span>
                 }
                 <span class="min-w-0 flex-1 truncate">{{ f.name }}</span>
                 @if (f.hint) {
-                  <span class="text-footnote shrink-0 opacity-45">{{ f.hint }}</span>
+                  <span class="shrink-0 text-[0.8125rem] font-normal opacity-45">{{ f.hint }}</span>
                 }
               </button>
             } @empty {
               <p class="m-auto text-center text-[0.875rem] opacity-45">{{ 'students.notFound' | t }}</p>
             }
+          </div>
+          <!-- (the keys, at the bottom) -->
+          <div class="palette-foot">
+            <span><app-icon name="chevrons-up-down" class="size-4" />{{ 'palette.navigate' | t }}</span>
+            <span><app-icon name="enter" class="size-4" />{{ 'palette.select' | t }}</span>
+            <span><kbd class="kbd">Esc</kbd>{{ 'palette.close' | t }}</span>
           </div>
         </div>
       </div>
