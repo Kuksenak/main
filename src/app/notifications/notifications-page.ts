@@ -33,7 +33,8 @@ interface Item {
       <!-- Desktop (as Notion's inbox): the head, then a row a line — the title, what it said, when at
            the right; new ones with a blue dot (opening nothing for now) -->
       <main class="flex min-h-0 w-full flex-1 flex-col px-2 pb-4">
-        <h1 class="flex h-12 shrink-0 items-center px-2 text-[1.25rem] font-semibold">{{ 'sidebar.inbox' | t }}</h1>
+        <!-- (in line with the rows' titles) -->
+        <h1 class="flex h-12 shrink-0 items-center px-5 text-[1.25rem] font-semibold">{{ 'sidebar.inbox' | t }}</h1>
         <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
           @if (items(); as list) {
             <div class="flex flex-col gap-px">
