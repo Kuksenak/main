@@ -688,24 +688,20 @@ html.dark .btn-white {
   stroke-width: 2;
 }
 
-/* Adding people / lessons (AddField, as Notion Calendar's): a row with its icon, a hairline on
-   hover, gray while typing; what matches in a list under it, as the menus */
+/* Adding people / lessons (AddField, as Notion Calendar's): a row with its icon, a light tint on
+   hover and while typing; what matches in a list under it, as the menus */
 .add-field {
   display: flex;
   height: 2.25rem;
   align-items: center;
   gap: 0.625rem;
-  border: 1px solid transparent;
   border-radius: 0.375rem;
   padding: 0 0.5rem;
   font-size: 0.875rem;
   cursor: text;
 }
-.add-field:hover {
-  border-color: var(--separator);
-}
+.add-field:hover,
 .add-field:focus-within {
-  border-color: transparent;
   background: var(--tint);
 }
 .add-drop {
