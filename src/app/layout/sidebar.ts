@@ -75,7 +75,7 @@ interface Found {
     <app-scroll-area class="min-h-0 flex-1 pr-2" viewportClass="!rounded-none" contentClass="gap-px pb-3 pl-2 pt-2">
       <!-- Calendar: the schedule -->
       <div routerLink="/schedule" routerLinkActive="is-on" role="link" tabindex="0" class="side-row cursor-pointer">
-        <span class="flex-1">{{ 'sidebar.calendar' | t }}</span>
+        <span class="flex-1 text-[color-mix(in_srgb,var(--text)_50%,transparent)]">{{ 'sidebar.calendar' | t }}</span>
         <a routerLink="/schedule" (click)="$event.stopPropagation()" [appTip]="'sidebar.calendar' | t" tipSide="right" [attr.aria-label]="'sidebar.calendar' | t" class="side-add"><app-icon name="arrow-up-right" class="size-4" /></a>
         <button type="button" (click)="$event.stopPropagation(); create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>

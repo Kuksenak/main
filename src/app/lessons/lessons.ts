@@ -92,7 +92,7 @@ import { LessonUsage } from './lesson-usage';
           } @empty {
             <!-- None picked (the sidebar's View all): every lesson, a row each — its level, name, where it's used -->
             <div class="flex min-h-0 flex-1 flex-col">
-              <h1 class="flex h-[var(--control-h)] shrink-0 items-center px-2 text-[0.9375rem] font-medium">{{ 'nav.lessons' | t }}</h1>
+              <h1 class="flex h-[var(--control-h)] shrink-0 items-center px-2 text-[0.9375rem] font-medium">{{ 'sidebar.library' | t }}</h1>
               @if (visible().length) {
                 <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none">
                   <div class="flex flex-col gap-px">
