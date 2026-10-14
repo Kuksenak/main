@@ -58,7 +58,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [class.desktop:!min-w-80]="fit()"
         [class.desktop:!max-w-[85vw]]="fit()"
         [class.desktop:!max-h-[85vh]]="fit()"
-        [class.desktop:!px-1]="bleed()"
+        [class.desktop:!px-0]="bleed()"
         [class.desktop:!max-w-[45rem]]="doc() && !inline()"
         [class.desktop:!max-h-[85vh]]="doc() && !inline()"
         [class.desktop:!rounded-xl]="doc() && !inline()"
@@ -114,12 +114,12 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         @if (scroll()) {
           <app-scroll-area
             class="min-h-0 flex-1 px-4 desktop:flex-initial desktop:px-0"
-            [contentClass]="'pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:pb-0 desktop:pt-0' + (bleed() ? ' desktop:px-3' : '')"
+            [contentClass]="'pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:pb-0 desktop:pt-0' + (bleed() ? ' desktop:px-2' : '')"
           >
             <ng-container [ngTemplateOutlet]="body" />
           </app-scroll-area>
         } @else {
-          <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:px-0 desktop:pb-0 desktop:pt-0" [class.desktop:!px-3]="bleed()">
+          <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:px-0 desktop:pb-0 desktop:pt-0" [class.desktop:!px-2]="bleed()">
             <ng-container [ngTemplateOutlet]="body" />
           </div>
         }
@@ -127,7 +127,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         @if (actions()) {
           <!-- Desktop footer -->
           <!-- (in the new style: Delete and Save as head buttons; Delete orange on hover) -->
-          <div class="mt-4 flex items-center gap-2 mobile:hidden" [class.px-3]="bleed()">
+          <div class="mt-4 flex items-center gap-2 mobile:hidden" [class.px-2]="bleed()">
             @if (deletable()) {
               <button type="button" (click)="onDelete($event)" class="head-btn hover:!text-[var(--brand-orange,#f97316)]"><app-icon name="trash" />{{ 'action.delete' | t }}</button>
             }

@@ -42,7 +42,7 @@ import { TrashService } from '../core/services/trash.service';
   imports: [AddField, CreateDialog, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
-    <main class="flex min-h-0 w-full flex-1 flex-col px-4 pb-4">
+    <main class="flex min-h-0 w-full flex-1 flex-col px-2 pb-4">
       <app-scroll-area class="min-h-0 flex-1" viewportClass="!rounded-none" contentClass="gap-1 pb-10">
         @if (!exists()) {
           <p class="py-10 text-center text-[0.875rem] opacity-40">{{ 'students.notFound' | t }}</p>
