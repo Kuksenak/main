@@ -12,9 +12,9 @@
       </button>
     }
   }
-  <!-- Desktop (as Craft's): the content a white sheet over the sidebar's color — rounded, a light
-       gray hairline -->
-  <div class="relative flex min-h-0 min-w-0 flex-1 flex-col desktop:my-2 desktop:mr-2 desktop:overflow-hidden desktop:rounded-2xl desktop:border desktop:border-[var(--separator)] desktop:bg-[var(--app-bg)] desktop:pt-3" [class.desktop:ml-11]="desktop && !sidebarOpen()">
+  <!-- Desktop (as Craft's): the content a white sheet over the sidebar's color — rounded, set apart
+       by a soft shadow (no hairline) -->
+  <div class="relative flex min-h-0 min-w-0 flex-1 flex-col desktop:my-2 desktop:mr-2 desktop:overflow-hidden desktop:rounded-2xl desktop:bg-[var(--app-bg)] desktop:shadow-[0_0_0_1px_rgb(15_15_15/0.03),0_1px_3px_rgb(15_15_15/0.06),0_6px_20px_rgb(15_15_15/0.04)] desktop:pt-3" [class.desktop:ml-11]="desktop && !sidebarOpen()">
   <!-- overlay (a page that scrolls under it, e.g. Students on phones): floating, transparent,
        only its controls take taps -->
   @if (!desktop) {

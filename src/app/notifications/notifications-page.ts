@@ -7,6 +7,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { NotificationsService } from '../core/services/notifications.service';
 import { ToolbarService } from '../core/services/toolbar.service';
 import { Icon } from '../core/ui/icon/icon';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 
 interface Item {
   id: string;
@@ -26,6 +27,35 @@ interface Item {
   selector: 'app-notifications-page',
   imports: [Icon, TranslatePipe],
   template: `
+    @if (desktop) {
+      <!-- Desktop (as Notion's inbox): the head, then a row each — new ones with a blue dot -->
+      <main class="flex min-h-0 w-full flex-1 flex-col px-2 pb-4">
+        <h1 class="flex h-12 shrink-0 items-center px-3 text-[1.25rem] font-semibold">{{ 'sidebar.inbox' | t }}</h1>
+        <div class="min-h-0 flex-1 overflow-y-auto">
+          @if (items(); as list) {
+            <div class="flex max-w-3xl flex-col gap-px">
+              @for (n of list; track n.id) {
+                <button type="button" (click)="open(n.url)" class="relative flex w-full items-start gap-3 rounded-lg py-2.5 pl-6 pr-3 text-left hover:bg-[var(--tint)]">
+                  @if (isNew(n)) {
+                    <span class="absolute left-2 top-[1.1rem] size-2 rounded-full bg-[var(--accent)]"></span>
+                  }
+                  <span class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[var(--tint-strong)]"><app-icon name="bell" class="size-4 opacity-70" /></span>
+                  <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span class="text-[0.875rem]" [class.font-semibold]="isNew(n)" [class.font-medium]="!isNew(n)">{{ n.title }}</span>
+                    @if (n.body) {
+                      <span class="text-[0.8125rem] opacity-60">{{ n.body }}</span>
+                    }
+                    <span class="text-[0.75rem] tabular-nums opacity-40">{{ when(n.createdAt) }}</span>
+                  </span>
+                </button>
+              } @empty {
+                <p class="px-3 py-10 text-[0.875rem] opacity-40">{{ 'notifications.empty' | t }}</p>
+              }
+            </div>
+          }
+        </div>
+      </main>
+    } @else {
     <main class="min-h-0 w-full flex-1 overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-1 desktop:pt-6">
       <div class="flex w-full flex-col gap-4">
         @if (items(); as list) {
@@ -48,6 +78,7 @@ interface Item {
         }
       </div>
     </main>
+    }
   `,
 })
 export class NotificationsPage {
@@ -56,9 +87,17 @@ export class NotificationsPage {
   private notifications = inject(NotificationsService);
   // null: loading
   protected readonly items = signal<Item[] | null>(null);
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  // When the inbox was last open: newer ones are new (a blue dot); now is then, from here on
+  private readonly seenBefore = readSeen();
+
+  protected isNew(n: Item): boolean {
+    return !!this.seenBefore && n.createdAt > this.seenBefore;
+  }
 
   constructor() {
     this.load();
+    writeSeen(new Date().toISOString());
     // A new one meanwhile: the list again
     const sub = this.notifications.received.subscribe(() => this.load());
 
@@ -90,5 +129,21 @@ export class NotificationsPage {
     return new Date().toDateString() === d.toDateString()
       ? this.i18n.time(d)
       : this.i18n.date(d, { day: 'numeric', month: 'short' });
+  }
+}
+
+const SEEN_KEY = 'inbox.seenAt';
+function readSeen(): string | null {
+  try {
+    return localStorage.getItem(SEEN_KEY);
+  } catch {
+    return null;
+  }
+}
+function writeSeen(at: string): void {
+  try {
+    localStorage.setItem(SEEN_KEY, at);
+  } catch {
+    // (private mode: no dots then)
   }
 }
