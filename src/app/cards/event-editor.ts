@@ -65,13 +65,14 @@ import { ToastService } from '../core/ui/toast';
     <app-page-sheet
       #page
       [bleed]="desktop"
+      [doc]="desktop"
       [inline]="inline()"
       [actions]="!readOnly() && (!desktop || inline())"
       [dirty]="(!desktop || inline()) && dirty()"
       [cancelCloses]="!desktop || inline()"
       (cancel)="leave()"
       [canSave]="canSave()"
-      [deletable]="!!entry().id"
+      [deletable]="!!entry().id && !desktop"
       [confirmDelete]="!series()"
       (save)="save()"
       (delete)="remove()"
@@ -81,15 +82,16 @@ import { ToastService } from '../core/ui/toast';
       <!-- Desktop, in the new style (as a Notion page): the title big, then properties — a gray label
            with its icon, the value beside it; participants and lessons as rows (⋯ on hover: Open in new tab, Remove) -->
       <div class="contents" [class.read-only]="readOnly()">
-      <div class="flex flex-col gap-2.5 pt-1">
-        <div class="flex items-center gap-1">
-          <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent px-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
+      <!-- (as the pages': the head — the title, its buttons, ⋯ last — then the body under the title) -->
+      <div class="flex flex-col gap-2.5 [&>*:not(:first-child)]:px-5">
+        <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--head-bg,var(--app-bg))] px-1">
+          <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
           <!-- (Open in full page, Ctrl+Enter; a new one takes what's typed along) -->
           @if (!inline()) {
             <button type="button" (click)="openFull()" [appTip]="'**' + ('peek.openFull' | t) + '**  Ctrl+↵'" tipSide="bottom" [attr.aria-label]="'peek.openFull' | t" class="head-btn !px-1.5"><app-icon name="expand" /></button>
           }
           <!-- (a saved one, on a card: ⋯ — Delete; not asked first: Undo in its note; a series asks which) -->
-          @if (entry().id && !readOnly() && !inline()) {
+          @if (entry().id && !readOnly()) {
             <button #moreBtn type="button" (click)="moreOpen.set(!moreOpen())" [attr.aria-expanded]="moreOpen()" [appTip]="'lessons.more' | t" tipSide="bottom" [attr.aria-label]="'lessons.more' | t" class="head-btn !px-1.5"><app-icon name="dots" /></button>
             @if (moreOpen()) {
               <app-sheet [origin]="moreBtn" [fit]="true" (closed)="moreOpen.set(false)">

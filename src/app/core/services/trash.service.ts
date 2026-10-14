@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { environment } from '@environments/environment';
+import { Router } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { LessonService } from '../../lessons/lesson.service';
 import { StudentService } from '../../students/student.service';
@@ -20,6 +21,7 @@ export class TrashService {
   private readonly lessons = inject(LessonService);
   private readonly students = inject(StudentService);
   private readonly toast = inject(ToastService);
+  private readonly router = inject(Router);
   private readonly base = `${environment.apiUrl}/trash`;
 
   readonly items = signal<TrashItem[]>([]);
@@ -44,7 +46,9 @@ export class TrashService {
       .pipe(catchError(() => of(null)))
       .subscribe(() => {
         this.reloadList(item);
-        this.toast.show('toast.restored', { icon: 'restore' });
+        this.toast.show('toast.restored');
+        // (and opened: its page)
+        this.router.navigate(item.kind === 'lesson' ? ['/lessons', item.id] : ['/students', 'student', item.id]);
       });
   }
 

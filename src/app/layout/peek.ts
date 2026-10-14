@@ -21,7 +21,7 @@ import { PeekService } from './peek.service';
     @for (p of shown(); track p.n) {
       <!-- (under the menus and cards it opens: z 25; opened from a card: above it, 35) -->
       <div class="fixed inset-0 z-[25] flex items-center justify-center" (mousedown)="peek.close()" [class.!z-[35]]="p.over">
-        <div class="flex h-[86vh] w-[min(56rem,92vw)] flex-col overflow-hidden rounded-xl border border-[var(--separator)] bg-[var(--app-bg)] pt-3 shadow-[0_16px_48px_rgb(0_0_0/0.18)]" (mousedown)="$event.stopPropagation()">
+        <div class="dialog-panel flex max-h-[85vh] w-[min(45rem,92vw)] flex-col overflow-hidden !rounded-xl pt-3" (mousedown)="$event.stopPropagation()">
           @if (p.kind === 'lesson') {
             <app-lesson-page [lessonId]="p.id" (created)="created($event)">
               <!-- (in the page's head, beside its other buttons) -->

@@ -44,10 +44,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [class.dialog-panel]="desktop && !inline()"
         [class.!animate-none]="inline()"
         [class.desktop:!mx-auto]="inline()"
-        [class.desktop:!max-w-2xl]="inline()"
+        [class.desktop:!max-w-none]="inline()"
         [class.desktop:!h-full]="inline()"
         [class.desktop:!max-h-none]="inline()"
-        [class.desktop:!pt-8]="inline()"
+
         [class.desktop:!h-full]="wide()"
         [class.desktop:!max-h-none]="wide()"
         [class.desktop:!max-w-none]="wide()"
@@ -57,6 +57,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [class.desktop:!max-w-[85vw]]="fit()"
         [class.desktop:!max-h-[85vh]]="fit()"
         [class.desktop:!px-1]="bleed()"
+        [class.desktop:!max-w-[45rem]]="doc() && !inline()"
+        [class.desktop:!max-h-[85vh]]="doc() && !inline()"
+        [class.desktop:!rounded-xl]="doc() && !inline()"
+        [class.desktop:!pt-3]="doc()"
         [style.transform]="closing() ? 'translateX(100%)' : null"
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
@@ -178,6 +182,8 @@ export class PageSheet {
   /** Desktop: rows' tints may reach 12 px past the content's sides (its side padding moved inside the
    * scrolling, which would cut them off). */
   readonly bleed = input(false);
+  /** Desktop: a page's popup, as the peek's (720 wide, up to 85% tall; its head as the pages'). */
+  readonly doc = input(false);
   // false: back / ✕ / Cancel / a click outside emit `cancel` and leave the page open (e.g. a
   // card that leaves its edit mode instead of closing).
   readonly cancelCloses = input(true);

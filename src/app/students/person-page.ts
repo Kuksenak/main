@@ -48,7 +48,7 @@ import { TrashService } from '../core/services/trash.service';
         } @else {
           @let d = draft();
           <!-- The head, always at the top -->
-          <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--app-bg)] px-1">
+          <div class="sticky top-0 z-20 -mx-1 flex h-12 shrink-0 items-center gap-1 bg-[var(--head-bg,var(--app-bg))] px-1">
             <input #nameInput [ngModel]="d.name" (ngModelChange)="patch({ name: $event })" type="text" [placeholder]="(kind() === 'group' ? 'groups.name' : 'students.name') | t" autocomplete="off" style="margin-left: 14px" class="mr-2 min-w-0 flex-1 rounded-md bg-transparent px-1.5 py-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
             @if (kind() === 'student') {
               <!-- (Copy link — their page's) -->
