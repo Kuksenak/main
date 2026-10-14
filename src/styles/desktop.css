@@ -71,28 +71,28 @@ html:root body {
   --accent-label: #ffffff;
   --control-border: rgb(0 0 0 / 0.1);
 }
-/* The desktop's own look (the new style), as Craft's: one cool near-white canvas (the sidebar and
-   the page alike), hovers and the chosen row a light gray, blocks (cards) a shade deeper, floating
-   buttons white. (html:root: over tokens.css's :root, which loads after this file) */
+/* The desktop's own look (the new style), as Craft's: the sidebar a cool near-white, the content a
+   white sheet with a light gray hairline; hovers and the chosen row a light neutral gray.
+   (html:root: over tokens.css's :root, which loads after this file) */
 html:root {
   --text: #1a1c1e;
-  --app-bg: #fcfdfe;
+  --app-bg: #ffffff;
   --side-bg: #fcfdfe;
   --surface: #ffffff;
-  --card: #f5f6f7;
-  --separator: #eaebec;
-  --tint: rgb(26 28 30 / 0.04);
-  --tint-strong: rgb(26 28 30 / 0.065);
+  --card: #ffffff;
+  --separator: #e6e7e8;
+  --tint: rgb(26 28 30 / 0.035);
+  --tint-strong: rgb(26 28 30 / 0.06);
   --highlight: rgb(26 28 30 / 0.05);
 }
 
 html.dark:root {
   /* (dark: a neutral graphite, as Craft's) */
   --text: #ececed;
-  --app-bg: #1c1d1f;
-  --side-bg: #1c1d1f;
+  --app-bg: #202123;
+  --side-bg: #1a1b1d;
   --surface: #26272a;
-  --card: #232427;
+  --card: #202123;
   --separator: rgb(255 255 255 / 0.08);
   --tint: rgb(255 255 255 / 0.05);
   --tint-strong: rgb(255 255 255 / 0.085);

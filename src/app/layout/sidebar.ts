@@ -88,17 +88,14 @@ interface Found {
         <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('upcoming')) {
-        <!-- By day (Today, Tomorrow, Thu 16 Oct): each event its color's bar, its name, the time at
-             the right -->
-        @for (d of upcomingDays(); track d.label) {
-          <p class="mt-1 flex h-6 items-end pb-0.5 pl-[1.125rem] text-[0.75rem] font-medium opacity-45">{{ d.label }}</p>
-          @for (e of d.events; track e.id + e.startsAt) {
-            <button type="button" (click)="openEvent(e)" class="side-row !pl-[1.125rem]">
-              <span class="h-4 w-[3px] shrink-0 rounded-full" [style.background]="people.color(e)"></span>
-              <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
-              <span class="shrink-0 text-[0.75rem] tabular-nums opacity-50">{{ timeOf(e) }}</span>
-            </button>
-          }
+        <!-- As the rows of the other sections: in the icon's place the first letter in the event's
+             color, the name, and when at the right (today: the time; later: the day too) -->
+        @for (e of upcoming(); track e.id + e.startsAt) {
+          <button type="button" (click)="openEvent(e)" class="side-row !pl-[1.125rem]">
+            <span class="flex size-5 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-semibold uppercase text-white" [style.background]="people.color(e)">{{ initial(e) }}</span>
+            <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
+            <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(e) }}</span>
+          </button>
         } @empty {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
         }
@@ -308,26 +305,19 @@ export class Sidebar {
   });
   protected readonly upcoming = computed(() => this.upcomingAll().slice(0, 5));
 
-  // The upcoming ones by day: Today, Tomorrow, then "Thu 16 Oct"
-  protected readonly upcomingDays = computed(() => {
-    const days: { label: string; events: ScheduleEvent[] }[] = [];
-    const today = new Date();
-    const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-    for (const e of this.upcoming()) {
-      const d = new Date(e.startsAt);
-      const label =
-        d.toDateString() === today.toDateString() ? this.i18n.t('schedule.today')
-        : d.toDateString() === tomorrow.toDateString() ? this.i18n.t('sidebar.tomorrow')
-        : this.i18n.date(d, { weekday: 'short', day: 'numeric', month: 'short' });
-      const last = days.at(-1);
-      if (last?.label === label) last.events.push(e);
-      else days.push({ label, events: [e] });
-    }
-    return days;
-  });
+  // "14:00" today, "Tmrw 14:00", then "Thu 14:00"
+  protected when(e: ScheduleEvent): string {
+    const d = new Date(e.startsAt);
+    const now = new Date();
+    const time = this.i18n.time(d);
+    if (d.toDateString() === now.toDateString()) return time;
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const day = d.toDateString() === tomorrow.toDateString() ? this.i18n.t('sidebar.tomorrow') : this.i18n.date(d, { weekday: 'short' });
+    return `${day} ${time}`;
+  }
 
-  protected timeOf(e: ScheduleEvent): string {
-    return this.i18n.time(new Date(e.startsAt));
+  protected initial(e: ScheduleEvent): string {
+    return (this.people.label(e) || e.title || '·').trim().charAt(0);
   }
 
   // Ctrl+Alt+N: the New window
