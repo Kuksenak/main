@@ -87,11 +87,10 @@ interface Found {
         <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('upcoming')) {
-        <!-- As the rows of the other sections: in the icon's place the first letter in the event's
-             color, the name, and when at the right (today: the time; later: the day too) -->
+        <!-- As the rows of the other sections: in the icon's place a thin bar in the event's color, the name, and when at the right (today: the time; later: the day too) -->
         @for (e of upcoming(); track e.id + e.startsAt) {
           <button type="button" (click)="openEvent(e)" class="side-row !pl-[1.125rem]">
-            <span class="flex size-5 shrink-0 items-center justify-center rounded-full text-[0.625rem] font-semibold uppercase text-white" [style.background]="people.color(e)">{{ initial(e) }}</span>
+            <span class="flex size-5 shrink-0 items-center justify-center"><span class="h-3.5 w-[3px] rounded-full" [style.background]="people.color(e)"></span></span>
             <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
             <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(e) }}</span>
           </button>
@@ -313,10 +312,6 @@ export class Sidebar {
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const day = d.toDateString() === tomorrow.toDateString() ? this.i18n.t('sidebar.tomorrow') : this.i18n.date(d, { weekday: 'short' });
     return `${day} ${time}`;
-  }
-
-  protected initial(e: ScheduleEvent): string {
-    return (this.people.label(e) || e.title || '·').trim().charAt(0);
   }
 
   // Ctrl+Alt+N: the New window
