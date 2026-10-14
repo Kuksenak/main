@@ -5,6 +5,8 @@ import { catchError, of } from 'rxjs';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ActionChoice, ActionSheet } from '../core/ui/confirm';
 import { Icon } from '../core/ui/icon/icon';
+import { Sheet } from '../core/ui/sheet/sheet';
+import { DeviceDetectionService } from '../core/services/device-detection.service';
 
 /** A student's personal link: their page (/s/{token}). */
 export function studentPageUrl(token: string): string {
@@ -18,9 +20,36 @@ export function studentPageUrl(token: string): string {
  */
 @Component({
   selector: 'app-student-link',
-  imports: [ActionSheet, Icon, TranslatePipe],
+  imports: [ActionSheet, Icon, Sheet, TranslatePipe],
   host: { class: 'flex flex-col gap-1.5' },
   template: `
+    @if (desktop) {
+      <!-- Desktop, in the new style (as the page's properties): Student's page — the link, Copy and
+           ⋯ (New link); PIN — set or not, Reset when set; the hint under them -->
+      <div class="flex flex-col">
+        <div class="flex h-9 items-center gap-3 text-[0.875rem]">
+          <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="link" class="size-4" />{{ 'students.link' | t }}</span>
+          <span class="min-w-0 flex-1 truncate px-1.5" [class.opacity-40]="!token()">{{ token() ? url() : '…' }}</span>
+          <button type="button" (click)="copy()" [disabled]="!token()" class="head-btn disabled:opacity-30"><app-icon [name]="copied() ? 'check' : 'copy'" />{{ (copied() ? 'lessons.copied' : 'action.copy') | t }}</button>
+          <button #moreBtn type="button" (click)="moreOpen.set(!moreOpen())" [attr.aria-expanded]="moreOpen()" [attr.aria-label]="'lessons.more' | t" class="head-btn !px-1.5"><app-icon name="dots" /></button>
+        </div>
+        <div class="flex h-9 items-center gap-3 text-[0.875rem]">
+          <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="lock" class="size-4" />PIN</span>
+          <span class="min-w-0 flex-1 px-1.5" [class.opacity-40]="!hasPin()">{{ (hasPin() ? 'students.pinSet' : 'students.pinNone') | t }}</span>
+          @if (hasPin()) {
+            <button type="button" (click)="resetPin()" class="head-btn">{{ 'students.resetPin' | t }}</button>
+          }
+        </div>
+        <p class="pt-1 text-[0.75rem] opacity-45">{{ 'students.linkHint' | t }}</p>
+      </div>
+      @if (moreOpen()) {
+        <app-sheet [origin]="moreBtn" [fit]="true" (closed)="moreOpen.set(false)">
+          <div class="menu-list">
+            <button type="button" (click)="moreOpen.set(false); asking.set(moreBtn)" [disabled]="!token()" class="menu-item is-danger"><app-icon name="repeat" /><span class="flex-1">{{ 'students.newLink' | t }}</span></button>
+          </div>
+        </app-sheet>
+      }
+    } @else {
     <span class="card-label">{{ 'students.link' | t }}</span>
     <div class="card">
       <button type="button" (click)="copy()" [disabled]="!token()" class="list-row w-full text-left">
@@ -41,6 +70,7 @@ export function studentPageUrl(token: string): string {
       </button>
     </div>
     <p class="text-footnote px-1 opacity-50">{{ 'students.linkHint' | t }}</p>
+    }
 
     @if (asking(); as origin) {
       <app-action-sheet
@@ -57,6 +87,8 @@ export class StudentLink {
   readonly studentId = input.required<string>();
 
   private http = inject(HttpClient);
+  protected readonly desktop = !inject(DeviceDetectionService).isMobile();
+  protected readonly moreOpen = signal(false);
   protected readonly token = signal<string | null>(null);
   protected readonly hasPin = signal(false);
   protected readonly copied = signal(false);
