@@ -5,7 +5,6 @@ import { catchError, of } from 'rxjs';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { ActionChoice, ActionSheet } from '../core/ui/confirm';
 import { Icon } from '../core/ui/icon/icon';
-import { Sheet } from '../core/ui/sheet/sheet';
 import { DeviceDetectionService } from '../core/services/device-detection.service';
 
 /** A student's personal link: their page (/s/{token}). */
@@ -20,23 +19,15 @@ export function studentPageUrl(token: string): string {
  */
 @Component({
   selector: 'app-student-link',
-  imports: [ActionSheet, Icon, Sheet, TranslatePipe],
+  imports: [ActionSheet, Icon, TranslatePipe],
   host: { class: 'flex flex-col gap-1.5' },
   template: `
     @if (desktop) {
-      <!-- Desktop, in the new style (as the page's properties): Student's page — the link and ⋯
-           (Copy, New link; copied: ✓ Copied beside it); PIN — set or not, Reset when set; the hint under them -->
+      <!-- Desktop, in the new style (as the page's properties): the PIN — set or not, Reset when set;
+           the hint under it. (The link: Copy link and New link in the page's head, see PersonPage) -->
       <div class="flex flex-col">
         <div class="flex h-9 items-center gap-3 text-[0.875rem]">
-          <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="link" class="size-4" />{{ 'students.link' | t }}</span>
-          <span class="min-w-0 flex-1 truncate px-1.5" [class.opacity-40]="!token()">{{ token() ? url() : '…' }}</span>
-          @if (copied()) {
-            <span class="flex shrink-0 items-center gap-1 text-[0.8125rem] opacity-50"><app-icon name="check" class="size-4" />{{ 'lessons.copied' | t }}</span>
-          }
-          <button #moreBtn type="button" (click)="moreOpen.set(!moreOpen())" [attr.aria-expanded]="moreOpen()" [attr.aria-label]="'lessons.more' | t" class="head-btn !px-1.5"><app-icon name="dots" /></button>
-        </div>
-        <div class="flex h-9 items-center gap-3 text-[0.875rem]">
-          <span class="flex w-28 shrink-0 items-center gap-2 opacity-50"><app-icon name="lock" class="size-4" />PIN</span>
+          <span class="flex w-36 shrink-0 items-center gap-2 opacity-50"><app-icon name="lock" class="size-4" />PIN</span>
           <span class="min-w-0 flex-1 px-1.5" [class.opacity-40]="!hasPin()">{{ (hasPin() ? 'students.pinSet' : 'students.pinNone') | t }}</span>
           @if (hasPin()) {
             <button type="button" (click)="resetPin()" class="head-btn">{{ 'students.resetPin' | t }}</button>
@@ -44,14 +35,6 @@ export function studentPageUrl(token: string): string {
         </div>
         <p class="pt-1 text-[0.75rem] opacity-45">{{ 'students.linkHint' | t }}</p>
       </div>
-      @if (moreOpen()) {
-        <app-sheet [origin]="moreBtn" [fit]="true" (closed)="moreOpen.set(false)">
-          <div class="menu-list">
-            <button type="button" (click)="moreOpen.set(false); copy()" [disabled]="!token()" class="menu-item"><app-icon name="copy" /><span class="flex-1">{{ 'action.copy' | t }}</span></button>
-            <button type="button" (click)="moreOpen.set(false); asking.set(moreBtn)" [disabled]="!token()" class="menu-item is-danger"><app-icon name="repeat" /><span class="flex-1">{{ 'students.newLink' | t }}</span></button>
-          </div>
-        </app-sheet>
-      }
     } @else {
     <span class="card-label">{{ 'students.link' | t }}</span>
     <div class="card">
@@ -91,10 +74,9 @@ export class StudentLink {
 
   private http = inject(HttpClient);
   protected readonly desktop = !inject(DeviceDetectionService).isMobile();
-  protected readonly moreOpen = signal(false);
-  protected readonly token = signal<string | null>(null);
+  readonly token = signal<string | null>(null);
   protected readonly hasPin = signal(false);
-  protected readonly copied = signal(false);
+  readonly copied = signal(false);
   protected readonly asking = signal<HTMLElement | null>(null);
   protected readonly choices: ActionChoice[] = [{ value: 'reset', label: 'students.newLink', danger: true }];
 
@@ -127,7 +109,8 @@ export class StudentLink {
     return studentPageUrl(this.token() ?? '');
   }
 
-  protected copy(): void {
+  /** Copies the link (✓ for a moment: `copied`). */
+  copy(): void {
     if (!this.token()) return;
     navigator.clipboard?.writeText(this.url()).then(
       () => {
@@ -136,6 +119,11 @@ export class StudentLink {
       },
       () => {},
     );
+  }
+
+  /** New link (asked first, next to `origin`): the old one stops working. */
+  askNewLink(origin: HTMLElement): void {
+    if (this.token()) this.asking.set(origin);
   }
 
   protected reset(): void {
