@@ -88,11 +88,17 @@ interface Found {
         </button>
       </div>
       @if (!folded().includes('upcoming')) {
-        @for (e of upcoming(); track e.id + e.startsAt) {
-          <button type="button" (click)="openEvent(e)" class="side-row">
-            <span class="w-[4.5rem] shrink-0 text-[0.8125rem] tabular-nums opacity-50">{{ when(e) }}</span>
-            <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
-          </button>
+        <!-- By day (Today, Tomorrow, Thu 16 Oct): each event its color's bar, its name, the time at
+             the right -->
+        @for (d of upcomingDays(); track d.label) {
+          <p class="mt-1 flex h-6 items-end pb-0.5 pl-[1.125rem] text-[0.75rem] font-medium opacity-45">{{ d.label }}</p>
+          @for (e of d.events; track e.id + e.startsAt) {
+            <button type="button" (click)="openEvent(e)" class="side-row !pl-[1.125rem]">
+              <span class="h-4 w-[3px] shrink-0 rounded-full" [style.background]="people.color(e)"></span>
+              <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
+              <span class="shrink-0 text-[0.75rem] tabular-nums opacity-50">{{ timeOf(e) }}</span>
+            </button>
+          }
         } @empty {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
         }
@@ -284,11 +290,26 @@ export class Sidebar {
       .slice(0, 5);
   });
 
-  // "Mon 14:00"; today: "14:00"
-  protected when(e: ScheduleEvent): string {
-    const d = new Date(e.startsAt);
-    const time = this.i18n.time(d);
-    return new Date().toDateString() === d.toDateString() ? time : `${this.i18n.date(d, { weekday: 'short' })} ${time}`;
+  // The upcoming ones by day: Today, Tomorrow, then "Thu 16 Oct"
+  protected readonly upcomingDays = computed(() => {
+    const days: { label: string; events: ScheduleEvent[] }[] = [];
+    const today = new Date();
+    const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    for (const e of this.upcoming()) {
+      const d = new Date(e.startsAt);
+      const label =
+        d.toDateString() === today.toDateString() ? this.i18n.t('schedule.today')
+        : d.toDateString() === tomorrow.toDateString() ? this.i18n.t('sidebar.tomorrow')
+        : this.i18n.date(d, { weekday: 'short', day: 'numeric', month: 'short' });
+      const last = days.at(-1);
+      if (last?.label === label) last.events.push(e);
+      else days.push({ label, events: [e] });
+    }
+    return days;
+  });
+
+  protected timeOf(e: ScheduleEvent): string {
+    return this.i18n.time(new Date(e.startsAt));
   }
 
   // Ctrl+Alt+N: the New window
