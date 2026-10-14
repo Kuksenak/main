@@ -48,9 +48,10 @@ interface Model {
 /** Event card (new or existing), opened on the NavStack. */
 import { AddField, AddItem } from '../core/ui/add-field';
 import { PeekService } from '../layout/peek.service';
+import { RowMenu } from '../core/ui/row-menu';
 @Component({
   selector: 'app-event-editor',
-  imports: [AddField, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
+  imports: [AddField, RowMenu, ActionSheet, FormsModule, DateField, Icon, PageSheet, PickList, SelectField, TimeField, TranslatePipe],
   template: `
     @let m = model();
     <app-page-sheet
@@ -66,7 +67,7 @@ import { PeekService } from '../layout/peek.service';
     >
       @if (desktop) {
       <!-- Desktop, in the new style (as a Notion page): the title big, then properties — a gray label
-           with its icon, the value beside it; participants and lessons as rows (× on hover) -->
+           with its icon, the value beside it; participants and lessons as rows (⋯ on hover: Open in new tab, Remove) -->
       <div class="contents" [class.read-only]="readOnly()">
       <div class="flex flex-col gap-4 pt-1">
         <input name="title" [ngModel]="m.title" (ngModelChange)="patch({ title: $event })" type="text" [placeholder]="'event.title' | t" autocomplete="off" class="w-full bg-transparent px-1 text-[1.25rem] font-semibold outline-none placeholder:opacity-30" />
@@ -129,11 +130,14 @@ import { PeekService } from '../layout/peek.service';
                   <span class="truncate text-[0.75rem] opacity-50">{{ h }}</span>
                 }
               </span>
-              <button type="button" (click)="uninvite(p.id)" [attr.aria-label]="'action.remove' | t" class="edit-only flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/r:opacity-60"><app-icon name="close" class="size-3.5" /></button>
+              <app-row-menu class="edit-only" [link]="['/students', p.kind, p.id]" (removed)="uninvite(p.id)" />
             </div>
           }
           <app-add-field class="edit-only" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" />
         </div>
+
+        <!-- (a line between participants and lessons) -->
+        <div class="h-px bg-[var(--separator)]"></div>
 
         <div class="flex flex-col gap-px">
           @for (l of attached(); track l.id) {
@@ -145,7 +149,7 @@ import { PeekService } from '../layout/peek.service';
                   <span class="truncate text-[0.75rem] opacity-50">{{ l.level }}</span>
                 }
               </span>
-              <button type="button" (click)="detach(l.id)" [attr.aria-label]="'action.remove' | t" class="edit-only flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/r:opacity-60"><app-icon name="close" class="size-3.5" /></button>
+              <app-row-menu class="edit-only" [link]="['/lessons', l.id]" (removed)="detach(l.id)" />
             </div>
           }
           <app-add-field class="edit-only" [class.pl-[1.9375rem]]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newLesson()" [section]="'event.fromLibrary' | t" itemIcon="page" />

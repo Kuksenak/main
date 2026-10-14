@@ -32,9 +32,10 @@ interface Draft {
  * group's members; their lessons and events under it.
  */
 import { AddField, AddItem } from '../core/ui/add-field';
+import { RowMenu } from '../core/ui/row-menu';
 @Component({
   selector: 'app-person-page',
-  imports: [AddField, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
+  imports: [AddField, RowMenu, ConfirmDelete, FormsModule, Icon, LessonsCard, ScrollArea, Sheet, StudentLink, Tip, TranslatePipe],
   host: { class: 'flex min-h-0 w-full flex-1 flex-col' },
   template: `
     <main class="flex min-h-0 w-full flex-1 flex-col pb-4 pl-4">
@@ -90,7 +91,7 @@ import { AddField, AddItem } from '../core/ui/add-field';
                   <div class="side-row group/m !px-0">
                     <app-icon name="person" class="side-glyph" />
                     <button type="button" (click)="router.navigate(['/students', 'student', s.id])" class="min-w-0 flex-1 truncate text-left">{{ s.name }}</button>
-                    <button type="button" (click)="toggleMember(s.id)" [attr.aria-label]="'action.delete' | t" class="flex size-6 items-center justify-center rounded opacity-0 hover:bg-[var(--tint)] group-hover/m:opacity-60"><app-icon name="close" class="size-3.5" /></button>
+                    <app-row-menu [link]="['/students', 'student', s.id]" (removed)="toggleMember(s.id)" />
                   </div>
                 }
                 <!-- (adding: as the event's participants) -->

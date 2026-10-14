@@ -749,6 +749,27 @@ html.dark .btn-white {
   background: var(--tint);
 }
 
+/* A row's ⋯ (RowMenu): shown on the row's hover and while its menu is open */
+.row-dots {
+  display: flex;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  opacity: 0;
+}
+:hover > .row-dots,
+:hover > app-row-menu > .row-dots,
+.row-dots[aria-expanded='true'] {
+  opacity: 0.6;
+}
+.row-dots:hover {
+  background: var(--tint);
+  opacity: 1 !important;
+}
+
 .menu-sep {
   margin: 0.25rem -0.25rem;
   height: 1px;
