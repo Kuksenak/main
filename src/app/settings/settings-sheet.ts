@@ -28,7 +28,7 @@ type Section = 'language' | 'schedule' | 'google' | 'notifications';
   selector: 'app-settings-sheet',
   imports: [Icon, IntegrationsSettings, LanguageList, NotificationSettings, ScheduleSettings, Sheet, TranslatePipe],
   template: `
-    <app-sheet #sheet [origin]="origin()" [wide]="!desktop" [fit]="desktop" [tall]="true" (closed)="closed.emit()">
+    <app-sheet #sheet [origin]="origin()" [wide]="!desktop" [fit]="desktop" [above]="desktop" [tall]="true" (closed)="closed.emit()">
       <!-- Phones, a row's page: ‹ back to the list and its title in the middle -->
       @if (page(); as p) {
         <div class="relative mb-3 flex h-[var(--control-round)] shrink-0 items-center justify-center">

@@ -29,7 +29,7 @@ import { InstallService } from '../../services/install.service';
         cdkConnectedOverlay
         [cdkConnectedOverlayOrigin]="origin()!"
         [cdkConnectedOverlayOpen]="!closing()"
-        [cdkConnectedOverlayPositions]="side() ? sidePositions : positions"
+        [cdkConnectedOverlayPositions]="above() ? abovePositions : side() ? sidePositions : positions"
         [cdkConnectedOverlayPush]="true"
         [cdkConnectedOverlayViewportMargin]="24"
         [cdkConnectedOverlayHasBackdrop]="true"
@@ -96,6 +96,8 @@ export class Sheet implements OnInit {
   readonly fit = input(false);
   /** Desktop: at the anchor's right (tops aligned; no room below: bottoms), not under it. */
   readonly side = input(false);
+  /** Desktop: over the anchor, left edges aligned (the sidebar's account). */
+  readonly above = input(false);
   /** Phones: a fixed height, up to the middle of the top bar (not the content's: pages switching
    * inside it don't make it jump). (Desktop dropdowns grow with their content up to the window.) */
   readonly tall = input(false);
@@ -136,6 +138,11 @@ export class Sheet implements OnInit {
   protected readonly sidePositions: ConnectedPosition[] = [
     { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top', offsetX: 6 },
     { originX: 'end', originY: 'bottom', overlayX: 'start', overlayY: 'bottom', offsetX: 6 },
+    ...this.positions,
+  ];
+
+  protected readonly abovePositions: ConnectedPosition[] = [
+    { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -4 },
     ...this.positions,
   ];
 
