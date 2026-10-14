@@ -1,6 +1,6 @@
 import { EscStack } from '../esc-stack';
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, ElementRef, afterNextRender, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, afterNextRender, inject, input, output, signal, computed } from '@angular/core';
 import { TranslatePipe } from '../../i18n/t.pipe';
 import { DeviceDetectionService } from '../../services/device-detection.service';
 import { LayerStack } from '../../services/layer-stack.service';
@@ -32,8 +32,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
     <div
       class="fixed inset-0 z-30 desktop:flex desktop:items-center desktop:justify-center desktop:p-4"
       [class.desktop:!p-2]="wide()"
-      [class.desktop:!items-start]="(doc() || fit()) && !inline()"
-      [class.desktop:!pt-[12vh]]="(doc() || fit()) && !inline()"
+      [class.desktop:!flex-col]="popup()"
+      [class.desktop:!justify-start]="popup()"
+      [class.desktop:!pt-[2vh]]="popup()"
+      [class.desktop:!pb-[10vh]]="popup()"
       [class.!relative]="inline()"
       [class.!z-auto]="inline()"
       [class.desktop:!block]="inline()"
@@ -41,6 +43,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
       [class.h-full]="inline()"
       (click)="back(null)"
     >
+      <!-- (a popup: 10% of room over it, given way as it grows to the bottom's 10%) -->
+      @if (popup()) {
+        <div class="hidden shrink basis-[10vh] desktop:block"></div>
+      }
       <div
         class="relative flex h-full w-full flex-col text-[var(--text)] [animation:pageInRight_360ms_var(--ease-out-quick)] mobile:bg-[var(--app-bg)] desktop:h-auto desktop:max-h-[calc(var(--app-h,100dvh)-2rem)] desktop:max-w-md desktop:p-4"
         [class.dialog-panel]="desktop && !inline()"
@@ -57,10 +63,10 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [class.desktop:!w-fit]="fit()"
         [class.desktop:!min-w-80]="fit()"
         [class.desktop:!max-w-[85vw]]="fit()"
-        [class.desktop:!max-h-[85vh]]="fit()"
+        [class.desktop:!max-h-full]="popup()"
+        [class.desktop:shrink-0]="popup()"
         [class.desktop:!px-0]="bleed()"
-        [class.desktop:!max-w-[45rem]]="doc() && !inline()"
-        [class.desktop:!max-h-[85vh]]="doc() && !inline()"
+        [class.desktop:!max-w-[32rem]]="doc() && !inline()"
         [class.desktop:!rounded-xl]="doc() && !inline()"
         [class.desktop:!pt-3]="doc()"
         [style.transform]="closing() ? 'translateX(100%)' : null"
@@ -186,6 +192,8 @@ export class PageSheet {
   readonly bleed = input(false);
   /** Desktop: a page's popup, as the peek's (720 wide, up to 85% tall; its head as the pages'). */
   readonly doc = input(false);
+  // A popup placed as the search window (a page's card or a fitted one), not a page of its own
+  protected readonly popup = computed(() => (this.doc() || this.fit()) && !this.inline());
   // false: back / ✕ / Cancel / a click outside emit `cancel` and leave the page open (e.g. a
   // card that leaves its edit mode instead of closing).
   readonly cancelCloses = input(true);

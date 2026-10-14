@@ -143,7 +143,6 @@ export class Sheet implements OnInit {
 
   protected readonly abovePositions: ConnectedPosition[] = [
     { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -4 },
-    ...this.positions,
   ];
 
   protected readonly closing = signal(false);
