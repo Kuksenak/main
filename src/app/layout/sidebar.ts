@@ -71,10 +71,11 @@ interface Found {
           <app-icon name="sidebar" />
         </button>
         <span class="flex-1"></span>
-        <a routerLink="/notifications" (click)="unseen.set(false)" [appTip]="'sidebar.inbox' | t" tipSide="bottom" [attr.aria-label]="'sidebar.inbox' | t" class="side-icon relative">
+        <a routerLink="/notifications" (click)="unread.set(0)" [appTip]="'sidebar.inbox' | t" tipSide="bottom" [attr.aria-label]="'sidebar.inbox' | t" class="side-icon relative">
           <app-icon name="inbox" />
-          @if (unseen()) {
-            <span class="absolute right-1 top-1 size-1.5 rounded-full bg-[var(--accent)]"></span>
+          <!-- (new since the inbox was last open: how many, in a pale red badge) -->
+          @if (unread()) {
+            <span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--danger)_18%,var(--side-bg))] px-1 text-[0.625rem] font-semibold tabular-nums text-[var(--danger)]">{{ unread() > 9 ? '9+' : unread() }}</span>
           }
         </a>
         <button #newBtn type="button" (click)="newOpen.set(!newOpen())" [appTip]="('sidebar.new' | t) + '  Ctrl+Alt+N'" tipSide="bottom" [attr.aria-label]="'sidebar.new' | t" [attr.aria-expanded]="newOpen()" class="side-icon">
@@ -358,7 +359,23 @@ export class Sidebar {
   readonly hide = output<void>();
 
   // A notification come in since the inbox was last opened
-  protected readonly unseen = signal(false);
+  protected readonly unread = signal(0);
+
+  // New since the inbox was last open (its page keeps when: inbox.seenAt)
+  private countUnread(): void {
+    let seen: string | null = null;
+    try {
+      seen = localStorage.getItem('inbox.seenAt');
+      // (never open yet: from now on — what comes later counts)
+      if (!seen) localStorage.setItem('inbox.seenAt', (seen = new Date().toISOString()));
+    } catch {
+      // (private mode: no count)
+    }
+    this.http
+      .get<{ notifications: { createdAt: string }[] }>(`${environment.apiUrl}/notifications`)
+      .pipe(catchError(() => of({ notifications: [] as { createdAt: string }[] })))
+      .subscribe((res) => this.unread.set(seen ? (res.notifications ?? []).filter((n) => n.createdAt > seen!).length : 0));
+  }
 
   protected readonly auth = inject(AuthStore);
   protected readonly updates = inject(UpdateService);
@@ -695,7 +712,9 @@ export class Sidebar {
   }
 
   constructor() {
-    const sub = inject(NotificationsService).received.subscribe(() => this.unseen.set(true));
+    // The inbox's badge: counted now and with each new one
+    this.countUnread();
+    const sub = inject(NotificationsService).received.subscribe(() => this.countUnread());
     inject(DestroyRef).onDestroy(() => sub.unsubscribe());
     // Ctrl+K / ⌘K: the search window
     const onKey = (e: KeyboardEvent) => {
