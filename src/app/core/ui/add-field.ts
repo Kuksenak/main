@@ -118,9 +118,9 @@ export class AddField {
   protected show(): void {
     const r = this.box().nativeElement.getBoundingClientRect();
     const width = 280;
-    const top = Math.max(8, Math.min(r.top - 4, window.innerHeight - 8 - 320));
+    const top = Math.max(8, Math.min(r.top, window.innerHeight - 8 - 320));
     // (always at the left: no room — pushed in from the window's edge, over the card if it must)
-    this.pos.set({ left: Math.max(8, r.left - 8 - width), top, width });
+    this.pos.set({ left: Math.max(8, r.left - 4 - width), top, width });
     this.offEsc ??= this.esc.push(() => (this.box().nativeElement.querySelector('input') as HTMLInputElement).blur());
   }
 
