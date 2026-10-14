@@ -130,11 +130,12 @@ import { CreateDialog } from './create-dialog';
         </div>
 
         <!-- Participants, then lessons (as Notion Calendar's): a row each (a second line under the
-             name; × on hover), then a field adding more (none yet: the field with its icon) -->
+             name; ⋯ on hover), then a field adding more (none yet: the field with its icon). Icons
+             under the properties' icons, texts under their labels (their tint reaching out a bit) -->
         <div class="flex flex-col gap-px">
           @for (p of invited(); track p.id) {
-            <div class="group/r flex min-h-10 items-center gap-2.5 rounded-md px-1.5 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
-              <span class="flex min-w-0 flex-1 flex-col">
+            <div class="group/r -mx-2 flex min-h-10 items-center gap-2 rounded-md px-2 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
+              <span class="flex min-w-0 flex-1 flex-col pl-6">
                 <span class="truncate">{{ p.name }}</span>
                 @if (hintOf(p); as h) {
                   <span class="truncate text-[0.75rem] opacity-50">{{ h }}</span>
@@ -143,13 +144,13 @@ import { CreateDialog } from './create-dialog';
               <app-row-menu class="edit-only" [link]="['/students', p.kind, p.id]" (removed)="uninvite(p.id)" />
             </div>
           }
-          <app-add-field class="edit-only" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" [section]="'event.fromPeople' | t" />
+          <app-add-field class="edit-only -mx-2" [class.pl-6]="invited().length" [icon]="invited().length ? null : 'people'" [placeholder]="(invited().length ? 'event.addParticipant' : 'event.participants') | t" [items]="inviteItems()" [exclude]="inviteIds()" (picked)="invite($event)" [openOnFocus]="true" [action]="{ label: 'sidebar.newStudent' | t, icon: 'compose' }" (acted)="newStudent.set($event)" [section]="'event.fromPeople' | t" />
         </div>
 
         <div class="flex flex-col gap-px">
           @for (l of attached(); track l.id) {
-            <div class="group/r flex min-h-10 items-center gap-2.5 rounded-md px-1.5 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
-              <app-icon name="page" class="side-glyph" />
+            <div class="group/r -mx-2 flex min-h-10 items-center gap-2 rounded-md px-2 py-1 text-[0.875rem] hover:bg-[var(--tint)]">
+              <app-icon name="page" class="size-4 shrink-0 opacity-50" />
               <span class="flex min-w-0 flex-1 flex-col">
                 <span class="truncate">{{ l.title }}</span>
                 @if (l.level) {
@@ -159,7 +160,7 @@ import { CreateDialog } from './create-dialog';
               <app-row-menu class="edit-only" [link]="['/lessons', l.id]" (removed)="detach(l.id)" />
             </div>
           }
-          <app-add-field class="edit-only" [class.pl-[1.9375rem]]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newPage.set($event)" [section]="'event.fromLibrary' | t" itemIcon="page" />
+          <app-add-field class="edit-only -mx-2" [class.pl-6]="attached().length" [icon]="attached().length ? null : 'page'" [placeholder]="(attached().length ? 'event.searchLibrary' : 'event.lessons') | t" [items]="lessonItems()" [exclude]="m.lessonIds" (picked)="attach($event)" [openOnFocus]="true" [action]="{ label: 'event.newLesson' | t, icon: 'compose' }" (acted)="newPage.set($event)" [section]="'event.fromLibrary' | t" itemIcon="page" />
         </div>
       </div>
       </div>
