@@ -68,9 +68,9 @@ import { PeekService } from '../layout/peek.service';
       [bleed]="desktop"
       [doc]="desktop"
       [inline]="inline()"
-      [actions]="!readOnly() && (!desktop || inline())"
-      [dirty]="(!desktop || inline()) && dirty()"
-      [cancelCloses]="!desktop || inline()"
+      [actions]="!readOnly() && !desktop"
+      [dirty]="!desktop && dirty()"
+      [cancelCloses]="!desktop"
       (cancel)="leave()"
       [canSave]="canSave()"
       [deletable]="!!entry().id && !desktop"
@@ -536,7 +536,12 @@ export class EventEditor implements OnInit {
         if (this.desktop && this.entry().id) this.autosaveTimer = setTimeout(() => this.autosave(), 1000);
       });
     });
-    inject(DestroyRef).onDestroy(() => clearTimeout(this.autosaveTimer));
+    inject(DestroyRef).onDestroy(() => {
+      clearTimeout(this.autosaveTimer);
+      // Its own page, left (no Save there): what changed is kept — a new one made, a single one
+      // saved, a repeat of a series saved as just this one (a new rule: for the whole series)
+      if (this.inline() && !this.readOnly() && this.dirty() && this.canSave()) this.keep();
+    });
   }
 
   ngOnInit(): void {
@@ -697,6 +702,23 @@ export class EventEditor implements OnInit {
     this.events.update(id, this.toInput());
     this.snapshot.set(EventEditor.key(this.model()));
     this.toast.show('toast.saved');
+  }
+
+  private keep(): void {
+    const id = this.entry().id;
+    const input = this.toInput();
+    if (!id) {
+      this.events.create(input);
+      this.toast.show('toast.eventCreated');
+    } else if (!this.series()) {
+      this.events.update(id, input);
+      this.toast.show('toast.saved');
+    } else if (this.repeatChanged()) this.saveSeries(input);
+    else {
+      const event = this.opened()!;
+      this.events.occurrence(event.id, event.startsAt, { ...input, repeat: 'Never', repeatInterval: 1, repeatUntil: null });
+      this.toast.show('toast.saved');
+    }
   }
 
   private toInput(): EventInput {
