@@ -87,10 +87,10 @@ interface Found {
         <button type="button" (click)="create('event')" [appTip]="'sidebar.newEvent' | t" tipSide="right" [attr.aria-label]="'sidebar.newEvent' | t" class="side-add"><app-icon name="plus" class="size-3.5" /></button>
       </div>
       @if (!folded().includes('upcoming')) {
-        <!-- As the rows of the other sections: in the icon's place a thin bar in the event's color, the name, and when at the right (today: the time; later: the day too) -->
+        <!-- No icon: the name (in line with the lessons' titles), when at the right (today: the time;
+             later: the day too) -->
         @for (e of upcoming(); track e.id + e.startsAt) {
-          <button type="button" (click)="openEvent(e)" class="side-row !pl-[1.125rem]">
-            <span class="flex size-5 shrink-0 items-center justify-center"><span class="h-3.5 w-[3px] rounded-full" [style.background]="people.color(e)"></span></span>
+          <button type="button" (click)="openEvent(e)" class="side-row !pl-[2.875rem]">
             <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
             <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(e) }}</span>
           </button>
@@ -98,7 +98,7 @@ interface Found {
           <p class="text-footnote px-2 py-1 opacity-40">{{ 'sidebar.nothingSoon' | t }}</p>
         }
         <!-- (View all only when not all are shown) -->
-        @if (upcomingAll().length > 5) {
+        @if (upcomingAll().length > 3) {
           <a routerLink="/schedule" class="side-row !pl-[1.125rem] opacity-60"><app-icon name="dots" class="side-glyph" /><span class="flex-1">{{ 'sidebar.viewAll' | t }}</span></a>
         }
       }
@@ -293,7 +293,7 @@ export class Sidebar {
   });
   protected readonly lessonsSorted = computed(() => [...this.lessons.lessons()].sort((a, b) => a.title.localeCompare(b.title, this.i18n.locale())));
 
-  // The next five events not over yet
+  // The events not over yet (the sidebar shows the next three)
   protected readonly upcomingAll = computed(() => {
     const now = Date.now();
     return this.events
@@ -301,7 +301,7 @@ export class Sidebar {
       .filter((e) => new Date(e.startsAt).getTime() + e.durationMinutes * 60000 > now)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
   });
-  protected readonly upcoming = computed(() => this.upcomingAll().slice(0, 5));
+  protected readonly upcoming = computed(() => this.upcomingAll().slice(0, 3));
 
   // "14:00" today, "Tmrw 14:00", then "Thu 14:00"
   protected when(e: ScheduleEvent): string {
