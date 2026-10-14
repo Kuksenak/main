@@ -349,24 +349,24 @@ interface Found {
         </div>
       </app-sheet>
     }
+    <!-- The trash: a command window as the search's, smaller (z 45: its Delete forever question over it) -->
     @if (trashOpen()) {
-      <app-sheet [origin]="trashAnchor()?.nativeElement ?? null" [fit]="true" (closed)="trashOpen.set(false)">
-        <div class="flex w-[22rem] flex-col">
-          <!-- (its search as the search window's, smaller: a small menu) -->
-          <label class="flex h-10 shrink-0 items-center gap-2 px-2.5">
-            <app-icon name="search" class="size-[1.125rem] shrink-0 opacity-50" />
-            <input data-autofocus [value]="trashQuery()" (input)="trashQuery.set($any($event.target).value)" type="text" [placeholder]="'trash.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[0.875rem] outline-none placeholder:opacity-45" />
+      <div class="fixed inset-0 z-[45] flex items-start justify-center pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="closeTrash()">
+        <div class="palette h-[50vh] w-[32rem] max-w-[92vw] [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
+          <label class="palette-search">
+            <app-icon name="search" class="size-5 shrink-0 opacity-50" />
+            <input data-autofocus [value]="trashQuery()" (input)="trashQuery.set($any($event.target).value)" type="text" [placeholder]="'trash.search' | t" autocomplete="off" class="min-w-0 flex-1 bg-transparent text-[1.0625rem] outline-none placeholder:opacity-40" />
             @if (trashQuery()) {
               <button type="button" (mousedown)="$event.preventDefault()" (click)="trashQuery.set(''); $any($event.currentTarget).parentElement.querySelector('input')?.focus()" [attr.aria-label]="'action.clear' | t" class="flex size-6 shrink-0 items-center justify-center rounded-md opacity-45 hover:bg-[var(--tint)] hover:opacity-80"><app-icon name="close" class="size-4" /></button>
             }
           </label>
           <!-- (one height, found or not; nothing: said in the middle) -->
-          <div class="flex h-80 flex-col gap-px overflow-y-auto">
+          <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 pb-2">
             @for (x of trashShown(); track x.kind + x.id) {
-              <div class="menu-item">
-                <app-icon [name]="x.kind === 'lesson' ? 'page' : 'person'" />
+              <div class="palette-row group/t hover:bg-[var(--tint)]">
+                <app-icon [name]="x.kind === 'lesson' ? 'page' : 'person'" class="size-[1.125rem] shrink-0 opacity-55" />
                 <span class="min-w-0 flex-1 truncate">{{ x.name }}</span>
-                <span class="shrink-0 text-[0.75rem] opacity-40">{{ deletedOn(x) }}</span>
+                <span class="shrink-0 text-[0.8125rem] font-normal opacity-40">{{ deletedOn(x) }}</span>
                 <button type="button" (click)="trash.restore(x)" [appTip]="'trash.restore' | t" tipSide="bottom" [attr.aria-label]="'trash.restore' | t" class="row-dots !opacity-60 hover:!opacity-100"><app-icon name="restore" class="size-4" /></button>
                 <button #purgeBtn type="button" (click)="purging.set({ item: x, origin: purgeBtn })" [appTip]="'trash.deleteForever' | t" tipSide="bottom" [attr.aria-label]="'trash.deleteForever' | t" class="row-dots !opacity-60 hover:!opacity-100 hover:text-[var(--brand-orange,#f97316)]"><app-icon name="trash" class="size-4" /></button>
               </div>
@@ -374,10 +374,12 @@ interface Found {
               <p class="m-auto px-2.5 text-center text-[0.875rem] opacity-45">{{ (trash.loading() ? 'trash.loading' : trashQuery() ? 'students.notFound' : 'trash.empty') | t }}</p>
             }
           </div>
-          <div class="menu-sep"></div>
-          <p class="menu-foot">{{ 'trash.hint' | t }}</p>
+          <div class="palette-foot">
+            <span class="min-w-0 flex-1 truncate">{{ 'trash.hint' | t }}</span>
+            <span><kbd class="kbd">Esc</kbd>{{ 'palette.close' | t }}</span>
+          </div>
         </div>
-      </app-sheet>
+      </div>
     }
     @if (purging(); as p) {
       <app-confirm-delete [origin]="p.origin" (confirmed)="trash.purge(p.item)" (closed)="purging.set(null)" />
@@ -539,10 +541,19 @@ export class Sidebar {
     const q = this.trashQuery().trim().toLocaleLowerCase();
     return this.trash.items().filter((x) => !q || x.name.toLocaleLowerCase().includes(q));
   });
+  private offTrashEsc: (() => void) | null = null;
+  protected closeTrash(): void {
+    this.trashOpen.set(false);
+    this.offTrashEsc?.();
+    this.offTrashEsc = null;
+  }
   protected openTrash(): void {
+    if (this.trashOpen()) return this.closeTrash();
     this.trashQuery.set('');
     this.trash.load();
-    this.trashOpen.set(!this.trashOpen());
+    this.trashOpen.set(true);
+    // (Esc: the question first when it's asking, else the window)
+    this.offTrashEsc = this.esc.push(() => (this.purging() ? this.purging.set(null) : this.closeTrash()));
     if (this.trashOpen()) setTimeout(() => document.querySelector<HTMLInputElement>('input[data-autofocus]')?.focus(), 50);
   }
   // When it was deleted: "14 Oct"

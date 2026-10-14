@@ -101,6 +101,9 @@
   <div class="fixed inset-0 z-[2200] flex items-start justify-center pt-[12vh] [animation:fadeIn_150ms_ease-out]" (mousedown)="inbox.open.set(false)">
     <div class="palette h-[70vh] w-[42rem] max-w-[92vw] [animation:dropdownIn_160ms_var(--ease-out-quick)]" (mousedown)="$event.stopPropagation()">
       <app-notifications-page />
+      <div class="palette-foot">
+          <span><kbd class="kbd">Esc</kbd>{{ 'palette.close' | t }}</span>
+        </div>
     </div>
   </div>
 }

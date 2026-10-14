@@ -48,7 +48,7 @@ interface Item {
             <div class="flex min-h-full flex-col gap-px">
               @for (n of filtered(list); track n.id) {
                 <!-- (not opening anything for now) -->
-                <div class="side-row relative !h-9 !gap-2.5 !pl-5 hover:!bg-transparent">
+                <div class="palette-row relative !pl-5">
                   @if (isNew(n)) {
                     <span class="absolute left-1.5 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-[var(--accent)]"></span>
                   }
