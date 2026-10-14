@@ -160,9 +160,10 @@ const SAVE_AT_LEAST_MS = 5000;
             <app-toggle class="pointer-events-none scale-[0.8] origin-right" [checked]="!!s.draft().locked" />
           </button>
           @if (s.lesson()) {
-            <button type="button" (click)="askDeleteFromMenu()" [disabled]="!!s.draft().locked" class="menu-item is-danger">
+            <!-- (to the trash: restorable there, so not asked first) -->
+            <button type="button" (click)="menuOpen.set(false); remove()" [disabled]="!!s.draft().locked" class="menu-item is-danger">
               <app-icon name="trash" />
-              <span class="flex-1">{{ 'action.delete' | t }}</span>
+              <span class="flex-1">{{ 'trash.move' | t }}</span>
             </button>
           }
           <!-- (how much is in it; when it was last saved) -->

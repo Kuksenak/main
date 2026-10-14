@@ -129,7 +129,8 @@ import { CreateDialog } from '../cards/create-dialog';
             <button type="button" (click)="menuOpen.set(false); k.resetPin()" [disabled]="!k.hasPin()" class="menu-item"><app-icon name="lock" /><span class="flex-1">{{ 'students.resetPin' | t }}</span></button>
             <div class="menu-sep"></div>
           }
-          <button type="button" (click)="askDelete()" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'action.delete' | t }}</span></button>
+          <!-- (to the trash: restorable there, so not asked first) -->
+          <button type="button" (click)="menuOpen.set(false); remove()" class="menu-item is-danger"><app-icon name="trash" /><span class="flex-1">{{ 'trash.move' | t }}</span></button>
         </div>
       </app-sheet>
     }
