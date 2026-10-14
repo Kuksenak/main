@@ -109,7 +109,7 @@ interface Found {
         <!-- No icon: the name (indented as the other rows), when at the right (today: the time;
              later: the day too) -->
         @for (e of upcoming(); track e.id + e.startsAt) {
-          <div role="button" tabindex="0" (click)="openEvent(e)" (keydown.enter)="openEvent(e)" class="side-row cursor-pointer !pl-[1.125rem]">
+          <div role="button" tabindex="0" (click)="openEvent(e)" (keydown.enter)="openEvent(e)" [appTip]="eventTip(e)" tipSide="right" class="side-row cursor-pointer !pl-[1.125rem]">
             <span class="min-w-0 flex-1 truncate">{{ people.label(e) || e.title }}</span>
             <span class="shrink-0 text-[0.75rem] tabular-nums opacity-45">{{ when(e) }}</span>
           </div>
@@ -533,6 +533,13 @@ export class Sidebar {
   protected readonly upcoming = computed(() => this.upcomingAll().slice(0, 3));
 
   // "14:00" today, "Tmrw 14:00", then "Thu 14:00"
+  // Its hint: the full title (bold), then who's in it under it
+  protected eventTip(e: ScheduleEvent): string {
+    const names = this.people.names(e).join(', ');
+    const title = e.title?.trim();
+    return title ? `**${title}**${names ? '\n' + names : ''}` : names ? `**${names}**` : '';
+  }
+
   protected when(e: ScheduleEvent): string {
     const d = new Date(e.startsAt);
     const now = new Date();
