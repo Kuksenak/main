@@ -700,9 +700,10 @@ html.dark .btn-white {
   font-size: 0.875rem;
   cursor: text;
 }
-/* (its tint reaching out 8 px, the icon staying in line: AddField with -mx-2) */
+/* (its tint reaching out 6 px, the icon staying in line: AddField with -mx-1.5) */
 .add-wide .add-field {
-  padding: 0 0.5rem;
+  padding: 0 0.375rem;
+  border-radius: 0.5rem;
 }
 .add-field:hover,
 .add-field:focus-within {
