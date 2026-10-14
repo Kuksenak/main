@@ -62,6 +62,7 @@ let carried: Model | null = null;
     @let m = model();
     <app-page-sheet
       #page
+      [bleed]="desktop"
       [inline]="inline()"
       [actions]="!readOnly()"
       [dirty]="dirty()"

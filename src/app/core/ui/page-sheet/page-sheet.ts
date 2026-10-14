@@ -57,6 +57,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [class.desktop:!min-w-80]="fit()"
         [class.desktop:!max-w-[85vw]]="fit()"
         [class.desktop:!max-h-[85vh]]="fit()"
+        [class.desktop:!px-1]="bleed()"
         [style.transform]="closing() ? 'translateX(100%)' : null"
         [style.transition]="closing() ? 'transform 240ms var(--ease-out-quick)' : null"
         (click)="$event.stopPropagation()"
@@ -114,12 +115,12 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         @if (scroll()) {
           <app-scroll-area
             class="min-h-0 flex-1 px-4 desktop:flex-initial desktop:px-0"
-            contentClass="pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:pb-0 desktop:pt-0"
+            [contentClass]="'pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:pb-0 desktop:pt-0' + (bleed() ? ' desktop:px-3' : '')"
           >
             <ng-container [ngTemplateOutlet]="body" />
           </app-scroll-area>
         } @else {
-          <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:px-0 desktop:pb-0 desktop:pt-0">
+          <div class="flex min-h-0 flex-1 flex-col px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:px-0 desktop:pb-0 desktop:pt-0" [class.desktop:!px-3]="bleed()">
             <ng-container [ngTemplateOutlet]="body" />
           </div>
         }
@@ -127,7 +128,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         @if (actions()) {
           <!-- Desktop footer -->
           <!-- (in the new style: Delete and Save as head buttons; Delete orange on hover) -->
-          <div class="mt-4 flex items-center gap-2 mobile:hidden">
+          <div class="mt-4 flex items-center gap-2 mobile:hidden" [class.px-3]="bleed()">
             @if (deletable()) {
               <button type="button" (click)="onDelete($event)" class="head-btn hover:!text-[var(--brand-orange,#f97316)]"><app-icon name="trash" />{{ 'action.delete' | t }}</button>
             }
@@ -181,6 +182,9 @@ export class PageSheet {
   readonly large = input(false);
   /** Desktop: as big as its content, up to 85% of the window either way (then it scrolls). */
   readonly fit = input(false);
+  /** Desktop: rows' tints may reach 12 px past the content's sides (its side padding moved inside the
+   * scrolling, which would cut them off). */
+  readonly bleed = input(false);
   // false: back / ✕ / Cancel / a click outside emit `cancel` and leave the page open (e.g. a
   // card that leaves its edit mode instead of closing).
   readonly cancelCloses = input(true);
