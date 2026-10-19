@@ -27,7 +27,7 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
  */
 @Component({
   selector: 'app-scroll-area',
-  host: { class: 'flex min-h-0 flex-col' },
+  host: { class: 'flex min-h-0 flex-col', '[class.is-scrolled]': 'scrolled()' },
   template: `
     <!-- Positioning box = the content edge, so padding on the host leaves room for the thumb -->
     <div class="relative flex min-h-0 flex-1 flex-col">
@@ -35,8 +35,8 @@ import { DeviceDetectionService } from '../../services/device-detection.service'
         <div
           class="scroll-indicator"
           [style.right.px]="-gutter"
-          [style.top.%]="t.top"
-          [style.height.%]="t.height"
+          [style.top]="track(t.top, true)"
+          [style.height]="track(t.height)"
           [style.opacity]="scrolling() ? 1 : 0.5"
         ></div>
       }
@@ -57,6 +57,15 @@ export class ScrollArea {
   // How far outside the content edge the thumb sits — the same everywhere on a device: clear of
   // the cards on phones, a little closer on desktop.
   protected readonly gutter = inject(DeviceDetectionService).isMobile() ? 10 : 6;
+  /** Room kept free above and below the thumb's track, px (e.g. a popup's pinned head, its corners). */
+  readonly thumbInset = input<[number, number]>([0, 0]);
+
+  // A % of the track as CSS: within the room left between the insets
+  protected track(pct: number, offset = false): string {
+    const [top, bottom] = this.thumbInset();
+    if (!top && !bottom) return `${pct}%`;
+    return `calc(${offset ? top : 0}px + ${pct.toFixed(3)} * (100% - ${top + bottom}px) / 100)`;
+  }
 
   private readonly viewport = viewChild.required<ElementRef<HTMLElement>>('viewport');
   private readonly content = viewChild.required<ElementRef<HTMLElement>>('content');
@@ -64,6 +73,8 @@ export class ScrollArea {
   // Thumb position/size in % of the area; null when everything fits.
   protected readonly thumb = signal<{ top: number; height: number } | null>(null);
   protected readonly scrolling = signal(false);
+  /** Scrolled down from its top (its host gets .is-scrolled: e.g. the sidebar's line over its list). */
+  readonly scrolled = signal(false);
   private timer?: ReturnType<typeof setTimeout>;
 
   constructor() {
@@ -86,6 +97,7 @@ export class ScrollArea {
 
   private update(): void {
     const el = this.viewport().nativeElement;
+    this.scrolled.set(el.scrollTop > 0);
     if (el.scrollHeight <= el.clientHeight + 1) {
       this.thumb.set(null);
       return;

@@ -20,6 +20,8 @@ import { InstallService } from '../../services/install.service';
  */
 @Component({
   selector: 'app-sheet',
+  // (no box of its own: put next to its button in a row, it takes no room — no gap pushing the button aside)
+  host: { class: 'contents' },
   imports: [OverlayModule, NgTemplateOutlet],
   template: `
     <ng-template #content><ng-content /></ng-template>

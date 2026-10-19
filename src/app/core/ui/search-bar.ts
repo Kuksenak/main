@@ -39,7 +39,7 @@ import { Icon } from './icon/icon';
       @if (active() || value()) {
         <!-- ✕ inside: clears and leaves search (pointerdown: no blur first) -->
         <button type="button" (pointerdown)="$event.preventDefault()" (click)="leave()" [attr.aria-label]="'action.cancel' | t" class="-mr-1.5 flex size-7 shrink-0 items-center justify-center rounded-full opacity-50 active:opacity-30">
-          <app-icon name="close" [strokeWidth]="2.25" class="size-5" />
+          <app-icon name="close" class="size-5" />
         </button>
       }
     </label>

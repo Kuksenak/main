@@ -42,6 +42,8 @@ export type IconName =
   | 'video'
   | 'checklist'
   | 'compose'
+  | 'folder'
+  | 'stack'
   | 'google'
   | 'apple'
   | 'share'
@@ -62,6 +64,7 @@ export type IconName =
   | 'expand'
   | 'restore'
   | 'star'
+  | 'bookmark'
   | 'settings'
   | 'logout'
   | 'calendar-day'
@@ -88,17 +91,23 @@ export type IconName =
         @case ('plus') { <path d="M12 5v14M5 12h14" /> }
         @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
         @case ('close') { <path d="M18 6 6 18M6 6l12 12" /> }
-        @case ('people') { <circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14a6.5 6.5 0 0 1 3.5 6" /> }
+        <!-- People (a group, all of them): two, as the person — the one in front whole, the other's
+             head and shoulder behind it -->
+        @case ('people') { <circle cx="9" cy="8.25" r="3.5" fill="currentColor" fill-opacity="0.1" /><path d="M2.75 20c.35-3.6 2.85-5.75 6.25-5.75S14.9 16.4 15.25 20" /><path d="M15.5 4.9a3.5 3.5 0 0 1 0 6.7M17.5 14.5c2.2.7 3.5 2.6 3.75 5.5" /> }
         @case ('calendar') { <rect x="3.5" y="5" width="17" height="15.5" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /> }
         @case ('lock') { <rect x="5" y="11" width="14" height="9.5" rx="2.5" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /> }
         @case ('eye') { <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" /><circle cx="12" cy="12" r="3" /> }
         @case ('exercise') { <circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.01" /> }
         @case ('wand') { <path d="m4 20 11-11M13.5 7.5l3 3" /><path d="M17 3v3M15.5 4.5h3M20 8.5v2.5M18.75 9.75h2.5M10 3.5v2M9 4.5h2" /> }
-        <!-- (Notion Calendar's: today's date on the page, a page behind) -->
-        @case ('calendar-day') { <path d="M4.5 16.5V6a1.5 1.5 0 0 1 1.5-1.5h10.5" /><rect x="7" y="7" width="13.5" height="13.5" rx="2" /><path d="M7 10.5h13.5" /><text x="13.75" y="18.4" text-anchor="middle" font-size="7.5" font-weight="600" fill="currentColor" stroke="none">{{ day }}</text> }
+        <!-- Today, as Notion's calendar: a rounded sheet, its band at the top and two rings, the day in it -->
+        @case ('calendar-day') { <rect x="3.75" y="5" width="16.5" height="15.25" rx="2.75" /><path d="M3.75 9.25h16.5M8.25 3.25v3.5M15.75 3.25v3.5" /><text x="12" y="17.6" text-anchor="middle" font-size="7.25" font-weight="600" fill="currentColor" stroke="none">{{ day }}</text> }
         @case ('settings') { <circle cx="12" cy="12" r="3" /><path d="M12 2.8v2.4M12 18.8v2.4M4.2 7.5l2.1 1.2M17.7 15.3l2.1 1.2M4.2 16.5l2.1-1.2M17.7 8.7l2.1-1.2" /><circle cx="12" cy="12" r="7" /> }
         @case ('logout') { <path d="M14 4.5H7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h7M10.5 12h10M17 8.5l3.5 3.5-3.5 3.5" /> }
-        @case ('star') { <path d="M12 3.8l2.5 5.1 5.6.8-4 4 1 5.6-5.1-2.7-5 2.7 1-5.6-4.1-4 5.6-.8z" /> }
+        <!-- A favorite (the sidebar's Favorites): a bookmark — Tabler Icons' "bookmark" (MIT,
+             © Paweł Kuna, tabler.io/icons), faintly filled as ours -->
+        @case ('bookmark') { <path d="M18 7v14l-6 -4l-6 4v-14a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4z" fill="currentColor" fill-opacity="0.1" /> }
+        <!-- A favorite: a star with soft, rounded points, faintly filled (as the page, the person) -->
+        @case ('star') { <path d="M11.1 3.9a1 1 0 0 1 1.8 0l2.05 4.15 4.58.67a1 1 0 0 1 .55 1.7l-3.31 3.23.78 4.56a1 1 0 0 1-1.45 1.05L12 17.11l-4.1 2.15a1 1 0 0 1-1.45-1.05l.78-4.56-3.31-3.23a1 1 0 0 1 .55-1.7l4.58-.67z" fill="currentColor" fill-opacity="0.1" /> }
         @case ('restore') { <path d="M9.5 14.5 4.5 9.5l5-5" /><path d="M4.5 9.5h10a5 5 0 0 1 0 10H12" /> }
         @case ('expand') { <path d="M14 4h6v6M10 20H4v-6M20 4l-6.5 6.5M4 20l6.5-6.5" /> }
         @case ('library') { <rect x="3.9" y="4" width="4" height="16" rx="0.75" /><rect x="7.9" y="4" width="4" height="16" rx="0.75" /><rect x="16.2" y="4" width="4" height="16" rx="0.75" transform="rotate(-14 16.2 20)" /> }
@@ -113,6 +122,10 @@ export type IconName =
         <!-- SF Symbols-like: "info" (a typeset i) and "square.and.pencil" (edit) -->
         @case ('i') { <circle cx="12" cy="5.5" r="1.6" fill="currentColor" stroke="none" /><path d="M10 10h2v9M9 19h6" /> }
         @case ('compose') { <path d="M11.5 4.5h-5a2.5 2.5 0 0 0-2.5 2.5v10.5a2.5 2.5 0 0 0 2.5 2.5H17a2.5 2.5 0 0 0 2.5-2.5v-5" /><path d="M18.3 3.7a1.9 1.9 0 0 1 2.7 2.7l-8.3 8.3-3.6.9.9-3.6z" /> }
+        <!-- The library (as Claude's Projects): two sheets over a tray -->
+        @case ('stack') { <path d="M8.25 4.75h7.5" /><path d="M6 7.75h12" /><path d="M4.25 10.75h15.5l-1.05 7.1a2 2 0 0 1-1.98 1.7H7.28a2 2 0 0 1-1.98-1.7z" /> }
+        <!-- A collection: a folder -->
+        @case ('folder') { <path d="M3.75 7.25a2 2 0 0 1 2-2h3.4a1.5 1.5 0 0 1 1.1.48l1.35 1.47h6.65a2 2 0 0 1 2 2v8.55a2 2 0 0 1-2 2h-12.5a2 2 0 0 1-2-2z" /><path d="M3.75 9.6h16.5" /> }
         @case ('grid') {
           @for (y of [5, 12, 19]; track y) {
             @for (x of [5, 12, 19]; track x) {
@@ -131,7 +144,8 @@ export type IconName =
         @case ('checklist') { <path d="m4 6.5 1.5 1.5L8 5.5M4 13.5 5.5 15 8 12.5M11 7h9M11 14h9M11 19h6" /> }
         @case ('repeat') { <path d="m17 3 3 3-3 3" /><path d="M4 11.5V10a4 4 0 0 1 4-4h12" /><path d="m7 21-3-3 3-3" /><path d="M20 12.5V14a4 4 0 0 1-4 4H4" /> }
         @case ('paperclip') { <path d="m20.5 11.5-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l8-8" /> }
-        @case ('person') { <circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /> }
+        <!-- A person: a round head (faintly filled, as the page), soft shoulders under it -->
+        @case ('person') { <circle cx="12" cy="7.75" r="4" fill="currentColor" fill-opacity="0.1" /><path d="M4.5 20.5c.4-4.1 3.5-6.5 7.5-6.5s7.1 2.4 7.5 6.5" /> }
         @case ('search') { <circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /> }
         @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
         @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
@@ -146,8 +160,9 @@ export type IconName =
         <!-- Paste: a clipboard -->
         <!-- Paste (as Notion's): a plain clipboard -->
         @case ('paste') { <path d="M15 4.5h1.5A2.5 2.5 0 0 1 19 7v11.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 5 18.5V7a2.5 2.5 0 0 1 2.5-2.5H9" /><rect x="9" y="2.75" width="6" height="3.5" rx="1.25" /> }
-        <!-- A page (as Notion's): a sheet with a folded corner and lines -->
-        @case ('page') { <path d="M13.5 3.5H7.5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-10z" /><path d="M13.5 3.5v5h5" /><path d="M9 13h6M9 16.5h6" /> }
+        <!-- A page (the app's main thing): a sheet, its corner folded, two lines of text (the second
+             short); faintly filled with its color — a lesson's level's when it has one -->
+        @case ('page') { <path d="M7 2.75h6.6a1.5 1.5 0 0 1 1.06.44l4.15 4.15a1.5 1.5 0 0 1 .44 1.06V19.25A2 2 0 0 1 17.25 21.25H7a2 2 0 0 1-2-2V4.75a2 2 0 0 1 2-2z" fill="currentColor" fill-opacity="0.1" /><path d="M13.75 3v3.75a1.5 1.5 0 0 0 1.5 1.5H19" /><path d="M8.5 12.75h7M8.5 16.25h4.5" /> }
         <!-- The sidebar: a panel, its left column -->
         @case ('sidebar') { <rect x="3.5" y="5" width="17" height="14" rx="2.5" /><path d="M9.5 5v14" /> }
         <!-- The inbox: a tray -->
@@ -193,6 +208,6 @@ export type IconName =
 })
 export class Icon {
   readonly name = input.required<IconName>();
-  readonly strokeWidth = input(2);
+  readonly strokeWidth = input(1.35); // (one weight for every icon: thin, as Notion's)
   protected readonly day = new Date().getDate();
 }

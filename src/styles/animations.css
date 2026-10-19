@@ -58,3 +58,13 @@
     transform: none;
   }
 }
+
+/* A lesson's next task: in from the right (back: from the left) */
+@keyframes stepFromRight {
+  from { opacity: 0; transform: translateX(0.75rem); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes stepFromLeft {
+  from { opacity: 0; transform: translateX(-0.75rem); }
+  to { opacity: 1; transform: none; }
+}

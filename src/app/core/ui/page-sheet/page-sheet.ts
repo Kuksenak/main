@@ -42,6 +42,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
       [class.desktop:!p-0]="inline()"
       [class.h-full]="inline()"
       (click)="back(null)"
+      (wheel)="$any($event.target).closest('.dialog-panel') ? null : $event.preventDefault()"
     >
       <!-- (a popup: 10% of room over it, given way as it grows to the bottom's 10%) -->
       @if (popup()) {
@@ -66,7 +67,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
         [class.desktop:!max-h-full]="popup()"
         [class.desktop:shrink-0]="popup()"
         [class.desktop:!px-0]="bleed()"
-        [class.desktop:!max-w-[32rem]]="doc() && !inline()"
+        [class.desktop:!max-w-[40rem]]="doc() && !inline()"
         [class.desktop:!rounded-xl]="doc() && !inline()"
         [class.desktop:!pt-3]="doc()"
         [style.transform]="closing() ? 'translateX(100%)' : null"
@@ -102,7 +103,7 @@ import { ScrollArea } from '../scroll-area/scroll-area';
               [class.icon-btn]="!canSave()"
               [class.opacity-40]="!canSave()"
             >
-              <app-icon name="check" [strokeWidth]="2" class="size-7" />
+              <app-icon name="check" class="size-7" />
             </button>
           } @else {
             <div class="relative ml-auto flex items-center gap-2"><ng-content select="[barEnd]" /></div>
@@ -118,7 +119,9 @@ import { ScrollArea } from '../scroll-area/scroll-area';
           }
         </ng-template>
         @if (scroll()) {
+          <!-- (a doc popup: the thumb under its pinned head, clear of the round corner below) -->
           <app-scroll-area
+            [thumbInset]="desktop && doc() ? [52, 12] : [0, 0]"
             class="min-h-0 flex-1 px-4 desktop:flex-initial desktop:px-0"
             [contentClass]="'pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-[calc(env(safe-area-inset-top)+4.25rem)] desktop:pb-0 desktop:pt-0' + (bleed() ? ' desktop:px-2' : '')"
           >

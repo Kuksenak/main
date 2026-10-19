@@ -14,7 +14,7 @@
   >
     <span [class.opacity-40]="value() === null">{{ triggerLabel() }}</span>
     <!-- ⇅ thin and a bit large, close to the value (the icon has its own side margin) -->
-    <app-icon name="chevrons-up-down" [strokeWidth]="1.5" class="-ml-0.5 -mr-1 size-6 shrink-0" />
+    <app-icon name="chevrons-up-down" class="-ml-0.5 -mr-1 size-6 shrink-0" />
   </button>
 
   @if (native()) {
@@ -97,7 +97,7 @@
               >
                 <span class="flex w-6 shrink-0 justify-center">
                   @if (isSelected(opt)) {
-                    <app-icon name="check" [strokeWidth]="2.4" class="size-5" />
+                    <app-icon name="check" class="size-5" />
                   }
                 </span>
                 <span class="min-w-0 flex-1 truncate">{{ opt.label }}</span>

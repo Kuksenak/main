@@ -4,7 +4,7 @@
 
 :root {
   /* Surfaces */
-  --app-bg: #faf9f5;
+  --app-bg: #fbfbf9; /* (the sidebar's color, as the manifest's) */
   --surface: #fffefb; /* cards; re-pointed inside sheets/dialogs */
   --card: #fffefb; /* solid card color (desktop dialogs) */
   --dialog-bg: #f5f4ef; /* desktop dialogs: solid, glass over the backdrop turns muddy */

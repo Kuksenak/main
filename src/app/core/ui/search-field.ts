@@ -24,7 +24,7 @@ import { Icon } from './icon/icon';
       />
       @if (value()) {
         <button type="button" (click)="value.set('')" [attr.aria-label]="'action.clear' | t" class="icon-plain -mr-1">
-          <app-icon name="close" [strokeWidth]="2.2" class="size-5 desktop:size-4" />
+          <app-icon name="close" class="size-5 desktop:size-4" />
         </button>
       }
     </label>

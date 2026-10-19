@@ -9,5 +9,5 @@ export const authGuard: CanActivateFn = () => {
 
 export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthStore);
-  return !auth.isAuthenticated() || inject(Router).createUrlTree(['/schedule']);
+  return !auth.isAuthenticated() || inject(Router).createUrlTree(['/']);
 };
