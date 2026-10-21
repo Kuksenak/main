@@ -3,49 +3,14 @@ import { DICTIONARIES, LANGUAGES, LanguageCode, TranslationKey } from './transla
 
 const STORAGE_KEY = 'lang';
 
-/** Current UI language: translations (`t`) and the locale for dates and times. */
+/** Current UI language: translations (`t`) and its locale. */
 @Injectable({ providedIn: 'root' })
 export class I18nService {
-  readonly languages = LANGUAGES;
   readonly lang = signal<LanguageCode>(this.initialLang());
   readonly locale = computed(() => LANGUAGES.find((l) => l.code === this.lang())!.locale);
 
-  // Monday-first short weekday names in the current locale.
-  readonly weekdays = computed(() =>
-    Array.from({ length: 7 }, (_, i) =>
-      new Date(2024, 0, 1 + i).toLocaleDateString(this.locale(), { weekday: 'short' }),
-    ),
-  );
-
   constructor() {
     document.documentElement.lang = this.lang();
-  }
-
-  /** Time of day in the current locale, e.g. "18:00" / "06:00 PM". */
-  time(d: Date): string {
-    return this.format(d, { hour: '2-digit', minute: '2-digit' });
-  }
-
-  /** A date in the current locale with the given parts, e.g. { weekday: 'short', day: 'numeric' }. */
-  date(d: Date, parts: Intl.DateTimeFormatOptions): string {
-    return this.format(d, parts);
-  }
-
-  // A formatter per locale and parts, made once: toLocale…String builds a new one on every call,
-  // which is slow (Safari especially) when lists format hundreds of dates per redraw.
-  private readonly formatters = new Map<string, Intl.DateTimeFormat>();
-
-  private format(d: Date, parts: Intl.DateTimeFormatOptions): string {
-    const locale = this.locale();
-    const key = `${locale}|${JSON.stringify(parts)}`;
-    let f = this.formatters.get(key);
-    if (!f) this.formatters.set(key, (f = new Intl.DateTimeFormat(locale, parts)));
-    return f.format(d);
-  }
-
-  /** First letter uppercased (month / weekday names are lowercase in some languages). */
-  capitalize(s: string): string {
-    return s.charAt(0).toLocaleUpperCase(this.locale()) + s.slice(1);
   }
 
   t(key: TranslationKey): string {

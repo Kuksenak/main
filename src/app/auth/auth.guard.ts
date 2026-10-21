@@ -11,3 +11,4 @@ export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthStore);
   return !auth.isAuthenticated() || inject(Router).createUrlTree(['/']);
 };
+

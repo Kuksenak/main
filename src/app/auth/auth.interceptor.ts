@@ -1,11 +1,13 @@
-import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
-import { environment } from '@environments/environment';
 import { AuthStore } from './auth.store';
 
+/**
+ * Every API call with the access token. A 401 (the token ran out): a new one (AuthStore.refresh —
+ * one for all the calls that hit it at once), then the call again; no new one: signed out.
+ */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const http = inject(HttpClient);
   const authStore = inject(AuthStore);
   const token = authStore.accessToken();
 
@@ -16,29 +18,19 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Public pages (a student's portal, a shared lesson) handle their own 401 (e.g. the PIN):
-      // no session to refresh, no login page
-      const isPublic = req.url.startsWith(`${environment.apiUrl}/portal/`) || req.url.startsWith(`${environment.apiUrl}/shared/`);
-      if (error.status !== 401 || req.url.includes('/refresh') || isPublic) {
+      if (error.status !== 401 || req.url.includes('/refresh')) {
         return throwError(() => error);
       }
 
-      return http
-        .post<{ accessToken: string }>(`${environment.apiUrl}/refresh`, {}, { withCredentials: true })
-        .pipe(
-          switchMap((res) => {
-            authStore.setAccessToken(res.accessToken);
-            const retryReq = req.clone({
-              withCredentials: true,
-              setHeaders: { Authorization: `Bearer ${res.accessToken}` },
-            });
-            return next(retryReq);
-          }),
-          catchError((refreshError) => {
-            authStore.logout();
-            return throwError(() => refreshError);
-          }),
-        );
+      return authStore.refresh().pipe(
+        catchError((refreshError) => {
+          authStore.logout();
+          return throwError(() => refreshError);
+        }),
+        switchMap((fresh) =>
+          next(req.clone({ withCredentials: true, setHeaders: { Authorization: `Bearer ${fresh}` } })),
+        ),
+      );
     }),
   );
 };

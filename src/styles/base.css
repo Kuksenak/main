@@ -1,52 +1,51 @@
-/* Document-level defaults: page, scrollbars, press feedback, cursors. */
+/* Colors (the same on both devices; per-device sizes are in mobile.css / desktop.css) and the
+   document-level defaults: page, scrollbars, press feedback, cursors. Templates use the colors
+   (text-[var(--text)], …), never raw ones. */
 
-@font-face {
-  font-family: 'Inter';
-  src: url('/assets/fonts/InterVariable.woff2') format('woff2');
-  font-weight: 100 900;
-  font-style: normal;
-  font-display: swap;
+:root {
+  --app-bg: #fbfbf9; /* (as the manifest's) */
+  --text: #171717;
+  --text-secondary: color-mix(in srgb, var(--text) 50%, transparent);
+  --danger: #fd7d49;
+  --strong-bg: #000000; /* black buttons (sign-in) */
+  --strong-fg: #ffffff;
+  --scroll-thumb: rgb(0 0 0 / 0.25);
+
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-quick: cubic-bezier(0.2, 0, 0, 1);
+
+  /* App height. Phones are portrait-only by CSS (a "rotate" notice in landscape) — don't call
+     screen.orientation.lock(): on iOS home-screen apps it shrinks the launch viewport by the
+     bottom safe area (a blank strip until the phone is rotated). */
+  --app-h: 100dvh;
+}
+
+html.dark {
+  --app-bg: #000000;
+  --text: #f5f5f5;
+  --danger: #ff8a55;
+  --strong-bg: #ffffff;
+  --strong-fg: #000000;
+  --scroll-thumb: rgb(255 255 255 / 0.3);
 }
 
 html,
 body {
   margin: 0;
+  height: var(--app-h);
   overflow: hidden;
   background: var(--app-bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, 'Inter', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
-
-/* App height (--app-h). Phones are portrait-only by CSS (a "rotate" notice in landscape) —
-   don't call screen.orientation.lock(): on iOS home-screen apps it shrinks the launch viewport
-   by the bottom safe area (a blank strip until the phone is rotated). */
-:root {
-  --app-h: 100dvh;
-}
-html,
-body {
-  height: var(--app-h);
-}
 app-root {
   display: block;
   height: 100%;
-}
-
-/* Routed components fill the layout's content area so inner panels can scroll. */
-app-schedule,
-app-students,
-app-lessons,
-app-settings,
-app-about {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  width: 100%;
 }
 
 /* Thin scrollbars without stepper arrows. WebKit uses the pseudo-elements; the standard
@@ -75,14 +74,6 @@ app-about {
   }
 }
 
-/* Hide the native scrollbar on a scroll area (custom indicator or none). */
-.no-scrollbar {
-  scrollbar-width: none;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
 /* Pointer cursor on anything clickable (Tailwind v4 drops it from buttons). */
 button:not(:disabled),
 a[href],
@@ -97,8 +88,7 @@ button:disabled {
 }
 
 /* Press feedback (in the base layer so utilities still win): no grey tap flash, a quick
-   shrink that springs back. List rows get the grey cell highlight instead.
-   iOS Safari needs a touchstart listener for :active — see index.html. */
+   shrink that springs back. iOS Safari needs a touchstart listener for :active — see index.html. */
 @layer base {
   button,
   a[href] {
@@ -112,17 +102,5 @@ button:disabled {
   }
   button:not(:disabled):active {
     transform: scale(0.94);
-  }
-  button.list-row:active,
-  button.event-row:active {
-    transform: none;
-    opacity: 1;
-    background-color: var(--highlight);
-  }
-  /* A pressed row is highlighted edge to edge (iOS): the hairlines above and below it hide, so
-     no inset divider cuts across the highlight. */
-  button.list-row:active::after,
-  .list-row:has(+ button.list-row:active)::after {
-    opacity: 0;
   }
 }

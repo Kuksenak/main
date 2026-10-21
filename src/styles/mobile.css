@@ -1,27 +1,12 @@
 /* Mobile-only stylesheet: loaded by index.html when data-device="mobile" (desktop devices
-   never download it). Device-specific sizes are tokens consumed by components.css. */
+   never download it). The sizes that differ per device, used by components.css. */
 
 :root {
-  /* Typography */
   --text-body: 1.0625rem; /* 17px */
-  --text-callout: 0.9375rem; /* 15px */
 
-  /* Controls: round buttons 48, capsules and list rows 44 */
-  --control-round: 3rem;
+  /* Capsule buttons: 44 tall, fully round */
   --control-h: 2.75rem;
   --capsule-px: 1.25rem;
-  --row-h: 3rem; /* list rows and card buttons */
-  --row-px: 1rem; /* list rows' side padding */
-
-  /* Corners */
   --radius-capsule: 9999px;
-  --radius-card: calc(var(--row-h) / 2); /* a card one row tall is an oval */
-  --radius-chip: 0.5rem;
-}
-
-/* Date / time / select chips like iOS Calendar's: capsules in the system tertiary fill. */
-.chip {
-  border-radius: 9999px;
-  background-color: var(--chip-ios);
-  padding: 0.375rem 0.875rem;
+  --radius-card: 1.5rem;
 }

@@ -1,17 +1,13 @@
 @import "tailwindcss";
-@import "@angular/cdk/overlay-prebuilt.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Device variants. index.html decides once, before Angular boots, and sets
-   <html data-device="mobile|desktop">; every device-specific style uses these
-   (never width breakpoints), and components read the same value via DeviceDetectionService. */
+   <html data-device="mobile|desktop">, and loads that device's own stylesheet (styles/mobile.css
+   or styles/desktop.css); device-specific styles use these (never width breakpoints). */
 @custom-variant mobile (&:where([data-device="mobile"], [data-device="mobile"] *));
 @custom-variant desktop (&:where([data-device="desktop"], [data-device="desktop"] *));
 
-/* Design system: tokens (colors, shadows, motion) → base (page, scrollbars, press feedback)
-   → components (buttons, surfaces, lists, chips). */
-@import "./styles/tokens.css";
-@import "./styles/animations.css";
+/* base (colors, the page, scrollbars, press feedback) → components (the few shared pieces) */
 @import "./styles/base.css";
 @import "./styles/components.css";

@@ -11,6 +11,9 @@ import { Icon } from '../core/ui/icon/icon';
 })
 export class Login {
   protected readonly auth = inject(AuthStore);
-  // Back from Google without a sign-in (e.g. Cancel on its screen): the API sends ?error=denied.
-  protected readonly denied = inject(ActivatedRoute).snapshot.queryParamMap.get('error') === 'denied';
+  // Back without a sign-in, the API says why: ?error=denied — cancelled on the provider's screen;
+  // ?error=unverified — an email the provider hasn't checked (not let in)
+  private readonly error = inject(ActivatedRoute).snapshot.queryParamMap.get('error');
+  protected readonly denied = this.error === 'denied' || this.error === 'unverified';
+  protected readonly deniedKey = this.error === 'unverified' ? 'login.unverified' : 'login.denied';
 }

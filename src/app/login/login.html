@@ -13,7 +13,7 @@
     @if (auth.loginError() || (denied && !auth.loggingIn())) {
       <!-- Or back from Google without a sign-in -->
       <p class="text-footnote rounded-[var(--radius-card)] bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-4 py-3 text-center text-[var(--danger)]">
-        {{ (auth.loginError() ? 'login.unavailable' : 'login.denied') | t }}
+        {{ (auth.loginError() ? 'login.unavailable' : deniedKey) | t }}
       </p>
     }
     <button type="button" (click)="auth.login()" [disabled]="auth.loggingIn()" class="btn-strong w-full">

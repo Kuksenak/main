@@ -19,20 +19,14 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="preload" href="assets/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin="anonymous">
   <script>
     (function () {
       var query = window.matchMedia('(prefers-color-scheme: dark)');
-      // The theme follows the system. The status bar's color (theme-color): a new tag rather than an
-      // edited one — iOS didn't notice an edit while a popup was open (only once it closed).
-      // A page with a colored sky (a lesson one task a screen) sets its own: window.__barColor
-      // ({ light, dark } or null), then window.__applyBar().
+      // The theme follows the system. The status bar's color (theme-color, the page's — base.css):
+      // a new tag rather than an edited one — iOS didn't notice an edit while a popup was open.
       function apply(isDark) {
         document.documentElement.classList.toggle('dark', isDark);
-        var own = window.__barColor;
-        // (dark: phones a black page, desktop the sidebar's / page's dark gray — as desktop.css)
-        var desktop = document.documentElement.dataset.device === 'desktop';
-        var color = own ? (isDark ? own.dark : own.light) : isDark ? (desktop ? '#1f1e1d' : '#000000') : '#fbfbf9';
+        var color = isDark ? '#000000' : '#fbfbf9';
         var old = document.querySelector('meta[name="theme-color"]');
         if (old && old.getAttribute('content') === color) return;
         var meta = document.createElement('meta');
@@ -42,7 +36,6 @@
         else document.head.appendChild(meta);
       }
       apply(query.matches);
-      window.__applyBar = function () { apply(query.matches); };
       query.addEventListener('change', function (e) { apply(e.matches); });
       // Back in the app: the system theme may have changed while it was hidden.
       document.addEventListener('visibilitychange', function () {
@@ -54,8 +47,6 @@
                    'ontouchstart' in window ||
                    navigator.maxTouchPoints > 0;
       document.documentElement.dataset.device = mobile ? 'mobile' : 'desktop';
-      // (the bar's color depends on the device too: again, now it's known)
-      apply(query.matches);
 
       // Load only this device's stylesheet (separate non-injected bundles from angular.json).
       // document.write keeps it parser-inserted, so it blocks first paint like a normal <link>.

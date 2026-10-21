@@ -1,14 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, finalize, Observable, of, switchMap, tap, timeout } from 'rxjs';
+import { catchError, finalize, map, Observable, of, shareReplay, switchMap, tap, throwError, timeout, timer } from 'rxjs';
 import { environment } from '@environments/environment';
 
 export interface UserProfile {
-  firstName: string;
-  lastName: string;
+  firstName: string | null;
+  lastName: string | null;
   email: string;
-  isAdmin: boolean;
 }
 
 const REFRESH_TIMEOUT_MS = 5000;
@@ -33,16 +32,31 @@ export class AuthStore {
     return [u?.firstName, u?.lastName].filter((p) => !!p?.trim()).join(' ') || null;
   });
 
-  setAccessToken(token: string): void {
-    this._accessToken.set(token);
+  private refreshing: Observable<string> | null = null;
+
+  /**
+   * A new access token from the refresh cookie (the cookie renewed too). One at a time: requests
+   * that need it meanwhile share the one under way — two at once with one token would look stolen
+   * to the server. 409: another tab refreshed that moment (the cookie is already the new one) —
+   * once more, a moment later.
+   */
+  refresh(): Observable<string> {
+    const post = () =>
+      this.http.post<{ accessToken: string }>(`${environment.apiUrl}/refresh`, {}, { withCredentials: true });
+    this.refreshing ??= post().pipe(
+      catchError((e: HttpErrorResponse) => (e.status === 409 ? timer(300).pipe(switchMap(post)) : throwError(() => e))),
+      map((res) => res.accessToken),
+      tap((token) => this._accessToken.set(token)),
+      finalize(() => (this.refreshing = null)),
+      shareReplay(1),
+    );
+    return this.refreshing;
   }
 
   initAuth(): Observable<UserProfile | null> {
-    return this.http
-      .post<{ accessToken: string }>(`${environment.apiUrl}/refresh`, {}, { withCredentials: true })
+    return this.refresh()
       .pipe(
         timeout({ first: REFRESH_TIMEOUT_MS }),
-        tap((res) => this._accessToken.set(res.accessToken)),
         switchMap(() => this.http.get<UserProfile>(`${environment.apiUrl}/me`)),
         tap((user) => this._user.set(user)),
         catchError(() => {
