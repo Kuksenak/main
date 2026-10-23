@@ -1,24 +1,24 @@
 import { AfterViewInit, Component, ElementRef, inject, model, viewChild } from '@angular/core';
-import { I18nService } from '../../i18n/i18n.service';
-import { addDays, sameDay, sameMonth, startOfDay, startOfMonth, startOfWeek, WEEK_MS } from '../../utils/date';
+import { I18nService } from '../../core/i18n/i18n.service';
+import { addDays, sameDay, sameMonth, startOfDay, startOfMonth, startOfWeek, WEEK_MS } from '../../core/utils/date';
 
 // The weeks it scrolls through: half a year back and forward from this one
 const WEEKS_BEFORE = 26;
 const WEEKS = 53;
 
 /**
- * The days of a calendar, as iOS Calendar's month: the weekdays' row (Monday first), then the
+ * The schedule's calendar, as iOS Calendar's month: the weekdays' row (Monday first), then the
  * weeks one under another, scrolling on and on, six of them in view (any month fits). The days of
  * the month mostly in view are clear, the rest dimmed (`[(month)]`: that month — for the page's title);
  * today in the accent color; the picked day (`[(selected)]`) on a dark circle.
- *   <ui-calendar [(selected)]="day" [(month)]="month" />  …  calendar.show(today)
+ *   <app-calendar [(selected)]="day" [(month)]="month" />  …  calendar.show(today)
  */
 @Component({
-  selector: 'ui-calendar',
+  selector: 'app-calendar',
   host: { class: 'flex flex-col' },
   templateUrl: './calendar.html',
 })
-export class UiCalendar implements AfterViewInit {
+export class Calendar implements AfterViewInit {
   readonly selected = model(startOfDay(new Date()));
   /** The month in view (its first day): `[(month)]`, for the page's title. */
   readonly month = model(startOfMonth(new Date()));

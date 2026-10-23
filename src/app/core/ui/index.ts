@@ -7,7 +7,6 @@
 export { Icon, type IconName } from './icon/icon';
 export { UiAvatar } from './avatar/avatar';
 export { UiButton } from './button/button';
-export { UiCalendar } from './calendar/calendar';
 export { UiMenu } from './menu/menu';
 export { UiMenuItem } from './menu/menu-item';
 export { UiMenuLabel } from './menu/menu-label';

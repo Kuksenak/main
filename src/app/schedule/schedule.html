@@ -4,6 +4,6 @@
       <h1 class="ml-1 flex-1 text-body font-medium mobile:text-xl mobile:font-semibold">{{ title() }}</h1>
       <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
     </div>
-    <ui-calendar [(selected)]="selected" [(month)]="month" />
+    <app-calendar [(selected)]="selected" [(month)]="month" />
   </section>
 </div>
