@@ -27,4 +27,9 @@
   --menu-row-h: 1.75rem;
   --icon-menu: 1.25rem;
   --round-menu: 0.625rem;
+  /* The calendar: 40 tall weeks, the date (14px) in a 28px circle, 12px weekdays */
+  --cal-row-h: 2.5rem;
+  --cal-day: 1.75rem;
+  --font-cal-day: 0.875rem;
+  --font-cal-weekday: 0.75rem;
 }

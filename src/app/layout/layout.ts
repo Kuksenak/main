@@ -31,5 +31,6 @@ export class Layout {
   // The app's places, in the sidebar in this order
   protected readonly places: { path: string; label: TranslationKey; icon: IconName }[] = [
     { path: '/', label: 'nav.home', icon: 'home' },
+    { path: '/schedule', label: 'nav.schedule', icon: 'calendar' },
   ];
 }

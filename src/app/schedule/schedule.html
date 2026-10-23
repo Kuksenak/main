@@ -1,0 +1,9 @@
+<div class="flex flex-col px-4 pt-2 desktop:px-10 desktop:pt-8">
+  <section class="flex w-full flex-col gap-1 desktop:w-68">
+    <div class="flex h-button items-center">
+      <h1 class="ml-1 flex-1 text-body font-medium mobile:text-xl mobile:font-semibold">{{ title() }}</h1>
+      <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
+    </div>
+    <ui-calendar [(selected)]="selected" [(month)]="month" />
+  </section>
+</div>

@@ -8,7 +8,10 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./layout/layout').then((m) => m.Layout),
     canActivate: [authGuard],
-    children: [{ path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) }],
+    children: [
+      { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) },
+      { path: 'schedule', loadComponent: () => import('./schedule/schedule').then((m) => m.Schedule) },
+    ],
   },
   { path: '**', redirectTo: '' },
 ];

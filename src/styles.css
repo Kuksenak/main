@@ -19,6 +19,7 @@
   --color-fg: var(--text);
   --color-fg-secondary: var(--text-secondary);
   --color-danger: var(--danger);
+  --color-accent: var(--accent);
   --color-strong: var(--strong-bg);
   --color-on-strong: var(--strong-fg);
   --color-tint: var(--tint);
@@ -32,6 +33,8 @@
 
   --text-body: var(--font-body);
   --text-ui: var(--font-ui);
+  --text-cal-day: var(--font-cal-day);
+  --text-cal-weekday: var(--font-cal-weekday);
 
   --spacing-control: var(--control-h);
   --spacing-capsule-x: var(--capsule-px);
@@ -44,6 +47,8 @@
   --spacing-side-row: var(--side-row-h);
   --spacing-menu: var(--menu-w);
   --spacing-menu-row: var(--menu-row-h);
+  --spacing-cal-row: var(--cal-row-h);
+  --spacing-cal-day: var(--cal-day);
 
   --radius-capsule: var(--round-capsule);
   --radius-card: var(--round-card);
