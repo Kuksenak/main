@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { booleanAttribute, Component, computed, input } from '@angular/core';
 
 /** Every icon there is (e.g. to show them all). */
 export const ICONS = [
@@ -19,10 +19,11 @@ export const ICONS = [
 export type IconName = (typeof ICONS)[number];
 
 /**
- * The app's icons, as drawn with a black marker and coloured in with one pastel (see
- * docs/icons.md): each its own SVG file, public/icons/ui/{name}.svg, 64×64, its colors
- * its own. The brands' marks (Google, Apple) are drawn here, in currentColor. Size it from the
- * host: `<app-icon name="home" class="size-7" />`.
+ * The app's icons, as drawn with a black marker (docs/icons.md): each its own SVG file, 64×64 —
+ * public/icons/ui/{name}.svg the outline only (small ones: menus, rows), and `filled`:
+ * public/icons/ui/filled/{name}.svg coloured in with one pastel (big ones: the phones' sections).
+ * The dark theme turns them over (the marker white, the pastels dark). The brands' marks (Google,
+ * Apple) are drawn here, in currentColor. Size it from the host: `<app-icon name="home" class="size-7" />`.
  */
 @Component({
   selector: 'app-icon',
@@ -43,12 +44,13 @@ export type IconName = (typeof ICONS)[number];
         }
       </svg>
     } @else {
-      <img [src]="'icons/ui/' + name() + '.svg'" alt="" draggable="false" class="size-full select-none" />
+      <img [src]="'icons/ui/' + (filled() ? 'filled/' : '') + name() + '.svg'" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
     }
   `,
 })
 export class Icon {
   readonly name = input.required<IconName>();
+  readonly filled = input(false, { transform: booleanAttribute });
   // (the brands' marks: drawn here; the rest: their files)
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
 }

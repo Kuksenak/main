@@ -21,12 +21,12 @@
   /* The sidebar (as Claude's): 270 wide; its rows as the menus' */
   --nav-w: 16.875rem;
   --side-row-h: 2rem;
-  --icon-side: 1.5rem;
+  --icon-side: 1.625rem;
   --round-side-row: 0.5rem;
-  /* Menus: 32 tall rows, 24px icons */
+  /* Menus: 32 tall rows, 26px icons */
   --menu-w: 14rem;
   --menu-row-h: 2rem;
-  --icon-menu: 1.5rem;
+  --icon-menu: 1.625rem;
   --round-menu: 0.625rem;
   /* Round buttons as tall as the others; list rows 44 */
   --round-h: var(--control-h);

@@ -4,7 +4,7 @@ import { Icon, IconName } from '../icon/icon';
 
 /**
  * A place in the sidebar: `<a uiSidebarItem icon="home" routerLink="/">Home</a>` — a thin icon and
- * the name, 14px, a soft gray; a gray fill on hover, the icon hopping softly; the current one (by the address:
+ * the name, 14px, a soft gray; a gray fill on hover; the current one (by the address:
  * aria-current="page") on a darker gray, its text near-black. `routerLinkActiveOptions` as the
  * router's (e.g. `{ exact: true }` for the start page).
  */
@@ -17,11 +17,11 @@ import { Icon, IconName } from '../icon/icon';
   ],
   host: {
     class:
-      'group flex h-side-row shrink-0 items-center gap-2.5 rounded-side-row px-2.5 text-ui text-side-text outline-none ' +
+      'flex h-side-row shrink-0 items-center gap-2.5 rounded-side-row px-2.5 text-ui text-side-text outline-none ' +
       'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-fg',
   },
   template: `
-    <app-icon [name]="icon()" class="size-icon-side group-hover:animate-icon-hop motion-reduce:animate-none" />
+    <app-icon [name]="icon()" class="size-icon-side" />
     <span class="min-w-0 truncate"><ng-content /></span>
   `,
 })
