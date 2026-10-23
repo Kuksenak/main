@@ -25,6 +25,10 @@
 - Device differences use the `mobile:` / `desktop:` variants (from `<html data-device>`, set in
   `index.html`) or the per-device size tokens, never width breakpoints.
 
+## Icons
+- The app's icons are drawn in one style, "marker doodle + pastel fill" (docs/icons.md): one SVG file
+  each, in `public/icons/ui/`, shown by `<app-icon name="…">`.
+
 ## i18n
 - Every user-facing string goes in `core/i18n/translations.ts`, with each key in en, pl and fr
   (type-checked). In templates use `{{ 'key' | t }}`.

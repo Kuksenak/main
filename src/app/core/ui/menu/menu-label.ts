@@ -11,7 +11,7 @@ import { Icon, IconName } from '../icon/icon';
   host: { class: 'flex items-center gap-1.5 px-2 pt-1 pb-0.5 text-footnote font-medium text-fg-secondary' },
   template: `
     @if (icon(); as name) {
-      <app-icon [name]="name" class="size-4" />
+      <app-icon [name]="name" class="size-5" />
     }
     <span class="min-w-0 truncate"><ng-content /></span>
   `,

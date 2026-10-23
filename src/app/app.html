@@ -1,12 +1,3 @@
-<!-- The icons' hand-drawn wobble (core/ui/icon): their lines bent a little by a slow noise, in the
-     icon's own 24×24 units, so it looks the same at any size -->
-<svg width="0" height="0" class="absolute" aria-hidden="true">
-  <filter id="hand-drawn" filterUnits="userSpaceOnUse" x="-2" y="-2" width="28" height="28">
-    <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="1" seed="7" />
-    <feDisplacementMap in="SourceGraphic" scale="1.4" xChannelSelector="R" yChannelSelector="G" />
-  </filter>
-</svg>
-
 @if (!auth.initialized()) {
   <main class="flex h-full items-center justify-center text-fg">
     <p class="text-sm opacity-40">{{ 'app.loading' | t }}</p>

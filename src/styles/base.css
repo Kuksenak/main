@@ -25,7 +25,6 @@
   --side-hover: #f3f2ee;
   --side-on: #edece8;
   --side-text: #52514e;
-  --side-icon: #7a7975; /* (lighter than the text, the current row's too) */
   /* Phones, as iOS 26: frosted round buttons (a white rim, a soft wide shadow), the accent ones
      solid; sheets of see-through glass over a strong blur, their cards a little whiter */
   --glass: rgb(255 255 255 / 0.8);
@@ -59,7 +58,6 @@ html.dark {
   --side-hover: #1c1c1e;
   --side-on: #2c2c2e;
   --side-text: #c7c7cc;
-  --side-icon: #8e8e93;
   --glass: rgb(58 58 60 / 0.72);
   --glass-shadow: 0 2px 14px rgb(0 0 0 / 0.4);
   --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.35), inset 0 0 0 0.5px rgb(255 255 255 / 0.12), 0 2px 12px rgb(0 0 0 / 0.35);
