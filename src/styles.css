@@ -102,13 +102,14 @@
   @keyframes pane-back {
     from { opacity: 0; transform: translateX(-1.5rem); }
   }
-  /* A row's icon under the pointer: a soft little hop — up, a touch of a bounce, back */
-  --animate-icon-hop: icon-hop 620ms cubic-bezier(0.37, 0, 0.27, 1);
+  /* A row's icon under the pointer (the sidebar's): a slow soft hop — up a little, tilting a
+     little, a small bounce, back */
+  --animate-icon-hop: icon-hop 900ms cubic-bezier(0.45, 0, 0.25, 1);
   @keyframes icon-hop {
     0% { transform: none; }
-    35% { transform: translateY(-14%); }
-    65% { transform: translateY(3%); }
-    85% { transform: translateY(-2%); }
+    35% { transform: translateY(-8%) rotate(-4deg); }
+    62% { transform: translateY(1.5%) rotate(1.5deg); }
+    82% { transform: translateY(-1%) rotate(-0.5deg); }
     100% { transform: none; }
   }
   /* The rotate notice's phone: from landscape back to portrait, a pause, again */
