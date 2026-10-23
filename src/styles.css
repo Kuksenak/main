@@ -45,6 +45,7 @@
   --spacing-icon-menu: var(--icon-menu);
   --spacing-nav: var(--nav-w);
   --spacing-side-row: var(--side-row-h);
+  --spacing-icon-side: var(--icon-side);
   --spacing-menu: var(--menu-w);
   --spacing-menu-row: var(--menu-row-h);
   --spacing-cal-row: var(--cal-row-h);
