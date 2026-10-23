@@ -74,6 +74,14 @@
       transform: translateY(-0.25rem) scale(0.98);
     }
   }
+  /* A row's icon under the pointer (as Claude's): a little bigger, with a short wiggle */
+  --animate-icon-nudge: icon-nudge 360ms var(--ease-out-quick) forwards;
+  @keyframes icon-nudge {
+    0% { transform: none; }
+    40% { transform: scale(1.07) rotate(-4deg); }
+    75% { transform: scale(1.06) rotate(2deg); }
+    100% { transform: scale(1.06); }
+  }
   /* The rotate notice's phone: from landscape back to portrait, a pause, again */
   --animate-rotate-back: rotate-back 2.4s var(--ease-ios) infinite;
   @keyframes rotate-back {
