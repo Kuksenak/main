@@ -11,6 +11,7 @@ export const ICONS = [
   'calendar',
   'grid',
   'person',
+  'library',
   'chevron-left',
   'chevron-right',
   'home',
