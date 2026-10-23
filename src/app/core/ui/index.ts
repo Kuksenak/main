@@ -7,9 +7,13 @@
 export { Icon, type IconName } from './icon/icon';
 export { UiAvatar } from './avatar/avatar';
 export { UiButton } from './button/button';
+export { UiGlassButton } from './glass-button/glass-button';
+export { UiCard } from './list/card';
+export { UiListRow } from './list/list-row';
 export { UiMenu } from './menu/menu';
 export { UiMenuItem } from './menu/menu-item';
 export { UiMenuLabel } from './menu/menu-label';
 export { UiMenuSeparator } from './menu/menu-separator';
+export { UiSheet } from './sheet/sheet';
 export { UiSidebar } from './sidebar/sidebar';
 export { UiSidebarItem } from './sidebar/sidebar-item';

@@ -1,14 +1,18 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiButton } from '../core/ui';
+import { UiButton, UiGlassButton } from '../core/ui';
 import { startOfDay, startOfMonth } from '../core/utils/date';
+import { PageTitle } from '../layout/page-title';
 import { Calendar } from './calendar';
 
-/** The schedule: the month in view and Today over the calendar's days (so far just the days). */
+/**
+ * The schedule: the month in view and Today over the calendar's days (so far just the days).
+ * Phones: the month in the top bar, the days edge to edge, Today floating at the bottom left.
+ */
 @Component({
   selector: 'app-schedule',
-  imports: [Calendar, TranslatePipe, UiButton],
+  imports: [Calendar, TranslatePipe, UiButton, UiGlassButton],
   templateUrl: './schedule.html',
 })
 export class Schedule {
@@ -22,6 +26,11 @@ export class Schedule {
   protected readonly title = computed(() =>
     this.i18n.capitalize(this.i18n.date(this.month(), { month: 'long', year: 'numeric' })),
   );
+
+  constructor() {
+    // (phones: the month in the top bar)
+    inject(PageTitle).show(this.title);
+  }
 
   protected today(): void {
     const today = startOfDay(new Date());

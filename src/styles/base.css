@@ -26,6 +26,18 @@
   --side-on: #edece8;
   --side-text: #52514e;
   --side-icon: #7a7975; /* (lighter than the text, the current row's too) */
+  /* Phones, as iOS 26: frosted round buttons (a white rim, a soft wide shadow), the accent ones
+     solid; sheets of see-through glass over a strong blur, their cards a little whiter */
+  --glass: rgb(255 255 255 / 0.8);
+  --glass-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.9), 0 2px 14px rgb(0 0 0 / 0.1);
+  --on-accent: #ffffff;
+  --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.55), inset 0 0 0 0.5px rgb(255 255 255 / 0.2), 0 2px 12px rgb(0 0 0 / 0.12);
+  --sheet: rgb(255 255 255 / 0.55);
+  --sheet-card: rgb(255 255 255 / 0.75);
+  --sheet-border: rgb(255 255 255 / 0.7);
+  --sheet-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 -1px 6px rgb(0 0 0 / 0.06);
+  --grabber: rgb(0 0 0 / 0.2);
+  --highlight: rgb(0 0 0 / 0.05); /* a pressed row or tile */
 
   /* App height. Phones are portrait-only by CSS (a "rotate" notice in landscape) — don't call
      screen.orientation.lock(): on iOS home-screen apps it shrinks the launch viewport by the
@@ -48,6 +60,15 @@ html.dark {
   --side-on: #2c2c2e;
   --side-text: #c7c7cc;
   --side-icon: #8e8e93;
+  --glass: rgb(58 58 60 / 0.72);
+  --glass-shadow: 0 2px 14px rgb(0 0 0 / 0.4);
+  --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.35), inset 0 0 0 0.5px rgb(255 255 255 / 0.12), 0 2px 12px rgb(0 0 0 / 0.35);
+  --sheet: rgb(28 28 30 / 0.78);
+  --sheet-card: rgb(255 255 255 / 0.07);
+  --sheet-border: rgb(255 255 255 / 0.1);
+  --sheet-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 0.5px rgb(0 0 0 / 0.6), 0 -1px 6px rgb(0 0 0 / 0.3);
+  --grabber: rgb(255 255 255 / 0.25);
+  --highlight: rgb(255 255 255 / 0.08);
   --popover-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 3px 8px rgb(0 0 0 / 0.25), 0 12px 32px rgb(0 0 0 / 0.4);
 }
 

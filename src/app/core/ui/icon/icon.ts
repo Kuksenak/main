@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 'globe' | 'calendar' | 'home' | 'chevron-down';
+export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 'globe' | 'calendar' | 'grid' | 'person' | 'chevron-left' | 'chevron-right' | 'home' | 'chevron-down';
 
 /**
  * All app icons in one place (24×24 stroke icons, currentColor). Size it from the host:
@@ -25,6 +25,17 @@ export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 
         @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
         <!-- A calendar page with today's date on it -->
         @case ('calendar') { <rect x="3.75" y="5" width="16.5" height="15.25" rx="2.75" /><path d="M3.75 9.25h16.5M8.25 3.25v3.5M15.75 3.25v3.5" /><text x="12" y="17.6" text-anchor="middle" font-size="7.25" font-weight="600" fill="currentColor" stroke="none">{{ day }}</text> }
+        <!-- The sections' menu (phones): nine dots -->
+        @case ('grid') {
+          @for (y of [5, 12, 19]; track y) {
+            @for (x of [5, 12, 19]; track x) {
+              <circle [attr.cx]="x" [attr.cy]="y" r="2" fill="currentColor" stroke="none" />
+            }
+          }
+        }
+        @case ('person') { <circle cx="12" cy="7.75" r="4" fill="currentColor" fill-opacity="0.1" /><path d="M4.5 20.5c.4-4.1 3.5-6.5 7.5-6.5s7.1 2.4 7.5 6.5" /> }
+        @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
+        @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
         @case ('globe') { <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9s1.3-6.4 3.8-9z" /> }
         @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
         @case ('logout') { <path d="M14 4.5H7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h7M10.5 12h10M17 8.5l3.5 3.5-3.5 3.5" /> }

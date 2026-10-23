@@ -1,0 +1,17 @@
+<ui-sheet #sheet (closed)="closed.emit()">
+  <!-- (a gap between the tiles: an open one and a pressed one never merge) -->
+  <div class="grid grid-cols-3 gap-1.5">
+    @for (place of places; track place.path) {
+      <button type="button" (click)="go(place.path, sheet)" class="group flex h-25 min-w-0 items-center justify-center active:transform-none">
+        <!-- The gray: a square under the icon and the name (not the whole column), fading in and out -->
+        <span
+          class="flex size-22 max-w-full min-w-0 flex-col items-center justify-center gap-2 rounded-2xl px-1 transition-colors duration-200 group-active:bg-highlight"
+          [class.bg-highlight]="isOpen(place.path)"
+        >
+          <app-icon [name]="place.icon" class="size-12" />
+          <span class="max-w-full truncate text-[0.9375rem] leading-tight">{{ place.label | t }}</span>
+        </span>
+      </button>
+    }
+  </div>
+</ui-sheet>

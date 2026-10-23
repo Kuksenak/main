@@ -1,0 +1,11 @@
+@if (icon(); as name) {
+  <app-icon [name]="name" class="size-5.5 shrink-0 opacity-60" />
+}
+<span class="min-w-0 flex-1 truncate"><ng-content /></span>
+<ng-content select="[rowValue]" />
+@if (checked()) {
+  <app-icon name="check" class="size-5 shrink-0 text-accent" />
+}
+@if (chevron()) {
+  <app-icon name="chevron-right" class="size-5 shrink-0 opacity-30" />
+}

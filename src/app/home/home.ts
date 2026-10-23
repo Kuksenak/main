@@ -1,5 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { AuthStore } from '../auth/auth.store';
+import { I18nService } from '../core/i18n/i18n.service';
+import { PageTitle } from '../layout/page-title';
 
 /** The start page: who's signed in — a placeholder until the app's own pages (Log out: the layout's account menu). */
 @Component({
@@ -12,4 +14,9 @@ import { AuthStore } from '../auth/auth.store';
 })
 export class Home {
   protected readonly auth = inject(AuthStore);
+
+  constructor() {
+    const i18n = inject(I18nService);
+    inject(PageTitle).show(computed(() => i18n.t('nav.home')));
+  }
 }

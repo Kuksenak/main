@@ -31,6 +31,13 @@
   --color-side-on: var(--side-on);
   --color-side-text: var(--side-text);
   --color-side-icon: var(--side-icon);
+  --color-glass: var(--glass);
+  --color-on-accent: var(--on-accent);
+  --color-sheet: var(--sheet);
+  --color-sheet-card: var(--sheet-card);
+  --color-sheet-border: var(--sheet-border);
+  --color-grabber: var(--grabber);
+  --color-highlight: var(--highlight);
 
   --text-body: var(--font-body);
   --text-ui: var(--font-ui);
@@ -51,6 +58,9 @@
   --spacing-menu-row: var(--menu-row-h);
   --spacing-cal-row: var(--cal-row-h);
   --spacing-cal-day: var(--cal-day);
+  --spacing-round: var(--round-h);
+  --spacing-row: var(--row-h);
+  --spacing-row-x: var(--row-px);
 
   --radius-capsule: var(--round-capsule);
   --radius-card: var(--round-card);
@@ -59,6 +69,9 @@
   --radius-menu: var(--round-menu);
 
   --shadow-popover: var(--popover-shadow);
+  --shadow-glass: var(--glass-shadow);
+  --shadow-accent: var(--accent-shadow);
+  --shadow-sheet: var(--sheet-shadow);
 }
 
 /* The same on every device */
@@ -75,6 +88,20 @@
       opacity: 0;
       transform: translateY(-0.25rem) scale(0.98);
     }
+  }
+  /* A sheet coming up from the bottom */
+  --animate-sheet-up: sheet-up 380ms var(--ease-ios);
+  @keyframes sheet-up {
+    from { transform: translateY(100%); }
+  }
+  /* A page sliding in (from the right) / back (from the left), e.g. inside a sheet */
+  --animate-pane-in: pane-in 280ms var(--ease-out-quick);
+  @keyframes pane-in {
+    from { opacity: 0; transform: translateX(1.5rem); }
+  }
+  --animate-pane-back: pane-back 280ms var(--ease-out-quick);
+  @keyframes pane-back {
+    from { opacity: 0; transform: translateX(-1.5rem); }
   }
   /* A row's icon under the pointer (as Claude's): a little bigger, with a short wiggle */
   --animate-icon-nudge: icon-nudge 360ms var(--ease-out-quick) forwards;
