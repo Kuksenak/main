@@ -2,7 +2,7 @@ import { Component, DestroyRef, inject, input, output, signal } from '@angular/c
 
 /**
  * Phones: a sheet from the bottom (as iOS 26's): see-through glass over a strong blur, big round
- * corners, a little in from the screen's edges; as tall as its content (up to 90% of the screen),
+ * corners, just in from the screen's edges; as tall as its content (up to 90% of the screen),
  * or `tall`: from the top bar's buttons (a little over them) down — a fixed height, so pages
  * switching inside it don't make it jump. Drag it down by the top,
  * tap outside or press Esc: it slides away, then `closed` fires. Render it with @if; `close()` from

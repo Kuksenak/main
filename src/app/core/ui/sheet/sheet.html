@@ -4,18 +4,18 @@
 <div
   role="dialog"
   aria-modal="true"
-  class="absolute inset-x-2 flex animate-sheet-up flex-col overflow-hidden rounded-[2.75rem] border-[0.5px] border-sheet-border bg-sheet
-         text-fg shadow-sheet backdrop-blur-[30px] backdrop-saturate-[180%] [corner-shape:squircle]"
-  [class.bottom-2]="!inBrowser"
-  [class.bottom-6]="inBrowser"
-  [class.max-h-[calc(var(--app-h)*0.9)]]="!tall()"
-  [class.top-[calc(env(safe-area-inset-top)+0.375rem)]]="tall()"
+  class="absolute inset-x-1 flex animate-sheet-up flex-col overflow-hidden rounded-[2.75rem] border-[0.5px] border-sheet-border bg-sheet
+         text-fg shadow-sheet backdrop-blur-[30px] backdrop-saturate-[180%] [corner-shape:squircle]
+         max-h-[calc(var(--app-h)*0.9)] data-tall:top-[calc(env(safe-area-inset-top)+6px)] data-tall:max-h-none"
+  [class.bottom-1]="!inBrowser"
+  [class.bottom-5]="inBrowser"
+  [attr.data-tall]="tall() ? '' : null"
   [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : dragY() ? 'translateY(' + dragY() + 'px)' : null"
   [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
 >
   <!-- The grabber: drag it (or the top) down -->
   <div
-    class="shrink-0 touch-none px-4 pt-2 pb-2.5"
+    class="shrink-0 touch-none px-4 pt-2.5 pb-4"
     (touchstart)="dragStart($event)"
     (touchmove)="dragMove($event)"
     (touchend)="dragEnd()"
@@ -24,7 +24,7 @@
     <div class="mx-auto h-1.25 w-9 rounded-full bg-grabber"></div>
   </div>
 
-  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-3 pt-1 pb-[max(1rem,env(safe-area-inset-bottom))]">
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
     <ng-content />
   </div>
 </div>

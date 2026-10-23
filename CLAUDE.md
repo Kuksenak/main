@@ -13,6 +13,10 @@
 ## Styles
 - Tailwind classes only, in the markup or in `host: { class: … }`. States are variants too:
   `hover:`, `focus-visible:`, `aria-expanded:`, `aria-[current=page]:`, `data-*:`, `not-disabled:`.
+- A class switched on by a condition: plain names only in `[class.name]` (`[class.bg-tint]`).
+  Anything with a variant or brackets (`hover:…`, `top-[…]`) Tailwind doesn't find there. Put
+  those in the static `class` instead, keyed to an attribute the condition sets:
+  `data-tall:top-[…]` plus `[attr.data-tall]="tall() ? '' : null"`.
 - Colors and sizes are tokens, used by their Tailwind names (`bg-side`, `text-danger`, `h-button`,
   `rounded-menu`, `text-ui`, …). They are registered in `src/styles.css` (`@theme inline`), and
   their values are:
