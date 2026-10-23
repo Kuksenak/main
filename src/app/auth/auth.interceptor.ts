@@ -1,36 +1,19 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, switchMap, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { AuthStore } from './auth.store';
 
 /**
- * Every API call with the access token. A 401 (the token ran out): a new one (AuthStore.refresh —
- * one for all the calls that hit it at once), then the call again; no new one: signed out.
+ * Every API call with the session cookie (withCredentials: the API is on another host). A 401 on
+ * any call but the start's /me: the session ran out — signed out (AuthStore.expired).
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authStore = inject(AuthStore);
-  const token = authStore.accessToken();
 
-  const authReq = req.clone({
-    withCredentials: true,
-    setHeaders: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-
-  return next(authReq).pipe(
+  return next(req.clone({ withCredentials: true })).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status !== 401 || req.url.includes('/refresh')) {
-        return throwError(() => error);
-      }
-
-      return authStore.refresh().pipe(
-        catchError((refreshError) => {
-          authStore.logout();
-          return throwError(() => refreshError);
-        }),
-        switchMap((fresh) =>
-          next(req.clone({ withCredentials: true, setHeaders: { Authorization: `Bearer ${fresh}` } })),
-        ),
-      );
+      if (error.status === 401 && authStore.isAuthenticated()) authStore.expired();
+      return throwError(() => error);
     }),
   );
 };
