@@ -5,7 +5,8 @@ import { Icon, IconName } from '../icon/icon';
  * A row of a `<ui-card>` (as iOS's): an icon (the outline: a small one), the name, then (put in with `rowValue`) a value
  * in gray, ✓ when `checked`, › when it opens something (`chevron`); `danger` (log out): its text
  * in the danger color. A hairline under it, from the text on (not under the last). A `div` for a
- * row that isn't tapped (e.g. the email); a button grays while pressed.
+ * row that isn't tapped (e.g. the email); a button grays while pressed, edge to edge (not shrunk
+ * as other buttons are).
  */
 @Component({
   selector: 'button[uiListRow], div[uiListRow]',
@@ -14,7 +15,7 @@ import { Icon, IconName } from '../icon/icon';
     class:
       'relative flex h-row w-full shrink-0 items-center gap-3 px-row-x text-left text-body ' +
       'after:absolute after:right-0 after:bottom-0 after:left-4 after:h-[0.5px] after:bg-separator last:after:hidden ' +
-      'data-icon:after:left-12 [button&]:active:bg-highlight',
+      'data-icon:after:left-12 [button&]:active:bg-highlight [button&]:active:transform-none',
     '[attr.data-icon]': "icon() ? '' : null",
     '[class.text-danger]': 'danger()',
     '[attr.aria-pressed]': 'checked()',

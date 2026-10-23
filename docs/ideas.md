@@ -14,3 +14,11 @@ Tiempos — for its answers; both are paid, not ours to use):
 
 Things to check before choosing: Cyrillic and Polish / French accents, how gaps and choices look in
 a serif, sizes (a serif reads smaller at 14 px).
+
+## To do later
+
+- **Update checks less often.** `UpdateService` (`src/app/core/services/update.service.ts`) checks
+  for a new version every 10 s while the app is deployed often. Set it back to about a minute once
+  it's settled: each check asks the server for `ngsw.json`.
+- **One way to pick the language on phones.** The account sheet shows two for now (Language 1: the
+  list right in it; Language 2: a page that slides in). Keep one.
