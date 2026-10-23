@@ -25,6 +25,16 @@
 - Device differences use the `mobile:` / `desktop:` variants (from `<html data-device>`, set in
   `index.html`) or the per-device size tokens, never width breakpoints.
 
+## Sizes on phones
+The account sheet's language list sets the size for everything on phones:
+- list rows 48px tall (`h-row`), in cards (`ui-card`, 24px corners: `rounded-card`);
+- 17px text (`text-body`), 16px side padding (`px-row-x`);
+- 28px icons (`size-icon-menu`), ✓ / › 20px;
+- hairlines between rows from the text on;
+- round buttons 48px (`h-round`).
+
+New phone screens use these tokens (`styles/mobile.css`), not sizes of their own.
+
 ## Icons
 - The app's icons are drawn in one style, "marker doodle + pastel fill" (docs/icons.md): one SVG file
   each, in `public/icons/ui/`, shown by `<app-icon name="…">`.

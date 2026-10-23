@@ -9,13 +9,13 @@
   [class.bottom-2]="!inBrowser"
   [class.bottom-6]="inBrowser"
   [class.max-h-[calc(var(--app-h)*0.9)]]="!tall()"
-  [class.top-[calc(env(safe-area-inset-top)+2rem)]]="tall()"
+  [class.top-[calc(env(safe-area-inset-top)+0.375rem)]]="tall()"
   [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : dragY() ? 'translateY(' + dragY() + 'px)' : null"
   [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
 >
   <!-- The grabber: drag it (or the top) down -->
   <div
-    class="shrink-0 touch-none px-4 pt-2.5 pb-4"
+    class="shrink-0 touch-none px-4 pt-2 pb-2.5"
     (touchstart)="dragStart($event)"
     (touchmove)="dragMove($event)"
     (touchend)="dragEnd()"
@@ -24,7 +24,7 @@
     <div class="mx-auto h-1.25 w-9 rounded-full bg-grabber"></div>
   </div>
 
-  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pt-2 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-3 pt-1 pb-[max(1rem,env(safe-area-inset-bottom))]">
     <ng-content />
   </div>
 </div>

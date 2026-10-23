@@ -55,10 +55,16 @@ ICONS = {
         + '<!--badge-->' + fill(TEAL, ring(46, 46, 10.5), off=False)
         + line(ring(46, 46, 10.5))
         + thin('M46.2 39.6 46 46.4 50.4 49'),
-    # the sections: a little table of four, one cell yellow
-    'grid': fill(YELLOW, 'M32.8 32.6 51.4 32.4 51.6 51.4 33 51.6z')
-        + line('M12.5 12.8C25 12.4 39 12.6 51.6 12.5 51.3 25 51.4 39 51.8 51.6 39 51.3 25 51.5 12.9 51.8 12.7 39 12.8 25 12.5 12.8')
-        + line('M32.3 10.6C32 25 32.4 39 32 53.6M10.7 32.4C25 32 39 32.3 53.4 31.9'),
+    # the sections: nine dots, as Google's apps button — dabbed with the marker: not quite in rows,
+    # each its own size, a little squashed and turned
+    'grid': ''.join(
+        f'<path stroke="none" fill="#1a1a1a" '
+        f'transform="translate({x + dx} {y + dy}) rotate({t}) scale(1 {q})" d="{ring(0, 0, r)}z"/>'
+        for (x, y), (dx, dy, r, q, t) in zip(
+            [(x, y) for y in (15.5, 32, 48.5) for x in (15.5, 32, 48.5)],
+            [(1.4, -1, 5.2, .82, 20), (-1.1, 1.2, 3.9, 1, 0), (.8, .5, 4.7, .86, -30),
+             (-1.5, .4, 4.2, .9, 40), (.6, -1.4, 5.3, .84, -15), (1.6, 1.1, 3.8, .96, 0),
+             (.4, 1.5, 4.6, .88, 10), (-1.2, -.6, 5, .8, -40), (.9, 1.3, 4, .92, 25)])),
     # a person, as a bust: the body (rose) a soft arch, a little lopsided; the head over it (beige),
     # its outline not quite closed
     'person': fill(ROSE, 'M14.6 52C14.4 43.6 20.6 36.8 31.6 36.6 42.6 36.6 49.6 43 49.8 51.6z')

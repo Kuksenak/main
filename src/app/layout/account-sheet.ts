@@ -7,9 +7,8 @@ import { Icon, UiCard, UiGlassButton, UiListRow, UiSheet } from '../core/ui';
 
 /**
  * Phones: the account (as the Claude app's) — a sheet from the bottom, a fixed height: the email;
- * the language, for now two ways to compare (1: the list right in the sheet; 2: a row whose list
- * slides in on a page of its own, ‹ back); at the bottom Update available (when a new version is
- * ready), Log out and Log out of all devices.
+ * the language (the current one in gray, ›: its list slides in on a page of its own, ‹ back); at
+ * the bottom Update available (when a new version is ready), Log out and Log out of all devices.
  */
 @Component({
   selector: 'app-account-sheet',

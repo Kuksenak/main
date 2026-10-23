@@ -3,7 +3,8 @@ import { Component, DestroyRef, inject, input, output, signal } from '@angular/c
 /**
  * Phones: a sheet from the bottom (as iOS 26's): see-through glass over a strong blur, big round
  * corners, a little in from the screen's edges; as tall as its content (up to 90% of the screen),
- * or `tall`: a fixed height (pages switching inside it don't make it jump). Drag it down by the top,
+ * or `tall`: from the top bar's buttons (a little over them) down — a fixed height, so pages
+ * switching inside it don't make it jump. Drag it down by the top,
  * tap outside or press Esc: it slides away, then `closed` fires. Render it with @if; `close()` from
  * inside (e.g. after a pick) does the same.
  *   @if (open()) { <ui-sheet #sheet (closed)="open.set(false)">…</ui-sheet> }
