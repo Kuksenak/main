@@ -55,8 +55,8 @@ import { UiAvatar, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiSidebar, UiSideb
     @if (menuAt(); as at) {
       <ui-menu [origin]="at" (closed)="menuAt.set(null)">
         <ui-menu-label>{{ auth.email() }}</ui-menu-label>
-        <button type="button" uiMenuItem icon="logout" (click)="auth.logout()">{{ 'account.logout' | t }}</button>
-        <button type="button" uiMenuItem icon="devices" (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
+        <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
+        <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
       </ui-menu>
     }
   `,

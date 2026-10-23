@@ -1,15 +1,16 @@
-import { Component, input } from '@angular/core';
+import { booleanAttribute, Component, input } from '@angular/core';
 import { Icon, IconName } from '../core/ui/icon/icon';
 
 /**
  * A row of a `<ui-menu>`: `<button type="button" uiMenuItem icon="logout">Log out</button>` — a
  * thin icon and the name in the small UI text; gray under the pointer or the keys (↑ ↓).
+ * `danger` (delete, log out): like the rest, in the danger color under the pointer.
  * Picking it closes the menu.
  */
 @Component({
   selector: 'button[uiMenuItem]',
   imports: [Icon],
-  host: { role: 'menuitem' },
+  host: { role: 'menuitem', '[class.danger]': 'danger()' },
   template: `
     @if (icon(); as name) {
       <app-icon [name]="name" class="icon" />
@@ -35,6 +36,10 @@ import { Icon, IconName } from '../core/ui/icon/icon';
     :host(:focus-visible) {
       background: var(--tint-strong);
     }
+    :host(.danger:hover:not(:disabled)),
+    :host(.danger:focus-visible) {
+      color: var(--danger);
+    }
     :host(:disabled) {
       opacity: 0.4;
     }
@@ -53,4 +58,5 @@ import { Icon, IconName } from '../core/ui/icon/icon';
 })
 export class UiMenuItem {
   readonly icon = input<IconName>();
+  readonly danger = input(false, { transform: booleanAttribute });
 }
