@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, ElementRef, inject, model, viewChild } from '@angular/core';
-import { I18nService } from '../../core/i18n/i18n.service';
-import { addDays, sameDay, sameMonth, startOfDay, startOfMonth, startOfWeek, WEEK_MS } from '../../core/utils/date';
+import { I18nService } from '../core/i18n/i18n.service';
+import { addDays, sameDay, sameMonth, startOfDay, startOfMonth, startOfWeek, WEEK_MS } from '../core/utils/date';
 
 // The weeks it scrolls through: half a year back and forward from this one
 const WEEKS_BEFORE = 26;

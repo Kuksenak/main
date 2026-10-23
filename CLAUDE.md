@@ -5,6 +5,8 @@
   piece: `menu/` holds the menu and its rows, `sidebar/` the sidebar and its items, and so on.
   A new shared piece goes there too, named `Ui*` with a `ui-*` (or attribute) selector, and is
   exported from `core/ui/index.ts`.
+- A section of the app (a page and its own pieces) is one flat folder, e.g. `schedule/` holds
+  `schedule.ts` (the page) and `calendar.ts`, with no subfolders.
 - Markup longer than a few lines goes in its own `.html` (`templateUrl`); a one- or two-line template
   stays inline. No component stylesheets.
 

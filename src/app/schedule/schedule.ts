@@ -3,7 +3,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UiButton } from '../core/ui';
 import { startOfDay, startOfMonth } from '../core/utils/date';
-import { Calendar } from './calendar/calendar';
+import { Calendar } from './calendar';
 
 /** The schedule: the month in view and Today over the calendar's days (so far just the days). */
 @Component({
