@@ -1,0 +1,122 @@
+# The app's icons, "marker doodle + pastel fill" (docs/icons.md), 64x64: each drawn here once,
+# written as two SVGs — public/icons/ui/{name}.svg (the outline only, a thicker marker: the small
+# ones) and public/icons/ui/filled/{name}.svg (coloured in: the big ones).
+#   python tools/icons.py            (from main/)
+#   python tools/icons.py doodle     (into ./doodle, with a preview page, doodle.html)
+import os, sys
+
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), '..', 'public', 'icons', 'ui')
+os.makedirs(OUT, exist_ok=True)
+
+BEIGE, TEAL, SAGE, CREAM, ROSE, YELLOW = '#E5E4DF', '#C5DAD8', '#CBD5BF', '#F2EAD7', '#E9D3CE', '#F3E7B8'
+OFF = 'transform="translate(1.4 1.1)"'  # a pastel a little off its outline, as coloured in by hand
+
+
+def fill(color, d, off=True):
+    return f'<path fill="{color}" stroke="none" {OFF if off else ""} d="{d}"/>'
+
+
+def thin(d):  # inner details: the same marker, thinner (~65%)
+    return f'<path stroke-width="2" d="{d}"/>'
+
+
+def line(d):
+    return f'<path d="{d}"/>'
+
+
+# a wobbly, not-quite-closed circle around (cx, cy), radius r
+def ring(cx, cy, r):
+    k = 0.56 * r
+    return (f'M{cx + .3} {cy - r} C{cx + k + .4} {cy - r + .2} {cx + r + .2} {cy - k} {cx + r - .2} {cy + .4} '
+            f'C{cx + r - .4} {cy + k + .3} {cx + k} {cy + r + .3} {cx - .2} {cy + r - .1} '
+            f'C{cx - k - .3} {cy + r - .2} {cx - r - .2} {cy + k} {cx - r + .1} {cy - .3} '
+            f'C{cx - r + .3} {cy - k - .4} {cx - k + .2} {cy - r - .6} {cx + 1.6} {cy - r + .3}')
+
+
+ICONS = {
+    # a house (beige), crooked: the roof off to one side and running over, the walls leaning, a
+    # chimney; its door (sage)
+    'home': fill(BEIGE, 'M16.4 29.6 31.6 16.8 47.6 28.2 48.8 50.6 15.4 51.4z')
+        + line('M9.2 33.8C15.8 27.6 23.8 20.4 31.3 13.4 38.4 18.8 46.2 25.4 55.2 31')
+        + line('M16.3 28.6C15.4 36.2 15 44.2 15.5 51.7 26.4 50.6 37.6 51.3 49.2 50.3 48.1 43.4 48.6 35.6 47.5 27.4')
+        + line('M40.1 21.2C40.2 18.6 40.4 16.2 40.6 13.5 42.2 13.4 43.8 13.6 45.5 13.9 45.4 17.4 45.3 21 45.1 24.8')
+        + fill(SAGE, 'M27.7 50.9 28.6 39.7 36.4 40.3 36.2 50.8z', off=False)
+        + thin('M27.7 50.9C27.9 47 28.2 43.4 28.6 39.7 31.2 39.6 33.9 40 36.4 40.3 36.1 43.8 36.3 47.4 36.2 50.8'),
+    # a calendar page (cream), a clock badge (teal) at its corner
+    'calendar': fill(CREAM, 'M12.6 15.8 50.6 15.4 50.8 50.7 12.8 50.9z')
+        + line('M12.5 15.8C24 15.2 38 15.3 50.6 15.5 50.3 27 50.4 39 50.8 50.7 38 50.3 25 50.6 12.8 50.9 12.9 39 12.6 27 12.5 15.8')
+        + line('M10.8 24.6C24 24 38 24.3 52.4 24.2')
+        + thin('M21.8 10.6 22.1 19.4M41.2 10.4 41.5 19.2M19.5 32.5h4.5M29.5 32.4h4.5M19.6 40.6h4.4')
+        + '<!--badge-->' + fill(TEAL, ring(46, 46, 10.5), off=False)
+        + line(ring(46, 46, 10.5))
+        + thin('M46.2 39.6 46 46.4 50.4 49'),
+    # the sections: a little table of four, one cell yellow
+    'grid': fill(YELLOW, 'M32.8 32.6 51.4 32.4 51.6 51.4 33 51.6z')
+        + line('M12.5 12.8C25 12.4 39 12.6 51.6 12.5 51.3 25 51.4 39 51.8 51.6 39 51.3 25 51.5 12.9 51.8 12.7 39 12.8 25 12.5 12.8')
+        + line('M32.3 10.6C32 25 32.4 39 32 53.6M10.7 32.4C25 32 39 32.3 53.4 31.9'),
+    # a person: the head (rose), the shoulders
+    'person': fill(ROSE, ring(32, 21.8, 9.4).replace('M32.3', 'M32.3', 1) + 'z')
+        + line(ring(32, 21.8, 9.4))
+        + line('M13.8 51.6C14.4 42 22 36.4 32.2 36.5 42 36.7 49.6 42.4 50.2 51.2 38 51.7 26 51.4 13.8 51.6'),
+    # the language: a globe (teal), a meridian, the equator
+    'globe': fill(TEAL, ring(32, 32, 20) + 'z')
+        + line(ring(32, 32, 20))
+        + thin('M31.6 12.4C25.6 18.6 23.2 25.4 23.4 32.2 23.6 39.2 26.4 45.6 32.2 51.6M32.6 12.4C38.4 18.4 40.8 25.2 40.6 32 40.4 39 37.6 45.6 31.8 51.6')
+        + thin('M10.6 32.4C25 31.8 39 32 53.4 31.8'),
+    'check': line('M13.6 33.8C18.2 37.8 22.4 41.8 26.6 46.2 33.8 35.6 41.4 26.2 50.6 17.4'),
+    'chevron-left': line('M39.2 14.4C33.2 20 27.4 26 21.4 32.2 27 38 32.8 43.8 38.8 49.6'),
+    'chevron-right': line('M24.8 14.4C30.8 20 36.6 26 42.6 32.2 37 38 31.2 43.8 25.2 49.6'),
+    'chevron-down': line('M14.4 24.8C20 30.8 26 36.6 32.2 42.6 38 37 43.8 31.2 49.6 25.2'),
+    # log out: a door (beige), the arrow out of it
+    'logout': fill(BEIGE, 'M14.2 12.4 34.2 12.6 34 52 14.5 52.3z')
+        + line('M34.1 21.4C34.2 18.4 34.1 15.6 34.2 12.6 27 12.3 20.6 12.4 14.1 12.2 14.4 25 14.2 39 14.5 52.2 21 52 27.6 52.1 34.1 51.8 34 48.6 34.2 46 34 42.8')
+        + line('M25 32.4C33 31.9 42 32.1 52.6 31.9M44.6 23.4C47.6 26.4 50.2 29.2 53.2 32 50.2 35 47.4 37.6 44.4 40.6'),
+    # log out of all devices: another door (sage) behind the first
+    'logout-all': fill(SAGE, 'M9.6 8.8 28.4 8.9 28.3 46.5 9.8 46.8z')
+        + line('M9.6 46.8C9.7 35 9.5 22 9.8 8.8 16 8.6 22.4 8.9 28.6 8.7')
+        + fill(BEIGE, 'M17.4 16.4 36.2 16.6 36 54.4 17.6 54.6z', off=False)
+        + line('M36.1 24.6C36.2 21.8 36.1 19.4 36.2 16.6 29.6 16.3 23.6 16.4 17.4 16.2 17.6 29 17.5 41.6 17.7 54.5 23.8 54.3 30 54.4 36.1 54.1 36 51.2 36.2 48.6 36 45.6')
+        + line('M27.6 35.6C35 35.2 43 35.4 52.8 35.2M45.2 27.2C48 30 50.6 32.6 53.4 35.3 50.6 38.1 47.8 40.6 45 43.4'),
+}
+
+HEAD = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#1a1a1a" '
+        'stroke-width="3" stroke-linecap="round" stroke-linejoin="round">'
+        '<defs><filter id="marker" x="-10%" y="-10%" width="120%" height="120%">'
+        '<feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4"/>'
+        '<feDisplacementMap in="SourceGraphic" scale="2" xChannelSelector="R" yChannelSelector="G"/>'
+        '</filter></defs><g filter="url(#marker)">')
+
+import re
+INK = float(os.environ.get('INK', 4.4))
+WOBBLE = float(os.environ.get('WOBBLE', 1.1))
+os.makedirs(os.path.join(OUT, 'filled'), exist_ok=True)
+for name, body in ICONS.items():
+    # coloured in: for the big ones (the phones' sections)
+    open(os.path.join(OUT, 'filled', f'{name}.svg'), 'w', encoding='utf-8').write(
+        HEAD + body.replace('<!--badge-->', '') + '</g></svg>\n')
+    # the outline only (the small ones): no pastel; a badge still hides what's under it (a mask)
+    line_body = re.sub(r'<path fill="[^"]+" stroke="none"[^>]*/>', '', body)
+    if '<!--badge-->' in line_body:
+        under, badge = line_body.split('<!--badge-->')
+        line_body = ('<mask id="cut"><rect width="64" height="64" fill="#fff"/>'
+                     '<circle cx="46" cy="46" r="12.5" fill="#000"/></mask>'
+                     f'<g mask="url(#cut)">{under}</g>{badge}')
+    # (small: a thicker marker, ~1.5px at 22px, and less wobble — else it blurs to a hairline)
+    small = (HEAD.replace('stroke-width="3"', f'stroke-width="{INK}"').replace('scale="2"', f'scale="{WOBBLE}"')
+             .replace('numOctaves="2"', 'numOctaves="1"'))
+    open(os.path.join(OUT, f'{name}.svg'), 'w', encoding='utf-8').write(
+        small + line_body.replace('stroke-width="2"', f'stroke-width="{INK * 0.7:.1f}"') + '</g></svg>\n')
+
+if OUT == 'doodle':
+    def row(bg):
+        cells = ''.join(
+            f'<div class="c"><img src="doodle/{n}.svg" width="26"><img src="doodle/{n}.svg" width="48">'
+            f'<img src="doodle/filled/{n}.svg" width="48"><span>{n}</span></div>' for n in ICONS)
+        return f'<div style="background:{bg};padding:8px">{cells}</div>'
+    refs = ''.join(f'<img src="file:///C:/source/tmp/adnak/tmp/Screenshot 2026-10-24 {n}.png" height="90">'
+                   for n in ['001203', '001223', '001251'])
+    open('doodle.html', 'w', encoding='utf-8').write(
+        '<html><body style="margin:8px;font:11px sans-serif;color:#555;background:#FAF9F5">'
+        '<style>.c{display:inline-flex;align-items:flex-end;gap:8px;width:235px;margin:4px}</style>'
+        + refs + row('#FAF9F5') + row('#CBD5BF')
+        + '<div style="filter:invert(1) hue-rotate(180deg)">' + row('#FAF9F5') + '</div></body></html>')
