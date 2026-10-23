@@ -21,10 +21,10 @@ export const ICONS = [
 export type IconName = (typeof ICONS)[number];
 
 /**
- * The app's icons, as drawn with a black marker (docs/icons.md): each its own SVG file, 64×64 —
- * public/icons/ui/{name}.svg the outline only (small ones: menus, rows), and `filled`:
- * public/icons/ui/filled/{name}.svg coloured in with one pastel (big ones: the phones' sections).
- * The dark theme turns them over (the marker white, the pastels dark). The brands' marks (Google,
+ * The app's icons, as drawn with a marker (docs/icons.md): each its own SVG file, 64×64 —
+ * public/icons/ui/{name}.svg the outline only (small ones: menus, rows), drawn in the text's
+ * color (currentColor: a mask); and `filled`: public/icons/ui/filled/{name}.svg coloured in with
+ * one pastel (big ones, 40px+: the phones' sections) — the dark theme turns those over. The brands' marks (Google,
  * Apple) are drawn here, in currentColor. Size it from the host: `<app-icon name="home" class="size-7" />`.
  */
 @Component({
@@ -46,7 +46,17 @@ export type IconName = (typeof ICONS)[number];
         }
       </svg>
     } @else {
-      <img [src]="'icons/ui/' + (filled() ? 'filled/' : '') + name() + '.svg'" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
+      @if (filled()) {
+        <img [src]="'icons/ui/filled/' + name() + '.svg'" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
+      } @else {
+        <!-- (the outline as a mask over the text's color: it takes the color it's in — gray, red on
+             a Log out under the pointer, light in the dark theme) -->
+        <span
+          class="block size-full bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+          [style.mask-image]="url()"
+          [style.-webkit-mask-image]="url()"
+        ></span>
+      }
     }
   `,
 })
@@ -55,4 +65,5 @@ export class Icon {
   readonly filled = input(false, { transform: booleanAttribute });
   // (the brands' marks: drawn here; the rest: their files)
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
+  protected readonly url = computed(() => `url(icons/ui/${this.name()}.svg)`);
 }

@@ -9,13 +9,8 @@
     [attr.aria-expanded]="!!menuAt()"
     [attr.aria-label]="'account.title' | t"
   >
-    <span class="relative flex">
-      <ui-avatar [name]="userName()" />
-      <!-- (a new version ready: a green dot) -->
-      @if (updates.ready()) {
-        <span class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-success ring-2 ring-side"></span>
-      }
-    </span>
+    <!-- (a new version ready: a green dot on it) -->
+    <ui-avatar [name]="userName()" [dot]="updates.ready()" />
     {{ userName() }}
   </button>
 </ng-template>
