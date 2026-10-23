@@ -1,9 +1,26 @@
 import { Component, input } from '@angular/core';
 
-export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 'globe' | 'calendar' | 'grid' | 'person' | 'chevron-left' | 'chevron-right' | 'home' | 'chevron-down';
+/** Every icon there is (e.g. to show them all). */
+export const ICONS = [
+  'google',
+  'apple',
+  'logout',
+  'logout-all',
+  'check',
+  'globe',
+  'calendar',
+  'grid',
+  'person',
+  'chevron-left',
+  'chevron-right',
+  'home',
+  'chevron-down',
+] as const;
+export type IconName = (typeof ICONS)[number];
 
 /**
- * All app icons in one place (24×24 stroke icons, currentColor). Size it from the host:
+ * All app icons in one place (24×24, currentColor), drawn as by hand: ink lines a little off
+ * straight, the main shape on a light gray. Size it from the host:
  * `<app-icon name="plus" class="size-7" />`.
  */
 @Component({
@@ -20,27 +37,54 @@ export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 
       stroke-linejoin="round"
     >
       @switch (name()) {
-        <!-- (a screen and a phone: every device) -->
-        @case ('home') { <path d="M4 10.25 12 4l8 6.25V19a1.5 1.5 0 0 1-1.5 1.5H15V15a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5.5H5.5A1.5 1.5 0 0 1 4 19z" fill="currentColor" fill-opacity="0.1" /> }
-        @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
-        <!-- A calendar page with today's date on it -->
-        @case ('calendar') { <rect x="3.75" y="5" width="16.5" height="15.25" rx="2.75" /><path d="M3.75 9.25h16.5M8.25 3.25v3.5M15.75 3.25v3.5" /><text x="12" y="17.6" text-anchor="middle" font-size="7.25" font-weight="600" fill="currentColor" stroke="none">{{ day }}</text> }
-        <!-- The sections' menu (phones): nine dots -->
+        <!-- (drawn as by hand: lines a little off straight, corners not quite even; the main shape
+             on a light gray, as ink on paper) -->
+        <!-- Home: a house, its roof over it, a door -->
+        @case ('home') {
+          <path d="M5.4 10.9 12 5.2l6.7 5.5-.2 9.4-13 .2z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M3.6 11.7 11.7 4.4c.2-.2.5-.2.7 0l8.1 7" />
+          <path d="M5.3 10.6l.1 9c0 .5.3.8.8.8l11.7-.2c.5 0 .8-.3.8-.8l.1-9" />
+          <path d="M10.1 20.3l.1-5c0-.5.3-.8.8-.8l2.2.1c.5 0 .8.3.8.8l.1 4.8" />
+        }
+        <!-- A calendar page: the binding on gray, today's date on it -->
+        @case ('calendar') {
+          <path d="M4.15 9.7 4.1 6.5c0-.8.5-1.3 1.3-1.3l13.3.1c.8 0 1.2.5 1.2 1.2l.1 2.9z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M4.1 6.5c0-.8.5-1.3 1.3-1.3l13.3.1c.8 0 1.2.5 1.2 1.2l-.2 12.7c0 .8-.5 1.2-1.3 1.2l-12.8-.2c-.8 0-1.3-.5-1.3-1.2z" />
+          <path d="M4.2 9.7c5.2-.2 10.4-.3 15.6-.3M8.3 3.3l.1 3.6M15.6 3.2l.1 3.8" />
+          <text x="12" y="17.7" text-anchor="middle" font-size="7.25" font-weight="600" fill="currentColor" stroke="none">{{ day }}</text>
+        }
+        <!-- The sections' menu (phones): nine dots, not quite in rows -->
         @case ('grid') {
-          @for (y of [5, 12, 19]; track y) {
-            @for (x of [5, 12, 19]; track x) {
-              <circle [attr.cx]="x" [attr.cy]="y" r="2" fill="currentColor" stroke="none" />
-            }
+          @for (dot of dots; track $index) {
+            <circle [attr.cx]="dot[0]" [attr.cy]="dot[1]" [attr.r]="dot[2]" fill="currentColor" stroke="none" />
           }
         }
-        @case ('person') { <circle cx="12" cy="7.75" r="4" fill="currentColor" fill-opacity="0.1" /><path d="M4.5 20.5c.4-4.1 3.5-6.5 7.5-6.5s7.1 2.4 7.5 6.5" /> }
-        @case ('chevron-left') { <path d="m15 18-6-6 6-6" /> }
-        @case ('chevron-right') { <path d="m9 18 6-6-6-6" /> }
-        @case ('globe') { <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9s1.3-6.4 3.8-9z" /> }
-        @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
-        @case ('logout') { <path d="M14 4.5H7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h7M10.5 12h10M17 8.5l3.5 3.5-3.5 3.5" /> }
-        <!-- Log out of all devices: the same, its door doubled (another one behind it) -->
-        @case ('logout-all') { <path d="M15 4.5H9a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h6M3.5 7.5v9M12 12h8.5M17 8.5l3.5 3.5-3.5 3.5" /> }
+        <!-- A person: a round head on gray, the shoulders under it -->
+        @case ('person') {
+          <path d="M12 3.6c2.4-.1 4.2 1.8 4.1 4.2-.1 2.3-1.9 4.1-4.2 4-2.3 0-4.1-1.8-4-4.1.1-2.4 1.8-4 4.1-4.1z" fill="currentColor" fill-opacity="0.12" />
+          <path d="M4.6 20.4c.4-4 3.4-6.3 7.5-6.3 3.9.1 6.8 2.4 7.3 6.2" />
+        }
+        <!-- The language: a globe on gray, a meridian and the equator -->
+        @case ('globe') {
+          <path d="M12 3.1c5-.1 9 3.9 8.9 9-.1 4.9-4 8.8-9 8.8-4.9-.1-8.8-4-8.8-9 .1-4.9 4-8.7 8.9-8.8z" fill="currentColor" fill-opacity="0.12" />
+          <path d="M12 3.2c-2.6 2.6-3.7 5.7-3.7 8.8 0 3.2 1.2 6.3 3.7 8.8 2.5-2.6 3.7-5.7 3.6-8.9 0-3.1-1.2-6.1-3.6-8.7M3.3 11.8c5.8.4 11.7.4 17.5.1" />
+        }
+        @case ('check') { <path d="M5 12.8c1.7 1.6 3.4 3.2 5 4.8 2.8-4 5.9-7.7 9.1-11" /> }
+        @case ('chevron-left') { <path d="M15.2 18.1 9.1 11.9l6-5.9" /> }
+        @case ('chevron-right') { <path d="M8.9 6l6.1 6.1-5.9 6" /> }
+        @case ('chevron-down') { <path d="M6 9.1l6.1 5.9 6-6.1" /> }
+        <!-- Log out: a door (on gray), an arrow out of it -->
+        @case ('logout') {
+          <path d="M13.8 4.6 7.2 4.4c-1.4 0-2.1.8-2.1 2.2l.1 11c0 1.3.7 2 2.1 2l6.6-.2z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M13.8 4.6 7.2 4.4c-1.4 0-2.1.8-2.1 2.2l.1 11c0 1.3.7 2 2.1 2l6.6-.2" />
+          <path d="M10.4 12.1c3.4-.2 6.7-.2 10.1-.1M17 8.6l3.5 3.4-3.6 3.5" />
+        }
+        <!-- Log out of all devices: the same, another door behind it -->
+        @case ('logout-all') {
+          <path d="M15 4.6 9.1 4.4c-1.4 0-2.1.8-2.1 2.2l.1 11c0 1.3.7 2 2.1 2l5.9-.2z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M15 4.6 9.1 4.4c-1.4 0-2.1.8-2.1 2.2l.1 11c0 1.3.7 2 2.1 2l5.9-.2M3.6 7.6c-.2 3-.2 5.9.1 8.9" />
+          <path d="M11.9 12.1c2.9-.2 5.7-.2 8.6-.1M17 8.6l3.5 3.4-3.6 3.5" />
+        }
         <!-- Brand marks: filled; Google keeps its brand colors, Apple uses currentColor -->
         @case ('google') {
           <path stroke="none" fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" />
@@ -57,7 +101,13 @@ export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 
 })
 export class Icon {
   readonly name = input.required<IconName>();
-  readonly strokeWidth = input(1.35); // (one weight for every icon: thin, as Notion's)
+  readonly strokeWidth = input(1.5); // (one weight for every icon, as an ink pen's)
   // (today's date, for the calendar's)
   protected readonly day = new Date().getDate();
+  // The grid's nine dots: x, y, radius — each a little off, as dotted by hand
+  protected readonly dots = [
+    [5.1, 5, 2], [12.1, 4.8, 2.05], [19, 5.1, 1.95],
+    [4.9, 12.1, 2.05], [12, 12, 1.95], [19.1, 11.9, 2],
+    [5, 19.1, 1.95], [11.9, 19, 2], [19, 18.9, 2.05],
+  ];
 }

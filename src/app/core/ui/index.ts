@@ -4,7 +4,7 @@
  * styles/base.css, sizes per device from styles/mobile.css / desktop.css), so a change there
  * changes the whole app; pages themselves carry no looks of their own.
  */
-export { Icon, type IconName } from './icon/icon';
+export { Icon, ICONS, type IconName } from './icon/icon';
 export { UiAvatar } from './avatar/avatar';
 export { UiButton } from './button/button';
 export { UiGlassButton } from './glass-button/glass-button';
