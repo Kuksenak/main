@@ -1,0 +1,48 @@
+<ng-template #accountButton>
+  <button
+    #account
+    uiButton
+    type="button"
+    [caret]="true"
+    (click)="menuAt.set(menuAt() ? null : account.element)"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="!!menuAt()"
+    [attr.aria-label]="'account.title' | t"
+  >
+    <ui-avatar [name]="userName()" />
+    {{ userName() }}
+  </button>
+</ng-template>
+
+<div class="flex h-full bg-app text-fg" [class.flex-col]="!desktop">
+  @if (desktop) {
+    <ui-sidebar>
+      @for (place of places; track place.path) {
+        <!-- (the start page: current only on itself) -->
+        <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
+      }
+      <ng-container ngProjectAs="[sidebarFoot]" [ngTemplateOutlet]="accountButton" />
+    </ui-sidebar>
+  } @else {
+    <header class="flex shrink-0 justify-end px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
+      <ng-container [ngTemplateOutlet]="accountButton" />
+    </header>
+  }
+  <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
+    <router-outlet />
+  </main>
+</div>
+
+@if (menuAt(); as at) {
+  <ui-menu [origin]="at" (closed)="menuAt.set(null)">
+    <ui-menu-label>{{ auth.email() }}</ui-menu-label>
+    <ui-menu-separator />
+    <ui-menu-label>{{ 'account.language' | t }}</ui-menu-label>
+    @for (language of i18n.languages; track language.code) {
+      <button type="button" uiMenuItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">{{ language.label }}</button>
+    }
+    <ui-menu-separator />
+    <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
+    <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
+  </ui-menu>
+}

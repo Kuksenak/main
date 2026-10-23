@@ -1,28 +1,20 @@
-/* The few shared pieces: the type utilities, the sign-in buttons, the "turn your phone upright"
-   notice. Colors come from base.css; sizes that differ per device (--control-h, --radius-*,
-   --text-body) from mobile.css / desktop.css. */
-
-/* ---- Typography (sizes come from the device stylesheet) ---- */
-@utility text-body {
-  font-size: var(--text-body);
-}
-@utility text-footnote {
-  font-size: 0.8125rem; /* 13px */
-}
+/* The few global pieces outside the UI kit (core/ui): the sign-in buttons, the "turn your phone
+   upright" notice. */
 
 @layer components {
   /* Strong neutral action: black (white in dark theme), e.g. sign-in buttons */
   .btn-strong {
-    @apply text-body inline-flex h-[var(--control-h)] items-center justify-center gap-2
-           rounded-[var(--radius-capsule)] bg-[var(--strong-bg)] px-[var(--capsule-px)] font-semibold
-           text-[var(--strong-fg)] active:opacity-80 disabled:opacity-40;
+    @apply text-body inline-flex h-control items-center justify-center gap-2 rounded-capsule bg-strong
+           px-capsule-x font-semibold text-on-strong active:opacity-80 disabled:opacity-40;
   }
 
   /* Full-screen "rotate to portrait" notice, shown only on phones held in landscape. */
   .rotate-hint {
-    @apply fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-3 bg-[var(--app-bg)]
-           px-8 text-center text-[var(--text)];
+    @apply fixed inset-0 z-[3000] hidden flex-col items-center justify-center gap-3 bg-app px-8
+           text-center text-fg;
   }
+  /* Only phones held sideways get the notice (max-height 32rem): a foldable opened up or an
+     iPad has a much taller screen and keeps the normal layout in any orientation. */
   @media (orientation: landscape) and (max-height: 32rem) {
     [data-device='mobile'] .rotate-hint {
       display: flex;
@@ -31,17 +23,4 @@
       visibility: hidden;
     }
   }
-  /* Only phones held sideways get the notice (max-height 32rem): a foldable opened up or an
-     iPad has a much taller screen and keeps the normal layout in any orientation. */
-  .rotate-hint-phone {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: rotateBack 2.4s var(--ease-ios) infinite;
-  }
-}
-
-/* Rotate notice: the phone turns from landscape back to portrait, pauses, repeats. */
-@keyframes rotateBack {
-  0%, 15% { transform: rotate(-90deg); }
-  55%, 100% { transform: rotate(0deg); }
 }

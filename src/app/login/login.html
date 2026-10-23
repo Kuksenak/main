@@ -1,5 +1,5 @@
 <main
-  class="flex h-full flex-col px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[calc(env(safe-area-inset-top)+3rem)] text-[var(--text)]"
+  class="flex h-full flex-col px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[calc(env(safe-area-inset-top)+3rem)] text-fg"
 >
   <!-- Brand at the very top -->
   <header class="flex flex-col items-center gap-3">
@@ -12,7 +12,7 @@
     <!-- The API is down: our message instead of the host's error page -->
     @if (auth.loginError() || (denied && !auth.loggingIn())) {
       <!-- Or back from Google without a sign-in -->
-      <p class="text-footnote rounded-[var(--radius-card)] bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] px-4 py-3 text-center text-[var(--danger)]">
+      <p class="text-footnote rounded-card bg-danger/12 px-4 py-3 text-center text-danger">
         {{ (auth.loginError() ? 'login.unavailable' : deniedKey) | t }}
       </p>
     }

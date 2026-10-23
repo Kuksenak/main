@@ -1,5 +1,5 @@
 @if (!auth.initialized()) {
-  <main class="flex h-full items-center justify-center text-[var(--text)]">
+  <main class="flex h-full items-center justify-center text-fg">
     <p class="text-sm opacity-40">{{ 'app.loading' | t }}</p>
   </main>
 } @else {
@@ -9,10 +9,10 @@
 <!-- Phones in landscape: the app is portrait-only (see index.html) -->
 <div class="rotate-hint">
   <!-- A gray phone turning from landscape back to portrait, on a loop -->
-  <svg viewBox="0 0 64 64" class="size-20" aria-hidden="true">
-    <g class="rotate-hint-phone">
-      <rect x="21" y="13" width="22" height="38" rx="5" fill="none" stroke-width="3" style="stroke: var(--text-secondary)" />
-      <rect x="28.5" y="17" width="7" height="2" rx="1" style="fill: var(--text-secondary)" />
+  <svg viewBox="0 0 64 64" class="size-20 text-fg-secondary" aria-hidden="true">
+    <g class="origin-center animate-rotate-back [transform-box:fill-box]">
+      <rect x="21" y="13" width="22" height="38" rx="5" fill="none" stroke-width="3" stroke="currentColor" />
+      <rect x="28.5" y="17" width="7" height="2" rx="1" fill="currentColor" />
     </g>
   </svg>
   <p class="text-body font-medium">{{ 'app.rotate' | t }}</p>

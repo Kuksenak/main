@@ -1,6 +1,6 @@
 /* Colors (the same on both devices; per-device sizes are in mobile.css / desktop.css) and the
-   document-level defaults: page, scrollbars, press feedback, cursors. Templates use the colors
-   (text-[var(--text)], …), never raw ones. */
+   document-level defaults: page, scrollbars, press feedback, cursors. Templates use them by their
+   Tailwind names (bg-app, text-fg, bg-side, … — see styles.css), never raw colors. */
 
 :root {
   --app-bg: #fbfbf9; /* (as the manifest's) */
@@ -16,7 +16,7 @@
   --tint-strong: color-mix(in srgb, var(--text) 8%, transparent);
   /* Menus over the page (as Notion's: nothing dims) — white, a faint hairline and soft shadows */
   --dialog-bg: #ffffff;
-  --shadow-popover: 0 0 0 1px rgb(15 15 15 / 0.06), 0 3px 8px rgb(15 15 15 / 0.05), 0 12px 32px rgb(15 15 15 / 0.1);
+  --popover-shadow: 0 0 0 1px rgb(15 15 15 / 0.06), 0 3px 8px rgb(15 15 15 / 0.05), 0 12px 32px rgb(15 15 15 / 0.1);
   --separator: rgb(31 30 29 / 0.1); /* hairlines (the sidebar's edge) */
   /* The desktop sidebar, as Claude's: one off-white with the page (a hairline between), its rows a
      soft dark gray; hovers and the open row a warm gray fill */
@@ -24,9 +24,6 @@
   --side-hover: #f3f2ee;
   --side-on: #edece8;
   --side-text: #52514e;
-
-  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
-  --ease-out-quick: cubic-bezier(0.2, 0, 0, 1);
 
   /* App height. Phones are portrait-only by CSS (a "rotate" notice in landscape) — don't call
      screen.orientation.lock(): on iOS home-screen apps it shrinks the launch viewport by the
@@ -47,7 +44,7 @@ html.dark {
   --side-hover: #1c1c1e;
   --side-on: #2c2c2e;
   --side-text: #c7c7cc;
-  --shadow-popover: 0 0 0 1px rgb(255 255 255 / 0.08), 0 3px 8px rgb(0 0 0 / 0.25), 0 12px 32px rgb(0 0 0 / 0.4);
+  --popover-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 3px 8px rgb(0 0 0 / 0.25), 0 12px 32px rgb(0 0 0 / 0.4);
 }
 
 html,

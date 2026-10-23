@@ -1,0 +1,21 @@
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="origin()"
+  [cdkConnectedOverlayOpen]="true"
+  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayPush]="true"
+  [cdkConnectedOverlayViewportMargin]="8"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="close()"
+  (overlayKeydown)="key($event)"
+  (attach)="focus(0)"
+>
+  <div
+    role="menu"
+    class="flex min-w-menu max-w-[calc(100vw-1rem)] animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
+    (click)="picked($event)"
+  >
+    <ng-content />
+  </div>
+</ng-template>

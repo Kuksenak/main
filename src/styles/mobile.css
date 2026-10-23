@@ -1,25 +1,26 @@
 /* Mobile-only stylesheet: loaded by index.html when data-device="mobile" (desktop devices
-   never download it). The sizes that differ per device, used by components.css. */
+   never download it). The sizes that differ per device — in templates by their Tailwind names
+   (text-ui, h-button, rounded-menu, … — see styles.css): iOS sizes, round. */
 
 :root {
-  --text-body: 1.0625rem; /* 17px */
+  --font-body: 1.0625rem; /* 17px */
 
-  /* Capsule buttons: 44 tall, fully round */
+  /* Capsules (sign-in): 44 tall, fully round */
   --control-h: 2.75rem;
   --capsule-px: 1.25rem;
-  --radius-capsule: 9999px;
-  --radius-card: 1.5rem;
+  --round-capsule: 9999px;
+  --round-card: 1.5rem;
 
-  /* The UI kit (ui/*): the body text, the capsules' height and roundness */
-  --text-ui: var(--text-body);
+  /* The UI kit (core/ui): the body text, the capsules' height and roundness */
+  --font-ui: var(--font-body);
   --icon-ui: 1.375rem;
   --button-h: var(--control-h);
   --button-px: 0.75rem;
   --button-label-max: 8rem; /* (a longer label ends in …) */
-  --radius-button: var(--radius-capsule);
+  --round-button: var(--round-capsule);
   /* Menus: rows as tall as the buttons */
   --menu-w: 15rem;
   --menu-row-h: var(--control-h);
   --icon-menu: 1.5rem;
-  --radius-menu: 1rem;
+  --round-menu: 1rem;
 }

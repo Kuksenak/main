@@ -1,0 +1,7 @@
+@if (icon(); as name) {
+  <app-icon [name]="name" class="size-icon-menu" />
+}
+<span class="min-w-0 flex-1 truncate"><ng-content /></span>
+@if (checked()) {
+  <app-icon name="check" class="size-icon-menu" />
+}

@@ -10,6 +10,73 @@
 @custom-variant mobile (&:where([data-device="mobile"], [data-device="mobile"] *));
 @custom-variant desktop (&:where([data-device="desktop"], [data-device="desktop"] *));
 
+/* The tokens as Tailwind's own names: bg-side, text-danger, h-button, rounded-menu, text-ui, …
+   Their values are the CSS variables of base.css (colors, light and dark) and of mobile.css /
+   desktop.css (sizes, per device) — inline: the classes read those variables, so the theme and the
+   device change them at run time. */
+@theme inline {
+  --color-app: var(--app-bg);
+  --color-fg: var(--text);
+  --color-fg-secondary: var(--text-secondary);
+  --color-danger: var(--danger);
+  --color-strong: var(--strong-bg);
+  --color-on-strong: var(--strong-fg);
+  --color-tint: var(--tint);
+  --color-tint-strong: var(--tint-strong);
+  --color-dialog: var(--dialog-bg);
+  --color-separator: var(--separator);
+  --color-side: var(--side-bg);
+  --color-side-hover: var(--side-hover);
+  --color-side-on: var(--side-on);
+  --color-side-text: var(--side-text);
+
+  --text-body: var(--font-body);
+  --text-ui: var(--font-ui);
+
+  --spacing-control: var(--control-h);
+  --spacing-capsule-x: var(--capsule-px);
+  --spacing-button: var(--button-h);
+  --spacing-button-x: var(--button-px);
+  --spacing-button-label: var(--button-label-max);
+  --spacing-icon-ui: var(--icon-ui);
+  --spacing-icon-menu: var(--icon-menu);
+  --spacing-nav: var(--nav-w);
+  --spacing-side-row: var(--side-row-h);
+  --spacing-menu: var(--menu-w);
+  --spacing-menu-row: var(--menu-row-h);
+
+  --radius-capsule: var(--round-capsule);
+  --radius-card: var(--round-card);
+  --radius-button: var(--round-button);
+  --radius-side-row: var(--round-side-row);
+  --radius-menu: var(--round-menu);
+
+  --shadow-popover: var(--popover-shadow);
+}
+
+/* The same on every device */
+@theme {
+  --text-footnote: 0.8125rem; /* 13px */
+
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out-quick: cubic-bezier(0.2, 0, 0, 1);
+
+  /* A menu unfolding at its button */
+  --animate-menu-in: menu-in 160ms var(--ease-out-quick);
+  @keyframes menu-in {
+    from {
+      opacity: 0;
+      transform: translateY(-0.25rem) scale(0.98);
+    }
+  }
+  /* The rotate notice's phone: from landscape back to portrait, a pause, again */
+  --animate-rotate-back: rotate-back 2.4s var(--ease-ios) infinite;
+  @keyframes rotate-back {
+    0%, 15% { transform: rotate(-90deg); }
+    55%, 100% { transform: rotate(0deg); }
+  }
+}
+
 /* base (colors, the page, scrollbars, press feedback) → components (the few shared pieces) */
 @import "./styles/base.css";
 @import "./styles/components.css";

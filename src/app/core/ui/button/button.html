@@ -1,0 +1,8 @@
+<ng-content select="ui-avatar" />
+@if (icon(); as name) {
+  <app-icon [name]="name" class="size-icon-ui opacity-85" />
+}
+<span class="max-w-button-label overflow-hidden text-ellipsis empty:hidden"><ng-content /></span>
+@if (caret()) {
+  <app-icon name="chevron-down" class="-ml-0.5 size-[calc(var(--icon-ui)*0.875)] opacity-50" />
+}

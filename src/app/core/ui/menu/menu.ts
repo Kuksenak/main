@@ -1,6 +1,9 @@
 import { CdkConnectedOverlay, ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
 import { Component, input, output, viewChild } from '@angular/core';
 
+// (its rows: plain ones and the ones of a choice — menuitem, menuitemradio)
+const ROWS = '[role^="menuitem"]:not(:disabled)';
+
 /**
  * A menu at its button (as Notion's: a plain list on the dialogs' color, a soft shadow, nothing
  * dims): under the button, its right edge at the button's (above it, or from its left edge, when
@@ -12,43 +15,7 @@ import { Component, input, output, viewChild } from '@angular/core';
 @Component({
   selector: 'ui-menu',
   imports: [OverlayModule],
-  template: `
-    <ng-template
-      cdkConnectedOverlay
-      [cdkConnectedOverlayOrigin]="origin()"
-      [cdkConnectedOverlayOpen]="true"
-      [cdkConnectedOverlayPositions]="positions"
-      [cdkConnectedOverlayPush]="true"
-      [cdkConnectedOverlayViewportMargin]="8"
-      [cdkConnectedOverlayHasBackdrop]="true"
-      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
-      (backdropClick)="close()"
-      (overlayKeydown)="key($event)"
-      (attach)="focus(0)"
-    >
-      <div class="panel" role="menu" (click)="picked($event)"><ng-content /></div>
-    </ng-template>
-  `,
-  styles: `
-    .panel {
-      display: flex;
-      min-width: var(--menu-w);
-      max-width: calc(100vw - 1rem);
-      flex-direction: column;
-      padding: 0.25rem;
-      border-radius: var(--radius-menu);
-      background: var(--dialog-bg);
-      color: var(--text);
-      box-shadow: var(--shadow-popover);
-      animation: menuIn 160ms var(--ease-out-quick);
-    }
-    @keyframes menuIn {
-      from {
-        opacity: 0;
-        transform: translateY(-0.25rem) scale(0.98);
-      }
-    }
-  `,
+  templateUrl: './menu.html',
 })
 export class UiMenu {
   readonly origin = input.required<HTMLElement>();
@@ -72,7 +39,7 @@ export class UiMenu {
 
   // (a row picked: the menu goes; the row's own click has run by now)
   protected picked(e: MouseEvent): void {
-    if ((e.target as HTMLElement).closest('[role="menuitem"]:not(:disabled)')) this.close();
+    if ((e.target as HTMLElement).closest(ROWS)) this.close();
   }
 
   protected key(e: KeyboardEvent): void {
@@ -97,6 +64,6 @@ export class UiMenu {
 
   private rows(): HTMLElement[] {
     const panel = this.overlay().overlayRef?.overlayElement;
-    return panel ? [...panel.querySelectorAll<HTMLElement>('[role="menuitem"]:not(:disabled)')] : [];
+    return panel ? [...panel.querySelectorAll<HTMLElement>(ROWS)] : [];
   }
 }
