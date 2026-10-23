@@ -4,7 +4,7 @@ import { Icon, IconName } from '../icon/icon';
 /**
  * A row of a `<ui-menu>`: `<button type="button" uiMenuItem icon="logout">Log out</button>` — a
  * thin icon and the name in the small UI text; gray under the pointer or the keys (↑ ↓), the icon
- * nudged (a short wiggle, as Claude's).
+ * hopping softly.
  * `danger` (delete, log out): like the rest, in the danger color under the pointer. `checked`
  * (one of a choice, e.g. the language): a ✓ at the end of the chosen one.
  * Picking it closes the menu.
