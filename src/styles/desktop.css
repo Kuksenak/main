@@ -10,4 +10,19 @@
   --capsule-px: 0.875rem;
   --radius-capsule: 0.3125rem;
   --radius-card: 0.5rem;
+
+  /* The UI kit (ui/*), as Notion's: 14px text, thin 18px icons, 32 tall buttons with no fill */
+  --text-ui: 0.875rem;
+  --icon-ui: 1.125rem;
+  --button-h: 2rem;
+  --button-px: 0.5rem;
+  --button-label-max: 15rem; /* (a longer label ends in …) */
+  --radius-button: 0.375rem;
+  --toolbar-h: 3rem;
+  --toolbar-px: 0.75rem;
+  /* Menus: 28 tall rows, 20px icons */
+  --menu-w: 14rem;
+  --menu-row-h: 1.75rem;
+  --icon-menu: 1.25rem;
+  --radius-menu: 0.625rem;
 }

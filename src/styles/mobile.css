@@ -9,4 +9,19 @@
   --capsule-px: 1.25rem;
   --radius-capsule: 9999px;
   --radius-card: 1.5rem;
+
+  /* The UI kit (ui/*): the body text, the capsules' height and roundness */
+  --text-ui: var(--text-body);
+  --icon-ui: 1.375rem;
+  --button-h: var(--control-h);
+  --button-px: 0.75rem;
+  --button-label-max: 8rem; /* (a longer label ends in …) */
+  --radius-button: var(--radius-capsule);
+  --toolbar-h: 3.25rem;
+  --toolbar-px: 1rem;
+  /* Menus: rows as tall as the buttons */
+  --menu-w: 15rem;
+  --menu-row-h: var(--control-h);
+  --icon-menu: 1.5rem;
+  --radius-menu: 1rem;
 }

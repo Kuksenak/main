@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type IconName = 'google' | 'apple' | 'logout';
+export type IconName = 'google' | 'apple' | 'logout' | 'home' | 'chevron-down';
 
 /**
  * All app icons in one place (24×24 stroke icons, currentColor). Size it from the host:
@@ -20,6 +20,8 @@ export type IconName = 'google' | 'apple' | 'logout';
       stroke-linejoin="round"
     >
       @switch (name()) {
+        @case ('home') { <path d="M4 10.25 12 4l8 6.25V19a1.5 1.5 0 0 1-1.5 1.5H15V15a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5.5H5.5A1.5 1.5 0 0 1 4 19z" fill="currentColor" fill-opacity="0.1" /> }
+        @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
         @case ('logout') { <path d="M14 4.5H7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h7M10.5 12h10M17 8.5l3.5 3.5-3.5 3.5" /> }
         <!-- Brand marks: filled; Google keeps its brand colors, Apple uses currentColor -->
         @case ('google') {

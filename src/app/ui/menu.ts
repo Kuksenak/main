@@ -1,0 +1,102 @@
+import { CdkConnectedOverlay, ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
+import { Component, input, output, viewChild } from '@angular/core';
+
+/**
+ * A menu at its button (as Notion's: a plain list on the dialogs' color, a soft shadow, nothing
+ * dims): under the button, its right edge at the button's (above it, or from its left edge, when
+ * there's no room). Render it with @if; `closed` fires on a click outside, Esc, Tab or a picked
+ * row (`<button uiMenuItem>`). ↑ ↓ move between the rows; the first one has the focus.
+ *   <button uiButton #b (click)="open.set(!open())" [attr.aria-expanded]="open()">…</button>
+ *   @if (open()) { <ui-menu [origin]="b.element" (closed)="open.set(false)">…</ui-menu> }
+ */
+@Component({
+  selector: 'ui-menu',
+  imports: [OverlayModule],
+  template: `
+    <ng-template
+      cdkConnectedOverlay
+      [cdkConnectedOverlayOrigin]="origin()"
+      [cdkConnectedOverlayOpen]="true"
+      [cdkConnectedOverlayPositions]="positions"
+      [cdkConnectedOverlayPush]="true"
+      [cdkConnectedOverlayViewportMargin]="8"
+      [cdkConnectedOverlayHasBackdrop]="true"
+      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+      (backdropClick)="close()"
+      (overlayKeydown)="key($event)"
+      (attach)="focus(0)"
+    >
+      <div class="panel" role="menu" (click)="picked($event)"><ng-content /></div>
+    </ng-template>
+  `,
+  styles: `
+    .panel {
+      display: flex;
+      min-width: var(--menu-w);
+      max-width: calc(100vw - 1rem);
+      flex-direction: column;
+      padding: 0.25rem;
+      border-radius: var(--radius-menu);
+      background: var(--dialog-bg);
+      color: var(--text);
+      box-shadow: var(--shadow-popover);
+      animation: menuIn 160ms var(--ease-out-quick);
+    }
+    @keyframes menuIn {
+      from {
+        opacity: 0;
+        transform: translateY(-0.25rem) scale(0.98);
+      }
+    }
+  `,
+})
+export class UiMenu {
+  readonly origin = input.required<HTMLElement>();
+  readonly closed = output<void>();
+
+  private readonly overlay = viewChild.required(CdkConnectedOverlay);
+  private done = false;
+
+  protected readonly positions: ConnectedPosition[] = [
+    { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 4 },
+    { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom', offsetY: -4 },
+    { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top', offsetY: 4 },
+    { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom', offsetY: -4 },
+  ];
+
+  close(): void {
+    if (this.done) return;
+    this.done = true;
+    this.closed.emit();
+  }
+
+  // (a row picked: the menu goes; the row's own click has run by now)
+  protected picked(e: MouseEvent): void {
+    if ((e.target as HTMLElement).closest('[role="menuitem"]:not(:disabled)')) this.close();
+  }
+
+  protected key(e: KeyboardEvent): void {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.close();
+      this.origin().focus(); // (back on its button, for the keys)
+    } else if (e.key === 'Tab') {
+      this.close();
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      const at = this.rows().indexOf(document.activeElement as HTMLElement);
+      this.focus(e.key === 'ArrowDown' ? at + 1 : at < 0 ? -1 : at - 1);
+    }
+  }
+
+  // The n-th row, round at the ends (-1: the last)
+  protected focus(n: number): void {
+    const rows = this.rows();
+    if (rows.length) rows[(n + rows.length) % rows.length].focus();
+  }
+
+  private rows(): HTMLElement[] {
+    const panel = this.overlay().overlayRef?.overlayElement;
+    return panel ? [...panel.querySelectorAll<HTMLElement>('[role="menuitem"]:not(:disabled)')] : [];
+  }
+}

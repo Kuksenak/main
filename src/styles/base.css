@@ -10,6 +10,13 @@
   --strong-bg: #000000; /* black buttons (sign-in) */
   --strong-fg: #ffffff;
   --scroll-thumb: rgb(0 0 0 / 0.25);
+  /* The UI kit's grays, out of the text's color (so the dark theme follows): a hover, a button
+     whose menu is open; the current tab, a pressed button, a menu's row under the pointer */
+  --tint: color-mix(in srgb, var(--text) 5%, transparent);
+  --tint-strong: color-mix(in srgb, var(--text) 8%, transparent);
+  /* Menus over the page (as Notion's: nothing dims) — white, a faint hairline and soft shadows */
+  --dialog-bg: #ffffff;
+  --shadow-popover: 0 0 0 1px rgb(15 15 15 / 0.06), 0 3px 8px rgb(15 15 15 / 0.05), 0 12px 32px rgb(15 15 15 / 0.1);
 
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out-quick: cubic-bezier(0.2, 0, 0, 1);
@@ -27,6 +34,8 @@ html.dark {
   --strong-bg: #ffffff;
   --strong-fg: #000000;
   --scroll-thumb: rgb(255 255 255 / 0.3);
+  --dialog-bg: #1c1c1e;
+  --shadow-popover: 0 0 0 1px rgb(255 255 255 / 0.08), 0 3px 8px rgb(0 0 0 / 0.25), 0 12px 32px rgb(0 0 0 / 0.4);
 }
 
 html,
@@ -102,5 +111,9 @@ button:disabled {
   }
   button:not(:disabled):active {
     transform: scale(0.94);
+  }
+  /* Desktop: no shrink (it blurs the label mid-way) — the buttons' own fill is the feedback */
+  [data-device='desktop'] :is(button, a[href]):not(:disabled):active {
+    transform: none;
   }
 }
