@@ -23,7 +23,8 @@ export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 
         <!-- (a screen and a phone: every device) -->
         @case ('home') { <path d="M4 10.25 12 4l8 6.25V19a1.5 1.5 0 0 1-1.5 1.5H15V15a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5.5H5.5A1.5 1.5 0 0 1 4 19z" fill="currentColor" fill-opacity="0.1" /> }
         @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
-        @case ('calendar') { <rect x="3.5" y="5" width="17" height="15.5" rx="3" /><path d="M3.5 10h17M8 3v4M16 3v4" /> }
+        <!-- A calendar page with today's date on it -->
+        @case ('calendar') { <rect x="3.75" y="5" width="16.5" height="15.25" rx="2.75" /><path d="M3.75 9.25h16.5M8.25 3.25v3.5M15.75 3.25v3.5" /><text x="12" y="17.6" text-anchor="middle" font-size="7.25" font-weight="600" fill="currentColor" stroke="none">{{ day }}</text> }
         @case ('globe') { <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9s1.3-6.4 3.8-9z" /> }
         @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
         @case ('logout') { <path d="M14 4.5H7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h7M10.5 12h10M17 8.5l3.5 3.5-3.5 3.5" /> }
@@ -46,4 +47,6 @@ export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 
 export class Icon {
   readonly name = input.required<IconName>();
   readonly strokeWidth = input(1.35); // (one weight for every icon: thin, as Notion's)
+  // (today's date, for the calendar's)
+  protected readonly day = new Date().getDate();
 }
