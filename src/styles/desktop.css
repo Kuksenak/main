@@ -18,8 +18,10 @@
   --button-px: 0.5rem;
   --button-label-max: 15rem; /* (a longer label ends in …) */
   --radius-button: 0.375rem;
-  --toolbar-h: 3rem;
-  --toolbar-px: 0.75rem;
+  /* The sidebar (as Claude's): 270 wide, 30 tall rows */
+  --nav-w: 16.875rem;
+  --side-row-h: 1.875rem;
+  --radius-side-row: 0.5rem;
   /* Menus: 28 tall rows, 20px icons */
   --menu-w: 14rem;
   --menu-row-h: 1.75rem;

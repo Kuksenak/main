@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { AuthStore } from '../auth/auth.store';
 
-/** The start page: who's signed in — a placeholder until the app's own pages (Log out: the toolbar's account). */
+/** The start page: who's signed in — a placeholder until the app's own pages (Log out: the shell's account menu). */
 @Component({
   selector: 'app-home',
   template: `

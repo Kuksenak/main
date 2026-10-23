@@ -4,7 +4,7 @@ import { authGuard, guestGuard } from './auth/auth.guard';
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./login/login').then((m) => m.Login), canActivate: [guestGuard] },
   {
-    // The signed-in pages, in the shell (the toolbar over them)
+    // The signed-in pages, in the shell (desktop: the sidebar beside them)
     path: '',
     loadComponent: () => import('./shell/shell').then((m) => m.Shell),
     canActivate: [authGuard],

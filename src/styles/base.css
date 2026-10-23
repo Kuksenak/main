@@ -17,6 +17,13 @@
   /* Menus over the page (as Notion's: nothing dims) — white, a faint hairline and soft shadows */
   --dialog-bg: #ffffff;
   --shadow-popover: 0 0 0 1px rgb(15 15 15 / 0.06), 0 3px 8px rgb(15 15 15 / 0.05), 0 12px 32px rgb(15 15 15 / 0.1);
+  --separator: rgb(31 30 29 / 0.1); /* hairlines (the sidebar's edge) */
+  /* The desktop sidebar, as Claude's: one off-white with the page (a hairline between), its rows a
+     soft dark gray; hovers and the open row a warm gray fill */
+  --side-bg: #fbfbf9;
+  --side-hover: #f3f2ee;
+  --side-on: #edece8;
+  --side-text: #52514e;
 
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
   --ease-out-quick: cubic-bezier(0.2, 0, 0, 1);
@@ -35,6 +42,11 @@ html.dark {
   --strong-fg: #000000;
   --scroll-thumb: rgb(255 255 255 / 0.3);
   --dialog-bg: #1c1c1e;
+  --separator: rgb(255 255 255 / 0.1);
+  --side-bg: #000000;
+  --side-hover: #1c1c1e;
+  --side-on: #2c2c2e;
+  --side-text: #c7c7cc;
   --shadow-popover: 0 0 0 1px rgb(255 255 255 / 0.08), 0 3px 8px rgb(0 0 0 / 0.25), 0 12px 32px rgb(0 0 0 / 0.4);
 }
 

@@ -8,5 +8,5 @@ export { UiButton } from './button';
 export { UiMenu } from './menu';
 export { UiMenuItem } from './menu-item';
 export { UiMenuLabel } from './menu-label';
-export { UiToolbar } from './toolbar';
-export { UiToolbarTab } from './toolbar-tab';
+export { UiSidebar } from './sidebar';
+export { UiSidebarItem } from './sidebar-item';

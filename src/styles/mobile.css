@@ -17,8 +17,6 @@
   --button-px: 0.75rem;
   --button-label-max: 8rem; /* (a longer label ends in …) */
   --radius-button: var(--radius-capsule);
-  --toolbar-h: 3.25rem;
-  --toolbar-px: 1rem;
   /* Menus: rows as tall as the buttons */
   --menu-w: 15rem;
   --menu-row-h: var(--control-h);
