@@ -22,6 +22,8 @@
   --menu-w: 15rem;
   --menu-row-h: var(--control-h);
   --icon-menu: 1.75rem;
+  --menu-row-px: 0.5rem;
+  --menu-label-px: 0.5rem;
   --round-menu: 1rem;
   /* Round buttons (menu, account): 48; list rows 48 */
   --round-h: 3rem;

@@ -17,7 +17,7 @@ import { Icon, IconName } from '../icon/icon';
   ],
   host: {
     class:
-      'flex h-side-row shrink-0 items-center gap-2.5 rounded-side-row px-2.5 text-ui text-side-text outline-none ' +
+      'flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-ui text-side-text outline-none ' +
       'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-fg',
   },
   template: `

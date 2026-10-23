@@ -8,7 +8,7 @@ import { Icon, IconName } from '../icon/icon';
 @Component({
   selector: 'ui-menu-label',
   imports: [Icon],
-  host: { class: 'flex items-center gap-1.5 px-2 pt-1 pb-0.5 text-footnote font-medium text-fg-secondary' },
+  host: { class: 'flex items-center gap-1.5 px-menu-label-x pt-1 pb-0.5 text-footnote font-medium text-fg-secondary' },
   template: `
     @if (icon(); as name) {
       <app-icon [name]="name" class="size-5" />
