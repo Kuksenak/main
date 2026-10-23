@@ -9,7 +9,13 @@
     [attr.aria-expanded]="!!menuAt()"
     [attr.aria-label]="'account.title' | t"
   >
-    <ui-avatar [name]="userName()" />
+    <span class="relative flex">
+      <ui-avatar [name]="userName()" />
+      <!-- (a new version ready: a green dot) -->
+      @if (updates.ready()) {
+        <span class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-success ring-2 ring-side"></span>
+      }
+    </span>
     {{ userName() }}
   </button>
 </ng-template>
@@ -29,8 +35,11 @@
       <button type="button" uiGlassButton round (click)="placesOpen.set(true)" [attr.aria-label]="'nav.menu' | t">
         <app-icon name="grid" class="size-6" />
       </button>
-      <button type="button" uiGlassButton round accent (click)="accountOpen.set(true)" [attr.aria-label]="'account.title' | t">
+      <button type="button" uiGlassButton round accent (click)="accountOpen.set(true)" class="relative" [attr.aria-label]="'account.title' | t">
         <span class="text-[1.375rem] font-medium uppercase">{{ initial() }}</span>
+        @if (updates.ready()) {
+          <span class="absolute top-0 right-0 size-3 rounded-full bg-success ring-2 ring-app"></span>
+        }
       </button>
     </header>
   }
@@ -48,6 +57,9 @@
       <button type="button" uiMenuItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">{{ language.label }}</button>
     }
     <ui-menu-separator />
+    @if (updates.ready()) {
+      <button type="button" uiMenuItem icon="update" (click)="updates.apply()"><span class="text-accent">{{ 'account.update' | t }}</span></button>
+    }
     <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
     <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
   </ui-menu>

@@ -1,34 +1,35 @@
 <ui-sheet [tall]="true" (closed)="closed.emit()">
-  @if (page() === 'language') {
-    <!-- ‹ back, the page's name in the middle -->
-    <div class="relative mb-3 flex h-round shrink-0 animate-pane-in items-center justify-center">
-      <button type="button" uiGlassButton round (click)="back()" [attr.aria-label]="'action.back' | t" class="absolute left-0">
-        <app-icon name="chevron-left" class="-ml-0.5 size-7" />
-      </button>
-      <span class="text-body font-semibold">{{ 'account.language' | t }}</span>
-    </div>
-    <ui-card class="animate-pane-in">
-      @for (language of i18n.languages; track language.code) {
-        <button type="button" uiListRow [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code); back()">
-          {{ language.label }}
-        </button>
-      }
+  <div class="flex flex-1 flex-col gap-6">
+    <ui-card>
+      <div uiListRow icon="person">{{ auth.email() }}</div>
     </ui-card>
-  } @else {
-    <div class="flex flex-1 flex-col gap-6" [class.animate-pane-back]="cameBack">
+
+    <!-- The language: the list right here, the current one ✓ -->
+    <div class="flex flex-col gap-1.5">
+      <span class="flex items-center gap-1.5 px-row-x text-footnote font-medium text-fg-secondary">
+        <app-icon name="globe" class="size-4" />
+        {{ 'account.language' | t }}
+      </span>
       <ui-card>
-        <div uiListRow icon="person">{{ auth.email() }}</div>
+        @for (language of i18n.languages; track language.code) {
+          <button type="button" uiListRow [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">
+            {{ language.label }}
+          </button>
+        }
       </ui-card>
+    </div>
+
+    <div class="mt-auto flex flex-col gap-3">
+      <!-- A new version downloaded: switch to it (the page reloads) -->
+      @if (updates.ready()) {
+        <ui-card>
+          <button type="button" uiListRow icon="update" (click)="updates.apply()"><span class="text-accent">{{ 'account.update' | t }}</span></button>
+        </ui-card>
+      }
       <ui-card>
-        <button type="button" uiListRow icon="globe" chevron (click)="page.set('language')">
-          {{ 'account.language' | t }}
-          <span rowValue class="text-fg-secondary">{{ language() }}</span>
-        </button>
-      </ui-card>
-      <ui-card class="mt-auto">
         <button type="button" uiListRow icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
         <button type="button" uiListRow icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
       </ui-card>
     </div>
-  }
+  </div>
 </ui-sheet>

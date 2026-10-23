@@ -20,6 +20,7 @@
   --color-fg-secondary: var(--text-secondary);
   --color-danger: var(--danger);
   --color-accent: var(--accent);
+  --color-success: var(--success);
   --color-strong: var(--strong-bg);
   --color-on-strong: var(--strong-fg);
   --color-tint: var(--tint);
@@ -95,15 +96,6 @@
   --animate-sheet-up: sheet-up 380ms var(--ease-ios);
   @keyframes sheet-up {
     from { transform: translateY(100%); }
-  }
-  /* A page sliding in (from the right) / back (from the left), e.g. inside a sheet */
-  --animate-pane-in: pane-in 280ms var(--ease-out-quick);
-  @keyframes pane-in {
-    from { opacity: 0; transform: translateX(1.5rem); }
-  }
-  --animate-pane-back: pane-back 280ms var(--ease-out-quick);
-  @keyframes pane-back {
-    from { opacity: 0; transform: translateX(-1.5rem); }
   }
   /* The rotate notice's phone: from landscape back to portrait, a pause, again */
   --animate-rotate-back: rotate-back 2.4s var(--ease-ios) infinite;

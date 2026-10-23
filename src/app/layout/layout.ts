@@ -5,6 +5,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon, UiAvatar, UiButton, UiGlassButton, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSidebar, UiSidebarItem } from '../core/ui';
+import { UpdateService } from '../core/services/update.service';
 import { AccountSheet } from './account-sheet';
 import { PageTitle } from './page-title';
 import { PLACES } from './places';
@@ -41,6 +42,7 @@ import { PlacesSheet } from './places-sheet';
 export class Layout {
   protected readonly auth = inject(AuthStore);
   protected readonly i18n = inject(I18nService);
+  protected readonly updates = inject(UpdateService);
   // (index.html decides the device once, before the app starts)
   protected readonly desktop = document.documentElement.dataset['device'] === 'desktop';
   // The account's menu: open at its button

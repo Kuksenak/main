@@ -12,6 +12,7 @@ export const ICONS = [
   'grid',
   'person',
   'library',
+  'update',
   'chevron-left',
   'chevron-right',
   'home',
