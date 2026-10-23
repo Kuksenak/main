@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 
-export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 'home' | 'chevron-down';
+export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 'globe' | 'home' | 'chevron-down';
 
 /**
  * All app icons in one place (24×24 stroke icons, currentColor). Size it from the host:
@@ -23,6 +23,7 @@ export type IconName = 'google' | 'apple' | 'logout' | 'logout-all' | 'check' | 
         <!-- (a screen and a phone: every device) -->
         @case ('home') { <path d="M4 10.25 12 4l8 6.25V19a1.5 1.5 0 0 1-1.5 1.5H15V15a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5.5H5.5A1.5 1.5 0 0 1 4 19z" fill="currentColor" fill-opacity="0.1" /> }
         @case ('chevron-down') { <path d="m6 9 6 6 6-6" /> }
+        @case ('globe') { <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9s1.3-6.4 3.8-9z" /> }
         @case ('check') { <path d="M5 12.5 10 17.5 19 7" /> }
         @case ('logout') { <path d="M14 4.5H7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h7M10.5 12h10M17 8.5l3.5 3.5-3.5 3.5" /> }
         <!-- Log out of all devices: the same, its door doubled (another one behind it) -->

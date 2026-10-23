@@ -37,7 +37,7 @@
   <ui-menu [origin]="at" (closed)="menuAt.set(null)">
     <ui-menu-label>{{ auth.email() }}</ui-menu-label>
     <ui-menu-separator />
-    <ui-menu-label>{{ 'account.language' | t }}</ui-menu-label>
+    <ui-menu-label icon="globe">{{ 'account.language' | t }}</ui-menu-label>
     @for (language of i18n.languages; track language.code) {
       <button type="button" uiMenuItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">{{ language.label }}</button>
     }
