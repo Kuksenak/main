@@ -2,20 +2,20 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
+import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { IconName } from '../core/ui/icon/icon';
-import { UiAvatar, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiSidebar, UiSidebarItem } from '../ui';
+import { IconName, UiAvatar, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSidebar, UiSidebarItem } from '../core/ui';
 
 /**
  * The signed-in frame. Desktop: the sidebar at the left — the app's places, the account at the
- * bottom (its letter, the name — else the email — and ▾; its menu: the email, Log out, Sign out
- * on all devices); the open page beside it. Phones (no room for a sidebar): just the account at
+ * bottom (its letter, the name — else the email — and ▾; its menu: the email, the language, Log
+ * out, Log out of all devices); the open page beside it. Phones (no room for a sidebar): just the account at
  * the top right, the page under it.
  */
 @Component({
   selector: 'app-shell',
-  imports: [NgTemplateOutlet, RouterOutlet, TranslatePipe, UiAvatar, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiSidebar, UiSidebarItem],
+  imports: [NgTemplateOutlet, RouterOutlet, TranslatePipe, UiAvatar, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSidebar, UiSidebarItem],
   template: `
     <ng-template #accountButton>
       <button
@@ -55,6 +55,12 @@ import { UiAvatar, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiSidebar, UiSideb
     @if (menuAt(); as at) {
       <ui-menu [origin]="at" (closed)="menuAt.set(null)">
         <ui-menu-label>{{ auth.email() }}</ui-menu-label>
+        <ui-menu-separator />
+        <ui-menu-label>{{ 'account.language' | t }}</ui-menu-label>
+        @for (language of i18n.languages; track language.code) {
+          <button type="button" uiMenuItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">{{ language.label }}</button>
+        }
+        <ui-menu-separator />
         <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
         <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
       </ui-menu>
@@ -63,6 +69,7 @@ import { UiAvatar, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiSidebar, UiSideb
 })
 export class Shell {
   protected readonly auth = inject(AuthStore);
+  protected readonly i18n = inject(I18nService);
   // (index.html decides the device once, before the app starts)
   protected readonly desktop = document.documentElement.dataset['device'] === 'desktop';
   // The account's menu: open at its button

@@ -1,6 +1,6 @@
 import { Component, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { Icon, IconName } from '../core/ui/icon/icon';
+import { Icon, IconName } from './icon/icon';
 
 /**
  * A place in the sidebar: `<a uiSidebarItem icon="home" routerLink="/">Home</a>` — a thin icon and

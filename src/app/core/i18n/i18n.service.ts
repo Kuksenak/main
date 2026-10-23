@@ -6,6 +6,7 @@ const STORAGE_KEY = 'lang';
 /** Current UI language: translations (`t`) and its locale. */
 @Injectable({ providedIn: 'root' })
 export class I18nService {
+  readonly languages = LANGUAGES;
   readonly lang = signal<LanguageCode>(this.initialLang());
   readonly locale = computed(() => LANGUAGES.find((l) => l.code === this.lang())!.locale);
 

@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon } from '../core/ui/icon/icon';
+import { Icon } from '../core/ui';
 
 @Component({
   selector: 'app-login',

@@ -1,5 +1,5 @@
 import { Component, ElementRef, inject, input } from '@angular/core';
-import { Icon, IconName } from '../core/ui/icon/icon';
+import { Icon, IconName } from './icon/icon';
 
 /**
  * A button (or a link styled as one), as Notion's head buttons: no fill, the small UI text, a thin
