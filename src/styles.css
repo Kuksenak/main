@@ -30,6 +30,7 @@
   --color-side-hover: var(--side-hover);
   --color-side-on: var(--side-on);
   --color-side-text: var(--side-text);
+  --color-side-icon: var(--side-icon);
 
   --text-body: var(--font-body);
   --text-ui: var(--font-ui);

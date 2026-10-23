@@ -25,6 +25,7 @@
   --side-hover: #f3f2ee;
   --side-on: #edece8;
   --side-text: #52514e;
+  --side-icon: #7a7975; /* (lighter than the text, the current row's too) */
 
   /* App height. Phones are portrait-only by CSS (a "rotate" notice in landscape) — don't call
      screen.orientation.lock(): on iOS home-screen apps it shrinks the launch viewport by the
@@ -46,6 +47,7 @@ html.dark {
   --side-hover: #1c1c1e;
   --side-on: #2c2c2e;
   --side-text: #c7c7cc;
+  --side-icon: #8e8e93;
   --popover-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 3px 8px rgb(0 0 0 / 0.25), 0 12px 32px rgb(0 0 0 / 0.4);
 }
 
