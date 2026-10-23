@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
 /** Every icon there is (e.g. to show them all). */
 export const ICONS = [
@@ -19,9 +19,10 @@ export const ICONS = [
 export type IconName = (typeof ICONS)[number];
 
 /**
- * All app icons in one place (24×24, currentColor), drawn as by hand: ink lines a little off
- * straight, the main shape on a light gray. Size it from the host:
- * `<app-icon name="plus" class="size-7" />`.
+ * All app icons in one place (24×24, currentColor), as drawn with an ink pen: sharp corners, lines
+ * a little off (and wobbling a little: the hand-drawn filter, app.html), one part on a light gray.
+ * The line is as thick at any size, `--icon-ink` (1.5px; a big icon a thicker one, e.g.
+ * `[--icon-ink:2.2px]`). Size it from the host: `<app-icon name="home" class="size-7" />`.
  */
 @Component({
   selector: 'app-icon',
@@ -29,61 +30,55 @@ export type IconName = (typeof ICONS)[number];
   template: `
     <svg
       viewBox="0 0 24 24"
-      class="size-full"
+      class="size-full [stroke-width:var(--icon-ink,1.5px)] [&_*]:[vector-effect:non-scaling-stroke]"
       fill="none"
       stroke="currentColor"
-      [attr.stroke-width]="strokeWidth()"
       stroke-linecap="round"
       stroke-linejoin="round"
     >
+      <g [attr.filter]="brand() ? null : 'url(#hand-drawn)'">
       @switch (name()) {
-        <!-- (drawn as by hand: lines a little off straight, corners not quite even; the main shape
-             on a light gray, as ink on paper) -->
-        <!-- Home: a house, its roof over it, a door -->
+        <!-- (as drawn with an ink pen: sharp corners, lines a little off, one part on gray; the
+             wobble itself is the hand-drawn filter's, see app.html) -->
+        <!-- Home: a house, its roof; the door on gray -->
         @case ('home') {
-          <path d="M5.4 10.9 12 5.2l6.7 5.5-.2 9.4-13 .2z" fill="currentColor" fill-opacity="0.12" stroke="none" />
-          <path d="M3.6 11.7 11.7 4.4c.2-.2.5-.2.7 0l8.1 7" />
-          <path d="M5.3 10.6l.1 9c0 .5.3.8.8.8l11.7-.2c.5 0 .8-.3.8-.8l.1-9" />
-          <path d="M10.1 20.3l.1-5c0-.5.3-.8.8-.8l2.2.1c.5 0 .8.3.8.8l.1 4.8" />
+          <path d="M10 20.1 10.1 14.6 14 14.5 14.1 20.1z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M3.4 11.3 12.1 3.9 20.7 11.1M5.6 9.6 5.4 20.2 18.7 20 18.5 9.5M10 20.1 10.1 14.6 14 14.5 14.1 20.1" />
         }
-        <!-- A calendar page: the binding on gray, today's date on it -->
+        <!-- A calendar page: its top on gray, two rings, today's date -->
         @case ('calendar') {
-          <path d="M4.15 9.7 4.1 6.5c0-.8.5-1.3 1.3-1.3l13.3.1c.8 0 1.2.5 1.2 1.2l.1 2.9z" fill="currentColor" fill-opacity="0.12" stroke="none" />
-          <path d="M4.1 6.5c0-.8.5-1.3 1.3-1.3l13.3.1c.8 0 1.2.5 1.2 1.2l-.2 12.7c0 .8-.5 1.2-1.3 1.2l-12.8-.2c-.8 0-1.3-.5-1.3-1.2z" />
-          <path d="M4.2 9.7c5.2-.2 10.4-.3 15.6-.3M8.3 3.3l.1 3.6M15.6 3.2l.1 3.8" />
-          <text x="12" y="17.7" text-anchor="middle" font-size="7.25" font-weight="600" fill="currentColor" stroke="none">{{ day }}</text>
+          <path d="M4.1 5.4 19.8 5.2 19.9 9.4 4.2 9.6z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M4.1 5.4 19.8 5.2 19.7 20.3 4.3 20.4zM4.2 9.6 19.9 9.4M8.2 3.2 8.3 7.1M15.8 3.1 15.7 7" />
+          <text x="12.1" y="17.9" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" stroke="none">{{ day }}</text>
         }
-        <!-- The sections' menu (phones): nine dots, not quite in rows -->
+        <!-- The sections (phones): four squares as a little table, one on gray -->
         @case ('grid') {
-          @for (dot of dots; track $index) {
-            <circle [attr.cx]="dot[0]" [attr.cy]="dot[1]" [attr.r]="dot[2]" fill="currentColor" stroke="none" />
-          }
+          <path d="M12.6 12.7 19.9 12.6 20 19.9 12.7 20z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M4.1 4.2 19.8 4 20 19.9 4.2 20.1zM12.1 4.1 12.2 20M4.2 12.3 19.9 12.1" />
         }
-        <!-- A person: a round head on gray, the shoulders under it -->
+        <!-- A person: the head on gray, the shoulders a flat-bottomed arch -->
         @case ('person') {
-          <path d="M12 3.6c2.4-.1 4.2 1.8 4.1 4.2-.1 2.3-1.9 4.1-4.2 4-2.3 0-4.1-1.8-4-4.1.1-2.4 1.8-4 4.1-4.1z" fill="currentColor" fill-opacity="0.12" />
-          <path d="M4.6 20.4c.4-4 3.4-6.3 7.5-6.3 3.9.1 6.8 2.4 7.3 6.2" />
+          <path d="M12.1 3.6c2.3 0 4 1.8 4 4.1 0 2.4-1.8 4.1-4.1 4.1-2.4 0-4.1-1.7-4.1-4.1 0-2.3 1.9-4.1 4.2-4.1z" fill="currentColor" fill-opacity="0.12" />
+          <path d="M4.3 20.6c.2-3.9 3.4-6.6 7.8-6.6 4.3.1 7.5 2.7 7.6 6.5z" />
         }
-        <!-- The language: a globe on gray, a meridian and the equator -->
+        <!-- The language: a globe on gray, a meridian, the equator -->
         @case ('globe') {
-          <path d="M12 3.1c5-.1 9 3.9 8.9 9-.1 4.9-4 8.8-9 8.8-4.9-.1-8.8-4-8.8-9 .1-4.9 4-8.7 8.9-8.8z" fill="currentColor" fill-opacity="0.12" />
-          <path d="M12 3.2c-2.6 2.6-3.7 5.7-3.7 8.8 0 3.2 1.2 6.3 3.7 8.8 2.5-2.6 3.7-5.7 3.6-8.9 0-3.1-1.2-6.1-3.6-8.7M3.3 11.8c5.8.4 11.7.4 17.5.1" />
+          <path d="M12 3.2c4.9-.1 8.9 3.8 8.9 8.8 0 5-4 9-9 8.9-4.9 0-8.8-4-8.7-8.9.1-5 4-8.7 8.8-8.8z" fill="currentColor" fill-opacity="0.12" />
+          <path d="M11.9 3.3c-2.5 2.7-3.6 5.6-3.6 8.8 0 3.1 1.2 6.1 3.7 8.7M12.1 3.3c2.4 2.6 3.5 5.6 3.5 8.7 0 3.2-1.2 6.2-3.6 8.8M3.4 12.1 20.8 11.9" />
         }
-        @case ('check') { <path d="M5 12.8c1.7 1.6 3.4 3.2 5 4.8 2.8-4 5.9-7.7 9.1-11" /> }
-        @case ('chevron-left') { <path d="M15.2 18.1 9.1 11.9l6-5.9" /> }
-        @case ('chevron-right') { <path d="M8.9 6l6.1 6.1-5.9 6" /> }
-        @case ('chevron-down') { <path d="M6 9.1l6.1 5.9 6-6.1" /> }
-        <!-- Log out: a door (on gray), an arrow out of it -->
+        @case ('check') { <path d="M4.6 12.9 9.8 17.9 19.6 6.3" /> }
+        @case ('chevron-left') { <path d="M15.1 18.2 8.9 12.1 15 5.8" /> }
+        @case ('chevron-right') { <path d="M9 5.8 15.1 12 8.9 18.2" /> }
+        @case ('chevron-down') { <path d="M5.8 9 12 15.1 18.2 8.9" /> }
+        <!-- Log out: a door on gray (open at the right), the arrow out of it -->
         @case ('logout') {
-          <path d="M13.8 4.6 7.2 4.4c-1.4 0-2.1.8-2.1 2.2l.1 11c0 1.3.7 2 2.1 2l6.6-.2z" fill="currentColor" fill-opacity="0.12" stroke="none" />
-          <path d="M13.8 4.6 7.2 4.4c-1.4 0-2.1.8-2.1 2.2l.1 11c0 1.3.7 2 2.1 2l6.6-.2" />
-          <path d="M10.4 12.1c3.4-.2 6.7-.2 10.1-.1M17 8.6l3.5 3.4-3.6 3.5" />
+          <path d="M4.6 4.1 12.4 4.3 12.3 19.9 4.4 20z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M12.4 7.6 12.4 4.3 4.6 4.1 4.4 20 12.3 19.9 12.4 16.4M9.2 12.1 20.4 11.9M16.9 8.4 20.5 11.9 16.8 15.6" />
         }
         <!-- Log out of all devices: the same, another door behind it -->
         @case ('logout-all') {
-          <path d="M15 4.6 9.1 4.4c-1.4 0-2.1.8-2.1 2.2l.1 11c0 1.3.7 2 2.1 2l5.9-.2z" fill="currentColor" fill-opacity="0.12" stroke="none" />
-          <path d="M15 4.6 9.1 4.4c-1.4 0-2.1.8-2.1 2.2l.1 11c0 1.3.7 2 2.1 2l5.9-.2M3.6 7.6c-.2 3-.2 5.9.1 8.9" />
-          <path d="M11.9 12.1c2.9-.2 5.7-.2 8.6-.1M17 8.6l3.5 3.4-3.6 3.5" />
+          <path d="M6.6 6.1 13.4 6.2 13.3 19.9 6.5 20z" fill="currentColor" fill-opacity="0.12" stroke="none" />
+          <path d="M3.8 17.9 3.9 4 11.3 4.1M13.4 8.9 13.4 6.2 6.6 6.1 6.5 20 13.3 19.9 13.4 17.2M10.2 13 20.4 12.9M17 9.4 20.5 12.9 16.9 16.6" />
         }
         <!-- Brand marks: filled; Google keeps its brand colors, Apple uses currentColor -->
         @case ('google') {
@@ -96,18 +91,14 @@ export type IconName = (typeof ICONS)[number];
           <path stroke="none" fill="currentColor" d="M16.37 12.77c-.03-2.64 2.16-3.91 2.26-3.97-1.23-1.8-3.15-2.05-3.83-2.08-1.63-.17-3.18.96-4.01.96-.83 0-2.1-.94-3.46-.91-1.78.03-3.42 1.03-4.34 2.62-1.85 3.21-.47 7.96 1.33 10.56.88 1.27 1.93 2.7 3.3 2.65 1.33-.05 1.83-.86 3.43-.86 1.6 0 2.05.86 3.45.83 1.43-.02 2.33-1.29 3.2-2.57 1.01-1.47 1.42-2.9 1.45-2.97-.03-.01-2.77-1.06-2.8-4.22zM13.73 5c.73-.89 1.22-2.12 1.09-3.35-1.05.04-2.32.7-3.07 1.58-.67.78-1.26 2.03-1.1 3.23 1.17.09 2.36-.59 3.08-1.46z" />
         }
       }
+      </g>
     </svg>
   `,
 })
 export class Icon {
   readonly name = input.required<IconName>();
-  readonly strokeWidth = input(1.5); // (one weight for every icon, as an ink pen's)
   // (today's date, for the calendar's)
   protected readonly day = new Date().getDate();
-  // The grid's nine dots: x, y, radius — each a little off, as dotted by hand
-  protected readonly dots = [
-    [5.1, 5, 2], [12.1, 4.8, 2.05], [19, 5.1, 1.95],
-    [4.9, 12.1, 2.05], [12, 12, 1.95], [19.1, 11.9, 2],
-    [5, 19.1, 1.95], [11.9, 19, 2], [19, 18.9, 2.05],
-  ];
+  // (the brands' marks are as they are: not drawn by hand)
+  protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
 }
