@@ -1,12 +1,6 @@
 <div class="flex flex-col gap-4 px-4 py-4 desktop:px-10 desktop:py-8">
   <h1 class="ml-1 flex h-button items-center text-body font-medium mobile:hidden">{{ 'users.title' | t }}</h1>
 
-  @if (loadError()) {
-    <p class="px-1 text-body text-danger">{{ 'users.loadError' | t }}</p>
-  }
-  @if (saveError()) {
-    <p class="px-1 text-body text-danger" role="alert">{{ 'users.saveError' | t }}</p>
-  }
 
   @if (users(); as users) {
     @if (!users.length) {

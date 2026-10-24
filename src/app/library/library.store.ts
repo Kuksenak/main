@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from '@environments/environment';
+import { I18nService } from '../core/i18n/i18n.service';
+import { Toasts } from '../core/ui';
 
 /** A page in the library's list (no content). */
 export interface PageItem {
@@ -32,13 +34,13 @@ export class LibraryStore {
   private readonly url = `${environment.apiUrl}/pages`;
 
   readonly items = signal<PageItem[] | null>(null);
-  readonly loadError = signal(false);
+  private readonly toasts = inject(Toasts);
+  private readonly i18n = inject(I18nService);
 
   load(): void {
-    this.loadError.set(false);
     this.http.get<PageItem[]>(this.url).subscribe({
       next: (items) => this.items.set(items),
-      error: () => this.loadError.set(true),
+      error: () => this.toasts.error(this.i18n.t('library.loadError')),
     });
   }
 

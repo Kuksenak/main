@@ -5,12 +5,6 @@
     <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
   </div>
 
-  @if (store.loadError()) {
-    <p class="px-row-x text-body text-danger">{{ 'library.loadError' | t }}</p>
-  }
-  @if (createError()) {
-    <p class="px-row-x text-body text-danger" role="alert">{{ 'library.createError' | t }}</p>
-  }
 
   @if (store.items(); as items) {
     @if (!items.length) {

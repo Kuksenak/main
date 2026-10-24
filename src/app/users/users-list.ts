@@ -11,9 +11,6 @@ import { User, UsersStore } from './users.store';
   selector: 'app-users-list',
   imports: [TranslatePipe, UiList, UiListItem],
   template: `
-    @if (store.loadError()) {
-      <p class="px-row-x text-body text-danger">{{ 'users.loadError' | t }}</p>
-    }
     @if (store.users(); as users) {
       @if (!users.length) {
         <p class="px-row-x text-body text-fg-secondary">{{ 'users.empty' | t }}</p>

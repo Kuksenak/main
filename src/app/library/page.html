@@ -1,7 +1,4 @@
 <div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:max-w-3xl desktop:px-10 desktop:pt-8">
-  @if (loadError()) {
-    <p class="text-body text-danger">{{ 'library.pageLoadError' | t }}</p>
-  }
 
   @if (page()) {
     <!-- Desktop: the state of the saving, Delete at the right -->
@@ -13,9 +10,6 @@
       <button uiButton type="button" icon="trash" (click)="delete()">{{ 'library.delete' | t }}</button>
     </div>
 
-    @if (saveError()) {
-      <p class="text-body text-danger" role="alert">{{ 'library.saveError' | t }}</p>
-    }
 
     <!-- The title: big, no box (as Notion's) -->
     <input

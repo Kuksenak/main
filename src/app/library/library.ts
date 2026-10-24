@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
+import { Icon, Toasts, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 
@@ -24,7 +24,7 @@ export class Library {
 
   protected readonly desktop = desktop;
   protected readonly creating = signal(false);
-  protected readonly createError = signal(false);
+  private readonly toasts = inject(Toasts);
 
   constructor() {
     inject(PageTitle).show(computed(() => this.i18n.t('nav.library')));
@@ -38,12 +38,11 @@ export class Library {
   protected create(): void {
     if (this.creating()) return;
     this.creating.set(true);
-    this.createError.set(false);
     this.store.create(this.i18n.t('library.untitled')).subscribe({
       next: (page) => this.router.navigate(['/library', page.id], { state: { fresh: true } }),
       error: () => {
         this.creating.set(false);
-        this.createError.set(true);
+        this.toasts.error(this.i18n.t('library.createError'));
       },
     });
   }

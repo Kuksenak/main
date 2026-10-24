@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { AREAS, Area } from '../auth/permissions';
 import { I18nService } from '../core/i18n/i18n.service';
+import { Toasts } from '../core/ui';
 
 export interface User {
   id: string;
@@ -40,18 +41,16 @@ export class UsersStore {
   readonly areas = signal<Area[]>([]);
   // The AI questions a day a user has unless set for them (null: AI is off on the server)
   readonly aiDefault = signal<number | null>(null);
-  readonly loadError = signal(false);
-  readonly saveError = signal(false);
+  private readonly toasts = inject(Toasts);
 
   load(): void {
-    this.loadError.set(false);
     this.http.get<UsersResponse>(this.url).subscribe({
       next: (res) => {
         this.areas.set(AREAS.filter((a) => res.areas.includes(a)));
         this.aiDefault.set(res.aiPerDay);
         this.users.set(res.users);
       },
-      error: () => this.loadError.set(true),
+      error: () => this.toasts.error(this.i18n.t('users.loadError')),
     });
   }
 
@@ -75,10 +74,9 @@ export class UsersStore {
   /** The AI questions a user may ask a day (null: the app's own number): saved, then shown. */
   setAiLimit(user: User, perDay: number | null): void {
     if (user.aiPerDay === perDay) return;
-    this.saveError.set(false);
     this.http.put<User>(`${this.url}/${user.id}/ai-limit`, { perDay }).subscribe({
       next: (saved) => this.users.update((users) => users?.map((u) => (u.id === saved.id ? saved : u)) ?? null),
-      error: () => this.saveError.set(true),
+      error: () => this.toasts.error(this.i18n.t('users.saveError')),
     });
   }
 
@@ -92,13 +90,12 @@ export class UsersStore {
   set(user: User, area: Area, access: boolean): void {
     if (user.isAdmin || this.has(user, area) === access) return;
     const before = user.permissions;
-    this.saveError.set(false);
     this.update(user.id, { ...before, [area]: access });
     this.http.put<User>(`${this.url}/${user.id}/permissions`, { [area]: access }).subscribe({
       next: (saved) => this.update(user.id, saved.permissions),
       error: () => {
         this.update(user.id, before);
-        this.saveError.set(true);
+        this.toasts.error(this.i18n.t('users.saveError'));
       },
     });
   }

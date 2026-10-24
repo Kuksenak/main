@@ -28,8 +28,6 @@ export class Users {
 
   protected readonly users = this.store.users;
   protected readonly areas = this.store.areas;
-  protected readonly loadError = this.store.loadError;
-  protected readonly saveError = this.store.saveError;
   protected readonly name = this.store.name.bind(this.store);
   protected readonly lastSignIn = this.store.lastSignIn.bind(this.store);
   protected readonly has = this.store.has.bind(this.store);

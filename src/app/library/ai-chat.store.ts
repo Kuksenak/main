@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
+import { Toasts } from '../core/ui';
 
 /** A turn of the chat: the teacher's message, or the assistant's reply and the texts it wrote for the page. */
 export interface ChatTurn {
@@ -15,8 +16,8 @@ export interface ChatTurn {
 /**
  * The page assistant's chats (the API's /ai/chat answers one turn; the chat itself lives here, on
  * the device, a chat per page while the app is open). `send` a message with the page as it is now:
- * the answer comes as the next turn; `error` says why there's none (the day's questions used up,
- * AI off on the server, …).
+ * the answer comes as the next turn; else a toast says why there's none (the day's questions used
+ * up, AI off on the server, …).
  */
 @Injectable({ providedIn: 'root' })
 export class AiChatStore {
@@ -26,7 +27,7 @@ export class AiChatStore {
 
   private readonly chats = new Map<string, ReturnType<typeof signal<ChatTurn[]>>>();
   readonly busy = signal(false);
-  readonly error = signal<string | null>(null);
+  private readonly toasts = inject(Toasts);
 
   /** The chat about this page (empty to begin with). */
   turns(pageId: string) {
@@ -43,7 +44,6 @@ export class AiChatStore {
     const history = chat().map((t) => ({ role: t.role, text: [t.text, ...(t.blocks ?? [])].join('\n\n') }));
     chat.update((turns) => [...turns, { role: 'user', text }]);
     this.busy.set(true);
-    this.error.set(null);
     this.http.post<{ reply: string; blocks: string[] }>(this.url, { history, message: text, page }).subscribe({
       next: (answer) => {
         this.busy.set(false);
@@ -51,7 +51,7 @@ export class AiChatStore {
       },
       error: (e: HttpErrorResponse) => {
         this.busy.set(false);
-        this.error.set(
+        this.toasts.error(
           e.status === 429
             ? (e.error?.description ?? this.i18n.t('ai.tooMany'))
             : e.status === 503 && e.error?.code === 'Ai.Off'
@@ -69,6 +69,5 @@ export class AiChatStore {
 
   clear(pageId: string): void {
     this.turns(pageId).set([]);
-    this.error.set(null);
   }
 }

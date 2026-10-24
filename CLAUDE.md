@@ -57,6 +57,11 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
   (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS` (outlined and coloured in), so each new
   one is there to judge.
 
+## Toasts
+- Errors (a call that failed) and short notices ("Deleted · Undo") are toasts: `inject(Toasts)`
+  (`core/ui`) — `.error(text)`, `.show(text, { label, run })`. No red lines in the page for them.
+  `<ui-toasts />` in app.html shows them (phones: under the top bar; desktops: at the bottom).
+
 ## Status bar color (keeps breaking — read before touching overlays)
 - The status bar's color is the `theme-color` tag, set only by the script in `src/index.html`
   (light `#fbfbf9`, dark `#000000`: the page's `--app-bg`). Nothing else edits it.

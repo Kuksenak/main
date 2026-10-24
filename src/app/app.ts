@@ -4,10 +4,11 @@ import { AuthStore } from './auth/auth.store';
 import { Loading } from './core/services/loading';
 import { TranslatePipe } from './core/i18n/t.pipe';
 import { UpdateService } from './core/services/update.service';
+import { UiToasts } from './core/ui';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TranslatePipe],
+  imports: [RouterOutlet, TranslatePipe, UiToasts],
   templateUrl: './app.html',
 })
 export class App {

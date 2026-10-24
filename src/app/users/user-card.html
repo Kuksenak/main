@@ -1,7 +1,4 @@
 @if (user(); as user) {
-  @if (store.saveError()) {
-    <p class="px-row-x text-body text-danger" role="alert">{{ 'users.saveError' | t }}</p>
-  }
   <div class="flex flex-col gap-6">
     <!-- Who: the email, the last sign-in -->
     <ui-list>

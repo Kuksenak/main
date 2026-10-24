@@ -12,3 +12,4 @@ export { UiList } from './list/list';
 export { UiListItem } from './list/list-item';
 export { UiSheet } from './sheet/sheet';
 export { UiToggle } from './toggle/toggle';
+export { Toasts, UiToasts, type Toast } from './toast/toast';

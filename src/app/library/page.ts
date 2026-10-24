@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { UiButton, UiSheet } from '../core/ui';
+import { Toasts, UiButton, UiSheet } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
 import { Page, LibraryStore } from './library.store';
@@ -36,8 +36,7 @@ export class PageView implements OnInit {
   private readonly i18n = inject(I18nService);
 
   protected readonly page = signal<Page | null>(null);
-  protected readonly loadError = signal(false);
-  protected readonly saveError = signal(false);
+  private readonly toasts = inject(Toasts);
   protected readonly saving = signal(false);
 
   // What's being edited (the page's as loaded, then as typed)
@@ -69,7 +68,7 @@ export class PageView implements OnInit {
         this.texts = this.blocks;
         if (fresh) setTimeout(() => this.titleField()?.nativeElement.select());
       },
-      error: () => this.loadError.set(true),
+      error: () => this.toasts.error(this.i18n.t('library.pageLoadError')),
     });
   }
 
@@ -111,13 +110,12 @@ export class PageView implements OnInit {
     this.dirty = false;
     const title = this.title().trim() || this.i18n.t('library.untitled');
     this.saving.set(true);
-    this.saveError.set(false);
     this.saveSub?.unsubscribe();
     this.saveSub = this.store.save(this.id(), title, this.blocks.filter((t) => t.trim()).map((text) => ({ kind: 'text' as const, text }))).subscribe({
       next: () => this.saving.set(false),
       error: () => {
         this.saving.set(false);
-        this.saveError.set(true);
+        this.toasts.error(this.i18n.t('library.saveError'));
         this.dirty = true; // (tried again with the next change)
       },
     });
@@ -127,7 +125,7 @@ export class PageView implements OnInit {
     this.dirty = false;
     this.store.delete(this.id()).subscribe({
       next: () => this.router.navigateByUrl('/library'),
-      error: () => this.saveError.set(true),
+      error: () => this.toasts.error(this.i18n.t('library.deleteError')),
     });
   }
 }
