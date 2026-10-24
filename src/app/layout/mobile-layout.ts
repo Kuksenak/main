@@ -1,7 +1,9 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
 import { VisibleArea } from '../core/services/visible-area';
 import { Icon, UiFloatingButton } from '../core/ui';
@@ -33,4 +35,17 @@ export class MobileLayout {
   protected readonly accountOpen = signal(false);
   // (the account button: the email's first letter)
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));
+
+  // Another page in: it slides in (Slide) — from the right, or, back to where it was opened from,
+  // from the left
+  private readonly router = inject(Router);
+  private lastUrl = this.router.url;
+
+  protected entered(): void {
+    const url = this.router.url;
+    if (url === this.lastUrl) return;
+    const way = Slide.way(this.lastUrl, url);
+    this.lastUrl = url;
+    setTimeout(() => Slide.in(way, 'route'));
+  }
 }

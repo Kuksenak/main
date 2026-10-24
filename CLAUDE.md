@@ -72,11 +72,12 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 - No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).
 
 ## Moving between views
-- Phones slide as iOS does with View Transitions (`core/services/slide.ts`, CSS in
-  `styles/base.css`): the router's moves and a sheet's panes (`Slide.run`). What moves is marked
-  `data-vt="…"`; base.css names it only during its own scope's move. A push sideways: the old
-  out to the left as the new comes in from the right, side by side, each clipped to its own box
-  (never one over the other, never cross-faded).
+- Phones slide as iOS does (`core/services/slide.ts`): the new view slides in — forward from the
+  right edge, back from a little to the left — clipped by the box it's in, the old one gone at
+  once. What moves is marked `data-vt="page" | "page-title" | "page-back"` (the router's moves:
+  MobileLayout) or `"sheet-pane" | "sheet-title" | "sheet-back"` (a sheet's: `Slide.run`).
+- Plain animations only — no View Transitions: their pictures of the page lost iOS's blur under a
+  sheet (the page showed through it) and laid one view over the other.
 
 ## i18n
 - Every user-facing string goes in `core/i18n/translations.ts`, with each key in en, pl and fr
