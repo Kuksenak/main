@@ -15,7 +15,9 @@ import { Icon, IconName } from '../icon/icon';
     class:
       'group relative flex h-row w-full shrink-0 items-center gap-3 px-row-x text-left text-body ' +
       'after:absolute after:right-0 after:bottom-0 after:left-4 after:h-[0.5px] after:bg-separator last:after:hidden ' +
-      'data-icon:after:left-12 [button&]:active:bg-highlight [button&]:active:transform-none',
+      'data-icon:after:left-12 [button&]:active:bg-highlight [button&]:active:transform-none ' +
+      // (pressed: its hairline and the one over it, the item before's, gone — the gray one whole)
+      '[button&]:active:after:opacity-0 [&:has(+button:active)]:after:opacity-0',
     '[attr.data-icon]': "icon() ? '' : null",
     '[class.text-danger]': 'danger()',
     '[attr.data-danger]': 'danger() || null',
