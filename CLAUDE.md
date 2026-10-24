@@ -49,6 +49,9 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 ## Icons
 - The app's icons are drawn in one style, "marker doodle + pastel fill" (docs/icons.md): one SVG file
   each, in `public/icons/`, shown by `<app-icon name="…">`.
+- A new icon: drawn in `tools/icons.py` (then `python tools/icons.py`) and added to `ICONS`
+  (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS` (outlined and coloured in), so each new
+  one is there to judge.
 
 ## i18n
 - Every user-facing string goes in `core/i18n/translations.ts`, with each key in en, pl and fr
