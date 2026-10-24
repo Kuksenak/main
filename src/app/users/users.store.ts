@@ -13,17 +13,21 @@ export interface User {
   lastSignInAt: string;
   isAdmin: boolean;
   permissions: Partial<Record<Area, boolean>>;
+  // AI questions a day (null: the app's own number) and asked today
+  aiPerDay: number | null;
+  aiAskedToday: number;
 }
 
 interface UsersResponse {
   areas: string[];
   users: User[];
+  aiPerDay: number | null;
 }
 
 /**
  * The users and their access (the admins only), for the Users page (desktop) and the account
  * sheet's Users (phones): `load()` them; an area's access `set` (on / off) is shown at once and
- * saved — back as it was if that fails.
+ * saved — back as it was if that fails; the AI questions a day `setAiLimit` (null: the app's own).
  */
 @Injectable({ providedIn: 'root' })
 export class UsersStore {
@@ -34,6 +38,8 @@ export class UsersStore {
   readonly users = signal<User[] | null>(null);
   // (the areas the server sends that this app knows: their names are here)
   readonly areas = signal<Area[]>([]);
+  // The AI questions a day a user has unless set for them (null: AI is off on the server)
+  readonly aiDefault = signal<number | null>(null);
   readonly loadError = signal(false);
   readonly saveError = signal(false);
 
@@ -42,6 +48,7 @@ export class UsersStore {
     this.http.get<UsersResponse>(this.url).subscribe({
       next: (res) => {
         this.areas.set(AREAS.filter((a) => res.areas.includes(a)));
+        this.aiDefault.set(res.aiPerDay);
         this.users.set(res.users);
       },
       error: () => this.loadError.set(true),
@@ -63,6 +70,22 @@ export class UsersStore {
   /** Whether the user may open the area (the admins: every one). */
   has(user: User, area: Area): boolean {
     return user.isAdmin || !!user.permissions[area];
+  }
+
+  /** The AI questions a user may ask a day (null: the app's own number): saved, then shown. */
+  setAiLimit(user: User, perDay: number | null): void {
+    if (user.aiPerDay === perDay) return;
+    this.saveError.set(false);
+    this.http.put<User>(`${this.url}/${user.id}/ai-limit`, { perDay }).subscribe({
+      next: (saved) => this.users.update((users) => users?.map((u) => (u.id === saved.id ? saved : u)) ?? null),
+      error: () => this.saveError.set(true),
+    });
+  }
+
+  /** The AI limit as typed: a number (0 and up), or nothing — the app's own. */
+  setAiLimitTyped(user: User, value: string): void {
+    const perDay = value.trim() === '' ? null : Math.max(0, Math.min(10_000, Math.round(Number(value))));
+    if (perDay === null || Number.isFinite(perDay)) this.setAiLimit(user, perDay);
   }
 
   /** An area's access switched: shown at once, saved; if that fails, back as it was. */

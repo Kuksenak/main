@@ -28,5 +28,34 @@
         }
       </ui-list>
     </div>
+
+    <!-- AI: questions a day (empty: the app's own number, gray in the field), asked today -->
+    @if (store.aiDefault() !== null) {
+      <div class="flex flex-col gap-1.5">
+        <span class="px-row-x text-footnote font-medium text-fg-secondary">{{ 'users.ai' | t }}</span>
+        <ui-list>
+          <div uiListItem>
+            {{ 'users.aiPerDay' | t }}
+            <input
+              itemValue
+              #limit
+              type="number"
+              inputmode="numeric"
+              min="0"
+              max="10000"
+              [value]="user.aiPerDay ?? ''"
+              [placeholder]="store.aiDefault()"
+              (change)="store.setAiLimitTyped(user, limit.value)"
+              (keydown.enter)="limit.blur()"
+              class="w-20 bg-transparent text-right text-fg-secondary outline-none placeholder:text-fg-secondary/50"
+            />
+          </div>
+          <div uiListItem>
+            {{ 'users.aiToday' | t }}
+            <span itemValue class="text-fg-secondary">{{ user.aiAskedToday }}</span>
+          </div>
+        </ui-list>
+      </div>
+    }
   </div>
 }

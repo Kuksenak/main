@@ -10,7 +10,8 @@ import { UsersStore } from './users.store';
 /**
  * Users (the admins only: adminGuard): everyone who has signed in, latest first — the name, the
  * email, the last sign-in — and per area their access (a switch), saved as soon as it's
- * switched (back as it was if that fails; see UsersStore). The admins: every area, locked.
+ * switched (back as it was if that fails; see UsersStore). The admins: every area, locked. AI
+ * (when it's on): the questions a day per user (empty: the app's own number) and today's.
  * Desktop: a table, a column per area; phones (when opened by its address — the account sheet has
  * its own Users): a card per user.
  */
@@ -33,6 +34,8 @@ export class Users {
   protected readonly lastSignIn = this.store.lastSignIn.bind(this.store);
   protected readonly has = this.store.has.bind(this.store);
   protected readonly set = this.store.set.bind(this.store);
+  protected readonly aiDefault = this.store.aiDefault;
+  protected readonly setAiLimitTyped = this.store.setAiLimitTyped.bind(this.store);
 
   constructor() {
     const i18n = inject(I18nService);

@@ -18,5 +18,6 @@ export class UserCard {
   protected readonly store = inject(UsersStore);
   // (as now: their access changes as it's switched)
   protected readonly user = computed(() => this.store.user(this.userId()));
+
   protected readonly areaLabels = AREA_LABELS;
 }

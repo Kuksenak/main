@@ -7,35 +7,70 @@
        nothing, the page's text drifting into it -->
   <header
     data-vt="top-bar"
-    class="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center gap-3 bg-linear-to-b from-app from-60% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5
-           *:pointer-events-auto"
+    class="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center gap-3 bg-linear-to-b from-app from-60% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5 *:pointer-events-auto"
   >
     <!-- A page opened from a list: ‹ back to it, the title smaller next to it -->
     @if (back(); as to) {
-      <a uiFloatingButton round [routerLink]="to" data-vt="page-back" [attr.aria-label]="'action.back' | t">
+      <a
+        uiFloatingButton
+        round
+        [routerLink]="to"
+        data-vt="page-back"
+        [attr.aria-label]="'action.back' | t"
+      >
         <app-icon name="chevron-left" class="-ml-0.5 size-8" />
       </a>
-      <span class="min-w-0 flex-1 truncate text-body font-semibold" data-vt="page-title">{{ title() }}</span>
+      <span class="min-w-0 flex-1 truncate text-body font-semibold" data-vt="page-title">{{
+        title()
+      }}</span>
     } @else {
-      <span class="min-w-0 flex-1 truncate text-xl font-semibold" data-vt="page-title">{{ title() }}</span>
+      <span class="min-w-0 flex-1 truncate text-xl font-semibold" data-vt="page-title">{{
+        title()
+      }}</span>
     }
-    <button type="button" uiFloatingButton round (click)="searchBar().start()" [attr.aria-label]="'search.title' | t">
-      <app-icon name="search" class="size-7" />
-    </button>
-    <button type="button" uiFloatingButton round (click)="placesOpen.set(true)" [attr.aria-label]="'nav.menu' | t">
-      <app-icon name="grid" class="size-7" />
-    </button>
-    <button type="button" uiFloatingButton round accent (click)="accountOpen.set(true)" class="relative" [attr.aria-label]="'account.title' | t">
-      <span class="text-[1.25rem] font-medium uppercase">{{ initial() }}</span>
-      <!-- (a new version ready: a green dot on it) -->
-      @if (updates.ready()) {
-        <span class="absolute top-0 right-0 size-3 rounded-full bg-success ring-2 ring-app"></span>
-      }
-    </button>
+    <!-- (not inside a page opened from a list: there, only ‹ and its title) -->
+    @if (!back()) {
+      <button
+        type="button"
+        uiFloatingButton
+        round
+        (click)="searchBar().start()"
+        [attr.aria-label]="'search.title' | t"
+      >
+        <app-icon name="search" class="size-7" />
+      </button>
+      <button
+        type="button"
+        uiFloatingButton
+        round
+        (click)="placesOpen.set(true)"
+        [attr.aria-label]="'nav.menu' | t"
+      >
+        <app-icon name="grid" class="size-7" />
+      </button>
+      <button
+        type="button"
+        uiFloatingButton
+        round
+        accent
+        (click)="accountOpen.set(true)"
+        class="relative"
+        [attr.aria-label]="'account.title' | t"
+      >
+        <span class="text-[1.25rem] font-medium uppercase">{{ initial() }}</span>
+        <!-- (a new version ready: a green dot on it) -->
+        @if (updates.ready()) {
+          <span
+            class="absolute top-0 right-0 size-3 rounded-full bg-success ring-2 ring-app"
+          ></span>
+        }
+      </button>
+    }
   </header>
   <!-- (its top under the bar) -->
   <main
-    class="h-full min-w-0 overflow-y-auto overscroll-contain pt-[calc(env(safe-area-inset-top)+3.75rem)]" data-vt="page"
+    class="h-full min-w-0 overflow-y-auto overscroll-contain pt-[calc(env(safe-area-inset-top)+3.75rem)]"
+    data-vt="page"
   >
     <router-outlet />
   </main>
