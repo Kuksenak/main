@@ -3,8 +3,8 @@ import { TranslationKey } from '../core/i18n/translations';
 import { IconName } from '../core/ui';
 
 /**
- * A section of the app: its address, name and icon — in the sidebar (desktop) and the sections'
- * title's menu (phones); `area`: shown only to those who can read it (its route guarded too: areaGuard).
+ * A section of the app: its address, name and icon — in the sidebar (desktop) and the top bar's
+ * title menu (phones); `area`: shown only to those who can read it (its route guarded too: areaGuard).
  */
 export interface Place {
   path: string;
