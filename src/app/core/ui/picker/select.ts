@@ -18,7 +18,7 @@ export interface UiOption {
 @Component({
   selector: 'ui-select',
   imports: [Icon],
-  host: { class: 'relative inline-flex' },
+  host: { class: 'relative inline-flex', '[class.w-full]': 'wide()' },
   template: `
     @if (desktop) {
       <button
@@ -58,12 +58,16 @@ export interface UiOption {
         </div>
       }
     } @else {
-      <span class="pointer-events-none inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-body text-fg" [class.pl-2.5]="!!chosenIcon()">
+      <span
+        class="pointer-events-none inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-body text-fg data-wide:w-full data-wide:gap-3 data-wide:pr-3.5 data-wide:pl-4"
+        [class.pl-2.5]="!!chosenIcon() && !wide()"
+        [attr.data-wide]="wide() ? '' : null"
+      >
         @if (chosenIcon(); as icon) {
-          <app-icon [name]="icon" colored class="size-6 text-icon" />
+          <app-icon [name]="icon" colored class="size-6 shrink-0 text-icon data-wide:size-icon-menu" [attr.data-wide]="wide() ? '' : null" />
         }
-        {{ chosen() }}
-        <app-icon name="chevron-down" class="size-4 text-icon" />
+        <span class="min-w-0 truncate data-wide:flex-1" [attr.data-wide]="wide() ? '' : null">{{ chosen() }}</span>
+        <app-icon name="chevron-down" class="size-4 shrink-0 text-icon" />
       </span>
       <!-- (the system's own select over the chip, unseen: a tap opens iOS's menu) -->
       <select class="absolute inset-0 opacity-0" (change)="value.set($any($event.target).value)" [attr.aria-label]="label() || null">
@@ -80,6 +84,8 @@ export class UiSelect {
   readonly label = input('');
   // (the chip's words instead of the chosen one's, e.g. the page's title: the schedule's month)
   readonly text = input<string | null>(null);
+  // (as wide as it's given: the words at the left, ▾ at the right; its icon as the lists' — 28px, 16px in)
+  readonly wide = input(false);
 
   protected readonly desktop = desktop;
   protected readonly open = signal(false);

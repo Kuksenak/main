@@ -63,15 +63,14 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
   `<ui-toasts />` in app.html shows them (phones: under the top bar; desktops: the bottom right corner, as wide as the sidebar, scrolling past 80vh).
 
 ## Status bar color (keeps breaking — read before touching overlays)
-- The status bar's color is two `theme-color` tags, one per scheme (`media="(prefers-color-scheme:
-  …)"`: light `#fbfbf9`, dark `#000000` — the page's `--app-bg`), so iOS picks the right one itself
-  as the system switches — but iOS's home-screen app takes the last tag whatever its media (a
-  screen recording showed it black in light), so the current scheme's tag is always put last. Only
-  the script in `src/index.html` touches them.
-- It still puts them in anew (nudged: a hair off, then right a moment later) at every theme switch,
-  when the app comes back, and as anything over the whole screen closes — iOS kept the old color
-  otherwise (a theme switch under the search or a sheet). Anything full-screen calls
-  `refreshThemeColor()` (`core/services/theme-color.ts`) as it closes.
+- The status bar's color is ONE `theme-color` tag, its color set by the script in `src/index.html`
+  (light `#fbfbf9`, dark `#000000`: the page's `--app-bg`). Nothing else touches it.
+- Not two tags with `media` per scheme: iOS's home-screen app took the last one whatever its
+  media — black in light (tried, seen in a screen recording, reverted).
+- The tag is put in anew (nudged: a hair off, then right a moment later, the page's background
+  too) at every theme switch, when the app comes back, and as anything over the whole screen
+  closes: anything full-screen calls `refreshThemeColor()` (`core/services/theme-color.ts`) as it
+  closes. iOS kept the old color otherwise (a theme switch under the search or a sheet).
 - No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).
 
 ## Moving between views

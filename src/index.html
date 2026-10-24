@@ -8,7 +8,7 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
   <meta name="color-scheme" content="light dark">
-  <!-- (the status bar's color: put in by the script below, the current scheme's tag last) -->
+  <meta name="theme-color" content="#fbfbf9">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <!-- "default", not "black-translucent": with a translucent status bar iOS launches home-screen
@@ -22,35 +22,30 @@
   <script>
     (function () {
       var query = window.matchMedia('(prefers-color-scheme: dark)');
-      // The theme follows the system. The status bar's color: two theme-color tags, one per scheme
-      // (media) — iOS picks the right one by itself as the system switches, nothing to edit then.
-      // They're put in anew (nudged: a hair off, then right a moment later) at every switch, when
-      // the app comes back, and as anything over the whole screen closes ('theme-color' event:
-      // core/services/theme-color.ts) — iOS kept the old color now and then otherwise.
+      // The theme follows the system. The status bar's color: one theme-color tag, its color set
+      // here (two tags, one per scheme, went black in light: iOS's home-screen app took the last).
+      // A new tag rather than an edited one; nudged (a hair off, then right a moment later, the
+      // page's own background too) at every switch, when the app comes back, and as anything over
+      // the whole screen closes ('theme-color' event: core/services/theme-color.ts) — iOS kept the
+      // old color now and then otherwise.
       var LIGHT = '#fbfbf9', DARK = '#000000';
-      // (the current scheme's tag last: iOS's home-screen app takes the last one, whatever its media)
-      function tags(light, dark) {
+      function tag(color) {
         document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.remove(); });
-        var both = [['light', light], ['dark', dark]];
-        if (!query.matches) both.reverse();
-        both.forEach(function (t) {
-          var meta = document.createElement('meta');
-          meta.name = 'theme-color';
-          meta.media = '(prefers-color-scheme: ' + t[0] + ')';
-          meta.content = t[1];
-          document.head.appendChild(meta);
-        });
+        var meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = color;
+        document.head.appendChild(meta);
       }
       function apply(isDark, nudge) {
         var root = document.documentElement;
         root.classList.toggle('dark', isDark);
-        if (!nudge) return tags(LIGHT, DARK);
-        tags('#fbfbfa', '#010101');
-        // (the page's own background nudged too: iOS colors the bar from what's under it as well)
+        var color = isDark ? DARK : LIGHT;
+        if (!nudge) return tag(color);
+        tag(isDark ? '#010101' : '#fbfbfa');
         root.style.backgroundColor = isDark ? '#010101' : '#fbfbfa';
         // (a frame later — or, hidden, where frames don't come, a moment later)
         var done = false;
-        var right = function () { if (!done) { done = true; tags(LIGHT, DARK); root.style.backgroundColor = ''; } };
+        var right = function () { if (!done) { done = true; tag(color); root.style.backgroundColor = ''; } };
         requestAnimationFrame(right);
         setTimeout(right, 60);
       }
