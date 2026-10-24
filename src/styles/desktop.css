@@ -21,7 +21,7 @@
   --button-px: 0.5rem;
   --button-label-max: 15rem; /* (a longer label ends in …) */
   --round-button: 0.375rem;
-  /* The sidebar, as Notion's (measured): 270 wide, its rows 30 tall, nearly edge to edge; the
+  /* The sidebar, as Notion's (measured): 270 wide, its rows 30 tall, 12 in from its sides; the
      icon 22 (its drawing ~15: the files keep a margin), 12 from the icon's drawing to the name */
   --nav-w: 16.875rem;
   --side-row-h: 1.875rem;

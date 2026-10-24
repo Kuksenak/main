@@ -23,8 +23,8 @@
   /* The desktop sidebar, as Claude's: one off-white with the page (a hairline between), its rows a
      soft dark gray; hovers and the open row a warm gray fill */
   --side-bg: #fbfbf9;
-  --side-hover: #f3f2ee;
-  --side-on: #edece8;
+  --side-hover: #f6f5f2;
+  --side-on: #f0efeb;
   --side-text: #52514e;
   /* Phones, as iOS 26: frosted round buttons (a white rim, a soft wide shadow), the accent ones
      solid; sheets of see-through glass over a strong blur, their cards a little whiter */
@@ -57,8 +57,8 @@ html.dark {
   --dialog-bg: #1c1c1e;
   --separator: rgb(255 255 255 / 0.1);
   --side-bg: #000000;
-  --side-hover: #1c1c1e;
-  --side-on: #2c2c2e;
+  --side-hover: #161618;
+  --side-on: #242426;
   --side-text: #c7c7cc;
   --glass: rgb(58 58 60 / 0.72);
   --glass-shadow: 0 2px 14px rgb(0 0 0 / 0.4);
