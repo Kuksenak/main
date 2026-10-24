@@ -11,7 +11,7 @@ export interface UiSearchResult {
 }
 
 /**
- * A search window, as Notion's (nothing dims): near the top of the screen — the field with its
+ * A search window, as Notion's (measured: 600 wide, results 36 tall; nothing dims): near the top of the screen — the field with its
  * loupe (`[(query)]`), the `results` under it by section (a section's name small and gray over its
  * first one; a result: its icon, its name, a hint after a dash), the picked one gray; at the bottom,
  * under a hairline, the keys (Esc, ↑↓, ↵). ↑ ↓ move, ↵ or a click picks (`picked`), Esc or a click

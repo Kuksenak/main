@@ -3,7 +3,7 @@
   <div
     role="dialog"
     aria-modal="true"
-    class="flex max-h-[76vh] w-[47rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-[1.25rem] border-[0.5px] border-separator
+    class="flex max-h-[76vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-[1.25rem] border-[0.5px] border-separator
            bg-dialog text-fg shadow-popover"
     (mousedown)="$event.stopPropagation()"
   >
@@ -23,10 +23,10 @@
     </div>
 
     <!-- The results by section (its name small and gray over its first one); the picked one gray -->
-    <div #list role="listbox" class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 pb-2">
+    <div #list role="listbox" class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pt-1 pb-2">
       @for (result of results(); track result.section + result.id; let i = $index) {
         @if (i === 0 || results()[i - 1].section !== result.section) {
-          <p class="px-2.5 pt-3 pb-1.5 text-footnote font-medium text-fg-secondary">{{ result.section }}</p>
+          <p class="px-2 pt-3 pb-1.5 text-footnote font-medium text-fg-secondary">{{ result.section }}</p>
         }
         <button
           type="button"
@@ -34,11 +34,11 @@
           [attr.aria-selected]="i === index()"
           (click)="picked.emit(result)"
           (mouseenter)="index.set(i)"
-          class="flex min-h-10.5 w-full shrink-0 items-center gap-2.5 rounded-[0.625rem] px-2.5 text-left active:transform-none aria-selected:bg-tint"
+          class="flex min-h-9 w-full shrink-0 items-center gap-2.5 rounded-xl px-2 py-1 text-left active:transform-none aria-selected:bg-tint"
         >
-          <app-icon [name]="result.icon" class="size-5.5 shrink-0 text-fg-secondary" />
+          <app-icon [name]="result.icon" class="size-5 shrink-0 text-fg-secondary" />
           <!-- (the name, then its hint after a dash, small and gray, as Notion's) -->
-          <span class="min-w-0 flex-1 truncate text-[0.9375rem] font-medium">
+          <span class="min-w-0 flex-1 truncate text-base font-medium">
             {{ result.label }}
             @if (result.hint) {
               <span class="text-footnote font-normal text-fg-secondary"> — {{ result.hint }}</span>
