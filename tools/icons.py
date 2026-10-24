@@ -133,9 +133,11 @@ ICONS = {
         + line('M18.2 20.6C19 31.8 19.8 43 20.8 54.4 28.4 54.2 35.8 54.4 43.4 54.2 44.2 43 45.2 31.6 46 20.4')
         + line('M12.6 20.4C25.6 19.8 38.6 19.6 51.6 19.2M25.6 19.6C25.8 16.8 26.4 13.6 28.6 12.8 31 12.2 33.4 12.4 35.6 12.6 37.8 13.4 38.4 16.2 38.6 19.2')
         + thin('M28.4 28.6 29 46.2M35.8 28.4 35.2 46'),
-    # search: a loupe — a round glass (teal), a short straight handle out at the bottom right
+    # search: a loupe — a round glass (teal), a glint in it at the top left, a short straight handle
+    # out at the bottom right
     'search': fill(TEAL, ring(27, 27, 15.6) + 'z')
         + line(ring(27, 27, 15.6))
+        + thin('M19.2 25.8C19.8 21.8 22.6 19 26.4 18.4')
         + line('M38.6 38.8C42.8 43 46.6 46.8 51 51.2'),
     # filter (what's on the page): a funnel (yellow), wide at the top, its spout a little crooked
     'filter': fill(YELLOW, 'M12.4 14.2 51.6 13.6 36.2 32.4 36.4 50.8 27.8 54.4 27.6 32.6z')
