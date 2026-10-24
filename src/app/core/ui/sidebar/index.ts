@@ -3,5 +3,4 @@
  * which has no sidebar, doesn't download them.
  */
 export { UiSidebar } from './sidebar';
-export { UiSidebarSearch } from './sidebar-search';
 export { UiSidebarItem } from './sidebar-item';

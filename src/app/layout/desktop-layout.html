@@ -1,7 +1,16 @@
 <div class="flex h-full bg-app text-fg">
   <ui-sidebar>
-    <!-- Search (Ctrl K / ⌘K too), over the sections -->
-    <button uiSidebarSearch [shortcut]="shortcut" (click)="searchOpen.set(true)">{{ 'search.title' | t }}</button>
+    <!-- Search (Ctrl+K / ⌘K too), over the sections, as Notion's: a field-like box (a hairline, a
+         little lighter than the sidebar; darker under the pointer), its words gray, the keys on a chip -->
+    <button
+      type="button"
+      (click)="searchOpen.set(true)"
+      class="mt-1 mb-1.5 flex h-9 w-full shrink-0 items-center gap-2.5 rounded-[0.625rem] border-[0.5px] border-fg/14 bg-side-field px-2.5
+             text-left text-ui text-fg-secondary outline-none hover:border-fg/22 hover:bg-side-on focus-visible:border-fg/22 active:transform-none"
+    >
+      <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
+      <span class="shrink-0 rounded-[0.3rem] bg-tint-strong px-1.5 py-px text-footnote">{{ shortcut }}</span>
+    </button>
     @for (place of places(); track place.path) {
       <!-- (the start page: current only on itself) -->
       <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>

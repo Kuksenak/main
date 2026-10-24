@@ -5,7 +5,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
 import { UiAvatar, UiButton } from '../core/ui';
-import { UiSidebar, UiSidebarItem, UiSidebarSearch } from '../core/ui/sidebar';
+import { UiSidebar, UiSidebarItem } from '../core/ui/sidebar';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
 import { Search } from './search';
@@ -30,7 +30,6 @@ import { Search } from './search';
     UiMenuSeparator,
     UiSidebar,
     UiSidebarItem,
-    UiSidebarSearch,
   ],
   templateUrl: './desktop-layout.html',
 })
