@@ -5,6 +5,8 @@ import { ICON_DATA } from './icon-data';
 export const ICONS = [
   'google',
   'apple',
+  'google-doodle',
+  'apple-doodle',
   'logout',
   'logout-all',
   'check',
