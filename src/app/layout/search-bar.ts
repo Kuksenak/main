@@ -64,6 +64,13 @@ export class SearchBar {
     this.field().nativeElement.focus({ preventScroll: true });
   }
 
+  // The results dragged: the keyboard away (as iOS's own search, Telegram's) — with it up, iOS
+  // moved the whole screen along with the drag, the head with it
+  protected scrolled(): void {
+    const field = this.field().nativeElement;
+    if (document.activeElement === field) field.blur();
+  }
+
   protected close(): void {
     this.open.set(false);
     this.field().nativeElement.blur();
