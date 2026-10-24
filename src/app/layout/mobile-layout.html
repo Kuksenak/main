@@ -8,7 +8,7 @@
        seen: iOS shifting the view up for the keyboard doesn't take it along. -->
   <header
     [style.top.px]="area.top()"
-    class="pointer-events-none fixed inset-x-0 z-30 flex items-center gap-3 bg-linear-to-b from-app from-60% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5 *:pointer-events-auto"
+    class="pointer-events-none fixed inset-x-0 z-30 flex items-center gap-2 bg-linear-to-b from-app from-60% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5 *:pointer-events-auto"
   >
     <!-- A page opened from a list: ‹ back to it, the title smaller next to it -->
     @if (back(); as to) {
