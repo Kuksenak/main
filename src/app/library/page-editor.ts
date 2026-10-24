@@ -3,7 +3,7 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { VisibleArea } from '../core/services/visible-area';
-import { Icon, IconName } from '../core/ui';
+import { Icon, IconName, UiList, UiListItem, UiSheet } from '../core/ui';
 import type { PageBlock } from './library.store';
 import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
 
@@ -47,13 +47,14 @@ let nextId = 1;
  * new text under this one, the assistant (`ai`). A selection: B I U S and Link (desktop: a menu
  * over the block; phones: the bar over the keyboard, with the assistant and ✓ too). Each block's ⠿
  * (desktop: at its left under the pointer; phones: at its right): dragged, it moves (a line where
- * it'd land); tapped, its menu — only for me (a lock on it), copy, duplicate, delete. A tap between
+ * it'd land); tapped, its menu (desktop: a popup; phones: a sheet) — only for me (a lock on it),
+ * copy, duplicate, delete. A tap between
  * two blocks: a new one there; under the last: a hint, + Text and Assistant. `blocks`: what it starts with (read once);
  * `changed`: all of them, at each change.
  */
 @Component({
   selector: 'app-page-editor',
-  imports: [Icon, TranslatePipe],
+  imports: [Icon, TranslatePipe, UiList, UiListItem, UiSheet],
   templateUrl: './page-editor.html',
   host: { class: 'relative block' },
 })
@@ -380,19 +381,16 @@ export class PageEditor {
 
   // The block's menu: only for the teacher (a lock on it) or not
   protected togglePrivate(at: number): void {
-    this.blockMenu.set(null);
     this.items.update((items) => items.map((item, i) => (i === at ? { ...item, private: !item.private } : item)));
     this.emit();
   }
 
   // The block's menu: its text copied (with its marks)
   protected copy(at: number): void {
-    this.blockMenu.set(null);
     navigator.clipboard?.writeText(this.items()[at].text).catch(() => {});
   }
 
   protected duplicate(at: number): void {
-    this.blockMenu.set(null);
     const items = this.items();
     this.items.set([...items.slice(0, at + 1), { ...items[at], id: nextId++ }, ...items.slice(at + 1)]);
     this.emit();
@@ -400,7 +398,6 @@ export class PageEditor {
   }
 
   protected remove(at: number): void {
-    this.blockMenu.set(null);
     const items = this.items().filter((_, i) => i !== at);
     this.items.set(items.length ? items : [{ id: nextId++, text: '' }]);
     this.emit();

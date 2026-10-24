@@ -144,16 +144,16 @@
       }
 
       <!-- Its menu (its ⠿ tapped): duplicate, delete -->
-      @if (blockMenu() === i) {
+      @if (desktop && blockMenu() === i) {
         <div class="fixed inset-0 z-30" (click)="blockMenu.set(null)"></div>
         <div
           role="menu"
-          class="absolute top-8 z-40 flex w-56 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover desktop:-left-7 mobile:right-0"
+          class="absolute top-8 z-40 flex w-56 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover -left-7"
         >
           <button
             type="button"
             role="menuitem"
-            (click)="togglePrivate(i)"
+            (click)="blockMenu.set(null); togglePrivate(i)"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
           >
             <app-icon name="lock" colored class="size-icon-menu text-icon" /><span class="flex-1">{{ 'editor.onlyMe' | t }}</span>
@@ -164,7 +164,7 @@
           <button
             type="button"
             role="menuitem"
-            (click)="copy(i)"
+            (click)="blockMenu.set(null); copy(i)"
             [disabled]="!item.text.trim()"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong disabled:opacity-40"
           >
@@ -173,7 +173,7 @@
           <button
             type="button"
             role="menuitem"
-            (click)="duplicate(i)"
+            (click)="blockMenu.set(null); duplicate(i)"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
           >
             <app-icon name="plus" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
@@ -182,7 +182,7 @@
           <button
             type="button"
             role="menuitem"
-            (click)="remove(i)"
+            (click)="blockMenu.set(null); remove(i)"
             class="group/del flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong hover:text-danger"
           >
             <app-icon name="trash" colored class="size-icon-menu text-icon group-hover/del:text-danger" />{{
@@ -284,4 +284,26 @@
       </button>
     </div>
   </div>
+}
+
+<!-- Phones: a block's menu (its ⠿ tapped) as the app's sheets — a list: only for me (✓), copy,
+     duplicate; delete in its own, red -->
+@if (!desktop && blockMenu() !== null) {
+  @let at = blockMenu()!;
+  <ui-sheet #menuSheet (closed)="blockMenu.set(null)">
+    <div class="flex flex-col gap-6">
+      <ui-list>
+        <button type="button" uiListItem icon="lock" [checked]="!!items()[at]?.private" (click)="menuSheet.close(); togglePrivate(at)">
+          {{ 'editor.onlyMe' | t }}
+        </button>
+        <button type="button" uiListItem icon="page" [disabled]="!items()[at]?.text?.trim()" (click)="menuSheet.close(); copy(at)">
+          {{ 'editor.copy' | t }}
+        </button>
+        <button type="button" uiListItem icon="plus" (click)="menuSheet.close(); duplicate(at)">{{ 'editor.duplicate' | t }}</button>
+      </ui-list>
+      <ui-list>
+        <button type="button" uiListItem icon="trash" danger (click)="menuSheet.close(); remove(at)">{{ 'editor.delete' | t }}</button>
+      </ui-list>
+    </div>
+  </ui-sheet>
 }
