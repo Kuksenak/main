@@ -85,8 +85,8 @@ ICONS = {
     # its own curve; a teal dab
     # in the middle
     'update': fill(TEAL, ring(32, 32, 10) + 'z')
-        + line('M49.0 35.6A17.1 17.7 8 0 1 21.7 45.2M23.6 53.2 21.7 45.2 29.9 45.2')
-        + line('M15.4 28.5A17.2 17.9 8 0 1 42.8 18.2M40.8 10.3 42.8 18.2 34.6 18.2'),
+        + line('M49.3 33.8A17.1 17.7 8 0 1 20.3 44.1M21.5 52.2 20.3 44.1 28.5 44.9')
+        + line('M15.1 30.2A17.2 17.9 8 0 1 44.2 19.4M43.0 11.3 44.2 19.4 36.0 18.6'),
     # the language: a globe (teal), a meridian, the equator
     'globe': fill(TEAL, ring(32, 32, 20) + 'z')
         + line(ring(32, 32, 20))
