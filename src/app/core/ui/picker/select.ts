@@ -1,9 +1,6 @@
-import { Component, computed, input, model, signal } from '@angular/core';
+import { Component, input, model, signal } from '@angular/core';
 import { desktop } from '../../device';
 import { Icon, IconName } from '../icon/icon';
-import { UiList } from '../list/list';
-import { UiListItem } from '../list/list-item';
-import { UiSheet } from '../sheet/sheet';
 
 /** An option of a `<ui-select>`: its value, its words, an icon before them (on the chip; in the menu on desktops — iOS's own has none). */
 export interface UiOption {
@@ -14,13 +11,13 @@ export interface UiOption {
 
 /**
  * A choice of a few, shown as a chip with the chosen one's words and ▾. Phones: the system's own
- * select (iOS's menu) — options with icons: our sheet instead, a row each with its icon; desktops: our menu under the chip (as the app's others: the rows — an icon
+ * select (iOS's menu); desktops: our menu under the chip (as the app's others: the rows — an icon
  * each, if they have one — ✓ at the chosen one; the chosen one's icon on the chip too). `[(value)]`, `options`.
  *   <ui-select [options]="levels" [(value)]="level" />
  */
 @Component({
   selector: 'ui-select',
-  imports: [Icon, UiList, UiListItem, UiSheet],
+  imports: [Icon],
   host: { class: 'relative inline-flex' },
   template: `
     @if (desktop) {
@@ -61,8 +58,6 @@ export interface UiOption {
         </div>
       }
     } @else {
-      <!-- Phones: the chip; a tap — options with icons: our sheet (iOS's own menu can't show them),
-           a row each (its icon, ✓ at the chosen one); else the system's own select, unseen over it -->
       <span class="pointer-events-none inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-body text-fg" [class.pl-2.5]="!!chosenIcon()">
         @if (chosenIcon(); as icon) {
           <app-icon [name]="icon" colored class="size-6 text-icon" />
@@ -70,29 +65,12 @@ export interface UiOption {
         {{ chosen() }}
         <app-icon name="chevron-down" class="size-4 text-icon" />
       </span>
-      @if (withIcons()) {
-        <button type="button" class="absolute inset-0" (click)="open.set(true)" [attr.aria-label]="label() || chosen()"></button>
-        @if (open()) {
-          <ui-sheet #sheet (closed)="open.set(false)">
-            @if (label()) {
-              <span sheetHead class="text-body font-semibold">{{ label() }}</span>
-            }
-            <ui-list>
-              @for (option of options(); track option.value) {
-                <button type="button" uiListItem [icon]="option.icon" [checked]="option.value === value()" (click)="value.set(option.value); sheet.close()">
-                  {{ option.label }}
-                </button>
-              }
-            </ui-list>
-          </ui-sheet>
+      <!-- (the system's own select over the chip, unseen: a tap opens iOS's menu) -->
+      <select class="absolute inset-0 opacity-0" (change)="value.set($any($event.target).value)" [attr.aria-label]="label() || null">
+        @for (option of options(); track option.value) {
+          <option [value]="option.value" [selected]="option.value === value()">{{ option.label }}</option>
         }
-      } @else {
-        <select class="absolute inset-0 opacity-0" (change)="value.set($any($event.target).value)" [attr.aria-label]="label() || null">
-          @for (option of options(); track option.value) {
-            <option [value]="option.value" [selected]="option.value === value()">{{ option.label }}</option>
-          }
-        </select>
-      }
+      </select>
     }
   `,
 })
@@ -103,9 +81,6 @@ export class UiSelect {
 
   protected readonly desktop = desktop;
   protected readonly open = signal(false);
-
-  // (any option with an icon: on phones, our sheet instead of iOS's menu, which can't show them)
-  protected readonly withIcons = computed(() => this.options().some((o) => !!o.icon));
 
   protected chosenIcon(): IconName | undefined {
     return this.options().find((o) => o.value === this.value())?.icon;
