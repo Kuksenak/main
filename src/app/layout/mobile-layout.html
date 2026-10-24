@@ -68,9 +68,10 @@
       </button>
     }
   </header>
-  <!-- (its top under the bar; clipping the next page as it slides in) -->
+  <!-- (from just under the top bar's buttons — its scroll bar too — the page's text drifting into the
+       bar's fade; clipping the next page as it slides in) -->
   <main
-    class="h-full min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain pt-[calc(env(safe-area-inset-top)+3.75rem)]"
+    class="absolute inset-x-0 top-[calc(env(safe-area-inset-top)+3.25rem)] bottom-0 min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain pt-2"
     data-vt="page"
   >
     <router-outlet (activate)="entered()" />
