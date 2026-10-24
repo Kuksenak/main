@@ -8,7 +8,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UiCard, UiListRow, UiSegment, UiSegmented } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 
-interface AdminUser {
+interface User {
   id: string;
   email: string;
   firstName: string | null;
@@ -19,9 +19,9 @@ interface AdminUser {
   permissions: Partial<Record<Area, Level>>;
 }
 
-interface AdminUsers {
+interface UsersResponse {
   areas: string[];
-  users: AdminUser[];
+  users: User[];
 }
 
 /**
@@ -38,12 +38,12 @@ interface AdminUsers {
 export class Users {
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
-  private readonly url = `${environment.apiUrl}/admin/users`;
+  private readonly url = `${environment.apiUrl}/users`;
 
   protected readonly desktop = desktop;
   protected readonly areaLabels = AREA_LABELS;
 
-  protected readonly users = signal<AdminUser[] | null>(null);
+  protected readonly users = signal<User[] | null>(null);
   // (the areas the server sends that this app knows: their names are here)
   protected readonly areas = signal<Area[]>([]);
   protected readonly loadError = signal(false);
@@ -55,7 +55,7 @@ export class Users {
 
   constructor() {
     inject(PageTitle).show(computed(() => this.i18n.t('users.title')));
-    this.http.get<AdminUsers>(this.url).subscribe({
+    this.http.get<UsersResponse>(this.url).subscribe({
       next: (res) => {
         this.areas.set(AREAS.filter((a) => res.areas.includes(a)));
         this.users.set(res.users);
@@ -64,25 +64,25 @@ export class Users {
     });
   }
 
-  protected name(user: AdminUser): string | null {
+  protected name(user: User): string | null {
     return [user.firstName, user.lastName].filter((p) => !!p?.trim()).join(' ') || null;
   }
 
-  protected lastSignIn(user: AdminUser): string {
+  protected lastSignIn(user: User): string {
     return this.i18n.date(new Date(user.lastSignInAt), { dateStyle: 'medium', timeStyle: 'short' });
   }
 
-  protected level(user: AdminUser, area: Area): Level {
+  protected level(user: User, area: Area): Level {
     return user.isAdmin ? 'write' : (user.permissions[area] ?? 'none');
   }
 
   /** A level picked: shown at once, saved; if that fails, back as it was. */
-  protected set(user: AdminUser, area: Area, level: Level | undefined): void {
+  protected set(user: User, area: Area, level: Level | undefined): void {
     if (!level || user.isAdmin || this.level(user, area) === level) return;
     const before = user.permissions;
     this.saveError.set(false);
     this.update(user.id, { ...before, [area]: level });
-    this.http.put<AdminUser>(`${this.url}/${user.id}/permissions`, { [area]: level }).subscribe({
+    this.http.put<User>(`${this.url}/${user.id}/permissions`, { [area]: level }).subscribe({
       next: (saved) => this.update(user.id, saved.permissions),
       error: () => {
         this.update(user.id, before);
@@ -91,7 +91,7 @@ export class Users {
     });
   }
 
-  private update(id: string, permissions: AdminUser['permissions']): void {
+  private update(id: string, permissions: User['permissions']): void {
     this.users.update((users) => users?.map((u) => (u.id === id ? { ...u, permissions } : u)) ?? null);
   }
 }
