@@ -78,6 +78,8 @@ export class UiSelect {
   readonly options = input.required<UiOption[]>();
   readonly value = model<string | null>(null);
   readonly label = input('');
+  // (the chip's words instead of the chosen one's, e.g. the page's title: the schedule's month)
+  readonly text = input<string | null>(null);
 
   protected readonly desktop = desktop;
   protected readonly open = signal(false);
@@ -87,6 +89,6 @@ export class UiSelect {
   }
 
   protected chosen(): string {
-    return this.options().find((o) => o.value === this.value())?.label ?? '—';
+    return this.text() || (this.options().find((o) => o.value === this.value())?.label ?? '—');
   }
 }
