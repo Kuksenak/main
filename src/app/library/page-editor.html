@@ -25,6 +25,29 @@
       >
         <app-icon name="grip" class="size-4.5" />
       </button>
+      <!-- Phones: its menu the system's own (a select, unseen over the grip): only for me (✓), copy,
+           duplicate, up, down, delete -->
+      @if (!desktop) {
+        <select
+          class="absolute top-3 -right-2 h-7 w-6 opacity-0"
+          [attr.aria-label]="'editor.grip' | t"
+          (change)="menuPicked(i, $any($event.target))"
+        >
+          <option value="" selected disabled hidden></option>
+          <option value="private">{{ item.private ? '✓ ' : '' }}{{ 'editor.onlyMe' | t }}</option>
+          @if (item.text.trim()) {
+            <option value="copy">{{ 'editor.copy' | t }}</option>
+          }
+          <option value="duplicate">{{ 'editor.duplicate' | t }}</option>
+          @if (i > 0) {
+            <option value="up">{{ 'editor.up' | t }}</option>
+          }
+          @if (i < items().length - 1) {
+            <option value="down">{{ 'editor.down' | t }}</option>
+          }
+          <option value="delete">{{ 'editor.delete' | t }}</option>
+        </select>
+      }
 
       <!-- (a card: set apart — a soft fill, round corners, room inside) -->
       <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
@@ -284,26 +307,4 @@
       </button>
     </div>
   </div>
-}
-
-<!-- Phones: a block's menu (its ⠿ tapped) as the app's sheets — a list: only for me (✓), copy,
-     duplicate; delete in its own, red -->
-@if (!desktop && blockMenu() !== null) {
-  @let at = blockMenu()!;
-  <ui-sheet #menuSheet (closed)="blockMenu.set(null)">
-    <div class="flex flex-col gap-6">
-      <ui-list>
-        <button type="button" uiListItem icon="lock" [checked]="!!items()[at]?.private" (click)="menuSheet.close(); togglePrivate(at)">
-          {{ 'editor.onlyMe' | t }}
-        </button>
-        <button type="button" uiListItem icon="page" [disabled]="!items()[at]?.text?.trim()" (click)="menuSheet.close(); copy(at)">
-          {{ 'editor.copy' | t }}
-        </button>
-        <button type="button" uiListItem icon="plus" (click)="menuSheet.close(); duplicate(at)">{{ 'editor.duplicate' | t }}</button>
-      </ui-list>
-      <ui-list>
-        <button type="button" uiListItem icon="trash" danger (click)="menuSheet.close(); remove(at)">{{ 'editor.delete' | t }}</button>
-      </ui-list>
-    </div>
-  </ui-sheet>
 }
