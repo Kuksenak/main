@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
@@ -10,19 +10,21 @@ import { PlacesSheet } from './places-sheet';
 
 /**
  * Phones: the frame of every page after sign-in (the router puts the page into it), as iOS's — a
- * top bar: the page's title, ⊞ (the sections' sheet) and the account (its letter: the account's
+ * top bar: the page's title (a page opened from a list: ‹ back to it first), ⊞ (the sections' sheet) and the account (its letter: the account's
  * sheet); the page under it. (Desktops have their own, DesktopLayout: neither downloads the other's.)
  */
 @Component({
   selector: 'app-mobile-layout',
-  imports: [AccountSheet, Icon, PlacesSheet, RouterOutlet, TranslatePipe, UiFloatingButton],
+  imports: [AccountSheet, Icon, PlacesSheet, RouterLink, RouterOutlet, TranslatePipe, UiFloatingButton],
   templateUrl: './mobile-layout.html',
 })
 export class MobileLayout {
   private readonly auth = inject(AuthStore);
   protected readonly updates = inject(UpdateService);
 
-  protected readonly title = inject(PageTitle).text;
+  private readonly page = inject(PageTitle);
+  protected readonly title = this.page.text;
+  protected readonly back = this.page.back;
   protected readonly placesOpen = signal(false);
   protected readonly accountOpen = signal(false);
   // (the account button: the email's first letter)

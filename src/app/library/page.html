@@ -1,0 +1,44 @@
+<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:max-w-3xl desktop:px-10 desktop:pt-8">
+  @if (loadError()) {
+    <p class="text-body text-danger">{{ 'library.pageLoadError' | t }}</p>
+  }
+
+  @if (page()) {
+    <!-- Desktop: the state of the saving, Delete at the right -->
+    <div class="flex h-button items-center justify-end gap-2 text-footnote text-fg-secondary mobile:hidden">
+      @if (saving()) {
+        <span>{{ 'library.saving' | t }}</span>
+      }
+      <button uiButton type="button" icon="trash" (click)="delete()">{{ 'library.delete' | t }}</button>
+    </div>
+
+    @if (saveError()) {
+      <p class="text-body text-danger" role="alert">{{ 'library.saveError' | t }}</p>
+    }
+
+    <!-- The title: big, no box (as Notion's) -->
+    <input
+      #titleField
+      type="text"
+      [value]="title()"
+      (input)="typed('title', titleField.value)"
+      [placeholder]="'library.untitled' | t"
+      maxlength="200"
+      class="w-full bg-transparent text-[1.75rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary desktop:text-[2rem]"
+    />
+
+    <!-- The text: as tall as it is -->
+    <textarea
+      #textField
+      rows="6"
+      [value]="text()"
+      (input)="typed('text', textField.value); grow(textField)"
+      (focus)="grow(textField)"
+      [placeholder]="'library.textPlaceholder' | t"
+      class="min-h-40 w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed text-fg outline-none placeholder:text-fg-secondary"
+    ></textarea>
+
+    <!-- Phones: Delete at the bottom -->
+    <button uiButton type="button" icon="trash" (click)="delete()" class="self-start desktop:hidden">{{ 'library.delete' | t }}</button>
+  }
+</div>

@@ -1,0 +1,43 @@
+<div class="flex flex-col gap-3 px-4 pt-2 pb-24 desktop:max-w-3xl desktop:px-10 desktop:pt-8 desktop:pb-8">
+  <!-- Desktop: the section's name, New page at its right -->
+  <div class="flex h-button items-center mobile:hidden">
+    <h1 class="ml-1 flex-1 text-body font-medium">{{ 'nav.library' | t }}</h1>
+    <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
+  </div>
+
+  @if (store.loadError()) {
+    <p class="px-row-x text-body text-danger">{{ 'library.loadError' | t }}</p>
+  }
+  @if (createError()) {
+    <p class="px-row-x text-body text-danger" role="alert">{{ 'library.createError' | t }}</p>
+  }
+
+  @if (store.items(); as items) {
+    @if (!items.length) {
+      <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'library.empty' | t }}</p>
+    } @else {
+      <ui-list>
+        @for (item of items; track item.id) {
+          <button type="button" uiListItem icon="page" (click)="open(item)" [chevron]="!desktop">
+            {{ item.title }}
+            <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
+          </button>
+        }
+      </ui-list>
+    }
+  }
+</div>
+
+<!-- Phones: + floating at the bottom right, just above the home indicator -->
+<button
+  type="button"
+  uiFloatingButton
+  round
+  accent
+  [disabled]="creating()"
+  (click)="create()"
+  [attr.aria-label]="'library.new' | t"
+  class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20 desktop:hidden"
+>
+  <app-icon name="plus" class="size-7" />
+</button>

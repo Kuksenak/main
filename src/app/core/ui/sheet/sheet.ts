@@ -1,12 +1,13 @@
 import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { dimStatusBar, undimStatusBar } from '../../services/status-bar';
 
 /**
- * Phones: a sheet from the bottom (as iOS 26's): see-through glass over a strong blur, big round
- * corners, just in from the screen's edges; as tall as its content (up to 90% of the screen),
- * or `tall`: from the top bar's buttons (a little over them) down — a fixed height, so pages
- * switching inside it don't make it jump. Drag it down by the top,
- * tap outside or press Esc: it slides away, then `closed` fires. Render it with @if; `close()` from
- * inside (e.g. after a pick) does the same.
+ * Phones: a sheet from the bottom (as iOS 26's), the page under it dimmed (the status bar too):
+ * see-through glass over a strong blur, big round corners, just in from the screen's edges; as
+ * tall as its content (up to 90% of the screen), or `tall`: from the top bar's buttons (a little
+ * over them) down — a fixed height, so pages switching inside it don't make it jump. Drag it down
+ * by the top, tap outside or press Esc: it slides away (the dimming fades), then `closed` fires.
+ * Render it with @if; `close()` from inside (e.g. after a pick) does the same.
  *   @if (open()) { <ui-sheet #sheet (closed)="open.set(false)">…</ui-sheet> }
  */
 @Component({
@@ -31,13 +32,19 @@ export class UiSheet {
   constructor() {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && this.close();
     document.addEventListener('keydown', onKey);
-    inject(DestroyRef).onDestroy(() => document.removeEventListener('keydown', onKey));
+    // The page under it dimmed, the status bar with it (back as it was once it's gone)
+    dimStatusBar();
+    inject(DestroyRef).onDestroy(() => {
+      document.removeEventListener('keydown', onKey);
+      undimStatusBar();
+    });
   }
 
   close(): void {
     if (this.closing()) return;
     this.dragging.set(false);
     this.closing.set(true);
+    undimStatusBar(); // (with the backdrop fading out)
     // (once the slide away has played)
     setTimeout(() => this.closed.emit(), 380);
   }

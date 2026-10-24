@@ -1,5 +1,9 @@
-<!-- (outside it: a tap closes it; nothing dims) -->
-<div class="absolute inset-0" (click)="close()"></div>
+<!-- Outside it: the page dimmed (the status bar too: status-bar.ts), fading in and out; a tap closes it -->
+<div
+  class="absolute inset-0 animate-fade-in bg-backdrop transition-opacity duration-[340ms] ease-out data-closing:opacity-0"
+  [attr.data-closing]="closing() ? '' : null"
+  (click)="close()"
+></div>
 
 <div
   role="dialog"

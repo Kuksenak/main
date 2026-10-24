@@ -5,10 +5,11 @@ import { TranslationKey } from '../core/i18n/translations';
  * list as the API's (Core.Api Entities/Permissions.cs: Areas, a bit each); a new one: a line in
  * both, and its name in AREA_LABELS.
  */
-export const AREAS = ['schedule'] as const;
+export const AREAS = ['schedule', 'library'] as const;
 export type Area = (typeof AREAS)[number];
 
 /** Each area's name, as its section's. */
 export const AREA_LABELS: Record<Area, TranslationKey> = {
   schedule: 'nav.schedule',
+  library: 'nav.library',
 };

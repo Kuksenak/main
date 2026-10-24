@@ -20,6 +20,16 @@ export const routes: Routes = [
         loadComponent: () => import('./schedule/schedule').then((m) => m.Schedule),
         canActivate: [areaGuard('schedule')],
       },
+      {
+        path: 'library',
+        loadComponent: () => import('./library/library').then((m) => m.Library),
+        canActivate: [areaGuard('library')],
+      },
+      {
+        path: 'library/:id',
+        loadComponent: () => import('./library/page').then((m) => m.PageView),
+        canActivate: [areaGuard('library')],
+      },
       { path: 'users', loadComponent: () => import('./users/users').then((m) => m.Users), canActivate: [adminGuard] },
     ],
   },

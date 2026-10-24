@@ -17,6 +17,7 @@ export interface Place {
 export const PLACES: Place[] = [
   { path: '/', label: 'nav.home', icon: 'home' },
   { path: '/schedule', label: 'nav.schedule', icon: 'calendar', area: 'schedule' },
+  { path: '/library', label: 'nav.library', icon: 'library', area: 'library' },
 ];
 
 /** The sections this user may see. */
