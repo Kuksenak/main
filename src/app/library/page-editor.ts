@@ -3,7 +3,7 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { VisibleArea } from '../core/services/visible-area';
-import { Icon, IconName } from '../core/ui';
+import { Icon, IconName, UiSheet } from '../core/ui';
 import type { PageBlock } from './library.store';
 import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
 
@@ -47,14 +47,14 @@ let nextId = 1;
  * new text under this one, the assistant (`ai`). A selection: B I U S and Link (desktop: a menu
  * over the block; phones: the bar over the keyboard, with the assistant and ✓ too). Each block's ⠿
  * (desktop: at its left under the pointer; phones: at its right): dragged, it moves (a line where
- * it'd land); tapped, its menu (desktop: a popup; phones: the system's own, with up and down — no
- * drag there) — only for me (a lock on it), copy, duplicate, delete. A tap between
+ * it'd land); tapped, its menu (desktop: a popup; phones: a sheet, just its words) — only for me (a lock on it),
+ * copy, duplicate, delete. A tap between
  * two blocks: a new one there; under the last: a hint, + Text and Assistant. `blocks`: what it starts with (read once);
  * `changed`: all of them, at each change.
  */
 @Component({
   selector: 'app-page-editor',
-  imports: [Icon, TranslatePipe],
+  imports: [Icon, TranslatePipe, UiSheet],
   templateUrl: './page-editor.html',
   host: { class: 'relative block' },
 })
@@ -371,29 +371,6 @@ export class PageEditor {
     }
     const { from, to } = drag;
     if (to === from || to === from + 1) return;
-    const items = [...this.items()];
-    const [moved] = items.splice(from, 1);
-    items.splice(to > from ? to - 1 : to, 0, moved);
-    this.items.set(items);
-    this.emit();
-    setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
-  }
-
-  // Phones: a row picked in the block's menu (the system's own); the menu back to nothing picked
-  protected menuPicked(at: number, select: HTMLSelectElement): void {
-    const action = select.value;
-    select.value = '';
-    if (action === 'private') this.togglePrivate(at);
-    else if (action === 'copy') this.copy(at);
-    else if (action === 'duplicate') this.duplicate(at);
-    else if (action === 'up') this.move(at, at - 1);
-    else if (action === 'down') this.move(at, at + 2);
-    else if (action === 'delete') this.remove(at);
-  }
-
-  // A block moved to before the one at `to` (the end: the list's length)
-  private move(from: number, to: number): void {
-    if (to === from || to === from + 1 || to < 0 || to > this.items().length) return;
     const items = [...this.items()];
     const [moved] = items.splice(from, 1);
     items.splice(to > from ? to - 1 : to, 0, moved);

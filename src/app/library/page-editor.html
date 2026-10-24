@@ -25,29 +25,6 @@
       >
         <app-icon name="grip" class="size-4.5" />
       </button>
-      <!-- Phones: its menu the system's own (a select, unseen over the grip): only for me (✓), copy,
-           duplicate, up, down, delete -->
-      @if (!desktop) {
-        <select
-          class="absolute top-3 -right-2 h-7 w-6 opacity-0"
-          [attr.aria-label]="'editor.grip' | t"
-          (change)="menuPicked(i, $any($event.target))"
-        >
-          <option value="" selected disabled hidden></option>
-          <option value="private">{{ item.private ? '✓ ' : '' }}{{ 'editor.onlyMe' | t }}</option>
-          @if (item.text.trim()) {
-            <option value="copy">{{ 'editor.copy' | t }}</option>
-          }
-          <option value="duplicate">{{ 'editor.duplicate' | t }}</option>
-          @if (i > 0) {
-            <option value="up">{{ 'editor.up' | t }}</option>
-          }
-          @if (i < items().length - 1) {
-            <option value="down">{{ 'editor.down' | t }}</option>
-          }
-          <option value="delete">{{ 'editor.delete' | t }}</option>
-        </select>
-      }
 
       <!-- (a card: set apart — a soft fill, round corners, room inside) -->
       <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
@@ -307,4 +284,23 @@
       </button>
     </div>
   </div>
+}
+
+<!-- Phones: a block's menu (its ⠿ tapped) in a sheet — just its words, a row each, no cards: only
+     for me (✓ at the end when it is), copy, duplicate, delete (red) -->
+@if (!desktop && blockMenu() !== null) {
+  @let at = blockMenu()!;
+  <ui-sheet #menuSheet (closed)="blockMenu.set(null)">
+    <div class="-mx-2 flex flex-col">
+      <button type="button" class="flex h-row w-full items-center px-row-x text-left text-body active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); togglePrivate(at)">
+        <span class="flex-1">{{ 'editor.onlyMe' | t }}</span>
+        @if (items()[at]?.private) {
+          <app-icon name="check" class="size-5 text-accent" />
+        }
+      </button>
+      <button type="button" class="flex h-row w-full items-center px-row-x text-left text-body active:bg-tint disabled:opacity-40" [disabled]="!items()[at]?.text?.trim()" (click)="menuSheet.close(); copy(at)">{{ 'editor.copy' | t }}</button>
+      <button type="button" class="flex h-row w-full items-center px-row-x text-left text-body active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); duplicate(at)">{{ 'editor.duplicate' | t }}</button>
+      <button type="button" class="flex h-row w-full items-center px-row-x text-left text-body text-danger active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); remove(at)">{{ 'editor.delete' | t }}</button>
+    </div>
+  </ui-sheet>
 }
