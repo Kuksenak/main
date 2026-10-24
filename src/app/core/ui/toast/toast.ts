@@ -42,7 +42,7 @@ export class Toasts {
 }
 
 /**
- * Where the toasts show, the dialogs' color and shadow — phones: a capsule each at the top, under
+ * Where the toasts show, on glass as the floating buttons (a soft shadow, a hairline rim) — phones: a capsule each at the top, under
  * the top bar (on the part of the screen that's seen); desktops: a card each in the bottom right
  * corner, as wide as the sidebar, its words wrapped; more than fit in 80% of the screen's height:
  * they scroll.
@@ -61,7 +61,7 @@ export class Toasts {
     @for (toast of toasts.list(); track toast.id) {
       <div
         role="status"
-        class="pointer-events-auto flex max-w-full shrink-0 animate-menu-in gap-2.5 bg-dialog py-2.5 pr-2 pl-4 text-fg shadow-popover
+        class="pointer-events-auto flex max-w-full shrink-0 animate-menu-in gap-2.5 border-[0.5px] border-sheet-border bg-glass py-2.5 pr-2 pl-4 text-fg shadow-glass backdrop-blur-[20px] backdrop-saturate-[180%]
                mobile:items-center mobile:rounded-full mobile:text-body desktop:items-start desktop:rounded-menu desktop:text-ui"
         [class.pr-4]="!toast.action"
         (click)="toasts.dismiss(toast.id)"

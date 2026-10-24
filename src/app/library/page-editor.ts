@@ -11,6 +11,8 @@ import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
 interface Item {
   id: number;
   text: string;
+  // (only for the teacher: a lock on it)
+  private?: boolean;
 }
 
 /** A "/" command: a new text, or the assistant. */
@@ -45,7 +47,8 @@ let nextId = 1;
  * new text under this one, the assistant (`ai`). A selection: B I U S and Link (desktop: a menu
  * over the block; phones: the bar over the keyboard, with the assistant and ✓ too). Each block's ⠿
  * (desktop: at its left under the pointer; phones: at its right): dragged, it moves (a line where
- * it'd land); tapped, its menu — duplicate, delete. `blocks`: what it starts with (read once);
+ * it'd land); tapped, its menu — only for me (a lock on it), copy, duplicate, delete. A tap between
+ * two blocks: a new one there; under the last: a hint, + Text and Assistant. `blocks`: what it starts with (read once);
  * `changed`: all of them, at each change.
  */
 @Component({
@@ -95,8 +98,8 @@ export class PageEditor {
 
   constructor() {
     afterNextRender(() => {
-      const texts = this.blocks().length ? this.blocks().map((b) => b.text ?? '') : [''];
-      this.items.set(texts.map((text) => ({ id: nextId++, text })));
+      const blocks = this.blocks().length ? this.blocks() : [{ kind: 'card' as const, text: '' }];
+      this.items.set(blocks.map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private })));
       setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
     });
     // (the window's width changed: the fields' heights again)
@@ -134,7 +137,14 @@ export class PageEditor {
   }
 
   private emit(): void {
-    this.changed.emit(this.items().map((i) => ({ kind: 'card' as const, text: i.text })));
+    this.changed.emit(this.items().map((i) => ({ kind: 'card' as const, text: i.text, private: i.private || undefined })));
+  }
+
+  // A tap between two blocks: a new text there, typed at once
+  protected insertAt(at: number): void {
+    const items = this.items();
+    this.items.set([...items.slice(0, at), { id: nextId++, text: '' }, ...items.slice(at)]);
+    setTimeout(() => this.focusAt(at, 'start'));
   }
 
   // A tap under the last block: a new text there (the last one, if it's empty), typed at once
@@ -366,6 +376,19 @@ export class PageEditor {
     this.items.set(items);
     this.emit();
     setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
+  }
+
+  // The block's menu: only for the teacher (a lock on it) or not
+  protected togglePrivate(at: number): void {
+    this.blockMenu.set(null);
+    this.items.update((items) => items.map((item, i) => (i === at ? { ...item, private: !item.private } : item)));
+    this.emit();
+  }
+
+  // The block's menu: its text copied (with its marks)
+  protected copy(at: number): void {
+    this.blockMenu.set(null);
+    navigator.clipboard?.writeText(this.items()[at].text).catch(() => {});
   }
 
   protected duplicate(at: number): void {

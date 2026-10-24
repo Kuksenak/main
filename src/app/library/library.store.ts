@@ -16,6 +16,8 @@ export interface PageItem {
 export interface PageBlock {
   kind: 'text' | 'card';
   text: string | null;
+  // (only for the teacher)
+  private?: boolean;
 }
 
 /** A page as a whole. */

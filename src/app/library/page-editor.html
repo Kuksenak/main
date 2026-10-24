@@ -1,6 +1,6 @@
 <!-- The blocks: a field each, its marks faded over its text; its ⠿ (desktop: at its left under the
      pointer; phones: at its right). A line shows where a dragged block would land. -->
-<div #host class="relative flex flex-col gap-1" (pointermove)="gripMove($event, host)">
+<div #host class="relative flex flex-col" (pointermove)="gripMove($event, host)">
   @if (dropLine(); as y) {
     <div
       class="pointer-events-none absolute inset-x-0 z-10 h-0.75 rounded-full bg-accent/60"
@@ -8,6 +8,10 @@
     ></div>
   }
   @for (item of items(); track item.id; let i = $index) {
+    <!-- (between two blocks: a tap there, a new one) -->
+    @if (i > 0) {
+      <div class="h-2.5 cursor-text" (click)="insertAt(i)"></div>
+    }
     <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i">
       <button
         type="button"
@@ -23,9 +27,17 @@
       </button>
 
       <!-- (a card: set apart — a soft fill, round corners, room inside) -->
+      <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
       <div
-        class="rounded-card bg-tint px-4 py-3 mobile:mr-6"
+        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6"
+        [class.outline-dashed]="item.private"
+        [class.outline-1]="item.private"
+        [class.outline-separator]="item.private"
+        [class.pr-9]="item.private"
       >
+        @if (item.private) {
+          <app-icon name="lock" class="absolute top-2.5 right-3 size-4 text-icon" [attr.title]="'editor.onlyMe' | t" />
+        }
         <div class="relative">
           <!-- (the same letters as the field's, over it: only the marks faded, links colored) -->
           <!-- prettier-ignore -->
@@ -136,8 +148,28 @@
         <div class="fixed inset-0 z-30" (click)="blockMenu.set(null)"></div>
         <div
           role="menu"
-          class="absolute top-8 z-40 flex w-52 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover desktop:-left-7 mobile:right-0"
+          class="absolute top-8 z-40 flex w-56 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover desktop:-left-7 mobile:right-0"
         >
+          <button
+            type="button"
+            role="menuitem"
+            (click)="togglePrivate(i)"
+            class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
+          >
+            <app-icon name="lock" class="size-icon-menu text-icon" /><span class="flex-1">{{ 'editor.onlyMe' | t }}</span>
+            @if (item.private) {
+              <app-icon name="check" class="size-icon-menu" />
+            }
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            (click)="copy(i)"
+            [disabled]="!item.text.trim()"
+            class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong disabled:opacity-40"
+          >
+            <app-icon name="page" class="size-icon-menu text-icon" />{{ 'editor.copy' | t }}
+          </button>
           <button
             type="button"
             role="menuitem"
@@ -146,6 +178,7 @@
           >
             <app-icon name="plus" class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
           </button>
+          <span class="mx-menu-row-x my-1 h-px bg-separator"></span>
           <button
             type="button"
             role="menuitem"
@@ -160,8 +193,21 @@
       }
     </div>
   }
-  <!-- Under the last block: a tap there types text there at once -->
-  <div class="min-h-28 flex-1 cursor-text" (click)="typeAtEnd()"></div>
+  <!-- The end of the page: a hint to write on (a tap: a new text there, typed at once), + Text and
+       Assistant; under them, room to tap too -->
+  <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col gap-3" (click)="typeAtEnd()">
+    @if (items().length > 1 || items()[0]?.text) {
+      <span class="px-4 text-body text-fg-secondary/70">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
+    }
+    <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
+      <button type="button" (click)="typeAtEnd()" class="flex h-9 items-center gap-1.5 rounded-full bg-tint px-3.5 text-ui text-fg hover:bg-tint-strong active:bg-tint-strong">
+        <app-icon name="plus" class="size-4.5 text-icon" />{{ 'editor.text' | t }}
+      </button>
+      <button type="button" (click)="ai.emit()" class="flex h-9 items-center gap-1.5 rounded-full bg-tint px-3.5 text-ui text-fg hover:bg-tint-strong active:bg-tint-strong">
+        <app-icon name="sparkle" class="size-4.5" />{{ 'editor.ai' | t }}
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Phones: while it's written in, just over the keyboard — B I U S, Link, AI on a capsule; ✓ at
