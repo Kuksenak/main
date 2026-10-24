@@ -65,7 +65,9 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 ## Status bar color (keeps breaking — read before touching overlays)
 - The status bar's color is two `theme-color` tags, one per scheme (`media="(prefers-color-scheme:
   …)"`: light `#fbfbf9`, dark `#000000` — the page's `--app-bg`), so iOS picks the right one itself
-  as the system switches. Only the script in `src/index.html` touches them.
+  as the system switches — but iOS's home-screen app takes the last tag whatever its media (a
+  screen recording showed it black in light), so the current scheme's tag is always put last. Only
+  the script in `src/index.html` touches them.
 - It still puts them in anew (nudged: a hair off, then right a moment later) at every theme switch,
   when the app comes back, and as anything over the whole screen closes — iOS kept the old color
   otherwise (a theme switch under the search or a sheet). Anything full-screen calls

@@ -8,8 +8,7 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfbf9">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+  <!-- (the status bar's color: put in by the script below, the current scheme's tag last) -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <!-- "default", not "black-translucent": with a translucent status bar iOS launches home-screen
@@ -29,9 +28,12 @@
       // the app comes back, and as anything over the whole screen closes ('theme-color' event:
       // core/services/theme-color.ts) — iOS kept the old color now and then otherwise.
       var LIGHT = '#fbfbf9', DARK = '#000000';
+      // (the current scheme's tag last: iOS's home-screen app takes the last one, whatever its media)
       function tags(light, dark) {
         document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.remove(); });
-        [['light', light], ['dark', dark]].forEach(function (t) {
+        var both = [['light', light], ['dark', dark]];
+        if (!query.matches) both.reverse();
+        both.forEach(function (t) {
           var meta = document.createElement('meta');
           meta.name = 'theme-color';
           meta.media = '(prefers-color-scheme: ' + t[0] + ')';
