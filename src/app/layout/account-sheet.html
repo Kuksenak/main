@@ -22,7 +22,7 @@
 
       @if (auth.isAdmin()) {
         <ui-card>
-          <button type="button" uiListRow icon="shield" chevron (click)="go('/admin', sheet)">{{ 'admin.title' | t }}</button>
+          <button type="button" uiListRow icon="lock" chevron (click)="go('/users', sheet)">{{ 'users.title' | t }}</button>
         </ui-card>
       }
 

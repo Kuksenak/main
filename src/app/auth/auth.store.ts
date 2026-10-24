@@ -9,7 +9,7 @@ export interface UserProfile {
   firstName: string | null;
   lastName: string | null;
   email: string;
-  /** On the server's admin list: write in every area, and the admin page. */
+  /** On the server's admin list: write in every area, and Users (everyone's access). */
   isAdmin: boolean;
   /** The level in each area (the API sends every one; the admins: write in all). */
   permissions: Partial<Record<Area, Level>>;

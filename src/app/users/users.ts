@@ -25,17 +25,17 @@ interface AdminUsers {
 }
 
 /**
- * The admin page (the admins only: adminGuard): everyone who has signed in, latest first — the
+ * Users (the admins only: adminGuard): everyone who has signed in, latest first — the
  * name, the email, the last sign-in — and per area their level (none / read / write), saved as soon
  * as it's picked (back as it was if that fails). The admins: write everywhere, locked.
  * Desktop: a table, a column per area; phones: a card per user.
  */
 @Component({
-  selector: 'app-admin',
+  selector: 'app-users',
   imports: [TranslatePipe, UiCard, UiListRow, UiSegmented],
-  templateUrl: './admin.html',
+  templateUrl: './users.html',
 })
-export class Admin {
+export class Users {
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
   private readonly url = `${environment.apiUrl}/admin/users`;
@@ -54,7 +54,7 @@ export class Admin {
   );
 
   constructor() {
-    inject(PageTitle).show(computed(() => this.i18n.t('admin.title')));
+    inject(PageTitle).show(computed(() => this.i18n.t('users.title')));
     this.http.get<AdminUsers>(this.url).subscribe({
       next: (res) => {
         this.areas.set(AREAS.filter((a) => res.areas.includes(a)));

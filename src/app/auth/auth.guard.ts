@@ -20,5 +20,5 @@ export const areaGuard =
   () =>
     inject(AuthStore).can(area, 'read') || inject(Router).createUrlTree(['/']);
 
-/** The admin page: only for the admins (else the start page). */
+/** Users (their access): only for the admins (else the start page). */
 export const adminGuard: CanActivateFn = () => inject(AuthStore).isAdmin() || inject(Router).createUrlTree(['/']);

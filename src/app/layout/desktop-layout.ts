@@ -11,7 +11,7 @@ import { visiblePlaces } from './places';
 /**
  * Desktop: the frame of every page after sign-in (the router puts the page into it) — the sidebar
  * at the left: the app's places, the account at the bottom (its letter, the name — else the email
- * — and ▾; its menu: the email, Admin (the admins only), the language, Log out, Log out of all
+ * — and ▾; its menu: the email, Users (the admins only), the language, Log out, Log out of all
  * devices); the open page beside it. (Phones have their own, MobileLayout: neither downloads the other's.)
  */
 @Component({

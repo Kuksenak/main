@@ -20,7 +20,7 @@ export const routes: Routes = [
         loadComponent: () => import('./schedule/schedule').then((m) => m.Schedule),
         canActivate: [areaGuard('schedule')],
       },
-      { path: 'admin', loadComponent: () => import('./admin/admin').then((m) => m.Admin), canActivate: [adminGuard] },
+      { path: 'users', loadComponent: () => import('./users/users').then((m) => m.Users), canActivate: [adminGuard] },
     ],
   },
   { path: '**', redirectTo: '' },

@@ -30,7 +30,7 @@
     <ui-menu-label>{{ auth.email() }}</ui-menu-label>
     <ui-menu-separator />
     @if (auth.isAdmin()) {
-      <button type="button" uiMenuItem icon="shield" (click)="router.navigateByUrl('/admin')">{{ 'admin.title' | t }}</button>
+      <button type="button" uiMenuItem icon="lock" (click)="router.navigateByUrl('/users')">{{ 'users.title' | t }}</button>
       <ui-menu-separator />
     }
     <ui-menu-label icon="globe">{{ 'account.language' | t }}</ui-menu-label>
