@@ -41,7 +41,9 @@
         if (force) requestAnimationFrame(function () { apply(isDark, false); });
       }
       apply(query.matches);
-      query.addEventListener('change', function (e) { apply(e.matches); });
+      // (the theme changed: put in anew at once — with something over the whole screen open, the
+      // search, a sheet, iOS kept the old color for a plain edit)
+      query.addEventListener('change', function (e) { apply(e.matches, true); });
       document.addEventListener('theme-color', function () { apply(query.matches, true); });
       // Back in the app: the system theme may have changed while it was hidden.
       document.addEventListener('visibilitychange', function () {
