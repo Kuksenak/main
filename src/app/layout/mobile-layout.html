@@ -11,7 +11,7 @@
     }
     <!-- The open page's filter (only on a page that has one): the capsule at the bottom -->
     @if (filter.offered()) {
-      <button type="button" uiFloatingButton round (click)="filterOpen.set(true)" [attr.aria-label]="'filter.title' | t">
+      <button type="button" uiFloatingButton round (click)="filterBar()?.start()" [attr.aria-label]="'filter.title' | t">
         <app-icon name="filter" class="size-6" />
       </button>
     }
@@ -40,11 +40,11 @@
 @if (accountOpen()) {
   <app-account-sheet (closed)="accountOpen.set(false)" />
 }
-<!-- The filter (its field on a capsule just over the keyboard) and the search (a sheet, the field
-     in its head) — not deferred: the field is focused while the tap is going on, else iOS doesn't
-     open the keyboard -->
-@if (filterOpen() && filter.offered()) {
-  <app-filter-bar (closed)="filterOpen.set(false)" />
+<!-- The filter (there, unseen, while the page has one: the funnel focuses its field during the tap,
+     else iOS doesn't open the keyboard) and the search (a sheet, the field in its head; not deferred,
+     for the same reason) -->
+@if (filter.offered()) {
+  <app-filter-bar />
 }
 @if (searchOpen()) {
   <app-search-sheet (closed)="searchOpen.set(false)" />

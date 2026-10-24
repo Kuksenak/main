@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -31,7 +31,7 @@ export class MobileLayout {
   protected readonly back = this.page.back;
   protected readonly placesOpen = signal(false);
   protected readonly filter = inject(PageFilter);
-  protected readonly filterOpen = signal(false);
+  protected readonly filterBar = viewChild(FilterBar);
   protected readonly searchOpen = signal(false);
   protected readonly accountOpen = signal(false);
   // (the account button: the email's first letter)

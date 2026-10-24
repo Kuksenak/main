@@ -1,37 +1,35 @@
 <!-- On the part of the screen that's seen (with the keyboard up: what's over it), the page under it
-     seen and its own (taps go through): only the capsule at the bottom, just over the keyboard -->
+     seen and its own (taps go through). Unseen (closed, or the keyboard still coming): at the top;
+     shown: at the bottom, just over the keyboard — the capsule, ✕ at its right (taken only then) -->
 <div
-  class="pointer-events-none fixed inset-x-0 z-40 flex flex-col justify-end"
+  class="pointer-events-none fixed inset-x-0 z-40 flex flex-col justify-start opacity-0 transition-opacity duration-200 data-shown:justify-end data-shown:opacity-100"
+  [attr.data-shown]="shown() ? '' : null"
+  [attr.aria-hidden]="open() ? null : 'true'"
   [style.top.px]="area.top()"
   [style.height.px]="area.height()"
 >
-  <!-- The capsule (as the system's bar under it: glass, round): the funnel, the field, ✕ -->
-  <form
-    class="pointer-events-auto mx-3 flex h-12 shrink-0 items-center gap-2.5 rounded-full border-[0.5px] border-sheet-border bg-sheet pr-1.5 pl-4 shadow-sheet
-           backdrop-blur-[30px] backdrop-saturate-[180%]"
-    [style.margin-bottom]="typing() || area.keyboard() ? '0.375rem' : 'max(0.75rem, env(safe-area-inset-bottom))'"
-    (submit)="submit($event)"
-  >
-    <app-icon name="filter" class="size-5.5 shrink-0 text-icon" />
-    <input
-      #field
-      type="search"
-      enterkeyhint="search"
-      autocomplete="off"
-      [value]="filter.query()"
-      (input)="filter.query.set(field.value)"
-      (focus)="typing.set(true)"
-      (blur)="typing.set(false)"
-      [placeholder]="'filter.placeholder' | t"
-      class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary [&::-webkit-search-cancel-button]:hidden"
-    />
-    <button
-      type="button"
-      (click)="close()"
-      [attr.aria-label]="'search.close' | t"
-      class="grid size-9 shrink-0 place-items-center rounded-full text-icon active:bg-highlight"
+  <div class="mx-3 flex items-center gap-2" [style.margin-bottom]="typing() || area.keyboard() ? '0.375rem' : 'max(0.75rem, env(safe-area-inset-bottom))'">
+    <!-- The capsule (as the floating buttons: glass, round): the funnel, the field -->
+    <form
+      class="flex h-round in-data-shown:pointer-events-auto min-w-0 flex-1 items-center gap-2.5 rounded-full bg-glass px-4 text-fg shadow-glass backdrop-blur-[20px] backdrop-saturate-[180%]"
+      (submit)="submit($event)"
     >
-      <app-icon name="close" class="size-5" />
+      <app-icon name="filter" class="size-5.5 shrink-0 text-icon" />
+      <input
+        #field
+        type="search"
+        enterkeyhint="search"
+        autocomplete="off"
+        [value]="filter.query()"
+        (input)="filter.query.set(field.value)"
+        (focus)="typing.set(true)"
+        (blur)="typing.set(false)"
+        [placeholder]="'filter.placeholder' | t"
+        class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary [&::-webkit-search-cancel-button]:hidden"
+      />
+    </form>
+    <button type="button" uiFloatingButton round (click)="close()" [attr.aria-label]="'search.close' | t" class="in-data-shown:pointer-events-auto">
+      <app-icon name="close" class="size-5.5" />
     </button>
-  </form>
+  </div>
 </div>
