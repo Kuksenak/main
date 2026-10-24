@@ -41,7 +41,8 @@ export type IconName = (typeof ICONS)[number];
  * public/icons/{name}.svg the outline only (small ones: menus, rows), drawn in the text's
  * color (currentColor: a mask); and `filled`: public/icons/filled/{name}.svg coloured in with
  * one pastel (big ones, 40px+: the phones' sections) — the dark theme turns those over; `colored`:
- * the same for small ones (menus, rows), a thinner marker. The brands' marks (Google,
+ * the same for small ones (menus, rows), a thinner marker — its lines in the text's color (class
+ * text-icon: gray; a danger row's: red), the pastel under them. The brands' marks (Google,
  * Apple) are drawn here, in currentColor. Size it from the host: `<app-icon name="home" class="size-7" />`.
  */
 @Component({
@@ -63,7 +64,17 @@ export type IconName = (typeof ICONS)[number];
         }
       </svg>
     } @else {
-      @if (filled() || colored()) {
+      @if (colored()) {
+        <!-- (small, coloured in: the pastel under, the lines over it in the text's color) -->
+        <span class="relative block size-full">
+          <img [src]="fillsUrl()" alt="" draggable="false" class="absolute inset-0 size-full select-none dark:invert dark:hue-rotate-180" />
+          <span
+            class="absolute inset-0 block bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+            [style.mask-image]="linesUrl()"
+            [style.-webkit-mask-image]="linesUrl()"
+          ></span>
+        </span>
+      } @else if (filled()) {
         <img [src]="filledUrl()" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
       } @else {
         <!-- (the outline as a mask over the text's color: it takes the color it's in — gray, red on
@@ -86,5 +97,7 @@ export class Icon {
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
   // (from the app's own code, not a file each: no request each — ICON_DATA, tools/icons.py)
   protected readonly url = computed(() => `url("${ICON_DATA[this.name()]?.[0]}")`);
-  protected readonly filledUrl = computed(() => ICON_DATA[this.name()]?.[this.colored() ? 2 : 1] ?? '');
+  protected readonly filledUrl = computed(() => ICON_DATA[this.name()]?.[1] ?? '');
+  protected readonly fillsUrl = computed(() => ICON_DATA[this.name()]?.[2] ?? '');
+  protected readonly linesUrl = computed(() => `url("${ICON_DATA[this.name()]?.[3]}")`);
 }

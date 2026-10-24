@@ -77,7 +77,7 @@
               (click)="run(command)"
               class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui aria-selected:bg-tint-strong"
             >
-              <app-icon [name]="command.icon" colored class="size-icon-menu" />
+              <app-icon [name]="command.icon" colored class="size-icon-menu text-icon" />
               <span class="flex-1">{{ command.label | t }}</span>
               <span class="text-footnote text-fg-secondary">{{ command.hint | t }}</span>
             </button>
@@ -156,7 +156,7 @@
             (click)="togglePrivate(i)"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
           >
-            <app-icon name="lock" colored class="size-icon-menu" /><span class="flex-1">{{ 'editor.onlyMe' | t }}</span>
+            <app-icon name="lock" colored class="size-icon-menu text-icon" /><span class="flex-1">{{ 'editor.onlyMe' | t }}</span>
             @if (item.private) {
               <app-icon name="check" class="size-icon-menu" />
             }
@@ -168,7 +168,7 @@
             [disabled]="!item.text.trim()"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong disabled:opacity-40"
           >
-            <app-icon name="page" colored class="size-icon-menu" />{{ 'editor.copy' | t }}
+            <app-icon name="page" colored class="size-icon-menu text-icon" />{{ 'editor.copy' | t }}
           </button>
           <button
             type="button"
@@ -176,7 +176,7 @@
             (click)="duplicate(i)"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
           >
-            <app-icon name="plus" colored class="size-icon-menu" />{{ 'editor.duplicate' | t }}
+            <app-icon name="plus" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
           </button>
           <span class="mx-menu-row-x my-1 h-px bg-separator"></span>
           <button
@@ -185,7 +185,7 @@
             (click)="remove(i)"
             class="group/del flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong hover:text-danger"
           >
-            <app-icon name="trash" colored class="size-icon-menu" />{{
+            <app-icon name="trash" colored class="size-icon-menu text-icon group-hover/del:text-danger" />{{
               'editor.delete' | t
             }}
           </button>
