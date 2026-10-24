@@ -21,7 +21,7 @@ import { Icon, IconName } from '../icon/icon';
       'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-fg',
   },
   template: `
-    <app-icon [name]="icon()" class="size-icon-side text-icon" />
+    <app-icon [name]="icon()" colored class="size-icon-side" />
     <span class="min-w-0 truncate"><ng-content /></span>
   `,
 })

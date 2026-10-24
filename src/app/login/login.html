@@ -26,16 +26,6 @@
       {{ 'login.apple' | t }}
     </button>
 
-    <!-- The same two with our own drawings of the marks (marker doodle + pastel), to judge beside them -->
-    <button type="button" (click)="auth.login()" [disabled]="auth.loggingIn()" class="btn-strong w-full">
-      <app-icon name="google-doodle" filled class="size-6" />
-      {{ 'login.google' | t }}
-    </button>
-    <button type="button" class="btn-strong w-full">
-      <app-icon name="apple-doodle" filled class="size-6" />
-      {{ 'login.apple' | t }}
-    </button>
-
     <p class="text-footnote mt-2 text-center leading-relaxed opacity-50">
       {{ 'login.legalPrefix' | t }}
       <span class="underline">{{ 'login.terms' | t }}</span>

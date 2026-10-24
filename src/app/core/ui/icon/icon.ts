@@ -40,7 +40,8 @@ export type IconName = (typeof ICONS)[number];
  * app's code as data: URLs — icon-data.ts, made by tools/icons.py with the files) —
  * public/icons/{name}.svg the outline only (small ones: menus, rows), drawn in the text's
  * color (currentColor: a mask); and `filled`: public/icons/filled/{name}.svg coloured in with
- * one pastel (big ones, 40px+: the phones' sections) — the dark theme turns those over. The brands' marks (Google,
+ * one pastel (big ones, 40px+: the phones' sections) — the dark theme turns those over; `colored`:
+ * the same for small ones (menus, rows), a thinner marker. The brands' marks (Google,
  * Apple) are drawn here, in currentColor. Size it from the host: `<app-icon name="home" class="size-7" />`.
  */
 @Component({
@@ -62,7 +63,7 @@ export type IconName = (typeof ICONS)[number];
         }
       </svg>
     } @else {
-      @if (filled()) {
+      @if (filled() || colored()) {
         <img [src]="filledUrl()" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
       } @else {
         <!-- (the outline as a mask over the text's color: it takes the color it's in — gray, red on
@@ -79,9 +80,11 @@ export type IconName = (typeof ICONS)[number];
 export class Icon {
   readonly name = input.required<IconName>();
   readonly filled = input(false, { transform: booleanAttribute });
+  // (small and coloured in: menus, rows — the pastel, a thinner marker)
+  readonly colored = input(false, { transform: booleanAttribute });
   // (the brands' marks: drawn here; the rest: their files)
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
   // (from the app's own code, not a file each: no request each — ICON_DATA, tools/icons.py)
   protected readonly url = computed(() => `url("${ICON_DATA[this.name()]?.[0]}")`);
-  protected readonly filledUrl = computed(() => ICON_DATA[this.name()]?.[1] ?? '');
+  protected readonly filledUrl = computed(() => ICON_DATA[this.name()]?.[this.colored() ? 2 : 1] ?? '');
 }
