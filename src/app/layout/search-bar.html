@@ -1,0 +1,56 @@
+<!-- Over the page: what's found, from the bottom up (the nearest to the thumb lowest); a tap on
+     nothing closes it -->
+<div class="fixed inset-0 z-40 flex flex-col bg-app/95 backdrop-blur-[20px]" (click)="closed.emit()">
+  <div
+    class="mt-auto flex min-h-0 flex-col gap-5 overflow-y-auto px-4 pt-[calc(env(safe-area-inset-top)+1rem)] pb-3"
+    [style.margin-bottom.px]="keyboard() + 64"
+    (click)="$event.stopPropagation()"
+  >
+    @for (section of sections(); track section.name) {
+      <div class="flex flex-col gap-1.5">
+        <span class="px-row-x text-footnote font-medium text-fg-secondary">{{ section.name }}</span>
+        <ui-list>
+          @for (found of section.items; track found.id) {
+            <button type="button" uiListItem [icon]="found.icon" (click)="pick(found)">
+              {{ found.label }}
+              @if (found.hint) {
+                <span itemValue class="text-fg-secondary">{{ found.hint }}</span>
+              }
+            </button>
+          }
+        </ui-list>
+      </div>
+    } @empty {
+      <p class="py-10 text-center text-body text-fg-secondary">{{ 'search.nothing' | t }}</p>
+    }
+  </div>
+</div>
+
+<!-- The capsule, just over the keyboard (as the system's bar under it: dark glass, round), the
+     loupe, the field, ✕ -->
+<form
+  class="fixed inset-x-4 z-40 flex h-12 items-center gap-2.5 rounded-full border-[0.5px] border-sheet-border bg-sheet pr-1.5 pl-4
+         shadow-sheet backdrop-blur-[30px] backdrop-saturate-[180%]"
+  [style.bottom]="keyboard() ? keyboard() + 8 + 'px' : 'max(0.75rem, env(safe-area-inset-bottom))'"
+  (submit)="submit($event)"
+>
+  <app-icon name="search" class="size-5.5 shrink-0 text-icon" />
+  <input
+    #field
+    type="search"
+    enterkeyhint="search"
+    autocomplete="off"
+    [value]="query()"
+    (input)="query.set(field.value)"
+    [placeholder]="'search.placeholder' | t"
+    class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary [&::-webkit-search-cancel-button]:hidden"
+  />
+  <button
+    type="button"
+    (click)="closed.emit()"
+    [attr.aria-label]="'search.close' | t"
+    class="grid size-9 shrink-0 place-items-center rounded-full text-icon active:bg-highlight"
+  >
+    <app-icon name="close" class="size-5" />
+  </button>
+</form>

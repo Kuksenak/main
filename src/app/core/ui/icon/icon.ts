@@ -20,6 +20,7 @@ export const ICONS = [
   'enter',
   'arrow-up',
   'arrow-down',
+  'close',
   'chevron-left',
   'chevron-right',
   'home',

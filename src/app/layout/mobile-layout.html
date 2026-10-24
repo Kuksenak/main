@@ -34,9 +34,8 @@
 @if (accountOpen()) {
   <app-account-sheet (closed)="accountOpen.set(false)" />
 }
-<!-- The search (its code downloaded only the first time it's opened) -->
+<!-- The search: its field on a capsule just over the keyboard (not deferred: the field is focused
+     while the tap is going on, else iOS doesn't open the keyboard) -->
 @if (searchOpen()) {
-  @defer {
-    <app-search-sheet (closed)="searchOpen.set(false)" />
-  }
+  <app-search-bar (closed)="searchOpen.set(false)" />
 }
