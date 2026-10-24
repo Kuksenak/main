@@ -17,6 +17,7 @@
   --color-app: var(--app-bg);
   --color-fg: var(--text);
   --color-fg-secondary: var(--text-secondary);
+  --color-icon: var(--icon);
   --color-danger: var(--danger);
   --color-accent: var(--accent);
   --color-success: var(--success);

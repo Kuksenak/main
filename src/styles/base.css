@@ -6,6 +6,7 @@
   --app-bg: #fbfbf9; /* (as the manifest's) */
   --text: #171717;
   --text-secondary: color-mix(in srgb, var(--text) 50%, transparent);
+  --icon: color-mix(in srgb, var(--text) 60%, transparent); /* the outlined icons in rows: softer than their text */
   --danger: #fd7d49;
   --accent: #3478f6; /* today in the calendar */
   --success: #34c759; /* (the dot: an update ready) */

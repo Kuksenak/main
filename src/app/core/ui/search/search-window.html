@@ -9,7 +9,7 @@
   >
     <!-- The field, its loupe at the left -->
     <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
-      <app-icon name="search" class="size-5 shrink-0 text-fg-secondary" />
+      <app-icon name="search" class="size-5 shrink-0 text-icon" />
       <input
         #field
         type="text"
@@ -36,7 +36,7 @@
           (mouseenter)="index.set(i)"
           class="flex min-h-9 w-full shrink-0 items-center gap-2.5 rounded-xl px-2 py-1 text-left active:transform-none aria-selected:bg-tint"
         >
-          <app-icon [name]="result.icon" class="size-5 shrink-0 text-fg-secondary" />
+          <app-icon [name]="result.icon" class="size-5 shrink-0 text-icon" />
           <!-- (the name, then its hint after a dash, small and gray, as Notion's) -->
           <span class="min-w-0 flex-1 truncate text-ui text-side-text">
             {{ result.label }}

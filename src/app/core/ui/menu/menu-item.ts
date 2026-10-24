@@ -13,7 +13,7 @@ import { Icon, IconName } from '../icon/icon';
   imports: [Icon],
   host: {
     class:
-      'flex min-h-menu-row w-full items-center gap-2 rounded-button px-menu-row-x py-1 text-left text-ui leading-tight text-fg outline-none ' +
+      'group flex min-h-menu-row w-full items-center gap-2 rounded-button px-menu-row-x py-1 text-left text-ui leading-tight text-fg outline-none ' +
       'not-disabled:hover:bg-tint-strong not-disabled:active:bg-tint-strong focus-visible:bg-tint-strong disabled:opacity-40 ' +
       'data-danger:not-disabled:hover:text-danger data-danger:focus-visible:text-danger',
     '[attr.role]': "checked() === undefined ? 'menuitem' : 'menuitemradio'",
