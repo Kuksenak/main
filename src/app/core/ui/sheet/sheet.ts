@@ -5,7 +5,7 @@ import { VisibleArea } from '../../services/visible-area';
 
 /**
  * Phones: a sheet from the bottom (as iOS 26's): see-through glass over a strong blur, big round
- * corners, just in from the screen's edges; as tall as its content (up to 90% of the screen), or
+ * corners, right at the screen's edges and bottom (no gap); as tall as its content (up to 90% of the screen), or
  * `tall`: from the top bar's buttons (a little over them) down — a fixed height, so pages switching
  * inside it don't make it jump. Pulled down (anywhere: what's in it scrolled to its top, a pull
  * down moves the sheet, not it) far enough or flicked down, a tap outside or Esc: it slides away,
