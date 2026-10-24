@@ -49,14 +49,15 @@ ICONS = {
         + fill(SAGE, 'M27.7 50.9 28.6 39.7 36.4 40.3 36.2 50.8z', off=False)
         + thin('M27.7 50.9C27.9 47 28.2 43.4 28.6 39.7 31.2 39.6 33.9 40 36.4 40.3 36.1 43.8 36.3 47.4 36.2 50.8'),
     # a calendar page (cream), a clock badge (teal) at its corner
-    'calendar': fill(CREAM, 'M12.6 15.8 50.6 15.4 50.8 50.7 12.8 50.9z')
-        + line('M12.5 15.8C24 15.2 38 15.3 50.6 15.5 50.3 27 50.4 39 50.8 50.7 38 50.3 25 50.6 12.8 50.9 12.9 39 12.6 27 12.5 15.8')
-        + line('M10.8 24.6C24 24 38 24.3 52.4 24.2')
-        + thin('M21.8 10.6 22.1 19.4M41.2 10.4 41.5 19.2')
-        + detail('M19.5 32.5h4.5M29.5 32.4h4.5M19.6 40.6h4.4')
-        + '<!--badge-->' + fill(TEAL, ring(46, 46, 10.5), off=False)
-        + line(ring(46, 46, 10.5))
-        + thin('M46.2 39.6 46 46.4 50.4 49'),
+    # (drawn 1.5 up and left of where it was: its clock made it sit low and right of the middle)
+    'calendar': fill(CREAM, 'M11.2 14.2 49.2 13.8 49.4 49.1 11.4 49.3z')
+        + line('M11.1 14.2C22.6 13.6 36.6 13.7 49.2 13.9 48.9 25.4 49 37.4 49.4 49.1 36.6 48.7 23.6 49 11.4 49.3 11.5 37.4 11.2 25.4 11.1 14.2')
+        + line('M9.4 23C22.6 22.4 36.6 22.7 51 22.6')
+        + thin('M20.4 9 20.7 17.8M39.8 8.8 40.1 17.6')
+        + detail('M18.1 30.9h4.5M28.1 30.8h4.5M18.2 39h4.4')
+        + '<!--badge-->' + fill(TEAL, ring(44.6, 44.4, 10.5), off=False)
+        + line(ring(44.6, 44.4, 10.5))
+        + thin('M44.8 38 44.6 44.8 49 47.4'),
     # the sections: nine dots, as Google's apps button — dabbed with the marker: in rows, but each
     # a touch off, its own size, a little squashed
     'grid': ''.join(
@@ -192,7 +193,7 @@ for name, body in ICONS.items():
     if '<!--badge-->' in line_body:
         under, badge = line_body.split('<!--badge-->')
         line_body = ('<mask id="cut"><rect width="64" height="64" fill="#fff"/>'
-                     '<circle cx="46" cy="46" r="12.5" fill="#000"/></mask>'
+                     '<circle cx="44.6" cy="44.4" r="12.5" fill="#000"/></mask>'
                      f'<g mask="url(#cut)">{under}</g>{badge}')
     # (small: a thicker marker, ~1.5px at 22px, and less wobble — else it blurs to a hairline)
     small = (HEAD.replace('stroke-width="3"', f'stroke-width="{INK}"').replace('scale="2"', f'scale="{WOBBLE}"')
