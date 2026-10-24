@@ -41,7 +41,7 @@ The account sheet's language list sets the size for everything on phones:
 - 17px text (`text-body`), 16px side padding (`px-row-x`);
 - 28px icons (`size-icon-menu`), ✓ / › 20px;
 - hairlines between rows from the text on;
-- round buttons 48px (`h-round`).
+- round buttons 44px (`h-round`), as iOS's.
 
 New phone screens use these tokens (`styles/mobile.css`), not sizes of their own.
 

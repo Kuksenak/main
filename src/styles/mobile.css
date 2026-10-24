@@ -25,8 +25,8 @@
   --menu-row-px: 0.5rem;
   --menu-label-px: 0.5rem;
   --round-menu: 1rem;
-  /* Round buttons (menu, account): 48; list rows 48 */
-  --round-h: 3rem;
+  /* Round buttons (menu, account, ‹), as iOS's (Telegram's): 44; list rows 48 */
+  --round-h: 2.75rem;
   --row-h: 3rem;
   --row-px: 1rem;
   /* Switches (on / off), as iOS's: 51 × 31 */
