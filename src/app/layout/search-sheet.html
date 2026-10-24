@@ -9,6 +9,7 @@
       autocomplete="off"
       [value]="query()"
       (input)="query.set(field.value)"
+      (keydown.enter)="first(sheet)"
       [placeholder]="'search.placeholder' | t"
       class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary"
     />

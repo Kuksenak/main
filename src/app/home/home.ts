@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { Icon, ICONS } from '../core/ui';
+import { PageFilter } from '../layout/page-filter';
 import { PageTitle } from '../layout/page-title';
 
 /**
@@ -13,10 +14,13 @@ import { PageTitle } from '../layout/page-title';
   templateUrl: './home.html',
 })
 export class Home {
-  protected readonly icons = ICONS;
+  // (phones: the top bar's filter — the icons whose name has what's typed)
+  private readonly filter = inject(PageFilter);
+  protected readonly icons = computed(() => ICONS.filter((name) => this.filter.matches(name)));
 
   constructor() {
     const i18n = inject(I18nService);
     inject(PageTitle).show(computed(() => i18n.t('nav.home')));
+    this.filter.offer();
   }
 }

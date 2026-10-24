@@ -1,0 +1,37 @@
+<!-- On the part of the screen that's seen (with the keyboard up: what's over it), the page under it
+     seen and its own (taps go through): only the capsule at the bottom, just over the keyboard -->
+<div
+  class="pointer-events-none fixed inset-x-0 z-40 flex flex-col justify-end"
+  [style.top.px]="area.top()"
+  [style.height.px]="area.height()"
+>
+  <!-- The capsule (as the system's bar under it: glass, round): the funnel, the field, ✕ -->
+  <form
+    class="pointer-events-auto mx-3 flex h-12 shrink-0 items-center gap-2.5 rounded-full border-[0.5px] border-sheet-border bg-sheet pr-1.5 pl-4 shadow-sheet
+           backdrop-blur-[30px] backdrop-saturate-[180%]"
+    [style.margin-bottom]="typing() || area.keyboard() ? '0.375rem' : 'max(0.75rem, env(safe-area-inset-bottom))'"
+    (submit)="submit($event)"
+  >
+    <app-icon name="filter" class="size-5.5 shrink-0 text-icon" />
+    <input
+      #field
+      type="search"
+      enterkeyhint="search"
+      autocomplete="off"
+      [value]="filter.query()"
+      (input)="filter.query.set(field.value)"
+      (focus)="typing.set(true)"
+      (blur)="typing.set(false)"
+      [placeholder]="'filter.placeholder' | t"
+      class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary [&::-webkit-search-cancel-button]:hidden"
+    />
+    <button
+      type="button"
+      (click)="close()"
+      [attr.aria-label]="'search.close' | t"
+      class="grid size-9 shrink-0 place-items-center rounded-full text-icon active:bg-highlight"
+    >
+      <app-icon name="close" class="size-5" />
+    </button>
+  </form>
+</div>

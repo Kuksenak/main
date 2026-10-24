@@ -4,13 +4,15 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
+import { PageFilter } from '../layout/page-filter';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
- * Desktop: New page at the top; phones: + floating at the bottom right.
+ * Desktop: New page at the top; phones: + floating at the bottom right, and the top bar's
+ * filter (the titles).
  */
 @Component({
   selector: 'app-library',
@@ -25,9 +27,13 @@ export class Library {
   protected readonly desktop = desktop;
   protected readonly creating = signal(false);
   protected readonly createError = signal(false);
+  // (phones: the top bar's filter — the pages whose title has what's typed)
+  protected readonly filter = inject(PageFilter);
+  protected readonly shown = computed(() => this.store.items()?.filter((item) => this.filter.matches(item.title)));
 
   constructor() {
     inject(PageTitle).show(computed(() => this.i18n.t('nav.library')));
+    this.filter.offer();
     this.store.load();
   }
 

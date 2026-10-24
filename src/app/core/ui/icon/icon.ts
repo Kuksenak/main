@@ -17,6 +17,7 @@ export const ICONS = [
   'page',
   'trash',
   'search',
+  'filter',
   'enter',
   'arrow-up',
   'arrow-down',

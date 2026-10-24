@@ -5,18 +5,21 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
 import { Icon, UiFloatingButton } from '../core/ui';
 import { AccountSheet } from './account-sheet';
+import { FilterBar } from './filter-bar';
 import { PageTitle } from './page-title';
 import { PlacesSheet } from './places-sheet';
-import { SearchBar } from './search-bar';
+import { PageFilter } from './page-filter';
+import { SearchSheet } from './search-sheet';
 
 /**
  * Phones: the frame of every page after sign-in (the router puts the page into it), as iOS's — a
- * top bar: the page's title (a page opened from a list: ‹ back to it first), 🔍 (the search: a capsule over the keyboard), ⊞ (the sections' sheet) and the account (its letter: the account's
+ * top bar: the page's title (a page opened from a list: ‹ back to it first), the funnel (a page that has a filter: its field on a capsule over the
+ * keyboard, FilterBar), 🔍 (the search, as the desktop's: a sheet, SearchSheet), ⊞ (the sections' sheet) and the account (its letter: the account's
  * sheet); the page under it. (Desktops have their own, DesktopLayout: neither downloads the other's.)
  */
 @Component({
   selector: 'app-mobile-layout',
-  imports: [AccountSheet, Icon, PlacesSheet, RouterLink, RouterOutlet, SearchBar, TranslatePipe, UiFloatingButton],
+  imports: [AccountSheet, FilterBar, Icon, PlacesSheet, RouterLink, RouterOutlet, SearchSheet, TranslatePipe, UiFloatingButton],
   templateUrl: './mobile-layout.html',
 })
 export class MobileLayout {
@@ -27,6 +30,8 @@ export class MobileLayout {
   protected readonly title = this.page.text;
   protected readonly back = this.page.back;
   protected readonly placesOpen = signal(false);
+  protected readonly filter = inject(PageFilter);
+  protected readonly filterOpen = signal(false);
   protected readonly searchOpen = signal(false);
   protected readonly accountOpen = signal(false);
   // (the account button: the email's first letter)

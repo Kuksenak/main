@@ -15,9 +15,11 @@
   @if (store.items(); as items) {
     @if (!items.length) {
       <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'library.empty' | t }}</p>
+    } @else if (!shown()?.length) {
+      <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'filter.nothing' | t }}</p>
     } @else {
       <ui-list>
-        @for (item of items; track item.id) {
+        @for (item of shown(); track item.id) {
           <button type="button" uiListItem icon="page" (click)="open(item)" [chevron]="!desktop">
             {{ item.title }}
             <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
