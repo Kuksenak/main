@@ -8,7 +8,8 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#fbfbf9">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbfbf9">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <!-- "default", not "black-translucent": with a translucent status bar iOS launches home-screen
@@ -22,32 +23,38 @@
   <script>
     (function () {
       var query = window.matchMedia('(prefers-color-scheme: dark)');
-      // The theme follows the system. The status bar's color (theme-color, the page's — base.css):
-      // a new tag rather than an edited one — iOS didn't notice an edit while a popup was open.
-      // `force`: put in again even if it's the same (a nudge first: another color, then the right
-      // one a frame later) — iOS keeps the old color when the theme changed under a full-screen
-      // overlay (the search, a sheet); they ask for it as they close ('theme-color' event:
-      // core/services/theme-color.ts).
-      function apply(isDark, force) {
+      // The theme follows the system. The status bar's color: two theme-color tags, one per scheme
+      // (media) — iOS picks the right one by itself as the system switches, nothing to edit then.
+      // They're put in anew (nudged: a hair off, then right a moment later) at every switch, when
+      // the app comes back, and as anything over the whole screen closes ('theme-color' event:
+      // core/services/theme-color.ts) — iOS kept the old color now and then otherwise.
+      var LIGHT = '#fbfbf9', DARK = '#000000';
+      function tags(light, dark) {
+        document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.remove(); });
+        [['light', light], ['dark', dark]].forEach(function (t) {
+          var meta = document.createElement('meta');
+          meta.name = 'theme-color';
+          meta.media = '(prefers-color-scheme: ' + t[0] + ')';
+          meta.content = t[1];
+          document.head.appendChild(meta);
+        });
+      }
+      function apply(isDark, nudge) {
         document.documentElement.classList.toggle('dark', isDark);
-        var color = isDark ? '#000000' : '#fbfbf9';
-        var old = document.querySelector('meta[name="theme-color"]');
-        if (old && old.getAttribute('content') === color && !force) return;
-        var meta = document.createElement('meta');
-        meta.name = 'theme-color';
-        meta.content = force ? (isDark ? '#010101' : '#fbfbfa') : color;
-        if (old) old.replaceWith(meta);
-        else document.head.appendChild(meta);
-        if (force) requestAnimationFrame(function () { apply(isDark, false); });
+        if (!nudge) return tags(LIGHT, DARK);
+        tags('#fbfbfa', '#010101');
+        // (a frame later — or, hidden, where frames don't come, a moment later)
+        var done = false;
+        var right = function () { if (!done) { done = true; tags(LIGHT, DARK); } };
+        requestAnimationFrame(right);
+        setTimeout(right, 60);
       }
       apply(query.matches);
-      // (the theme changed: put in anew at once — with something over the whole screen open, the
-      // search, a sheet, iOS kept the old color for a plain edit)
       query.addEventListener('change', function (e) { apply(e.matches, true); });
       document.addEventListener('theme-color', function () { apply(query.matches, true); });
       // Back in the app: the system theme may have changed while it was hidden.
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') apply(query.matches);
+        if (document.visibilityState === 'visible') apply(query.matches, true);
       });
 
       var ua = navigator.userAgent;
