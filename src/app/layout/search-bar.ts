@@ -9,8 +9,8 @@ import { AppSearch, Found, SearchScope } from './app-search';
 /**
  * Phones: the app's search (the top bar's 🔍), as Telegram's — over the whole screen, the field on
  * a capsule where the top bar was and ✕ at its right (both as the top bar's buttons), the tabs
- * under them (All, Pages, Events); under those what's found (AppSearch's: nothing typed, the
- * recent pages and New page), by section, scrolled on its own down to the keyboard — the head
+ * under them (All, Pages, Events); under those what's found (AppSearch's, no actions: nothing
+ * typed, the recent pages), by section, scrolled on its own down to the keyboard — the head
  * stays put. A tap (or
  * Search on the keyboard: the first one) opens it; ✕ or Esc closes it.
  *
@@ -39,7 +39,7 @@ export class SearchBar {
   // What's found, by section, in order
   protected readonly sections = computed(() => {
     const sections: { name: string; items: Found[] }[] = [];
-    for (const found of this.search.find(this.query(), this.scope())) {
+    for (const found of this.search.find(this.query(), this.scope(), false)) {
       const last = sections.at(-1);
       if (last?.name === found.section) last.items.push(found);
       else sections.push({ name: found.section, items: [found] });
@@ -49,17 +49,9 @@ export class SearchBar {
 
   constructor() {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && this.open() && this.close();
-    // (iOS pushing the page up for the field, or a drag pushing it: back to the top)
-    const stay = () => this.open() && window.scrollY !== 0 && window.scrollTo(0, 0);
     document.addEventListener('keydown', onKey);
-    window.visualViewport?.addEventListener('resize', stay);
-    window.visualViewport?.addEventListener('scroll', stay);
-    window.addEventListener('scroll', stay);
     inject(DestroyRef).onDestroy(() => {
       document.removeEventListener('keydown', onKey);
-      window.visualViewport?.removeEventListener('resize', stay);
-      window.visualViewport?.removeEventListener('scroll', stay);
-      window.removeEventListener('scroll', stay);
     });
   }
 

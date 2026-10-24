@@ -24,7 +24,7 @@ export type SearchScope = 'all' | 'pages' | 'events';
  * Nothing typed: the pages last changed and the actions (New page); something typed: the library's
  * pages and the app's sections whose names have it (the ones that start with it first). `find` reads
  * signals: call it in a computed. `scope` (the phones' tabs): 'pages' — all the pages, the last
- * changed first (or those that have it); 'events' — none yet.
+ * changed first (or those that have it); 'events' — none yet. `actions` off (phones): no New page.
  */
 @Injectable({ providedIn: 'root' })
 export class AppSearch {
@@ -38,7 +38,7 @@ export class AppSearch {
     if (this.auth.can('library') && !this.library.items()) this.library.load();
   }
 
-  find(query: string, scope: SearchScope = 'all'): Found[] {
+  find(query: string, scope: SearchScope = 'all', actions = true): Found[] {
     const q = query.trim().toLocaleLowerCase(this.i18n.locale());
     const t = (key: Parameters<I18nService['t']>[0]) => this.i18n.t(key);
     const pages = (this.auth.can('library') ? (this.library.items() ?? []) : []).map(
@@ -52,10 +52,10 @@ export class AppSearch {
 
     // Nothing typed: the pages last changed, then the actions
     if (!q) {
-      const actions: Found[] = this.auth.can('library')
+      const extra: Found[] = actions && this.auth.can('library')
         ? [{ id: 'new-page', section: t('search.actions'), label: t('library.new'), icon: 'plus', open: () => this.newPage() }]
         : [];
-      return [...pages.slice(0, 8).map((p) => ({ ...p, section: t('search.recents') })), ...actions];
+      return [...pages.slice(0, 8).map((p) => ({ ...p, section: t('search.recents') })), ...extra];
     }
 
     // Something typed: the names that have it — those starting with it first

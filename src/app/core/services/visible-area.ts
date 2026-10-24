@@ -4,7 +4,8 @@ import { Injectable, signal } from '@angular/core';
  * The part of the screen that's seen (window.visualViewport): with the keyboard up, iOS shrinks it
  * and shifts the page up under it. Things fixed to the screen that must stay in view — a sheet, the
  * search's capsule — take their place from `top` and `height` (px, in the page's fixed frame), not
- * from the whole screen. `keyboard`: how much of the screen the keyboard (and its bar) takes; 0 without one.
+ * from the whole screen; the page itself is kept from scrolling (iOS pushes it up for a field).
+ * `keyboard`: how much of the screen the keyboard (and its bar) takes; 0 without one.
  */
 @Injectable({ providedIn: 'root' })
 export class VisibleArea {
@@ -32,9 +33,24 @@ export class VisibleArea {
       const keyboard = Math.round(full - height);
       this.keyboard.set(keyboard > 80 ? keyboard : 0);
     };
+    // The page itself never scrolls (its own parts do): iOS pushing it up for a field the keyboard
+    // would cover, back to the top — the top bar stays where it is — and the field brought into
+    // view in its own part instead
+    const stay = () => {
+      if (window.scrollY === 0) return;
+      window.scrollTo(0, 0);
+      const field = document.activeElement;
+      if (field instanceof HTMLElement && field.matches('input, textarea, [contenteditable]'))
+        requestAnimationFrame(() => field.scrollIntoView({ block: 'nearest' }));
+    };
+    const changed = () => {
+      measure();
+      stay();
+    };
     measure();
-    viewport?.addEventListener('resize', measure);
-    viewport?.addEventListener('scroll', measure);
-    window.addEventListener('resize', measure);
+    viewport?.addEventListener('resize', changed);
+    viewport?.addEventListener('scroll', changed);
+    window.addEventListener('resize', changed);
+    window.addEventListener('scroll', stay);
   }
 }
