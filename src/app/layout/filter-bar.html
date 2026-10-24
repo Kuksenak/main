@@ -11,8 +11,8 @@
   <!-- (under the capsule: the page's color, fading to nothing upwards — the page's text drifting in) -->
   <div class="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-app from-35% to-transparent"></div>
   <!-- As iOS's bar over the keyboard just under it: as wide, as tall, the same glass and rim, the
-       same room between -->
-  <div class="relative mx-4 flex items-center gap-2" [style.margin-bottom]="typing() || area.keyboard() ? '0' : 'max(0.75rem, env(safe-area-inset-bottom))'">
+       same room between (in the browser, Safari's own bar there sits higher: a little more) -->
+  <div class="relative mx-4 flex items-center gap-2" [style.margin-bottom]="typing() || area.keyboard() ? (inBrowser ? '0.625rem' : '0') : 'max(0.75rem, env(safe-area-inset-bottom))'">
     <!-- The capsule: the funnel, the field -->
     <form
       class="flex h-bar min-w-0 flex-1 items-center gap-2.5 rounded-full border-[0.5px] border-bar-border bg-bar px-4 text-fg backdrop-blur-[30px] backdrop-saturate-[180%]

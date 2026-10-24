@@ -1,0 +1,60 @@
+<!-- Over the whole screen (down to the keyboard), the page's color; unseen and not taken till open -->
+<div
+  class="pointer-events-none fixed inset-x-0 z-50 flex flex-col bg-app text-fg opacity-0 transition-opacity duration-150 data-open:pointer-events-auto data-open:opacity-100"
+  [attr.data-open]="open() ? '' : null"
+  [attr.aria-hidden]="open() ? null : 'true'"
+  [style.top.px]="area.top()"
+  [style.height.px]="area.height()"
+>
+  <!-- Where the top bar was: the capsule (the loupe, the field), ✕ a circle at its right — as the
+       filter's bar (its glass and rim) -->
+  <div class="flex shrink-0 items-center gap-2 px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-2">
+    <form
+      class="flex h-round min-w-0 flex-1 items-center gap-2.5 rounded-full border-[0.5px] border-bar-border bg-bar px-4"
+      (submit)="submit($event)"
+    >
+      <app-icon name="search" class="size-5.5 shrink-0 text-icon" />
+      <input
+        #field
+        type="search"
+        enterkeyhint="search"
+        autocomplete="off"
+        [value]="query()"
+        (input)="query.set(field.value)"
+        [placeholder]="'search.title' | t"
+        class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary [&::-webkit-search-cancel-button]:hidden"
+      />
+    </form>
+    <button
+      type="button"
+      (click)="close()"
+      [attr.aria-label]="'search.close' | t"
+      class="grid size-round shrink-0 place-items-center rounded-full border-[0.5px] border-bar-border bg-bar transition-[scale] duration-200 active:scale-110"
+    >
+      <app-icon name="close" class="size-5.5" />
+    </button>
+  </div>
+
+  <!-- What's found: a list per section, its name small and gray over it -->
+  @if (open()) {
+    <div class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 pt-2 pb-4">
+      @for (section of sections(); track section.name) {
+        <div class="flex flex-col gap-1.5">
+          <span class="px-row-x text-footnote font-medium text-fg-secondary">{{ section.name }}</span>
+          <ui-list>
+            @for (found of section.items; track found.id) {
+              <button type="button" uiListItem [icon]="found.icon" (click)="pick(found)">
+                {{ found.label }}
+                @if (found.hint) {
+                  <span itemValue class="text-fg-secondary">{{ found.hint }}</span>
+                }
+              </button>
+            }
+          </ui-list>
+        </div>
+      } @empty {
+        <p class="py-10 text-center text-body text-fg-secondary">{{ 'search.nothing' | t }}</p>
+      }
+    </div>
+  }
+</div>

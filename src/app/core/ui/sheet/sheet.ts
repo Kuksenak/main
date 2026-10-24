@@ -1,4 +1,5 @@
 import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { inBrowser } from '../../device';
 import { VisibleArea } from '../../services/visible-area';
 
 /**
@@ -8,7 +9,7 @@ import { VisibleArea } from '../../services/visible-area';
  * inside it don't make it jump. Drag it down by the top, tap outside or press Esc: it slides away,
  * then `closed` fires. Render it with @if; `close()` from inside (e.g. after a pick) does the same.
  * A head row (‹ back, a page's name, a field) goes in with `sheetHead`: it stays put while what's
- * under it scrolls; without one, the first block starts a little under the grabber. With the
+ * under it scrolls; without one, the first block starts half a head row under the grabber. With the
  * keyboard up, it sits over it (VisibleArea).
  *   @if (open()) { <ui-sheet #sheet (closed)="open.set(false)">…</ui-sheet> }
  */
@@ -25,9 +26,7 @@ export class UiSheet {
   protected readonly area = inject(VisibleArea);
 
   // In a phone's browser (not the installed app): a bit higher, clear of its bottom bar
-  protected readonly inBrowser = !(
-    matchMedia('(display-mode: standalone)').matches || (navigator as { standalone?: boolean }).standalone
-  );
+  protected readonly inBrowser = inBrowser;
 
   protected readonly closing = signal(false);
   protected readonly dragY = signal(0);

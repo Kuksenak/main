@@ -17,7 +17,7 @@ export interface Found {
 }
 
 /**
- * What the app's search finds — the desktop's search window and the phones' search sheet alike.
+ * What the app's search finds — the desktop's search window and the phones' search (SearchBar) alike.
  * Nothing typed: the pages last changed and the actions (New page); something typed: the library's
  * pages and the app's sections whose names have it (the ones that start with it first). `find` reads
  * signals: call it in a computed.

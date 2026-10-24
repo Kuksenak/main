@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { inBrowser } from '../core/device';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { VisibleArea } from '../core/services/visible-area';
 import { Icon } from '../core/ui';
@@ -25,6 +26,7 @@ import { PageFilter } from './page-filter';
 export class FilterBar {
   protected readonly filter = inject(PageFilter);
   protected readonly area = inject(VisibleArea);
+  protected readonly inBrowser = inBrowser;
   private readonly field = viewChild.required<ElementRef<HTMLInputElement>>('field');
 
   protected readonly open = signal(false);
