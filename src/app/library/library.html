@@ -30,7 +30,8 @@
   }
 </div>
 
-<!-- Phones: + floating at the bottom right, just above the home indicator -->
+<!-- Phones: + floating at the bottom right, just above the home indicator (not while filtering:
+     the capsule's there) -->
 <button
   type="button"
   uiFloatingButton
@@ -39,7 +40,7 @@
   [disabled]="creating()"
   (click)="create()"
   [attr.aria-label]="'library.new' | t"
-  class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20 desktop:hidden"
+  class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20 desktop:hidden in-data-filtering:hidden"
 >
   <app-icon name="plus" class="size-7" />
 </button>

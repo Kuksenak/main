@@ -1,5 +1,15 @@
-<div class="flex h-full flex-col bg-app text-fg">
-  <header class="flex shrink-0 items-center gap-3 px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-2">
+<!-- (with the keyboard up: down to it only — what's under the keyboard isn't the page's) -->
+<div
+  class="relative h-full bg-app text-fg"
+  [style.height.px]="area.keyboard() ? area.top() + area.height() : null"
+  [attr.data-filtering]="filtering() ? '' : null"
+>
+  <!-- The top bar over the page, the page passing under it: it fades from the page's color to
+       nothing, the page's text drifting into it -->
+  <header
+    class="pointer-events-none absolute inset-x-0 top-0 z-30 flex items-center gap-3 bg-linear-to-b from-app from-60% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5
+           *:pointer-events-auto"
+  >
     <!-- A page opened from a list: ‹ back to it, the title smaller next to it -->
     @if (back(); as to) {
       <a uiFloatingButton round [routerLink]="to" [attr.aria-label]="'action.back' | t">
@@ -29,7 +39,10 @@
       }
     </button>
   </header>
-  <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
+  <!-- (its top under the bar; filtering, room at the bottom for the capsule) -->
+  <main
+    class="h-full min-w-0 overflow-y-auto overscroll-contain pt-[calc(env(safe-area-inset-top)+3.75rem)] in-data-filtering:pb-20"
+  >
     <router-outlet />
   </main>
 </div>

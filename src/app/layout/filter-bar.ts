@@ -8,7 +8,8 @@ import { PageFilter } from './page-filter';
  * Phones: the filter of the open page (PageFilter) — its field on a glass capsule at the bottom
  * (as iOS 26's), just over the keyboard (and its own bar: the system's, which a page can't change),
  * ✕ a round button of its own at its right; the page stays where it is, seen, and shows only what
- * matches while it's typed. Search on the keyboard puts the keyboard away (the filter stays, the
+ * matches while it's typed, scrolled as
+ * ever, its text fading out under the capsule. Search on the keyboard puts the keyboard away (the filter stays, the
  * capsule at the bottom); ✕ or Esc clears it and closes it.
  *
  * It's there (unseen) all the while a page offers a filter: the top bar's funnel calls `start()`,
@@ -32,7 +33,7 @@ export class FilterBar {
   // (opened, the keyboard not up yet: unseen at the top a moment — at most 0.6s, for a keyboard
   // that never comes, e.g. a hardware one)
   private readonly waited = signal(false);
-  protected readonly shown = computed(() => this.open() && (this.area.keyboard() > 0 || !this.typing() || this.waited()));
+  readonly shown = computed(() => this.open() && (this.area.keyboard() > 0 || !this.typing() || this.waited()));
 
   constructor() {
     let timer = 0;
@@ -42,16 +43,15 @@ export class FilterBar {
       timer = setTimeout(() => this.waited.set(true), 600);
     });
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && this.open() && this.close();
-    // (iOS pushing the page up for the field: back to the top — the page stays put)
+    // (iOS pushing the page up for the field, as the keyboard comes: back to the top — the page
+    // stays put; scrolling it is the page's own, under the capsule)
     const stay = () => this.open() && window.scrollY !== 0 && window.scrollTo(0, 0);
     document.addEventListener('keydown', onKey);
     window.visualViewport?.addEventListener('resize', stay);
-    window.addEventListener('scroll', stay);
     inject(DestroyRef).onDestroy(() => {
       clearTimeout(timer);
       document.removeEventListener('keydown', onKey);
       window.visualViewport?.removeEventListener('resize', stay);
-      window.removeEventListener('scroll', stay);
     });
   }
 
