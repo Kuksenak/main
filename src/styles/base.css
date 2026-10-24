@@ -41,7 +41,7 @@
   /* a field's fill on the page (the search's, as iOS's): gray, see-through */
   --field: rgb(118 118 128 / 0.12);
   /* a toast (as iOS's / Telegram's): dark and solid on any page, its words white */
-  --toast: rgb(32 32 34 / 0.94);
+  --toast: rgb(58 58 60 / 0.96);
   --toast-text: #ffffff;
   --toast-action: #64b5ff;
   --toast-shadow: 0 6px 24px rgb(0 0 0 / 0.16), 0 1px 3px rgb(0 0 0 / 0.1);
