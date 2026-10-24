@@ -13,8 +13,7 @@
         type="button"
         [attr.aria-label]="'editor.grip' | t"
         [attr.aria-expanded]="blockMenu() === i"
-        [class.top-3]="item.kind === 'card'"
-        class="absolute top-0.5 grid h-7 w-6 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
+        class="absolute top-3 grid h-7 w-6 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
         (pointerdown)="gripDown($event, i)"
         (pointermove)="gripMove($event, host)"
         (pointerup)="gripUp()"
@@ -25,8 +24,7 @@
 
       <!-- (a card: set apart — a soft fill, round corners, room inside) -->
       <div
-        class="mobile:mr-6"
-        [class]="item.kind === 'card' ? 'rounded-card bg-tint px-4 py-3' : ''"
+        class="rounded-card bg-tint px-4 py-3 mobile:mr-6"
       >
         <div class="relative">
           <!-- (the same letters as the field's, over it: only the marks faded, links colored) -->
@@ -43,10 +41,7 @@
             (mouseup)="select(i, field)"
             (focus)="select(i, field)"
             (blur)="left(i)"
-            [placeholder]="
-              item.kind === 'card'
-                ? ('editor.cardPlaceholder' | t)
-                : focused() === i || items().length === 1
+            [placeholder]="focused() === i || items().length === 1
                   ? ((desktop ? 'editor.hint' : 'editor.hintPhone') | t)
                   : ''
             "
