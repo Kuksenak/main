@@ -8,8 +8,8 @@
     (mousedown)="$event.stopPropagation()"
   >
     <!-- The field, its loupe at the left -->
-    <div class="flex shrink-0 items-center gap-3 px-5 pt-4 pb-3">
-      <app-icon name="search" class="size-5.5 text-fg-secondary" />
+    <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
+      <app-icon name="search" class="size-5 shrink-0 text-fg-secondary" />
       <input
         #field
         type="text"
@@ -18,7 +18,7 @@
         (input)="query.set(field.value)"
         (keydown)="key($event)"
         [placeholder]="placeholder()"
-        class="min-w-0 flex-1 bg-transparent text-[1.0625rem] text-fg outline-none placeholder:text-fg-secondary"
+        class="min-w-0 flex-1 bg-transparent text-base text-fg outline-none placeholder:text-fg-secondary"
       />
     </div>
 
