@@ -32,7 +32,7 @@ export interface UiOption {
       </button>
       @if (open()) {
         <div class="fixed inset-0 z-40" (click)="open.set(false)"></div>
-        <div role="listbox" class="absolute top-full left-0 z-50 mt-1.5 flex min-w-menu animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover">
+        <div role="listbox" class="absolute top-full left-0 z-50 mt-1.5 flex w-max min-w-full animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover">
           @for (option of options(); track option.value) {
             <button
               type="button"
