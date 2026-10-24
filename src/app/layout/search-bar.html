@@ -5,12 +5,12 @@
   [attr.data-open]="open() ? '' : null"
   [attr.aria-hidden]="open() ? null : 'true'"
 >
-  <!-- What's in it: on the part of the screen that's seen — its top the screen's top even if iOS
-       pushes the page up for the keyboard, its bottom the keyboard's top -->
+  <!-- What's in it: its top the seen screen's top even if iOS pushes the page up for the keyboard;
+       down to the screen's bottom, under the keyboard — what's found passes under its see-through
+       bar (room at the end to scroll the last one over it) -->
   <div
-    class="absolute inset-x-0 flex flex-col"
+    class="absolute inset-x-0 bottom-0 flex flex-col"
     [style.top.px]="area.top()"
-    [style.height.px]="area.height()"
   >
     <!-- Where the top bar was, staying there (a drag on it moves nothing): the capsule (the loupe,
        the field) and ✕, as the top bar's buttons (the same glass, the same height); under them the
@@ -68,7 +68,7 @@
     @if (open()) {
       <div
         class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 pt-1"
-        [style.padding-bottom]="area.keyboard() ? '1rem' : 'max(1rem, env(safe-area-inset-bottom))'"
+        [style.padding-bottom]="area.keyboard() ? area.keyboard() + 16 + 'px' : 'max(1rem, env(safe-area-inset-bottom))'"
       >
         @for (section of sections(); track section.name) {
           <div class="flex flex-col gap-1.5">
