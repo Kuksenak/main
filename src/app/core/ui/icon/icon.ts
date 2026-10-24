@@ -18,6 +18,8 @@ export const ICONS = [
   'trash',
   'search',
   'enter',
+  'arrow-up',
+  'arrow-down',
   'chevron-left',
   'chevron-right',
   'home',

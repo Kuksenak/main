@@ -8,6 +8,8 @@ import os, sys
 OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), '..', 'public', 'icons')
 os.makedirs(OUT, exist_ok=True)
 
+# The marker's ink: a soft dark gray (as the app's icons in rows, --icon on the page), not black
+MARKER = '#72716d'
 BEIGE, TEAL, SAGE, CREAM, ROSE, YELLOW = '#E5E4DF', '#C5DAD8', '#CBD5BF', '#F2EAD7', '#E9D3CE', '#F3E7B8'
 OFF = 'transform="translate(1.4 1.1)"'  # a pastel a little off its outline, as coloured in by hand
 
@@ -58,7 +60,7 @@ ICONS = {
     # the sections: nine dots, as Google's apps button — dabbed with the marker: in rows, but each
     # a touch off, its own size, a little squashed
     'grid': ''.join(
-        f'<path stroke="none" fill="#1a1a1a" '
+        f'<path stroke="none" fill="{MARKER}" '
         f'transform="translate({x + dx} {y + dy}) rotate({t}) scale(1 {q})" d="{ring(0, 0, r)}z"/>'
         for (x, y), (dx, dy, r, q, t) in zip(
             [(x, y) for y in (15.5, 32, 48.5) for x in (15.5, 32, 48.5)],
@@ -118,6 +120,11 @@ ICONS = {
     # enter (↵): down, then back to the left, its head
     'enter': line('M47.4 15.2C47.6 22 47.4 28.6 47.2 34.4 47.1 37.2 45.6 38.6 42.8 38.6 34 38.6 25.4 38.4 16.8 38.6')
         + line('M25.4 29.6C22.4 32.6 19.8 35.4 16.6 38.6 19.6 41.6 22.4 44.6 25.6 47.6'),
+    # up / down (the search window's keys): a line, its head, a little off
+    'arrow-up': line('M32.2 51.2C32 39 32.1 26.8 31.9 14.2')
+        + line('M19.4 26.6C23.6 22.4 27.6 18.2 31.9 13.8 36.2 18 40.4 22.2 44.8 26.6'),
+    'arrow-down': line('M31.8 12.8C32 25 31.9 37.2 32.1 49.8')
+        + line('M19.2 37.4C23.4 41.6 27.6 45.8 32.1 50.2 36.4 46 40.6 41.8 44.6 37.4'),
     'check': line('M13.6 33.8C18.2 37.8 22.4 41.8 26.6 46.2 33.8 35.6 41.4 26.2 50.6 17.4'),
     'chevron-left': line('M39.2 14.4C33.2 20 27.4 26 21.4 32.2 27 38 32.8 43.8 38.8 49.6'),
     'chevron-right': line('M24.8 14.4C30.8 20 36.6 26 42.6 32.2 37 38 31.2 43.8 25.2 49.6'),
@@ -134,7 +141,7 @@ ICONS = {
         + line('M27.6 35.6C35 35.2 43 35.4 52.8 35.2M45.2 27.2C48 30 50.6 32.6 53.4 35.3 50.6 38.1 47.8 40.6 45 43.4'),
 }
 
-HEAD = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#1a1a1a" '
+HEAD = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="' + MARKER + '" '
         'stroke-width="3" stroke-linecap="round" stroke-linejoin="round">'
         '<defs><filter id="marker" x="-10%" y="-10%" width="120%" height="120%">'
         '<feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4"/>'
