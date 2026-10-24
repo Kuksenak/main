@@ -25,20 +25,10 @@
         title()
       }}</span>
     } @else {
-      <!-- A section: its name with ▾ — the system's own menu of the sections (a select, unseen over
-           it): one picked, it opens -->
-      <div class="relative flex min-w-0 flex-1 items-center gap-1" data-vt="page-title">
-        <span class="truncate text-xl font-semibold">{{ title() }}</span>
-        <app-icon name="chevron-down" class="size-5 shrink-0 text-icon" />
-        <select
-          class="absolute inset-0 opacity-0"
-          [attr.aria-label]="'nav.menu' | t"
-          (change)="go($any($event.target))"
-        >
-          @for (place of places(); track place.path) {
-            <option [value]="place.path" [selected]="place.path === here()">{{ place.label | t }}</option>
-          }
-        </select>
+      <!-- A section: a pill with its icon and name, ▾ — the shared select (phones: the system's own
+           menu of the sections): one picked, it opens -->
+      <div class="min-w-0 flex-1" data-vt="page-title">
+        <ui-select [options]="places()" [value]="here()" (valueChange)="go($event)" [label]="'nav.menu' | t" />
       </div>
     }
     <!-- (not inside a page opened from a list: there, only ‹ and its title) -->
