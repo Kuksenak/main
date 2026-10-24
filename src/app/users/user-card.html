@@ -13,11 +13,8 @@
     </ui-list>
 
     <!-- Their access: a row per area, switched right there (the admins: locked) -->
-    <div class="flex flex-col gap-1.5">
-      <span class="flex items-center gap-1.5 px-row-x text-footnote font-medium text-fg-secondary">
-        <app-icon name="lock" class="size-4" />
-        {{ (user.isAdmin ? 'users.locked' : 'users.access') | t }}
-      </span>
+    <div class="flex flex-col gap-2">
+      <span class="px-row-x text-body font-semibold text-fg-secondary">{{ (user.isAdmin ? 'users.locked' : 'users.access') | t }}</span>
       <ui-list>
         @for (area of store.areas(); track area) {
           <div uiListItem>
@@ -31,8 +28,8 @@
 
     <!-- AI: questions a day (empty: the app's own number, gray in the field), asked today -->
     @if (store.aiDefault() !== null) {
-      <div class="flex flex-col gap-1.5">
-        <span class="px-row-x text-footnote font-medium text-fg-secondary">{{ 'users.ai' | t }}</span>
+      <div class="flex flex-col gap-2">
+        <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'users.ai' | t }}</span>
         <ui-list>
           <div uiListItem>
             {{ 'users.aiPerDay' | t }}

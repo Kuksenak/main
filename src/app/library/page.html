@@ -9,6 +9,7 @@
       @if (saving()) {
         <span>{{ 'library.saving' | t }}</span>
       }
+      <button uiButton type="button" icon="sparkle" (click)="aiOpen.set(!aiOpen())">{{ 'editor.ai' | t }}</button>
       <button uiButton type="button" icon="trash" (click)="delete()">{{ 'library.delete' | t }}</button>
     </div>
 
@@ -21,24 +22,35 @@
       #titleField
       type="text"
       [value]="title()"
-      (input)="typed('title', titleField.value)"
+      (input)="typedTitle(titleField.value)"
+      (keydown.enter)="titleEnter($event)"
       [placeholder]="'library.untitled' | t"
       maxlength="200"
       class="w-full bg-transparent text-[1.75rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary desktop:text-[2rem]"
     />
 
-    <!-- The text: as tall as it is -->
-    <textarea
-      #textField
-      rows="6"
-      [value]="text()"
-      (input)="typed('text', textField.value); grow(textField)"
-      (focus)="grow(textField)"
-      [placeholder]="'library.textPlaceholder' | t"
-      class="min-h-40 w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed text-fg outline-none placeholder:text-fg-secondary"
-    ></textarea>
+    <!-- The text: blocks, written right on the page -->
+    <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
 
     <!-- Phones: Delete at the bottom -->
     <button uiButton type="button" icon="trash" (click)="delete()" class="self-start desktop:hidden">{{ 'library.delete' | t }}</button>
   }
 </div>
+
+<!-- The AI's chat: a panel at the right (desktop), a sheet (phones) -->
+@if (aiOpen() && page(); as p) {
+  @if (desktop) {
+    <aside class="fixed inset-y-0 right-0 z-40 flex w-[26rem] max-w-full animate-menu-in flex-col gap-3 border-l-[0.5px] border-separator bg-app p-4 shadow-popover">
+      <div class="flex h-button items-center gap-2">
+        <span class="flex-1 text-body font-medium">{{ 'editor.ai' | t }}</span>
+        <button uiButton type="button" icon="close" (click)="aiOpen.set(false)" [attr.aria-label]="'search.close' | t"></button>
+      </div>
+      <app-ai-chat [pageId]="p.id" [page]="pageText()" (add)="editor()?.insert($event)" />
+    </aside>
+  } @else {
+    <ui-sheet [tall]="true" (closed)="aiOpen.set(false)">
+      <span sheetHead class="text-body font-semibold">{{ 'editor.ai' | t }}</span>
+      <app-ai-chat [pageId]="p.id" [page]="pageText()" (add)="editor()?.insert($event)" />
+    </ui-sheet>
+  }
+}

@@ -42,7 +42,9 @@ The account sheet's language list sets the size for everything on phones:
 - 17px text (`text-body`), 16px side padding (`px-row-x`);
 - 28px icons (`size-icon-menu`), ✓ / › 20px;
 - hairlines between rows from the text on;
-- round buttons 44px (`h-round`), as iOS's.
+- round buttons 44px (`h-round`), as iOS's;
+- a card's title over it (as iOS 26's Settings): `text-body font-semibold text-fg-secondary`,
+  `px-row-x`, no icon; a note under one: `text-footnote text-fg-secondary`.
 
 New phone screens use these tokens (`styles/mobile.css`), not sizes of their own.
 
@@ -67,8 +69,9 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 ## Moving between views
 - Phones slide as iOS does with View Transitions (`core/services/slide.ts`, CSS in
   `styles/base.css`): the router's moves and a sheet's panes (`Slide.run`). What moves is marked
-  `data-vt="…"`; base.css names it only during its own scope's move. The old fades out first,
-  then the new comes in — both at once, they ran over each other.
+  `data-vt="…"`; base.css names it only during its own scope's move. A push sideways: the old
+  out to the left as the new comes in from the right, side by side, each clipped to its own box
+  (never one over the other, never cross-faded).
 
 ## i18n
 - Every user-facing string goes in `core/i18n/translations.ts`, with each key in en, pl and fr

@@ -45,8 +45,15 @@
     </div>
   } @else {
     <div class="flex flex-1 flex-col gap-6" data-vt="sheet-pane">
+      <!-- (tapped three times: the app's version under it) -->
       <ui-list>
-        <div uiListItem icon="person">{{ auth.email() }}</div>
+        <div uiListItem icon="person" (click)="tapped()">{{ auth.email() }}</div>
+        @if (showVersion()) {
+          <div uiListItem>
+            {{ 'account.version' | t }}
+            <span itemValue class="text-fg-secondary">{{ version }}</span>
+          </div>
+        }
       </ui-list>
 
       <!-- Users (the admins only: their list slides in, a user tapped: their card); the language (the

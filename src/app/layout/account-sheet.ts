@@ -1,4 +1,5 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
+import { environment } from '@environments/environment';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -39,6 +40,17 @@ export class AccountSheet {
   // the users' code is downloaded only when Users is opened — @defer)
   protected readonly userId = signal<string | null>(null);
   private readonly userName = signal('');
+
+  // The app's version: shown once the account's row is tapped three times (each within 0.6s of the last)
+  protected readonly version = environment.version;
+  protected readonly showVersion = signal(false);
+  private taps: number[] = [];
+
+  protected tapped(): void {
+    const now = Date.now();
+    this.taps = [...this.taps.filter((t) => now - t < 600 * 3), now].slice(-3);
+    if (this.taps.length === 3 && this.taps[2] - this.taps[0] < 1200) this.showVersion.set(true);
+  }
 
   protected readonly language = computed(() => this.i18n.languages.find((l) => l.code === this.i18n.lang())!.label);
 

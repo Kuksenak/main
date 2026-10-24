@@ -1,7 +1,7 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { AREA_LABELS } from '../auth/permissions';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, UiList, UiListItem, UiToggle } from '../core/ui';
+import { UiList, UiListItem, UiToggle } from '../core/ui';
 import { UsersStore } from './users.store';
 
 /**
@@ -10,7 +10,7 @@ import { UsersStore } from './users.store';
  */
 @Component({
   selector: 'app-user-card',
-  imports: [Icon, TranslatePipe, UiList, UiListItem, UiToggle],
+  imports: [TranslatePipe, UiList, UiListItem, UiToggle],
   templateUrl: './user-card.html',
 })
 export class UserCard {

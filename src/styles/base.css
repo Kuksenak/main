@@ -176,9 +176,9 @@ button:disabled {
 
 /* Moving between views, as iOS does (View Transitions; Slide, and the router's): what's marked
    data-vt is named for its scope's move only (<html data-slide-scope>: else the page, named,
-   would be drawn over a sheet moving its panes) and slides — forward, the old fading out a
-   little to the left, then the new in from the right; back (<html data-slide=back>), the other
-   way. One after the other: both seen at once, they ran over each other. The rest
+   would be drawn over a sheet moving its panes) and slides — forward, the old pushed out to the
+   left as the new comes in from the right, side by side, each kept in its own box; back
+   (<html data-slide=back>), the other way. (Both seen at once, one over the other, was a mess.) The rest
    stays as it is, not cross-faded; the top bar too (named, so it stays over the page). */
 html[data-slide-scope='route'] [data-vt='page'] { view-transition-name: page; }
 html[data-slide-scope='route'] [data-vt='page-title'] { view-transition-name: page-title; }
@@ -196,15 +196,17 @@ html[data-slide-scope='sheet'] [data-vt='sheet-back'] { view-transition-name: sh
   animation: none;
 }
 ::view-transition-group(*) {
-  animation-duration: 340ms;
+  animation-duration: 380ms;
   animation-timing-function: var(--ease-ios);
+  /* (the slides kept inside the moving part's own box: nothing slides over the rest) */
+  overflow: hidden;
 }
-/* (one after the other, never both at once: the old goes quick, then the new comes) */
+/* (side by side: the old pushed out to the left as the new comes in from the right) */
 ::view-transition-old(*) {
-  animation: slide-out 140ms ease-in both;
+  animation: slide-out 380ms var(--ease-ios) both;
 }
 ::view-transition-new(*) {
-  animation: slide-in 240ms var(--ease-ios) 110ms both;
+  animation: slide-in 380ms var(--ease-ios) both;
 }
 html[data-slide='back']::view-transition-old(*) {
   animation-name: slide-out-back;
@@ -213,14 +215,14 @@ html[data-slide='back']::view-transition-new(*) {
   animation-name: slide-in-back;
 }
 @keyframes slide-in {
-  from { opacity: 0; transform: translateX(1.25rem); }
+  from { transform: translateX(100%); }
 }
 @keyframes slide-out {
-  to { opacity: 0; transform: translateX(-0.75rem); }
+  to { transform: translateX(-100%); }
 }
 @keyframes slide-in-back {
-  from { opacity: 0; transform: translateX(-1.25rem); }
+  from { transform: translateX(-100%); }
 }
 @keyframes slide-out-back {
-  to { opacity: 0; transform: translateX(0.75rem); }
+  to { transform: translateX(100%); }
 }

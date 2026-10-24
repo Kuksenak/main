@@ -3,22 +3,28 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiButton } from '../core/ui';
+import { desktop } from '../core/device';
+import { UiButton, UiSheet } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
+import { AiChat } from './ai-chat';
 import { Page, LibraryStore } from './library.store';
+import { PageEditor } from './page-editor';
 
 // How long after the last keystroke a change is saved
 const SAVE_AFTER_MS = 700;
 
 /**
- * A page of the library (/library/:id): its title and its text, edited right there and saved by
- * themselves a moment after the typing stops (and on leaving). A new one ("Untitled") opens with its
- * title selected. Delete: the page gone, back to the library. Phones: the title in the top bar,
- * ‹ back to the library.
+ * A page of the library (/library/:id): its title and its text (PageEditor: blocks, "/", B I U S,
+ * ⠿), edited right there and saved by themselves a moment after the typing stops (and on leaving).
+ * A new one ("Untitled") opens with its title selected; Enter in the title goes on into the text.
+ * AI (the editor's "/" or its bar, desktop: the button at the top): its chat (AiChat) — a sheet
+ * (phones) or a panel at the right (desktop); its texts go in after the caret's block.
+ * Delete: the page gone, back to the library. Phones: the title in the top bar, ‹ back to the
+ * library.
  */
 @Component({
   selector: 'app-page',
-  imports: [TranslatePipe, UiButton],
+  imports: [AiChat, PageEditor, TranslatePipe, UiButton, UiSheet],
   templateUrl: './page.html',
 })
 export class PageView implements OnInit {
@@ -36,7 +42,10 @@ export class PageView implements OnInit {
 
   // What's being edited (the page's as loaded, then as typed)
   protected readonly title = signal('');
-  protected readonly text = signal('');
+  private blocks: string[] = [];
+  protected readonly desktop = desktop;
+  protected readonly aiOpen = signal(false);
+  protected readonly editor = viewChild(PageEditor);
 
   private readonly titleField = viewChild<ElementRef<HTMLInputElement>>('titleField');
   private timer: ReturnType<typeof setTimeout> | null = null;
@@ -56,32 +65,55 @@ export class PageView implements OnInit {
       next: (page) => {
         this.page.set(page);
         this.title.set(page.title);
-        this.text.set(page.blocks.map((b) => b.text ?? '').join('\n\n'));
+        this.blocks = page.blocks.map((b) => b.text ?? '');
+        this.texts = this.blocks;
         if (fresh) setTimeout(() => this.titleField()?.nativeElement.select());
       },
       error: () => this.loadError.set(true),
     });
   }
 
-  protected typed(field: 'title' | 'text', value: string): void {
-    (field === 'title' ? this.title : this.text).set(value);
+  // The blocks it opened with (the editor reads them once)
+  protected texts: string[] = [];
+
+  protected typedTitle(value: string): void {
+    this.title.set(value);
+    this.changed();
+  }
+
+  protected typedBlocks(blocks: string[]): void {
+    this.blocks = blocks;
+    this.changed();
+  }
+
+  // Enter in the title: on into the text
+  protected titleEnter(e: Event): void {
+    e.preventDefault();
+    this.editor()?.focusStart();
+  }
+
+  // The page as text for the AI: its title, then its blocks
+  protected pageText(): string {
+    return [this.title(), this.editor()?.text() ?? ''].filter(Boolean).join('\n\n');
+  }
+
+  private changed(): void {
     this.dirty = true;
     if (this.timer) clearTimeout(this.timer);
     this.timer = setTimeout(() => this.flush(), SAVE_AFTER_MS);
   }
 
-  /** The change saved now (if there's one): the title (else "Untitled") and the text as one block. */
+  /** The change saved now (if there's one): the title (else "Untitled") and the blocks (the empty ones left out). */
   private flush(): void {
     if (this.timer) clearTimeout(this.timer);
     this.timer = null;
     if (!this.dirty || !this.page()) return;
     this.dirty = false;
     const title = this.title().trim() || this.i18n.t('library.untitled');
-    const text = this.text().trim();
     this.saving.set(true);
     this.saveError.set(false);
     this.saveSub?.unsubscribe();
-    this.saveSub = this.store.save(this.id(), title, text ? [{ kind: 'text', text }] : []).subscribe({
+    this.saveSub = this.store.save(this.id(), title, this.blocks.filter((t) => t.trim()).map((text) => ({ kind: 'text' as const, text }))).subscribe({
       next: () => this.saving.set(false),
       error: () => {
         this.saving.set(false);
@@ -97,11 +129,5 @@ export class PageView implements OnInit {
       next: () => this.router.navigateByUrl('/library'),
       error: () => this.saveError.set(true),
     });
-  }
-
-  // The text's box as tall as its text (no scrollbar of its own: the page scrolls)
-  protected grow(area: HTMLTextAreaElement): void {
-    area.style.height = 'auto';
-    area.style.height = `${area.scrollHeight}px`;
   }
 }

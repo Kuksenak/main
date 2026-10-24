@@ -1,0 +1,66 @@
+<!-- The turns, scrolled on their own -->
+<div class="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pb-3">
+  @for (turn of turns(); track $index) {
+    @if (turn.role === 'user') {
+      <!-- The teacher's: a bubble at the right -->
+      <p class="max-w-[85%] self-end rounded-[1.25rem] bg-tint px-3.5 py-2 text-body whitespace-pre-wrap">{{ turn.text }}</p>
+    } @else {
+      <!-- The assistant's: its reply, then what it wrote for the page as cards, "Add to the page" -->
+      <div class="flex flex-col gap-2">
+        <p class="px-1 text-body whitespace-pre-wrap">{{ turn.text }}</p>
+        @if (turn.blocks?.length) {
+          <div class="flex flex-col gap-2 rounded-card border-[0.5px] border-separator p-3">
+            @for (block of turn.blocks; track $index) {
+              <p class="text-body leading-relaxed whitespace-pre-wrap">@for (k of marked(block); track $index) {<span [class.opacity-30]="k.kind === 'syntax'" [class.text-accent]="k.kind === 'link'">{{ k.t }}</span>}</p>
+            }
+          </div>
+          <button
+            type="button"
+            (click)="put(turn)"
+            [disabled]="turn.added"
+            class="flex h-9 items-center gap-1.5 self-start rounded-full bg-accent px-4 text-ui font-medium text-on-accent disabled:bg-tint disabled:text-fg-secondary"
+          >
+            <app-icon [name]="turn.added ? 'check' : 'plus'" class="size-4.5" />
+            {{ (turn.added ? 'ai.added' : 'ai.add') | t }}
+          </button>
+        }
+      </div>
+    }
+  } @empty {
+    <!-- Nothing yet: what to ask -->
+    <div class="flex flex-col gap-2 px-1 py-4 text-body text-fg-secondary">
+      <p>{{ 'ai.hello' | t }}</p>
+      <p class="text-footnote">{{ 'ai.examples' | t }}</p>
+    </div>
+  }
+  @if (store.busy()) {
+    <p class="px-1 text-body text-fg-secondary">
+      <span class="inline-block animate-pulse">{{ 'ai.thinking' | t }}</span>
+    </p>
+  }
+  @if (store.error(); as error) {
+    <p class="px-1 text-body text-danger" role="alert">{{ error }}</p>
+  }
+  <div #end></div>
+</div>
+
+<!-- The field: grows with what's typed; Enter sends -->
+<form class="flex shrink-0 items-end gap-2 rounded-[1.375rem] border-[0.5px] border-separator bg-app py-1.5 pr-1.5 pl-4" (submit)="$event.preventDefault(); send()">
+  <textarea
+    #field
+    rows="1"
+    enterkeyhint="send"
+    (keydown)="key($event)"
+    (input)="grow(field)"
+    [placeholder]="'ai.placeholder' | t"
+    class="min-h-8 flex-1 resize-none bg-transparent py-1 text-body leading-snug text-fg outline-none placeholder:text-fg-secondary"
+  ></textarea>
+  <button
+    type="submit"
+    [disabled]="store.busy()"
+    [attr.aria-label]="'ai.send' | t"
+    class="grid size-8 shrink-0 place-items-center rounded-full bg-accent text-on-accent disabled:opacity-40"
+  >
+    <app-icon name="arrow-up" class="size-5" />
+  </button>
+</form>
