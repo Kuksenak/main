@@ -176,8 +176,9 @@ button:disabled {
 
 /* Moving between views, as iOS does (View Transitions; Slide, and the router's): what's marked
    data-vt is named for its scope's move only (<html data-slide-scope>: else the page, named,
-   would be drawn over a sheet moving its panes) and slides — forward, the new in from the right
-   as the old goes a little left, fading; back (<html data-slide=back>), the other way. The rest
+   would be drawn over a sheet moving its panes) and slides — forward, the old fading out a
+   little to the left, then the new in from the right; back (<html data-slide=back>), the other
+   way. One after the other: both seen at once, they ran over each other. The rest
    stays as it is, not cross-faded; the top bar too (named, so it stays over the page). */
 html[data-slide-scope='route'] [data-vt='page'] { view-transition-name: page; }
 html[data-slide-scope='route'] [data-vt='page-title'] { view-transition-name: page-title; }
@@ -195,14 +196,15 @@ html[data-slide-scope='sheet'] [data-vt='sheet-back'] { view-transition-name: sh
   animation: none;
 }
 ::view-transition-group(*) {
-  animation-duration: 380ms;
+  animation-duration: 340ms;
   animation-timing-function: var(--ease-ios);
 }
+/* (one after the other, never both at once: the old goes quick, then the new comes) */
 ::view-transition-old(*) {
-  animation: slide-out 380ms var(--ease-ios) both;
+  animation: slide-out 140ms ease-in both;
 }
 ::view-transition-new(*) {
-  animation: slide-in 380ms var(--ease-ios) both;
+  animation: slide-in 240ms var(--ease-ios) 110ms both;
 }
 html[data-slide='back']::view-transition-old(*) {
   animation-name: slide-out-back;
@@ -211,14 +213,14 @@ html[data-slide='back']::view-transition-new(*) {
   animation-name: slide-in-back;
 }
 @keyframes slide-in {
-  from { opacity: 0; transform: translateX(2.5rem); }
+  from { opacity: 0; transform: translateX(1.25rem); }
 }
 @keyframes slide-out {
-  to { opacity: 0; transform: translateX(-1.5rem); }
+  to { opacity: 0; transform: translateX(-0.75rem); }
 }
 @keyframes slide-in-back {
-  from { opacity: 0; transform: translateX(-1.5rem); }
+  from { opacity: 0; transform: translateX(-1.25rem); }
 }
 @keyframes slide-out-back {
-  to { opacity: 0; transform: translateX(2.5rem); }
+  to { opacity: 0; transform: translateX(0.75rem); }
 }

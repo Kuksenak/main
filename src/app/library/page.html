@@ -21,15 +21,22 @@
       #titleField
       type="text"
       [value]="title()"
-      (input)="typedTitle(titleField.value)"
-      (keydown.enter)="titleEnter($event)"
+      (input)="typed('title', titleField.value)"
       [placeholder]="'library.untitled' | t"
       maxlength="200"
       class="w-full bg-transparent text-[1.75rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary desktop:text-[2rem]"
     />
 
-    <!-- The content: written right on the page -->
-    <app-editor [content]="page()!.content" (changed)="typedContent($event)" />
+    <!-- The text: as tall as it is -->
+    <textarea
+      #textField
+      rows="6"
+      [value]="text()"
+      (input)="typed('text', textField.value); grow(textField)"
+      (focus)="grow(textField)"
+      [placeholder]="'library.textPlaceholder' | t"
+      class="min-h-40 w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed text-fg outline-none placeholder:text-fg-secondary"
+    ></textarea>
 
     <!-- Phones: Delete at the bottom -->
     <button uiButton type="button" icon="trash" (click)="delete()" class="self-start desktop:hidden">{{ 'library.delete' | t }}</button>

@@ -1,5 +1,6 @@
 import { afterNextRender, Component, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { inBrowser } from '../../device';
+import { refreshThemeColor } from '../../services/theme-color';
 import { VisibleArea } from '../../services/visible-area';
 
 /**
@@ -54,8 +55,11 @@ export class UiSheet {
     if (this.closing()) return;
     this.dragging.set(false);
     this.closing.set(true);
-    // (once the slide away has played)
-    setTimeout(() => this.closed.emit(), 380);
+    // (once the slide away has played; the status bar's color put in again: see refreshThemeColor)
+    setTimeout(() => {
+      this.closed.emit();
+      refreshThemeColor();
+    }, 380);
   }
 
   // A touch: not known yet whether it's a pull (the sheet down) or a scroll (what's in it)

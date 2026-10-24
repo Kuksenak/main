@@ -24,19 +24,25 @@
       var query = window.matchMedia('(prefers-color-scheme: dark)');
       // The theme follows the system. The status bar's color (theme-color, the page's — base.css):
       // a new tag rather than an edited one — iOS didn't notice an edit while a popup was open.
-      function apply(isDark) {
+      // `force`: put in again even if it's the same (a nudge first: another color, then the right
+      // one a frame later) — iOS keeps the old color when the theme changed under a full-screen
+      // overlay (the search, a sheet); they ask for it as they close ('theme-color' event:
+      // core/services/theme-color.ts).
+      function apply(isDark, force) {
         document.documentElement.classList.toggle('dark', isDark);
         var color = isDark ? '#000000' : '#fbfbf9';
         var old = document.querySelector('meta[name="theme-color"]');
-        if (old && old.getAttribute('content') === color) return;
+        if (old && old.getAttribute('content') === color && !force) return;
         var meta = document.createElement('meta');
         meta.name = 'theme-color';
-        meta.content = color;
+        meta.content = force ? (isDark ? '#010101' : '#fbfbfa') : color;
         if (old) old.replaceWith(meta);
         else document.head.appendChild(meta);
+        if (force) requestAnimationFrame(function () { apply(isDark, false); });
       }
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });
+      document.addEventListener('theme-color', function () { apply(query.matches, true); });
       // Back in the app: the system theme may have changed while it was hidden.
       document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') apply(query.matches);

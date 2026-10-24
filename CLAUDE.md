@@ -53,6 +53,21 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
   (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS` (outlined and coloured in), so each new
   one is there to judge.
 
+## Status bar color (keeps breaking — read before touching overlays)
+- The status bar's color is the `theme-color` tag, set only by the script in `src/index.html`
+  (light `#fbfbf9`, dark `#000000`: the page's `--app-bg`). Nothing else edits it.
+- iOS keeps the old color when the theme (light/dark) changed while something over the whole
+  screen was open (the search, a sheet). So anything full-screen calls `refreshThemeColor()`
+  (`core/services/theme-color.ts`) as it closes: the tag is put in anew. A new overlay does the
+  same.
+- No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).
+
+## Moving between views
+- Phones slide as iOS does with View Transitions (`core/services/slide.ts`, CSS in
+  `styles/base.css`): the router's moves and a sheet's panes (`Slide.run`). What moves is marked
+  `data-vt="…"`; base.css names it only during its own scope's move. The old fades out first,
+  then the new comes in — both at once, they ran over each other.
+
 ## i18n
 - Every user-facing string goes in `core/i18n/translations.ts`, with each key in en, pl and fr
   (type-checked). In templates use `{{ 'key' | t }}`.
