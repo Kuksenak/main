@@ -40,6 +40,11 @@
   --bar: rgb(246 246 246 / 0.82);
   /* a field's fill on the page (the search's, as iOS's): gray, see-through */
   --field: rgb(118 118 128 / 0.12);
+  /* a toast (as iOS's / Telegram's): dark and solid on any page, its words white */
+  --toast: rgb(32 32 34 / 0.94);
+  --toast-text: #ffffff;
+  --toast-action: #64b5ff;
+  --toast-shadow: 0 6px 24px rgb(0 0 0 / 0.16), 0 1px 3px rgb(0 0 0 / 0.1);
   /* the loading bar: the icons' teal (their pastels, tools/icons.py) */
   --loading: #c5dad8;
   --bar-border: rgb(0 0 0 / 0.08);
@@ -76,6 +81,10 @@ html.dark {
   --sheet-border: rgb(255 255 255 / 0.1);
   --bar: rgb(20 20 20 / 0.82);
   --field: rgb(118 118 128 / 0.24);
+  --toast: rgb(58 58 60 / 0.96);
+  --toast-text: #ffffff;
+  --toast-action: #64b5ff;
+  --toast-shadow: 0 6px 24px rgb(0 0 0 / 0.5);
   --bar-border: rgb(255 255 255 / 0.12);
   --sheet-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 0.5px rgb(0 0 0 / 0.6), 0 -1px 6px rgb(0 0 0 / 0.3);
   --grabber: rgb(255 255 255 / 0.25);

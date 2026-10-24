@@ -39,6 +39,9 @@
   --color-bar: var(--bar);
   --color-bar-border: var(--bar-border);
   --color-field: var(--field);
+  --color-toast: var(--toast);
+  --color-toast-text: var(--toast-text);
+  --color-toast-action: var(--toast-action);
   --color-loading: var(--loading);
   --color-grabber: var(--grabber);
   --color-highlight: var(--highlight);
@@ -80,6 +83,7 @@
   --radius-menu: var(--round-menu);
 
   --shadow-popover: var(--popover-shadow);
+  --shadow-toast: var(--toast-shadow);
   --shadow-glass: var(--glass-shadow);
   --shadow-accent: var(--accent-shadow);
   --shadow-sheet: var(--sheet-shadow);
