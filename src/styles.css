@@ -63,6 +63,7 @@
   --spacing-round: var(--round-h);
   --spacing-row: var(--row-h);
   --spacing-row-x: var(--row-px);
+  --spacing-segment: var(--segment-h);
 
   --radius-capsule: var(--round-capsule);
   --radius-card: var(--round-card);

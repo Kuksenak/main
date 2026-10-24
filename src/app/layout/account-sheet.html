@@ -1,4 +1,4 @@
-<ui-sheet [tall]="true" (closed)="closed.emit()">
+<ui-sheet #sheet [tall]="true" (closed)="closed.emit()">
   @if (page() === 'language') {
     <!-- The language's page: ‹ back, the page's name in the middle; it slides in -->
     <div class="relative mb-3 flex h-round shrink-0 animate-pane-in items-center justify-center">
@@ -19,6 +19,12 @@
       <ui-card>
         <div uiListRow icon="person">{{ auth.email() }}</div>
       </ui-card>
+
+      @if (auth.isAdmin()) {
+        <ui-card>
+          <button type="button" uiListRow icon="shield" chevron (click)="go('/admin', sheet)">{{ 'admin.title' | t }}</button>
+        </ui-card>
+      }
 
       <!-- The language: a row (the current one in gray, ›) — its list slides in on a page of its own -->
       <ui-card>

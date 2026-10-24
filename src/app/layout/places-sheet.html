@@ -1,7 +1,7 @@
 <ui-sheet #sheet (closed)="closed.emit()">
   <!-- (a gap between the tiles: an open one and a pressed one never merge) -->
   <div class="grid grid-cols-3 gap-1.5">
-    @for (place of places; track place.path) {
+    @for (place of places(); track place.path) {
       <button type="button" (click)="go(place.path, sheet)" class="group flex h-25 min-w-0 items-center justify-center active:transform-none">
         <!-- The gray: a square under the icon and the name (not the whole column), fading in and out -->
         <span

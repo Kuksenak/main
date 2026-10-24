@@ -3,11 +3,16 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, Observable, of, tap, timeout } from 'rxjs';
 import { environment } from '@environments/environment';
+import { Area, atLeast, Level } from './permissions';
 
 export interface UserProfile {
   firstName: string | null;
   lastName: string | null;
   email: string;
+  /** On the server's admin list: write in every area, and the admin page. */
+  isAdmin: boolean;
+  /** The level in each area (the API sends every one; the admins: write in all). */
+  permissions: Partial<Record<Area, Level>>;
 }
 
 const ME_TIMEOUT_MS = 5000;
@@ -34,6 +39,13 @@ export class AuthStore {
     const u = this._user();
     return [u?.firstName, u?.lastName].filter((p) => !!p?.trim()).join(' ') || null;
   });
+  readonly isAdmin = computed(() => this._user()?.isAdmin ?? false);
+
+  /** Whether the user has at least `level` in the area (write includes read; admins: everything). */
+  can(area: Area, level: Level = 'read'): boolean {
+    const u = this._user();
+    return !!u && (u.isAdmin || atLeast(u.permissions?.[area], level));
+  }
 
   initAuth(): Observable<UserProfile | null> {
     return this.http.get<UserProfile>(`${environment.apiUrl}/me`).pipe(

@@ -26,6 +26,18 @@ const en = {
   'login.terms': 'Terms of Service',
   'login.and': 'and',
   'login.privacy': 'Privacy Policy',
+  'admin.title': 'Admin',
+  'admin.name': 'Name',
+  'admin.email': 'Email',
+  'admin.lastSignIn': 'Last sign-in',
+  'admin.admin': 'Admin',
+  'admin.locked': 'Admins have full access',
+  'admin.empty': 'No users yet',
+  'admin.loadError': 'Couldn’t load the users. Try again later.',
+  'admin.saveError': 'Couldn’t save the change. Try again.',
+  'level.none': 'None',
+  'level.read': 'Read',
+  'level.write': 'Write',
 };
 
 export type TranslationKey = keyof typeof en;
@@ -54,6 +66,18 @@ const pl: Dictionary = {
   'login.terms': 'Regulamin',
   'login.and': 'oraz',
   'login.privacy': 'Politykę prywatności',
+  'admin.title': 'Administracja',
+  'admin.name': 'Imię i nazwisko',
+  'admin.email': 'E-mail',
+  'admin.lastSignIn': 'Ostatnie logowanie',
+  'admin.admin': 'Administrator',
+  'admin.locked': 'Administratorzy mają pełny dostęp',
+  'admin.empty': 'Nie ma jeszcze użytkowników',
+  'admin.loadError': 'Nie udało się wczytać użytkowników. Spróbuj później.',
+  'admin.saveError': 'Nie udało się zapisać zmiany. Spróbuj ponownie.',
+  'level.none': 'Brak',
+  'level.read': 'Odczyt',
+  'level.write': 'Zapis',
 };
 
 const fr: Dictionary = {
@@ -79,6 +103,18 @@ const fr: Dictionary = {
   'login.terms': 'Conditions d’utilisation',
   'login.and': 'et notre',
   'login.privacy': 'Politique de confidentialité',
+  'admin.title': 'Administration',
+  'admin.name': 'Nom',
+  'admin.email': 'E-mail',
+  'admin.lastSignIn': 'Dernière connexion',
+  'admin.admin': 'Admin',
+  'admin.locked': 'Les administrateurs ont un accès complet',
+  'admin.empty': 'Aucun utilisateur pour l’instant',
+  'admin.loadError': 'Impossible de charger les utilisateurs. Réessayez plus tard.',
+  'admin.saveError': 'Impossible d’enregistrer la modification. Réessayez.',
+  'level.none': 'Aucun',
+  'level.read': 'Lecture',
+  'level.write': 'Écriture',
 };
 
 export const LANGUAGES = [

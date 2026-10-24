@@ -1,0 +1,87 @@
+<div class="flex flex-col gap-4 px-4 py-4 desktop:px-10 desktop:py-8">
+  <h1 class="ml-1 flex h-button items-center text-body font-medium mobile:hidden">{{ 'admin.title' | t }}</h1>
+
+  @if (loadError()) {
+    <p class="px-1 text-body text-danger">{{ 'admin.loadError' | t }}</p>
+  }
+  @if (saveError()) {
+    <p class="px-1 text-body text-danger" role="alert">{{ 'admin.saveError' | t }}</p>
+  }
+
+  @if (users(); as users) {
+    @if (!users.length) {
+      <p class="px-1 text-body text-fg-secondary">{{ 'admin.empty' | t }}</p>
+    } @else if (desktop) {
+      <!-- Desktop: a table — the user, then a column per area -->
+      <table class="w-full max-w-5xl text-left text-ui">
+        <thead class="text-footnote text-fg-secondary">
+          <tr>
+            <th class="h-button px-2 font-normal">{{ 'admin.name' | t }}</th>
+            <th class="h-button px-2 font-normal">{{ 'admin.email' | t }}</th>
+            <th class="h-button px-2 font-normal">{{ 'admin.lastSignIn' | t }}</th>
+            @for (area of areas(); track area) {
+              <th class="h-button px-2 font-normal">{{ areaLabels[area] | t }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users; track user.id) {
+            <tr class="border-t-[0.5px] border-separator">
+              <td class="h-row max-w-60 truncate px-2">
+                {{ name(user) ?? '—' }}
+                @if (user.isAdmin) {
+                  <span class="ml-1.5 text-footnote text-fg-secondary">{{ 'admin.admin' | t }}</span>
+                }
+              </td>
+              <td class="h-row max-w-72 truncate px-2 text-fg-secondary">{{ user.email }}</td>
+              <td class="h-row px-2 whitespace-nowrap text-fg-secondary">{{ lastSignIn(user) }}</td>
+              @for (area of areas(); track area) {
+                <td class="h-row px-2" [attr.title]="user.isAdmin ? ('admin.locked' | t) : null">
+                  <ui-segmented
+                    [options]="levels()"
+                    [value]="level(user, area)"
+                    (valueChange)="set(user, area, $event)"
+                    [disabled]="user.isAdmin"
+                    [label]="(areaLabels[area] | t) + ': ' + user.email"
+                  />
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <!-- Phones: a card per user — the name (or the email), the email, the last sign-in, a row per area -->
+      @for (user of users; track user.id) {
+        <ui-card>
+          <div uiListRow icon="person">
+            {{ name(user) ?? user.email }}
+            @if (user.isAdmin) {
+              <span rowValue class="text-fg-secondary">{{ 'admin.admin' | t }}</span>
+            }
+          </div>
+          @if (name(user)) {
+            <div uiListRow><span class="text-fg-secondary">{{ user.email }}</span></div>
+          }
+          <div uiListRow>
+            {{ 'admin.lastSignIn' | t }}
+            <span rowValue class="text-fg-secondary">{{ lastSignIn(user) }}</span>
+          </div>
+          @for (area of areas(); track area) {
+            <div uiListRow>
+              {{ areaLabels[area] | t }}
+              <ui-segmented
+                rowValue
+                [options]="levels()"
+                [value]="level(user, area)"
+                (valueChange)="set(user, area, $event)"
+                [disabled]="user.isAdmin"
+                [label]="(areaLabels[area] | t) + ': ' + user.email"
+              />
+            </div>
+          }
+        </ui-card>
+      }
+    }
+  }
+</div>

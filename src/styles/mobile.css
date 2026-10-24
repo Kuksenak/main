@@ -29,6 +29,8 @@
   --round-h: 3rem;
   --row-h: 3rem;
   --row-px: 1rem;
+  /* A segmented control (a choice of a few), as iOS's: 32 tall, in a list row */
+  --segment-h: 2rem;
   /* The calendar, as iOS Calendar's month: 51 tall weeks, the date (20px) in a 30px circle, 13px
      weekdays */
   --cal-row-h: 3.1875rem;

@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './auth/auth.guard';
+import { adminGuard, areaGuard, authGuard, guestGuard } from './auth/auth.guard';
 import { desktop } from './core/device';
 
 export const routes: Routes = [
@@ -15,7 +15,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) },
-      { path: 'schedule', loadComponent: () => import('./schedule/schedule').then((m) => m.Schedule) },
+      {
+        path: 'schedule',
+        loadComponent: () => import('./schedule/schedule').then((m) => m.Schedule),
+        canActivate: [areaGuard('schedule')],
+      },
+      { path: 'admin', loadComponent: () => import('./admin/admin').then((m) => m.Admin), canActivate: [adminGuard] },
     ],
   },
   { path: '**', redirectTo: '' },

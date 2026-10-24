@@ -1,0 +1,13 @@
+@for (option of options(); track option.value) {
+  <!-- (no shrink when pressed: the capsule stays put) -->
+  <button
+    type="button"
+    role="radio"
+    [attr.aria-checked]="option.value === value()"
+    [disabled]="disabled()"
+    (click)="pick(option.value)"
+    class="flex min-w-0 items-center justify-center rounded-button px-2.5 text-ui leading-none whitespace-nowrap text-fg-secondary transition-colors duration-[120ms] active:transform-none mobile:text-footnote aria-checked:bg-dialog aria-checked:font-medium aria-checked:text-fg not-disabled:not-aria-checked:hover:text-fg"
+  >
+    {{ option.label }}
+  </button>
+}

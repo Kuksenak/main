@@ -1,8 +1,9 @@
-import { Component, inject, output } from '@angular/core';
+import { Component, computed, inject, output } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon, UiSheet } from '../core/ui';
-import { PLACES } from './places';
+import { visiblePlaces } from './places';
 
 /**
  * Phones: the sections, as Google's app launcher — a sheet from the bottom with a grid of big
@@ -17,7 +18,9 @@ export class PlacesSheet {
   readonly closed = output<void>();
 
   private readonly router = inject(Router);
-  protected readonly places = PLACES;
+  private readonly auth = inject(AuthStore);
+  // (the sections this user can read)
+  protected readonly places = computed(() => visiblePlaces((area) => this.auth.can(area)));
 
   // (the start page: open only on itself)
   protected isOpen(path: string): boolean {
