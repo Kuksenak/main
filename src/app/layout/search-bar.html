@@ -1,78 +1,97 @@
 <!-- Over the whole screen, the page's color; unseen and not taken till open (it comes in: fades,
      moving down a little) -->
 <div
-  class="pointer-events-none fixed inset-0 z-50 flex -translate-y-2 flex-col bg-app text-fg opacity-0 transition-[opacity,translate] duration-300 ease-ios
-         data-open:pointer-events-auto data-open:translate-y-0 data-open:opacity-100"
+  class="pointer-events-none fixed inset-0 z-50 -translate-y-2 bg-app text-fg opacity-0 transition-[opacity,translate] duration-300 ease-ios data-open:pointer-events-auto data-open:translate-y-0 data-open:opacity-100"
   [attr.data-open]="open() ? '' : null"
   [attr.aria-hidden]="open() ? null : 'true'"
 >
-  <!-- Where the top bar was, staying there (a drag on it moves nothing): the capsule (the loupe,
+  <!-- What's in it: on the part of the screen that's seen — its top the screen's top even if iOS
+       pushes the page up for the keyboard, its bottom the keyboard's top -->
+  <div
+    class="absolute inset-x-0 flex flex-col"
+    [style.top.px]="area.top()"
+    [style.height.px]="area.height()"
+  >
+    <!-- Where the top bar was, staying there (a drag on it moves nothing): the capsule (the loupe,
        the field) and ✕, as the top bar's buttons (the same glass, the same height); under them the
        tabs -->
-  <div class="flex shrink-0 flex-col gap-3 px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3" (touchmove)="$event.preventDefault()">
-    <div class="flex items-center gap-3">
-      <form
-        class="flex h-round min-w-0 flex-1 items-center gap-2.5 rounded-full bg-glass px-4 shadow-glass backdrop-blur-[20px] backdrop-saturate-[180%]"
-        (submit)="submit($event)"
-      >
-        <app-icon name="search" class="size-5.5 shrink-0 text-icon" />
-        <input
-          #field
-          type="search"
-          enterkeyhint="search"
-          autocomplete="off"
-          [value]="query()"
-          (input)="query.set(field.value)"
-          [placeholder]="'search.title' | t"
-          class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary [&::-webkit-search-cancel-button]:hidden"
-        />
-      </form>
-      <button type="button" uiFloatingButton round (click)="close()" [attr.aria-label]="'search.close' | t">
-        <app-icon name="close" class="size-6" />
-      </button>
-    </div>
-
-    <!-- The tabs (as Telegram's): All, Pages, Events — the picked one lifted -->
-    <div class="flex h-10 items-center rounded-full bg-field p-1" role="tablist">
-      @for (tab of tabs; track tab.scope) {
+    <div
+      class="flex shrink-0 flex-col gap-3 px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-3"
+      (touchmove)="$event.preventDefault()"
+    >
+      <div class="flex items-center gap-3">
+        <form
+          class="flex h-round min-w-0 flex-1 items-center gap-2.5 rounded-full bg-glass px-4 shadow-glass backdrop-blur-[20px] backdrop-saturate-[180%]"
+          (submit)="submit($event)"
+        >
+          <app-icon name="search" class="size-5.5 shrink-0 text-icon" />
+          <input
+            #field
+            type="search"
+            enterkeyhint="search"
+            autocomplete="off"
+            [value]="query()"
+            (input)="query.set(field.value)"
+            [placeholder]="'search.title' | t"
+            class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary [&::-webkit-search-cancel-button]:hidden"
+          />
+        </form>
         <button
           type="button"
-          role="tab"
-          [attr.aria-selected]="scope() === tab.scope"
-          (click)="scope.set(tab.scope)"
-          class="h-full flex-1 rounded-full text-[0.9375rem] font-medium text-fg-secondary transition-colors duration-200
-                 aria-selected:bg-glass aria-selected:text-fg aria-selected:shadow-glass"
+          uiFloatingButton
+          round
+          (click)="close()"
+          [attr.aria-label]="'search.close' | t"
         >
-          {{ tab.label | t }}
+          <app-icon name="close" class="size-6" />
         </button>
-      }
-    </div>
-  </div>
+      </div>
 
-  <!-- What's found: a list per section, its name small and gray over it; scrolled on its own, down
-       to the keyboard -->
-  @if (open()) {
-    <div
-      class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 pt-1"
-      [style.padding-bottom]="area.keyboard() ? area.keyboard() + 16 + 'px' : 'max(1rem, env(safe-area-inset-bottom))'"
-    >
-      @for (section of sections(); track section.name) {
-        <div class="flex flex-col gap-1.5">
-          <span class="px-row-x text-footnote font-medium text-fg-secondary">{{ section.name }}</span>
-          <ui-list>
-            @for (found of section.items; track found.id) {
-              <button type="button" uiListItem [icon]="found.icon" (click)="pick(found)">
-                {{ found.label }}
-                @if (found.hint) {
-                  <span itemValue class="text-fg-secondary">{{ found.hint }}</span>
-                }
-              </button>
-            }
-          </ui-list>
-        </div>
-      } @empty {
-        <p class="py-10 text-center text-body text-fg-secondary">{{ (scope() === 'events' ? 'search.noEvents' : 'search.nothing') | t }}</p>
-      }
+      <!-- The tabs (as Telegram's): All, Pages, Events — the picked one lifted -->
+      <div class="flex h-10 items-center rounded-full bg-field p-1" role="tablist">
+        @for (tab of tabs; track tab.scope) {
+          <button
+            type="button"
+            role="tab"
+            [attr.aria-selected]="scope() === tab.scope"
+            (click)="scope.set(tab.scope)"
+            class="h-full flex-1 rounded-full text-[0.9375rem] font-medium text-fg-secondary transition-colors duration-200 aria-selected:bg-glass aria-selected:text-fg aria-selected:shadow-glass"
+          >
+            {{ tab.label | t }}
+          </button>
+        }
+      </div>
     </div>
-  }
+
+    <!-- What's found: a list per section, its name small and gray over it; scrolled on its own, down
+       to the keyboard -->
+    @if (open()) {
+      <div
+        class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 pt-1"
+        [style.padding-bottom]="area.keyboard() ? '1rem' : 'max(1rem, env(safe-area-inset-bottom))'"
+      >
+        @for (section of sections(); track section.name) {
+          <div class="flex flex-col gap-1.5">
+            <span class="px-row-x text-footnote font-medium text-fg-secondary">{{
+              section.name
+            }}</span>
+            <ui-list>
+              @for (found of section.items; track found.id) {
+                <button type="button" uiListItem [icon]="found.icon" (click)="pick(found)">
+                  {{ found.label }}
+                  @if (found.hint) {
+                    <span itemValue class="text-fg-secondary">{{ found.hint }}</span>
+                  }
+                </button>
+              }
+            </ui-list>
+          </div>
+        } @empty {
+          <p class="py-10 text-center text-body text-fg-secondary">
+            {{ (scope() === 'events' ? 'search.noEvents' : 'search.nothing') | t }}
+          </p>
+        }
+      </div>
+    }
+  </div>
 </div>

@@ -48,13 +48,17 @@ export class SearchBar {
 
   constructor() {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && this.open() && this.close();
-    // (iOS pushing the page up for the field anyway: back to the top)
+    // (iOS pushing the page up for the field, or a drag pushing it: back to the top)
     const stay = () => this.open() && window.scrollY !== 0 && window.scrollTo(0, 0);
     document.addEventListener('keydown', onKey);
     window.visualViewport?.addEventListener('resize', stay);
+    window.visualViewport?.addEventListener('scroll', stay);
+    window.addEventListener('scroll', stay);
     inject(DestroyRef).onDestroy(() => {
       document.removeEventListener('keydown', onKey);
       window.visualViewport?.removeEventListener('resize', stay);
+      window.visualViewport?.removeEventListener('scroll', stay);
+      window.removeEventListener('scroll', stay);
     });
   }
 
