@@ -109,10 +109,12 @@ ICONS = {
         + line('M18.2 20.6C19 31.8 19.8 43 20.8 54.4 28.4 54.2 35.8 54.4 43.4 54.2 44.2 43 45.2 31.6 46 20.4')
         + line('M12.6 20.4C25.6 19.8 38.6 19.6 51.6 19.2M25.6 19.6C25.8 16.8 26.4 13.6 28.6 12.8 31 12.2 33.4 12.4 35.6 12.6 37.8 13.4 38.4 16.2 38.6 19.2')
         + thin('M28.4 28.6 29 46.2M35.8 28.4 35.2 46'),
-    # search: a loupe — its glass (teal) not quite round, the handle a little off
-    'search': fill(TEAL, ring(27.4, 27.4, 13.4) + 'z')
-        + line(ring(27.4, 27.4, 13.4))
-        + line('M37.6 37.8C41.6 41.6 45.6 45.6 50.4 50.2'),
+    # search: a loupe — a big round glass (teal), not quite closed, a glint in it; the handle short
+    # and firm, out at the bottom right
+    'search': fill(TEAL, ring(27, 27, 15.4) + 'z')
+        + line(ring(27, 27, 15.4))
+        + line('M38.4 38.6C42.4 42.4 46.2 46.4 50.6 50.8')
+        + detail('M18.6 24.6C19.6 20.6 22.6 18 26.4 17.4'),
     # enter (↵): down, then back to the left, its head
     'enter': line('M47.4 15.2C47.6 22 47.4 28.6 47.2 34.4 47.1 37.2 45.6 38.6 42.8 38.6 34 38.6 25.4 38.4 16.8 38.6')
         + line('M25.4 29.6C22.4 32.6 19.8 35.4 16.6 38.6 19.6 41.6 22.4 44.6 25.6 47.6'),
