@@ -18,7 +18,7 @@ export const guestGuard: CanActivateFn = () => {
 export const areaGuard =
   (area: Area): CanActivateFn =>
   () =>
-    inject(AuthStore).can(area, 'read') || inject(Router).createUrlTree(['/']);
+    inject(AuthStore).can(area) || inject(Router).createUrlTree(['/']);
 
 /** Users (their access): only for the admins (else the start page). */
 export const adminGuard: CanActivateFn = () => inject(AuthStore).isAdmin() || inject(Router).createUrlTree(['/']);

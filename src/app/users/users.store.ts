@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
-import { AREAS, Area, LEVEL_LABELS, LEVELS, Level } from '../auth/permissions';
+import { AREAS, Area } from '../auth/permissions';
 import { I18nService } from '../core/i18n/i18n.service';
-import { UiSegment } from '../core/ui';
 
 export interface User {
   id: string;
@@ -13,7 +12,7 @@ export interface User {
   createdAt: string;
   lastSignInAt: string;
   isAdmin: boolean;
-  permissions: Partial<Record<Area, Level>>;
+  permissions: Partial<Record<Area, boolean>>;
 }
 
 interface UsersResponse {
@@ -23,8 +22,8 @@ interface UsersResponse {
 
 /**
  * The users and their access (the admins only), for the Users page (desktop) and the account
- * sheet's Users (phones): `load()` them; a level `set` is shown at once and saved — back as it was
- * if that fails.
+ * sheet's Users (phones): `load()` them; an area's access `set` (on / off) is shown at once and
+ * saved — back as it was if that fails.
  */
 @Injectable({ providedIn: 'root' })
 export class UsersStore {
@@ -37,11 +36,6 @@ export class UsersStore {
   readonly areas = signal<Area[]>([]);
   readonly loadError = signal(false);
   readonly saveError = signal(false);
-
-  /** The levels to pick from, by name. */
-  readonly levels = computed<UiSegment<Level>[]>(() =>
-    LEVELS.map((level) => ({ value: level, label: this.i18n.t(LEVEL_LABELS[level]) })),
-  );
 
   load(): void {
     this.loadError.set(false);
@@ -66,17 +60,18 @@ export class UsersStore {
     return this.i18n.date(new Date(user.lastSignInAt), { dateStyle: 'medium', timeStyle: 'short' });
   }
 
-  level(user: User, area: Area): Level {
-    return user.isAdmin ? 'write' : (user.permissions[area] ?? 'none');
+  /** Whether the user may open the area (the admins: every one). */
+  has(user: User, area: Area): boolean {
+    return user.isAdmin || !!user.permissions[area];
   }
 
-  /** A level picked: shown at once, saved; if that fails, back as it was. */
-  set(user: User, area: Area, level: Level | undefined): void {
-    if (!level || user.isAdmin || this.level(user, area) === level) return;
+  /** An area's access switched: shown at once, saved; if that fails, back as it was. */
+  set(user: User, area: Area, access: boolean): void {
+    if (user.isAdmin || this.has(user, area) === access) return;
     const before = user.permissions;
     this.saveError.set(false);
-    this.update(user.id, { ...before, [area]: level });
-    this.http.put<User>(`${this.url}/${user.id}/permissions`, { [area]: level }).subscribe({
+    this.update(user.id, { ...before, [area]: access });
+    this.http.put<User>(`${this.url}/${user.id}/permissions`, { [area]: access }).subscribe({
       next: (saved) => this.update(user.id, saved.permissions),
       error: () => {
         this.update(user.id, before);

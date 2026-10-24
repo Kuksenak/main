@@ -37,13 +37,7 @@
               <td class="h-row px-2 whitespace-nowrap text-fg-secondary">{{ lastSignIn(user) }}</td>
               @for (area of areas(); track area) {
                 <td class="h-row px-2" [attr.title]="user.isAdmin ? ('users.locked' | t) : null">
-                  <ui-segmented
-                    [options]="levels()"
-                    [value]="level(user, area)"
-                    (valueChange)="set(user, area, $event)"
-                    [disabled]="user.isAdmin"
-                    [label]="(areaLabels[area] | t) + ': ' + user.email"
-                  />
+                  <ui-toggle [checked]="has(user, area)" (checkedChange)="set(user, area, $event)" [disabled]="user.isAdmin" [label]="(areaLabels[area] | t) + ': ' + user.email" />
                 </td>
               }
             </tr>
@@ -70,14 +64,8 @@
           @for (area of areas(); track area) {
             <div uiListRow>
               {{ areaLabels[area] | t }}
-              <ui-segmented
-                rowValue
-                [options]="levels()"
-                [value]="level(user, area)"
-                (valueChange)="set(user, area, $event)"
-                [disabled]="user.isAdmin"
-                [label]="(areaLabels[area] | t) + ': ' + user.email"
-              />
+              <ui-toggle rowValue
+                [checked]="has(user, area)" (checkedChange)="set(user, area, $event)" [disabled]="user.isAdmin" [label]="(areaLabels[area] | t) + ': ' + user.email" />
             </div>
           }
         </ui-card>

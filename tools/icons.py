@@ -81,10 +81,12 @@ ICONS = {
         + line('M43.6 50.6C40.6 40.4 37.6 30 34.6 19.6 37.2 18.8 39.8 18.1 42.4 17.4 45.4 27.8 48.4 38 51.4 48.4')
         + thin('M15 23.4 18.8 23.3M25.2 19.6 29.2 19.5M25.1 24 29.1 23.9')
         + line('M8.8 51.6C24 50.8 39.6 51 55.4 50.6'),
-    # an update: an arrow down into an open box (sage)
-    'update': fill(SAGE, 'M12.6 34.4 12.8 50.6 51.2 50.4 51 34.2z')
-        + line('M12.4 33.8C12.5 39.4 12.6 45 12.8 50.6 25.6 50.8 38.4 50.6 51.2 50.4 51.1 45 51 39.6 51.2 34')
-        + line('M32.2 11.4C32 19.4 32.1 28 32.3 38.4M23.4 29.6C26.4 32.6 29.2 35.4 32.3 38.6 35.2 35.6 38.2 32.6 41.2 29.4'),
+    # an update: two arrows chasing each other round (as a refresh), a gap between them, each
+    # its own curve; a teal dab
+    # in the middle
+    'update': fill(TEAL, ring(32, 32, 10) + 'z')
+        + line('M49.0 35.6A17.1 17.7 8 0 1 21.7 45.2M23.6 53.2 21.7 45.2 29.9 45.2')
+        + line('M15.4 28.5A17.2 17.9 8 0 1 42.8 18.2M40.8 10.3 42.8 18.2 34.6 18.2'),
     # the language: a globe (teal), a meridian, the equator
     'globe': fill(TEAL, ring(32, 32, 20) + 'z')
         + line(ring(32, 32, 20))

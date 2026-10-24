@@ -41,15 +41,12 @@
         <div uiListRow icon="person">{{ auth.email() }}</div>
       </ui-card>
 
-      <!-- Users (the admins only): their list slides in, a user tapped: their card -->
-      @if (auth.isAdmin()) {
-        <ui-card>
-          <button type="button" uiListRow icon="lock" chevron (click)="open('users')">{{ 'users.title' | t }}</button>
-        </ui-card>
-      }
-
-      <!-- The language: a row (the current one in gray, ›) — its list slides in on a page of its own -->
+      <!-- Users (the admins only: their list slides in, a user tapped: their card); the language (the
+           current one in gray, ›: its list slides in) -->
       <ui-card>
+        @if (auth.isAdmin()) {
+          <button type="button" uiListRow icon="lock" chevron (click)="open('users')">{{ 'users.title' | t }}</button>
+        }
         <button type="button" uiListRow icon="globe" chevron (click)="open('language')">
           {{ 'account.language' | t }}
           <span rowValue class="text-fg-secondary">{{ language() }}</span>
@@ -60,7 +57,7 @@
         <!-- A new version downloaded: switch to it (the page reloads) -->
         @if (updates.ready()) {
           <ui-card>
-            <button type="button" uiListRow icon="update" (click)="updates.apply()"><span class="text-accent">{{ 'account.update' | t }}</span></button>
+            <button type="button" uiListRow icon="update" (click)="updates.apply()">{{ 'account.update' | t }}</button>
           </ui-card>
         }
         <ui-card>

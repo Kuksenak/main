@@ -10,7 +10,7 @@ export { UiButton } from './button/button';
 export { UiGlassButton } from './glass-button/glass-button';
 export { UiCard } from './list/card';
 export { UiListRow } from './list/list-row';
-export { UiSegmented, type UiSegment } from './segmented/segmented';
 export { UiSheet } from './sheet/sheet';
 export { UiSidebar } from './sidebar/sidebar';
 export { UiSidebarItem } from './sidebar/sidebar-item';
+export { UiToggle } from './toggle/toggle';

@@ -12,7 +12,7 @@
       </div>
     </ui-card>
 
-    <!-- Their access: a row per area, its level picked right there (the admins: locked) -->
+    <!-- Their access: a row per area, switched right there (the admins: locked) -->
     <div class="flex flex-col gap-1.5">
       <span class="flex items-center gap-1.5 px-row-x text-footnote font-medium text-fg-secondary">
         <app-icon name="lock" class="size-4" />
@@ -22,14 +22,8 @@
         @for (area of store.areas(); track area) {
           <div uiListRow>
             {{ areaLabels[area] | t }}
-            <ui-segmented
-              rowValue
-              [options]="store.levels()"
-              [value]="store.level(user, area)"
-              (valueChange)="store.set(user, area, $event)"
-              [disabled]="user.isAdmin"
-              [label]="(areaLabels[area] | t) + ': ' + user.email"
-            />
+            <ui-toggle rowValue
+              [checked]="store.has(user, area)" (checkedChange)="store.set(user, area, $event)" [disabled]="user.isAdmin" [label]="(areaLabels[area] | t) + ': ' + user.email" />
           </div>
         }
       </ui-card>

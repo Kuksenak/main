@@ -36,9 +36,6 @@ const en = {
   'users.empty': 'No users yet',
   'users.loadError': 'Couldn’t load the users. Try again later.',
   'users.saveError': 'Couldn’t save the change. Try again.',
-  'level.none': 'None',
-  'level.read': 'Read',
-  'level.write': 'Write',
 };
 
 export type TranslationKey = keyof typeof en;
@@ -77,9 +74,6 @@ const pl: Dictionary = {
   'users.empty': 'Nie ma jeszcze użytkowników',
   'users.loadError': 'Nie udało się wczytać użytkowników. Spróbuj później.',
   'users.saveError': 'Nie udało się zapisać zmiany. Spróbuj ponownie.',
-  'level.none': 'Brak',
-  'level.read': 'Odczyt',
-  'level.write': 'Zapis',
 };
 
 const fr: Dictionary = {
@@ -115,9 +109,6 @@ const fr: Dictionary = {
   'users.empty': 'Aucun utilisateur pour l’instant',
   'users.loadError': 'Impossible de charger les utilisateurs. Réessayez plus tard.',
   'users.saveError': 'Impossible d’enregistrer la modification. Réessayez.',
-  'level.none': 'Aucun',
-  'level.read': 'Lecture',
-  'level.write': 'Écriture',
 };
 
 export const LANGUAGES = [
