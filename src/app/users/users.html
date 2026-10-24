@@ -47,28 +47,28 @@
     } @else {
       <!-- Phones: a card per user — the name (or the email), the email, the last sign-in, a row per area -->
       @for (user of users; track user.id) {
-        <ui-card>
-          <div uiListRow icon="person">
+        <ui-list>
+          <div uiListItem icon="person">
             {{ name(user) ?? user.email }}
             @if (user.isAdmin) {
-              <span rowValue class="text-fg-secondary">{{ 'users.admin' | t }}</span>
+              <span itemValue class="text-fg-secondary">{{ 'users.admin' | t }}</span>
             }
           </div>
           @if (name(user)) {
-            <div uiListRow><span class="text-fg-secondary">{{ user.email }}</span></div>
+            <div uiListItem><span class="text-fg-secondary">{{ user.email }}</span></div>
           }
-          <div uiListRow>
+          <div uiListItem>
             {{ 'users.lastSignIn' | t }}
-            <span rowValue class="text-fg-secondary">{{ lastSignIn(user) }}</span>
+            <span itemValue class="text-fg-secondary">{{ lastSignIn(user) }}</span>
           </div>
           @for (area of areas(); track area) {
-            <div uiListRow>
+            <div uiListItem>
               {{ areaLabels[area] | t }}
-              <ui-toggle rowValue
+              <ui-toggle itemValue
                 [checked]="has(user, area)" (checkedChange)="set(user, area, $event)" [disabled]="user.isAdmin" [label]="(areaLabels[area] | t) + ': ' + user.email" />
             </div>
           }
-        </ui-card>
+        </ui-list>
       }
     }
   }

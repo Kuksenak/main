@@ -7,9 +7,9 @@
 export { Icon, ICONS, type IconName } from './icon/icon';
 export { UiAvatar } from './avatar/avatar';
 export { UiButton } from './button/button';
-export { UiGlassButton } from './glass-button/glass-button';
-export { UiCard } from './list/card';
-export { UiListRow } from './list/list-row';
+export { UiFloatingButton } from './floating-button/floating-button';
+export { UiList } from './list/list';
+export { UiListItem } from './list/list-item';
 export { UiSheet } from './sheet/sheet';
 export { UiSidebar } from './sidebar/sidebar';
 export { UiSidebarItem } from './sidebar/sidebar-item';

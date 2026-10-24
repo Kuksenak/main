@@ -3,7 +3,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, UiCard, UiGlassButton, UiListRow, UiSheet } from '../core/ui';
+import { Icon, UiList, UiFloatingButton, UiListItem, UiSheet } from '../core/ui';
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
 import type { User } from '../users/users.store';
@@ -18,7 +18,7 @@ type Page = 'language' | 'users' | 'user';
  */
 @Component({
   selector: 'app-account-sheet',
-  imports: [Icon, TranslatePipe, UiCard, UiGlassButton, UiListRow, UiSheet, UserCard, UsersList],
+  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSheet, UserCard, UsersList],
   templateUrl: './account-sheet.html',
 })
 export class AccountSheet {

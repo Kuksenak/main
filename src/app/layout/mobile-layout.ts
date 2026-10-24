@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, UiGlassButton } from '../core/ui';
+import { Icon, UiFloatingButton } from '../core/ui';
 import { AccountSheet } from './account-sheet';
 import { PageTitle } from './page-title';
 import { PlacesSheet } from './places-sheet';
@@ -15,7 +15,7 @@ import { PlacesSheet } from './places-sheet';
  */
 @Component({
   selector: 'app-mobile-layout',
-  imports: [AccountSheet, Icon, PlacesSheet, RouterOutlet, TranslatePipe, UiGlassButton],
+  imports: [AccountSheet, Icon, PlacesSheet, RouterOutlet, TranslatePipe, UiFloatingButton],
   templateUrl: './mobile-layout.html',
 })
 export class MobileLayout {

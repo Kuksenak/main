@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiButton, UiGlassButton } from '../core/ui';
+import { UiButton, UiFloatingButton } from '../core/ui';
 import { startOfDay, startOfMonth } from '../core/utils/date';
 import { PageTitle } from '../layout/page-title';
 import { Calendar } from './calendar';
@@ -12,7 +12,7 @@ import { Calendar } from './calendar';
  */
 @Component({
   selector: 'app-schedule',
-  imports: [Calendar, TranslatePipe, UiButton, UiGlassButton],
+  imports: [Calendar, TranslatePipe, UiButton, UiFloatingButton],
   templateUrl: './schedule.html',
 })
 export class Schedule {

@@ -2,14 +2,14 @@ import { booleanAttribute, Component, input } from '@angular/core';
 import { Icon, IconName } from '../icon/icon';
 
 /**
- * A row of a `<ui-card>` (as iOS's): an icon (the outline: a small one), the name, then (put in with `rowValue`) a value
- * in gray, ✓ when `checked`, › when it opens something (`chevron`); `danger` (log out): its text
- * in the danger color. A hairline under it, from the text on (not under the last). A `div` for a
- * row that isn't tapped (e.g. the email); a button grays while pressed, edge to edge (not shrunk
- * as other buttons are).
+ * An item of a `<ui-list>` (as iOS's rows): an icon (the outline: a small one), the name, then (put
+ * in with `itemValue`) a value in gray, ✓ when `checked`, › when it opens something (`chevron`);
+ * `danger` (log out): its text in the danger color. A hairline under it, from the text on (not under
+ * the last). A `div` for one that isn't tapped (e.g. the email); a button grays while pressed, edge
+ * to edge (not shrunk as other buttons are).
  */
 @Component({
-  selector: 'button[uiListRow], div[uiListRow]',
+  selector: 'button[uiListItem], div[uiListItem]',
   imports: [Icon],
   host: {
     class:
@@ -20,9 +20,9 @@ import { Icon, IconName } from '../icon/icon';
     '[class.text-danger]': 'danger()',
     '[attr.aria-pressed]': 'checked()',
   },
-  templateUrl: './list-row.html',
+  templateUrl: './list-item.html',
 })
-export class UiListRow {
+export class UiListItem {
   readonly icon = input<IconName>();
   readonly chevron = input(false, { transform: booleanAttribute });
   readonly checked = input<boolean>();

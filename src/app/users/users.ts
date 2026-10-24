@@ -3,7 +3,7 @@ import { AREA_LABELS } from '../auth/permissions';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiCard, UiListRow, UiToggle } from '../core/ui';
+import { UiList, UiListItem, UiToggle } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { UsersStore } from './users.store';
 
@@ -16,7 +16,7 @@ import { UsersStore } from './users.store';
  */
 @Component({
   selector: 'app-users',
-  imports: [TranslatePipe, UiCard, UiListRow, UiToggle],
+  imports: [TranslatePipe, UiList, UiListItem, UiToggle],
   templateUrl: './users.html',
 })
 export class Users {

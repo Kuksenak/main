@@ -37,7 +37,7 @@
 
 ## Sizes on phones
 The account sheet's language list sets the size for everything on phones:
-- list rows 48px tall (`h-row`), in cards (`ui-card`, 24px corners: `rounded-card`);
+- list rows 48px tall (`h-row`), in cards (`ui-list`, 24px corners: `rounded-card`);
 - 17px text (`text-body`), 16px side padding (`px-row-x`);
 - 28px icons (`size-icon-menu`), ✓ / › 20px;
 - hairlines between rows from the text on;

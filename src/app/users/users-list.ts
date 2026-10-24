@@ -1,6 +1,6 @@
 import { Component, inject, output } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiCard, UiListRow } from '../core/ui';
+import { UiList, UiListItem } from '../core/ui';
 import { User, UsersStore } from './users.store';
 
 /**
@@ -9,7 +9,7 @@ import { User, UsersStore } from './users.store';
  */
 @Component({
   selector: 'app-users-list',
-  imports: [TranslatePipe, UiCard, UiListRow],
+  imports: [TranslatePipe, UiList, UiListItem],
   template: `
     @if (store.loadError()) {
       <p class="px-row-x text-body text-danger">{{ 'users.loadError' | t }}</p>
@@ -18,16 +18,16 @@ import { User, UsersStore } from './users.store';
       @if (!users.length) {
         <p class="px-row-x text-body text-fg-secondary">{{ 'users.empty' | t }}</p>
       } @else {
-        <ui-card>
+        <ui-list>
           @for (user of users; track user.id) {
-            <button type="button" uiListRow icon="person" chevron (click)="picked.emit(user)">
+            <button type="button" uiListItem icon="person" chevron (click)="picked.emit(user)">
               {{ store.name(user) ?? user.email }}
               @if (user.isAdmin) {
-                <span rowValue class="text-fg-secondary">{{ 'users.admin' | t }}</span>
+                <span itemValue class="text-fg-secondary">{{ 'users.admin' | t }}</span>
               }
             </button>
           }
-        </ui-card>
+        </ui-list>
       }
     }
   `,

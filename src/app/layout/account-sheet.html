@@ -6,7 +6,7 @@
       [class.animate-pane-in]="!cameBack"
       [class.animate-pane-back]="cameBack"
     >
-      <button type="button" uiGlassButton round (click)="back()" [attr.aria-label]="'action.back' | t" class="absolute left-0">
+      <button type="button" uiFloatingButton round (click)="back()" [attr.aria-label]="'action.back' | t" class="absolute left-0">
         <app-icon name="chevron-left" class="-ml-0.5 size-7" />
       </button>
       <span class="max-w-[calc(100%-7rem)] truncate text-body font-semibold">{{ title() }}</span>
@@ -14,13 +14,13 @@
     <div class="flex flex-col" [class.animate-pane-in]="!cameBack" [class.animate-pane-back]="cameBack">
       @switch (open) {
         @case ('language') {
-          <ui-card>
+          <ui-list>
             @for (language of i18n.languages; track language.code) {
-              <button type="button" uiListRow [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code); back()">
+              <button type="button" uiListItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code); back()">
                 {{ language.label }}
               </button>
             }
-          </ui-card>
+          </ui-list>
         }
         <!-- (the users' code: downloaded only now, the first time) -->
         @case ('users') {
@@ -37,33 +37,33 @@
     </div>
   } @else {
     <div class="flex flex-1 flex-col gap-6" [class.animate-pane-back]="cameBack">
-      <ui-card>
-        <div uiListRow icon="person">{{ auth.email() }}</div>
-      </ui-card>
+      <ui-list>
+        <div uiListItem icon="person">{{ auth.email() }}</div>
+      </ui-list>
 
       <!-- Users (the admins only: their list slides in, a user tapped: their card); the language (the
            current one in gray, ›: its list slides in) -->
-      <ui-card>
+      <ui-list>
         @if (auth.isAdmin()) {
-          <button type="button" uiListRow icon="lock" chevron (click)="open('users')">{{ 'users.title' | t }}</button>
+          <button type="button" uiListItem icon="lock" chevron (click)="open('users')">{{ 'users.title' | t }}</button>
         }
-        <button type="button" uiListRow icon="globe" chevron (click)="open('language')">
+        <button type="button" uiListItem icon="globe" chevron (click)="open('language')">
           {{ 'account.language' | t }}
-          <span rowValue class="text-fg-secondary">{{ language() }}</span>
+          <span itemValue class="text-fg-secondary">{{ language() }}</span>
         </button>
-      </ui-card>
+      </ui-list>
 
       <div class="mt-auto flex flex-col gap-3">
         <!-- A new version downloaded: switch to it (the page reloads) -->
         @if (updates.ready()) {
-          <ui-card>
-            <button type="button" uiListRow icon="update" (click)="updates.apply()">{{ 'account.update' | t }}</button>
-          </ui-card>
+          <ui-list>
+            <button type="button" uiListItem icon="update" (click)="updates.apply()">{{ 'account.update' | t }}</button>
+          </ui-list>
         }
-        <ui-card>
-          <button type="button" uiListRow icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
-          <button type="button" uiListRow icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
-        </ui-card>
+        <ui-list>
+          <button type="button" uiListItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
+          <button type="button" uiListItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
+        </ui-list>
       </div>
     </div>
   }

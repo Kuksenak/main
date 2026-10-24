@@ -6,7 +6,7 @@ import { booleanAttribute, Component, input } from '@angular/core';
  * else a capsule with its label (e.g. Today).
  */
 @Component({
-  selector: 'button[uiGlassButton], a[uiGlassButton]',
+  selector: 'button[uiFloatingButton], a[uiFloatingButton]',
   host: {
     class:
       'inline-flex h-round shrink-0 items-center justify-center gap-1.5 rounded-full text-body font-medium active:opacity-70 ' +
@@ -22,7 +22,7 @@ import { booleanAttribute, Component, input } from '@angular/core';
   },
   template: `<ng-content />`,
 })
-export class UiGlassButton {
+export class UiFloatingButton {
   readonly accent = input(false, { transform: booleanAttribute });
   readonly round = input(false, { transform: booleanAttribute });
 }

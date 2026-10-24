@@ -2,7 +2,7 @@
   <app-icon [name]="name" class="size-icon-menu shrink-0" />
 }
 <span class="min-w-0 flex-1 truncate"><ng-content /></span>
-<ng-content select="[rowValue]" />
+<ng-content select="[itemValue]" />
 @if (checked()) {
   <app-icon name="check" class="size-5 shrink-0 text-accent" />
 }

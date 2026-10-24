@@ -1,10 +1,10 @@
 <div class="flex h-full flex-col bg-app text-fg">
   <header class="flex shrink-0 items-center gap-3 px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-2">
     <span class="min-w-0 flex-1 truncate text-xl font-semibold">{{ title() }}</span>
-    <button type="button" uiGlassButton round (click)="placesOpen.set(true)" [attr.aria-label]="'nav.menu' | t">
+    <button type="button" uiFloatingButton round (click)="placesOpen.set(true)" [attr.aria-label]="'nav.menu' | t">
       <app-icon name="grid" class="size-6" />
     </button>
-    <button type="button" uiGlassButton round accent (click)="accountOpen.set(true)" class="relative" [attr.aria-label]="'account.title' | t">
+    <button type="button" uiFloatingButton round accent (click)="accountOpen.set(true)" class="relative" [attr.aria-label]="'account.title' | t">
       <span class="text-[1.375rem] font-medium uppercase">{{ initial() }}</span>
       <!-- (a new version ready: a green dot on it) -->
       @if (updates.ready()) {
