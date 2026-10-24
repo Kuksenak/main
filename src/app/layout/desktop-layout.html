@@ -1,12 +1,13 @@
 <div class="flex h-full bg-app text-fg">
   <ui-sidebar>
-    <!-- Search (Ctrl+K / ⌘K too), over the sections, as Notion's: a field-like box (a hairline, a
-         little lighter than the sidebar; its fill darker under the pointer), its words gray, the keys on a chip -->
+    <!-- Search (Ctrl+K / ⌘K too), over the sections, as Notion's (measured): a field-like box 32 tall,
+         12 in from the sidebar's sides, a hairline, no fill (a gray one under the pointer), its words
+         gray, the keys on a chip -->
     <button
       type="button"
       (click)="searchOpen.set(true)"
-      class="mt-1 mb-1.5 flex h-7.5 w-full shrink-0 items-center gap-2.5 rounded-[0.625rem] border-[0.5px] border-fg/14 bg-side-field px-2.5
-             text-left text-ui text-fg-secondary outline-none hover:bg-side-on focus-visible:bg-side-on active:transform-none"
+      class="mx-2 mb-1.5 flex h-8 shrink-0 items-center gap-2 rounded-lg border-[0.8px] border-separator pr-1.5 pl-2 text-left text-ui
+             text-fg-secondary outline-none hover:bg-side-hover focus-visible:bg-side-hover active:transform-none"
     >
       <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
       <span class="shrink-0 rounded-[0.3rem] bg-tint-strong px-1.5 py-px text-footnote">{{ shortcut }}</span>
