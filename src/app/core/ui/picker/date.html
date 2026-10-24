@@ -1,0 +1,45 @@
+@if (desktop) {
+  <button type="button" (click)="toggle()" [attr.aria-expanded]="open()" class="inline-flex h-button items-center rounded-full bg-tint px-3.5 text-ui text-fg hover:bg-tint-strong">
+    {{ label() }}
+  </button>
+  @if (open()) {
+    <div class="fixed inset-0 z-40" (click)="open.set(false)"></div>
+    <!-- The calendar under the chip -->
+    <div class="absolute top-full left-0 z-50 mt-1.5 w-62 animate-menu-in rounded-menu bg-dialog p-2 text-fg shadow-popover">
+      <div class="mb-1 flex items-center gap-0.5 pl-1.5">
+        <span class="flex-1 text-ui font-medium">{{ monthLabel() }}</span>
+        <button type="button" (click)="step(-1)" class="grid size-7 place-items-center rounded-md text-icon hover:bg-tint-strong">
+          <app-icon name="chevron-left" class="size-4" />
+        </button>
+        <button type="button" (click)="step(1)" class="grid size-7 place-items-center rounded-md text-icon hover:bg-tint-strong">
+          <app-icon name="chevron-right" class="size-4" />
+        </button>
+      </div>
+      <div class="grid grid-cols-7">
+        @for (wd of i18n.weekdays(); track $index) {
+          <span class="flex h-7 items-center justify-center text-footnote text-fg-secondary">{{ wd }}</span>
+        }
+        @for (week of weeks(); track $index) {
+          @for (cell of week; track cell.date.getTime()) {
+            <button
+              type="button"
+              (click)="pick(cell.date)"
+              class="mx-auto grid size-8 place-items-center rounded-full text-ui hover:bg-tint-strong"
+              [class.opacity-35]="!cell.inMonth"
+              [class.text-accent]="isToday(cell.date) && !isChosen(cell.date)"
+              [class.font-semibold]="isToday(cell.date)"
+              [class.bg-fg]="isChosen(cell.date)"
+              [class.text-app]="isChosen(cell.date)"
+            >
+              {{ cell.date.getDate() }}
+            </button>
+          }
+        }
+      </div>
+    </div>
+  }
+} @else {
+  <!-- Phones: the chip, the system's own date picker over it, unseen (a tap opens it) -->
+  <span class="pointer-events-none inline-flex h-button items-center rounded-full bg-tint px-3.5 text-body text-fg">{{ label() }}</span>
+  <input #field type="date" class="absolute inset-0 opacity-0" [value]="value() ?? ''" (change)="typed(field.value)" />
+}

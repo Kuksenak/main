@@ -1,3 +1,13 @@
+<!-- The choosers: a day, a time, a choice of a few -->
+<div class="flex flex-col gap-2 px-4 pt-4 desktop:px-10 desktop:pt-8">
+  <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'home.choosers' | t }}</span>
+  <div class="flex flex-wrap items-center gap-2">
+    <ui-date [(value)]="day" />
+    <ui-time [(value)]="time" />
+    <ui-select [options]="levels" [(value)]="level" [label]="'home.level' | t" />
+  </div>
+</div>
+
 <div class="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-3 px-4 py-4 desktop:px-10 desktop:py-8">
   @for (name of icons; track name) {
     <div class="flex flex-col items-center gap-3 rounded-card border-[0.5px] border-separator px-2 py-4">
