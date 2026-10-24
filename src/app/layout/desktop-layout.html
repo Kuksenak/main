@@ -1,0 +1,43 @@
+<div class="flex h-full bg-app text-fg">
+  <ui-sidebar>
+    @for (place of places; track place.path) {
+      <!-- (the start page: current only on itself) -->
+      <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
+    }
+    <button
+      #account
+      sidebarFoot
+      uiButton
+      type="button"
+      [caret]="true"
+      (click)="menuAt.set(menuAt() ? null : account.element)"
+      aria-haspopup="menu"
+      [attr.aria-expanded]="!!menuAt()"
+      [attr.aria-label]="'account.title' | t"
+    >
+      <!-- (a new version ready: a green dot on it) -->
+      <ui-avatar [name]="userName()" [dot]="updates.ready()" />
+      {{ userName() }}
+    </button>
+  </ui-sidebar>
+  <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
+    <router-outlet />
+  </main>
+</div>
+
+@if (menuAt(); as at) {
+  <ui-menu [origin]="at" (closed)="menuAt.set(null)">
+    <ui-menu-label>{{ auth.email() }}</ui-menu-label>
+    <ui-menu-separator />
+    <ui-menu-label icon="globe">{{ 'account.language' | t }}</ui-menu-label>
+    @for (language of i18n.languages; track language.code) {
+      <button type="button" uiMenuItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">{{ language.label }}</button>
+    }
+    <ui-menu-separator />
+    @if (updates.ready()) {
+      <button type="button" uiMenuItem icon="update" (click)="updates.apply()"><span class="text-accent">{{ 'account.update' | t }}</span></button>
+    }
+    <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
+    <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
+  </ui-menu>
+}

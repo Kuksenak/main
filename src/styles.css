@@ -1,6 +1,5 @@
 @import "tailwindcss";
 /* (the menus' layer over the page: ui/menu.ts) */
-@import "@angular/cdk/overlay-prebuilt.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

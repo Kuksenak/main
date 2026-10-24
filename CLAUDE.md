@@ -10,6 +10,12 @@
 - Markup longer than a few lines goes in its own `.html` (`templateUrl`); a one- or two-line template
   stays inline. No component stylesheets.
 
+- Where phones and desktops differ a lot, each gets its own component, picked once by the device
+  (`core/device.ts`; e.g. app.routes loads `DesktopLayout` or `MobileLayout`). Then neither device
+  downloads the other's code.
+- Desktop-only pieces with heavy dependencies stay out of the kit's index: the menus (CDK overlay)
+  are imported from `core/ui/menu`.
+
 ## Styles
 - Tailwind classes only, in the markup or in `host: { class: … }`. States are variants too:
   `hover:`, `focus-visible:`, `aria-expanded:`, `aria-[current=page]:`, `data-*:`, `not-disabled:`.

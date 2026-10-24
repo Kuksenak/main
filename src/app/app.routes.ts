@@ -1,12 +1,17 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './auth/auth.guard';
+import { desktop } from './core/device';
 
 export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./login/login').then((m) => m.Login), canActivate: [guestGuard] },
   {
-    // The signed-in pages, in the layout (desktop: the sidebar beside them)
+    // The signed-in pages, in the device's own layout (desktop: the sidebar beside them; phones: a
+    // top bar) — each device downloads only its own
     path: '',
-    loadComponent: () => import('./layout/layout').then((m) => m.Layout),
+    loadComponent: () =>
+      desktop
+        ? import('./layout/desktop-layout').then((m) => m.DesktopLayout)
+        : import('./layout/mobile-layout').then((m) => m.MobileLayout),
     canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) },

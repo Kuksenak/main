@@ -2,6 +2,9 @@
    download it). The sizes that differ per device — in templates by their Tailwind names (text-ui,
    h-button, rounded-menu, … — see styles.css): one step smaller, less rounded, as Notion's. */
 
+/* The menus' overlay (CDK): only desktops open menus at their buttons */
+@import "@angular/cdk/overlay-prebuilt.css";
+
 :root {
   --font-body: 0.9375rem; /* 15px */
 
