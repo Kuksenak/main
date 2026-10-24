@@ -5,13 +5,10 @@
   [attr.data-open]="open() ? '' : null"
   [attr.aria-hidden]="open() ? null : 'true'"
 >
-  <!-- What's in it: its top the seen screen's top even if iOS pushes the page up for the keyboard;
-       down to the screen's bottom, under the keyboard — what's found passes under its see-through
-       bar (room at the end to scroll the last one over it) -->
-  <div
-    class="absolute inset-x-0 bottom-0 flex flex-col"
-    [style.top.px]="area.top()"
-  >
+  <!-- What's in it: the whole screen, fixed — nothing moved by script as the view shifts (that made
+       it jump; the page itself can't scroll: body fixed); down under the keyboard — what's found
+       passes under its see-through bar (room at the end to scroll the last one over it) -->
+  <div class="absolute inset-0 flex flex-col">
     <!-- Where the top bar was, staying there (a drag on it moves nothing): the capsule (the loupe,
        the field) and ✕, as the top bar's buttons (the same glass, the same height); under them the
        tabs -->
