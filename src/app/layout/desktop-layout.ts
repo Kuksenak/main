@@ -5,7 +5,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
 import { UiAvatar, UiButton } from '../core/ui';
-import { UiSidebar, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
+import { UiSidebar, UiSidebarItem, UiSidebarSearch } from '../core/ui/sidebar';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
 import { Search } from './search';
@@ -29,8 +29,8 @@ import { Search } from './search';
     UiMenuLabel,
     UiMenuSeparator,
     UiSidebar,
-    UiSidebarButton,
     UiSidebarItem,
+    UiSidebarSearch,
   ],
   templateUrl: './desktop-layout.html',
 })
@@ -50,7 +50,7 @@ export class DesktopLayout {
   // The search window: open from the sidebar's Search, or Ctrl K (⌘K on a Mac) from anywhere
   protected readonly searchOpen = signal(false);
   private readonly mac = /mac/i.test(navigator.platform);
-  protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl K';
+  protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl+K';
 
   constructor() {
     const onKey = (e: KeyboardEvent) => {

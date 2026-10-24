@@ -25,6 +25,7 @@
   --side-bg: #fbfbf9;
   --side-hover: #f3f2ee;
   --side-on: #edece8;
+  --side-field: #fdfdfc; /* (the sidebar's Search: a little lighter than it) */
   --side-text: #52514e;
   /* Phones, as iOS 26: frosted round buttons (a white rim, a soft wide shadow), the accent ones
      solid; sheets of see-through glass over a strong blur, their cards a little whiter */
@@ -59,6 +60,7 @@ html.dark {
   --side-bg: #000000;
   --side-hover: #1c1c1e;
   --side-on: #2c2c2e;
+  --side-field: #1c1c1e;
   --side-text: #c7c7cc;
   --glass: rgb(58 58 60 / 0.72);
   --glass-shadow: 0 2px 14px rgb(0 0 0 / 0.4);

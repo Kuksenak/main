@@ -1,7 +1,7 @@
 <div class="flex h-full bg-app text-fg">
   <ui-sidebar>
     <!-- Search (Ctrl K / ⌘K too), over the sections -->
-    <button uiSidebarButton icon="search" [shortcut]="shortcut" (click)="searchOpen.set(true)">{{ 'search.title' | t }}</button>
+    <button uiSidebarSearch [shortcut]="shortcut" (click)="searchOpen.set(true)">{{ 'search.title' | t }}</button>
     @for (place of places(); track place.path) {
       <!-- (the start page: current only on itself) -->
       <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
