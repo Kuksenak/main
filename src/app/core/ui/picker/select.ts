@@ -2,7 +2,7 @@ import { Component, input, model, signal } from '@angular/core';
 import { desktop } from '../../device';
 import { Icon, IconName } from '../icon/icon';
 
-/** An option of a `<ui-select>`: its value, its words, an icon before them (desktops; iOS's menu has none). */
+/** An option of a `<ui-select>`: its value, its words, an icon before them (on the chip; in the menu on desktops — iOS's own has none). */
 export interface UiOption {
   value: string;
   label: string;
@@ -58,7 +58,10 @@ export interface UiOption {
         </div>
       }
     } @else {
-      <span class="pointer-events-none inline-flex h-button items-center gap-1 rounded-full bg-tint pr-2 pl-3.5 text-body text-fg">
+      <span class="pointer-events-none inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-body text-fg" [class.pl-2.5]="!!chosenIcon()">
+        @if (chosenIcon(); as icon) {
+          <app-icon [name]="icon" colored class="size-6 text-icon" />
+        }
         {{ chosen() }}
         <app-icon name="chevron-down" class="size-4 text-icon" />
       </span>
