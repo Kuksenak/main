@@ -25,9 +25,21 @@
         title()
       }}</span>
     } @else {
-      <span class="min-w-0 flex-1 truncate text-xl font-semibold" data-vt="page-title">{{
-        title()
-      }}</span>
+      <!-- A section: its name with ▾ — the system's own menu of the sections (a select, unseen over
+           it): one picked, it opens -->
+      <div class="relative flex min-w-0 flex-1 items-center gap-1" data-vt="page-title">
+        <span class="truncate text-xl font-semibold">{{ title() }}</span>
+        <app-icon name="chevron-down" class="size-5 shrink-0 text-icon" />
+        <select
+          class="absolute inset-0 opacity-0"
+          [attr.aria-label]="'nav.menu' | t"
+          (change)="go($any($event.target))"
+        >
+          @for (place of places(); track place.path) {
+            <option [value]="place.path" [selected]="place.path === here()">{{ place.label | t }}</option>
+          }
+        </select>
+      </div>
     }
     <!-- (not inside a page opened from a list: there, only ‹ and its title) -->
     @if (!back()) {
@@ -39,15 +51,6 @@
         [attr.aria-label]="'search.title' | t"
       >
         <app-icon name="search" class="size-7" />
-      </button>
-      <button
-        type="button"
-        uiFloatingButton
-        round
-        (click)="placesOpen.set(true)"
-        [attr.aria-label]="'nav.menu' | t"
-      >
-        <app-icon name="grid" class="size-7" />
       </button>
       <button
         type="button"
@@ -78,9 +81,6 @@
   </main>
 </div>
 
-@if (placesOpen()) {
-  <app-places-sheet (closed)="placesOpen.set(false)" />
-}
 @if (accountOpen()) {
   <app-account-sheet (closed)="accountOpen.set(false)" />
 }

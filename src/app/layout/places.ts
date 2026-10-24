@@ -4,7 +4,7 @@ import { IconName } from '../core/ui';
 
 /**
  * A section of the app: its address, name and icon — in the sidebar (desktop) and the sections'
- * sheet (phones); `area`: shown only to those who can read it (its route guarded too: areaGuard).
+ * title's menu (phones); `area`: shown only to those who can read it (its route guarded too: areaGuard).
  */
 export interface Place {
   path: string;
