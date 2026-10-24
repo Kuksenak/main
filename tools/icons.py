@@ -1,11 +1,11 @@
 # The app's icons, "marker doodle + pastel fill" (docs/icons.md), 64x64: each drawn here once,
-# written as two SVGs — public/icons/ui/{name}.svg (the outline only, a thicker marker: the small
-# ones) and public/icons/ui/filled/{name}.svg (coloured in: the big ones).
+# written as two SVGs — public/icons/{name}.svg (the outline only, a thicker marker: the small
+# ones) and public/icons/filled/{name}.svg (coloured in: the big ones).
 #   python tools/icons.py            (from main/)
 #   python tools/icons.py doodle     (into ./doodle, with a preview page, doodle.html)
 import os, sys
 
-OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), '..', 'public', 'icons', 'ui')
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), '..', 'public', 'icons')
 os.makedirs(OUT, exist_ok=True)
 
 BEIGE, TEAL, SAGE, CREAM, ROSE, YELLOW = '#E5E4DF', '#C5DAD8', '#CBD5BF', '#F2EAD7', '#E9D3CE', '#F3E7B8'
