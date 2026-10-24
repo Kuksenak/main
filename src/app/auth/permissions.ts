@@ -2,7 +2,7 @@ import { TranslationKey } from '../core/i18n/translations';
 
 /**
  * The app's areas (its sections) that access is given to, one by one — the same fixed list as the
- * API's (Core.Api Entities/AccountPermission.cs: Areas); a new one: a line in both, and its name in
+ * API's (Core.Api Entities/Permissions.cs: Areas, with its two bits); a new one: a line in both, and its name in
  * AREA_LABELS.
  */
 export const AREAS = ['schedule'] as const;
