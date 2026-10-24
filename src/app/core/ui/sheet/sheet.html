@@ -6,9 +6,9 @@
   aria-modal="true"
   class="absolute inset-x-1 flex animate-sheet-up flex-col overflow-hidden rounded-[2.75rem] border-[0.5px] border-sheet-border bg-sheet
          text-fg shadow-sheet backdrop-blur-[30px] backdrop-saturate-[180%] [corner-shape:squircle]
-         max-h-[calc(var(--app-h)*0.9)] data-tall:top-[calc(env(safe-area-inset-top)+6px)] data-tall:max-h-none"
-  [class.bottom-1]="!inBrowser"
-  [class.bottom-5]="inBrowser"
+         max-h-[90%] data-tall:top-[calc(env(safe-area-inset-top)+6px)] data-tall:max-h-none"
+  [class.bottom-1]="!inBrowser || area.keyboard()"
+  [class.bottom-5]="inBrowser && !area.keyboard()"
   [attr.data-tall]="tall() ? '' : null"
   [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : dragY() ? 'translateY(' + dragY() + 'px)' : null"
   [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
@@ -24,12 +24,18 @@
     <div class="mx-auto h-1.25 w-9 rounded-full bg-grabber"></div>
   </div>
 
-  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pt-1.5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-    <!-- The head row (‹, the page's name: put in with sheetHead); with nothing in it, just a little
-         room. (Room over it too: a button growing under the finger isn't cut off at the top.) -->
-    <div class="relative mb-3 flex h-round shrink-0 items-center justify-center empty:mb-0 empty:h-2">
-      <ng-content select="[sheetHead]" />
-    </div>
+  <!-- The head row (‹, the page's name, a field: put in with sheetHead), staying put while what's under
+       it scrolls; with nothing in it, just a little room. (Room over it too: a button growing under
+       the finger isn't cut off at the top.) -->
+  <div class="relative mx-5 mt-1.5 mb-3 flex h-round shrink-0 items-center justify-center empty:mb-0 empty:h-2">
+    <ng-content select="[sheetHead]" />
+  </div>
+
+  <!-- What's in it, scrolling (at the bottom: room for the home indicator — none over the keyboard) -->
+  <div
+    class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5"
+    [style.padding-bottom]="area.keyboard() ? '0.75rem' : 'max(1.5rem, env(safe-area-inset-bottom))'"
+  >
     <ng-content />
   </div>
 </div>

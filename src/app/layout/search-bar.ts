@@ -1,5 +1,6 @@
 import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, output, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
+import { VisibleArea } from '../core/services/visible-area';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon, UiList, UiListItem } from '../core/ui';
 import { AppSearch, Found } from './app-search';
@@ -35,29 +36,16 @@ export class SearchBar {
     return sections;
   });
 
-  // How far up the keyboard reaches (0: none) — the capsule just over it
-  protected readonly keyboard = signal(0);
+  // (on the part of the screen that's seen: with the keyboard up, the capsule just over it)
+  protected readonly area = inject(VisibleArea);
 
   constructor() {
     this.search.prepare();
     // (focused at once: iOS opens the keyboard only while the tap that opened it is going on)
     afterNextRender(() => this.field().nativeElement.focus());
-
-    const viewport = window.visualViewport;
-    const measure = () => {
-      if (!viewport) return;
-      this.keyboard.set(Math.max(0, Math.round(window.innerHeight - viewport.height - viewport.offsetTop)));
-    };
-    measure();
-    viewport?.addEventListener('resize', measure);
-    viewport?.addEventListener('scroll', measure);
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && this.closed.emit();
     document.addEventListener('keydown', onKey);
-    inject(DestroyRef).onDestroy(() => {
-      viewport?.removeEventListener('resize', measure);
-      viewport?.removeEventListener('scroll', measure);
-      document.removeEventListener('keydown', onKey);
-    });
+    inject(DestroyRef).onDestroy(() => document.removeEventListener('keydown', onKey));
   }
 
   protected pick(found: Found): void {

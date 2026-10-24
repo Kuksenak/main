@@ -1,4 +1,5 @@
 import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { VisibleArea } from '../../services/visible-area';
 
 /**
  * Phones: a sheet from the bottom (as iOS 26's): see-through glass over a strong blur, big round
@@ -6,18 +7,22 @@ import { Component, DestroyRef, inject, input, output, signal } from '@angular/c
  * `tall`: from the top bar's buttons (a little over them) down — a fixed height, so pages switching
  * inside it don't make it jump. Drag it down by the top, tap outside or press Esc: it slides away,
  * then `closed` fires. Render it with @if; `close()` from inside (e.g. after a pick) does the same.
- * A head row (‹ back, a page's name) goes in with `sheetHead`; without one, the first block starts
- * a little under the grabber.
+ * A head row (‹ back, a page's name, a field) goes in with `sheetHead`: it stays put while what's
+ * under it scrolls; without one, the first block starts a little under the grabber. With the
+ * keyboard up, it sits over it (VisibleArea).
  *   @if (open()) { <ui-sheet #sheet (closed)="open.set(false)">…</ui-sheet> }
  */
 @Component({
   selector: 'ui-sheet',
-  host: { class: 'fixed inset-0 z-40' },
+  // (on the part of the screen that's seen: with the keyboard up, over it, not behind it)
+  host: { class: 'fixed inset-x-0 z-40', '[style.top.px]': 'area.top()', '[style.height.px]': 'area.height()' },
   templateUrl: './sheet.html',
 })
 export class UiSheet {
   readonly tall = input(false);
   readonly closed = output<void>();
+
+  protected readonly area = inject(VisibleArea);
 
   // In a phone's browser (not the installed app): a bit higher, clear of its bottom bar
   protected readonly inBrowser = !(
