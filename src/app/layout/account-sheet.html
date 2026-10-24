@@ -1,5 +1,6 @@
 <ui-sheet [tall]="true" (closed)="closed.emit()">
-  <!-- A page in the sheet: in its head ‹ back and its name; it slides in (back to it: from the left) -->
+  <!-- A page in the sheet: in its head ‹ back and its name; it slides in (back to it: from the left —
+       Slide: the head's ‹ and name and the page below are named for it) -->
   @if (page()) {
     <div sheetHead class="contents">
       <button
@@ -8,19 +9,17 @@
         round
         (click)="back()"
         [attr.aria-label]="'action.back' | t"
-        class="absolute left-0"
-        [class.animate-pane-in]="!cameBack"
-        [class.animate-pane-back]="cameBack"
+        class="absolute left-0" data-vt="sheet-back"
       >
         <app-icon name="chevron-left" class="-ml-0.5 size-7" />
       </button>
-      <span class="max-w-[calc(100%-7rem)] truncate text-body font-semibold" [class.animate-pane-in]="!cameBack" [class.animate-pane-back]="cameBack">
+      <span class="max-w-[calc(100%-7rem)] truncate text-body font-semibold" data-vt="sheet-title">
         {{ title() }}
       </span>
     </div>
   }
   @if (page(); as open) {
-    <div class="flex flex-col" [class.animate-pane-in]="!cameBack" [class.animate-pane-back]="cameBack">
+    <div class="flex flex-col" data-vt="sheet-pane">
       @switch (open) {
         @case ('language') {
           <ui-list>
@@ -33,19 +32,19 @@
         }
         <!-- (the users' code: downloaded only now, the first time) -->
         @case ('users') {
-          @defer {
+          @defer (on immediate) {
             <app-users-list (picked)="openUser($event)" />
           }
         }
         @case ('user') {
-          @defer {
+          @defer (on immediate) {
             <app-user-card [userId]="userId()!" />
           }
         }
       }
     </div>
   } @else {
-    <div class="flex flex-1 flex-col gap-6" [class.animate-pane-back]="cameBack">
+    <div class="flex flex-1 flex-col gap-6" data-vt="sheet-pane">
       <ui-list>
         <div uiListItem icon="person">{{ auth.email() }}</div>
       </ui-list>

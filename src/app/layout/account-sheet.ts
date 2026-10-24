@@ -2,6 +2,7 @@ import { Component, computed, inject, output, signal } from '@angular/core';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
+import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
 import { Icon, UiList, UiFloatingButton, UiListItem, UiSheet } from '../core/ui';
 import { UserCard } from '../users/user-card';
@@ -31,8 +32,8 @@ export class AccountSheet {
   // The pages open in the sheet, one over another (none: the account's list); ‹ goes one back
   protected readonly pages = signal<Page[]>([]);
   protected readonly page = computed(() => this.pages().at(-1) ?? null);
-  // (back from one: the one under it slides in from the left)
-  protected cameBack = false;
+  // (one opened slides in from the right; back, the one under it from the left)
+  private readonly slide = inject(Slide);
 
   // The user whose card is open, and their name over it (the card reads them from UsersStore itself:
   // the users' code is downloaded only when Users is opened — @defer)
@@ -42,8 +43,7 @@ export class AccountSheet {
   protected readonly language = computed(() => this.i18n.languages.find((l) => l.code === this.i18n.lang())!.label);
 
   protected open(page: Page): void {
-    this.cameBack = false;
-    this.pages.update((pages) => [...pages, page]);
+    this.slide.run('forward', () => this.pages.update((pages) => [...pages, page]));
   }
 
   protected openUser(user: User): void {
@@ -53,8 +53,7 @@ export class AccountSheet {
   }
 
   protected back(): void {
-    this.cameBack = true;
-    this.pages.update((pages) => pages.slice(0, -1));
+    this.slide.run('back', () => this.pages.update((pages) => pages.slice(0, -1)));
   }
 
   /** The open page's name, in the middle over it. */

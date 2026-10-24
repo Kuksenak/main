@@ -15,11 +15,9 @@
   @if (store.items(); as items) {
     @if (!items.length) {
       <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'library.empty' | t }}</p>
-    } @else if (!shown()?.length) {
-      <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'filter.nothing' | t }}</p>
     } @else {
       <ui-list>
-        @for (item of shown(); track item.id) {
+        @for (item of items; track item.id) {
           <button type="button" uiListItem icon="page" (click)="open(item)" [chevron]="!desktop">
             {{ item.title }}
             <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
@@ -30,8 +28,7 @@
   }
 </div>
 
-<!-- Phones: + floating at the bottom right, just above the home indicator (not while filtering:
-     the capsule's there) -->
+<!-- Phones: + floating at the bottom right, just above the home indicator -->
 <button
   type="button"
   uiFloatingButton
@@ -40,7 +37,7 @@
   [disabled]="creating()"
   (click)="create()"
   [attr.aria-label]="'library.new' | t"
-  class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20 desktop:hidden in-data-filtering:hidden"
+  class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20 desktop:hidden"
 >
   <app-icon name="plus" class="size-7" />
 </button>

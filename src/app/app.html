@@ -21,3 +21,10 @@
   <p class="text-body font-medium">{{ 'app.rotate' | t }}</p>
 </div>
 
+
+<!-- Something loading (the API): a thin bar running along the bottom, in the icons' teal -->
+<div class="pointer-events-none fixed inset-x-0 bottom-0 z-[60] h-0.75 overflow-hidden">
+  @if (loading.visible()) {
+    <div class="h-0.75 w-2/5 animate-loading-bar rounded-full bg-loading"></div>
+  }
+</div>

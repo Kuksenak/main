@@ -1,5 +1,5 @@
 <div class="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-3 px-4 py-4 desktop:px-10 desktop:py-8">
-  @for (name of icons(); track name) {
+  @for (name of icons; track name) {
     <div class="flex flex-col items-center gap-3 rounded-card border-[0.5px] border-separator px-2 py-4">
       <div class="flex items-end gap-4">
         <app-icon [name]="name" class="size-6.5" />

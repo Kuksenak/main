@@ -2,13 +2,15 @@ import { Component, computed, DestroyRef, ElementRef, inject, signal, viewChild 
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { VisibleArea } from '../core/services/visible-area';
-import { Icon, UiList, UiListItem } from '../core/ui';
-import { AppSearch, Found } from './app-search';
+import { Icon, UiFloatingButton, UiList, UiListItem } from '../core/ui';
+import { AppSearch, Found, SearchScope } from './app-search';
 
 /**
  * Phones: the app's search (the top bar's 🔍), as Telegram's — over the whole screen, the field on
- * a capsule where the top bar was, ✕ a circle at its right; under it what's found (AppSearch's:
- * nothing typed, the recent pages and New page), by section, down to the keyboard. A tap (or
+ * a capsule where the top bar was and ✕ at its right (both as the top bar's buttons), the tabs
+ * under them (All, Pages, Events); under those what's found (AppSearch's: nothing typed, the
+ * recent pages and New page), by section, scrolled on its own down to the keyboard — the head
+ * stays put. A tap (or
  * Search on the keyboard: the first one) opens it; ✕ or Esc closes it.
  *
  * It's there (unseen) all the while: 🔍 calls `start()`, which focuses the field during the tap
@@ -16,7 +18,7 @@ import { AppSearch, Found } from './app-search';
  */
 @Component({
   selector: 'app-search-bar',
-  imports: [Icon, TranslatePipe, UiList, UiListItem],
+  imports: [Icon, TranslatePipe, UiFloatingButton, UiList, UiListItem],
   templateUrl: './search-bar.html',
 })
 export class SearchBar {
@@ -27,10 +29,16 @@ export class SearchBar {
 
   readonly open = signal(false);
   protected readonly query = signal('');
+  protected readonly scope = signal<SearchScope>('all');
+  protected readonly tabs = [
+    { scope: 'all', label: 'search.all' },
+    { scope: 'pages', label: 'search.pages' },
+    { scope: 'events', label: 'search.events' },
+  ] as const;
   // What's found, by section, in order
   protected readonly sections = computed(() => {
     const sections: { name: string; items: Found[] }[] = [];
-    for (const found of this.search.find(this.query())) {
+    for (const found of this.search.find(this.query(), this.scope())) {
       const last = sections.at(-1);
       if (last?.name === found.section) last.items.push(found);
       else sections.push({ name: found.section, items: [found] });
@@ -54,6 +62,7 @@ export class SearchBar {
   start(): void {
     this.search.prepare();
     this.query.set('');
+    this.scope.set('all');
     this.open.set(true);
     this.field().nativeElement.focus({ preventScroll: true });
   }

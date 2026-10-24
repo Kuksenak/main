@@ -1,24 +1,27 @@
 import { Component, computed, DestroyRef, ElementRef, inject, input, OnInit, signal, viewChild } from '@angular/core';
+import type { JSONContent } from '@tiptap/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UiButton } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
+import { PageEditor } from './editor';
 import { Page, LibraryStore } from './library.store';
 
 // How long after the last keystroke a change is saved
 const SAVE_AFTER_MS = 700;
 
 /**
- * A page of the library (/library/:id): its title and its text, edited right there and saved by
- * themselves a moment after the typing stops (and on leaving). A new one ("Untitled") opens with its
- * title selected. Delete: the page gone, back to the library. Phones: the title in the top bar,
+ * A page of the library (/library/:id): its title and its content (PageEditor: text, headings,
+ * lists, …), edited right there and saved by themselves a moment after the typing stops (and on
+ * leaving). A new one ("Untitled") opens with its title selected; Enter in the title goes on into
+ * the text. Delete: the page gone, back to the library. Phones: the title in the top bar,
  * ‹ back to the library.
  */
 @Component({
   selector: 'app-page',
-  imports: [TranslatePipe, UiButton],
+  imports: [PageEditor, TranslatePipe, UiButton],
   templateUrl: './page.html',
 })
 export class PageView implements OnInit {
@@ -36,9 +39,10 @@ export class PageView implements OnInit {
 
   // What's being edited (the page's as loaded, then as typed)
   protected readonly title = signal('');
-  protected readonly text = signal('');
+  private content: JSONContent | null = null;
 
   private readonly titleField = viewChild<ElementRef<HTMLInputElement>>('titleField');
+  private readonly editor = viewChild(PageEditor);
   private timer: ReturnType<typeof setTimeout> | null = null;
   private dirty = false;
   private saveSub: Subscription | null = null;
@@ -56,32 +60,46 @@ export class PageView implements OnInit {
       next: (page) => {
         this.page.set(page);
         this.title.set(page.title);
-        this.text.set(page.blocks.map((b) => b.text ?? '').join('\n\n'));
+        this.content = page.content;
         if (fresh) setTimeout(() => this.titleField()?.nativeElement.select());
       },
       error: () => this.loadError.set(true),
     });
   }
 
-  protected typed(field: 'title' | 'text', value: string): void {
-    (field === 'title' ? this.title : this.text).set(value);
+  protected typedTitle(value: string): void {
+    this.title.set(value);
+    this.changed();
+  }
+
+  protected typedContent(content: JSONContent): void {
+    this.content = content;
+    this.changed();
+  }
+
+  // Enter in the title: on into the text, at its start
+  protected titleEnter(e: Event): void {
+    e.preventDefault();
+    this.editor()?.focus('start');
+  }
+
+  private changed(): void {
     this.dirty = true;
     if (this.timer) clearTimeout(this.timer);
     this.timer = setTimeout(() => this.flush(), SAVE_AFTER_MS);
   }
 
-  /** The change saved now (if there's one): the title (else "Untitled") and the text as one block. */
+  /** The change saved now (if there's one): the title (else "Untitled") and the content. */
   private flush(): void {
     if (this.timer) clearTimeout(this.timer);
     this.timer = null;
     if (!this.dirty || !this.page()) return;
     this.dirty = false;
     const title = this.title().trim() || this.i18n.t('library.untitled');
-    const text = this.text().trim();
     this.saving.set(true);
     this.saveError.set(false);
     this.saveSub?.unsubscribe();
-    this.saveSub = this.store.save(this.id(), title, text ? [{ kind: 'text', text }] : []).subscribe({
+    this.saveSub = this.store.save(this.id(), title, this.content).subscribe({
       next: () => this.saving.set(false),
       error: () => {
         this.saving.set(false);
@@ -97,11 +115,5 @@ export class PageView implements OnInit {
       next: () => this.router.navigateByUrl('/library'),
       error: () => this.saveError.set(true),
     });
-  }
-
-  // The text's box as tall as its text (no scrollbar of its own: the page scrolls)
-  protected grow(area: HTMLTextAreaElement): void {
-    area.style.height = 'auto';
-    area.style.height = `${area.scrollHeight}px`;
   }
 }

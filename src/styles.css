@@ -38,6 +38,8 @@
   --color-sheet-border: var(--sheet-border);
   --color-bar: var(--bar);
   --color-bar-border: var(--bar-border);
+  --color-field: var(--field);
+  --color-loading: var(--loading);
   --color-grabber: var(--grabber);
   --color-highlight: var(--highlight);
 
@@ -111,6 +113,12 @@
   --animate-pane-back: pane-back 280ms var(--ease-out-quick);
   @keyframes pane-back {
     from { opacity: 0; transform: translateX(-1.5rem); }
+  }
+  /* Something loading: a short bar running along the screen's bottom, again and again */
+  --animate-loading-bar: loading-bar 1.8s ease-in-out infinite;
+  @keyframes loading-bar {
+    from { transform: translateX(-120%); }
+    to { transform: translateX(320%); }
   }
   /* The rotate notice's phone: from landscape back to portrait, a pause, again */
   --animate-rotate-back: rotate-back 2.4s var(--ease-ios) infinite;

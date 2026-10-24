@@ -10,6 +10,7 @@ export const ICONS = [
   'globe',
   'calendar',
   'grid',
+  'grip',
   'person',
   'library',
   'update',

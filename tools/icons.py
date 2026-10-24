@@ -67,6 +67,14 @@ ICONS = {
             [(.5, -.3, 4.7, .92, 20), (-.4, .4, 4.4, 1, 0), (.3, .2, 4.6, .94, -30),
              (-.5, .2, 4.5, .95, 40), (.2, -.5, 4.7, .93, -15), (.5, .4, 4.4, .98, 0),
              (.2, .5, 4.6, .94, 10), (-.4, -.2, 4.7, .92, -40), (.3, .4, 4.4, .96, 25)])),
+    # a block's grip (drag it to move the block): six dots, two columns — dabbed as the grid's
+    'grip': ''.join(
+        f'<path stroke="none" fill="{MARKER}" '
+        f'transform="translate({x + dx} {y + dy}) rotate({t}) scale(1 {q})" d="{ring(0, 0, r)}z"/>'
+        for (x, y), (dx, dy, r, q, t) in zip(
+            [(x, y) for y in (15.5, 32, 48.5) for x in (24, 40)],
+            [(.4, -.3, 4.6, .93, 20), (-.3, .4, 4.4, 1, 0), (.3, .2, 4.6, .95, -30),
+             (-.4, .2, 4.5, .94, 40), (.2, .5, 4.6, .94, 10), (-.3, -.2, 4.5, .93, -40)])),
     # a person, as a bust: the body (rose) a soft arch, a little lopsided; the head over it (beige),
     # its outline not quite closed
     'person': fill(ROSE, 'M14.6 52C14.4 43.6 20.6 36.8 31.6 36.6 42.6 36.6 49.6 43 49.8 51.6z')

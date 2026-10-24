@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable, tap } from 'rxjs';
+import type { JSONContent } from '@tiptap/core';
 import { environment } from '@environments/environment';
 
 /** A page in the library's list (no content). */
@@ -10,21 +11,15 @@ export interface PageItem {
   updatedAt: string;
 }
 
-/** A block of a page's content — for now a text. */
-export interface PageBlock {
-  kind: 'text';
-  text: string | null;
-}
-
-/** A page as a whole. */
+/** A page as a whole: its content the editor's document (PageEditor; null — nothing written yet). */
 export interface Page extends PageItem {
-  blocks: PageBlock[];
+  content: JSONContent | null;
   createdAt: string;
 }
 
 /**
  * The library (the API's /pages): its pages, the last changed first (`load()`); a page `get`,
- * `create`d (empty, then opened), `save`d (its title and blocks as a whole — the list follows), deleted.
+ * `create`d (empty, then opened), `save`d (its title and content as a whole — the list follows), deleted.
  */
 @Injectable({ providedIn: 'root' })
 export class LibraryStore {
@@ -50,8 +45,8 @@ export class LibraryStore {
     return this.http.post<Page>(this.url, { title }).pipe(tap((page) => this.put(page)));
   }
 
-  save(id: string, title: string, blocks: PageBlock[]): Observable<Page> {
-    return this.http.put<Page>(`${this.url}/${id}`, { title, blocks }).pipe(tap((page) => this.put(page)));
+  save(id: string, title: string, content: JSONContent | null): Observable<Page> {
+    return this.http.put<Page>(`${this.url}/${id}`, { title, content }).pipe(tap((page) => this.put(page)));
   }
 
   delete(id: string): Observable<void> {

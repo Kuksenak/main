@@ -38,6 +38,10 @@
   --sheet-border: rgb(255 255 255 / 0.7);
   /* the bar over the keyboard (the filter's), as iOS's own just under it: glass, a hairline rim */
   --bar: rgb(246 246 246 / 0.82);
+  /* a field's fill on the page (the search's, as iOS's): gray, see-through */
+  --field: rgb(118 118 128 / 0.12);
+  /* the loading bar: the icons' teal (their pastels, tools/icons.py) */
+  --loading: #c5dad8;
   --bar-border: rgb(0 0 0 / 0.08);
   --sheet-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 -1px 6px rgb(0 0 0 / 0.06);
   --grabber: rgb(0 0 0 / 0.2);
@@ -71,6 +75,7 @@ html.dark {
   --sheet-card: rgb(255 255 255 / 0.07);
   --sheet-border: rgb(255 255 255 / 0.1);
   --bar: rgb(20 20 20 / 0.82);
+  --field: rgb(118 118 128 / 0.24);
   --bar-border: rgb(255 255 255 / 0.12);
   --sheet-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), 0 0 0 0.5px rgb(0 0 0 / 0.6), 0 -1px 6px rgb(0 0 0 / 0.3);
   --grabber: rgb(255 255 255 / 0.25);
@@ -167,4 +172,53 @@ button:disabled {
   [data-device='desktop'] :is(button, a[href]):not(:disabled):active {
     transform: none;
   }
+}
+
+/* Moving between views, as iOS does (View Transitions; Slide, and the router's): what's marked
+   data-vt is named for its scope's move only (<html data-slide-scope>: else the page, named,
+   would be drawn over a sheet moving its panes) and slides — forward, the new in from the right
+   as the old goes a little left, fading; back (<html data-slide=back>), the other way. The rest
+   stays as it is, not cross-faded; the top bar too (named, so it stays over the page). */
+html[data-slide-scope='route'] [data-vt='page'] { view-transition-name: page; }
+html[data-slide-scope='route'] [data-vt='page-title'] { view-transition-name: page-title; }
+html[data-slide-scope='route'] [data-vt='page-back'] { view-transition-name: page-back; }
+html[data-slide-scope='route'] [data-vt='top-bar'] { view-transition-name: top-bar; }
+html[data-slide-scope='sheet'] [data-vt='sheet-pane'] { view-transition-name: sheet-pane; }
+html[data-slide-scope='sheet'] [data-vt='sheet-title'] { view-transition-name: sheet-title; }
+html[data-slide-scope='sheet'] [data-vt='sheet-back'] { view-transition-name: sheet-back; }
+:root::view-transition-old(root),
+:root::view-transition-new(root),
+:root[data-slide]::view-transition-old(root),
+:root[data-slide]::view-transition-new(root),
+:root[data-slide]::view-transition-old(top-bar),
+:root[data-slide]::view-transition-new(top-bar) {
+  animation: none;
+}
+::view-transition-group(*) {
+  animation-duration: 380ms;
+  animation-timing-function: var(--ease-ios);
+}
+::view-transition-old(*) {
+  animation: slide-out 380ms var(--ease-ios) both;
+}
+::view-transition-new(*) {
+  animation: slide-in 380ms var(--ease-ios) both;
+}
+html[data-slide='back']::view-transition-old(*) {
+  animation-name: slide-out-back;
+}
+html[data-slide='back']::view-transition-new(*) {
+  animation-name: slide-in-back;
+}
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(2.5rem); }
+}
+@keyframes slide-out {
+  to { opacity: 0; transform: translateX(-1.5rem); }
+}
+@keyframes slide-in-back {
+  from { opacity: 0; transform: translateX(-1.5rem); }
+}
+@keyframes slide-out-back {
+  to { opacity: 0; transform: translateX(2.5rem); }
 }

@@ -16,11 +16,15 @@ export interface Found {
   open: () => void;
 }
 
+/** What the search looks through: everything, the pages only, the events only (none yet). */
+export type SearchScope = 'all' | 'pages' | 'events';
+
 /**
  * What the app's search finds — the desktop's search window and the phones' search (SearchBar) alike.
  * Nothing typed: the pages last changed and the actions (New page); something typed: the library's
  * pages and the app's sections whose names have it (the ones that start with it first). `find` reads
- * signals: call it in a computed.
+ * signals: call it in a computed. `scope` (the phones' tabs): 'pages' — all the pages, the last
+ * changed first (or those that have it); 'events' — none yet.
  */
 @Injectable({ providedIn: 'root' })
 export class AppSearch {
@@ -34,12 +38,17 @@ export class AppSearch {
     if (this.auth.can('library') && !this.library.items()) this.library.load();
   }
 
-  find(query: string): Found[] {
+  find(query: string, scope: SearchScope = 'all'): Found[] {
     const q = query.trim().toLocaleLowerCase(this.i18n.locale());
     const t = (key: Parameters<I18nService['t']>[0]) => this.i18n.t(key);
     const pages = (this.auth.can('library') ? (this.library.items() ?? []) : []).map(
       (p): Found => ({ id: p.id, section: '', label: p.title, icon: 'page', open: () => this.router.navigate(['/library', p.id]) }),
     );
+    if (scope === 'events') return [];
+    if (scope === 'pages') {
+      const all = pages.map((p) => ({ ...p, section: t('search.pages') }));
+      return q ? all.filter((p) => p.label.toLocaleLowerCase(this.i18n.locale()).includes(q)) : all;
+    }
 
     // Nothing typed: the pages last changed, then the actions
     if (!q) {

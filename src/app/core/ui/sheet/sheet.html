@@ -2,6 +2,7 @@
 <div class="absolute inset-0" (click)="close()"></div>
 
 <div
+  #panel
   role="dialog"
   aria-modal="true"
   class="absolute inset-x-1 flex animate-sheet-up flex-col overflow-hidden rounded-[2.75rem] border-[0.5px] border-sheet-border bg-sheet
@@ -13,14 +14,8 @@
   [style.transform]="closing() ? 'translateY(calc(100% + 1rem))' : dragY() ? 'translateY(' + dragY() + 'px)' : null"
   [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
 >
-  <!-- The grabber: drag it (or the top) down -->
-  <div
-    class="shrink-0 touch-none px-4 pt-2.5 pb-0.5"
-    (touchstart)="dragStart($event)"
-    (touchmove)="dragMove($event)"
-    (touchend)="dragEnd()"
-    (touchcancel)="dragEnd()"
-  >
+  <!-- The grabber (the sheet's pulled down by it, or anywhere) -->
+  <div class="shrink-0 px-4 pt-2.5 pb-0.5">
     <div class="mx-auto h-1.25 w-9 rounded-full bg-grabber"></div>
   </div>
 
@@ -33,6 +28,7 @@
 
   <!-- What's in it, scrolling (at the bottom: room for the home indicator — none over the keyboard) -->
   <div
+    #scroller
     class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5"
     [style.padding-bottom]="area.keyboard() ? '0.75rem' : 'max(1.5rem, env(safe-area-inset-bottom))'"
   >
