@@ -49,6 +49,8 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 ## Icons
 - The app's icons are drawn in one style, "marker doodle + pastel fill" (docs/icons.md): one SVG file
   each, in `public/icons/`, shown by `<app-icon name="…">`.
+- `python tools/icons.py` also writes `core/ui/icon/icon-data.ts`: the icons as data: URLs, which
+  `<app-icon>` uses — no request per icon (a file each showed late on phones). Never hand-edit it.
 - A new icon: drawn in `tools/icons.py` (then `python tools/icons.py`) and added to `ICONS`
   (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS` (outlined and coloured in), so each new
   one is there to judge.

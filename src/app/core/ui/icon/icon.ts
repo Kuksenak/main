@@ -1,4 +1,5 @@
 import { booleanAttribute, Component, computed, input } from '@angular/core';
+import { ICON_DATA } from './icon-data';
 
 /** Every icon there is (e.g. to show them all). */
 export const ICONS = [
@@ -32,7 +33,8 @@ export const ICONS = [
 export type IconName = (typeof ICONS)[number];
 
 /**
- * The app's icons, as drawn with a marker (docs/icons.md): each its own SVG file, 64×64 —
+ * The app's icons, as drawn with a marker (docs/icons.md): each its own SVG, 64×64 (in the
+ * app's code as data: URLs — icon-data.ts, made by tools/icons.py with the files) —
  * public/icons/{name}.svg the outline only (small ones: menus, rows), drawn in the text's
  * color (currentColor: a mask); and `filled`: public/icons/filled/{name}.svg coloured in with
  * one pastel (big ones, 40px+: the phones' sections) — the dark theme turns those over. The brands' marks (Google,
@@ -58,7 +60,7 @@ export type IconName = (typeof ICONS)[number];
       </svg>
     } @else {
       @if (filled()) {
-        <img [src]="'icons/filled/' + name() + '.svg'" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
+        <img [src]="filledUrl()" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
       } @else {
         <!-- (the outline as a mask over the text's color: it takes the color it's in — gray, red on
              a Log out under the pointer, light in the dark theme) -->
@@ -76,5 +78,7 @@ export class Icon {
   readonly filled = input(false, { transform: booleanAttribute });
   // (the brands' marks: drawn here; the rest: their files)
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
-  protected readonly url = computed(() => `url(icons/${this.name()}.svg)`);
+  // (from the app's own code, not a file each: no request each — ICON_DATA, tools/icons.py)
+  protected readonly url = computed(() => `url("${ICON_DATA[this.name()]?.[0]}")`);
+  protected readonly filledUrl = computed(() => ICON_DATA[this.name()]?.[1] ?? '');
 }
