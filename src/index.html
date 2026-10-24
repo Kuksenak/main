@@ -40,12 +40,15 @@
         });
       }
       function apply(isDark, nudge) {
-        document.documentElement.classList.toggle('dark', isDark);
+        var root = document.documentElement;
+        root.classList.toggle('dark', isDark);
         if (!nudge) return tags(LIGHT, DARK);
         tags('#fbfbfa', '#010101');
+        // (the page's own background nudged too: iOS colors the bar from what's under it as well)
+        root.style.backgroundColor = isDark ? '#010101' : '#fbfbfa';
         // (a frame later — or, hidden, where frames don't come, a moment later)
         var done = false;
-        var right = function () { if (!done) { done = true; tags(LIGHT, DARK); } };
+        var right = function () { if (!done) { done = true; tags(LIGHT, DARK); root.style.backgroundColor = ''; } };
         requestAnimationFrame(right);
         setTimeout(right, 60);
       }

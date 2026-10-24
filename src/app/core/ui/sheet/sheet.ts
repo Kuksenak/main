@@ -1,5 +1,4 @@
 import { afterNextRender, Component, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
-import { inBrowser } from '../../device';
 import { refreshThemeColor } from '../../services/theme-color';
 import { VisibleArea } from '../../services/visible-area';
 
@@ -27,8 +26,6 @@ export class UiSheet {
 
   protected readonly area = inject(VisibleArea);
 
-  // In a phone's browser (not the installed app): a bit higher, clear of its bottom bar
-  protected readonly inBrowser = inBrowser;
 
   protected readonly closing = signal(false);
   protected readonly dragY = signal(0);

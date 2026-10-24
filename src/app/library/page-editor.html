@@ -292,17 +292,17 @@
   @let at = blockMenu()!;
   <ui-sheet #menuSheet (closed)="blockMenu.set(null)">
     <div class="-mx-2 flex flex-col">
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); togglePrivate(at)">
+      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:transform-none active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); togglePrivate(at)">
         <app-icon name="lock" colored class="size-icon-menu text-icon" />
         <span class="flex-1">{{ 'editor.onlyMe' | t }}</span>
         @if (items()[at]?.private) {
           <app-icon name="check" class="size-5 text-accent" />
         }
       </button>
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body active:bg-tint disabled:opacity-40" [disabled]="!items()[at]?.text?.trim()" (click)="menuSheet.close(); copy(at)">
+      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:transform-none active:bg-tint disabled:opacity-40" [disabled]="!items()[at]?.text?.trim()" (click)="menuSheet.close(); copy(at)">
         <app-icon name="page" colored class="size-icon-menu text-icon" />{{ 'editor.copy' | t }}
       </button>
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); duplicate(at)">
+      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:transform-none active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); duplicate(at)">
         <app-icon name="plus" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
       </button>
       <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body text-danger active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); remove(at)">
