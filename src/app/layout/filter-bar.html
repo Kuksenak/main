@@ -10,10 +10,13 @@
 >
   <!-- (under the capsule: the page's color, fading to nothing upwards — the page's text drifting in) -->
   <div class="absolute inset-x-0 bottom-0 h-28 bg-linear-to-t from-app from-35% to-transparent"></div>
-  <div class="relative mx-3 flex items-center gap-2" [style.margin-bottom]="typing() || area.keyboard() ? '0.375rem' : 'max(0.75rem, env(safe-area-inset-bottom))'">
-    <!-- The capsule (as the floating buttons: glass, round): the funnel, the field -->
+  <!-- As iOS's bar over the keyboard just under it: as wide, as tall, the same glass and rim, the
+       same room between -->
+  <div class="relative mx-4 flex items-center gap-2" [style.margin-bottom]="typing() || area.keyboard() ? '0' : 'max(0.75rem, env(safe-area-inset-bottom))'">
+    <!-- The capsule: the funnel, the field -->
     <form
-      class="flex h-round in-data-shown:pointer-events-auto min-w-0 flex-1 items-center gap-2.5 rounded-full bg-glass px-4 text-fg shadow-glass backdrop-blur-[20px] backdrop-saturate-[180%]"
+      class="flex h-bar min-w-0 flex-1 items-center gap-2.5 rounded-full border-[0.5px] border-bar-border bg-bar px-4 text-fg backdrop-blur-[30px] backdrop-saturate-[180%]
+             in-data-shown:pointer-events-auto"
       (submit)="submit($event)"
     >
       <app-icon name="filter" class="size-5.5 shrink-0 text-icon" />
@@ -30,7 +33,14 @@
         class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary [&::-webkit-search-cancel-button]:hidden"
       />
     </form>
-    <button type="button" uiFloatingButton round (click)="close()" [attr.aria-label]="'search.close' | t" class="in-data-shown:pointer-events-auto">
+    <!-- ✕: a circle of the same -->
+    <button
+      type="button"
+      (click)="close()"
+      [attr.aria-label]="'search.close' | t"
+      class="grid size-bar shrink-0 place-items-center rounded-full border-[0.5px] border-bar-border bg-bar text-fg backdrop-blur-[30px] backdrop-saturate-[180%]
+             transition-[scale] duration-200 active:scale-110 in-data-shown:pointer-events-auto"
+    >
       <app-icon name="close" class="size-5.5" />
     </button>
   </div>

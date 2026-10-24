@@ -1,13 +1,13 @@
 import { Component, computed, DestroyRef, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { VisibleArea } from '../core/services/visible-area';
-import { Icon, UiFloatingButton } from '../core/ui';
+import { Icon } from '../core/ui';
 import { PageFilter } from './page-filter';
 
 /**
- * Phones: the filter of the open page (PageFilter) — its field on a glass capsule at the bottom
- * (as iOS 26's), just over the keyboard (and its own bar: the system's, which a page can't change),
- * ✕ a round button of its own at its right; the page stays where it is, seen, and shows only what
+ * Phones: the filter of the open page (PageFilter) — its field on a capsule at the bottom, as
+ * iOS's bar over the keyboard (its size, glass and rim), just over the keyboard (and its own bar: the system's, which a page can't change),
+ * ✕ a circle of the same at its right; the page stays where it is, seen, and shows only what
  * matches while it's typed, scrolled as
  * ever, its text fading out under the capsule. Search on the keyboard puts the keyboard away (the filter stays, the
  * capsule at the bottom); ✕ or Esc clears it and closes it.
@@ -19,7 +19,7 @@ import { PageFilter } from './page-filter';
  */
 @Component({
   selector: 'app-filter-bar',
-  imports: [Icon, TranslatePipe, UiFloatingButton],
+  imports: [Icon, TranslatePipe],
   templateUrl: './filter-bar.html',
 })
 export class FilterBar {

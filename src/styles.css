@@ -36,6 +36,8 @@
   --color-sheet: var(--sheet);
   --color-sheet-card: var(--sheet-card);
   --color-sheet-border: var(--sheet-border);
+  --color-bar: var(--bar);
+  --color-bar-border: var(--bar-border);
   --color-grabber: var(--grabber);
   --color-highlight: var(--highlight);
 
@@ -62,6 +64,7 @@
   --spacing-cal-row: var(--cal-row-h);
   --spacing-cal-day: var(--cal-day);
   --spacing-round: var(--round-h);
+  --spacing-bar: var(--bar-h);
   --spacing-row: var(--row-h);
   --spacing-row-x: var(--row-px);
   --spacing-toggle: var(--toggle-h);
