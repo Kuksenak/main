@@ -38,10 +38,10 @@
         >
           <app-icon [name]="result.icon" class="size-5 shrink-0 text-fg-secondary" />
           <!-- (the name, then its hint after a dash, small and gray, as Notion's) -->
-          <span class="min-w-0 flex-1 truncate text-base font-medium">
+          <span class="min-w-0 flex-1 truncate text-ui text-side-text">
             {{ result.label }}
             @if (result.hint) {
-              <span class="text-footnote font-normal text-fg-secondary"> — {{ result.hint }}</span>
+              <span class="text-footnote text-fg-secondary"> — {{ result.hint }}</span>
             }
           </span>
         </button>
