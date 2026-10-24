@@ -5,6 +5,7 @@
     <ui-date [(value)]="day" />
     <ui-time [(value)]="time" />
     <ui-select [options]="levels" [(value)]="level" [label]="'home.level' | t" />
+    <ui-select [options]="sections()" [(value)]="section" />
   </div>
 </div>
 

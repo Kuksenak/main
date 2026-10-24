@@ -22,9 +22,16 @@ export class Home {
   protected readonly time = signal('09:30');
   protected readonly level = signal<string | null>('B1');
   protected readonly levels: UiOption[] = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((l) => ({ value: l, label: l }));
+  // (with icons: the app's sections)
+  protected readonly section = signal<string | null>('library');
+  protected readonly sections = computed<UiOption[]>(() => [
+    { value: 'home', label: this.i18n.t('nav.home'), icon: 'home' },
+    { value: 'schedule', label: this.i18n.t('nav.schedule'), icon: 'calendar' },
+    { value: 'library', label: this.i18n.t('nav.library'), icon: 'library' },
+  ]);
+  private readonly i18n = inject(I18nService);
 
   constructor() {
-    const i18n = inject(I18nService);
-    inject(PageTitle).show(computed(() => i18n.t('nav.home')));
+    inject(PageTitle).show(computed(() => this.i18n.t('nav.home')));
   }
 }
