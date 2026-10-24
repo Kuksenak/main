@@ -30,18 +30,8 @@
       >
         <div class="relative">
           <!-- (the same letters as the field's, over it: only the marks faded, links colored) -->
-          <div
-            aria-hidden="true"
-            class="pointer-events-none absolute inset-0 text-body leading-relaxed break-words whitespace-pre-wrap"
-          >
-            @for (k of marked(item.text); track $index) {
-              <span
-                [class.opacity-30]="k.kind === 'syntax'"
-                [class.text-accent]="k.kind === 'link'"
-                >{{ k.t }}</span
-              >
-            }
-          </div>
+          <!-- prettier-ignore -->
+          <div aria-hidden="true" class="pointer-events-none absolute inset-0 text-body leading-relaxed break-words whitespace-pre-wrap">@for (k of marked(item.text); track $index) {<span [class.opacity-30]="k.kind === 'syntax'" [class.text-accent]="k.kind === 'link'">{{ k.t }}</span>}</div>
           <textarea
             #field
             rows="1"
