@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard, areaGuard, authGuard, guestGuard } from './auth/auth.guard';
+import { lastSectionGuard } from './auth/last-section';
 import { desktop } from './core/device';
 
 export const routes: Routes = [
@@ -14,7 +15,8 @@ export const routes: Routes = [
         : import('./layout/mobile-layout').then((m) => m.MobileLayout),
     canActivate: [authGuard],
     children: [
-      { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home) },
+      // (at the app's start: the section used last instead, if there's one — LastSection)
+      { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home), canActivate: [lastSectionGuard] },
       {
         path: 'schedule',
         loadComponent: () => import('./schedule/schedule').then((m) => m.Schedule),

@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthStore } from './auth/auth.store';
+import { LastSection } from './auth/last-section';
 import { Loading } from './core/services/loading';
 import { TranslatePipe } from './core/i18n/t.pipe';
 import { UpdateService } from './core/services/update.service';
@@ -17,5 +18,6 @@ export class App {
 
   constructor() {
     inject(UpdateService); // (checking for a new version from the start)
+    inject(LastSection); // (noting the section opened, from the start)
   }
 }

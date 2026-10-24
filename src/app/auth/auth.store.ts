@@ -13,6 +13,8 @@ export interface UserProfile {
   isAdmin: boolean;
   /** Access to each area (the API sends every one; the admins: all). */
   permissions: Partial<Record<Area, boolean>>;
+  /** The section used last (an area's name; null: none yet) — LastSection. */
+  lastSection: string | null;
 }
 
 const ME_TIMEOUT_MS = 5000;
