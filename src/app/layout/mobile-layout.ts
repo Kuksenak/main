@@ -7,15 +7,16 @@ import { Icon, UiFloatingButton } from '../core/ui';
 import { AccountSheet } from './account-sheet';
 import { PageTitle } from './page-title';
 import { PlacesSheet } from './places-sheet';
+import { SearchSheet } from './search-sheet';
 
 /**
  * Phones: the frame of every page after sign-in (the router puts the page into it), as iOS's — a
- * top bar: the page's title (a page opened from a list: ‹ back to it first), ⊞ (the sections' sheet) and the account (its letter: the account's
+ * top bar: the page's title (a page opened from a list: ‹ back to it first), 🔍 (the search's sheet), ⊞ (the sections' sheet) and the account (its letter: the account's
  * sheet); the page under it. (Desktops have their own, DesktopLayout: neither downloads the other's.)
  */
 @Component({
   selector: 'app-mobile-layout',
-  imports: [AccountSheet, Icon, PlacesSheet, RouterLink, RouterOutlet, TranslatePipe, UiFloatingButton],
+  imports: [AccountSheet, Icon, PlacesSheet, RouterLink, RouterOutlet, SearchSheet, TranslatePipe, UiFloatingButton],
   templateUrl: './mobile-layout.html',
 })
 export class MobileLayout {
@@ -26,6 +27,7 @@ export class MobileLayout {
   protected readonly title = this.page.text;
   protected readonly back = this.page.back;
   protected readonly placesOpen = signal(false);
+  protected readonly searchOpen = signal(false);
   protected readonly accountOpen = signal(false);
   // (the account button: the email's first letter)
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));

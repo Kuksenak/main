@@ -9,6 +9,9 @@
     } @else {
       <span class="min-w-0 flex-1 truncate text-xl font-semibold">{{ title() }}</span>
     }
+    <button type="button" uiFloatingButton round (click)="searchOpen.set(true)" [attr.aria-label]="'search.title' | t">
+      <app-icon name="search" class="size-6" />
+    </button>
     <button type="button" uiFloatingButton round (click)="placesOpen.set(true)" [attr.aria-label]="'nav.menu' | t">
       <app-icon name="grid" class="size-6" />
     </button>
@@ -30,4 +33,10 @@
 }
 @if (accountOpen()) {
   <app-account-sheet (closed)="accountOpen.set(false)" />
+}
+<!-- The search (its code downloaded only the first time it's opened) -->
+@if (searchOpen()) {
+  @defer {
+    <app-search-sheet (closed)="searchOpen.set(false)" />
+  }
 }
