@@ -38,7 +38,6 @@
   --sheet-shadow: inset 0 1px 0 rgb(255 255 255 / 0.8), 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 -1px 6px rgb(0 0 0 / 0.06);
   --grabber: rgb(0 0 0 / 0.2);
   --highlight: rgb(0 0 0 / 0.05); /* a pressed row or tile */
-  --backdrop: rgb(0 0 0 / 0.3); /* under a sheet (the status bar dims to match: core/services/status-bar.ts) */
 
   /* App height. Phones are portrait-only by CSS (a "rotate" notice in landscape) — don't call
      screen.orientation.lock(): on iOS home-screen apps it shrinks the launch viewport by the

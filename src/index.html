@@ -22,13 +22,11 @@
   <script>
     (function () {
       var query = window.matchMedia('(prefers-color-scheme: dark)');
-      // The theme follows the system. The status bar's color (theme-color, the page's — base.css; a
-      // sheet open: dimmed as the page under it, window.__setBar — core/services/status-bar.ts): a
-      // new tag rather than an edited one — iOS didn't notice an edit while a popup was open.
-      var override = null;
+      // The theme follows the system. The status bar's color (theme-color, the page's — base.css):
+      // a new tag rather than an edited one — iOS didn't notice an edit while a popup was open.
       function apply(isDark) {
         document.documentElement.classList.toggle('dark', isDark);
-        var color = override || (isDark ? '#000000' : '#fbfbf9');
+        var color = isDark ? '#000000' : '#fbfbf9';
         var old = document.querySelector('meta[name="theme-color"]');
         if (old && old.getAttribute('content') === color) return;
         var meta = document.createElement('meta');
@@ -38,7 +36,6 @@
         else document.head.appendChild(meta);
       }
       apply(query.matches);
-      window.__setBar = function (color) { override = color; apply(query.matches); };
       query.addEventListener('change', function (e) { apply(e.matches); });
       // Back in the app: the system theme may have changed while it was hidden.
       document.addEventListener('visibilitychange', function () {
