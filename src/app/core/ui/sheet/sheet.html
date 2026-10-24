@@ -15,7 +15,7 @@
 >
   <!-- The grabber: drag it (or the top) down -->
   <div
-    class="shrink-0 touch-none px-4 pt-2.5 pb-2"
+    class="shrink-0 touch-none px-4 pt-2.5 pb-0.5"
     (touchstart)="dragStart($event)"
     (touchmove)="dragMove($event)"
     (touchend)="dragEnd()"
@@ -24,10 +24,10 @@
     <div class="mx-auto h-1.25 w-9 rounded-full bg-grabber"></div>
   </div>
 
-  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-    <!-- The head row (‹, the page's name: put in with sheetHead) — there with nothing in it too, so
-         the first block starts at one height whether there's a head or not -->
-    <div class="relative mb-3 flex h-round shrink-0 items-center justify-center">
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 pt-1.5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+    <!-- The head row (‹, the page's name: put in with sheetHead); with nothing in it, just a little
+         room. (Room over it too: a button growing under the finger isn't cut off at the top.) -->
+    <div class="relative mb-3 flex h-round shrink-0 items-center justify-center empty:mb-0 empty:h-2">
       <ng-content select="[sheetHead]" />
     </div>
     <ng-content />

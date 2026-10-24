@@ -6,8 +6,8 @@ import { Component, DestroyRef, inject, input, output, signal } from '@angular/c
  * `tall`: from the top bar's buttons (a little over them) down — a fixed height, so pages switching
  * inside it don't make it jump. Drag it down by the top, tap outside or press Esc: it slides away,
  * then `closed` fires. Render it with @if; `close()` from inside (e.g. after a pick) does the same.
- * A head row (‹ back, a page's name) goes in with `sheetHead`; its room is kept without one too, so
- * the first block starts at one height either way.
+ * A head row (‹ back, a page's name) goes in with `sheetHead`; without one, the first block starts
+ * a little under the grabber.
  *   @if (open()) { <ui-sheet #sheet (closed)="open.set(false)">…</ui-sheet> }
  */
 @Component({
