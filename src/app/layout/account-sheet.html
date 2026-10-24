@@ -22,12 +22,15 @@
             }
           </ui-card>
         }
+        <!-- (the users' code: downloaded only now, the first time) -->
         @case ('users') {
-          <app-users-list (picked)="openUser($event)" />
+          @defer {
+            <app-users-list (picked)="openUser($event)" />
+          }
         }
         @case ('user') {
-          @if (user(); as user) {
-            <app-user-card [user]="user" />
+          @defer {
+            <app-user-card [userId]="userId()!" />
           }
         }
       }

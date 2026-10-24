@@ -6,7 +6,7 @@ import { UpdateService } from '../core/services/update.service';
 import { Icon, UiCard, UiGlassButton, UiListRow, UiSheet } from '../core/ui';
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
-import { User, UsersStore } from '../users/users.store';
+import type { User } from '../users/users.store';
 
 type Page = 'language' | 'users' | 'user';
 
@@ -27,7 +27,6 @@ export class AccountSheet {
   protected readonly auth = inject(AuthStore);
   protected readonly i18n = inject(I18nService);
   protected readonly updates = inject(UpdateService);
-  protected readonly users = inject(UsersStore);
 
   // The pages open in the sheet, one over another (none: the account's list); ‹ goes one back
   protected readonly pages = signal<Page[]>([]);
@@ -35,12 +34,10 @@ export class AccountSheet {
   // (back from one: the one under it slides in from the left)
   protected cameBack = false;
 
-  // The user whose card is open (as now: their levels change as they're picked)
-  private readonly userId = signal<string | null>(null);
-  protected readonly user = computed(() => {
-    const id = this.userId();
-    return id ? (this.users.user(id) ?? null) : null;
-  });
+  // The user whose card is open, and their name over it (the card reads them from UsersStore itself:
+  // the users' code is downloaded only when Users is opened — @defer)
+  protected readonly userId = signal<string | null>(null);
+  private readonly userName = signal('');
 
   protected readonly language = computed(() => this.i18n.languages.find((l) => l.code === this.i18n.lang())!.label);
 
@@ -51,6 +48,7 @@ export class AccountSheet {
 
   protected openUser(user: User): void {
     this.userId.set(user.id);
+    this.userName.set([user.firstName, user.lastName].filter((p) => !!p?.trim()).join(' ') || user.email);
     this.open('user');
   }
 
@@ -66,10 +64,8 @@ export class AccountSheet {
         return this.i18n.t('account.language');
       case 'users':
         return this.i18n.t('users.title');
-      case 'user': {
-        const user = this.user();
-        return user ? (this.users.name(user) ?? user.email) : '';
-      }
+      case 'user':
+        return this.userName();
       default:
         return '';
     }

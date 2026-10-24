@@ -1,36 +1,38 @@
-@if (store.saveError()) {
-  <p class="px-row-x text-body text-danger" role="alert">{{ 'users.saveError' | t }}</p>
-}
-<div class="flex flex-col gap-6">
-  <!-- Who: the email, the last sign-in -->
-  <ui-card>
-    <div uiListRow icon="person">{{ user().email }}</div>
-    <div uiListRow>
-      {{ 'users.lastSignIn' | t }}
-      <span rowValue class="text-fg-secondary">{{ store.lastSignIn(user()) }}</span>
-    </div>
-  </ui-card>
-
-  <!-- Their access: a row per area, its level picked right there (the admins: locked) -->
-  <div class="flex flex-col gap-1.5">
-    <span class="flex items-center gap-1.5 px-row-x text-footnote font-medium text-fg-secondary">
-      <app-icon name="lock" class="size-4" />
-      {{ (user().isAdmin ? 'users.locked' : 'users.access') | t }}
-    </span>
+@if (user(); as user) {
+  @if (store.saveError()) {
+    <p class="px-row-x text-body text-danger" role="alert">{{ 'users.saveError' | t }}</p>
+  }
+  <div class="flex flex-col gap-6">
+    <!-- Who: the email, the last sign-in -->
     <ui-card>
-      @for (area of store.areas(); track area) {
-        <div uiListRow>
-          {{ areaLabels[area] | t }}
-          <ui-segmented
-            rowValue
-            [options]="store.levels()"
-            [value]="store.level(user(), area)"
-            (valueChange)="store.set(user(), area, $event)"
-            [disabled]="user().isAdmin"
-            [label]="(areaLabels[area] | t) + ': ' + user().email"
-          />
-        </div>
-      }
+      <div uiListRow icon="person">{{ user.email }}</div>
+      <div uiListRow>
+        {{ 'users.lastSignIn' | t }}
+        <span rowValue class="text-fg-secondary">{{ store.lastSignIn(user) }}</span>
+      </div>
     </ui-card>
+
+    <!-- Their access: a row per area, its level picked right there (the admins: locked) -->
+    <div class="flex flex-col gap-1.5">
+      <span class="flex items-center gap-1.5 px-row-x text-footnote font-medium text-fg-secondary">
+        <app-icon name="lock" class="size-4" />
+        {{ (user.isAdmin ? 'users.locked' : 'users.access') | t }}
+      </span>
+      <ui-card>
+        @for (area of store.areas(); track area) {
+          <div uiListRow>
+            {{ areaLabels[area] | t }}
+            <ui-segmented
+              rowValue
+              [options]="store.levels()"
+              [value]="store.level(user, area)"
+              (valueChange)="store.set(user, area, $event)"
+              [disabled]="user.isAdmin"
+              [label]="(areaLabels[area] | t) + ': ' + user.email"
+            />
+          </div>
+        }
+      </ui-card>
+    </div>
   </div>
-</div>
+}
