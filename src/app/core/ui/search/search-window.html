@@ -1,0 +1,61 @@
+<!-- (outside it: a click closes it; nothing dims) -->
+<div class="fixed inset-0 z-50 flex items-start justify-center pt-[10vh]" (mousedown)="closed.emit()">
+  <div
+    role="dialog"
+    aria-modal="true"
+    class="flex max-h-[72vh] w-[46rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-2xl bg-dialog text-fg shadow-popover"
+    (mousedown)="$event.stopPropagation()"
+  >
+    <!-- The field, its loupe at the left -->
+    <div class="flex shrink-0 items-center gap-3 px-4.5 pt-4 pb-2">
+      <app-icon name="search" class="size-5 text-fg-secondary" />
+      <input
+        #field
+        type="text"
+        autocomplete="off"
+        [value]="query()"
+        (input)="query.set(field.value)"
+        (keydown)="key($event)"
+        [placeholder]="placeholder()"
+        class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary"
+      />
+    </div>
+
+    <!-- The results by section; the picked one gray, ↵ at its right -->
+    <div #list role="listbox" class="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 py-1.5">
+      @for (result of results(); track result.section + result.id; let i = $index) {
+        @if (i === 0 || results()[i - 1].section !== result.section) {
+          <p class="px-2.5 pt-2.5 pb-1 text-footnote font-medium text-fg-secondary">{{ result.section }}</p>
+        }
+        <button
+          type="button"
+          role="option"
+          [attr.aria-selected]="i === index()"
+          (click)="picked.emit(result)"
+          (mouseenter)="index.set(i)"
+          class="flex min-h-9 w-full shrink-0 items-center gap-2.5 rounded-button px-2.5 text-left text-ui active:transform-none aria-selected:bg-tint"
+        >
+          <app-icon [name]="result.icon" class="size-icon-menu shrink-0" />
+          <span class="min-w-0 flex-1 truncate">
+            {{ result.label }}
+            @if (result.hint) {
+              <span class="text-footnote text-fg-secondary"> — {{ result.hint }}</span>
+            }
+          </span>
+          @if (i === index()) {
+            <app-icon name="enter" class="size-4 shrink-0 text-fg-secondary" />
+          }
+        </button>
+      } @empty {
+        <p class="m-auto py-10 text-center text-ui text-fg-secondary">{{ empty() }}</p>
+      }
+    </div>
+
+    <!-- The keys, at the bottom (no line over them) -->
+    <div class="flex h-9.5 shrink-0 items-center gap-5 px-4.5 text-[0.75rem] text-fg-secondary">
+      <span class="flex items-center gap-1.5">{{ keys()[0] }}<kbd class="rounded-[0.3rem] bg-tint-strong px-1.5 py-px font-sans text-[0.6875rem]">Esc</kbd></span>
+      <span class="flex items-center gap-1.5">{{ keys()[1] }}<kbd class="rounded-[0.3rem] bg-tint-strong px-1.5 py-px font-sans text-[0.6875rem]">↑</kbd><kbd class="rounded-[0.3rem] bg-tint-strong px-1.5 py-px font-sans text-[0.6875rem]">↓</kbd></span>
+      <span class="flex items-center gap-1.5">{{ keys()[2] }}<kbd class="rounded-[0.3rem] bg-tint-strong px-1.5 py-px font-sans text-[0.6875rem]">↵</kbd></span>
+    </div>
+  </div>
+</div>

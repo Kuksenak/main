@@ -11,6 +11,4 @@ export { UiFloatingButton } from './floating-button/floating-button';
 export { UiList } from './list/list';
 export { UiListItem } from './list/list-item';
 export { UiSheet } from './sheet/sheet';
-export { UiSidebar } from './sidebar/sidebar';
-export { UiSidebarItem } from './sidebar/sidebar-item';
 export { UiToggle } from './toggle/toggle';
