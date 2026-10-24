@@ -26,7 +26,7 @@
   --nav-w: 16.875rem;
   --side-row-h: 1.875rem;
   --side-row-px: 0.4375rem;
-  --icon-side: 1.375rem;
+  --icon-side: 1.625rem;
   --round-side-row: 0.5rem;
   /* Menus, as Claude's (measured): 272 wide, 28 tall rows, the icon as the sidebar's; the
      labels (the email) and lines start where the icons' drawings do */
