@@ -1,14 +1,15 @@
 <!-- (outside it: a click closes it; nothing dims) -->
-<div class="fixed inset-0 z-50 flex items-start justify-center pt-[10vh]" (mousedown)="closed.emit()">
+<div class="fixed inset-0 z-50 flex items-start justify-center pt-[8vh]" (mousedown)="closed.emit()">
   <div
     role="dialog"
     aria-modal="true"
-    class="flex max-h-[72vh] w-[46rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-2xl bg-dialog text-fg shadow-popover"
+    class="flex max-h-[76vh] w-[47rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-[1.25rem] border-[0.5px] border-separator
+           bg-dialog text-fg shadow-popover"
     (mousedown)="$event.stopPropagation()"
   >
     <!-- The field, its loupe at the left -->
-    <div class="flex shrink-0 items-center gap-3 px-4.5 pt-4 pb-2">
-      <app-icon name="search" class="size-5 text-fg-secondary" />
+    <div class="flex shrink-0 items-center gap-3 px-5 pt-4 pb-3">
+      <app-icon name="search" class="size-5.5 text-fg-secondary" />
       <input
         #field
         type="text"
@@ -17,15 +18,15 @@
         (input)="query.set(field.value)"
         (keydown)="key($event)"
         [placeholder]="placeholder()"
-        class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary"
+        class="min-w-0 flex-1 bg-transparent text-[1.0625rem] text-fg outline-none placeholder:text-fg-secondary"
       />
     </div>
 
-    <!-- The results by section; the picked one gray, ↵ at its right -->
-    <div #list role="listbox" class="flex min-h-0 flex-1 flex-col overflow-y-auto px-2 py-1.5">
+    <!-- The results by section (its name small and gray over its first one); the picked one gray -->
+    <div #list role="listbox" class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3 pb-2">
       @for (result of results(); track result.section + result.id; let i = $index) {
         @if (i === 0 || results()[i - 1].section !== result.section) {
-          <p class="px-2.5 pt-2.5 pb-1 text-footnote font-medium text-fg-secondary">{{ result.section }}</p>
+          <p class="px-2.5 pt-3 pb-1.5 text-footnote font-medium text-fg-secondary">{{ result.section }}</p>
         }
         <button
           type="button"
@@ -33,29 +34,27 @@
           [attr.aria-selected]="i === index()"
           (click)="picked.emit(result)"
           (mouseenter)="index.set(i)"
-          class="flex min-h-9 w-full shrink-0 items-center gap-2.5 rounded-button px-2.5 text-left text-ui active:transform-none aria-selected:bg-tint"
+          class="flex min-h-10.5 w-full shrink-0 items-center gap-2.5 rounded-[0.625rem] px-2.5 text-left active:transform-none aria-selected:bg-tint"
         >
-          <app-icon [name]="result.icon" class="size-icon-menu shrink-0" />
-          <span class="min-w-0 flex-1 truncate">
+          <app-icon [name]="result.icon" class="size-5.5 shrink-0 text-fg-secondary" />
+          <!-- (the name, then its hint after a dash, small and gray, as Notion's) -->
+          <span class="min-w-0 flex-1 truncate text-[0.9375rem] font-medium">
             {{ result.label }}
             @if (result.hint) {
-              <span class="text-footnote text-fg-secondary"> — {{ result.hint }}</span>
+              <span class="text-footnote font-normal text-fg-secondary"> — {{ result.hint }}</span>
             }
           </span>
-          @if (i === index()) {
-            <app-icon name="enter" class="size-4 shrink-0 text-fg-secondary" />
-          }
         </button>
       } @empty {
         <p class="m-auto py-10 text-center text-ui text-fg-secondary">{{ empty() }}</p>
       }
     </div>
 
-    <!-- The keys, at the bottom (no line over them) -->
-    <div class="flex h-9.5 shrink-0 items-center gap-5 px-4.5 text-[0.75rem] text-fg-secondary">
-      <span class="flex items-center gap-1.5">{{ keys()[0] }}<kbd class="rounded-[0.3rem] bg-tint-strong px-1.5 py-px font-sans text-[0.6875rem]">Esc</kbd></span>
-      <span class="flex items-center gap-1.5">{{ keys()[1] }}<kbd class="rounded-[0.3rem] bg-tint-strong px-1.5 py-px font-sans text-[0.6875rem]">↑</kbd><kbd class="rounded-[0.3rem] bg-tint-strong px-1.5 py-px font-sans text-[0.6875rem]">↓</kbd></span>
-      <span class="flex items-center gap-1.5">{{ keys()[2] }}<kbd class="rounded-[0.3rem] bg-tint-strong px-1.5 py-px font-sans text-[0.6875rem]">↵</kbd></span>
+    <!-- The keys, at the bottom, under a hairline -->
+    <div class="flex h-11 shrink-0 items-center gap-5 border-t-[0.5px] border-separator px-5 text-footnote text-fg-secondary">
+      <span class="flex items-center gap-1.5"><kbd class="font-sans">Esc</kbd>{{ keys()[0] }}</span>
+      <span class="flex items-center gap-1.5"><kbd class="font-sans">↑↓</kbd>{{ keys()[1] }}</span>
+      <span class="flex items-center gap-1.5"><kbd class="font-sans">↵</kbd>{{ keys()[2] }}</span>
     </div>
   </div>
 </div>

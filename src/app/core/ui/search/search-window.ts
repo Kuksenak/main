@@ -11,11 +11,12 @@ export interface UiSearchResult {
 }
 
 /**
- * A search window (as Notion's / Claude's; nothing dims): near the top of the screen — the field
- * with its loupe (`[(query)]`), the `results` under it by section (a section's name over its first
- * one), the picked one gray with ↵; at the bottom the keys (Esc, ↑ ↓, ↵), no lines. ↑ ↓ move, ↵ or a
- * click picks (`picked`), Esc or a click outside closes (`closed`). What's found is the page's to
- * say: it gives the results for the query. Render it with @if.
+ * A search window, as Notion's (nothing dims): near the top of the screen — the field with its
+ * loupe (`[(query)]`), the `results` under it by section (a section's name small and gray over its
+ * first one; a result: its icon, its name, a hint after a dash), the picked one gray; at the bottom,
+ * under a hairline, the keys (Esc, ↑↓, ↵). ↑ ↓ move, ↵ or a click picks (`picked`), Esc or a click
+ * outside closes (`closed`). What's found is the page's to say: it gives the results for the query.
+ * Render it with @if.
  */
 @Component({
   selector: 'ui-search-window',
