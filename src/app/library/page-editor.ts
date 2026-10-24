@@ -4,24 +4,26 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { VisibleArea } from '../core/services/visible-area';
 import { Icon, IconName } from '../core/ui';
+import type { PageBlock } from './library.store';
 import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
 
 /** A block being edited (its id: for the list's tracking, as blocks move). */
 interface Item {
   id: number;
+  kind: 'text' | 'card';
   text: string;
 }
 
-/** A "/" command: a new text under this one, or the AI. */
+/** A "/" command: a card (a block set apart), or the AI. */
 interface Command {
-  id: 'text' | 'ai';
+  id: 'card' | 'ai';
   icon: IconName;
-  label: 'editor.text' | 'editor.ai';
-  hint: 'editor.textHint' | 'editor.aiHint';
+  label: 'editor.card' | 'editor.ai';
+  hint: 'editor.cardHint' | 'editor.aiHint';
 }
 
 const COMMANDS: Command[] = [
-  { id: 'text', icon: 'page', label: 'editor.text', hint: 'editor.textHint' },
+  { id: 'card', icon: 'page', label: 'editor.card', hint: 'editor.cardHint' },
   { id: 'ai', icon: 'sparkle', label: 'editor.ai', hint: 'editor.aiHint' },
 ];
 
@@ -35,12 +37,15 @@ const STYLES: { id: Mark; mark: string; look: string; label: 'editor.bold' | 'ed
 let nextId = 1;
 
 /**
- * A page's text, edited right on it, as the old app's (and Notion's): blocks of text, typed where
- * they are, their marks (**bold**, *italic*, __underline__, ~~strike~~, [links](…)) faded over
- * the text. Enter: a new block from the caret on (Shift+Enter: a new line); Backspace at a block's
- * start: into the one above; ↑ ↓ at the ends: the next one; emptied and left, a block goes.
- * "/" at a line's start (or after a space): the commands at the block — a new text under it, the
- * AI (`ai`). A selection: B I U S and Link (desktop: a menu over the block; phones: the bar over
+ * A page's text, edited right on it, as the old app's (and Notion's): what's typed is text right on
+ * the page; cards are blocks set apart ("/" → Card, and what the AI writes) — their marks
+ * (**bold**, *italic*, __underline__, ~~strike~~, [links](…)) faded over the text alike. Text:
+ * Enter, a new text from the caret on (Shift+Enter: a new line). A card: Enter, a new line; on an
+ * empty last line, out of it, into text under it. Backspace at a block's start: into the one above
+ * (of its kind; an empty card: back to text); ↑ ↓ at the ends: the next one; emptied and left, a
+ * block goes. A tap under the last block: text there, typed at once. "/" at a line's start (or
+ * after a space): the commands at the block — a card (this empty text made one, else one under
+ * it), the AI (`ai`). A selection: B I U S and Link (desktop: a menu over the block; phones: the bar over
  * the keyboard, with AI and ✓ too). Each block's ⠿ (desktop: at its left under the pointer;
  * phones: at its right): dragged, it moves (a line where it'd land); tapped, its menu — duplicate,
  * delete. `blocks`: the texts it starts with (read once); `changed`: all of them, at each change.
@@ -52,8 +57,8 @@ let nextId = 1;
   host: { class: 'relative block' },
 })
 export class PageEditor {
-  readonly blocks = input<string[]>([]);
-  readonly changed = output<string[]>();
+  readonly blocks = input<PageBlock[]>([]);
+  readonly changed = output<PageBlock[]>();
   readonly ai = output<void>();
 
   private readonly i18n = inject(I18nService);
@@ -92,8 +97,8 @@ export class PageEditor {
 
   constructor() {
     afterNextRender(() => {
-      const texts = this.blocks().length ? this.blocks() : [''];
-      this.items.set(texts.map((text) => ({ id: nextId++, text })));
+      const blocks: PageBlock[] = this.blocks().length ? this.blocks() : [{ kind: 'text', text: '' }];
+      this.items.set(blocks.map((b) => ({ id: nextId++, kind: b.kind, text: b.text ?? '' })));
       setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
     });
     // (the window's width changed: the fields' heights again)
@@ -102,13 +107,13 @@ export class PageEditor {
     inject(DestroyRef).onDestroy(() => window.removeEventListener('resize', resize));
   }
 
-  /** The texts put in after the block with the caret (none: at the end) — e.g. the AI's. */
-  insert(texts: string[], focusLast = false): void {
+  /** Blocks put in after the block with the caret (none: at the end) — e.g. the AI's, as cards. */
+  insert(texts: string[], focusLast = false, kind: Item['kind'] = 'card'): void {
     const at = this.focused() >= 0 ? this.focused() : this.items().length - 1;
     const items = this.items();
     // (the page still empty: its empty block replaced)
     const replace = items.length === 1 && !items[0].text.trim();
-    const added = texts.map((text) => ({ id: nextId++, text }));
+    const added = texts.map((text) => ({ id: nextId++, kind, text }));
     this.items.set(replace ? added : [...items.slice(0, at + 1), ...added, ...items.slice(at + 1)]);
     this.emit();
     setTimeout(() => {
@@ -131,7 +136,19 @@ export class PageEditor {
   }
 
   private emit(): void {
-    this.changed.emit(this.items().map((i) => i.text));
+    this.changed.emit(this.items().map((i) => ({ kind: i.kind, text: i.text })));
+  }
+
+  // A tap under the last block: text there (the last one, if it's an empty text), typed at once
+  protected typeAtEnd(): void {
+    const items = this.items();
+    const last = items[items.length - 1];
+    if (last && last.kind === 'text' && !last.text) {
+      this.focusAt(items.length - 1, 'end');
+      return;
+    }
+    this.items.set([...items, { id: nextId++, kind: 'text', text: '' }]);
+    setTimeout(() => this.focusAt(this.items().length - 1, 'start'));
   }
 
   private setText(at: number, text: string): void {
@@ -193,14 +210,26 @@ export class PageEditor {
     const a = field.selectionStart;
     const b = field.selectionEnd;
     const text = field.value;
-    if (e.key === 'Enter' && !e.shiftKey) {
-      // A new block from the caret on
+    const kind = this.items()[at].kind;
+    if (e.key === 'Enter' && kind === 'card') {
+      // A card: a new line — but on an empty last line, out of it: text under it
+      if (e.shiftKey || a !== b || a !== text.length || !text.endsWith('\n')) return;
+      e.preventDefault();
+      const items = this.items();
+      this.items.set([...items.slice(0, at), { ...items[at], text: text.slice(0, -1) }, { id: nextId++, kind: 'text', text: '' }, ...items.slice(at + 1)]);
+      this.emit();
+      setTimeout(() => {
+        this.grow(field);
+        this.focusAt(at + 1, 'start');
+      });
+    } else if (e.key === 'Enter' && !e.shiftKey) {
+      // Text: a new text from the caret on
       e.preventDefault();
       const items = this.items();
       this.items.set([
         ...items.slice(0, at),
         { ...items[at], text: text.slice(0, a) },
-        { id: nextId++, text: text.slice(b) },
+        { id: nextId++, kind: 'text', text: text.slice(b) },
         ...items.slice(at + 1),
       ]);
       this.emit();
@@ -208,6 +237,15 @@ export class PageEditor {
         this.grow(field);
         this.focusAt(at + 1, 'start');
       });
+    } else if (e.key === 'Backspace' && a === 0 && b === 0 && kind === 'card' && !text) {
+      // An empty card: back to text
+      e.preventDefault();
+      this.items.update((items) => items.map((item, i) => (i === at ? { ...item, kind: 'text' } : item)));
+      this.emit();
+    } else if (e.key === 'Backspace' && a === 0 && b === 0 && at > 0 && this.items()[at - 1].kind !== kind) {
+      // (another kind above: only the caret goes up, to its end)
+      e.preventDefault();
+      this.focusAt(at - 1, 'end');
     } else if (e.key === 'Backspace' && a === 0 && b === 0 && at > 0) {
       // Into the one above (the caret where they meet)
       e.preventDefault();
@@ -251,9 +289,16 @@ export class PageEditor {
     const text = this.items()[slash.at].text;
     const end = field?.selectionStart ?? slash.from + slash.query.length + 1;
     this.setText(slash.at, text.slice(0, slash.from) + text.slice(end));
-    if (command.id === 'text') {
-      this.focused.set(slash.at);
-      this.insert([''], true);
+    if (command.id === 'card') {
+      // This text, if it's empty now, made a card; else a card under it
+      if (!this.items()[slash.at].text.trim()) {
+        this.items.update((items) => items.map((item, i) => (i === slash.at ? { ...item, kind: 'card', text: '' } : item)));
+        this.emit();
+        setTimeout(() => this.focusAt(slash.at, 'start'));
+      } else {
+        this.focused.set(slash.at);
+        this.insert([''], true);
+      }
     } else {
       this.ai.emit();
     }
@@ -354,7 +399,7 @@ export class PageEditor {
   protected duplicate(at: number): void {
     this.blockMenu.set(null);
     const items = this.items();
-    this.items.set([...items.slice(0, at + 1), { id: nextId++, text: items[at].text }, ...items.slice(at + 1)]);
+    this.items.set([...items.slice(0, at + 1), { ...items[at], id: nextId++ }, ...items.slice(at + 1)]);
     this.emit();
     setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
   }
@@ -362,7 +407,7 @@ export class PageEditor {
   protected remove(at: number): void {
     this.blockMenu.set(null);
     const items = this.items().filter((_, i) => i !== at);
-    this.items.set(items.length ? items : [{ id: nextId++, text: '' }]);
+    this.items.set(items.length ? items : [{ id: nextId++, kind: 'text', text: '' }]);
     this.emit();
   }
 

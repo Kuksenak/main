@@ -7,7 +7,7 @@ import { desktop } from '../core/device';
 import { Toasts, UiButton, UiSheet } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
-import { Page, LibraryStore } from './library.store';
+import { Page, PageBlock, LibraryStore } from './library.store';
 import { PageEditor } from './page-editor';
 
 // How long after the last keystroke a change is saved
@@ -41,7 +41,7 @@ export class PageView implements OnInit {
 
   // What's being edited (the page's as loaded, then as typed)
   protected readonly title = signal('');
-  private blocks: string[] = [];
+  private blocks: PageBlock[] = [];
   protected readonly desktop = desktop;
   protected readonly aiOpen = signal(false);
   protected readonly editor = viewChild(PageEditor);
@@ -64,7 +64,7 @@ export class PageView implements OnInit {
       next: (page) => {
         this.page.set(page);
         this.title.set(page.title);
-        this.blocks = page.blocks.map((b) => b.text ?? '');
+        this.blocks = page.blocks;
         this.texts = this.blocks;
         if (fresh) setTimeout(() => this.titleField()?.nativeElement.select());
       },
@@ -73,14 +73,14 @@ export class PageView implements OnInit {
   }
 
   // The blocks it opened with (the editor reads them once)
-  protected texts: string[] = [];
+  protected texts: PageBlock[] = [];
 
   protected typedTitle(value: string): void {
     this.title.set(value);
     this.changed();
   }
 
-  protected typedBlocks(blocks: string[]): void {
+  protected typedBlocks(blocks: PageBlock[]): void {
     this.blocks = blocks;
     this.changed();
   }
@@ -111,7 +111,7 @@ export class PageView implements OnInit {
     const title = this.title().trim() || this.i18n.t('library.untitled');
     this.saving.set(true);
     this.saveSub?.unsubscribe();
-    this.saveSub = this.store.save(this.id(), title, this.blocks.filter((t) => t.trim()).map((text) => ({ kind: 'text' as const, text }))).subscribe({
+    this.saveSub = this.store.save(this.id(), title, this.blocks.filter((b) => b.text?.trim())).subscribe({
       next: () => this.saving.set(false),
       error: () => {
         this.saving.set(false);

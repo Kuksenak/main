@@ -12,9 +12,9 @@ export interface PageItem {
   updatedAt: string;
 }
 
-/** A block of a page's content — for now a text. */
+/** A block of a page's content: a text right on it, or a card (set apart: material, what the AI wrote). */
 export interface PageBlock {
-  kind: 'text';
+  kind: 'text' | 'card';
   text: string | null;
 }
 
