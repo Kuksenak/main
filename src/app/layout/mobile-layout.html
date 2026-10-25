@@ -27,7 +27,7 @@
     } @else {
       <!-- A section: a pill with its icon and name, ▾ — the shared select (phones: the system's own
            menu of the sections): one picked, it opens -->
-      <div class="min-w-0 flex-1" data-vt="page-title">
+      <div class="min-w-0 flex-1">
         <ui-select [options]="places()" [value]="here()" [text]="title()" [wide]="true" [glass]="true" (valueChange)="go($event)" [label]="'nav.menu' | t" />
       </div>
     }
