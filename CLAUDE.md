@@ -64,20 +64,18 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 
 ## Status bar color (keeps breaking — read before touching it)
 - The status bar's color is ONE `theme-color` tag, set by the script in `src/index.html` (light
-  `#fbfbf9`, dark `#000000`: the page's `--app-bg`): at a theme switch a new tag (not an edited
-  one), as it was when it worked. Nothing else touches it.
-- Tried and reverted: two tags with `media` per scheme (iOS's home-screen app took the last one:
-  black in light); nudging the page's background too.
-- Phones go through a cover (the logo on `#7d7c79`, a gray between the themes; the manifest's and
-  the first tag's color too): at the start, when the app comes back, and at a theme switch. Under
-  it the theme and the bar's color switch together, then it fades out slowly. iOS redraws the bar
-  only when the color changes — from the gray it always does. (Without it: the page, then the bar,
-  changing in sight; a one-shade-off nudge flickered.)
+  `#fbfbf9`, dark `#000000`: the page's `--app-bg`); a new tag at each change, not an edited one.
+- The "stuck bar" came from switching while the app was away: iOS doesn't redraw it then, and
+  back, the tag already said the new color — nothing changed for it. So a switch made while away
+  waits till the app is back (the tag then changes in sight, iOS redraws).
+- A switch eases the page into its new colors (`.theme-easing`, 0.3s, base.css) as iOS eases the
+  bar, so the two change together.
+- Tried and taken out: two tags with `media` per scheme (black in light: iOS took the last tag),
+  one-shade-off nudges (flickered), a gray cover over the app (out of step with the bar), the
+  body `position: fixed`.
 - Anything over the whole screen calls `refreshThemeColor()` (`core/services/theme-color.ts`) as it
-  closes: the same color put in anew, nothing more.
+  closes: the same color put in anew.
 - No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).
-- No `position: fixed` on the body (phones): suspected of keeping the old color after a theme
-  switch made while the app was hidden (taken out).
 
 ## Moving between views
 - Phones slide as iOS does (`core/services/slide.ts`): the new view slides in — forward from the

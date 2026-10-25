@@ -8,7 +8,7 @@
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#7d7c79">
+  <meta name="theme-color" content="#fbfbf9">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <!-- "default", not "black-translucent": with a translucent status bar iOS launches home-screen
@@ -19,8 +19,6 @@
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <!-- (the cover's the phones': desktops never show it) -->
-  <style>html[data-device='desktop'] #cover { display: none; }</style>
   <script>
     (function () {
       var ua = navigator.userAgent;
@@ -34,15 +32,15 @@
       document.write('<link rel="stylesheet" href="' + (mobile ? 'styles-mobile.css' : 'styles-desktop.css') + '">');
 
       // The theme follows the system. The status bar's color: one theme-color tag (a new tag, not
-      // an edited one — iOS didn't notice an edit while a popup was open). Phones go through a
-      // cover — the logo on a gray between the two themes (#7d7c79; the manifest's and the first
-      // tag's too) — at the start, when the app comes back, and at a theme switch: under it, the
-      // page's theme and the bar's color switch together, then the cover fades out slowly. iOS
-      // redraws the bar only when the color changes — from the gray it always does (a switch made
-      // while away, a long while frozen) — and nothing changes color in sight.
-      var GRAY = '#7d7c79';
+      // an edited one — iOS didn't notice an edit while a popup was open).
+      // Never switched while the app is away: iOS doesn't redraw the bar then, and back, the tag
+      // already said the new color — nothing changed for it, the old color stayed (the "stuck bar").
+      // So a switch made while away waits till the app is back: then the tag changes in sight and
+      // iOS redraws. And the page eases into the new colors (0.3s, as iOS eases the bar), so the
+      // two change together.
       var query = window.matchMedia('(prefers-color-scheme: dark)');
       var root = document.documentElement;
+      var shown = null; // the theme the page and the tag have now (null: none yet)
       function tag(color) {
         var old = document.querySelector('meta[name="theme-color"]');
         var meta = document.createElement('meta');
@@ -51,51 +49,28 @@
         if (old) old.replaceWith(meta);
         else document.head.appendChild(meta);
       }
-      // The theme and the bar's color, together
-      function apply() {
+      var easing = 0;
+      function apply(again) {
+        if (document.visibilityState === 'hidden') return; // (away: when it's back)
         var dark = query.matches;
+        if (dark === shown && !again) return;
+        if (shown !== null && dark !== shown) {
+          // (the page easing into the new colors, as the bar does)
+          root.classList.add('theme-easing');
+          clearTimeout(easing);
+          easing = setTimeout(function () { root.classList.remove('theme-easing'); }, 400);
+        }
+        shown = dark;
         root.classList.toggle('dark', dark);
         tag(dark ? '#000000' : '#fbfbf9');
       }
-      // The cover: on at once (the bar gray); off: a moment, the theme under it, then a slow fade
-      var timer = 0;
-      function cover() {
-        var el = document.getElementById('cover');
-        if (!el) return;
-        clearTimeout(timer);
-        el.style.transition = 'none';
-        el.style.opacity = '1';
-        el.style.visibility = 'visible';
-        tag(GRAY);
-      }
-      function uncover(wait) {
-        clearTimeout(timer);
-        timer = setTimeout(function () {
-          apply();
-          var el = document.getElementById('cover');
-          if (!el) return;
-          el.style.transition = 'opacity 450ms ease-out, visibility 0s 450ms';
-          el.style.opacity = '0';
-          el.style.visibility = 'hidden';
-        }, wait);
-      }
-      if (mobile) {
-        // (the start: the cover's in the page from the first paint — see the body — till the app's up)
-        root.classList.toggle('dark', query.matches);
-        window.addEventListener('load', function () { uncover(600); });
-        query.addEventListener('change', function () { cover(); uncover(350); });
-        document.addEventListener('visibilitychange', function () {
-          if (document.visibilityState === 'hidden') cover();
-          else uncover(500);
-        });
-        window.addEventListener('pageshow', function (e) { if (e.persisted) { cover(); uncover(500); } });
-      } else {
-        apply();
-        query.addEventListener('change', apply);
-      }
+      apply();
+      query.addEventListener('change', function () { apply(); });
+      document.addEventListener('visibilitychange', function () { apply(); });
+      window.addEventListener('pageshow', function () { apply(); });
       // (anything over the whole screen, as it closes: the same color put in anew —
       // core/services/theme-color.ts)
-      document.addEventListener('theme-color', function () { if (!mobile || document.getElementById('cover').style.visibility === 'hidden') apply(); });
+      document.addEventListener('theme-color', function () { apply(true); });
 
       // iOS Safari only applies :active styles once a touchstart listener exists.
       document.addEventListener('touchstart', function () {}, { passive: true });
@@ -105,12 +80,6 @@
 
 <body>
   <app-root></app-root>
-  <!-- The cover (the script above): the logo on the gray between the themes, over everything —
-       on phones from the first paint till the app's up, and whenever it comes back -->
-  <div id="cover" aria-hidden="true"
-    style="position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:#7d7c79;pointer-events:none">
-    <img src="logo.png" alt="" width="88" height="88">
-  </div>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
 
