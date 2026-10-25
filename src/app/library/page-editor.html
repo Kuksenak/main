@@ -185,7 +185,7 @@
             (click)="blockMenu.set(null); remove(i)"
             class="group/del flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong hover:text-danger"
           >
-            <app-icon name="trash" colored class="size-icon-menu text-icon group-hover/del:text-danger" />{{
+            <app-icon name="trash" colored class="size-icon-menu text-icon" />{{
               'editor.delete' | t
             }}
           </button>
@@ -306,7 +306,7 @@
         <app-icon name="plus" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
       </button>
       <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body text-danger active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); remove(at)">
-        <app-icon name="trash" colored class="size-icon-menu text-danger" />{{ 'editor.delete' | t }}
+        <app-icon name="trash" colored class="size-icon-menu text-icon" />{{ 'editor.delete' | t }}
       </button>
     </div>
   </ui-sheet>
