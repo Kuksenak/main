@@ -41,9 +41,10 @@
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });
       document.addEventListener('theme-color', function () { apply(query.matches, true); });
-      // Back in the app: the system theme may have changed while it was hidden.
+      // Back in the app: the system theme may have changed while it was hidden — and iOS didn't
+      // take the tag put in then: put in anew (the same color), whatever it says now.
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') apply(query.matches);
+        if (document.visibilityState === 'visible') apply(query.matches, true);
       });
 
       var ua = navigator.userAgent;
