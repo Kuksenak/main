@@ -63,19 +63,13 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
   `<ui-toasts />` in app.html shows them (phones: under the top bar; desktops: the bottom right corner, as wide as the sidebar, scrolling past 80vh).
 
 ## Status bar color (keeps breaking — read before touching it)
-- The status bar's color is ONE `theme-color` tag, set by the script in `src/index.html` (light
-  `#fbfbf9`, dark `#000000`: the page's `--app-bg`); a new tag at each change, not an edited one.
-- The "stuck bar" came from switching while the bar was out of sight (the app away; a phone turned
-  sideways — iOS hides the bar): iOS doesn't redraw it then, and back, the tag already said the new
-  color — nothing changed for it. So such a switch waits till the bar's back in sight (the tag then
-  changes in sight, iOS redraws).
-- A switch eases the page into its new colors (`.theme-easing`, 0.3s, base.css) as iOS eases the
-  bar, so the two change together.
-- Tried and taken out: two tags with `media` per scheme (black in light: iOS took the last tag),
-  one-shade-off nudges (flickered), a gray cover over the app (out of step with the bar). (The body's
-  `position: fixed` wasn't it: without it the whole app bounced — it stays.)
-- Anything over the whole screen calls `refreshThemeColor()` (`core/services/theme-color.ts`) as it
-  closes: the same color put in anew.
+- EXPERIMENT now: no `theme-color` tag at all (index.html, nor in the manifest) — iOS colors the
+  status bar by the system's theme itself; the page's theme follows the system too.
+- Everything tried with a tag fell out of step somewhere: a new tag per switch (stuck after a
+  switch made while away / while the bar was hidden sideways), two tags with `media` (black in
+  light: iOS took the last), one-shade-off nudges (flickered), a gray cover (it can't cover the
+  bar), waiting till the bar's in sight (gray / black the wrong way round).
+- Without it the whole app bounced: the body stays `position: fixed` on phones.
 - No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).
 
 ## Moving between views
