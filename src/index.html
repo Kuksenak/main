@@ -22,39 +22,28 @@
   <script>
     (function () {
       var query = window.matchMedia('(prefers-color-scheme: dark)');
-      // The theme follows the system. The status bar's color: one theme-color tag, its color set
-      // here (two tags, one per scheme, went black in light: iOS's home-screen app took the last).
-      // A new tag rather than an edited one; nudged (a hair off, then right a moment later, the
-      // page's own background too) at every switch, when the app comes back, and as anything over
-      // the whole screen closes ('theme-color' event: core/services/theme-color.ts) — iOS kept the
-      // old color now and then otherwise.
-      var LIGHT = '#fbfbf9', DARK = '#000000';
-      function tag(color) {
-        document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.remove(); });
+      // The theme follows the system. The status bar's color (theme-color, the page's — base.css):
+      // a new tag rather than an edited one — iOS didn't notice an edit while a popup was open.
+      // Just that: no nudges (another color first) — they made it worse. `again`: the same color
+      // put in anew, as anything over the whole screen closes ('theme-color' event:
+      // core/services/theme-color.ts).
+      function apply(isDark, again) {
+        document.documentElement.classList.toggle('dark', isDark);
+        var color = isDark ? '#000000' : '#fbfbf9';
+        var old = document.querySelector('meta[name="theme-color"]');
+        if (old && old.getAttribute('content') === color && !again) return;
         var meta = document.createElement('meta');
         meta.name = 'theme-color';
         meta.content = color;
-        document.head.appendChild(meta);
-      }
-      function apply(isDark, nudge) {
-        var root = document.documentElement;
-        root.classList.toggle('dark', isDark);
-        var color = isDark ? DARK : LIGHT;
-        if (!nudge) return tag(color);
-        tag(isDark ? '#010101' : '#fbfbfa');
-        root.style.backgroundColor = isDark ? '#010101' : '#fbfbfa';
-        // (a frame later — or, hidden, where frames don't come, a moment later)
-        var done = false;
-        var right = function () { if (!done) { done = true; tag(color); root.style.backgroundColor = ''; } };
-        requestAnimationFrame(right);
-        setTimeout(right, 60);
+        if (old) old.replaceWith(meta);
+        else document.head.appendChild(meta);
       }
       apply(query.matches);
-      query.addEventListener('change', function (e) { apply(e.matches, true); });
+      query.addEventListener('change', function (e) { apply(e.matches); });
       document.addEventListener('theme-color', function () { apply(query.matches, true); });
       // Back in the app: the system theme may have changed while it was hidden.
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') apply(query.matches, true);
+        if (document.visibilityState === 'visible') apply(query.matches);
       });
 
       var ua = navigator.userAgent;
