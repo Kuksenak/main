@@ -1,8 +1,7 @@
 /**
- * The status bar's color, put in again as anything over the whole screen closes. EXPERIMENT: the
- * app sets no theme-color now (iOS colors the bar by the system's theme itself) — nothing to put
- * in; kept so the overlays' call stays in one place if the tag comes back.
+ * Called by anything over the whole screen as it closes. The app sets no status bar color now (a
+ * theme switch reloads it: index.html) — nothing to do; kept so the call stays in one place.
  */
 export function refreshThemeColor(): void {
-  document.dispatchEvent(new Event('theme-color'));
+  // (nothing: see index.html)
 }

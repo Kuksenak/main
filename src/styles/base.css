@@ -92,20 +92,6 @@ html.dark {
   --popover-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 3px 8px rgb(0 0 0 / 0.25), 0 12px 32px rgb(0 0 0 / 0.4);
 }
 
-/* A theme switch: everything eases into its new colors (0.3s, as iOS eases the status bar) —
-   index.html puts .theme-easing on <html> for the moment */
-html.theme-easing,
-html.theme-easing *,
-html.theme-easing *::before,
-html.theme-easing *::after {
-  transition:
-    background-color 300ms ease,
-    color 300ms ease,
-    border-color 300ms ease,
-    fill 300ms ease,
-    stroke 300ms ease !important;
-}
-
 html,
 body {
   margin: 0;

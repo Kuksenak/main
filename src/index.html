@@ -30,25 +30,23 @@
       // document.write keeps it parser-inserted, so it blocks first paint like a normal <link>.
       document.write('<link rel="stylesheet" href="' + (mobile ? 'styles-mobile.css' : 'styles-desktop.css') + '">');
 
-      // The theme follows the system (the page's class). EXPERIMENT: no theme-color tag at all —
-      // iOS colors the status bar by the system's theme itself (white / black), nothing of ours
-      // to fall out of step. A switch eases the page into its new colors (0.3s, as iOS eases the
-      // bar).
+      // The theme follows the system (the page's class), read once as the app starts — a switch
+      // later reloads the app (at once; made while the app was away: as it comes back): after a
+      // reload iOS always got the status bar right, everything else fell out of step somewhere (see
+      // CLAUDE.md). No theme-color tag: iOS colors the bar by the system's theme itself.
+      // (Before a reload: 'app-reload' on window — a page saves what's typed.)
       var query = window.matchMedia('(prefers-color-scheme: dark)');
       var root = document.documentElement;
-      var easing = 0;
-      function apply(ease) {
-        var dark = query.matches;
-        if (ease && root.classList.contains('dark') !== dark) {
-          root.classList.add('theme-easing');
-          clearTimeout(easing);
-          easing = setTimeout(function () { root.classList.remove('theme-easing'); }, 400);
-        }
-        root.classList.toggle('dark', dark);
+      var started = query.matches;
+      root.classList.toggle('dark', started);
+      function reloadIfSwitched() {
+        if (document.visibilityState === 'hidden' || query.matches === started) return;
+        window.dispatchEvent(new Event('app-reload'));
+        setTimeout(function () { location.reload(); }, 50);
       }
-      apply(false);
-      query.addEventListener('change', function () { apply(true); });
-      document.addEventListener('visibilitychange', function () { apply(false); });
+      query.addEventListener('change', reloadIfSwitched);
+      document.addEventListener('visibilitychange', reloadIfSwitched);
+      window.addEventListener('pageshow', reloadIfSwitched);
 
       // iOS Safari only applies :active styles once a touchstart listener exists.
       document.addEventListener('touchstart', function () {}, { passive: true });

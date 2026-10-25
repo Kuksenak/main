@@ -55,6 +55,14 @@ export class PageView implements OnInit {
     inject(PageTitle).show(computed(() => this.title() || this.i18n.t('library.untitled')), '/library');
     // (leaving with a change not saved yet: saved now)
     inject(DestroyRef).onDestroy(() => this.flush());
+    // (the app about to reload — a theme switch, index.html: saved now)
+    const beforeReload = () => this.flush();
+    window.addEventListener('app-reload', beforeReload);
+    window.addEventListener('pagehide', beforeReload);
+    inject(DestroyRef).onDestroy(() => {
+      window.removeEventListener('app-reload', beforeReload);
+      window.removeEventListener('pagehide', beforeReload);
+    });
   }
 
   ngOnInit(): void {
