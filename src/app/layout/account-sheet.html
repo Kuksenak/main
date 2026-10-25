@@ -49,7 +49,7 @@
       <ui-list>
         <div uiListItem icon="person" (click)="tapped()">{{ auth.email() }}</div>
         @if (showVersion()) {
-          <div uiListItem>
+          <div uiListItem icon="update">
             {{ 'account.version' | t }}
             <span itemValue class="text-fg-secondary">{{ version }}</span>
           </div>
