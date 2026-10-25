@@ -66,9 +66,11 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 - The status bar's color is ONE `theme-color` tag, set by the script in `src/index.html` (light
   `#fbfbf9`, dark `#000000`: the page's `--app-bg`): at a theme switch a new tag (not an edited
   one), as it was when it worked. Nothing else touches it.
-- Tried and reverted, each made it worse: two tags with `media` per scheme (iOS's home-screen app
-  took the last one: black in light); nudges (another color first, then the right one; the page's
-  background too).
+- Tried and reverted: two tags with `media` per scheme (iOS's home-screen app took the last one:
+  black in light); nudging the page's background too.
+- Coming back to the app (even after a long while, frozen): iOS redraws the bar only when the tag's
+  color changes from what it last drew — so a color one shade off first (no eye tells them apart),
+  then the right one, a few times over the first 2s.
 - Anything over the whole screen calls `refreshThemeColor()` (`core/services/theme-color.ts`) as it
   closes: the same color put in anew, nothing more.
 - No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).

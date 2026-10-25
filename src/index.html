@@ -24,7 +24,7 @@
       var query = window.matchMedia('(prefers-color-scheme: dark)');
       // The theme follows the system. The status bar's color (theme-color, the page's — base.css):
       // a new tag rather than an edited one — iOS didn't notice an edit while a popup was open.
-      // Just that: no nudges (another color first) — they made it worse. `again`: the same color
+      // `again`: the same color
       // put in anew, as anything over the whole screen closes ('theme-color' event:
       // core/services/theme-color.ts).
       function apply(isDark, again) {
@@ -41,12 +41,19 @@
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });
       document.addEventListener('theme-color', function () { apply(query.matches, true); });
-      // Back in the app: the system theme may have changed while it was hidden — iOS didn't take a
-      // tag put in then, and the switch itself may come a moment after the app is back (it worked
-      // now and then): the tag put in anew a few times over the first 1.5s, each time with the
-      // theme as it is then (the same color, no other colors in between).
+      // Back in the app (even after a long while, frozen): iOS redraws the bar only when the tag's
+      // color changes from what it last drew — so first a color one shade off (#fbfbfa / #010101:
+      // no eye tells them apart), then the right one, a few times over the first 2s, each time
+      // with the theme as it is then (the switch itself may come a moment after the app is back).
       function back() {
-        [0, 150, 400, 800, 1500].forEach(function (ms) {
+        var off = query.matches ? '#010101' : '#fbfbfa';
+        var old = document.querySelector('meta[name="theme-color"]');
+        var meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = off;
+        if (old) old.replaceWith(meta);
+        else document.head.appendChild(meta);
+        [100, 400, 1000, 2000].forEach(function (ms) {
           setTimeout(function () { apply(query.matches, true); }, ms);
         });
       }
