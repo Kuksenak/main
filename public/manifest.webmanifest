@@ -66,8 +66,8 @@
     }
   ],
   "display": "standalone",
-  "background_color": "#fbfbf9",
-  "theme_color": "#fbfbf9",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "orientation": "portrait",
   "launch_handler": {
     "client_mode": "navigate-existing"
