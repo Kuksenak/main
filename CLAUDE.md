@@ -71,8 +71,8 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 - A switch eases the page into its new colors (`.theme-easing`, 0.3s, base.css) as iOS eases the
   bar, so the two change together.
 - Tried and taken out: two tags with `media` per scheme (black in light: iOS took the last tag),
-  one-shade-off nudges (flickered), a gray cover over the app (out of step with the bar), the
-  body `position: fixed`.
+  one-shade-off nudges (flickered), a gray cover over the app (out of step with the bar). (The body's
+  `position: fixed` wasn't it: without it the whole app bounced — it stays.)
 - Anything over the whole screen calls `refreshThemeColor()` (`core/services/theme-color.ts`) as it
   closes: the same color put in anew.
 - No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).
