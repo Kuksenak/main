@@ -72,6 +72,8 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 - Anything over the whole screen calls `refreshThemeColor()` (`core/services/theme-color.ts`) as it
   closes: the same color put in anew, nothing more.
 - No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).
+- No `position: fixed` on the body (phones): suspected of keeping the old color after a theme
+  switch made while the app was hidden (taken out).
 
 ## Moving between views
 - Phones slide as iOS does (`core/services/slide.ts`): the new view slides in — forward from the

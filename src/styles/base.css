@@ -151,11 +151,9 @@ button:disabled {
 }
 
 /* Phones: a long press selects no text (as an app's), the fields excepted */
-/* Phones: the page itself never scrolls — only its own parts do (iOS scrolls the body even with
-   overflow: hidden, and a drag in a list that goes on under the keyboard moved the whole page) */
+/* (no position: fixed on the body: with it, iOS kept the status bar's old color after a theme
+   switch made while the app was hidden) */
 [data-device='mobile'] body {
-  position: fixed;
-  inset: 0;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
