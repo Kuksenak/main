@@ -24,9 +24,8 @@
       var query = window.matchMedia('(prefers-color-scheme: dark)');
       // The theme follows the system. The status bar's color (theme-color, the page's — base.css):
       // a new tag rather than an edited one — iOS didn't notice an edit while a popup was open.
-      // `again`: the same color
-      // put in anew, as anything over the whole screen closes ('theme-color' event:
-      // core/services/theme-color.ts).
+      // `again`: the same color put in anew, as anything over the whole screen closes
+      // ('theme-color' event: core/services/theme-color.ts).
       function apply(isDark, again) {
         document.documentElement.classList.toggle('dark', isDark);
         var color = isDark ? '#000000' : '#fbfbf9';
@@ -41,27 +40,49 @@
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });
       document.addEventListener('theme-color', function () { apply(query.matches, true); });
-      // Back in the app (even after a long while, frozen): iOS redraws the bar only when the tag's
-      // color changes from what it last drew — so first a color one shade off (#fbfbfa / #010101:
-      // no eye tells them apart), then the right one, a few times over the first 2s, each time
-      // with the theme as it is then (the switch itself may come a moment after the app is back).
-      function back() {
-        var off = query.matches ? '#010101' : '#fbfbfa';
+      // Away and back: a cover — the logo on a gray, neither theme's page (#cover, below) — the
+      // moment the app goes away, the bar's tag its gray; back, it stays a moment, the bar's tag
+      // the theme's color again (iOS redraws the bar only when the color changes — from the gray,
+      // it always does; even a theme switched while away, or after a long while, frozen), then the
+      // cover fades out. Nothing changing color in sight.
+      var COVER = { light: '#e7e6e2', dark: '#1c1c1e' };
+      var away = false;
+      function cover() {
+        var el = document.getElementById('cover');
+        // (phones only: on desktops, switching tabs isn't worth a cover)
+        if (!el || document.documentElement.dataset.device !== 'mobile') return;
+        away = true;
+        el.style.transition = 'none';
+        el.style.opacity = '1';
+        el.style.visibility = 'visible';
+        tag(query.matches ? COVER.dark : COVER.light);
+      }
+      function uncover() {
+        if (!away) return;
+        away = false;
+        setTimeout(function () {
+          apply(query.matches, true);
+          var el = document.getElementById('cover');
+          if (!el) return;
+          el.style.transition = 'opacity 250ms ease-out, visibility 0s 250ms';
+          el.style.opacity = '0';
+          el.style.visibility = 'hidden';
+        }, 300);
+      }
+      function tag(color) {
         var old = document.querySelector('meta[name="theme-color"]');
         var meta = document.createElement('meta');
         meta.name = 'theme-color';
-        meta.content = off;
+        meta.content = color;
         if (old) old.replaceWith(meta);
         else document.head.appendChild(meta);
-        [100, 400, 1000, 2000].forEach(function (ms) {
-          setTimeout(function () { apply(query.matches, true); }, ms);
-        });
       }
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') back();
+        if (document.visibilityState === 'hidden') cover();
+        else uncover();
       });
-      window.addEventListener('pageshow', back);
-      window.addEventListener('focus', back);
+      window.addEventListener('pagehide', cover);
+      window.addEventListener('pageshow', uncover);
 
       var ua = navigator.userAgent;
       var mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||
@@ -81,6 +102,11 @@
 
 <body>
   <app-root></app-root>
+  <!-- The cover while the app is away (the script above): the logo on a gray, over everything -->
+  <div id="cover" aria-hidden="true"
+    style="position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:var(--cover);opacity:0;visibility:hidden;pointer-events:none">
+    <img src="logo.png" alt="" width="88" height="88">
+  </div>
   <noscript>Please enable JavaScript to continue using this application.</noscript>
 </body>
 

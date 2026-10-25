@@ -4,6 +4,8 @@
 
 :root {
   --app-bg: #fbfbf9; /* (as the manifest's) */
+  /* the cover while the app is away (index.html): a gray, neither theme's page */
+  --cover: #e7e6e2;
   --text: #171717;
   --text-secondary: color-mix(in srgb, var(--text) 50%, transparent);
   --icon: color-mix(in srgb, var(--text) 60%, transparent); /* the outlined icons in rows: softer than their text */
@@ -60,6 +62,7 @@
 
 html.dark {
   --app-bg: #000000;
+  --cover: #1c1c1e;
   --text: #f5f5f5;
   --danger: #ff8a55;
   --accent: #0a84ff;
