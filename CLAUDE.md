@@ -68,10 +68,11 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
   one), as it was when it worked. Nothing else touches it.
 - Tried and reverted: two tags with `media` per scheme (iOS's home-screen app took the last one:
   black in light); nudging the page's background too.
-- Away and back: a cover (the logo on a gray, `--cover`, neither theme's page) the moment the app
-  goes away, the tag its gray; back, a moment later the theme's color and the cover fades out. iOS
-  redraws the bar only when the color changes — from the gray it always does (a theme switched
-  while away, a long while frozen). A one-shade-off nudge instead was seen flickering.
+- Phones go through a cover (the logo on `#7d7c79`, a gray between the themes; the manifest's and
+  the first tag's color too): at the start, when the app comes back, and at a theme switch. Under
+  it the theme and the bar's color switch together, then it fades out slowly. iOS redraws the bar
+  only when the color changes — from the gray it always does. (Without it: the page, then the bar,
+  changing in sight; a one-shade-off nudge flickered.)
 - Anything over the whole screen calls `refreshThemeColor()` (`core/services/theme-color.ts`) as it
   closes: the same color put in anew, nothing more.
 - No dimming under sheets: the status bar changed at once, the page after it (tried, reverted).
