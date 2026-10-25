@@ -65,9 +65,10 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 ## Status bar color (keeps breaking — read before touching it)
 - The status bar's color is ONE `theme-color` tag, set by the script in `src/index.html` (light
   `#fbfbf9`, dark `#000000`: the page's `--app-bg`); a new tag at each change, not an edited one.
-- The "stuck bar" came from switching while the app was away: iOS doesn't redraw it then, and
-  back, the tag already said the new color — nothing changed for it. So a switch made while away
-  waits till the app is back (the tag then changes in sight, iOS redraws).
+- The "stuck bar" came from switching while the bar was out of sight (the app away; a phone turned
+  sideways — iOS hides the bar): iOS doesn't redraw it then, and back, the tag already said the new
+  color — nothing changed for it. So such a switch waits till the bar's back in sight (the tag then
+  changes in sight, iOS redraws).
 - A switch eases the page into its new colors (`.theme-easing`, 0.3s, base.css) as iOS eases the
   bar, so the two change together.
 - Tried and taken out: two tags with `media` per scheme (black in light: iOS took the last tag),

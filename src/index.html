@@ -33,10 +33,10 @@
 
       // The theme follows the system. The status bar's color: one theme-color tag (a new tag, not
       // an edited one — iOS didn't notice an edit while a popup was open).
-      // Never switched while the app is away: iOS doesn't redraw the bar then, and back, the tag
-      // already said the new color — nothing changed for it, the old color stayed (the "stuck bar").
-      // So a switch made while away waits till the app is back: then the tag changes in sight and
-      // iOS redraws. And the page eases into the new colors (0.3s, as iOS eases the bar), so the
+      // Never switched while the bar's out of sight (the app away; a phone turned sideways, iOS
+      // hides the bar): iOS doesn't redraw it then, and back, the tag already said the new color —
+      // nothing changed for it, the old color stayed (the "stuck bar"). So such a switch waits till
+      // the bar's back in sight: then the tag changes in sight and iOS redraws. And the page eases into the new colors (0.3s, as iOS eases the bar), so the
       // two change together.
       var query = window.matchMedia('(prefers-color-scheme: dark)');
       var root = document.documentElement;
@@ -50,8 +50,13 @@
         else document.head.appendChild(meta);
       }
       var easing = 0;
+      // (the bar out of sight: the app away, or a phone turned sideways — iOS hides the bar then)
+      var sideways = window.matchMedia('(orientation: landscape) and (max-height: 32rem)');
+      function barHidden() {
+        return document.visibilityState === 'hidden' || (mobile && sideways.matches);
+      }
       function apply(again) {
-        if (document.visibilityState === 'hidden') return; // (away: when it's back)
+        if (barHidden()) return; // (out of sight: when it's back)
         var dark = forced !== null ? forced : query.matches;
         if (dark === shown && !again) return;
         if (shown !== null && dark !== shown) {
@@ -68,10 +73,10 @@
       // theme flips — light ↔ dark, whatever the system says (till the app's reloaded); turned
       // back, it stays
       var forced = null;
-      window.matchMedia('(orientation: landscape)').addEventListener('change', function (e) {
-        if (!e.matches) return;
-        forced = !(shown !== null ? shown : query.matches);
-        apply();
+      sideways.addEventListener('change', function (e) {
+        // (sideways: the flip noted — the bar's hidden; upright again: put in, in sight)
+        if (e.matches) forced = !(shown !== null ? shown : query.matches);
+        else apply();
       });
       apply();
       query.addEventListener('change', function () { forced = null; apply(); });
