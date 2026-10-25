@@ -52,7 +52,7 @@
       var easing = 0;
       function apply(again) {
         if (document.visibilityState === 'hidden') return; // (away: when it's back)
-        var dark = query.matches;
+        var dark = forced !== null ? forced : query.matches;
         if (dark === shown && !again) return;
         if (shown !== null && dark !== shown) {
           // (the page easing into the new colors, as the bar does)
@@ -64,8 +64,15 @@
         root.classList.toggle('dark', dark);
         tag(dark ? '#000000' : '#fbfbf9');
       }
+      // EXPERIMENT (to watch the status bar follow a switch made in sight): each turn of the phone
+      // flips the theme, light ↔ dark, whatever the system says (till the app's reloaded)
+      var forced = null;
+      window.matchMedia('(orientation: landscape)').addEventListener('change', function () {
+        forced = !(shown !== null ? shown : query.matches);
+        apply();
+      });
       apply();
-      query.addEventListener('change', function () { apply(); });
+      query.addEventListener('change', function () { forced = null; apply(); });
       document.addEventListener('visibilitychange', function () { apply(); });
       window.addEventListener('pageshow', function () { apply(); });
       // (anything over the whole screen, as it closes: the same color put in anew —
