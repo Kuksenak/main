@@ -41,11 +41,20 @@
       apply(query.matches);
       query.addEventListener('change', function (e) { apply(e.matches); });
       document.addEventListener('theme-color', function () { apply(query.matches, true); });
-      // Back in the app: the system theme may have changed while it was hidden — and iOS didn't
-      // take the tag put in then: put in anew (the same color), whatever it says now.
+      // Back in the app: the system theme may have changed while it was hidden — iOS didn't take a
+      // tag put in then, and the switch itself may come a moment after the app is back (it worked
+      // now and then): the tag put in anew a few times over the first 1.5s, each time with the
+      // theme as it is then (the same color, no other colors in between).
+      function back() {
+        [0, 150, 400, 800, 1500].forEach(function (ms) {
+          setTimeout(function () { apply(query.matches, true); }, ms);
+        });
+      }
       document.addEventListener('visibilitychange', function () {
-        if (document.visibilityState === 'visible') apply(query.matches, true);
+        if (document.visibilityState === 'visible') back();
       });
+      window.addEventListener('pageshow', back);
+      window.addEventListener('focus', back);
 
       var ua = navigator.userAgent;
       var mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua) ||
