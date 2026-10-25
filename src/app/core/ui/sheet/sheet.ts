@@ -17,7 +17,13 @@ import { VisibleArea } from '../../services/visible-area';
 @Component({
   selector: 'ui-sheet',
   // (on the part of the screen that's seen: with the keyboard up, over it, not behind it)
-  host: { class: 'fixed inset-x-0 z-40', '[style.top.px]': 'area.top()', '[style.height.px]': 'area.height()' },
+  // (no keyboard: the whole screen, down under the browser's own bar — 100lvh; with one: the part
+  // that's seen, over the keyboard)
+  host: {
+    class: 'fixed inset-x-0 z-40',
+    '[style.top.px]': 'area.keyboard() ? area.top() : 0',
+    '[style.height]': "area.keyboard() ? area.height() + 'px' : '100lvh'",
+  },
   templateUrl: './sheet.html',
 })
 export class UiSheet {

@@ -69,6 +69,11 @@
   >
     <router-outlet (activate)="entered()" />
   </main>
+  <!-- (at the bottom, as at the top: the page's text fading out into its color as it goes under
+       the floating buttons and the home indicator) -->
+  <div
+    class="pointer-events-none fixed inset-x-0 bottom-0 z-10 h-[calc(env(safe-area-inset-bottom)+2.5rem)] bg-linear-to-t from-app from-30% to-transparent"
+  ></div>
 </div>
 
 @if (accountOpen()) {
