@@ -37,7 +37,7 @@
   /* The calendar, as iOS Calendar's month: 51 tall weeks, the date (20px) in a 30px circle, 13px
      weekdays */
   --cal-row-h: 3.1875rem;
-  --cal-day: 1.875rem;
+  --cal-day: 2.75rem;
   --font-cal-day: 1.25rem;
   --font-cal-weekday: 0.8125rem;
 }

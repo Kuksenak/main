@@ -18,13 +18,13 @@
         <button
           type="button"
           (click)="selected.set(day)"
-          class="group flex justify-center pt-1"
+          class="group flex justify-center pt-1 mobile:items-center mobile:pt-0"
           [class.opacity-35]="!inMonth(day)"
           [attr.aria-pressed]="isSelected(day)"
           [attr.data-mark]="isSelected(day) ? (isToday(day) ? 'picked-today' : 'picked') : isToday(day) ? 'today' : null"
         >
           <span
-            class="flex size-cal-day items-center justify-center rounded-full text-cal-day tabular-nums mobile:font-semibold
+            class="flex size-cal-day items-center justify-center rounded-full text-cal-day leading-none tabular-nums mobile:font-semibold
                    group-[:hover:not([aria-pressed=true])]:bg-tint
                    group-data-[mark=today]:font-semibold group-data-[mark=today]:text-accent
                    group-data-[mark=picked]:font-semibold mobile:group-data-[mark=picked]:bg-accent/15 mobile:group-data-[mark=picked]:text-accent
