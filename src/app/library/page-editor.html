@@ -19,13 +19,13 @@
         type="button"
         [attr.aria-label]="'editor.grip' | t"
         [attr.aria-expanded]="blockMenu() === i"
-        class="absolute top-3 grid h-7 w-6 desktop:top-0.5 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
+        class="absolute top-3 grid h-7 w-6 desktop:top-1 desktop:h-6 desktop:w-4 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-5.5 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
         (pointerdown)="gripDown($event, i)"
         (pointermove)="gripMove($event, host)"
         (pointerup)="gripUp()"
         (pointercancel)="gripUp()"
       >
-        <app-icon name="grip" class="size-4.5" />
+        <app-icon name="grip" class="size-4.5 desktop:size-4" />
       </button>
 
       <!-- (a card: set apart — phones: a soft fill, round corners, room inside; desktops as the old
@@ -124,7 +124,7 @@
         <div class="fixed inset-0 z-30" (click)="blockMenu.set(null)"></div>
         <div
           role="menu"
-          class="absolute top-8 z-40 flex w-56 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover -left-7"
+          class="absolute top-8 z-40 flex w-56 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover -left-5.5"
         >
           <button
             type="button"
