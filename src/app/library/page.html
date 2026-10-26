@@ -15,6 +15,7 @@
       (click)="menuOpen.set(!menuOpen())"
       [attr.aria-expanded]="menuOpen()"
       [attr.aria-label]="'library.more' | t"
+      [uiTip]="menuOpen() ? null : ('library.moreTip' | t)"
     ></button>
     @if (menuOpen()) {
       <!-- Duplicate, Copy / Paste content; Delete; how many blocks, when edited, made -->

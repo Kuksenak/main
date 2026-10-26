@@ -18,6 +18,8 @@
       <button
         type="button"
         [attr.aria-label]="'editor.grip' | t"
+        [uiTip]="desktop && blockMenu() !== i && dragging() === null ? ('editor.gripTip' | t) : null"
+        tipSide="bottom"
         [attr.aria-expanded]="blockMenu() === i"
         class="absolute top-3 grid h-7 w-6 desktop:top-1 desktop:h-6 desktop:w-4 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-5.5 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
         (pointerdown)="gripDown($event, i)"

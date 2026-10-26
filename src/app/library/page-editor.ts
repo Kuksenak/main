@@ -6,6 +6,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { VisibleArea } from '../core/services/visible-area';
 import { Icon, IconName, UiSheet } from '../core/ui';
 import type { PageBlock } from './library.store';
+import { UiTip } from '../core/ui/tip/tip';
 import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
 
 /** A block being edited (its id: for the list's tracking, as blocks move). */
@@ -55,7 +56,7 @@ let nextId = 1;
  */
 @Component({
   selector: 'app-page-editor',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiSheet],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiSheet, UiTip],
   templateUrl: './page-editor.html',
   host: { class: 'relative block' },
 })
