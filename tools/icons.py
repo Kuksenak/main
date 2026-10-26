@@ -76,6 +76,11 @@ ICONS = {
             [(x, y) for y in (15.5, 32, 48.5) for x in (24, 40)],
             [(.4, -.3, 4.6, .93, 20), (-.3, .4, 4.4, 1, 0), (.3, .2, 4.6, .95, -30),
              (-.4, .2, 4.5, .94, 40), (.2, .5, 4.6, .94, 10), (-.3, -.2, 4.5, .93, -40)])),
+    # more (a page's menu, ⋯): three dots in a row — dabbed as the grip's
+    'dots': ''.join(
+        f'<path stroke="none" fill="{MARKER}" '
+        f'transform="translate({x + dx} 32.2) rotate({t}) scale(1 {q})" d="{ring(0, 0, r)}z"/>'
+        for x, (dx, r, q, t) in zip((15, 32, 49), [(.3, 4.6, .93, 20), (-.2, 4.5, 1, 0), (.2, 4.6, .95, -30)])),
     # the AI: a sparkle (yellow) — a four-pointed star, its sides curving in, a small one by it
     'sparkle': fill(YELLOW, 'M28.4 10.6C30 21 33.6 25.6 45.8 28.4 33.8 31.2 30.2 35.8 28.6 47.4 26.8 35.8 23.2 31.2 11.4 28.6 23.4 25.8 26.8 21.2 28.4 10.6z')
         + line('M28.4 10.6C30 21 33.6 25.6 45.8 28.4 33.8 31.2 30.2 35.8 28.6 47.4 26.8 35.8 23.2 31.2 11.4 28.6 23.4 25.8 26.8 21.2 28.6 11.2')

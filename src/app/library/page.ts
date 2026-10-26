@@ -1,10 +1,11 @@
-import { Component, computed, DestroyRef, ElementRef, inject, input, OnInit, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
 import { Toasts, UiButton, UiSheet } from '../core/ui';
+import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
 import { Page, PageBlock, LibraryStore } from './library.store';
@@ -19,19 +20,20 @@ const SAVE_AFTER_MS = 700;
  * A new one ("Untitled") opens with its title selected; Enter in the title goes on into the text.
  * AI (the editor's "/" or its bar, desktop: the button at the top): its chat (AiChat) — a sheet
  * (phones) or a panel at the right (desktop); its texts go in after the caret's block.
- * Delete: the page gone, back to the library. Phones: the title in the top bar, ‹ back to the
- * library.
+ * Delete: the page gone, back to the library. Desktops: one row at the top — the title, the
+ * assistant, ⋯ (Duplicate, Copy / Paste content, Delete; how many blocks, when edited, made).
+ * Phones: the title in the top bar, ‹ back to the library.
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, PageEditor, TranslatePipe, UiButton, UiSheet],
+  imports: [AiChat, PageEditor, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet],
   templateUrl: './page.html',
 })
-export class PageView implements OnInit {
+export class PageView {
   /** The page's id (the route's :id). */
   readonly id = input.required<string>();
 
-  private readonly store = inject(LibraryStore);
+  protected readonly store = inject(LibraryStore);
   private readonly router = inject(Router);
   private readonly i18n = inject(I18nService);
 
@@ -44,6 +46,8 @@ export class PageView implements OnInit {
   private blocks: PageBlock[] = [];
   protected readonly desktop = desktop;
   protected readonly aiOpen = signal(false);
+  protected readonly menuOpen = signal(false);
+  protected readonly blockCount = signal(0);
   protected readonly editor = viewChild(PageEditor);
 
   private readonly titleField = viewChild<ElementRef<HTMLInputElement>>('titleField');
@@ -65,15 +69,27 @@ export class PageView implements OnInit {
     });
   }
 
-  ngOnInit(): void {
+  // (another page opened in its place — Duplicate: what's typed saved, the editor made anew)
+  private readonly opens = effect(() => {
+    const id = this.id();
+    untracked(() => {
+      this.flush();
+      this.page.set(null);
+      this.menuOpen.set(false);
+      this.open(id);
+    });
+  });
+
+  private open(id: string): void {
     // (a page just made: its title selected, to type over)
     const fresh = !!(history.state as { fresh?: boolean } | null)?.fresh;
-    this.store.get(this.id()).subscribe({
+    this.store.get(id).subscribe({
       next: (page) => {
         this.page.set(page);
         this.title.set(page.title);
         this.blocks = page.blocks;
         this.texts = this.blocks;
+        this.blockCount.set(page.blocks.length);
         if (fresh) setTimeout(() => this.titleField()?.nativeElement.select());
       },
       error: () => this.toasts.error(this.i18n.t('library.pageLoadError')),
@@ -90,6 +106,7 @@ export class PageView implements OnInit {
 
   protected typedBlocks(blocks: PageBlock[]): void {
     this.blocks = blocks;
+    this.blockCount.set(blocks.filter((b) => b.text?.trim()).length);
     this.changed();
   }
 
@@ -119,8 +136,13 @@ export class PageView implements OnInit {
     const title = this.title().trim() || this.i18n.t('library.untitled');
     this.saving.set(true);
     this.saveSub?.unsubscribe();
-    this.saveSub = this.store.save(this.id(), title, this.blocks.filter((b) => b.text?.trim())).subscribe({
-      next: () => this.saving.set(false),
+    const id = this.page()!.id;
+    this.saveSub = this.store.save(id, title, this.blocks.filter((b) => b.text?.trim())).subscribe({
+      next: (page) => {
+        this.saving.set(false);
+        // (its times, for the menu)
+        this.page.update((p) => (p?.id === page.id ? { ...p, updatedAt: page.updatedAt } : p));
+      },
       error: () => {
         this.saving.set(false);
         this.toasts.error(this.i18n.t('library.saveError'));
@@ -129,9 +151,40 @@ export class PageView implements OnInit {
     });
   }
 
+  // ⋯ → Duplicate: a copy of it (what's typed in it too), opened
+  protected duplicate(): void {
+    this.flush();
+    const title = this.i18n.t('library.copyOf').replace('{title}', this.title().trim() || this.i18n.t('library.untitled'));
+    const blocks = this.blocks.filter((b) => b.text?.trim());
+    this.store
+      .create(title)
+      .pipe(switchMap((page) => this.store.save(page.id, title, blocks)))
+      .subscribe({
+        next: (page) => this.router.navigate(['/library', page.id]),
+        error: () => this.toasts.error(this.i18n.t('library.duplicateError')),
+      });
+  }
+
+  // ⋯ → Copy content: its blocks kept, to paste into another page (their text to the clipboard too)
+  protected copyContent(): void {
+    const blocks = this.editor()?.now() ?? [];
+    this.store.clipboard.set(blocks);
+    navigator.clipboard?.writeText(this.editor()?.text() ?? '').catch(() => {});
+  }
+
+  // ⋯ → Paste content: the blocks copied, at the end
+  protected pasteContent(): void {
+    this.editor()?.append(this.store.clipboard() ?? []);
+  }
+
+  // "26 Oct, 15:02"
+  protected when(at: string): string {
+    return this.i18n.date(new Date(at), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
   protected delete(): void {
     this.dirty = false;
-    this.store.delete(this.id()).subscribe({
+    this.store.delete(this.page()?.id ?? this.id()).subscribe({
       next: () => this.router.navigateByUrl('/library'),
       error: () => this.toasts.error(this.i18n.t('library.deleteError')),
     });

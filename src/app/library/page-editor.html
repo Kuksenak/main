@@ -12,12 +12,12 @@
     @if (i > 0) {
       <div class="h-2.5 cursor-text" (click)="insertAt(i)"></div>
     }
-    <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i">
+    <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i" [attr.data-kind]="item.kind">
       <button
         type="button"
         [attr.aria-label]="'editor.grip' | t"
         [attr.aria-expanded]="blockMenu() === i"
-        class="absolute top-3 grid h-7 w-6 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
+        class="absolute top-3 grid h-7 w-6 desktop:group-data-[kind=text]:top-0 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
         (pointerdown)="gripDown($event, i)"
         (pointermove)="gripMove($event, host)"
         (pointerup)="gripUp()"
@@ -26,10 +26,11 @@
         <app-icon name="grip" class="size-4.5" />
       </button>
 
-      <!-- (a card: set apart — a soft fill, round corners, room inside) -->
+      <!-- (a card: set apart — a soft fill, round corners, room inside; desktops: a text right on
+           the page, no card — phones show all as cards) -->
       <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
       <div
-        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6"
+        class="relative rounded-card mobile:mr-6 mobile:bg-tint mobile:px-4 mobile:py-3 group-data-[kind=card]:bg-tint group-data-[kind=card]:px-4 group-data-[kind=card]:py-3 desktop:group-data-[kind=text]:py-0.5"
         [class.outline-dashed]="item.private"
         [class.outline-1]="item.private"
         [class.outline-separator]="item.private"
@@ -164,6 +165,17 @@
           <button
             type="button"
             role="menuitem"
+            (click)="blockMenu.set(null); setKind(i, item.kind === 'card' ? 'text' : 'card')"
+            class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
+          >
+            <app-icon name="grid" colored class="size-icon-menu text-icon" /><span class="flex-1">{{ 'editor.asCard' | t }}</span>
+            @if (item.kind === 'card') {
+              <app-icon name="check" class="size-icon-menu" />
+            }
+          </button>
+          <button
+            type="button"
+            role="menuitem"
             (click)="blockMenu.set(null); copy(i)"
             [disabled]="!item.text.trim()"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong disabled:opacity-40"
@@ -197,9 +209,10 @@
        Assistant; under them, room to tap too -->
   <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col gap-3" (click)="typeAtEnd()">
     @if (items().length > 1 || items()[0]?.text) {
-      <span class="px-4 text-body text-fg-secondary/70">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
+      <span class="text-body text-fg-secondary/70 mobile:px-4">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
     }
-    <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
+    <!-- (desktops: the assistant's in the page's head; a click here is a new text) -->
+    <div class="flex items-center gap-2 desktop:hidden" (click)="$event.stopPropagation()">
       <button type="button" (click)="typeAtEnd()" class="flex h-9 items-center gap-1.5 rounded-full bg-tint px-3.5 text-ui text-fg hover:bg-tint-strong active:bg-tint-strong">
         <app-icon name="plus" class="size-4.5 text-icon" />{{ 'editor.text' | t }}
       </button>

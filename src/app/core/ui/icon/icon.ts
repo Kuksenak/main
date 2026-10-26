@@ -14,6 +14,7 @@ export const ICONS = [
   'calendar',
   'grid',
   'grip',
+  'dots',
   'sparkle',
   'person',
   'library',

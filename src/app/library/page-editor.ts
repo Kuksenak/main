@@ -10,21 +10,24 @@ import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
 /** A block being edited (its id: for the list's tracking, as blocks move). */
 interface Item {
   id: number;
+  // (a text right on the page, or a card: set apart — desktops; phones show all as cards)
+  kind: 'text' | 'card';
   text: string;
   // (only for the teacher: a lock on it)
   private?: boolean;
 }
 
-/** A "/" command: a new text, or the assistant. */
+/** A "/" command: a new text, a new card, or the assistant. */
 interface Command {
-  id: 'text' | 'ai';
+  id: 'text' | 'card' | 'ai';
   icon: IconName;
-  label: 'editor.text' | 'editor.ai';
-  hint: 'editor.textHint' | 'editor.aiHint';
+  label: 'editor.text' | 'editor.card' | 'editor.ai';
+  hint: 'editor.textHint' | 'editor.cardHint' | 'editor.aiHint';
 }
 
 const COMMANDS: Command[] = [
   { id: 'text', icon: 'page', label: 'editor.text', hint: 'editor.textHint' },
+  { id: 'card', icon: 'grid', label: 'editor.card', hint: 'editor.cardHint' },
   { id: 'ai', icon: 'sparkle', label: 'editor.ai', hint: 'editor.aiHint' },
 ];
 
@@ -99,8 +102,8 @@ export class PageEditor {
 
   constructor() {
     afterNextRender(() => {
-      const blocks = this.blocks().length ? this.blocks() : [{ kind: 'card' as const, text: '' }];
-      this.items.set(blocks.map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private })));
+      const blocks = this.blocks().length ? this.blocks() : [{ kind: 'text' as const, text: '' }];
+      this.items.set(blocks.map((b) => ({ id: nextId++, kind: b.kind, text: b.text ?? '', private: !!b.private })));
       setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
     });
     // (the window's width changed: the fields' heights again)
@@ -109,19 +112,37 @@ export class PageEditor {
     inject(DestroyRef).onDestroy(() => window.removeEventListener('resize', resize));
   }
 
-  /** Texts put in after the block with the caret (none: at the end) — e.g. the assistant's. */
-  insert(texts: string[], focusLast = false): void {
+  /** Texts put in after the block with the caret (none: at the end) — the assistant's: cards. */
+  insert(texts: string[], focusLast = false, kind: Item['kind'] = 'card'): void {
     const at = this.focused() >= 0 ? this.focused() : this.items().length - 1;
     const items = this.items();
     // (the page still empty: its empty block replaced)
     const replace = items.length === 1 && !items[0].text.trim();
-    const added = texts.map((text) => ({ id: nextId++, text }));
+    const added = texts.map((text) => ({ id: nextId++, kind, text }));
     this.items.set(replace ? added : [...items.slice(0, at + 1), ...added, ...items.slice(at + 1)]);
     this.emit();
     setTimeout(() => {
       this.fields().forEach((f) => this.grow(f.nativeElement));
       if (focusLast) this.focusAt(replace ? added.length - 1 : at + added.length, 'end');
     });
+  }
+
+  /** Blocks put in at the end (the page's menu: Paste content). */
+  append(blocks: PageBlock[]): void {
+    const added = blocks.map((b) => ({ id: nextId++, kind: b.kind, text: b.text ?? '', private: !!b.private }));
+    const items = this.items();
+    // (the page still empty: its empty block replaced)
+    const replace = items.length === 1 && !items[0].text.trim();
+    this.items.set(replace ? added : [...items, ...added]);
+    this.emit();
+    setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
+  }
+
+  /** The blocks as they are now (the empty ones left out). */
+  now(): PageBlock[] {
+    return this.items()
+      .filter((i) => i.text.trim())
+      .map((i) => ({ kind: i.kind, text: i.text, private: i.private || undefined }));
   }
 
   /** The caret at the start of the first block (e.g. Enter in the title). */
@@ -138,13 +159,13 @@ export class PageEditor {
   }
 
   private emit(): void {
-    this.changed.emit(this.items().map((i) => ({ kind: 'card' as const, text: i.text, private: i.private || undefined })));
+    this.changed.emit(this.items().map((i) => ({ kind: i.kind, text: i.text, private: i.private || undefined })));
   }
 
   // A tap between two blocks: a new text there, typed at once
   protected insertAt(at: number): void {
     const items = this.items();
-    this.items.set([...items.slice(0, at), { id: nextId++, text: '' }, ...items.slice(at)]);
+    this.items.set([...items.slice(0, at), { id: nextId++, kind: 'text', text: '' }, ...items.slice(at)]);
     setTimeout(() => this.focusAt(at, 'start'));
   }
 
@@ -156,7 +177,7 @@ export class PageEditor {
       this.focusAt(items.length - 1, 'end');
       return;
     }
-    this.items.set([...items, { id: nextId++, text: '' }]);
+    this.items.set([...items, { id: nextId++, kind: 'text', text: '' }]);
     setTimeout(() => this.focusAt(this.items().length - 1, 'start'));
   }
 
@@ -223,7 +244,7 @@ export class PageEditor {
       // Enter on an empty last line: out of it — a new text under it
       e.preventDefault();
       const items = this.items();
-      this.items.set([...items.slice(0, at), { ...items[at], text: text.slice(0, -1) }, { id: nextId++, text: '' }, ...items.slice(at + 1)]);
+      this.items.set([...items.slice(0, at), { ...items[at], text: text.slice(0, -1) }, { id: nextId++, kind: 'text', text: '' }, ...items.slice(at + 1)]);
       this.emit();
       setTimeout(() => {
         this.grow(field);
@@ -274,13 +295,14 @@ export class PageEditor {
     const text = this.items()[slash.at].text;
     const end = field?.selectionStart ?? slash.from + slash.query.length + 1;
     this.setText(slash.at, text.slice(0, slash.from) + text.slice(end));
-    if (command.id === 'text') {
-      // This one, if it's empty now, is it; else a new text under it
+    if (command.id === 'text' || command.id === 'card') {
+      // This one, if it's empty now, is it (made that kind); else a new one under it
       if (!this.items()[slash.at].text.trim()) {
+        this.setKind(slash.at, command.id);
         setTimeout(() => this.focusAt(slash.at, 'start'));
       } else {
         this.focused.set(slash.at);
-        this.insert([''], true);
+        this.insert([''], true, command.id);
       }
     } else {
       this.ai.emit();
@@ -385,6 +407,13 @@ export class PageEditor {
     this.emit();
   }
 
+  // The block's menu: a card or a text right on the page
+  protected setKind(at: number, kind: Item['kind']): void {
+    this.items.update((items) => items.map((item, i) => (i === at ? { ...item, kind } : item)));
+    this.emit();
+    setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
+  }
+
   // The block's menu: its text copied (with its marks)
   protected copy(at: number): void {
     navigator.clipboard?.writeText(this.items()[at].text).catch(() => {});
@@ -399,7 +428,7 @@ export class PageEditor {
 
   protected remove(at: number): void {
     const items = this.items().filter((_, i) => i !== at);
-    this.items.set(items.length ? items : [{ id: nextId++, text: '' }]);
+    this.items.set(items.length ? items : [{ id: nextId++, kind: 'text', text: '' }]);
     this.emit();
   }
 

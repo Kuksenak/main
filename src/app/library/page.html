@@ -1,27 +1,63 @@
-<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:max-w-3xl desktop:px-10 desktop:pt-8">
+<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:max-w-3xl desktop:px-10 desktop:pt-0">
 
-  @if (page()) {
-    <!-- Desktop: the state of the saving, Delete at the right -->
-    <div class="flex h-button items-center justify-end gap-2 text-footnote text-fg-secondary mobile:hidden">
-      @if (saving()) {
-        <span>{{ 'library.saving' | t }}</span>
-      }
-      <button uiButton type="button" icon="sparkle" (click)="aiOpen.set(!aiOpen())">{{ 'editor.ai' | t }}</button>
-      <button uiButton type="button" icon="trash" (click)="delete()">{{ 'library.delete' | t }}</button>
-    </div>
-
-
-    <!-- The title: big, no box (as Notion's) -->
-    <input
-      #titleField
-      type="text"
-      [value]="title()"
-      (input)="typedTitle(titleField.value)"
-      (keydown.enter)="titleEnter($event)"
-      [placeholder]="'library.untitled' | t"
-      maxlength="200"
-      class="w-full bg-transparent text-[1.75rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary desktop:text-[2rem]"
-    />
+  @if (page(); as p) {
+    @if (desktop) {
+      <!-- Desktops: one row, staying at the top as the page scrolls — the title; saving…; the
+           assistant; ⋯ (its menu) -->
+      <div class="sticky top-0 z-20 -mx-2 flex h-14 shrink-0 items-center gap-1 bg-app px-2">
+        <input
+          #titleField
+          type="text"
+          [value]="title()"
+          (input)="typedTitle(titleField.value)"
+          (keydown.enter)="titleEnter($event)"
+          [placeholder]="'library.untitled' | t"
+          maxlength="200"
+          class="mr-2 min-w-0 flex-1 bg-transparent text-[1.25rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary"
+        />
+        @if (saving()) {
+          <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
+        }
+        <button uiButton type="button" icon="sparkle" (click)="aiOpen.set(!aiOpen())" [attr.aria-expanded]="aiOpen()">{{ 'editor.ai' | t }}</button>
+        <button
+          uiButton
+          #more
+          type="button"
+          icon="dots"
+          (click)="menuOpen.set(!menuOpen())"
+          [attr.aria-expanded]="menuOpen()"
+          [attr.aria-label]="'library.more' | t"
+        ></button>
+        @if (menuOpen()) {
+          <!-- Duplicate, Copy / Paste content; Delete; how many blocks, when edited, made -->
+          <ui-menu [origin]="more.element" (closed)="menuOpen.set(false)">
+            <button type="button" uiMenuItem icon="plus" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
+            <button type="button" uiMenuItem icon="page" (click)="copyContent()" [disabled]="!blockCount()">{{ 'library.copyContent' | t }}</button>
+            <button type="button" uiMenuItem icon="enter" (click)="pasteContent()" [disabled]="!store.clipboard()?.length">{{ 'library.pasteContent' | t }}</button>
+            <ui-menu-separator />
+            <button type="button" uiMenuItem icon="trash" danger (click)="delete()">{{ 'library.delete' | t }}</button>
+            <ui-menu-separator />
+            <div class="flex flex-col gap-0.5 px-menu-label-x py-1 text-footnote text-fg-secondary">
+              <span>{{ 'library.blocks' | t }}: {{ blockCount() }}</span>
+              <span>{{ 'library.edited' | t }} {{ when(p.updatedAt) }}</span>
+              <span>{{ 'library.created' | t }} {{ when(p.createdAt) }}</span>
+            </div>
+          </ui-menu>
+        }
+      </div>
+    } @else {
+      <!-- Phones: the title big, no box (as Notion's) -->
+      <input
+        #titleField
+        type="text"
+        [value]="title()"
+        (input)="typedTitle(titleField.value)"
+        (keydown.enter)="titleEnter($event)"
+        [placeholder]="'library.untitled' | t"
+        maxlength="200"
+        class="w-full bg-transparent text-[1.75rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary"
+      />
+    }
 
     <!-- The text: blocks, written right on the page -->
     <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />

@@ -36,6 +36,8 @@ export class LibraryStore {
   private readonly url = `${environment.apiUrl}/pages`;
 
   readonly items = signal<PageItem[] | null>(null);
+  /** A page's content copied (its menu: Copy content), to paste into another one. */
+  readonly clipboard = signal<PageBlock[] | null>(null);
   private readonly toasts = inject(Toasts);
   private readonly i18n = inject(I18nService);
 
