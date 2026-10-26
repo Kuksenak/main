@@ -3,7 +3,7 @@
 <div #host class="relative flex flex-col" (pointermove)="gripMove($event, host)">
   @if (dropLine(); as y) {
     <div
-      class="pointer-events-none absolute inset-x-0 z-10 h-0.75 rounded-full bg-accent/60"
+      class="pointer-events-none absolute inset-x-0 z-10 h-0.5 rounded-full bg-accent/35"
       [style.top.px]="y"
     ></div>
   }
@@ -12,7 +12,7 @@
     @if (caret() === i) {
       <ng-container [ngTemplateOutlet]="caretLine" />
     } @else if (i > 0) {
-      <div class="h-2.5 cursor-text" (click)="between(i)"></div>
+      <div class="h-2.5 cursor-text desktop:h-4" (click)="between(i)"></div>
     }
     <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i">
       <button

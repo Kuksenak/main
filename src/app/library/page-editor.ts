@@ -404,16 +404,19 @@ export class PageEditor {
     // Before the first block whose middle is under the pointer, else at the end
     const blocks = [...host.querySelectorAll<HTMLElement>('[data-block]')];
     const top = host.getBoundingClientRect().top;
-    let to = blocks.length;
-    let line = blocks.length ? blocks[blocks.length - 1].getBoundingClientRect().bottom - top : 0;
-    for (let i = 0; i < blocks.length; i++) {
-      const r = blocks[i].getBoundingClientRect();
-      if (e.clientY < r.top + r.height / 2) {
+    // (the line in the middle of the gap it'd land in; the gap's the one between two blocks)
+    const rects = blocks.map((b) => b.getBoundingClientRect());
+    const gap = rects.length > 1 ? rects[1].top - rects[0].bottom : 10;
+    let to = rects.length;
+    let mid = rects.length ? rects[rects.length - 1].bottom + gap / 2 : 0;
+    for (let i = 0; i < rects.length; i++) {
+      if (e.clientY < rects[i].top + rects[i].height / 2) {
         to = i;
-        line = r.top - top - 3;
+        mid = i ? (rects[i - 1].bottom + rects[i].top) / 2 : rects[i].top - gap / 2;
         break;
       }
     }
+    const line = mid - top - 1;
     drag.to = to;
     this.dropLine.set(line);
   }

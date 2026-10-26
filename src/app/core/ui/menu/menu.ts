@@ -61,7 +61,8 @@ export class UiMenu {
   // The n-th row, round at the ends (-1: the last)
   protected focus(n: number): void {
     const rows = this.rows();
-    if (rows.length) rows[(n + rows.length) % rows.length].focus();
+    // (no scrolling to it: the page under the menu jumped as it opened)
+    if (rows.length) rows[(n + rows.length) % rows.length].focus({ preventScroll: true });
   }
 
   private rows(): HTMLElement[] {
