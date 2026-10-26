@@ -12,7 +12,7 @@
     @if (caret() === i) {
       <ng-container [ngTemplateOutlet]="caretLine" />
     } @else if (i > 0) {
-      <div class="h-2.5 cursor-text desktop:h-4" (click)="between(i)"></div>
+      <div class="h-2.5 cursor-text" (click)="between(i)"></div>
     }
     <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i">
       <button
@@ -30,11 +30,11 @@
         <app-icon name="grip" class="size-4.5 desktop:size-4" />
       </button>
 
-      <!-- (a card: set apart — phones: a soft fill, round corners, room inside; desktops as the old
-           lesson's tasks: small corners, a hairline edge, nearly the page's white, snug) -->
+      <!-- (a card: set apart — a soft gray fill, no edge, round corners, room inside (desktops: as
+           Notion's callouts; written in: a faint accent line round it)) -->
       <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
       <div
-        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-lg desktop:border-[0.5px] desktop:border-separator desktop:bg-dialog/60 desktop:px-3.5 desktop:py-2.5 desktop:transition-colors desktop:focus-within:border-fg-secondary/40"
+        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:px-4 desktop:py-3 desktop:outline-1 desktop:outline-transparent desktop:transition-[outline-color] desktop:focus-within:outline-accent/35"
         [class.outline-dashed]="item.private"
         [class.outline-1]="item.private"
         [class.outline-separator]="item.private"
