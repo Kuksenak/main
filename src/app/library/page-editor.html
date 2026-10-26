@@ -178,7 +178,7 @@
        Assistant; under them, room to tap too -->
   <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col gap-3" (click)="typeAtEnd()">
     @if ((items().length > 1 || items()[0]?.text) && caret() === null) {
-      <span class="px-4 text-body text-fg-secondary/70 desktop:px-3.5 desktop:text-ui">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
+      <span class="px-4 text-body text-fg-secondary/70 desktop:px-0 desktop:text-ui">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
     }
     <!-- (desktops: the assistant's in the page's head; a click here is a new text) -->
     <div class="flex items-center gap-2 desktop:hidden" (click)="$event.stopPropagation()">
@@ -299,7 +299,7 @@
      click on one, or ↑ ↓ Enter; "/…" filters them); what's typed (or pasted) is a new block there -->
 <ng-template #caretLine>
   <!-- (a line with its hint, no card yet) -->
-  <div data-caret class="relative px-3.5 py-0.5">
+  <div data-caret class="relative py-0.5">
     <input
       #caretField
       data-caret-input
