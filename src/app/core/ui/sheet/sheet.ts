@@ -1,12 +1,11 @@
 import { afterNextRender, Component, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
-import { installed } from '../../device';
 import { refreshThemeColor } from '../../services/theme-color';
 import { VisibleArea } from '../../services/visible-area';
 
 /**
  * Phones: a sheet from the bottom (as iOS 26's): see-through glass over a strong blur, big round
- * corners, floating: 10px in from the sides and over the bottom of the part that's seen (in the
- * browser: over its own bar), the installed app 4px (the screen's own round corners close by), a soft wide shadow setting it apart; as tall as its content (up to 90% of the screen), or
+ * corners, floating 6px in from the sides and over the bottom of the part that's seen (in the
+ * browser: over its own bar), a soft wide shadow setting it apart; as tall as its content (up to 90% of the screen), or
  * `tall`: from the top bar's buttons (a little over them) down — a fixed height, so pages switching
  * inside it don't make it jump. Pulled down (anywhere: what's in it scrolled to its top, a pull
  * down moves the sheet, not it) far enough or flicked down, a tap outside or Esc: it slides away,
@@ -36,7 +35,6 @@ export class UiSheet {
   readonly closed = output<void>();
 
   protected readonly area = inject(VisibleArea);
-  protected readonly installed = installed;
 
 
   protected readonly closing = signal(false);
