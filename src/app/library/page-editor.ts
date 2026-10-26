@@ -108,8 +108,10 @@ export class PageEditor {
 
   constructor() {
     afterNextRender(() => {
-      const blocks = this.blocks().length ? this.blocks() : [{ kind: 'card' as const, text: '' }];
+      // (an empty page: desktops — no block, the caret's hint instead; phones — one empty block)
+      const blocks = this.blocks().length || desktop ? this.blocks() : [{ kind: 'card' as const, text: '' }];
       this.items.set(blocks.map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private })));
+      if (!blocks.length) this.openCaret(0, false, false);
       setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
     });
     // (the window's width changed: the fields' heights again)
@@ -155,7 +157,8 @@ export class PageEditor {
 
   /** The caret at the start of the first block (e.g. Enter in the title). */
   focusStart(): void {
-    this.focusAt(0, 'start');
+    if (this.items().length) this.focusAt(0, 'start');
+    else this.openCaret(0, false);
   }
 
   /** The page as text (for the AI): the blocks, a blank line between. */
@@ -176,12 +179,18 @@ export class PageEditor {
     else this.insertAt(at);
   }
 
-  private openCaret(at: number): void {
+  private openCaret(at: number, menu = true, focus = true): void {
     this.caret.set(at);
-    this.caretMenu.set(true);
+    this.caretMenu.set(menu);
     this.caretQuery.set('');
     this.caretActive.set(0);
-    setTimeout(() => document.querySelector<HTMLInputElement>('app-page-editor [data-caret-input]')?.focus());
+    if (focus) setTimeout(() => document.querySelector<HTMLInputElement>('app-page-editor [data-caret-input]')?.focus());
+  }
+
+  // (desktops: an empty page has no block, the caret's hint there instead; phones keep one)
+  private readonly least = desktop ? 0 : 1;
+  private emptied(): void {
+    if (!this.items().length) this.openCaret(0, false, false);
   }
 
   protected caretTyped(field: HTMLInputElement): void {
@@ -244,7 +253,9 @@ export class PageEditor {
   // (left: the caret goes — not for a click on its commands)
   protected caretLeft(): void {
     setTimeout(() => {
-      if (!document.activeElement?.hasAttribute('data-caret-input')) this.caret.set(null);
+      // (an empty page keeps it, its hint)
+      if (!document.activeElement?.hasAttribute('data-caret-input') && this.items().length) this.caret.set(null);
+      else if (!this.items().length) this.caretMenu.set(false);
     }, 120);
   }
 
@@ -312,12 +323,12 @@ export class PageEditor {
         this.grow(field);
         this.focusAt(at + 1, 'start');
       });
-    } else if (e.key === 'Backspace' && a === 0 && b === 0 && !text && this.items().length > 1) {
+    } else if (e.key === 'Backspace' && a === 0 && b === 0 && !text && this.items().length > this.least) {
       // Backspace in an empty one: it goes, the caret up (or down, at the top)
       e.preventDefault();
       this.items.update((items) => items.filter((_, i) => i !== at));
       this.emit();
-      setTimeout(() => (at > 0 ? this.focusAt(at - 1, 'end') : this.focusAt(0, 'start')));
+      setTimeout(() => (!this.items().length ? this.openCaret(0, false) : at > 0 ? this.focusAt(at - 1, 'end') : this.focusAt(0, 'start')));
     } else if (e.key === 'Backspace' && a === 0 && b === 0 && at > 0) {
       // (at the start of one: the caret up, to the end of the one above)
       e.preventDefault();
@@ -340,9 +351,10 @@ export class PageEditor {
         this.focused.set(-1);
       }
       const items = this.items();
-      if (items.length > 1 && !items[at]?.text.trim() && this.focused() !== at) {
+      if (items.length > this.least && !items[at]?.text.trim() && this.focused() !== at) {
         this.items.set(items.filter((_, i) => i !== at));
         this.emit();
+        this.emptied();
       }
     });
   }
@@ -462,8 +474,9 @@ export class PageEditor {
 
   protected remove(at: number): void {
     const items = this.items().filter((_, i) => i !== at);
-    this.items.set(items.length ? items : [{ id: nextId++, text: '' }]);
+    this.items.set(items.length || desktop ? items : [{ id: nextId++, text: '' }]);
     this.emit();
+    this.emptied();
   }
 
   // The caret in a block: at its start, its end, or at a place

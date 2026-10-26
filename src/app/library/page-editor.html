@@ -34,7 +34,7 @@
            lesson's tasks: small corners, a hairline edge, nearly the page's white, snug) -->
       <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
       <div
-        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-lg desktop:border-[0.5px] desktop:border-separator desktop:bg-dialog/45 desktop:px-2 desktop:py-1"
+        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-lg desktop:border-[0.5px] desktop:border-separator desktop:bg-dialog/60 desktop:px-3.5 desktop:py-2.5 desktop:transition-colors desktop:focus-within:border-fg-secondary/40"
         [class.outline-dashed]="item.private"
         [class.outline-1]="item.private"
         [class.outline-separator]="item.private"
@@ -62,7 +62,7 @@
                   ? ('editor.hintPhone' | t)
                   : ''
             "
-            class="relative block w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed desktop:min-h-[2lh] desktop:text-ui text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
+            class="relative block w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed desktop:min-h-[3lh] desktop:text-ui text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
           ></textarea>
         </div>
       </div>
@@ -178,7 +178,7 @@
        Assistant; under them, room to tap too -->
   <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col gap-3" (click)="typeAtEnd()">
     @if ((items().length > 1 || items()[0]?.text) && caret() === null) {
-      <span class="px-4 text-body text-fg-secondary/70 desktop:px-2 desktop:text-ui">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
+      <span class="px-4 text-body text-fg-secondary/70 desktop:px-3.5 desktop:text-ui">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
     }
     <!-- (desktops: the assistant's in the page's head; a click here is a new text) -->
     <div class="flex items-center gap-2 desktop:hidden" (click)="$event.stopPropagation()">
@@ -299,7 +299,7 @@
      click on one, or ↑ ↓ Enter; "/…" filters them); what's typed (or pasted) is a new block there -->
 <ng-template #caretLine>
   <!-- (a line with its hint, no card yet) -->
-  <div data-caret class="relative px-2 py-0.5">
+  <div data-caret class="relative px-3.5 py-0.5">
     <input
       #caretField
       data-caret-input
