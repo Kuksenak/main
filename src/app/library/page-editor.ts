@@ -5,7 +5,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { VisibleArea } from '../core/services/visible-area';
 import { Icon, IconName, UiSheet } from '../core/ui';
-import type { PageBlock } from './library.store';
+import { LibraryStore, type PageBlock } from './library.store';
 import { UiTip } from '../core/ui/tip/tip';
 import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
 
@@ -19,11 +19,14 @@ interface Item {
 
 /** A command at the caret between blocks: a new text, or the assistant. */
 interface Command {
-  id: 'text' | 'ai';
+  id: 'text' | 'ai' | 'paste';
   icon: IconName;
-  label: 'editor.text' | 'editor.ai';
-  hint: 'editor.textHint' | 'editor.aiHint';
+  label: 'editor.text' | 'editor.ai' | 'editor.paste';
+  hint: 'editor.textHint' | 'editor.aiHint' | 'editor.pasteHint';
 }
+
+// (what's been copied — a block's menu: Copy, the page's: Copy content — put in there)
+const PASTE: Command = { id: 'paste', icon: 'enter', label: 'editor.paste', hint: 'editor.pasteHint' };
 
 const COMMANDS: Command[] = [
   { id: 'text', icon: 'page', label: 'editor.text', hint: 'editor.textHint' },
@@ -66,6 +69,7 @@ export class PageEditor {
   readonly ai = output<void>();
 
   private readonly i18n = inject(I18nService);
+  private readonly store = inject(LibraryStore);
   protected readonly area = inject(VisibleArea);
   protected readonly desktop = desktop;
   protected readonly styles = STYLES;
@@ -92,7 +96,8 @@ export class PageEditor {
   protected readonly caretActive = signal(0);
   protected readonly caretCommands = computed(() => {
     const query = this.caretQuery().toLocaleLowerCase();
-    return COMMANDS.filter((c) => !query || this.i18n.t(c.label).toLocaleLowerCase().includes(query));
+    const all = this.store.clipboard()?.length ? [...COMMANDS, PASTE] : COMMANDS;
+    return all.filter((c) => !query || this.i18n.t(c.label).toLocaleLowerCase().includes(query));
   });
   // (the assistant asked from the caret: its texts go in there)
   private aiAt: number | null = null;
@@ -244,6 +249,12 @@ export class PageEditor {
     if (at === null || !command) return;
     if (command.id === 'text') {
       this.insertAt(at);
+    } else if (command.id === 'paste') {
+      const added = (this.store.clipboard() ?? []).map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private }));
+      const items = this.items();
+      this.items.set([...items.slice(0, at), ...added, ...items.slice(at)]);
+      this.emit();
+      setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
     } else {
       this.aiAt = at;
       this.ai.emit();
@@ -462,7 +473,9 @@ export class PageEditor {
 
   // The block's menu: its text copied (with its marks)
   protected copy(at: number): void {
-    navigator.clipboard?.writeText(this.items()[at].text).catch(() => {});
+    const item = this.items()[at];
+    this.store.clipboard.set([{ kind: 'card', text: item.text, private: item.private || undefined }]);
+    navigator.clipboard?.writeText(item.text).catch(() => {});
   }
 
   protected duplicate(at: number): void {

@@ -34,7 +34,7 @@
            Notion's callouts; written in: a faint accent line round it)) -->
       <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
       <div
-        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-tint/35 desktop:px-4 desktop:py-3 desktop:focus-within:outline-1 desktop:focus-within:outline-solid desktop:focus-within:outline-accent/15"
+        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-tint/50 desktop:px-4 desktop:py-3 desktop:focus-within:outline-1 desktop:focus-within:outline-solid desktop:focus-within:outline-accent/15"
         [class.outline-dashed]="item.private"
         [class.outline-1]="item.private"
         [class.outline-separator]="item.private"
@@ -309,7 +309,7 @@
       (input)="caretTyped(caretField)"
       (keydown)="caretKey($event)"
       (paste)="caretPaste($event)"
-      (click)="caretMenu.set(true)"
+      (click)="caretMenu.set(!caretMenu())"
       (blur)="caretLeft()"
       class="block w-full bg-transparent text-ui leading-relaxed text-fg outline-none placeholder:text-fg-secondary"
     />
