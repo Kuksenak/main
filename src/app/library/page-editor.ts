@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChildren } from '@angular/core';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -10,24 +11,21 @@ import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
 /** A block being edited (its id: for the list's tracking, as blocks move). */
 interface Item {
   id: number;
-  // (a text right on the page, or a card: set apart — desktops; phones show all as cards)
-  kind: 'text' | 'card';
   text: string;
   // (only for the teacher: a lock on it)
   private?: boolean;
 }
 
-/** A "/" command: a new text, a new card, or the assistant. */
+/** A "/" command: a new text, or the assistant. */
 interface Command {
-  id: 'text' | 'card' | 'ai';
+  id: 'text' | 'ai';
   icon: IconName;
-  label: 'editor.text' | 'editor.card' | 'editor.ai';
-  hint: 'editor.textHint' | 'editor.cardHint' | 'editor.aiHint';
+  label: 'editor.text' | 'editor.ai';
+  hint: 'editor.textHint' | 'editor.aiHint';
 }
 
 const COMMANDS: Command[] = [
   { id: 'text', icon: 'page', label: 'editor.text', hint: 'editor.textHint' },
-  { id: 'card', icon: 'grid', label: 'editor.card', hint: 'editor.cardHint' },
   { id: 'ai', icon: 'sparkle', label: 'editor.ai', hint: 'editor.aiHint' },
 ];
 
@@ -57,7 +55,7 @@ let nextId = 1;
  */
 @Component({
   selector: 'app-page-editor',
-  imports: [Icon, TranslatePipe, UiSheet],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiSheet],
   templateUrl: './page-editor.html',
   host: { class: 'relative block' },
 })
@@ -91,6 +89,19 @@ export class PageEditor {
     return COMMANDS.filter((c) => !query || this.i18n.t(c.label).toLocaleLowerCase().includes(query));
   });
 
+  // Desktops: the caret between blocks (a click between them, under the last): a line with its
+  // hint, the commands under it at once; what's typed there is a new block in that place, "/…"
+  // filters the commands
+  protected readonly caret = signal<number | null>(null);
+  protected readonly caretQuery = signal('');
+  protected readonly caretActive = signal(0);
+  protected readonly caretCommands = computed(() => {
+    const query = this.caretQuery().toLocaleLowerCase();
+    return COMMANDS.filter((c) => !query || this.i18n.t(c.label).toLocaleLowerCase().includes(query));
+  });
+  // (the assistant asked from the caret: its texts go in there)
+  private aiAt: number | null = null;
+
   // Link: the address asked for (the selection kept meanwhile)
   protected readonly linking = signal<{ at: number; a: number; b: number } | null>(null);
 
@@ -102,8 +113,8 @@ export class PageEditor {
 
   constructor() {
     afterNextRender(() => {
-      const blocks = this.blocks().length ? this.blocks() : [{ kind: 'text' as const, text: '' }];
-      this.items.set(blocks.map((b) => ({ id: nextId++, kind: b.kind, text: b.text ?? '', private: !!b.private })));
+      const blocks = this.blocks().length ? this.blocks() : [{ kind: 'card' as const, text: '' }];
+      this.items.set(blocks.map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private })));
       setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
     });
     // (the window's width changed: the fields' heights again)
@@ -112,24 +123,26 @@ export class PageEditor {
     inject(DestroyRef).onDestroy(() => window.removeEventListener('resize', resize));
   }
 
-  /** Texts put in after the block with the caret (none: at the end) — the assistant's: cards. */
-  insert(texts: string[], focusLast = false, kind: Item['kind'] = 'card'): void {
-    const at = this.focused() >= 0 ? this.focused() : this.items().length - 1;
+  /** Texts put in after the block with the caret (none: at the end) — e.g. the assistant's. */
+  insert(texts: string[], focusLast = false): void {
     const items = this.items();
+    // (where: the caret's place the assistant was asked from; else after the caret's block)
+    const at = this.aiAt ?? (this.focused() >= 0 ? this.focused() + 1 : items.length);
     // (the page still empty: its empty block replaced)
     const replace = items.length === 1 && !items[0].text.trim();
-    const added = texts.map((text) => ({ id: nextId++, kind, text }));
-    this.items.set(replace ? added : [...items.slice(0, at + 1), ...added, ...items.slice(at + 1)]);
+    const added = texts.map((text) => ({ id: nextId++, text }));
+    this.items.set(replace ? added : [...items.slice(0, at), ...added, ...items.slice(at)]);
+    if (this.aiAt !== null) this.aiAt = replace ? added.length : at + added.length; // (the next ones after them)
     this.emit();
     setTimeout(() => {
       this.fields().forEach((f) => this.grow(f.nativeElement));
-      if (focusLast) this.focusAt(replace ? added.length - 1 : at + added.length, 'end');
+      if (focusLast) this.focusAt(replace ? added.length - 1 : at + added.length - 1, 'end');
     });
   }
 
   /** Blocks put in at the end (the page's menu: Paste content). */
   append(blocks: PageBlock[]): void {
-    const added = blocks.map((b) => ({ id: nextId++, kind: b.kind, text: b.text ?? '', private: !!b.private }));
+    const added = blocks.map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private }));
     const items = this.items();
     // (the page still empty: its empty block replaced)
     const replace = items.length === 1 && !items[0].text.trim();
@@ -142,7 +155,7 @@ export class PageEditor {
   now(): PageBlock[] {
     return this.items()
       .filter((i) => i.text.trim())
-      .map((i) => ({ kind: i.kind, text: i.text, private: i.private || undefined }));
+      .map((i) => ({ kind: 'card' as const, text: i.text, private: i.private || undefined }));
   }
 
   /** The caret at the start of the first block (e.g. Enter in the title). */
@@ -159,25 +172,92 @@ export class PageEditor {
   }
 
   private emit(): void {
-    this.changed.emit(this.items().map((i) => ({ kind: i.kind, text: i.text, private: i.private || undefined })));
+    this.changed.emit(this.items().map((i) => ({ kind: 'card' as const, text: i.text, private: i.private || undefined })));
+  }
+
+  // A click between two blocks: desktops — the caret there (and the commands); phones — a new text
+  protected between(at: number): void {
+    if (desktop) this.openCaret(at);
+    else this.insertAt(at);
+  }
+
+  private openCaret(at: number): void {
+    this.caret.set(at);
+    this.caretQuery.set('');
+    this.caretActive.set(0);
+    setTimeout(() => document.querySelector<HTMLInputElement>('app-page-editor [data-caret-input]')?.focus());
+  }
+
+  protected caretTyped(field: HTMLInputElement): void {
+    const v = field.value;
+    if (v.startsWith('/') || !v) {
+      this.caretQuery.set(v.slice(1));
+      this.caretActive.set(0);
+      return;
+    }
+    // (anything else: a new block there with it, the caret on in it)
+    const at = this.caret() ?? this.items().length;
+    this.caret.set(null);
+    const items = this.items();
+    this.items.set([...items.slice(0, at), { id: nextId++, text: v }, ...items.slice(at)]);
+    this.emit();
+    setTimeout(() => this.focusAt(at, 'end'));
+  }
+
+  protected caretKey(e: KeyboardEvent): void {
+    const count = this.caretCommands().length;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.caret.set(null);
+    } else if (count && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
+      e.preventDefault();
+      this.caretActive.set((this.caretActive() + (e.key === 'ArrowDown' ? 1 : -1) + count) % count);
+    } else if (count && e.key === 'Enter') {
+      e.preventDefault();
+      this.runAtCaret(this.caretCommands()[this.caretActive()]);
+    }
+  }
+
+  // A command at the caret: a new text there, or the assistant (its texts to go in there)
+  protected runAtCaret(command: Command | undefined): void {
+    const at = this.caret();
+    this.caret.set(null);
+    if (at === null || !command) return;
+    if (command.id === 'text') {
+      this.insertAt(at);
+    } else {
+      this.aiAt = at;
+      this.ai.emit();
+    }
+  }
+
+  // (left: the caret goes — not for a click on its commands)
+  protected caretLeft(): void {
+    setTimeout(() => {
+      if (!document.activeElement?.hasAttribute('data-caret-input')) this.caret.set(null);
+    }, 120);
   }
 
   // A tap between two blocks: a new text there, typed at once
   protected insertAt(at: number): void {
     const items = this.items();
-    this.items.set([...items.slice(0, at), { id: nextId++, kind: 'text', text: '' }, ...items.slice(at)]);
+    this.items.set([...items.slice(0, at), { id: nextId++, text: '' }, ...items.slice(at)]);
     setTimeout(() => this.focusAt(at, 'start'));
   }
 
   // A tap under the last block: a new text there (the last one, if it's empty), typed at once
   protected typeAtEnd(): void {
     const items = this.items();
+    if (desktop) {
+      this.openCaret(items.length);
+      return;
+    }
     const last = items[items.length - 1];
     if (last && !last.text) {
       this.focusAt(items.length - 1, 'end');
       return;
     }
-    this.items.set([...items, { id: nextId++, kind: 'text', text: '' }]);
+    this.items.set([...items, { id: nextId++, text: '' }]);
     setTimeout(() => this.focusAt(this.items().length - 1, 'start'));
   }
 
@@ -203,6 +283,7 @@ export class PageEditor {
   }
 
   protected select(at: number, field: HTMLTextAreaElement): void {
+    this.aiAt = null;
     this.focused.set(at);
     this.selection.set({ a: field.selectionStart, b: field.selectionEnd });
   }
@@ -244,7 +325,7 @@ export class PageEditor {
       // Enter on an empty last line: out of it — a new text under it
       e.preventDefault();
       const items = this.items();
-      this.items.set([...items.slice(0, at), { ...items[at], text: text.slice(0, -1) }, { id: nextId++, kind: 'text', text: '' }, ...items.slice(at + 1)]);
+      this.items.set([...items.slice(0, at), { ...items[at], text: text.slice(0, -1) }, { id: nextId++, text: '' }, ...items.slice(at + 1)]);
       this.emit();
       setTimeout(() => {
         this.grow(field);
@@ -295,14 +376,13 @@ export class PageEditor {
     const text = this.items()[slash.at].text;
     const end = field?.selectionStart ?? slash.from + slash.query.length + 1;
     this.setText(slash.at, text.slice(0, slash.from) + text.slice(end));
-    if (command.id === 'text' || command.id === 'card') {
-      // This one, if it's empty now, is it (made that kind); else a new one under it
+    if (command.id === 'text') {
+      // This one, if it's empty now, is it; else a new text under it
       if (!this.items()[slash.at].text.trim()) {
-        this.setKind(slash.at, command.id);
         setTimeout(() => this.focusAt(slash.at, 'start'));
       } else {
         this.focused.set(slash.at);
-        this.insert([''], true, command.id);
+        this.insert([''], true);
       }
     } else {
       this.ai.emit();
@@ -407,13 +487,6 @@ export class PageEditor {
     this.emit();
   }
 
-  // The block's menu: a card or a text right on the page
-  protected setKind(at: number, kind: Item['kind']): void {
-    this.items.update((items) => items.map((item, i) => (i === at ? { ...item, kind } : item)));
-    this.emit();
-    setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
-  }
-
   // The block's menu: its text copied (with its marks)
   protected copy(at: number): void {
     navigator.clipboard?.writeText(this.items()[at].text).catch(() => {});
@@ -428,7 +501,7 @@ export class PageEditor {
 
   protected remove(at: number): void {
     const items = this.items().filter((_, i) => i !== at);
-    this.items.set(items.length ? items : [{ id: nextId++, kind: 'text', text: '' }]);
+    this.items.set(items.length ? items : [{ id: nextId++, text: '' }]);
     this.emit();
   }
 

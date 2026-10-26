@@ -8,16 +8,18 @@
     ></div>
   }
   @for (item of items(); track item.id; let i = $index) {
-    <!-- (between two blocks: a tap there, a new one) -->
-    @if (i > 0) {
-      <div class="h-2.5 cursor-text" (click)="insertAt(i)"></div>
+    <!-- (between two blocks: a tap there — desktops: the caret, phones: a new one) -->
+    @if (caret() === i) {
+      <ng-container [ngTemplateOutlet]="caretLine" />
+    } @else if (i > 0) {
+      <div class="h-2.5 cursor-text" (click)="between(i)"></div>
     }
-    <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i" [attr.data-kind]="item.kind">
+    <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i">
       <button
         type="button"
         [attr.aria-label]="'editor.grip' | t"
         [attr.aria-expanded]="blockMenu() === i"
-        class="absolute top-3 grid h-7 w-6 desktop:group-data-[kind=text]:top-0 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
+        class="absolute top-3 grid h-7 w-6 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
         (pointerdown)="gripDown($event, i)"
         (pointermove)="gripMove($event, host)"
         (pointerup)="gripUp()"
@@ -26,11 +28,10 @@
         <app-icon name="grip" class="size-4.5" />
       </button>
 
-      <!-- (a card: set apart — a soft fill, round corners, room inside; desktops: a text right on
-           the page, no card — phones show all as cards) -->
+      <!-- (a card: set apart — a soft fill, round corners, room inside) -->
       <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
       <div
-        class="relative rounded-card mobile:mr-6 mobile:bg-tint mobile:px-4 mobile:py-3 group-data-[kind=card]:bg-tint group-data-[kind=card]:px-4 group-data-[kind=card]:py-3 desktop:group-data-[kind=text]:py-0.5"
+        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6"
         [class.outline-dashed]="item.private"
         [class.outline-1]="item.private"
         [class.outline-separator]="item.private"
@@ -165,17 +166,6 @@
           <button
             type="button"
             role="menuitem"
-            (click)="blockMenu.set(null); setKind(i, item.kind === 'card' ? 'text' : 'card')"
-            class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
-          >
-            <app-icon name="grid" colored class="size-icon-menu text-icon" /><span class="flex-1">{{ 'editor.asCard' | t }}</span>
-            @if (item.kind === 'card') {
-              <app-icon name="check" class="size-icon-menu" />
-            }
-          </button>
-          <button
-            type="button"
-            role="menuitem"
             (click)="blockMenu.set(null); copy(i)"
             [disabled]="!item.text.trim()"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong disabled:opacity-40"
@@ -205,11 +195,14 @@
       }
     </div>
   }
+  @if (caret() === items().length) {
+    <div class="mt-2.5"><ng-container [ngTemplateOutlet]="caretLine" /></div>
+  }
   <!-- The end of the page: a hint to write on (a tap: a new text there, typed at once), + Text and
        Assistant; under them, room to tap too -->
   <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col gap-3" (click)="typeAtEnd()">
-    @if (items().length > 1 || items()[0]?.text) {
-      <span class="text-body text-fg-secondary/70 mobile:px-4">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
+    @if ((items().length > 1 || items()[0]?.text) && caret() === null) {
+      <span class="px-4 text-body text-fg-secondary/70">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
     }
     <!-- (desktops: the assistant's in the page's head; a click here is a new text) -->
     <div class="flex items-center gap-2 desktop:hidden" (click)="$event.stopPropagation()">
@@ -324,3 +317,44 @@
     </div>
   </ui-sheet>
 }
+
+
+<!-- Desktops: the caret between blocks — a line with its hint, the commands under it at once (a
+     click on one, or ↑ ↓ Enter); what's typed is a new block there, "/…" filters the commands -->
+<ng-template #caretLine>
+  <div data-caret class="relative flex h-7 animate-menu-in items-center">
+    <input
+      #caretField
+      data-caret-input
+      type="text"
+      autocomplete="off"
+      [placeholder]="'editor.hint' | t"
+      (input)="caretTyped(caretField)"
+      (keydown)="caretKey($event)"
+      (blur)="caretLeft()"
+      class="h-7 w-full bg-transparent px-4 text-body outline-none placeholder:text-fg-secondary"
+    />
+    <div
+      role="listbox"
+      class="absolute top-full left-2 z-30 mt-1 flex w-72 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
+      (mousedown)="$event.preventDefault()"
+    >
+      @for (command of caretCommands(); track command.id; let k = $index) {
+        <button
+          type="button"
+          role="option"
+          [attr.aria-selected]="k === caretActive()"
+          (click)="runAtCaret(command)"
+          (mouseenter)="caretActive.set(k)"
+          class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui aria-selected:bg-tint-strong"
+        >
+          <app-icon [name]="command.icon" colored class="size-icon-menu text-icon" />
+          <span class="flex-1">{{ command.label | t }}</span>
+          <span class="text-footnote text-fg-secondary">{{ command.hint | t }}</span>
+        </button>
+      } @empty {
+        <span class="px-menu-row-x py-1.5 text-ui text-fg-secondary">{{ 'editor.nothing' | t }}</span>
+      }
+    </div>
+  </div>
+</ng-template>
