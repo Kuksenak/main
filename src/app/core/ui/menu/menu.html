@@ -13,7 +13,8 @@
 >
   <div
     role="menu"
-    class="flex min-w-menu max-w-[calc(100vw-1rem)] animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
+    [attr.data-narrow]="narrow() ? '' : null"
+    class="flex min-w-menu max-w-[calc(100vw-1rem)] data-narrow:min-w-48 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
     (click)="picked($event)"
   >
     <ng-content />

@@ -1,5 +1,5 @@
 import { CdkConnectedOverlay, ConnectedPosition, OverlayModule } from '@angular/cdk/overlay';
-import { Component, input, output, viewChild } from '@angular/core';
+import { booleanAttribute, Component, input, output, viewChild } from '@angular/core';
 
 // (its rows: plain ones and the ones of a choice — menuitem, menuitemradio)
 const ROWS = '[role^="menuitem"]:not(:disabled)';
@@ -19,6 +19,8 @@ const ROWS = '[role^="menuitem"]:not(:disabled)';
 })
 export class UiMenu {
   readonly origin = input.required<HTMLElement>();
+  /** (short rows: 12rem wide at least, not the menus' 17rem) */
+  readonly narrow = input(false, { transform: booleanAttribute });
   readonly closed = output<void>();
 
   private readonly overlay = viewChild.required(CdkConnectedOverlay);

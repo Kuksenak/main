@@ -30,7 +30,7 @@
         ></button>
         @if (menuOpen()) {
           <!-- Duplicate, Copy / Paste content; Delete; how many blocks, when edited, made -->
-          <ui-menu [origin]="more.element" (closed)="menuOpen.set(false)">
+          <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
             <button type="button" uiMenuItem icon="plus" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
             <button type="button" uiMenuItem icon="page" (click)="copyContent()" [disabled]="!blockCount()">{{ 'library.copyContent' | t }}</button>
             <button type="button" uiMenuItem icon="enter" (click)="pasteContent()" [disabled]="!store.clipboard()?.length">{{ 'library.pasteContent' | t }}</button>
