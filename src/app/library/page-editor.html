@@ -57,40 +57,13 @@
             (focus)="select(i, field)"
             (blur)="left(i)"
             [placeholder]="focused() === i || items().length === 1
-                  ? ((desktop ? 'editor.hint' : 'editor.hintPhone') | t)
+                  ? ('editor.hintPhone' | t)
                   : ''
             "
             class="relative block w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed desktop:min-h-[2lh] desktop:text-ui text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
           ></textarea>
         </div>
       </div>
-
-      <!-- "/": the commands under the block — an icon, the name, a hint; the picked one gray -->
-      @if (slash()?.at === i) {
-        <div
-          role="listbox"
-          class="absolute top-full left-0 z-30 mt-1 flex w-72 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
-          (mousedown)="$event.preventDefault()"
-        >
-          @for (command of commands(); track command.id; let k = $index) {
-            <button
-              type="button"
-              role="option"
-              [attr.aria-selected]="k === slash()?.active"
-              (click)="run(command)"
-              class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui aria-selected:bg-tint-strong"
-            >
-              <app-icon [name]="command.icon" colored class="size-icon-menu text-icon" />
-              <span class="flex-1">{{ command.label | t }}</span>
-              <span class="text-footnote text-fg-secondary">{{ command.hint | t }}</span>
-            </button>
-          } @empty {
-            <span class="px-menu-row-x py-1.5 text-ui text-fg-secondary">{{
-              'editor.nothing' | t
-            }}</span>
-          }
-        </div>
-      }
 
       <!-- Desktop: a selection in it — B I U S, Link over the block (what's on: gray) -->
       @if (desktop && focused() === i && (selection().a !== selection().b || linking()?.at === i)) {

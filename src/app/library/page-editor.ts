@@ -16,7 +16,7 @@ interface Item {
   private?: boolean;
 }
 
-/** A "/" command: a new text, or the assistant. */
+/** A command at the caret between blocks: a new text, or the assistant. */
 interface Command {
   id: 'text' | 'ai';
   icon: IconName;
@@ -39,18 +39,18 @@ const STYLES: { id: Mark; mark: string; look: string; label: 'editor.bold' | 'ed
 let nextId = 1;
 
 /**
- * A page's text, edited right on it, as the old app's: blocks of text, each a card (set apart: a
- * soft fill, round corners) — whatever's typed is one at once; their marks (**bold**, *italic*,
- * __underline__, ~~strike~~, [links](…)) faded over the text. Enter: a new line; on an empty last
- * line, out of it — a new text under it. Backspace in an empty one: it goes, the caret up to the
- * one above; ↑ ↓ at the ends: the next one; emptied and left, a text goes. A tap under the last
- * one: a new text there, typed at once. "/" at a line's start (or after a space): the commands — a
- * new text under this one, the assistant (`ai`). A selection: B I U S and Link (desktop: a menu
- * over the block; phones: the bar over the keyboard, with the assistant and ✓ too). Each block's ⠿
- * (desktop: at its left under the pointer; phones: at its right): dragged, it moves (a line where
- * it'd land); tapped, its menu (desktop: a popup; phones: a sheet, just its words) — only for me (a lock on it),
- * copy, duplicate, delete. A tap between
- * two blocks: a new one there; under the last: a hint, + Text and Assistant. `blocks`: what it starts with (read once);
+ * A page's text, edited right on it, as the old app's: blocks of text, each a card (set apart) —
+ * a "/" in one is just text; their marks (**bold**, *italic*, __underline__, ~~strike~~,
+ * [links](…)) faded over the text. Enter: a new line; on an empty last line, out of it — a new
+ * text under it. Backspace in an empty one: it goes, the caret up to the one above; ↑ ↓ at the
+ * ends: the next one; emptied and left, a text goes. Between two blocks or under the last, a
+ * click: desktops — the caret there (a line with its hint and the commands: a new text, the
+ * assistant, `ai`; what's typed or pasted, a new block there); phones — a new text, typed at
+ * once (under the last: + Text and Assistant too). A selection: B I U S and Link (desktop: a menu
+ * over the block; phones: the bar over the keyboard, with the assistant and ✓ too). Each block's
+ * ⠿ (desktop: at its left under the pointer; phones: at its right): dragged, it moves (a line
+ * where it'd land); tapped, its menu (desktop: a popup; phones: a sheet, just its words) — only
+ * for me (a lock on it), copy, duplicate, delete. `blocks`: what it starts with (read once);
  * `changed`: all of them, at each change.
  */
 @Component({
@@ -80,13 +80,6 @@ export class PageEditor {
     const at = this.focused();
     const { a, b } = this.selection();
     return at < 0 || a === b ? [] : marksAt(this.items()[at]?.text ?? '', a, b);
-  });
-
-  // "/": at which block, what's typed after it, where the "/" is, the row picked
-  protected readonly slash = signal<{ at: number; query: string; from: number; active: number } | null>(null);
-  protected readonly commands = computed(() => {
-    const query = this.slash()?.query.toLocaleLowerCase() ?? '';
-    return COMMANDS.filter((c) => !query || this.i18n.t(c.label).toLocaleLowerCase().includes(query));
   });
 
   // Desktops: the caret between blocks (a click between them, under the last): a line with its
@@ -286,16 +279,6 @@ export class PageEditor {
     this.setText(at, field.value);
     this.grow(field);
     this.select(at, field);
-    // "/" at a line's start or after a space, the caret after it (what's typed after it narrows)
-    const before = field.value.slice(0, field.selectionStart);
-    const typed = /(?:^|\s)\/([\p{L}\d]{0,20})$/u.exec(before);
-    if (typed) {
-      const old = this.slash();
-      const query = typed[1];
-      this.slash.set({ at, query, from: field.selectionStart - query.length - 1, active: old?.query === query ? old.active : 0 });
-    } else {
-      this.slash.set(null);
-    }
   }
 
   protected select(at: number, field: HTMLTextAreaElement): void {
@@ -306,25 +289,6 @@ export class PageEditor {
 
   protected key(e: KeyboardEvent, at: number, field: HTMLTextAreaElement): void {
     if (e.isComposing) return;
-    const slash = this.slash();
-    if (slash) {
-      const count = this.commands().length;
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        this.slash.set(null);
-        return;
-      }
-      if (count && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
-        e.preventDefault();
-        this.slash.set({ ...slash, active: (slash.active + (e.key === 'ArrowDown' ? 1 : -1) + count) % count });
-        return;
-      }
-      if (count && (e.key === 'Enter' || e.key === 'Tab')) {
-        e.preventDefault();
-        this.run(this.commands()[slash.active]);
-        return;
-      }
-    }
     // (B I U: as everywhere)
     if ((e.ctrlKey || e.metaKey) && !e.altKey) {
       const style = { b: 'bold', i: 'italic', u: 'underline' }[e.key.toLowerCase()] as Mark | undefined;
@@ -366,14 +330,13 @@ export class PageEditor {
     }
   }
 
-  // Left: emptied, it goes (one is always there); the "/" menu closes
+  // Left: emptied, it goes (one is always there)
   protected left(at: number): void {
     setTimeout(() => {
       if (this.linking() || this.blockMenu() !== null || this.dragging() !== null) return;
       const field = document.activeElement;
       if (!(field instanceof HTMLTextAreaElement) || !this.fields().some((f) => f.nativeElement === field)) {
         this.focused.set(-1);
-        this.slash.set(null);
       }
       const items = this.items();
       if (items.length > 1 && !items[at]?.text.trim() && this.focused() !== at) {
@@ -381,28 +344,6 @@ export class PageEditor {
         this.emit();
       }
     });
-  }
-
-  // A "/" command: the "/" and what's typed after it taken out, then the command
-  protected run(command: Command | undefined): void {
-    const slash = this.slash();
-    this.slash.set(null);
-    if (!slash || !command) return;
-    const field = this.fields()[slash.at]?.nativeElement;
-    const text = this.items()[slash.at].text;
-    const end = field?.selectionStart ?? slash.from + slash.query.length + 1;
-    this.setText(slash.at, text.slice(0, slash.from) + text.slice(end));
-    if (command.id === 'text') {
-      // This one, if it's empty now, is it; else a new text under it
-      if (!this.items()[slash.at].text.trim()) {
-        setTimeout(() => this.focusAt(slash.at, 'start'));
-      } else {
-        this.focused.set(slash.at);
-        this.insert([''], true);
-      }
-    } else {
-      this.ai.emit();
-    }
   }
 
   // B I U S: on the selection (none: the marks with the caret between them)
