@@ -22,11 +22,12 @@ interface Command {
   id: 'text' | 'ai' | 'paste';
   icon: IconName;
   label: 'editor.text' | 'editor.ai' | 'editor.paste';
-  hint: 'editor.textHint' | 'editor.aiHint' | 'editor.pasteHint';
+  // (Paste's: what's been copied itself — copied())
+  hint?: 'editor.textHint' | 'editor.aiHint';
 }
 
 // (what's been copied — a block's menu: Copy, the page's: Copy content — put in there)
-const PASTE: Command = { id: 'paste', icon: 'enter', label: 'editor.paste', hint: 'editor.pasteHint' };
+const PASTE: Command = { id: 'paste', icon: 'enter', label: 'editor.paste' };
 
 const COMMANDS: Command[] = [
   { id: 'text', icon: 'page', label: 'editor.text', hint: 'editor.textHint' },
@@ -98,6 +99,12 @@ export class PageEditor {
     const query = this.caretQuery().toLocaleLowerCase();
     const all = this.store.clipboard()?.length ? [...COMMANDS, PASTE] : COMMANDS;
     return all.filter((c) => !query || this.i18n.t(c.label).toLocaleLowerCase().includes(query));
+  });
+  // Paste's hint: the copied text's start, "+2" for the blocks after it
+  protected readonly copied = computed(() => {
+    const blocks = this.store.clipboard() ?? [];
+    const first = (blocks[0]?.text ?? '').replace(/\s+/g, ' ').trim();
+    return first + (blocks.length > 1 ? ` +${blocks.length - 1}` : '');
   });
   // (the assistant asked from the caret: its texts go in there)
   private aiAt: number | null = null;

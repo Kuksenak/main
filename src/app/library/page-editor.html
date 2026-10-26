@@ -330,7 +330,7 @@
         >
           <app-icon [name]="command.icon" colored class="size-icon-menu text-icon" />
           <span class="flex-1">{{ command.label | t }}</span>
-          <span class="text-footnote text-fg-secondary">{{ command.hint | t }}</span>
+          <span class="max-w-36 truncate text-footnote text-fg-secondary">{{ command.hint ? (command.hint | t) : copied() }}</span>
         </button>
       } @empty {
         <span class="px-menu-row-x py-1.5 text-ui text-fg-secondary">{{ 'editor.nothing' | t }}</span>
