@@ -319,8 +319,8 @@
 }
 
 
-<!-- Desktops: the caret between blocks — a line with its hint, the commands under it at once (a
-     click on one, or ↑ ↓ Enter); what's typed is a new block there, "/…" filters the commands -->
+<!-- Desktops: the caret between blocks — a line with its hint; what's typed (or pasted) is a new
+     block there; "/": the commands under it (a click on one, or ↑ ↓ Enter), what's after it filters them -->
 <ng-template #caretLine>
   <div data-caret class="relative flex h-7 animate-menu-in items-center">
     <input
@@ -331,9 +331,11 @@
       [placeholder]="'editor.hint' | t"
       (input)="caretTyped(caretField)"
       (keydown)="caretKey($event)"
+      (paste)="caretPaste($event)"
       (blur)="caretLeft()"
       class="h-7 w-full bg-transparent px-4 text-body outline-none placeholder:text-fg-secondary"
     />
+    @if (caretMenu()) {
     <div
       role="listbox"
       class="absolute top-full left-2 z-30 mt-1 flex w-72 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
@@ -356,5 +358,6 @@
         <span class="px-menu-row-x py-1.5 text-ui text-fg-secondary">{{ 'editor.nothing' | t }}</span>
       }
     </div>
+    }
   </div>
 </ng-template>

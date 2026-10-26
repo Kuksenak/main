@@ -90,9 +90,10 @@ export class PageEditor {
   });
 
   // Desktops: the caret between blocks (a click between them, under the last): a line with its
-  // hint, the commands under it at once; what's typed there is a new block in that place, "/…"
-  // filters the commands
+  // hint; what's typed or pasted there is a new block in that place; "/": the commands (what's
+  // after it filters them)
   protected readonly caret = signal<number | null>(null);
+  protected readonly caretMenu = signal(false);
   protected readonly caretQuery = signal('');
   protected readonly caretActive = signal(0);
   protected readonly caretCommands = computed(() => {
@@ -183,6 +184,7 @@ export class PageEditor {
 
   private openCaret(at: number): void {
     this.caret.set(at);
+    this.caretMenu.set(false);
     this.caretQuery.set('');
     this.caretActive.set(0);
     setTimeout(() => document.querySelector<HTMLInputElement>('app-page-editor [data-caret-input]')?.focus());
@@ -190,22 +192,37 @@ export class PageEditor {
 
   protected caretTyped(field: HTMLInputElement): void {
     const v = field.value;
+    this.caretMenu.set(v.startsWith('/'));
     if (v.startsWith('/') || !v) {
       this.caretQuery.set(v.slice(1));
       this.caretActive.set(0);
       return;
     }
-    // (anything else: a new block there with it, the caret on in it)
+    this.blockAtCaret(v);
+  }
+
+  // Ctrl+V there: a new block with what's pasted (its lines kept)
+  protected caretPaste(e: ClipboardEvent): void {
+    const text = e.clipboardData?.getData('text/plain') ?? '';
+    e.preventDefault();
+    if (text.trim()) this.blockAtCaret(text);
+  }
+
+  // (a new block at the caret with this text, the caret on in it)
+  private blockAtCaret(v: string): void {
     const at = this.caret() ?? this.items().length;
     this.caret.set(null);
     const items = this.items();
     this.items.set([...items.slice(0, at), { id: nextId++, text: v }, ...items.slice(at)]);
     this.emit();
-    setTimeout(() => this.focusAt(at, 'end'));
+    setTimeout(() => {
+      this.fields().forEach((f) => this.grow(f.nativeElement));
+      this.focusAt(at, 'end');
+    });
   }
 
   protected caretKey(e: KeyboardEvent): void {
-    const count = this.caretCommands().length;
+    const count = this.caretMenu() ? this.caretCommands().length : 0;
     if (e.key === 'Escape') {
       e.preventDefault();
       this.caret.set(null);
