@@ -15,6 +15,9 @@ const ROWS = '[role^="menuitem"]:not(:disabled)';
 @Component({
   selector: 'ui-menu',
   imports: [OverlayModule],
+  // (its own element takes no room — the menu's drawn over the page: put in a row of buttons, it
+  // added a gap there and the buttons jumped)
+  host: { class: 'hidden' },
   templateUrl: './menu.html',
 })
 export class UiMenu {
