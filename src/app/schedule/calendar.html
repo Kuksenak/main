@@ -13,24 +13,19 @@
   @for (week of weeks; track week[0].getTime()) {
     <div class="grid h-cal-row snap-start grid-cols-7 mobile:border-b-[0.5px] mobile:border-separator">
       @for (day of week; track day.getTime()) {
-        <!-- (data-mark: picked — phones as iOS's: a pale accent circle, its number in the accent;
-             desktops: dark; today — the accent; picked today — phones: a full accent circle) -->
+        <!-- (picked: aria-pressed — the circle dark; today, not picked: data-today — accent) -->
         <button
           type="button"
           (click)="selected.set(day)"
           class="group flex justify-center pt-1 mobile:items-center mobile:pt-0"
           [class.opacity-35]="!inMonth(day)"
           [attr.aria-pressed]="isSelected(day)"
-          [attr.data-mark]="isSelected(day) ? (isToday(day) ? 'picked-today' : 'picked') : isToday(day) ? 'today' : null"
+          [attr.data-today]="isToday(day) && !isSelected(day) ? '' : null"
         >
           <span
             class="flex size-cal-day items-center justify-center rounded-full text-cal-day leading-none tabular-nums mobile:font-semibold
-                   group-[:hover:not([aria-pressed=true])]:bg-tint
-                   group-data-[mark=today]:font-semibold group-data-[mark=today]:text-accent
-                   group-data-[mark=picked]:font-semibold mobile:group-data-[mark=picked]:bg-accent/15 mobile:group-data-[mark=picked]:text-accent
-                   desktop:group-data-[mark=picked]:bg-fg desktop:group-data-[mark=picked]:text-app
-                   group-data-[mark=picked-today]:font-semibold mobile:group-data-[mark=picked-today]:bg-accent mobile:group-data-[mark=picked-today]:text-on-accent
-                   desktop:group-data-[mark=picked-today]:bg-fg desktop:group-data-[mark=picked-today]:text-app"
+                   group-[:hover:not([aria-pressed=true])]:bg-tint group-data-today:font-semibold group-data-today:text-accent
+                   group-aria-pressed:bg-fg group-aria-pressed:font-semibold group-aria-pressed:text-app"
           >{{ day.getDate() }}</span>
         </button>
       }
