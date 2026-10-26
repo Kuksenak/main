@@ -24,8 +24,10 @@ import { VisibleArea } from '../../services/visible-area';
   // keyboard up: the part that's seen, over it)
   host: {
     class: 'fixed inset-x-0 z-40',
-    '[style.top.px]': 'area.keyboard() ? area.top() : 0',
-    '[style.height]': "area.keyboard() ? area.height() + 'px' : '100lvh'",
+    // (the installed app: the part that's seen too — there 100lvh went past the screen's bottom,
+    // the sheet's round corners under it)
+    '[style.top.px]': 'area.keyboard() || installed ? area.top() : 0',
+    '[style.height]': "area.keyboard() || installed ? area.height() + 'px' : '100lvh'",
   },
   templateUrl: './sheet.html',
 })
