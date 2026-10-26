@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Toasts, UiButton, UiSheet } from '../core/ui';
+import { Icon, Toasts, UiButton, UiSheet } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
@@ -19,14 +19,14 @@ const SAVE_AFTER_MS = 700;
  * ⠿), edited right there and saved by themselves a moment after the typing stops (and on leaving).
  * A new one ("Untitled") opens with its title selected; Enter in the title goes on into the text.
  * AI (the editor's "/" or its bar, desktop: the button at the top): its chat (AiChat) — a sheet
- * (phones) or a panel at the right (desktop); its texts go in after the caret's block.
+ * (phones) or a window in the middle (desktop); its texts go in after the caret's block.
  * Delete: the page gone, back to the library. Desktops: one row at the top — the title, the
  * assistant, ⋯ (Duplicate, Copy / Paste content, Delete; how many blocks, when edited, made).
  * Phones: the title in the top bar, ‹ back to the library.
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, PageEditor, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet],
+  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet],
   templateUrl: './page.html',
 })
 export class PageView {
