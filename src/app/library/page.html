@@ -1,8 +1,18 @@
 <!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): the page's name at the left; saving…, the assistant, ⋯ (its menu) at the right -->
+     Notion's): the page's name at the left, edited right there; saving…, the assistant, ⋯ (its menu)
+     at the right -->
 @if (desktop && page(); as p) {
   <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app px-3">
-    <span class="mr-2 min-w-0 flex-1 truncate px-1.5 text-ui text-fg">{{ title() || ('library.untitled' | t) }}</span>
+    <input
+      #titleField
+      type="text"
+      [value]="title()"
+      (input)="typedTitle(titleField.value)"
+      (keydown.enter)="titleEnter($event)"
+      [placeholder]="'library.untitled' | t"
+      maxlength="200"
+      class="mr-2 h-7 min-w-0 flex-1 truncate rounded-button bg-transparent px-1.5 text-ui text-fg outline-none placeholder:text-fg-secondary hover:bg-tint focus:bg-tint"
+    />
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
     }
@@ -36,10 +46,11 @@
   </div>
 }
 
-<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-24 desktop:pt-10">
+<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-24 desktop:pt-6">
 
   @if (page(); as p) {
-    <!-- The title: big, no box (as Notion's) -->
+    <!-- Phones: the title big, no box (as Notion's); desktops: in the row at the top -->
+    @if (!desktop) {
     <input
       #titleField
       type="text"
@@ -48,8 +59,9 @@
       (keydown.enter)="titleEnter($event)"
       [placeholder]="'library.untitled' | t"
       maxlength="200"
-      class="w-full bg-transparent text-[1.75rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary desktop:mb-2 desktop:text-[2.5rem] desktop:font-bold"
+      class="w-full bg-transparent text-[1.75rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary"
     />
+    }
 
     <!-- The text: blocks, written right on the page -->
     <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
