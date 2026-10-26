@@ -19,7 +19,7 @@
         type="button"
         [attr.aria-label]="'editor.grip' | t"
         [attr.aria-expanded]="blockMenu() === i"
-        class="absolute top-3 grid h-7 w-6 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
+        class="absolute top-3 grid h-7 w-6 desktop:top-0.5 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-7 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
         (pointerdown)="gripDown($event, i)"
         (pointermove)="gripMove($event, host)"
         (pointerup)="gripUp()"
@@ -28,10 +28,11 @@
         <app-icon name="grip" class="size-4.5" />
       </button>
 
-      <!-- (a card: set apart — a soft fill, round corners, room inside) -->
+      <!-- (a card: set apart — phones: a soft fill, round corners, room inside; desktops as the old
+           lesson's tasks: small corners, a hairline edge, nearly the page's white, snug) -->
       <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
       <div
-        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6"
+        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-lg desktop:border-[0.5px] desktop:border-separator desktop:bg-dialog/45 desktop:px-2 desktop:py-1"
         [class.outline-dashed]="item.private"
         [class.outline-1]="item.private"
         [class.outline-separator]="item.private"
@@ -43,7 +44,7 @@
         <div class="relative">
           <!-- (the same letters as the field's, over it: only the marks faded, links colored) -->
           <!-- prettier-ignore -->
-          <div aria-hidden="true" class="pointer-events-none absolute inset-0 text-body leading-relaxed break-words whitespace-pre-wrap">@for (k of marked(item.text); track $index) {<span [class.opacity-30]="k.kind === 'syntax'" [class.text-accent]="k.kind === 'link'">{{ k.t }}</span>}</div>
+          <div aria-hidden="true" class="pointer-events-none absolute inset-0 text-body leading-relaxed desktop:text-ui break-words whitespace-pre-wrap">@for (k of marked(item.text); track $index) {<span [class.opacity-30]="k.kind === 'syntax'" [class.text-accent]="k.kind === 'link'">{{ k.t }}</span>}</div>
           <textarea
             #field
             rows="1"
@@ -59,7 +60,7 @@
                   ? ((desktop ? 'editor.hint' : 'editor.hintPhone') | t)
                   : ''
             "
-            class="relative block w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
+            class="relative block w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed desktop:text-ui text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
           ></textarea>
         </div>
       </div>
@@ -202,7 +203,7 @@
        Assistant; under them, room to tap too -->
   <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col gap-3" (click)="typeAtEnd()">
     @if ((items().length > 1 || items()[0]?.text) && caret() === null) {
-      <span class="px-4 text-body text-fg-secondary/70">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
+      <span class="px-4 text-body text-fg-secondary/70 desktop:px-2 desktop:text-ui">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
     }
     <!-- (desktops: the assistant's in the page's head; a click here is a new text) -->
     <div class="flex items-center gap-2 desktop:hidden" (click)="$event.stopPropagation()">
@@ -319,11 +320,12 @@
 }
 
 
-<!-- Desktops: the caret between blocks — a line with its hint; what's typed (or pasted) is a new
-     block there; "/": the commands under it (a click on one, or ↑ ↓ Enter), what's after it filters them -->
+<!-- Desktops: the caret between blocks — an empty block with its hint; what's typed (or pasted) is
+     a new block there; a click on it or "/": the commands under it (a click on one, or ↑ ↓ Enter),
+     what's after "/" filters them -->
 <ng-template #caretLine>
-  <!-- (as an empty block: the same card, its hint in it — not a faint line fading in) -->
-  <div data-caret class="relative rounded-card bg-tint px-4 py-3 outline-1 outline-separator">
+  <!-- (as an empty block: the same card, its hint in it) -->
+  <div data-caret class="relative rounded-lg border-[0.5px] border-separator bg-dialog/45 px-2 py-1">
     <input
       #caretField
       data-caret-input
@@ -333,8 +335,9 @@
       (input)="caretTyped(caretField)"
       (keydown)="caretKey($event)"
       (paste)="caretPaste($event)"
+      (click)="caretMenu.set(true)"
       (blur)="caretLeft()"
-      class="block w-full bg-transparent text-body leading-relaxed text-fg outline-none placeholder:text-fg-secondary"
+      class="block w-full bg-transparent text-ui leading-relaxed text-fg outline-none placeholder:text-fg-secondary"
     />
     @if (caretMenu()) {
     <div
