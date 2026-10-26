@@ -60,7 +60,7 @@
                   ? ((desktop ? 'editor.hint' : 'editor.hintPhone') | t)
                   : ''
             "
-            class="relative block w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed desktop:text-ui text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
+            class="relative block w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed desktop:min-h-[2lh] desktop:text-ui text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
           ></textarea>
         </div>
       </div>
@@ -320,12 +320,11 @@
 }
 
 
-<!-- Desktops: the caret between blocks — an empty block with its hint; what's typed (or pasted) is
-     a new block there; a click on it or "/": the commands under it (a click on one, or ↑ ↓ Enter),
-     what's after "/" filters them -->
+<!-- Desktops: the caret between blocks — a line with its hint, the commands under it at once (a
+     click on one, or ↑ ↓ Enter; "/…" filters them); what's typed (or pasted) is a new block there -->
 <ng-template #caretLine>
-  <!-- (as an empty block: the same card, its hint in it) -->
-  <div data-caret class="relative rounded-lg border-[0.5px] border-separator bg-dialog/45 px-2 py-1">
+  <!-- (a line with its hint, no card yet) -->
+  <div data-caret class="relative px-2 py-0.5">
     <input
       #caretField
       data-caret-input

@@ -90,8 +90,8 @@ export class PageEditor {
   });
 
   // Desktops: the caret between blocks (a click between them, under the last): a line with its
-  // hint; what's typed or pasted there is a new block in that place; "/": the commands (what's
-  // after it filters them)
+  // hint, the commands at once (what's after a "/" filters them); what's typed or pasted there is
+  // a new block in that place
   protected readonly caret = signal<number | null>(null);
   protected readonly caretMenu = signal(false);
   protected readonly caretQuery = signal('');
@@ -184,7 +184,7 @@ export class PageEditor {
 
   private openCaret(at: number): void {
     this.caret.set(at);
-    this.caretMenu.set(false);
+    this.caretMenu.set(true);
     this.caretQuery.set('');
     this.caretActive.set(0);
     setTimeout(() => document.querySelector<HTMLInputElement>('app-page-editor [data-caret-input]')?.focus());
@@ -192,7 +192,6 @@ export class PageEditor {
 
   protected caretTyped(field: HTMLInputElement): void {
     const v = field.value;
-    this.caretMenu.set(v.startsWith('/'));
     if (v.startsWith('/') || !v) {
       this.caretQuery.set(v.slice(1));
       this.caretActive.set(0);
