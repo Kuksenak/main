@@ -5,7 +5,7 @@
   #panel
   role="dialog"
   aria-modal="true"
-  class="absolute inset-x-2.5 bottom-0 data-app:bottom-2.5 flex animate-sheet-up flex-col overflow-hidden rounded-[2.75rem] border-[0.5px] border-sheet-border bg-sheet
+  class="absolute inset-x-2.5 bottom-2.5 data-app:inset-x-1 data-app:bottom-1 flex animate-sheet-up flex-col overflow-hidden rounded-[2.75rem] border-[0.5px] border-sheet-border bg-sheet
          text-fg shadow-sheet backdrop-blur-[30px] backdrop-saturate-[180%] [corner-shape:squircle]
          max-h-[90%] data-tall:top-[calc(env(safe-area-inset-top)+1.75rem)] data-tall:max-h-none"
   [attr.data-tall]="tall() ? '' : null"
@@ -29,7 +29,7 @@
   <div
     #scroller
     class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5"
-    [style.padding-bottom]="area.keyboard() ? '0.75rem' : installed ? 'max(1.25rem, calc(env(safe-area-inset-bottom) - 0.625rem))' : 'calc(100lvh - ' + area.height() + 'px + max(1.5rem, env(safe-area-inset-bottom)))'"
+    [style.padding-bottom]="area.keyboard() ? '0.75rem' : 'max(1.25rem, calc(env(safe-area-inset-bottom) - 0.25rem))'"
   >
     <ng-content />
   </div>
