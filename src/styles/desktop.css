@@ -17,7 +17,7 @@
   /* The UI kit (core/ui): 14px text, thin 18px icons, 32 tall buttons with no fill */
   --font-ui: 0.875rem;
   --icon-ui: 1.125rem;
-  --button-h: 2rem;
+  --button-h: 1.75rem; /* 28px, as Notion's */
   --button-px: 0.5rem;
   --button-label-max: 15rem; /* (a longer label ends in …) */
   --round-button: 0.375rem;
