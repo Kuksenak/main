@@ -2,8 +2,7 @@ import { Directive, ElementRef, OnDestroy, inject, input } from '@angular/core';
 
 /**
  * A hover hint, as Notion's (desktops; not the browser's title): a small dark label by the
- * element — `uiTip="**Drag** to move"`: `**words**` white, the rest faded; a line break (\n): a
- * new line. `tipSide`: where it shows (flipped when there's no room). Shown after a short pause on
+ * element — `uiTip="Drag to move"`, all in one color; a line break (\n): a new line. `tipSide`: where it shows (flipped when there's no room). Shown after a short pause on
  * hover; gone on leaving, a press or scrolling. Not on touch screens.
  */
 @Directive({
@@ -45,17 +44,10 @@ export class UiTip implements OnDestroy {
     tip.className =
       'pointer-events-none fixed z-[3000] max-w-60 animate-menu-in rounded-button bg-toast px-2 py-1 text-center text-tip leading-snug font-medium text-toast-text shadow-toast';
     tip.setAttribute('role', 'tooltip');
+    // (one color; a line break: a new line)
     text.split('\n').forEach((line) => {
       const row = document.createElement('div');
-      // (**words** white, the rest faded — "**Drag** to move")
-      line.split(/(\*\*[^*]+\*\*)/).forEach((part) => {
-        if (!part) return;
-        const span = document.createElement('span');
-        const strong = part.startsWith('**') && part.endsWith('**');
-        span.textContent = strong ? part.slice(2, -2) : part;
-        if (!strong) span.className = 'opacity-60';
-        row.appendChild(span);
-      });
+      row.textContent = line;
       tip.appendChild(row);
     });
     document.body.appendChild(tip);
