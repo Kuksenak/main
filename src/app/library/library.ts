@@ -10,7 +10,7 @@ import { LibraryStore, PageItem } from './library.store';
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
- * Desktop: New page at the top; phones: + floating at the bottom right (Trash: a section of its own).
+ * Desktop: New page at the top; phones: + floating at the bottom right (Trash: the account's sheet).
  */
 @Component({
   selector: 'app-library',

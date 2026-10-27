@@ -14,7 +14,7 @@ export interface Place {
   area?: Area;
   /** Shown when any of these may be read (e.g. Favorites: the library's pages — people later). */
   anyOf?: Area[];
-  /** Phones only (desktops show it otherwise — Favorites: the sidebar's folding group; Trash: its window). */
+  /** Phones only (desktops show it otherwise — Favorites: the sidebar's folding group). */
   phone?: boolean;
 }
 
@@ -24,7 +24,6 @@ export const PLACES: Place[] = [
   { path: '/schedule', label: 'nav.schedule', icon: 'calendar', area: 'schedule' },
   { path: '/library', label: 'nav.library', icon: 'library', area: 'library' },
   { path: '/favorites', label: 'nav.favorites', icon: 'bookmark', anyOf: ['library'], phone: true },
-  { path: '/trash', label: 'trash.title', icon: 'trash', area: 'library', phone: true },
 ];
 
 /** The sections this user may see. */

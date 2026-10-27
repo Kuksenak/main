@@ -41,11 +41,6 @@ export const routes: Routes = [
         loadComponent: () => import('./favorites/favorites').then((m) => m.Favorites),
         canActivate: [areaGuard('library')],
       },
-      {
-        path: 'trash',
-        loadComponent: () => import('./library/trash').then((m) => m.Trash),
-        canActivate: [areaGuard('library')],
-      },
       { path: 'users', loadComponent: () => import('./users/users').then((m) => m.Users), canActivate: [adminGuard] },
     ],
   },

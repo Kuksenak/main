@@ -36,6 +36,12 @@
             <app-users-list (picked)="openUser($event)" />
           }
         }
+        <!-- (the trash's code: downloaded only now, as the users') -->
+        @case ('trash') {
+          @defer (on immediate) {
+            <app-trash-list />
+          }
+        }
         @case ('user') {
           @defer (on immediate) {
             <app-user-card [userId]="userId()!" />
@@ -56,11 +62,15 @@
         }
       </ui-list>
 
-      <!-- Users (the admins only: their list slides in, a user tapped: their card); the language (the
+      <!-- Users (the admins only: their list slides in, a user tapped: their card); Trash (its pages slide
+           in); the language (the
            current one in gray, ›: its list slides in) -->
       <ui-list>
         @if (auth.isAdmin()) {
           <button type="button" uiListItem icon="lock" chevron (click)="open('users')">{{ 'users.title' | t }}</button>
+        }
+        @if (auth.can('library')) {
+          <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
         }
         <button type="button" uiListItem icon="globe" chevron (click)="open('language')">
           {{ 'account.language' | t }}
