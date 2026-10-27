@@ -16,16 +16,18 @@
       <!-- (the start page: current only on itself) -->
       <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
     }
-    <!-- Favorites (the library's pages starred): their names under a small gray title -->
-    @if (favorites().length) {
-      <p class="px-side-row-x pt-4 pb-1 text-footnote font-medium text-fg-secondary">{{ 'library.favorites' | t }}</p>
-      @for (page of favorites(); track page.id) {
-        <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]">{{ page.title }}</a>
+    <!-- Favorites (the library's pages starred): their names under a small gray title — only they
+         scroll (Search, the places and Trash stay), fading out at the bottom -->
+    <div class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto px-3 pb-4 [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)]">
+      @if (favorites().length) {
+        <p class="px-side-row-x pt-4 pb-1 text-footnote font-medium text-fg-secondary">{{ 'library.favorites' | t }}</p>
+        @for (page of favorites(); track page.id) {
+          <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]">{{ page.title }}</a>
+        }
       }
-    }
+    </div>
     <!-- Trash, at the bottom of the list: its window at it -->
     @if (library()) {
-      <span class="flex-1"></span>
       <button
         uiSidebarItem
         #trashBtn
