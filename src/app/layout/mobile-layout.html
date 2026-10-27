@@ -10,7 +10,8 @@
     [style.top.px]="area.top()"
     class="pointer-events-none fixed inset-x-0 z-30 flex items-center gap-2 bg-linear-to-b from-app from-60% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5 *:pointer-events-auto"
   >
-    <!-- A page opened from a list: ‹ back to it, the title smaller next to it -->
+    <!-- A page opened from a list: ‹ back to it, the title smaller in the middle (as a sheet's page:
+         Users, Language), its own ⋯ at the right (none: room as wide, the title kept in the middle) -->
     @if (back(); as to) {
       <a
         uiFloatingButton
@@ -21,7 +22,7 @@
       >
         <app-icon name="chevron-left" class="-ml-0.5 size-8" />
       </a>
-      <span class="min-w-0 flex-1 truncate text-body font-semibold" data-vt="page-title">{{
+      <span class="min-w-0 flex-1 truncate text-center text-body font-semibold" data-vt="page-title">{{
         title()
       }}</span>
       <!-- (the page's own ⋯, at the right) -->
@@ -29,6 +30,8 @@
         <button type="button" uiFloatingButton round (click)="open()" [attr.aria-label]="'library.more' | t">
           <app-icon name="dots" class="size-7" />
         </button>
+      } @else {
+        <span class="w-round shrink-0"></span>
       }
     } @else {
       <!-- A section: a pill with its icon and name, ▾ — the shared select (phones: the system's own

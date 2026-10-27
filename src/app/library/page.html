@@ -83,9 +83,8 @@
       <!-- The text: blocks, written right on the page -->
       <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
     } @else {
-      <!-- Phones: read only, as it'd be read — the title, the blocks (cards; "only for me": a lock, a
-           dashed edge); what can be done with it: the top bar's ⋯ -->
-      <h1 class="text-[1.75rem] leading-tight font-semibold">{{ title() || ('library.untitled' | t) }}</h1>
+      <!-- Phones: read only, as it'd be read — the blocks (cards; "only for me": a lock, a dashed edge);
+           its title: the top bar's; what can be done with it: the top bar's ⋯ -->
       @for (block of p.blocks; track $index) {
         <div
           class="relative rounded-card bg-tint px-4 py-3 text-body leading-relaxed break-words whitespace-pre-wrap"
