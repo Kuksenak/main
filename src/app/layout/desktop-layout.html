@@ -55,7 +55,7 @@
         <ui-menu [origin]="trashBtn.element" (closed)="trashOpen.set(false)">
           <div class="flex w-[26rem] max-w-full flex-col p-1">
             <p class="px-2 pt-1 pb-2 text-ui font-medium">{{ 'trash.title' | t }}</p>
-            <app-trash-list />
+            <app-trash-list (restored)="trashOpen.set(false)" />
           </div>
         </ui-menu>
       }

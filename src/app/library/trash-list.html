@@ -1,5 +1,5 @@
 <!-- The pages in the trash: each its name, when it was thrown away; Restore and Delete forever at its
-     right (desktops: under the pointer); under them, Empty trash (both asked first: they can't be undone) -->
+     right (desktops: under the pointer; phones: as big as the round buttons); under them, Empty trash (both asked first: they can't be undone) -->
 @if (store.trash(); as items) {
   @if (!items.length) {
     <p class="py-10 text-center text-ui text-fg-secondary mobile:text-body">{{ 'trash.empty' | t }}</p>
@@ -17,7 +17,8 @@
               uiButton
               type="button"
               icon="update"
-              (click)="store.restore(item.id)"
+              (click)="restore(item.id)"
+              class="mobile:size-11!"
               [uiTip]="'trash.restore' | t"
               [attr.aria-label]="'trash.restore' | t"
             ></button>
@@ -26,6 +27,7 @@
               type="button"
               icon="trash"
               (click)="deleteForever(item.id, $event)"
+              class="mobile:size-11!"
               [uiTip]="'trash.deleteForever' | t"
               [attr.aria-label]="'trash.deleteForever' | t"
             ></button>

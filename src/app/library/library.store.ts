@@ -122,12 +122,13 @@ export class LibraryStore {
     });
   }
 
-  /** Out of the trash, back in the library. */
-  restore(id: string): void {
+  /** Out of the trash, back in the library (`done`: then — the trash's list opens it). */
+  restore(id: string, done?: () => void): void {
     this.http.post<PageItem>(`${this.trashUrl}/${id}/restore`, {}).subscribe({
       next: (item) => {
         this.trash.update((items) => items?.filter((x) => x.id !== id) ?? null);
         this.items.update((items) => (items ? [item, ...items.filter((x) => x.id !== id)].sort(byChanged) : items));
+        done?.();
       },
       error: () => this.toasts.error(this.i18n.t('trash.restoreError')),
     });

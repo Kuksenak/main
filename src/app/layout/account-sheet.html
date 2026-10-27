@@ -1,4 +1,4 @@
-<ui-sheet [tall]="true" (closed)="closed.emit()">
+<ui-sheet #sheet [tall]="true" (closed)="closed.emit()">
   <!-- A page in the sheet: in its head ‹ back and its name; it slides in (back to it: from the left —
        Slide: the head's ‹ and name and the page below are marked for it) -->
   @if (page()) {
@@ -39,7 +39,8 @@
         <!-- (the trash's code: downloaded only now, as the users') -->
         @case ('trash') {
           @defer (on immediate) {
-            <app-trash-list />
+            <!-- (a page restored: opened — the sheet gone) -->
+            <app-trash-list (restored)="sheet.close()" />
           }
         }
         @case ('user') {
@@ -62,20 +63,19 @@
         }
       </ui-list>
 
-      <!-- Users (the admins only: their list slides in, a user tapped: their card); Trash (its pages slide
-           in); the language (the
-           current one in gray, ›: its list slides in) -->
+      <!-- Users (the admins only: their list slides in, a user tapped: their card); the language (the
+           current one in gray, ›: its list slides in); Trash last (its pages slide in) -->
       <ui-list>
         @if (auth.isAdmin()) {
           <button type="button" uiListItem icon="lock" chevron (click)="open('users')">{{ 'users.title' | t }}</button>
-        }
-        @if (auth.can('library')) {
-          <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
         }
         <button type="button" uiListItem icon="globe" chevron (click)="open('language')">
           {{ 'account.language' | t }}
           <span itemValue class="text-fg-secondary">{{ language() }}</span>
         </button>
+        @if (auth.can('library')) {
+          <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
+        }
       </ui-list>
 
       <div class="mt-auto flex flex-col gap-3">
