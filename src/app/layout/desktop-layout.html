@@ -19,20 +19,13 @@
     <!-- Favorites (the library's pages starred): their names under a small gray title — only they
          scroll (Search, the places and Trash stay), fading out at the bottom; scrolled (as the old
          app's): a hairline over them, their top fading under it too; a thin thumb -->
-    <!-- (its title stays put over them; a click folds them away / back — ⌄ by it under the pointer,
-         as the old app's) -->
+    <!-- (its row stays put over them, as a place's: ☆, the name, ⌄ / ⌃ — a click folds them away /
+         back) -->
     @if (favorites().length) {
-      <button
-        type="button"
-        (click)="toggleFavs()"
-        [attr.aria-expanded]="!favsFolded()"
-        class="group/fav mt-3 flex h-7 shrink-0 items-center gap-1 rounded-side-row px-side-row-x text-left text-footnote font-medium text-fg-secondary outline-none hover:bg-side-hover focus-visible:bg-side-hover"
-      >
+      <!-- (open: data-open, not aria-expanded — that one's look is a row whose window is open) -->
+      <button uiSidebarItem icon="star" (click)="toggleFavs()" [attr.data-open]="favsFolded() ? null : ''" class="group/fav mt-1 shrink-0">
         {{ 'library.favorites' | t }}
-        <app-icon
-          name="chevron-down"
-          class="size-3.5 opacity-0 transition-[opacity,rotate] group-hover/fav:opacity-70 group-focus-visible/fav:opacity-70 group-aria-[expanded=false]/fav:-rotate-90 group-aria-[expanded=false]/fav:opacity-70"
-        />
+        <app-icon itemEnd name="chevron-down" class="size-4 text-icon transition-[rotate] group-data-open/fav:rotate-180" />
       </button>
     }
     <div

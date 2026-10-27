@@ -9,7 +9,8 @@ const ROW =
   'aria-expanded:bg-side-on';
 const TEMPLATE = `
   <app-icon [name]="icon()" colored class="size-icon-side text-icon" />
-  <span class="min-w-0 truncate"><ng-content /></span>
+  <span class="min-w-0 flex-1 truncate"><ng-content /></span>
+  <ng-content select="[itemEnd]" />
 `;
 
 /**
@@ -39,7 +40,8 @@ export class UiSidebarItem {
   }
 }
 
-/** A row of the sidebar that's a button, not a place (e.g. Trash, opening its window): the same look. */
+/** A row of the sidebar that's a button, not a place (e.g. Trash, opening its window; Favorites, folding
+ * its pages): the same look; `itemEnd` at its right (e.g. a ⌄). */
 @Component({
   selector: 'button[uiSidebarItem]',
   imports: [Icon],
