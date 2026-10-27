@@ -43,8 +43,9 @@ export class Toasts {
 
 /**
  * Where the toasts show, dark and solid as iOS's / Telegram's (white words, a soft shadow) — phones: a capsule each at the bottom,
- * by the thumb, just over the floating buttons (+, Today), as wide as the screen; one line: a
- * capsule, more: a card, round as it (with the keyboard up: just over it); desktops: a card each in the bottom right
+ * a bar as wide as the
+ * screen (its side margins the floating buttons'), on their line — over them, a little see-through;
+ * the words at its left, wrapped (with the keyboard up: just over it); desktops: a card each in the bottom right
  * corner, as wide as the sidebar, its words wrapped; more than fit in 80% of the screen's height:
  * they scroll.
  */
@@ -63,7 +64,7 @@ export class Toasts {
       <div
         role="status"
         class="pointer-events-auto flex max-w-full shrink-0 animate-menu-in gap-2.5 bg-toast py-2.5 pr-2 pl-4 text-toast-text shadow-toast backdrop-blur-[20px]
-               mobile:items-center mobile:rounded-[1.375rem] mobile:text-body desktop:items-start desktop:rounded-menu desktop:text-ui"
+               mobile:min-h-round mobile:w-full mobile:items-center mobile:rounded-[1.375rem] mobile:bg-toast/85 mobile:text-body desktop:items-start desktop:rounded-menu desktop:text-ui"
         [class.pr-4]="!toast.action"
         (click)="toasts.dismiss(toast.id)"
       >
@@ -84,12 +85,12 @@ export class UiToasts {
   protected readonly toasts = inject(Toasts);
   protected readonly area = inject(VisibleArea);
 
-  // (phones: over the floating buttons; the keyboard up: over it — what's under the seen part)
+  // (phones: the floating buttons' line; the keyboard up: over it — what's under the seen part)
   protected readonly bottom = computed(() => {
     if (desktop) return null;
     const keyboard = this.area.keyboard();
     return keyboard
       ? `${window.innerHeight - this.area.top() - this.area.height() + 12}px`
-      : 'calc(max(0.75rem, calc(env(safe-area-inset-bottom) - 0.25rem)) + var(--round-h) + 0.625rem)';
+      : 'max(0.75rem, calc(env(safe-area-inset-bottom) - 0.25rem))';
   });
 }
