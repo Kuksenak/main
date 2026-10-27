@@ -19,12 +19,6 @@
         }
       </ui-list>
     }
-    <!-- Phones: Trash, under the pages — its sheet (desktops: the sidebar's) -->
-    @if (!desktop) {
-      <ui-list>
-        <button type="button" uiListItem icon="trash" (click)="trashOpen.set(true)" [chevron]="true">{{ 'trash.title' | t }}</button>
-      </ui-list>
-    }
   }
 </div>
 
@@ -41,10 +35,3 @@
 >
   <app-icon name="plus" class="size-8" />
 </button>
-
-@if (trashOpen()) {
-  <ui-sheet [tall]="true" (closed)="trashOpen.set(false)">
-    <span sheetHead class="text-body font-semibold">{{ 'trash.title' | t }}</span>
-    <app-trash-list />
-  </ui-sheet>
-}
