@@ -71,8 +71,8 @@
     }
   </header>
   <!-- (from the screen's top: what's scrolled goes on under the top bar, seen through it paler — not
-       cut off at a line under its buttons, as a sheet's under its head; at the bottom fading out under
-       the floating buttons and the home indicator; its scroll bar only on what's seen; clipping the
+       cut off at a line under its buttons, as a sheet's under its head; at the bottom as it is (a fade there
+       faded the floating buttons too: they're in the page); its scroll bar only on what's seen; clipping the
        next page as it slides in) -->
   <main
     #main
@@ -80,7 +80,7 @@
     [barTop]="barTop()"
     [barBottom]="30"
     class="absolute inset-x-0 top-0 bottom-0 min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain pt-[calc(env(safe-area-inset-top)+3.75rem)]
-           [mask-image:linear-gradient(to_bottom,transparent_env(safe-area-inset-top),rgb(0_0_0/0.08)_calc(env(safe-area-inset-top)+1.5rem),rgb(0_0_0/0.35)_calc(env(safe-area-inset-top)+2.75rem),black_calc(env(safe-area-inset-top)+3.75rem),black_calc(100%-env(safe-area-inset-bottom)-1.5rem),transparent_100%)]"
+           [mask-image:linear-gradient(to_bottom,transparent_env(safe-area-inset-top),rgb(0_0_0/0.08)_calc(env(safe-area-inset-top)+1.5rem),rgb(0_0_0/0.35)_calc(env(safe-area-inset-top)+2.75rem),black_calc(env(safe-area-inset-top)+3.75rem))]"
     data-vt="page"
   >
     <router-outlet (activate)="entered()" />
