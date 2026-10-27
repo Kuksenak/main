@@ -55,7 +55,6 @@
         <button type="button" uiMenuItem icon="trash" danger (click)="delete()">{{ 'library.moveToTrash' | t }}</button>
         <ui-menu-separator />
         <div class="flex flex-col px-menu-label-x py-1 text-caption leading-snug text-fg-secondary">
-          <span>{{ 'library.blocks' | t }}: {{ blockCount() }}</span>
           <span>{{ 'library.edited' | t }} {{ when(p.updatedAt) }}</span>
           <span>{{ 'library.created' | t }} {{ when(p.createdAt) }}</span>
         </div>
@@ -135,7 +134,7 @@
 
 <!-- Phones: the page's ⋯ (the top bar) — a sheet as the account's: its title in the head, the actions
      on cards (as iOS's grouped lists) — keeping it, its link, a copy; the trash on a card of its own;
-     under them in gray: how many blocks, when it was edited, made -->
+     under them in gray: when it was edited, made -->
 @if (!desktop && actionsOpen() && page(); as p) {
   <ui-sheet #actions (closed)="actionsOpen.set(false)">
     <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold">{{ title() || ('library.untitled' | t) }}</span>
@@ -167,7 +166,6 @@
       </ui-list>
 
       <div class="flex flex-col items-center gap-0.5 text-footnote text-fg-secondary">
-        <span>{{ 'library.blocks' | t }}: {{ p.blocks.length }}</span>
         <span>{{ 'library.edited' | t }} {{ when(p.updatedAt) }}</span>
         <span>{{ 'library.created' | t }} {{ when(p.createdAt) }}</span>
       </div>
