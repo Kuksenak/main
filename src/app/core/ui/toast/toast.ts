@@ -42,10 +42,10 @@ export class Toasts {
 }
 
 /**
- * Where the toasts show, dark and solid as iOS's / Telegram's (white words, a soft shadow) — phones: a capsule each at the bottom,
- * a bar as wide as the
- * screen (its side margins the floating buttons'), on their line — over them, a little see-through;
- * the words at its left, wrapped (with the keyboard up: just over it); desktops: a card each in the bottom right
+ * Where the toasts show, dark as iOS's / Telegram's (white words, a soft shadow) — phones: a bar as
+ * wide as the screen at the bottom (its side margins the floating buttons'), on their line — over
+ * them, a little see-through; the words at its left, wrapped (with the keyboard up: just over it);
+ * desktops: a card each in the bottom right
  * corner, as wide as the sidebar, its words wrapped; more than fit in 80% of the screen's height:
  * they scroll.
  */
