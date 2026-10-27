@@ -50,7 +50,7 @@ export class UiSheet {
   protected readonly topH = signal(0);
   protected readonly topMask = computed(() => {
     const h = this.topH();
-    return h ? `linear-gradient(to bottom, rgb(0 0 0 / 0.25) 17px, rgb(0 0 0 / 0.4) ${h - 20}px, black ${h}px)` : null;
+    return h ? `linear-gradient(to bottom, transparent 10px, rgb(0 0 0 / 0.12) ${h / 2}px, rgb(0 0 0 / 0.2) ${h - 16}px, black ${h}px)` : null;
   });
 
   constructor() {
