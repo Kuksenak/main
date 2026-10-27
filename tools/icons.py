@@ -95,8 +95,8 @@ ICONS = {
     'duplicate': fill(BEIGE, 'M23.4 22.6 50.2 22.4 50.4 52.6 23.6 52.8z')
                  + line('M17.8 41.2 15.6 41.2C13.2 41.2 11.6 39.6 11.6 37.2L11.8 15.4C11.8 13 13.4 11.4 15.8 11.4L37.4 11.6C39.8 11.6 41.4 13.2 41.4 15.6L41.4 17.6')
                  + line('M27.4 22.6 46.2 22.4C48.6 22.4 50.2 24 50.2 26.4L50.4 48.6C50.4 51 48.8 52.6 46.4 52.6L27.6 52.8C25.2 52.8 23.6 51.2 23.6 48.8L23.4 26.6C23.4 24.2 25 22.6 27.4 22.6z'),
-    # a favorite (a page bookmarked): a bookmark ribbon (rose), its tail cut in
-    'bookmark': fill(ROSE, 'M17.6 11.8 46.4 11.6 46.6 53.4 32.2 42.8 17.8 53.6z')
+    # a favorite (a page bookmarked): a bookmark ribbon (teal), its tail cut in
+    'bookmark': fill(TEAL, 'M17.6 11.8 46.4 11.6 46.6 53.4 32.2 42.8 17.8 53.6z')
                 + line('M21.4 11.6 42.6 11.4C45 11.4 46.4 12.8 46.4 15.2L46.6 53.4 32.2 42.8 17.8 53.6 17.6 15.4C17.6 13 19 11.6 21.4 11.6z'),
     # the AI: a sparkle (yellow) — a four-pointed star, its sides curving in, a small one by it
     'sparkle': fill(YELLOW, 'M28.4 10.6C30 21 33.6 25.6 45.8 28.4 33.8 31.2 30.2 35.8 28.6 47.4 26.8 35.8 23.2 31.2 11.4 28.6 23.4 25.8 26.8 21.2 28.4 10.6z')
