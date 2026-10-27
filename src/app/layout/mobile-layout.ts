@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
@@ -7,7 +7,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
 import { VisibleArea } from '../core/services/visible-area';
-import { Icon, UiFloatingButton, UiOption, UiSelect } from '../core/ui';
+import { Icon, UiFloatingButton, UiOption, UiScrollBar, UiSelect } from '../core/ui';
 import { AccountSheet } from './account-sheet';
 import { PageTitle } from './page-title';
 import { visiblePlaces } from './places';
@@ -20,7 +20,7 @@ import { SearchBar } from './search-bar';
  */
 @Component({
   selector: 'app-mobile-layout',
-  imports: [AccountSheet, Icon, RouterLink, RouterOutlet, SearchBar, TranslatePipe, UiFloatingButton, UiSelect],
+  imports: [AccountSheet, Icon, RouterLink, RouterOutlet, SearchBar, TranslatePipe, UiFloatingButton, UiScrollBar, UiSelect],
   templateUrl: './mobile-layout.html',
 })
 export class MobileLayout {
@@ -33,6 +33,10 @@ export class MobileLayout {
   protected readonly menu = this.page.menu;
   protected readonly area = inject(VisibleArea);
   protected readonly searchBar = viewChild.required(SearchBar);
+  // (the scroll bar from under the top bar: as far down as the page's room for it)
+  private readonly main = viewChild.required<ElementRef<HTMLElement>>('main');
+  protected readonly barTop = signal(0);
+  private readonly measured = afterNextRender(() => this.barTop.set(parseFloat(getComputedStyle(this.main().nativeElement).paddingTop) || 0));
   protected readonly accountOpen = signal(false);
   // (the account button: the email's first letter)
   protected readonly initial = computed(() => (this.auth.email() ?? '?').charAt(0));

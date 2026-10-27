@@ -1,6 +1,7 @@
 import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { refreshThemeColor } from '../../services/theme-color';
 import { VisibleArea } from '../../services/visible-area';
+import { UiScrollBar } from '../scroll-bar/scroll-bar';
 
 /**
  * Phones: a sheet from the bottom (as iOS 26's): see-through glass over a strong blur, big round
@@ -28,6 +29,7 @@ import { VisibleArea } from '../../services/visible-area';
     '[style.top.px]': 'area.top()',
     '[style.height.px]': 'area.height()',
   },
+  imports: [UiScrollBar],
   templateUrl: './sheet.html',
 })
 export class UiSheet {
@@ -50,7 +52,7 @@ export class UiSheet {
   protected readonly topH = signal(0);
   protected readonly topMask = computed(() => {
     const h = this.topH();
-    return h ? `linear-gradient(to bottom, transparent 10px, rgb(0 0 0 / 0.12) ${h / 2}px, rgb(0 0 0 / 0.2) ${h - 16}px, black ${h}px)` : null;
+    return h ? `linear-gradient(to bottom, transparent 8px, rgb(0 0 0 / 0.08) ${h * 0.4}px, rgb(0 0 0 / 0.35) ${h * 0.75}px, black ${h}px)` : null;
   });
 
   constructor() {

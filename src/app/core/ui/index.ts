@@ -11,6 +11,7 @@ export { UiFloatingButton } from './floating-button/floating-button';
 export { UiList } from './list/list';
 export { UiListItem } from './list/list-item';
 export { UiSheet } from './sheet/sheet';
+export { UiScrollBar } from './scroll-bar/scroll-bar';
 export { UiToggle } from './toggle/toggle';
 export { Toasts, UiToasts, type Toast } from './toast/toast';
 export { Confirm, type ConfirmAsk } from './confirm/confirm';
