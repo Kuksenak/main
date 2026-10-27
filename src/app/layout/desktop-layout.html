@@ -19,11 +19,11 @@
     <!-- Favorites (the library's pages starred): their names under a small gray title — only they
          scroll (Search, the places and Trash stay), fading out at the bottom; scrolled (as the old
          app's): a hairline over them, their top fading under it too; a thin thumb -->
-    <!-- (its row stays put over them, as a place's: ☆, the name, ⌄ / ⌃ — a click folds them away /
+    <!-- (its row stays put over them, as a place's: 🔖, the name, ⌄ / ⌃ — a click folds them away /
          back) -->
     @if (favorites().length) {
       <!-- (open: data-open, not aria-expanded — that one's look is a row whose window is open) -->
-      <button uiSidebarItem icon="star" (click)="toggleFavs()" [attr.data-open]="favsFolded() ? null : ''" class="group/fav shrink-0">
+      <button uiSidebarItem icon="bookmark" (click)="toggleFavs()" [attr.data-open]="favsFolded() ? null : ''" class="group/fav shrink-0">
         {{ 'library.favorites' | t }}
         <app-icon itemEnd name="chevron-down" class="size-4 text-icon transition-[rotate] group-data-open/fav:rotate-180" />
       </button>

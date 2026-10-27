@@ -1,5 +1,5 @@
 <!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): the page's name at the left; saving…, Publish, ☆, ⋯ (its menu: the assistant…) at the right -->
+     Notion's): the page's name at the left; saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
 @if (desktop && page(); as p) {
   <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app px-3">
     <span class="mr-2 min-w-0 flex-1 truncate px-1.5 text-ui text-fg">{{ title() || ('library.untitled' | t) }}</span>
@@ -21,11 +21,11 @@
     } @else {
       <button uiButton type="button" icon="globe" (click)="share(true)" [uiTip]="'library.publishTip' | t">{{ 'library.publish' | t }}</button>
     }
-    <!-- ☆: in the favorites (the sidebar's) or not -->
+    <!-- 🔖: in the favorites (the sidebar's) or not -->
     <button
       uiButton
       type="button"
-      [icon]="'star'"
+      [icon]="'bookmark'"
       [outline]="!p.favorite"
       (click)="favorite()"
       [attr.aria-pressed]="p.favorite"
@@ -88,7 +88,7 @@
     <!-- Phones: at the bottom — a favorite, publish (published: copy its link, unpublish), to the trash -->
     @if (!desktop) {
       <div class="flex flex-wrap gap-2">
-        <button uiButton type="button" icon="star" [outline]="!p.favorite" (click)="favorite()">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
+        <button uiButton type="button" icon="bookmark" [outline]="!p.favorite" (click)="favorite()">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
         @if (p.shareToken) {
           <button uiButton type="button" icon="link" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
           <button uiButton type="button" icon="lock" (click)="share(false)">{{ 'library.unpublish' | t }}</button>

@@ -15,7 +15,7 @@
         <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'library.favorites' | t }}</span>
         <ui-list>
           @for (item of favorites(); track item.id) {
-            <button type="button" uiListItem icon="star" (click)="open(item)" [chevron]="true">
+            <button type="button" uiListItem icon="bookmark" (click)="open(item)" [chevron]="true">
               {{ item.title }}
               <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
             </button>
