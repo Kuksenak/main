@@ -57,7 +57,9 @@ export class PageView {
   private saveSub: Subscription | null = null;
 
   constructor() {
-    inject(PageTitle).show(computed(() => this.title() || this.i18n.t('library.untitled')), '/library');
+    // (‹ back where it was opened from: the library, or Favorites)
+    const back = (history.state as { back?: string } | null)?.back ?? '/library';
+    inject(PageTitle).show(computed(() => this.title() || this.i18n.t('library.untitled')), back);
     // (leaving with a change not saved yet: saved now)
     inject(DestroyRef).onDestroy(() => this.flush());
     // (the app about to reload — a theme switch, index.html: saved now)

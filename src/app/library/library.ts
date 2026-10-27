@@ -11,8 +11,8 @@ import { TrashList } from './trash-list';
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
- * Desktop: New page at the top; phones: + floating at the bottom right, the favorites first (a card
- * of their own), Trash under the pages (its sheet).
+ * Desktop: New page at the top; phones: + floating at the bottom right, Trash under the pages (its
+ * sheet).
  */
 @Component({
   selector: 'app-library',
@@ -27,7 +27,6 @@ export class Library {
   protected readonly desktop = desktop;
   protected readonly creating = signal(false);
   protected readonly trashOpen = signal(false);
-  protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   private readonly toasts = inject(Toasts);
 
   constructor() {
