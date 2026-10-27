@@ -6,28 +6,10 @@
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
     }
-    <!-- Publish: its public link made (and copied); published: "Published" (its menu: preview, copy
-         the link, unpublish) and the link's own button (copied at a click), as Notion's Share -->
+    <!-- Publish: its public link made (and copied); published: Unpublish (a lock) and the link's own
+         button (copied at a click), as Notion's Share; Preview: in ⋯ -->
     @if (p.shareToken) {
-      <button
-        uiButton
-        #shareBtn
-        type="button"
-        icon="globe"
-        (click)="shareOpen.set(!shareOpen())"
-        [attr.aria-expanded]="shareOpen()"
-        [uiTip]="shareOpen() ? null : ('library.publishedTip' | t)"
-      >
-        {{ 'library.published' | t }}
-      </button>
-      @if (shareOpen()) {
-        <ui-menu narrow [origin]="shareBtn.element" (closed)="shareOpen.set(false)">
-          <button type="button" uiMenuItem icon="page" (click)="openLink()">{{ 'library.preview' | t }}</button>
-          <button type="button" uiMenuItem icon="link" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
-          <ui-menu-separator />
-          <button type="button" uiMenuItem icon="lock" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
-        </ui-menu>
-      }
+      <button uiButton type="button" icon="lock" (click)="share(false)" [uiTip]="'library.unpublishTip' | t">{{ 'library.unpublish' | t }}</button>
       <button
         uiButton
         type="button"
@@ -64,6 +46,9 @@
       <!-- The assistant; Duplicate, Copy / Paste content; Move to trash; how many blocks, when edited, made -->
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
         <button type="button" uiMenuItem icon="sparkle" (click)="aiOpen.set(true)">{{ 'editor.ai' | t }}</button>
+        @if (p.shareToken) {
+          <button type="button" uiMenuItem icon="eye" (click)="openLink()">{{ 'library.preview' | t }}</button>
+        }
         <ui-menu-separator />
         <button type="button" uiMenuItem icon="plus" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
         <button type="button" uiMenuItem icon="page" (click)="copyContent()" [disabled]="!blockCount()">{{ 'library.copyContent' | t }}</button>

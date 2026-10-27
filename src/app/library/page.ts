@@ -48,7 +48,6 @@ export class PageView {
   protected readonly desktop = desktop;
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
-  protected readonly shareOpen = signal(false);
   protected readonly blockCount = signal(0);
   protected readonly editor = viewChild(PageEditor);
 
