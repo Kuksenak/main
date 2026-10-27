@@ -43,7 +43,7 @@
       [uiTip]="menuOpen() ? null : ('library.moreTip' | t)"
     ></button>
     @if (menuOpen()) {
-      <!-- The assistant; Duplicate, Copy / Paste content; Move to trash; how many blocks, when edited, made -->
+      <!-- The assistant; Duplicate, Copy / Paste content; Move to trash; when edited, made -->
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
         <button type="button" uiMenuItem icon="sparkle" (click)="aiOpen.set(true)">{{ 'editor.ai' | t }}</button>
         <button type="button" uiMenuItem icon="popout" (click)="preview()">{{ 'library.preview' | t }}</button>
