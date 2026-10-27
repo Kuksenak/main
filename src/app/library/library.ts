@@ -3,18 +3,20 @@ import { Router } from '@angular/router';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, Toasts, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
+import { Icon, Toasts, UiButton, UiFloatingButton, UiList, UiListItem, UiSheet } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
+import { TrashList } from './trash-list';
 
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
- * Desktop: New page at the top; phones: + floating at the bottom right.
+ * Desktop: New page at the top; phones: + floating at the bottom right, the favorites first (a card
+ * of their own), Trash under the pages (its sheet).
  */
 @Component({
   selector: 'app-library',
-  imports: [Icon, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem],
+  imports: [Icon, TranslatePipe, TrashList, UiButton, UiFloatingButton, UiList, UiListItem, UiSheet],
   templateUrl: './library.html',
 })
 export class Library {
@@ -24,6 +26,8 @@ export class Library {
 
   protected readonly desktop = desktop;
   protected readonly creating = signal(false);
+  protected readonly trashOpen = signal(false);
+  protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   private readonly toasts = inject(Toasts);
 
   constructor() {

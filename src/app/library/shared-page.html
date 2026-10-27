@@ -1,0 +1,15 @@
+<!-- A published page, for anyone with its link: its title and its blocks (as on the page — cards),
+     read only; no sign-in, no sidebar -->
+<div class="min-h-full bg-app text-fg">
+  <div class="mx-auto flex max-w-3xl flex-col gap-2.5 px-4 pt-6 pb-16 desktop:px-10 desktop:pt-16">
+    @if (page(); as p) {
+      <h1 class="mb-2 text-[1.75rem] leading-tight font-semibold desktop:text-[2rem] desktop:font-bold">{{ p.title }}</h1>
+      @for (block of p.blocks; track $index) {
+        <!-- prettier-ignore -->
+        <div class="rounded-card bg-tint px-4 py-3 text-body leading-relaxed break-words whitespace-pre-wrap desktop:rounded-menu desktop:bg-tint/50 desktop:text-ui">@for (k of shown(block.text ?? ''); track $index) {@if (k.href) {<a [href]="k.href" target="_blank" rel="noopener" class="text-accent underline-offset-2 hover:underline" [class.font-semibold]="k.bold" [class.italic]="k.italic">{{ k.t }}</a>} @else {<span [class.font-semibold]="k.bold" [class.italic]="k.italic" [class.underline]="k.underline" [class.line-through]="k.strike">{{ k.t }}</span>}}</div>
+      }
+    } @else if (missing()) {
+      <p class="py-20 text-center text-body text-fg-secondary">{{ 'shared.notFound' | t }}</p>
+    }
+  </div>
+</div>

@@ -16,6 +16,32 @@
       <!-- (the start page: current only on itself) -->
       <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
     }
+    <!-- Favorites (the library's pages starred): their names under a small gray title -->
+    @if (favorites().length) {
+      <p class="px-side-row-x pt-4 pb-1 text-footnote font-medium text-fg-secondary">{{ 'library.favorites' | t }}</p>
+      @for (page of favorites(); track page.id) {
+        <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]">{{ page.title }}</a>
+      }
+    }
+    <!-- Trash, at the bottom of the list: its window at it -->
+    @if (library()) {
+      <span class="flex-1"></span>
+      <button
+        uiSidebarItem
+        #trashBtn
+        icon="trash"
+        (click)="trashOpen.set(!trashOpen())"
+        [attr.aria-expanded]="trashOpen()"
+      >{{ 'trash.title' | t }}</button>
+      @if (trashOpen()) {
+        <ui-menu [origin]="trashBtn.element" (closed)="trashOpen.set(false)">
+          <div class="flex w-[26rem] max-w-full flex-col p-1">
+            <p class="px-2 pt-1 pb-2 text-ui font-medium">{{ 'trash.title' | t }}</p>
+            <app-trash-list />
+          </div>
+        </ui-menu>
+      }
+    }
     <button
       #account
       sidebarFoot

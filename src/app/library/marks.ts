@@ -78,3 +78,39 @@ function around(text: string, a: number, b: number, pair: string): { start: numb
   }
   return null;
 }
+
+/** A piece of the text as read (a published page): its words, their styles, a link's address. */
+export interface Shown {
+  t: string;
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  strike?: boolean;
+  href?: string;
+}
+
+const BY_MARK: Record<string, Mark> = { '**': 'bold', '*': 'italic', __: 'underline', '~~': 'strike' };
+
+/** The text as read: the marks taken out, what's between them styled; links with their address. */
+export function shown(text: string): Shown[] {
+  const out: Shown[] = [];
+  const on: Partial<Record<Mark, boolean>> = {};
+  const plain = (t: string, href?: string) => {
+    let at = 0;
+    for (const m of t.matchAll(STYLE)) {
+      if (m.index > at) out.push({ t: t.slice(at, m.index), ...on, href });
+      const mark = BY_MARK[m[0]];
+      on[mark] = !on[mark];
+      at = m.index + m[0].length;
+    }
+    if (at < t.length) out.push({ t: t.slice(at), ...on, href });
+  };
+  let at = 0;
+  for (const m of text.matchAll(LINK)) {
+    if (m.index > at) plain(text.slice(at, m.index));
+    plain(m[1], m[2]);
+    at = m.index + m[0].length;
+  }
+  plain(text.slice(at));
+  return out;
+}

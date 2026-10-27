@@ -1,0 +1,41 @@
+<!-- The pages in the trash: each its name, when it was thrown away; Restore and Delete forever at its
+     right (desktops: under the pointer); under them, Empty trash -->
+@if (store.trash(); as items) {
+  @if (!items.length) {
+    <p class="py-10 text-center text-ui text-fg-secondary mobile:text-body">{{ 'trash.empty' | t }}</p>
+  } @else {
+    <div class="flex flex-col desktop:gap-0.5">
+      @for (item of items; track item.id) {
+        <div class="group flex min-h-9 items-center gap-2.5 rounded-xl px-2 py-1 desktop:hover:bg-tint mobile:min-h-row mobile:px-0">
+          <app-icon name="page" colored class="size-5 shrink-0 text-icon mobile:size-icon-menu" />
+          <span class="min-w-0 flex-1 truncate text-ui text-side-text mobile:text-body mobile:text-fg">
+            {{ item.title }}
+            <span class="text-footnote text-fg-secondary"> — {{ when(item.deletedAt) }}</span>
+          </span>
+          <div class="flex shrink-0 items-center gap-0.5 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:focus-within:opacity-100">
+            <button
+              uiButton
+              type="button"
+              icon="update"
+              (click)="store.restore(item.id)"
+              [uiTip]="'trash.restore' | t"
+              [attr.aria-label]="'trash.restore' | t"
+            ></button>
+            <button
+              uiButton
+              type="button"
+              icon="trash"
+              (click)="store.deleteForever(item.id)"
+              [uiTip]="'trash.deleteForever' | t"
+              [attr.aria-label]="'trash.deleteForever' | t"
+            ></button>
+          </div>
+        </div>
+      }
+    </div>
+    <div class="flex items-center justify-between gap-2 pt-2 text-footnote text-fg-secondary">
+      <span class="px-2 mobile:px-0">{{ 'trash.note' | t }}</span>
+      <button uiButton type="button" (click)="store.deleteForever(null)"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
+    </div>
+  }
+}

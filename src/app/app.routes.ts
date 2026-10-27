@@ -4,6 +4,8 @@ import { lastSectionGuard } from './auth/last-section';
 import { desktop } from './core/device';
 
 export const routes: Routes = [
+  // A published page, for anyone with its link (no sign-in)
+  { path: 's/:token', loadComponent: () => import('./library/shared-page').then((m) => m.SharedPageView) },
   { path: 'login', loadComponent: () => import('./login/login').then((m) => m.Login), canActivate: [guestGuard] },
   {
     // The signed-in pages, in the device's own layout (desktop: the sidebar beside them; phones: a

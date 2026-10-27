@@ -10,6 +10,18 @@
     @if (!items.length) {
       <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'library.empty' | t }}</p>
     } @else {
+      <!-- Phones: the favorites first, in a card of their own under their title (desktops: the sidebar's) -->
+      @if (!desktop && favorites().length) {
+        <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'library.favorites' | t }}</span>
+        <ui-list>
+          @for (item of favorites(); track item.id) {
+            <button type="button" uiListItem icon="star" (click)="open(item)" [chevron]="true">
+              {{ item.title }}
+              <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
+            </button>
+          }
+        </ui-list>
+      }
       <ui-list>
         @for (item of items; track item.id) {
           <button type="button" uiListItem icon="page" (click)="open(item)" [chevron]="!desktop">
@@ -17,6 +29,12 @@
             <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
           </button>
         }
+      </ui-list>
+    }
+    <!-- Phones: Trash, under the pages — its sheet (desktops: the sidebar's) -->
+    @if (!desktop) {
+      <ui-list>
+        <button type="button" uiListItem icon="trash" (click)="trashOpen.set(true)" [chevron]="true">{{ 'trash.title' | t }}</button>
       </ui-list>
     }
   }
@@ -35,3 +53,10 @@
 >
   <app-icon name="plus" class="size-8" />
 </button>
+
+@if (trashOpen()) {
+  <ui-sheet [tall]="true" (closed)="trashOpen.set(false)">
+    <span sheetHead class="text-body font-semibold">{{ 'trash.title' | t }}</span>
+    <app-trash-list />
+  </ui-sheet>
+}

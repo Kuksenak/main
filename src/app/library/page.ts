@@ -9,7 +9,7 @@ import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
-import { Page, PageBlock, LibraryStore } from './library.store';
+import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
 import { PageEditor } from './page-editor';
 
 // How long after the last keystroke a change is saved
@@ -48,6 +48,7 @@ export class PageView {
   protected readonly desktop = desktop;
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
+  protected readonly shareOpen = signal(false);
   protected readonly blockCount = signal(0);
   protected readonly editor = viewChild(PageEditor);
 
@@ -181,6 +182,41 @@ export class PageView {
   // "26 Oct, 15:02"
   protected when(at: string): string {
     return this.i18n.date(new Date(at), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Publish: its link made and copied (a toast says so); off: the link answers nothing any more
+  protected share(on: boolean): void {
+    const page = this.page();
+    if (!page) return;
+    this.store.share(page.id, on).subscribe({
+      next: (p) => {
+        this.page.update((x) => (x ? { ...x, shareToken: p.shareToken } : x));
+        if (on) this.copyLink(this.i18n.t('library.publishedCopied'));
+      },
+      error: () => this.toasts.error(this.i18n.t('library.shareError')),
+    });
+  }
+
+  protected copyLink(note = this.i18n.t('library.linkCopied')): void {
+    const token = this.page()?.shareToken;
+    if (!token) return;
+    navigator.clipboard?.writeText(shareUrl(token)).then(
+      () => this.toasts.show(note),
+      () => {},
+    );
+  }
+
+  protected openLink(): void {
+    const token = this.page()?.shareToken;
+    if (token) window.open(shareUrl(token), '_blank', 'noopener');
+  }
+
+  protected favorite(): void {
+    const page = this.page();
+    if (!page) return;
+    const on = !page.favorite;
+    this.page.set({ ...page, favorite: on });
+    this.store.favorite(page.id, on).subscribe({ error: () => this.page.update((x) => (x ? { ...x, favorite: !on } : x)) });
   }
 
   protected delete(): void {

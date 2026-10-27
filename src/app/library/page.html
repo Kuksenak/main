@@ -6,7 +6,34 @@
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
     }
+    <!-- Publish: its public link made (and copied); published: a menu — copy the link, open it, unpublish -->
+    @if (p.shareToken) {
+      <button uiButton #shareBtn type="button" icon="globe" (click)="shareOpen.set(!shareOpen())" [attr.aria-expanded]="shareOpen()">
+        <span class="text-accent">{{ 'library.published' | t }}</span>
+      </button>
+      @if (shareOpen()) {
+        <ui-menu narrow [origin]="shareBtn.element" (closed)="shareOpen.set(false)">
+          <button type="button" uiMenuItem icon="page" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
+          <button type="button" uiMenuItem icon="chevron-right" (click)="openLink()">{{ 'library.openLink' | t }}</button>
+          <ui-menu-separator />
+          <button type="button" uiMenuItem icon="close" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
+        </ui-menu>
+      }
+    } @else {
+      <button uiButton type="button" icon="globe" (click)="share(true)" [uiTip]="'library.publishTip' | t">{{ 'library.publish' | t }}</button>
+    }
     <button uiButton type="button" icon="sparkle" (click)="aiOpen.set(!aiOpen())" [attr.aria-expanded]="aiOpen()">{{ 'editor.ai' | t }}</button>
+    <!-- ☆: in the favorites (the sidebar's) or not -->
+    <button
+      uiButton
+      type="button"
+      [icon]="'star'"
+      (click)="favorite()"
+      [attr.aria-pressed]="p.favorite"
+      [attr.aria-label]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
+      [uiTip]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
+      class="aria-[pressed=false]:opacity-55"
+    ></button>
     <button
       uiButton
       #more
@@ -24,7 +51,7 @@
         <button type="button" uiMenuItem icon="page" (click)="copyContent()" [disabled]="!blockCount()">{{ 'library.copyContent' | t }}</button>
         <button type="button" uiMenuItem icon="enter" (click)="pasteContent()" [disabled]="!store.clipboard()?.length">{{ 'library.pasteContent' | t }}</button>
         <ui-menu-separator />
-        <button type="button" uiMenuItem icon="trash" danger (click)="delete()">{{ 'library.delete' | t }}</button>
+        <button type="button" uiMenuItem icon="trash" danger (click)="delete()">{{ 'library.moveToTrash' | t }}</button>
         <ui-menu-separator />
         <div class="flex flex-col px-menu-label-x py-1 text-caption leading-snug text-fg-secondary">
           <span>{{ 'library.blocks' | t }}: {{ blockCount() }}</span>
@@ -55,7 +82,19 @@
     <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
 
     <!-- Phones: Delete at the bottom -->
-    <button uiButton type="button" icon="trash" (click)="delete()" class="self-start desktop:hidden">{{ 'library.delete' | t }}</button>
+    <!-- Phones: at the bottom — a favorite, publish (published: copy its link, unpublish), to the trash -->
+    @if (!desktop) {
+      <div class="flex flex-wrap gap-2">
+        <button uiButton type="button" icon="star" (click)="favorite()">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
+        @if (p.shareToken) {
+          <button uiButton type="button" icon="globe" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
+          <button uiButton type="button" icon="close" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
+        } @else {
+          <button uiButton type="button" icon="globe" (click)="share(true)">{{ 'library.publish' | t }}</button>
+        }
+        <button uiButton type="button" icon="trash" (click)="delete()">{{ 'library.moveToTrash' | t }}</button>
+      </div>
+    }
   }
 </div>
 
