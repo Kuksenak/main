@@ -1,0 +1,30 @@
+<!-- By the button that asked (no dimming) — phones: a glass panel, the question in gray, the answer a
+     big round button; desktops: a small card, the question, Cancel and the answer at its right -->
+<div
+  role="alertdialog"
+  class="fixed flex animate-menu-in flex-col text-fg
+         mobile:w-64 mobile:gap-1.5 mobile:rounded-[2rem] mobile:bg-glass mobile:p-2 mobile:shadow-glass mobile:backdrop-blur-[20px]
+         desktop:w-72 desktop:gap-1 desktop:rounded-menu desktop:bg-dialog desktop:p-1 desktop:shadow-popover"
+  [style.top.px]="place().top"
+  [style.bottom.px]="place().bottom"
+  [style.left.px]="place().left"
+  (click)="$event.stopPropagation()"
+>
+  @if (desktop) {
+    <p class="px-2 pt-2 pb-1 text-ui leading-snug text-balance">{{ ask().text }}</p>
+    <div class="flex items-center justify-end gap-1 p-1">
+      <button uiButton type="button" (click)="answer(false)">{{ 'action.cancel' | t }}</button>
+      <button uiButton type="button" class="font-semibold" [class.text-danger]="ask().danger" (click)="answer(true)">{{ ask().yes }}</button>
+    </div>
+  } @else {
+    <p class="px-2 pt-1.5 pb-1 text-center text-body text-balance text-fg-secondary">{{ ask().text }}</p>
+    <button
+      type="button"
+      class="h-12 rounded-full bg-tint text-center text-body font-medium active:bg-tint-strong"
+      [class.text-danger]="ask().danger"
+      (click)="answer(true)"
+    >
+      {{ ask().yes }}
+    </button>
+  }
+</div>
