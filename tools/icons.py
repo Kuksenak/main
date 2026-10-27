@@ -91,9 +91,8 @@ ICONS = {
     'eye': fill(TEAL, ring(32.2, 32.4, 8.4) + 'z')
            + line('M7.8 32.6C14.6 21.8 22.8 16.2 32.2 16.4 41.6 16.2 49.6 21.8 56.4 32 49.8 42.6 41.4 48 32 48 22.4 48.2 14.4 42.8 7.8 32.6z')
            + line(ring(32.2, 32.4, 8.2)),
-    # open elsewhere (a page's preview, in a new tab): a window (beige), an arrow out of its corner
-    'popout': fill(BEIGE, 'M12.6 20.2 39.4 20 39.6 51.6 12.8 51.8z')
-              + line('M33.4 15.6 15.8 15.8C13.2 15.8 11.6 17.4 11.6 20L11.8 48.2C11.8 50.8 13.4 52.4 16 52.4L44.2 52.2C46.8 52.2 48.4 50.6 48.4 48L48.2 30.6')
+    # open elsewhere (a page's preview, in a new tab): a window, an arrow out of its corner — lines only
+    'popout': line('M33.4 15.6 15.8 15.8C13.2 15.8 11.6 17.4 11.6 20L11.8 48.2C11.8 50.8 13.4 52.4 16 52.4L44.2 52.2C46.8 52.2 48.4 50.6 48.4 48L48.2 30.6')
               + line('M30.2 33.8C37.4 26.6 44.6 19.4 51.8 12.2M39.4 12 52 11.8 52.2 24.4'),
     # duplicate: two sheets, one over the other — the back one's lines, the front one (beige) whole
     'duplicate': fill(BEIGE, 'M23.4 22.6 50.2 22.4 50.4 52.6 23.6 52.8z')
