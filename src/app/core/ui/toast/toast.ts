@@ -43,8 +43,8 @@ export class Toasts {
 
 /**
  * Where the toasts show, dark and solid as iOS's / Telegram's (white words, a soft shadow) — phones: a capsule each at the bottom,
- * by the thumb (on the line of the floating buttons, between them — + at the right, Today at the
- * left; with the keyboard up: just over it); desktops: a card each in the bottom right
+ * by the thumb, just over the floating buttons (+, Today), as wide as the screen; one line: a
+ * capsule, more: a card, round as it (with the keyboard up: just over it); desktops: a card each in the bottom right
  * corner, as wide as the sidebar, its words wrapped; more than fit in 80% of the screen's height:
  * they scroll.
  */
@@ -53,7 +53,7 @@ export class Toasts {
   host: {
     class:
       'pointer-events-none fixed z-[70] flex flex-col gap-2 ' +
-      'mobile:inset-x-0 mobile:items-center mobile:px-[calc(var(--round-h)+1.5rem)] ' +
+      'mobile:inset-x-0 mobile:items-center mobile:px-4 ' +
       'desktop:right-4 desktop:bottom-4 desktop:max-h-[80vh] desktop:w-nav desktop:overflow-y-auto desktop:p-1',
     '[style.bottom]': 'bottom()',
     'aria-live': 'polite',
@@ -63,7 +63,7 @@ export class Toasts {
       <div
         role="status"
         class="pointer-events-auto flex max-w-full shrink-0 animate-menu-in gap-2.5 bg-toast py-2.5 pr-2 pl-4 text-toast-text shadow-toast backdrop-blur-[20px]
-               mobile:items-center mobile:rounded-full mobile:text-body desktop:items-start desktop:rounded-menu desktop:text-ui"
+               mobile:items-center mobile:rounded-[1.375rem] mobile:text-body desktop:items-start desktop:rounded-menu desktop:text-ui"
         [class.pr-4]="!toast.action"
         (click)="toasts.dismiss(toast.id)"
       >
@@ -84,12 +84,12 @@ export class UiToasts {
   protected readonly toasts = inject(Toasts);
   protected readonly area = inject(VisibleArea);
 
-  // (phones: as the floating buttons' bottom; the keyboard up: over it — what's under the seen part)
+  // (phones: over the floating buttons; the keyboard up: over it — what's under the seen part)
   protected readonly bottom = computed(() => {
     if (desktop) return null;
     const keyboard = this.area.keyboard();
     return keyboard
       ? `${window.innerHeight - this.area.top() - this.area.height() + 12}px`
-      : 'max(0.75rem, calc(env(safe-area-inset-bottom) - 0.25rem))';
+      : 'calc(max(0.75rem, calc(env(safe-area-inset-bottom) - 0.25rem)) + var(--round-h) + 0.625rem)';
   });
 }
