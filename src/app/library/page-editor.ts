@@ -118,7 +118,31 @@ export class PageEditor {
   protected readonly blockMenu = signal<number | null>(null);
   private drag: { from: number; startY: number; moved: boolean; to: number } | null = null;
 
+  // Desktops: the block the pointer's at the height of (anywhere across the page, not only over
+  // it): its ⠿ shows
+  protected readonly near = signal<number | null>(null);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
   constructor() {
+    if (desktop) {
+      const onMove = (e: PointerEvent) => {
+        if (this.drag) return;
+        const blocks = [...this.host.nativeElement.querySelectorAll<HTMLElement>('[data-block]')];
+        const box = this.host.nativeElement.getBoundingClientRect();
+        // (the page's own column and its sides — not the sidebar)
+        const inPage = e.clientX > box.left - 120 && e.clientX < window.innerWidth;
+        const at = inPage
+          ? blocks.findIndex((b) => {
+              const r = b.getBoundingClientRect();
+              return e.clientY >= r.top && e.clientY <= r.bottom;
+            })
+          : -1;
+        const near = at < 0 ? null : at;
+        if (near !== this.near()) this.near.set(near);
+      };
+      document.addEventListener('pointermove', onMove, { passive: true });
+      inject(DestroyRef).onDestroy(() => document.removeEventListener('pointermove', onMove));
+    }
     afterNextRender(() => {
       // (an empty page: desktops — no block, the caret's hint instead; phones — one empty block)
       const blocks = this.blocks().length || desktop ? this.blocks() : [{ kind: 'card' as const, text: '' }];
