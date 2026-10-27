@@ -1,5 +1,5 @@
 <!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): the page's name at the left; saving…, the assistant, ⋯ (its menu) at the right -->
+     Notion's): the page's name at the left; saving…, Publish, ☆, ⋯ (its menu: the assistant…) at the right -->
 @if (desktop && page(); as p) {
   <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app px-3">
     <span class="mr-2 min-w-0 flex-1 truncate px-1.5 text-ui text-fg">{{ title() || ('library.untitled' | t) }}</span>
@@ -9,7 +9,15 @@
     <!-- Publish: its public link made (and copied); published: "Published" (its menu: preview, copy
          the link, unpublish) and the link's own button (copied at a click), as Notion's Share -->
     @if (p.shareToken) {
-      <button uiButton #shareBtn type="button" icon="globe" (click)="shareOpen.set(!shareOpen())" [attr.aria-expanded]="shareOpen()">
+      <button
+        uiButton
+        #shareBtn
+        type="button"
+        icon="globe"
+        (click)="shareOpen.set(!shareOpen())"
+        [attr.aria-expanded]="shareOpen()"
+        [uiTip]="shareOpen() ? null : ('library.publishedTip' | t)"
+      >
         {{ 'library.published' | t }}
       </button>
       @if (shareOpen()) {
@@ -17,7 +25,7 @@
           <button type="button" uiMenuItem icon="page" (click)="openLink()">{{ 'library.preview' | t }}</button>
           <button type="button" uiMenuItem icon="link" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
           <ui-menu-separator />
-          <button type="button" uiMenuItem icon="close" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
+          <button type="button" uiMenuItem icon="lock" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
         </ui-menu>
       }
       <button
@@ -25,13 +33,12 @@
         type="button"
         icon="link"
         (click)="copyLink()"
-        [uiTip]="'library.copyLink' | t"
+        [uiTip]="'library.copyLinkTip' | t"
         [attr.aria-label]="'library.copyLink' | t"
       ></button>
     } @else {
       <button uiButton type="button" icon="globe" (click)="share(true)" [uiTip]="'library.publishTip' | t">{{ 'library.publish' | t }}</button>
     }
-    <button uiButton type="button" icon="sparkle" (click)="aiOpen.set(!aiOpen())" [attr.aria-expanded]="aiOpen()">{{ 'editor.ai' | t }}</button>
     <!-- ☆: in the favorites (the sidebar's) or not -->
     <button
       uiButton
@@ -54,8 +61,10 @@
       [uiTip]="menuOpen() ? null : ('library.moreTip' | t)"
     ></button>
     @if (menuOpen()) {
-      <!-- Duplicate, Copy / Paste content; Delete; how many blocks, when edited, made -->
+      <!-- The assistant; Duplicate, Copy / Paste content; Move to trash; how many blocks, when edited, made -->
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
+        <button type="button" uiMenuItem icon="sparkle" (click)="aiOpen.set(true)">{{ 'editor.ai' | t }}</button>
+        <ui-menu-separator />
         <button type="button" uiMenuItem icon="plus" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
         <button type="button" uiMenuItem icon="page" (click)="copyContent()" [disabled]="!blockCount()">{{ 'library.copyContent' | t }}</button>
         <button type="button" uiMenuItem icon="enter" (click)="pasteContent()" [disabled]="!store.clipboard()?.length">{{ 'library.pasteContent' | t }}</button>
@@ -97,7 +106,7 @@
         <button uiButton type="button" icon="star" (click)="favorite()">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
         @if (p.shareToken) {
           <button uiButton type="button" icon="link" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
-          <button uiButton type="button" icon="close" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
+          <button uiButton type="button" icon="lock" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
         } @else {
           <button uiButton type="button" icon="globe" (click)="share(true)">{{ 'library.publish' | t }}</button>
         }
