@@ -61,6 +61,11 @@ export class UiSheet {
     const destroyed = inject(DestroyRef);
     destroyed.onDestroy(() => document.removeEventListener('keydown', onKey));
     // (its own listeners: a pull must be able to stop the scrolling — not passive)
+    // (moved to the body: a page's fade at the top / bottom — a mask on what scrolls, where a page's
+    // own sheet is put — made it see-through too, and lost its blur)
+    const host: HTMLElement = inject(ElementRef).nativeElement;
+    afterNextRender(() => document.body.appendChild(host));
+    destroyed.onDestroy(() => host.remove());
     afterNextRender(() => {
       const top = this.top().nativeElement;
       const measure = new ResizeObserver(() => this.topH.set(top.offsetHeight));
