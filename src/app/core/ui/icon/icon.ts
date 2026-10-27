@@ -16,6 +16,7 @@ export const ICONS = [
   'grip',
   'dots',
   'star',
+  'link',
   'sparkle',
   'person',
   'library',

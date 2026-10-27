@@ -6,19 +6,28 @@
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
     }
-    <!-- Publish: its public link made (and copied); published: a menu — copy the link, open it, unpublish -->
+    <!-- Publish: its public link made (and copied); published: "Published" (its menu: preview, copy
+         the link, unpublish) and the link's own button (copied at a click), as Notion's Share -->
     @if (p.shareToken) {
       <button uiButton #shareBtn type="button" icon="globe" (click)="shareOpen.set(!shareOpen())" [attr.aria-expanded]="shareOpen()">
-        <span class="text-accent">{{ 'library.published' | t }}</span>
+        {{ 'library.published' | t }}
       </button>
       @if (shareOpen()) {
         <ui-menu narrow [origin]="shareBtn.element" (closed)="shareOpen.set(false)">
-          <button type="button" uiMenuItem icon="page" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
-          <button type="button" uiMenuItem icon="chevron-right" (click)="openLink()">{{ 'library.openLink' | t }}</button>
+          <button type="button" uiMenuItem icon="page" (click)="openLink()">{{ 'library.preview' | t }}</button>
+          <button type="button" uiMenuItem icon="link" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
           <ui-menu-separator />
           <button type="button" uiMenuItem icon="close" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
         </ui-menu>
       }
+      <button
+        uiButton
+        type="button"
+        icon="link"
+        (click)="copyLink()"
+        [uiTip]="'library.copyLink' | t"
+        [attr.aria-label]="'library.copyLink' | t"
+      ></button>
     } @else {
       <button uiButton type="button" icon="globe" (click)="share(true)" [uiTip]="'library.publishTip' | t">{{ 'library.publish' | t }}</button>
     }
@@ -87,7 +96,7 @@
       <div class="flex flex-wrap gap-2">
         <button uiButton type="button" icon="star" (click)="favorite()">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
         @if (p.shareToken) {
-          <button uiButton type="button" icon="globe" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
+          <button uiButton type="button" icon="link" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
           <button uiButton type="button" icon="close" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
         } @else {
           <button uiButton type="button" icon="globe" (click)="share(true)">{{ 'library.publish' | t }}</button>
