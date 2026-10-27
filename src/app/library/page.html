@@ -50,7 +50,7 @@
           <button type="button" uiMenuItem icon="popout" (click)="openLink()">{{ 'library.preview' | t }}</button>
         }
         <ui-menu-separator />
-        <button type="button" uiMenuItem icon="plus" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
+        <button type="button" uiMenuItem icon="duplicate" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
         <button type="button" uiMenuItem icon="page" (click)="copyContent()" [disabled]="!blockCount()">{{ 'library.copyContent' | t }}</button>
         <button type="button" uiMenuItem icon="enter" (click)="pasteContent()" [disabled]="!store.clipboard()?.length">{{ 'library.pasteContent' | t }}</button>
         <ui-menu-separator />

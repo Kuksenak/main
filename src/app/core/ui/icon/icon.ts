@@ -19,6 +19,7 @@ export const ICONS = [
   'link',
   'eye',
   'popout',
+  'duplicate',
   'sparkle',
   'person',
   'library',

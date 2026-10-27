@@ -154,7 +154,7 @@
             (click)="blockMenu.set(null); duplicate(i)"
             class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
           >
-            <app-icon name="plus" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
+            <app-icon name="duplicate" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
           </button>
           <span class="mx-menu-row-x my-1 h-px bg-separator"></span>
           <button
@@ -285,7 +285,7 @@
         <app-icon name="page" colored class="size-icon-menu text-icon" />{{ 'editor.copy' | t }}
       </button>
       <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:transform-none active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); duplicate(at)">
-        <app-icon name="plus" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
+        <app-icon name="duplicate" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
       </button>
       <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body text-danger active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); remove(at)">
         <app-icon name="trash" colored class="size-icon-menu text-icon" />{{ 'editor.delete' | t }}
