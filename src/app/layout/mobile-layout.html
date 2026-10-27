@@ -3,12 +3,12 @@
   class="relative h-full bg-app text-fg"
   [style.height.px]="area.keyboard() ? area.top() + area.height() : null"
 >
-  <!-- The top bar over the page, the page passing under it: it fades from the page's color to
-       nothing, the page's text drifting into it. Fixed to the top of the part of the screen that's
+  <!-- The top bar over the page, the page passing under it (seen through it, paler: the page's own
+       fade, see main). Fixed to the top of the part of the screen that's
        seen: iOS shifting the view up for the keyboard doesn't take it along. -->
   <header
     [style.top.px]="area.top()"
-    class="pointer-events-none fixed inset-x-0 z-30 flex items-center gap-2 bg-linear-to-b from-app from-60% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5 *:pointer-events-auto"
+    class="pointer-events-none fixed inset-x-0 z-30 flex items-center gap-2 px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5 *:pointer-events-auto"
   >
     <!-- A page opened from a list: ‹ back to it, the title smaller in the middle (as a sheet's page:
          Users, Language), its own ⋯ at the right (none: room as wide, the title kept in the middle) -->
@@ -70,10 +70,12 @@
       </button>
     }
   </header>
-  <!-- (from just under the top bar's buttons — its scroll bar too — the page's text drifting into the
-       bar's fade; clipping the next page as it slides in) -->
+  <!-- (from the screen's top: what's scrolled goes on under the top bar, seen through it paler — not
+       cut off at a line under its buttons, as a sheet's under its head; clipping the next page as it
+       slides in) -->
   <main
-    class="absolute inset-x-0 top-[calc(env(safe-area-inset-top)+3.25rem)] bottom-0 min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain pt-2"
+    class="absolute inset-x-0 top-0 bottom-0 min-w-0 overflow-x-hidden overflow-y-auto overscroll-contain pt-[calc(env(safe-area-inset-top)+3.75rem)]
+           [mask-image:linear-gradient(to_bottom,transparent_0,rgb(0_0_0/0.25)_calc(env(safe-area-inset-top)+0.75rem),rgb(0_0_0/0.4)_calc(env(safe-area-inset-top)+3rem),black_calc(env(safe-area-inset-top)+3.75rem))]"
     data-vt="page"
   >
     <router-outlet (activate)="entered()" />
