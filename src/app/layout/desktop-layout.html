@@ -38,7 +38,7 @@
     >
       @if (!favsFolded()) {
         @for (page of favorites(); track page.id) {
-          <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]" class="pl-4.5!">{{ page.title }}</a>
+          <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]" class="pl-3.5!">{{ page.title }}</a>
         }
       }
     </div>
