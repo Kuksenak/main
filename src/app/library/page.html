@@ -47,7 +47,7 @@
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
         <button type="button" uiMenuItem icon="sparkle" (click)="aiOpen.set(true)">{{ 'editor.ai' | t }}</button>
         @if (p.shareToken) {
-          <button type="button" uiMenuItem icon="eye" (click)="openLink()">{{ 'library.preview' | t }}</button>
+          <button type="button" uiMenuItem icon="popout" (click)="openLink()">{{ 'library.preview' | t }}</button>
         }
         <ui-menu-separator />
         <button type="button" uiMenuItem icon="plus" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>

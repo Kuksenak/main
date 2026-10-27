@@ -18,6 +18,7 @@ export const ICONS = [
   'star',
   'link',
   'eye',
+  'popout',
   'sparkle',
   'person',
   'library',
