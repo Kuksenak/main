@@ -1,4 +1,4 @@
-import { Component, inject, Injectable, signal } from '@angular/core';
+import { Component, computed, inject, Injectable, signal } from '@angular/core';
 import { desktop } from '../../device';
 import { VisibleArea } from '../../services/visible-area';
 
@@ -42,8 +42,9 @@ export class Toasts {
 }
 
 /**
- * Where the toasts show, dark and solid as iOS's / Telegram's (white words, a soft shadow) — phones: a capsule each at the top, under
- * the top bar (on the part of the screen that's seen); desktops: a card each in the bottom right
+ * Where the toasts show, dark and solid as iOS's / Telegram's (white words, a soft shadow) — phones: a capsule each at the bottom,
+ * by the thumb (on the line of the floating buttons, between them — + at the right, Today at the
+ * left; with the keyboard up: just over it); desktops: a card each in the bottom right
  * corner, as wide as the sidebar, its words wrapped; more than fit in 80% of the screen's height:
  * they scroll.
  */
@@ -52,9 +53,9 @@ export class Toasts {
   host: {
     class:
       'pointer-events-none fixed z-[70] flex flex-col gap-2 ' +
-      'mobile:inset-x-0 mobile:items-center mobile:px-4 ' +
+      'mobile:inset-x-0 mobile:items-center mobile:px-[calc(var(--spacing-round)+1.5rem)] ' +
       'desktop:right-4 desktop:bottom-4 desktop:max-h-[80vh] desktop:w-nav desktop:overflow-y-auto desktop:p-1',
-    '[style.top]': "desktop ? null : 'calc(' + area.top() + 'px + env(safe-area-inset-top) + 3.75rem)'",
+    '[style.bottom]': 'bottom()',
     'aria-live': 'polite',
   },
   template: `
@@ -82,5 +83,13 @@ export class Toasts {
 export class UiToasts {
   protected readonly toasts = inject(Toasts);
   protected readonly area = inject(VisibleArea);
-  protected readonly desktop = desktop;
+
+  // (phones: as the floating buttons' bottom; the keyboard up: over it — what's under the seen part)
+  protected readonly bottom = computed(() => {
+    if (desktop) return null;
+    const keyboard = this.area.keyboard();
+    return keyboard
+      ? `${window.innerHeight - this.area.top() - this.area.height() + 12}px`
+      : 'max(0.75rem, calc(env(safe-area-inset-bottom) - 0.25rem))';
+  });
 }
