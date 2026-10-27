@@ -53,7 +53,7 @@ export class Toasts {
   host: {
     class:
       'pointer-events-none fixed z-[70] flex flex-col gap-2 ' +
-      'mobile:inset-x-0 mobile:items-center mobile:px-[calc(var(--spacing-round)+1.5rem)] ' +
+      'mobile:inset-x-0 mobile:items-center mobile:px-[calc(var(--round-h)+1.5rem)] ' +
       'desktop:right-4 desktop:bottom-4 desktop:max-h-[80vh] desktop:w-nav desktop:overflow-y-auto desktop:p-1',
     '[style.bottom]': 'bottom()',
     'aria-live': 'polite',
