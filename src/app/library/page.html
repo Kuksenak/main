@@ -44,11 +44,11 @@
       uiButton
       type="button"
       [icon]="'star'"
+      [outline]="!p.favorite"
       (click)="favorite()"
       [attr.aria-pressed]="p.favorite"
       [attr.aria-label]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
       [uiTip]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
-      class="aria-[pressed=false]:opacity-55"
     ></button>
     <button
       uiButton
@@ -103,7 +103,7 @@
     <!-- Phones: at the bottom — a favorite, publish (published: copy its link, unpublish), to the trash -->
     @if (!desktop) {
       <div class="flex flex-wrap gap-2">
-        <button uiButton type="button" icon="star" (click)="favorite()">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
+        <button uiButton type="button" icon="star" [outline]="!p.favorite" (click)="favorite()">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
         @if (p.shareToken) {
           <button uiButton type="button" icon="link" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
           <button uiButton type="button" icon="lock" (click)="share(false)">{{ 'library.unpublish' | t }}</button>

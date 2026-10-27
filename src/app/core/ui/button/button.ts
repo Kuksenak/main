@@ -19,6 +19,8 @@ import { Icon, IconName } from '../icon/icon';
 })
 export class UiButton {
   readonly icon = input<IconName>();
+  /** (its icon not coloured in: just its lines — e.g. ☆ while not a favorite) */
+  readonly outline = input(false);
   readonly caret = input(false);
   /** (the element: what a `<ui-menu>` opens at) */
   readonly element: HTMLElement = inject(ElementRef).nativeElement;
