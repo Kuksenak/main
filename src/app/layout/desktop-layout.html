@@ -23,7 +23,7 @@
          back) -->
     @if (favorites().length) {
       <!-- (open: data-open, not aria-expanded — that one's look is a row whose window is open) -->
-      <button uiSidebarItem icon="star" (click)="toggleFavs()" [attr.data-open]="favsFolded() ? null : ''" class="group/fav mt-1 shrink-0">
+      <button uiSidebarItem icon="star" (click)="toggleFavs()" [attr.data-open]="favsFolded() ? null : ''" class="group/fav shrink-0">
         {{ 'library.favorites' | t }}
         <app-icon itemEnd name="chevron-down" class="size-4 text-icon transition-[rotate] group-data-open/fav:rotate-180" />
       </button>
@@ -32,7 +32,7 @@
       #favs
       (scroll)="favsScrolled.set(favs.scrollTop > 0)"
       [attr.data-scrolled]="favsScrolled() ? '' : null"
-      class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pb-4 [scrollbar-width:thin]
+      class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4 [scrollbar-width:thin]
              [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] data-scrolled:border-separator
              data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-2rem),transparent)]"
     >
