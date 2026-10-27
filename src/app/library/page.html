@@ -133,18 +133,21 @@
 }
 
 <!-- Phones: the page's ⋯ (the top bar) — a sheet as the account's: its title in the head, the actions
-     on cards (as iOS's grouped lists) — keeping it, its link, a copy; the trash on a card of its own;
-     under them in gray: when it was edited, made -->
+     on cards (as iOS's grouped lists) — the page (keep it, a copy), its link, when it was edited and
+     made, the trash on a card of its own -->
 @if (!desktop && actionsOpen() && page(); as p) {
   <ui-sheet #actions (closed)="actionsOpen.set(false)">
     <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold">{{ title() || ('library.untitled' | t) }}</span>
     <div class="flex flex-col gap-6">
+      <!-- (the page: keep it, a copy) -->
       <ui-list>
         <button type="button" uiListItem icon="bookmark" (click)="actions.close(); favorite()">
           {{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}
         </button>
+        <button type="button" uiListItem icon="duplicate" (click)="actions.close(); duplicate()">{{ 'library.duplicate' | t }}</button>
       </ui-list>
 
+      <!-- (its link) -->
       <ui-list>
         @if (p.shareToken) {
           <button type="button" uiListItem icon="link" (click)="actions.close(); copyLink()">{{ 'library.copyLink' | t }}</button>
@@ -157,18 +160,21 @@
         }
       </ui-list>
 
+      <!-- (when it was edited, made: a row each, the time in gray at the right — as the account's version) -->
       <ui-list>
-        <button type="button" uiListItem icon="duplicate" (click)="actions.close(); duplicate()">{{ 'library.duplicate' | t }}</button>
+        <div uiListItem>
+          {{ 'library.edited' | t }}
+          <span itemValue class="text-fg-secondary">{{ when(p.updatedAt) }}</span>
+        </div>
+        <div uiListItem>
+          {{ 'library.created' | t }}
+          <span itemValue class="text-fg-secondary">{{ when(p.createdAt) }}</span>
+        </div>
       </ui-list>
 
       <ui-list>
         <button type="button" uiListItem icon="trash" danger (click)="actions.close(); delete()">{{ 'library.moveToTrash' | t }}</button>
       </ui-list>
-
-      <div class="flex flex-col items-center gap-0.5 text-footnote text-fg-secondary">
-        <span>{{ 'library.edited' | t }} {{ when(p.updatedAt) }}</span>
-        <span>{{ 'library.created' | t }} {{ when(p.createdAt) }}</span>
-      </div>
     </div>
   </ui-sheet>
 }
