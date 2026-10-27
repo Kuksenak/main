@@ -50,7 +50,15 @@ export class UiTip implements OnDestroy {
       row.textContent = line;
       tip.appendChild(row);
     });
+    // (in the browser's top layer, as the menus are — CDK's overlays are popovers: a z-index alone left
+    // the hint under them)
+    tip.popover = 'manual';
+    tip.style.margin = '0';
+    tip.style.inset = 'auto';
+    tip.style.border = '0';
+    tip.style.overflow = 'visible';
     document.body.appendChild(tip);
+    tip.showPopover();
     const r = this.el.getBoundingClientRect();
     const t = tip.getBoundingClientRect();
     const gap = 6;
