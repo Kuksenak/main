@@ -29,12 +29,12 @@
 
   <!-- What's in it, scrolling (at the bottom: room for the home indicator — none over the keyboard); at
        the top room for the grabber and the head (4.9375rem: 1.0625 + 3.875; no head: 2.8125), what
-       scrolls up under them fading out -->
+       scrolls up under them seen through, paler (not gone) -->
   <div
     #scroller
     class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5
-           pt-[4.9375rem] [mask-image:linear-gradient(to_bottom,transparent_1.5rem,black_4.9375rem)]
-           group-has-[[data-head]:empty]/sheet:pt-[2.8125rem] group-has-[[data-head]:empty]/sheet:[mask-image:linear-gradient(to_bottom,transparent_0.75rem,black_2.8125rem)]"
+           pt-[4.9375rem] [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.25)_1.0625rem,rgb(0_0_0/0.4)_3.5rem,black_4.9375rem)]
+           group-has-[[data-head]:empty]/sheet:pt-[2.8125rem] group-has-[[data-head]:empty]/sheet:[mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.25)_1.0625rem,black_2.8125rem)]"
     [style.padding-bottom]="area.keyboard() ? '0.75rem' : 'max(1.25rem, calc(env(safe-area-inset-bottom) - 0.25rem))'"
   >
     <ng-content />
