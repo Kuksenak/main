@@ -134,39 +134,40 @@
   }
 }
 
-<!-- Phones: the page's ⋯ (the top bar) — a sheet: a row each, its icon and words (as a block's menu) -->
+<!-- Phones: the page's ⋯ (the top bar) — a sheet as the account's: its title in the head, the actions
+     on cards (as iOS's grouped lists) — keeping it, its link, a copy; the trash on a card of its own;
+     under them in gray: how many blocks, when it was edited, made -->
 @if (!desktop && actionsOpen() && page(); as p) {
   <ui-sheet #actions (closed)="actionsOpen.set(false)">
-    <div class="-mx-2 flex flex-col">
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); favorite()">
-        <app-icon name="bookmark" [colored]="p.favorite" class="size-icon-menu text-icon" />
-        <span class="flex-1">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</span>
-      </button>
-      @if (p.shareToken) {
-        <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); copyLink()">
-          <app-icon name="link" colored class="size-icon-menu text-icon" />{{ 'library.copyLink' | t }}
+    <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold">{{ title() || ('library.untitled' | t) }}</span>
+    <div class="flex flex-col gap-6">
+      <ui-list>
+        <button type="button" uiListItem icon="bookmark" (click)="actions.close(); favorite()">
+          {{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}
         </button>
-        @if (canShare) {
-          <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); shareLink()">
-            <app-icon name="popout" colored class="size-icon-menu text-icon" />{{ 'library.sendLink' | t }}
-          </button>
+      </ui-list>
+
+      <ui-list>
+        @if (p.shareToken) {
+          <button type="button" uiListItem icon="link" (click)="actions.close(); copyLink()">{{ 'library.copyLink' | t }}</button>
+          @if (canShare) {
+            <button type="button" uiListItem icon="popout" (click)="actions.close(); shareLink()">{{ 'library.sendLink' | t }}</button>
+          }
+          <button type="button" uiListItem icon="lock" (click)="actions.close(); share(false)">{{ 'library.unpublish' | t }}</button>
+        } @else {
+          <button type="button" uiListItem icon="globe" (click)="actions.close(); share(true)">{{ 'library.publish' | t }}</button>
         }
-        <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); share(false)">
-          <app-icon name="lock" colored class="size-icon-menu text-icon" />{{ 'library.unpublish' | t }}
-        </button>
-      } @else {
-        <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); share(true)">
-          <app-icon name="globe" colored class="size-icon-menu text-icon" />{{ 'library.publish' | t }}
-        </button>
-      }
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); duplicate()">
-        <app-icon name="duplicate" colored class="size-icon-menu text-icon" />{{ 'library.duplicate' | t }}
-      </button>
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body text-danger outline-none active:bg-tint" (click)="actions.close(); delete()">
-        <app-icon name="trash" class="size-icon-menu" />{{ 'library.moveToTrash' | t }}
-      </button>
-      <!-- (how many blocks, when it was edited, made) -->
-      <div class="flex flex-col px-row-x pt-3 text-footnote text-fg-secondary">
+      </ui-list>
+
+      <ui-list>
+        <button type="button" uiListItem icon="duplicate" (click)="actions.close(); duplicate()">{{ 'library.duplicate' | t }}</button>
+      </ui-list>
+
+      <ui-list>
+        <button type="button" uiListItem icon="trash" danger (click)="actions.close(); delete()">{{ 'library.moveToTrash' | t }}</button>
+      </ui-list>
+
+      <div class="flex flex-col items-center gap-0.5 text-footnote text-fg-secondary">
         <span>{{ 'library.blocks' | t }}: {{ p.blocks.length }}</span>
         <span>{{ 'library.edited' | t }} {{ when(p.updatedAt) }}</span>
         <span>{{ 'library.created' | t }} {{ when(p.createdAt) }}</span>
