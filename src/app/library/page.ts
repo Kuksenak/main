@@ -10,6 +10,7 @@ import { UiTip } from '../core/ui/tip/tip';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
 import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
+import { shown } from './marks';
 import { PageEditor } from './page-editor';
 
 // How long after the last keystroke a change is saved
@@ -48,6 +49,10 @@ export class PageView {
   protected readonly desktop = desktop;
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
+  // Phones: the page read only; its actions in a sheet (the top bar's ⋯)
+  protected readonly actionsOpen = signal(false);
+  protected readonly shown = shown;
+  protected readonly canShare = typeof navigator.share === 'function';
   protected readonly blockCount = signal(0);
   protected readonly editor = viewChild(PageEditor);
 
@@ -59,7 +64,7 @@ export class PageView {
   constructor() {
     // (‹ back where it was opened from: the library, or Favorites)
     const back = (history.state as { back?: string } | null)?.back ?? '/library';
-    inject(PageTitle).show(computed(() => this.title() || this.i18n.t('library.untitled')), back);
+    inject(PageTitle).show(computed(() => this.title() || this.i18n.t('library.untitled')), back, desktop ? null : () => this.actionsOpen.set(true));
     // (leaving with a change not saved yet: saved now)
     inject(DestroyRef).onDestroy(() => this.flush());
     // (the app about to reload — a theme switch, index.html: saved now)
@@ -212,6 +217,12 @@ export class PageView {
     this.flush();
     const id = this.page()?.id;
     if (id) window.open(`/preview/${id}`, '_blank', 'noopener');
+  }
+
+  // Phones: the link sent by the system's own share sheet (Messages, Mail, …)
+  protected shareLink(): void {
+    const token = this.page()?.shareToken;
+    if (token) navigator.share?.({ title: this.title(), url: shareUrl(token) }).catch(() => {});
   }
 
   protected favorite(): void {

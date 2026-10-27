@@ -67,34 +67,42 @@
 <div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-24 desktop:pt-10">
 
   @if (page(); as p) {
-    <!-- The title: big, no box (as Notion's) -->
-    <input
-      #titleField
-      type="text"
-      [value]="title()"
-      (input)="typedTitle(titleField.value)"
-      (keydown.enter)="titleEnter($event)"
-      [placeholder]="'library.untitled' | t"
-      maxlength="200"
-      class="w-full bg-transparent text-[1.75rem] leading-tight font-semibold text-fg outline-none placeholder:text-fg-secondary/50 desktop:text-[2rem] desktop:font-bold"
-    />
+    @if (desktop) {
+      <!-- The title: big, no box (as Notion's) -->
+      <input
+        #titleField
+        type="text"
+        [value]="title()"
+        (input)="typedTitle(titleField.value)"
+        (keydown.enter)="titleEnter($event)"
+        [placeholder]="'library.untitled' | t"
+        maxlength="200"
+        class="w-full bg-transparent text-[2rem] leading-tight font-bold text-fg outline-none placeholder:text-fg-secondary/50"
+      />
 
-    <!-- The text: blocks, written right on the page -->
-    <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
-
-    <!-- Phones: Delete at the bottom -->
-    <!-- Phones: at the bottom — a favorite, publish (published: copy its link, unpublish), to the trash -->
-    @if (!desktop) {
-      <div class="flex flex-wrap gap-2">
-        <button uiButton type="button" icon="bookmark" [outline]="!p.favorite" (click)="favorite()">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
-        @if (p.shareToken) {
-          <button uiButton type="button" icon="link" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
-          <button uiButton type="button" icon="lock" (click)="share(false)">{{ 'library.unpublish' | t }}</button>
-        } @else {
-          <button uiButton type="button" icon="globe" (click)="share(true)">{{ 'library.publish' | t }}</button>
-        }
-        <button uiButton type="button" icon="trash" (click)="delete()">{{ 'library.moveToTrash' | t }}</button>
-      </div>
+      <!-- The text: blocks, written right on the page -->
+      <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
+    } @else {
+      <!-- Phones: read only, as it'd be read — the title, the blocks (cards; "only for me": a lock, a
+           dashed edge); what can be done with it: the top bar's ⋯ -->
+      <h1 class="text-[1.75rem] leading-tight font-semibold">{{ title() || ('library.untitled' | t) }}</h1>
+      @for (block of p.blocks; track $index) {
+        <div
+          class="relative rounded-card bg-tint px-4 py-3 text-body leading-relaxed break-words whitespace-pre-wrap"
+          [class.outline-dashed]="block.private"
+          [class.outline-1]="block.private"
+          [class.outline-separator]="block.private"
+          [class.pr-9]="block.private"
+        >
+          @if (block.private) {
+            <app-icon name="lock" class="absolute top-3 right-3 size-4 text-icon" />
+          }
+          <!-- prettier-ignore -->
+          @for (k of shown(block.text ?? ''); track $index) {@if (k.href) {<a [href]="k.href" target="_blank" rel="noopener" class="text-accent" [class.font-semibold]="k.bold" [class.italic]="k.italic">{{ k.t }}</a>} @else {<span [class.font-semibold]="k.bold" [class.italic]="k.italic" [class.underline]="k.underline" [class.line-through]="k.strike">{{ k.t }}</span>}}
+        </div>
+      } @empty {
+        <p class="text-body text-fg-secondary">{{ 'library.emptyPage' | t }}</p>
+      }
     }
   }
 </div>
@@ -124,4 +132,45 @@
       <app-ai-chat [pageId]="p.id" [page]="pageText()" (add)="editor()?.insert($event)" />
     </ui-sheet>
   }
+}
+
+<!-- Phones: the page's ⋯ (the top bar) — a sheet: a row each, its icon and words (as a block's menu) -->
+@if (!desktop && actionsOpen() && page(); as p) {
+  <ui-sheet #actions (closed)="actionsOpen.set(false)">
+    <div class="-mx-2 flex flex-col">
+      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); favorite()">
+        <app-icon name="bookmark" [colored]="p.favorite" class="size-icon-menu text-icon" />
+        <span class="flex-1">{{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</span>
+      </button>
+      @if (p.shareToken) {
+        <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); copyLink()">
+          <app-icon name="link" colored class="size-icon-menu text-icon" />{{ 'library.copyLink' | t }}
+        </button>
+        @if (canShare) {
+          <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); shareLink()">
+            <app-icon name="popout" colored class="size-icon-menu text-icon" />{{ 'library.sendLink' | t }}
+          </button>
+        }
+        <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); share(false)">
+          <app-icon name="lock" colored class="size-icon-menu text-icon" />{{ 'library.unpublish' | t }}
+        </button>
+      } @else {
+        <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); share(true)">
+          <app-icon name="globe" colored class="size-icon-menu text-icon" />{{ 'library.publish' | t }}
+        </button>
+      }
+      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:bg-tint" (click)="actions.close(); duplicate()">
+        <app-icon name="duplicate" colored class="size-icon-menu text-icon" />{{ 'library.duplicate' | t }}
+      </button>
+      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body text-danger outline-none active:bg-tint" (click)="actions.close(); delete()">
+        <app-icon name="trash" class="size-icon-menu" />{{ 'library.moveToTrash' | t }}
+      </button>
+      <!-- (how many blocks, when it was edited, made) -->
+      <div class="flex flex-col px-row-x pt-3 text-footnote text-fg-secondary">
+        <span>{{ 'library.blocks' | t }}: {{ p.blocks.length }}</span>
+        <span>{{ 'library.edited' | t }} {{ when(p.updatedAt) }}</span>
+        <span>{{ 'library.created' | t }} {{ when(p.createdAt) }}</span>
+      </div>
+    </div>
+  </ui-sheet>
 }

@@ -24,6 +24,12 @@
       <span class="min-w-0 flex-1 truncate text-body font-semibold" data-vt="page-title">{{
         title()
       }}</span>
+      <!-- (the page's own ⋯, at the right) -->
+      @if (menu(); as open) {
+        <button type="button" uiFloatingButton round (click)="open()" [attr.aria-label]="'library.more' | t">
+          <app-icon name="dots" class="size-7" />
+        </button>
+      }
     } @else {
       <!-- A section: a pill with its icon and name, ▾ — the shared select (phones: the system's own
            menu of the sections): one picked, it opens -->

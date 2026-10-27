@@ -30,6 +30,7 @@ export class MobileLayout {
   private readonly page = inject(PageTitle);
   protected readonly title = this.page.text;
   protected readonly back = this.page.back;
+  protected readonly menu = this.page.menu;
   protected readonly area = inject(VisibleArea);
   protected readonly searchBar = viewChild.required(SearchBar);
   protected readonly accountOpen = signal(false);
