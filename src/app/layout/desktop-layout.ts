@@ -51,6 +51,7 @@ export class DesktopLayout {
   private readonly store = inject(LibraryStore);
   protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   protected readonly trashOpen = signal(false);
+  protected readonly favsScrolled = signal(false);
 
   // The account's menu: open at its button
   protected readonly menuAt = signal<HTMLElement | null>(null);
