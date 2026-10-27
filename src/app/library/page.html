@@ -46,9 +46,7 @@
       <!-- The assistant; Duplicate, Copy / Paste content; Move to trash; how many blocks, when edited, made -->
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
         <button type="button" uiMenuItem icon="sparkle" (click)="aiOpen.set(true)">{{ 'editor.ai' | t }}</button>
-        @if (p.shareToken) {
-          <button type="button" uiMenuItem icon="popout" (click)="openLink()">{{ 'library.preview' | t }}</button>
-        }
+        <button type="button" uiMenuItem icon="popout" (click)="preview()">{{ 'library.preview' | t }}</button>
         <ui-menu-separator />
         <button type="button" uiMenuItem icon="duplicate" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
         <button type="button" uiMenuItem icon="page" (click)="copyContent()" [disabled]="!blockCount()">{{ 'library.copyContent' | t }}</button>

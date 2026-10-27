@@ -205,9 +205,11 @@ export class PageView {
     );
   }
 
-  protected openLink(): void {
-    const token = this.page()?.shareToken;
-    if (token) window.open(shareUrl(token), '_blank', 'noopener');
+  // ⋯ → Preview: the page as it'd be read (its "only for me" blocks left out), in a new tab — saved first
+  protected preview(): void {
+    this.flush();
+    const id = this.page()?.id;
+    if (id) window.open(`/preview/${id}`, '_blank', 'noopener');
   }
 
   protected favorite(): void {

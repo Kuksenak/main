@@ -6,6 +6,8 @@ import { desktop } from './core/device';
 export const routes: Routes = [
   // A published page, for anyone with its link (no sign-in)
   { path: 's/:token', loadComponent: () => import('./library/shared-page').then((m) => m.SharedPageView) },
+  // A page as it'd be read (published or not): its own, signed in
+  { path: 'preview/:id', loadComponent: () => import('./library/shared-page').then((m) => m.SharedPageView), canActivate: [authGuard] },
   { path: 'login', loadComponent: () => import('./login/login').then((m) => m.Login), canActivate: [guestGuard] },
   {
     // The signed-in pages, in the device's own layout (desktop: the sidebar beside them; phones: a
