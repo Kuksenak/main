@@ -4,7 +4,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { UiAvatar, UiButton } from '../core/ui';
+import { Icon, UiAvatar, UiButton } from '../core/ui';
 import { UiSidebar, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
 import { LibraryStore } from '../library/library.store';
 import { TrashList } from '../library/trash-list';
@@ -22,6 +22,7 @@ import { Search } from './search';
 @Component({
   selector: 'app-desktop-layout',
   imports: [
+    Icon,
     RouterOutlet,
     Search,
     TranslatePipe,
@@ -52,6 +53,12 @@ export class DesktopLayout {
   protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   protected readonly trashOpen = signal(false);
   protected readonly favsScrolled = signal(false);
+  // (folded away or not — kept on this device)
+  protected readonly favsFolded = signal(read(FOLDED) === '1');
+  protected toggleFavs(): void {
+    this.favsFolded.set(!this.favsFolded());
+    write(FOLDED, this.favsFolded() ? '1' : '0');
+  }
 
   // The account's menu: open at its button
   protected readonly menuAt = signal<HTMLElement | null>(null);
@@ -75,3 +82,20 @@ export class DesktopLayout {
     inject(DestroyRef).onDestroy(() => document.removeEventListener('keydown', onKey));
   }
 }
+
+// (the favorites folded: kept on this device — storage may be off, then it just isn't kept)
+const FOLDED = 'sidebar.favorites.folded';
+const read = (key: string): string | null => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+const write = (key: string, value: string): void => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // (not kept)
+  }
+};
