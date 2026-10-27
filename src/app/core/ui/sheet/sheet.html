@@ -5,7 +5,7 @@
   #panel
   role="dialog"
   aria-modal="true"
-  class="group/sheet absolute inset-x-1.5 bottom-1.5 flex animate-sheet-up flex-col overflow-hidden rounded-[2.75rem] border-[0.5px] border-sheet-border bg-sheet
+  class="absolute inset-x-1.5 bottom-1.5 flex animate-sheet-up flex-col overflow-hidden rounded-[2.75rem] border-[0.5px] border-sheet-border bg-sheet
          text-fg shadow-sheet backdrop-blur-[30px] backdrop-saturate-[180%] [corner-shape:squircle]
          max-h-[90%] data-tall:top-[calc(env(safe-area-inset-top)+1.75rem)] data-tall:max-h-none"
   [attr.data-tall]="tall() ? '' : null"
@@ -13,7 +13,7 @@
   [style.transition]="dragging() ? 'none' : closing() ? 'transform 360ms cubic-bezier(0.4, 0, 0.2, 1)' : 'transform 280ms var(--ease-ios)'"
 >
   <!-- Over what scrolls (it passes under them, fading out — not cut off at a line): -->
-  <div class="absolute inset-x-0 top-0 z-10 flex flex-col">
+  <div #top class="absolute inset-x-0 top-0 z-10 flex flex-col">
   <!-- The grabber (the sheet's pulled down by it, or anywhere) -->
   <div class="shrink-0 px-4 pt-2.5 pb-0.5">
     <div class="mx-auto h-1.25 w-9 rounded-full bg-grabber"></div>
@@ -22,19 +22,20 @@
   <!-- The head row (‹, the page's name, a field: put in with sheetHead), staying put while what's under
        it scrolls; with nothing in it, half its height of room. (Room over it too: a button growing under
        the finger isn't cut off at the top.) -->
-  <div data-head class="relative mx-5 mt-1.5 mb-3 flex h-round shrink-0 items-center justify-center empty:mb-0 empty:h-5.5">
+  <div class="relative mx-5 mt-1.5 mb-3 flex h-round shrink-0 items-center justify-center empty:mb-0 empty:h-5.5">
     <ng-content select="[sheetHead]" />
   </div>
   </div>
 
   <!-- What's in it, scrolling (at the bottom: room for the home indicator — none over the keyboard); at
-       the top room for the grabber and the head (4.9375rem: 1.0625 + 3.875; no head: 2.8125), what
-       scrolls up under them seen through, paler (not gone) -->
+       the top room for the grabber and the head (as tall as they are, measured), what scrolls up under
+       them seen through, paler (not gone) -->
   <div
     #scroller
-    class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5
-           pt-[4.9375rem] [mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.25)_1.0625rem,rgb(0_0_0/0.4)_3.5rem,black_4.9375rem)]
-           group-has-[[data-head]:empty]/sheet:pt-[2.8125rem] group-has-[[data-head]:empty]/sheet:[mask-image:linear-gradient(to_bottom,rgb(0_0_0/0.25)_1.0625rem,black_2.8125rem)]"
+    class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5"
+    [style.padding-top.px]="topH()"
+    [style.mask-image]="topMask()"
+    [style.-webkit-mask-image]="topMask()"
     [style.padding-bottom]="area.keyboard() ? '0.75rem' : 'max(1.25rem, calc(env(safe-area-inset-bottom) - 0.25rem))'"
   >
     <ng-content />

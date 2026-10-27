@@ -1,4 +1,4 @@
-import { afterNextRender, Component, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { refreshThemeColor } from '../../services/theme-color';
 import { VisibleArea } from '../../services/visible-area';
 
@@ -43,13 +43,27 @@ export class UiSheet {
 
   private readonly panel = viewChild.required<ElementRef<HTMLElement>>('panel');
   private readonly scroller = viewChild.required<ElementRef<HTMLElement>>('scroller');
+  private readonly top = viewChild.required<ElementRef<HTMLElement>>('top');
+
+  // The grabber and the head over what scrolls: their height (room for them at the top of it), and
+  // what passes under them paler — seen through, not gone
+  protected readonly topH = signal(0);
+  protected readonly topMask = computed(() => {
+    const h = this.topH();
+    return h ? `linear-gradient(to bottom, rgb(0 0 0 / 0.25) 17px, rgb(0 0 0 / 0.4) ${h - 20}px, black ${h}px)` : null;
+  });
 
   constructor() {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && this.close();
     document.addEventListener('keydown', onKey);
-    inject(DestroyRef).onDestroy(() => document.removeEventListener('keydown', onKey));
+    const destroyed = inject(DestroyRef);
+    destroyed.onDestroy(() => document.removeEventListener('keydown', onKey));
     // (its own listeners: a pull must be able to stop the scrolling — not passive)
     afterNextRender(() => {
+      const top = this.top().nativeElement;
+      const measure = new ResizeObserver(() => this.topH.set(top.offsetHeight));
+      measure.observe(top);
+      destroyed.onDestroy(() => measure.disconnect());
       const panel = this.panel().nativeElement;
       panel.addEventListener('touchstart', (e) => this.pullStart(e), { passive: true });
       panel.addEventListener('touchmove', (e) => this.pullMove(e), { passive: false });
