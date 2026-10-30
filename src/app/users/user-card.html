@@ -23,26 +23,28 @@
       </ui-list>
     </div>
 
-    <!-- AI: questions a day (empty: the app's own number, gray in the field), asked today -->
+    <!-- AI: questions a day (picked: the app's own number, or one of a few), asked today -->
     @if (store.aiDefault() !== null) {
       <div class="flex flex-col gap-2">
         <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'users.ai' | t }}</span>
         <ui-list>
+          <!-- (picked from iOS's own menu, not typed: no keyboard — the sheet didn't jump about) -->
           <div uiListItem>
             {{ 'users.aiPerDay' | t }}
-            <input
-              itemValue
-              #limit
-              type="number"
-              inputmode="numeric"
-              min="0"
-              max="10000"
-              [value]="user.aiPerDay ?? ''"
-              [placeholder]="store.aiDefault()"
-              (change)="store.setAiLimitTyped(user, limit.value)"
-              (keydown.enter)="limit.blur()"
-              class="w-20 bg-transparent text-right text-fg-secondary outline-none placeholder:text-fg-secondary/50"
-            />
+            <span itemValue class="flex items-center gap-1 text-fg-secondary">
+              {{ user.aiPerDay ?? store.aiDefault() }}
+              <app-icon name="chevron-down" class="size-4 text-icon" />
+            </span>
+            <select
+              class="absolute inset-0 opacity-0"
+              [attr.aria-label]="'users.aiPerDay' | t"
+              (change)="pick(user, $any($event.target).value)"
+            >
+              <option value="" [selected]="user.aiPerDay === null">{{ 'users.aiDefault' | t }} ({{ store.aiDefault() }})</option>
+              @for (n of limits(user); track n) {
+                <option [value]="n" [selected]="user.aiPerDay === n">{{ n }}</option>
+              }
+            </select>
           </div>
           <div uiListItem>
             {{ 'users.aiToday' | t }}
