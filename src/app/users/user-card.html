@@ -23,29 +23,23 @@
       </ui-list>
     </div>
 
-    <!-- AI: questions a day (picked: the app's own number, or one of a few), asked today -->
+    <!-- AI: questions a day (turned on a wheel: the app's own number, or one of a few), asked today -->
     @if (store.aiDefault() !== null) {
       <div class="flex flex-col gap-2">
         <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'users.ai' | t }}</span>
         <ui-list>
-          <!-- (picked from iOS's own menu, not typed: no keyboard — the sheet didn't jump about) -->
-          <div uiListItem>
+          <!-- (a tap: a wheel under the row, as Clock's — no keyboard, the sheet doesn't jump about; the
+               number in the accent color while it's open) -->
+          <button type="button" uiListItem (click)="wheelOpen.set(!wheelOpen())" [attr.aria-expanded]="wheelOpen()">
             {{ 'users.aiPerDay' | t }}
-            <span itemValue class="flex items-center gap-1 text-fg-secondary">
-              {{ user.aiPerDay ?? store.aiDefault() }}
-              <app-icon name="chevron-down" class="size-4 text-icon" />
-            </span>
-            <select
-              class="absolute inset-0 opacity-0"
-              [attr.aria-label]="'users.aiPerDay' | t"
-              (change)="pick(user, $any($event.target).value)"
-            >
-              <option value="" [selected]="user.aiPerDay === null">{{ 'users.aiDefault' | t }} ({{ store.aiDefault() }})</option>
-              @for (n of limits(user); track n) {
-                <option [value]="n" [selected]="user.aiPerDay === n">{{ n }}</option>
-              }
-            </select>
-          </div>
+            <span itemValue class="text-fg-secondary tabular-nums" [class.text-accent]="wheelOpen()">{{ user.aiPerDay ?? store.aiDefault() }}</span>
+          </button>
+          @if (wheelOpen()) {
+            <div class="relative py-2 after:absolute after:right-0 after:bottom-0 after:left-4 after:h-[0.5px] after:bg-separator">
+              <ui-wheel [options]="limits(user)" [value]="user.aiPerDay === null ? '' : '' + user.aiPerDay"
+                (valueChange)="pick(user, $event)" [label]="'users.aiPerDay' | t" />
+            </div>
+          }
           <div uiListItem>
             {{ 'users.aiToday' | t }}
             <span itemValue class="text-fg-secondary">{{ user.aiAskedToday }}</span>

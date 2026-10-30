@@ -18,3 +18,4 @@ export { Confirm, type ConfirmAsk } from './confirm/confirm';
 export { UiSelect, type UiOption } from './picker/select';
 export { UiDate } from './picker/date';
 export { UiTime } from './picker/time';
+export { UiWheel } from './picker/wheel';
