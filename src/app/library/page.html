@@ -15,24 +15,32 @@
       </button>
       @if (renaming()) {
         <div class="fixed inset-0 z-30" (click)="renaming.set(false)"></div>
+        <!-- (its words over it; the field the whole width, a faint accent edge; ↵ a quiet hint in it) -->
         <form
-          class="absolute top-full left-0 z-40 mt-1 flex animate-menu-in items-center gap-1 rounded-menu bg-dialog p-1 text-fg shadow-popover"
+          class="absolute top-full left-0 z-40 mt-1.5 flex w-96 animate-menu-in flex-col gap-1.5 rounded-menu bg-dialog p-2 text-fg shadow-popover"
           (submit)="$event.preventDefault(); titleDone()"
         >
-          <input
-            #titleField
-            type="text"
-            [value]="title()"
-            (input)="typedTitle(titleField.value)"
-            (keydown.escape)="renaming.set(false)"
-            [placeholder]="'library.untitled' | t"
-            maxlength="200"
-            autocomplete="off"
-            class="h-8 w-72 rounded-button bg-tint px-2 text-ui outline-none placeholder:text-fg-secondary"
-          />
-          <button type="submit" class="grid size-8 place-items-center rounded-button text-icon hover:bg-tint-strong" [attr.aria-label]="'editor.done' | t">
-            <app-icon name="enter" class="size-4.5" />
-          </button>
+          <span class="px-1 text-caption text-fg-secondary">{{ 'library.rename' | t }}</span>
+          <div class="relative">
+            <input
+              #titleField
+              type="text"
+              [value]="title()"
+              (input)="typedTitle(titleField.value)"
+              (keydown.escape)="renaming.set(false)"
+              [placeholder]="'library.untitled' | t"
+              maxlength="200"
+              autocomplete="off"
+              class="h-9 w-full rounded-button bg-tint/60 pr-9 pl-2.5 text-ui outline-1 outline-separator outline-solid placeholder:text-fg-secondary/60 focus:outline-accent/40"
+            />
+            <button
+              type="submit"
+              class="absolute top-1/2 right-1 grid size-7 -translate-y-1/2 place-items-center rounded-md text-icon opacity-60 hover:bg-tint-strong hover:opacity-100"
+              [attr.aria-label]="'editor.done' | t"
+            >
+              <app-icon name="enter" class="size-4" />
+            </button>
+          </div>
         </form>
       }
     </div>
