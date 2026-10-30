@@ -1,5 +1,5 @@
 <!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): the page's name at the left, ✎ by it (a click on either: a field under it, as the link's —
+     Notion's): the page's name at the left (a click: a field under it, as the link's —
      Enter or a click outside: done; a new page: open at once, its name selected); saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
 @if (desktop && page(); as p) {
   <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app px-3">
@@ -9,10 +9,9 @@
         (click)="renaming.set(!renaming())"
         [attr.aria-expanded]="renaming()"
         [uiTip]="renaming() ? null : ('library.rename' | t)"
-        class="group flex h-7 min-w-0 items-center gap-1.5 rounded-button px-1.5 text-ui text-fg hover:bg-tint-strong"
+        class="flex h-7 min-w-0 items-center rounded-button px-1.5 text-ui text-fg hover:bg-tint-strong"
       >
         <span class="min-w-0 truncate" [class.text-fg-secondary]="!title()">{{ title() || ('library.untitled' | t) }}</span>
-        <app-icon name="pencil" class="size-4 shrink-0 text-icon opacity-60 group-hover:opacity-100" />
       </button>
       @if (renaming()) {
         <div class="fixed inset-0 z-30" (click)="renaming.set(false)"></div>

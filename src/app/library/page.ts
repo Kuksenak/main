@@ -23,7 +23,7 @@ const SAVE_AFTER_MS = 700;
  * AI (the editor's "/" or its bar, desktop: the button at the top): its chat (AiChat) — a sheet
  * (phones) or a window in the middle (desktop); its texts go in after the caret's block.
  * Delete: the page gone, back to the library. Desktops: one row at the top — the title, the
- * title (✎: its field in a popover), the assistant, ⋯ (Duplicate, Delete; when edited, made).
+ * title (a click: its field in a popover), the assistant, ⋯ (Duplicate, Delete; when edited, made).
  * Phones: the title in the top bar, ‹ back to the library.
  */
 @Component({
