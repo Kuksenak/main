@@ -214,6 +214,8 @@ export class PageEditor {
   protected caretTyped(field: HTMLInputElement): void {
     const v = field.value;
     if (v.startsWith('/') || !v) {
+      // ("/" typed where its menu was shut — an empty page, the title's Enter: it opens)
+      if (v) this.caretMenu.set(true);
       this.caretQuery.set(v.slice(1));
       this.caretActive.set(0);
       return;
