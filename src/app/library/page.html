@@ -15,10 +15,10 @@
       </button>
       @if (renaming()) {
         <div class="fixed inset-0 z-30" (click)="renaming.set(false)"></div>
-        <!-- (as the sidebar's Search: a field-like box 32 tall, a faint hairline, round corners; over the
-             page: its fill and a shadow; Enter: the ↵ on a key's chip, a click on it too) -->
+        <!-- (as the sidebar's Search: a field-like box 32 tall, a faint hairline, round corners, the sidebar's color; over the
+             page, no shadow; Enter: the ↵ on a key's chip, a click on it too) -->
         <form
-          class="absolute top-full left-0 z-40 mt-1 flex h-8 w-72 max-w-[80vw] animate-menu-in items-center gap-2 rounded-lg border-[0.8px] border-fg/7 bg-dialog pr-1.5 pl-2 text-ui text-fg shadow-popover"
+          class="absolute top-full left-0 z-40 mt-1 flex h-8 w-72 max-w-[80vw] animate-menu-in items-center gap-2 rounded-lg border-[0.8px] border-fg/7 bg-side pr-1.5 pl-2 text-ui text-fg"
           (submit)="$event.preventDefault(); titleDone()"
         >
           <input
