@@ -15,13 +15,13 @@
       </button>
       @if (renaming()) {
         <div class="fixed inset-0 z-30" (click)="renaming.set(false)"></div>
-        <!-- (as the search window's field: a round box, a hairline edge; the page's icon at the left, the
-             name right in it, no box of its own; ↵ at the right) -->
+        <!-- (as the search window's field, smaller: a round box, a hairline edge; the page's icon at the
+             left, the name right in it, no box of its own; Enter: done) -->
         <form
-          class="absolute top-full left-0 z-40 mt-1.5 flex h-12 w-[28rem] max-w-[80vw] animate-menu-in items-center gap-3 rounded-[1.25rem] border-[0.5px] border-separator bg-dialog pr-2 pl-4.5 text-fg shadow-popover"
+          class="absolute top-full left-0 z-40 mt-1 flex h-10 w-80 max-w-[80vw] animate-menu-in items-center gap-2.5 rounded-xl border-[0.5px] border-separator bg-dialog px-3.5 text-fg shadow-popover"
           (submit)="$event.preventDefault(); titleDone()"
         >
-          <app-icon name="page" class="size-5 shrink-0 text-icon" />
+          <app-icon name="page" class="size-4.5 shrink-0 text-icon" />
           <input
             #titleField
             type="text"
@@ -32,15 +32,8 @@
             [attr.aria-label]="'library.rename' | t"
             maxlength="200"
             autocomplete="off"
-            class="min-w-0 flex-1 bg-transparent text-base text-fg outline-none placeholder:text-fg-secondary"
+            class="min-w-0 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
           />
-          <button
-            type="submit"
-            class="grid size-8 shrink-0 place-items-center rounded-button text-icon opacity-60 hover:bg-tint-strong hover:opacity-100"
-            [attr.aria-label]="'editor.done' | t"
-          >
-            <app-icon name="enter" class="size-4.5" />
-          </button>
         </form>
       }
     </div>
