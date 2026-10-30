@@ -96,7 +96,17 @@ export class UiSheet {
   private pullStart(e: TouchEvent): void {
     const y = e.touches[0]?.clientY ?? 0;
     const inScroller = this.scroller().nativeElement.contains(e.target as Node);
-    this.pull = { mode: 'unknown', fromY: y, inScroller, y, t: e.timeStamp, speed: 0 };
+    // (in a box that scrolls on its own — a wheel, say: always its, never the sheet's)
+    const mode = this.inOwnScroll(e.target as HTMLElement) ? 'scroll' : 'unknown';
+    this.pull = { mode, fromY: y, inScroller, y, t: e.timeStamp, speed: 0 };
+  }
+
+  private inOwnScroll(from: HTMLElement | null): boolean {
+    const scroller = this.scroller().nativeElement;
+    for (let el = from; el && el !== scroller; el = el.parentElement) {
+      if (el.scrollHeight > el.clientHeight + 1 && /auto|scroll/.test(getComputedStyle(el).overflowY)) return true;
+    }
+    return false;
   }
 
   private pullMove(e: TouchEvent): void {
