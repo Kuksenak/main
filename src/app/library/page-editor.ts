@@ -46,8 +46,8 @@ let nextId = 1;
 /**
  * A page's text, edited right on it, as the old app's: blocks of text, each a card (set apart) —
  * a "/" in one is just text; their marks (**bold**, *italic*, __underline__, ~~strike~~,
- * [links](…)) faded over the text. Enter: a new line; on an empty last line, out of it — a new
- * text under it. Backspace in an empty one: it goes, the caret up to the one above; ↑ ↓ at the
+ * [links](…)) faded over the text. Enter: a new line (only that); Ctrl+Enter (⌘↵): out of
+ * it — desktops: the caret's line under it, phones: a new text there. Backspace in an empty one: it goes, the caret up to the one above; ↑ ↓ at the
  * ends: the next one; emptied and left, a text goes. Between two blocks or under the last, a
  * click: desktops — the caret there (a line with its hint and the commands: a new text, the
  * assistant, `ai`; what's typed or pasted, a new block there); phones — a new text, typed at
@@ -339,16 +339,18 @@ export class PageEditor {
     const a = field.selectionStart;
     const b = field.selectionEnd;
     const text = field.value;
-    if (e.key === 'Enter' && !e.shiftKey && a === b && a === text.length && text.endsWith('\n')) {
-      // Enter on an empty last line: out of it — a new text under it
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      // Ctrl+Enter: out of it, under it — desktops: the caret's line; phones: a new text (a plain
+      // Enter: a new line in it, never more)
       e.preventDefault();
+      if (desktop) {
+        this.openCaret(at + 1, false);
+        return;
+      }
       const items = this.items();
-      this.items.set([...items.slice(0, at), { ...items[at], text: text.slice(0, -1) }, { id: nextId++, text: '' }, ...items.slice(at + 1)]);
+      this.items.set([...items.slice(0, at + 1), { id: nextId++, text: '' }, ...items.slice(at + 1)]);
       this.emit();
-      setTimeout(() => {
-        this.grow(field);
-        this.focusAt(at + 1, 'start');
-      });
+      setTimeout(() => this.focusAt(at + 1, 'start'));
     } else if (e.key === 'Backspace' && a === 0 && b === 0 && !text && this.items().length > this.least) {
       // Backspace in an empty one: it goes, the caret up (or down, at the top)
       e.preventDefault();
