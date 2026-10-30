@@ -13,7 +13,7 @@ const ROW = 36;
   selector: 'ui-wheel',
   host: { class: 'relative block h-[180px] select-none' },
   template: `
-    <div class="pointer-events-none absolute inset-x-2 top-[72px] h-9 rounded-[10px] bg-tint"></div>
+    <div class="pointer-events-none absolute inset-x-2 top-[72px] h-9 rounded-full bg-tint"></div>
     <div
       #column
       role="listbox"
