@@ -16,7 +16,7 @@
       @if (renaming()) {
         <div class="fixed inset-0 z-30" (click)="renaming.set(false)"></div>
         <!-- (as the search window's field, smaller: a round box, a hairline edge; the page's icon at the
-             left, the name right in it, no box of its own; Enter: done) -->
+             left, the name right in it, no box of its own; Enter: done — its chip at the right) -->
         <form
           class="absolute top-full left-0 z-40 mt-1 flex h-10 w-80 max-w-[80vw] animate-menu-in items-center gap-2.5 rounded-xl border-[0.5px] border-separator bg-dialog px-3.5 text-fg shadow-popover"
           (submit)="$event.preventDefault(); titleDone()"
@@ -34,6 +34,8 @@
             autocomplete="off"
             class="min-w-0 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
           />
+          <!-- (Enter: a key's chip, as the sidebar's Ctrl+K) -->
+          <span class="shrink-0 rounded-[0.3rem] bg-tint-strong px-1.5 py-px text-footnote text-fg-secondary">Enter</span>
         </form>
       }
     </div>
