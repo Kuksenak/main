@@ -173,24 +173,6 @@ export class PageEditor {
     });
   }
 
-  /** Blocks put in at the end (the page's menu: Paste content). */
-  append(blocks: PageBlock[]): void {
-    const added = blocks.map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private }));
-    const items = this.items();
-    // (the page still empty: its empty block replaced)
-    const replace = items.length === 1 && !items[0].text.trim();
-    this.items.set(replace ? added : [...items, ...added]);
-    this.emit();
-    setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
-  }
-
-  /** The blocks as they are now (the empty ones left out). */
-  now(): PageBlock[] {
-    return this.items()
-      .filter((i) => i.text.trim())
-      .map((i) => ({ kind: 'card' as const, text: i.text, private: i.private || undefined }));
-  }
-
   /** The caret at the start of the first block (e.g. Enter in the title). */
   focusStart(): void {
     if (this.items().length) this.focusAt(0, 'start');

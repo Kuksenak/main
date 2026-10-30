@@ -1,8 +1,42 @@
 <!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): the page's name at the left; saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
+     Notion's): the page's name at the left, ✎ by it (a click on either: a field under it, as the link's —
+     Enter or a click outside: done; a new page: open at once, its name selected); saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
 @if (desktop && page(); as p) {
   <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app px-3">
-    <span class="mr-2 min-w-0 flex-1 truncate px-1.5 text-ui text-fg">{{ title() || ('library.untitled' | t) }}</span>
+    <div class="relative mr-2 flex min-w-0 flex-1 items-center">
+      <button
+        type="button"
+        (click)="renaming.set(!renaming())"
+        [attr.aria-expanded]="renaming()"
+        [uiTip]="renaming() ? null : ('library.rename' | t)"
+        class="group flex h-7 min-w-0 items-center gap-1.5 rounded-button px-1.5 text-ui text-fg hover:bg-tint-strong"
+      >
+        <span class="min-w-0 truncate" [class.text-fg-secondary]="!title()">{{ title() || ('library.untitled' | t) }}</span>
+        <app-icon name="pencil" class="size-4 shrink-0 text-icon opacity-60 group-hover:opacity-100" />
+      </button>
+      @if (renaming()) {
+        <div class="fixed inset-0 z-30" (click)="renaming.set(false)"></div>
+        <form
+          class="absolute top-full left-0 z-40 mt-1 flex animate-menu-in items-center gap-1 rounded-menu bg-dialog p-1 text-fg shadow-popover"
+          (submit)="$event.preventDefault(); titleDone()"
+        >
+          <input
+            #titleField
+            type="text"
+            [value]="title()"
+            (input)="typedTitle(titleField.value)"
+            (keydown.escape)="renaming.set(false)"
+            [placeholder]="'library.untitled' | t"
+            maxlength="200"
+            autocomplete="off"
+            class="h-8 w-72 rounded-button bg-tint px-2 text-ui outline-none placeholder:text-fg-secondary"
+          />
+          <button type="submit" class="grid size-8 place-items-center rounded-button text-icon hover:bg-tint-strong" [attr.aria-label]="'editor.done' | t">
+            <app-icon name="enter" class="size-4.5" />
+          </button>
+        </form>
+      }
+    </div>
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
     }
@@ -43,14 +77,12 @@
       [uiTip]="menuOpen() ? null : ('library.moreTip' | t)"
     ></button>
     @if (menuOpen()) {
-      <!-- The assistant; Duplicate, Copy / Paste content; Move to trash; when edited, made -->
+      <!-- The assistant; Duplicate; Move to trash; when edited, made -->
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
         <button type="button" uiMenuItem icon="sparkle" (click)="aiOpen.set(true)">{{ 'editor.ai' | t }}</button>
         <button type="button" uiMenuItem icon="popout" (click)="preview()">{{ 'library.preview' | t }}</button>
         <ui-menu-separator />
         <button type="button" uiMenuItem icon="duplicate" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
-        <button type="button" uiMenuItem icon="page" (click)="copyContent()" [disabled]="!blockCount()">{{ 'library.copyContent' | t }}</button>
-        <button type="button" uiMenuItem icon="enter" (click)="pasteContent()" [disabled]="!store.clipboard()?.length">{{ 'library.pasteContent' | t }}</button>
         <ui-menu-separator />
         <button type="button" uiMenuItem icon="trash" danger (click)="delete()">{{ 'library.moveToTrash' | t }}</button>
         <ui-menu-separator />
@@ -67,18 +99,6 @@
 
   @if (page(); as p) {
     @if (desktop) {
-      <!-- The title: big, no box (as Notion's) -->
-      <input
-        #titleField
-        type="text"
-        [value]="title()"
-        (input)="typedTitle(titleField.value)"
-        (keydown.enter)="titleEnter($event)"
-        [placeholder]="'library.untitled' | t"
-        maxlength="200"
-        class="w-full bg-transparent text-[2rem] leading-tight font-bold text-fg outline-none placeholder:text-fg-secondary/50"
-      />
-
       <!-- The text: blocks, written right on the page -->
       <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
     } @else {

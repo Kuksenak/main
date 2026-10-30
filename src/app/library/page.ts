@@ -19,11 +19,11 @@ const SAVE_AFTER_MS = 700;
 /**
  * A page of the library (/library/:id): its title and its text (PageEditor: blocks, "/", B I U S,
  * ⠿), edited right there and saved by themselves a moment after the typing stops (and on leaving).
- * A new one ("Untitled") opens with its title selected; Enter in the title goes on into the text.
+ * A new one ("Untitled") opens with its title's field open, selected; Enter there goes on into the text.
  * AI (the editor's "/" or its bar, desktop: the button at the top): its chat (AiChat) — a sheet
  * (phones) or a window in the middle (desktop); its texts go in after the caret's block.
  * Delete: the page gone, back to the library. Desktops: one row at the top — the title, the
- * assistant, ⋯ (Duplicate, Copy / Paste content, Delete; how many blocks, when edited, made).
+ * title (✎: its field in a popover), the assistant, ⋯ (Duplicate, Delete; when edited, made).
  * Phones: the title in the top bar, ‹ back to the library.
  */
 @Component({
@@ -49,11 +49,11 @@ export class PageView {
   protected readonly desktop = desktop;
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
+  protected readonly renaming = signal(false);
   // Phones: the page read only; its actions in a sheet (the top bar's ⋯)
   protected readonly actionsOpen = signal(false);
   protected readonly shown = shown;
   protected readonly canShare = typeof navigator.share === 'function';
-  protected readonly blockCount = signal(0);
   protected readonly editor = viewChild(PageEditor);
 
   private readonly titleField = viewChild<ElementRef<HTMLInputElement>>('titleField');
@@ -84,6 +84,7 @@ export class PageView {
       this.flush();
       this.page.set(null);
       this.menuOpen.set(false);
+      this.renaming.set(false);
       this.open(id);
     });
   });
@@ -97,8 +98,7 @@ export class PageView {
         this.title.set(page.title);
         this.blocks = page.blocks;
         this.texts = this.blocks;
-        this.blockCount.set(page.blocks.length);
-        if (fresh) setTimeout(() => this.titleField()?.nativeElement.select());
+        if (fresh && desktop) this.renaming.set(true);
       },
       error: () => this.toasts.error(this.i18n.t('library.pageLoadError')),
     });
@@ -114,13 +114,18 @@ export class PageView {
 
   protected typedBlocks(blocks: PageBlock[]): void {
     this.blocks = blocks;
-    this.blockCount.set(blocks.filter((b) => b.text?.trim()).length);
     this.changed();
   }
 
-  // Enter in the title: on into the text
-  protected titleEnter(e: Event): void {
-    e.preventDefault();
+  // (the title's field: opened — focused, its name selected)
+  private readonly renameOpened = effect(() => {
+    const field = this.titleField();
+    if (field) setTimeout(() => field.nativeElement.select());
+  });
+
+  // Enter in the title's field: closed, on into the text
+  protected titleDone(): void {
+    this.renaming.set(false);
     this.editor()?.focusStart();
   }
 
@@ -171,18 +176,6 @@ export class PageView {
         next: (page) => this.router.navigate(['/library', page.id]),
         error: () => this.toasts.error(this.i18n.t('library.duplicateError')),
       });
-  }
-
-  // ⋯ → Copy content: its blocks kept, to paste into another page (their text to the clipboard too)
-  protected copyContent(): void {
-    const blocks = this.editor()?.now() ?? [];
-    this.store.clipboard.set(blocks);
-    navigator.clipboard?.writeText(this.editor()?.text() ?? '').catch(() => {});
-  }
-
-  // ⋯ → Paste content: the blocks copied, at the end
-  protected pasteContent(): void {
-    this.editor()?.append(this.store.clipboard() ?? []);
   }
 
   // "26 Oct, 15:02"

@@ -12,7 +12,7 @@
     @if (caret() === i) {
       <ng-container [ngTemplateOutlet]="caretLine" />
     } @else if (i > 0) {
-      <div class="h-2.5 cursor-text" (click)="between(i)"></div>
+      <div class="h-2.5 cursor-text desktop:h-5" (click)="between(i)"></div>
     }
     <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i">
       <button

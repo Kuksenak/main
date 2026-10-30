@@ -32,7 +32,7 @@
           <!-- (a tap: a wheel under the row, as Clock's — no keyboard, the sheet doesn't jump about; the
                limit in the accent color while it's open) -->
           <button type="button" uiListItem (click)="wheelOpen.set(!wheelOpen())" [attr.aria-expanded]="wheelOpen()">
-            {{ 'users.aiToday' | t }}
+            {{ 'users.aiUsage' | t }}
             <span itemValue class="text-fg-secondary tabular-nums">
               {{ user.aiAskedToday }} / <span [class.text-accent]="wheelOpen()">{{ perDay(user) }}</span>
             </span>
