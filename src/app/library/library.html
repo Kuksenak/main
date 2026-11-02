@@ -1,26 +1,25 @@
 @if (desktop) {
-  <!-- Desktops, as Notion's: the section's name big, under it the views as pills (an icon, its name;
-       the one shown: a gray pill) and New page at the right; then the pages -->
-  <div class="flex flex-col px-8 pt-2 pb-12">
-    <!-- (32 tall, 8 from the top: level with the sidebar's Search) -->
-    <h1 class="flex h-8 items-center px-2 text-lg font-semibold">{{ 'nav.library' | t }}</h1>
-    <!-- (the views' row stays at the top as the pages scroll under it) -->
-    <div class="sticky top-0 z-20 mt-2 mb-1 flex items-center gap-1 bg-app py-2">
-      @for (v of views; track v.id) {
-        <button
-          type="button"
-          (click)="view.set(v.id)"
-          [attr.aria-pressed]="view() === v.id"
-          class="flex h-8 items-center gap-1.5 rounded-full px-3 text-ui text-fg-secondary hover:bg-tint aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
-        >
-          <app-icon [name]="v.icon" colored class="size-5.5 text-icon" />
-          {{ v.label | t }}
-        </button>
-      }
-      <span class="flex-1"></span>
-      <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
-    </div>
+  <!-- Desktops, as Notion's: one row at the top, staying as the pages scroll under it (48 tall: level
+       with the sidebar's Search) — the section's name, the views as pills (an icon, its name; the one
+       shown: a gray pill), New page at the right; then the pages -->
+  <div class="sticky top-0 z-20 flex h-12 items-center gap-1 bg-app pr-3 pl-8">
+    <h1 class="mr-3 px-2 text-lg font-semibold">{{ 'nav.library' | t }}</h1>
+    @for (v of views; track v.id) {
+      <button
+        type="button"
+        (click)="view.set(v.id)"
+        [attr.aria-pressed]="view() === v.id"
+        class="flex h-8 items-center gap-1.5 rounded-full px-3 text-ui text-fg-secondary hover:bg-tint aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
+      >
+        <app-icon [name]="v.icon" colored class="size-5.5 text-icon" />
+        {{ v.label | t }}
+      </button>
+    }
+    <span class="flex-1"></span>
+    <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
+  </div>
 
+  <div class="flex flex-col px-8 pt-2 pb-12">
     @if (store.items(); as items) {
       @if (!items.length) {
         <!-- Nothing yet: a big page, a word, New page -->
