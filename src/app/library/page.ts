@@ -11,7 +11,7 @@ import { UiWindow, UiWindowHead } from '../core/ui/window';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
 import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
-import { shown } from './marks';
+import { ReadBlock } from './read-block';
 import { PageEditor } from './page-editor';
 import { TagPicker } from './tag-picker';
 import { TagSheet } from './tag-sheet';
@@ -32,7 +32,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, UiWindowHead, TagPicker, TagSheet],
+  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, UiWindowHead, TagPicker, TagSheet],
   templateUrl: './page.html',
 })
 export class PageView {
@@ -64,7 +64,6 @@ export class PageView {
   private readonly tagsLoaded = this.tags.load();
   // Phones: the page read only; its actions in a sheet (the top bar's ⋯)
   protected readonly actionsOpen = signal(false);
-  protected readonly shown = shown;
   protected readonly canShare = typeof navigator.share === 'function';
   protected readonly editor = viewChild(PageEditor);
 

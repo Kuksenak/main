@@ -2,7 +2,7 @@ import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { map } from 'rxjs';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { LibraryStore, SharedPage } from './library.store';
-import { shown } from './marks';
+import { ReadBlock } from './read-block';
 
 /**
  * A published page (/s/:token), for anyone with its link — no sign-in (or any of one's own, as it'd be
@@ -12,7 +12,7 @@ import { shown } from './marks';
  */
 @Component({
   selector: 'app-shared-page',
-  imports: [TranslatePipe],
+  imports: [ReadBlock, TranslatePipe],
   host: { class: 'block h-full overflow-y-auto' },
   templateUrl: './shared-page.html',
 })
@@ -24,7 +24,6 @@ export class SharedPageView implements OnInit {
   private readonly store = inject(LibraryStore);
   protected readonly page = signal<SharedPage | null>(null);
   protected readonly missing = signal(false);
-  protected readonly shown = shown;
 
   ngOnInit(): void {
     const id = this.id();

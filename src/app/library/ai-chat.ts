@@ -3,7 +3,7 @@ import { desktop } from '../core/device';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui';
 import { AiChatStore, ChatBlock, ChatTurn, MAX_PHOTOS } from './ai-chat.store';
-import { marked } from './marks';
+import { ReadBlock } from './read-block';
 
 /**
  * The page assistant's chat (AiChatStore), for a page: the turns — the teacher's on the right (their
@@ -15,7 +15,7 @@ import { marked } from './marks';
  */
 @Component({
   selector: 'app-ai-chat',
-  imports: [Icon, TranslatePipe],
+  imports: [Icon, ReadBlock, TranslatePipe],
   host: { class: 'flex min-h-0 flex-1 flex-col', '(dragover)': '$event.preventDefault()', '(drop)': 'dropped($event)' },
   templateUrl: './ai-chat.html',
 })
@@ -28,7 +28,6 @@ export class AiChat {
   protected readonly store = inject(AiChatStore);
   protected readonly desktop = desktop;
   protected readonly turns = computed(() => this.store.turns(this.pageId())());
-  protected readonly marked = marked;
   // The photos to go with the next message
   protected readonly photos = signal<{ blob: Blob; url: string }[]>([]);
   protected readonly maxPhotos = MAX_PHOTOS;
