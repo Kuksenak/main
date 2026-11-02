@@ -19,7 +19,7 @@
   @if (adding()) {
     <!-- (a new one's name: Enter makes it, Esc / away — not) -->
     <div class="flex h-side-row shrink-0 items-center gap-2 pr-side-row-x pl-3.5">
-      <span class="size-3 shrink-0 rounded-[0.25rem] bg-tag" [attr.data-tag]="store.nextColor()"></span>
+      <span class="size-3 shrink-0 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="store.nextColor()"></span>
       <input
         #field
         type="text"
@@ -47,7 +47,7 @@
       class="group/row flex h-side-row shrink-0 cursor-pointer items-center gap-2 rounded-side-row pr-side-row-x pl-3.5 text-ui text-side-text outline-none
              hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:text-fg data-drop:bg-side-on"
     >
-      <span class="size-3 shrink-0 rounded-[0.25rem] bg-tag" [attr.data-tag]="tag.color"></span>
+      <span class="size-3 shrink-0 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="tag.color"></span>
       @if (renaming() === tag.id) {
         <input
           #field
@@ -78,7 +78,7 @@
 <!-- A tag's ⋯: Rename; its colors; Delete (asked first) -->
 @if (menuFor(); as m) {
   <ui-menu narrow [origin]="m.at" (closed)="menuFor.set(null)">
-    <button type="button" uiMenuItem (click)="renaming.set(m.tag.id)">{{ 'tags.rename' | t }}</button>
+    <button type="button" uiMenuItem icon="pencil" (click)="renaming.set(m.tag.id)">{{ 'tags.rename' | t }}</button>
     <ui-menu-separator />
     <ui-menu-label>{{ 'tags.color' | t }}</ui-menu-label>
     @for (color of colors; track color) {

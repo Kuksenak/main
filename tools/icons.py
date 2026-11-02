@@ -172,10 +172,12 @@ ICONS = {
     # filter (what's on the page): a funnel (yellow), wide at the top, its spout a little crooked
     'filter': fill(YELLOW, 'M12.4 14.2 51.6 13.6 36.2 32.4 36.4 50.8 27.8 54.4 27.6 32.6z')
         + line('M12.4 14.2C25.6 13.8 38.6 14 51.6 13.6 46 20 40.6 26.2 36.2 32.4 36.4 38.6 36.2 44.6 36.4 50.8 33.6 52 30.6 53.2 27.8 54.4 27.6 47 27.8 39.6 27.6 32.6 22.6 26.4 17.4 20.4 12.6 14.6'),
-    # rename (a page's title): a pencil (yellow), aslant, its point at the bottom left, a band by its end
-    'pencil': fill(YELLOW, 'M13.2 50.8 17.4 39.6 45.4 11.6 52.4 18.6 24.4 46.6z')
-        + line('M13.2 50.8C14.6 47 16 43.4 17.4 39.6 26.6 30.2 36 21 45.2 11.8 47.6 14 50 16.4 52.4 18.6 43 28 33.8 37.2 24.4 46.6 20.6 48 16.8 49.4 13.4 50.6')
-        + thin('M17.6 39.8C19.6 41.8 22.2 44.4 24.2 46.4M39.4 17.6C41.8 20 44.2 22.4 46.6 24.6'),
+    # rename (as Notion's): a slim pencil aslant, its point at the bottom left, a band by its end, the
+    # line it writes on under it — lines only, a thicker marker
+    'pencil': '<g stroke-width="3.6">'
+        + line('M12.2 51.8C13 49 13.8 46.2 14.8 43.4 24.8 33.2 35 23.2 45.1 13.1 47 15 49 17 50.9 18.9 40.8 29 30.6 39.2 20.6 49.2 17.8 50 15 51 12.4 51.6')
+        + line('M40.4 18.2C42.2 20 44 21.8 45.8 23.8M33.6 52.2C39.8 52 46 52.2 52.2 52')
+        + '</g>',
     # tags: a # — two strokes leaning right, two across, a little off
     'hash': line('M27.4 12.8C25.6 25.6 23.6 38.4 21.8 51.2M42.2 12.6C40.4 25.4 38.4 38.2 36.6 51')
         + line('M13.4 24.8C26.2 24.6 39 24.8 51.6 24.6M12.4 39.4C25.2 39.2 38 39.4 50.6 39.2'),
