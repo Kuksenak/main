@@ -1,5 +1,5 @@
-<!-- The blocks: a field each, its marks faded over its text; its ⠿ (desktop: at its left under the
-     pointer; phones: at its right). A line shows where a dragged block would land. -->
+<!-- The blocks: a field each, its marks faded over its text; its ⠿ at its left under the pointer. A
+     line shows where a dragged block would land. -->
 <div #host class="relative flex flex-col" (pointermove)="gripMove($event, host)">
   @if (dropLine(); as y) {
     <div
@@ -8,36 +8,35 @@
     ></div>
   }
   @for (item of items(); track item.id; let i = $index) {
-    <!-- (between two blocks: a tap there — desktops: the caret, phones: a new one) -->
+    <!-- (between two blocks: a click there — the caret) -->
     @if (caret() === i) {
       <ng-container [ngTemplateOutlet]="caretLine" />
     } @else if (i > 0) {
-      <div class="h-2.5 cursor-text desktop:h-5" (click)="between(i)"></div>
+      <div class="h-5 cursor-text" (click)="openCaret(i)"></div>
     }
-    <!-- (desktops: the pointer over it or over its ⠿ — the strip at its left, a pseudo-element: hovered as one) -->
-    <div data-block class="group relative transition-opacity desktop:before:absolute desktop:before:inset-y-0 desktop:before:-left-7 desktop:before:w-7" [class.opacity-35]="dragging() === i">
+    <!-- (the pointer over it or over its ⠿ — the strip at its left, a pseudo-element: hovered as one) -->
+    <div data-block class="group relative transition-opacity before:absolute before:inset-y-0 before:-left-7 before:w-7" [class.opacity-35]="dragging() === i">
       <button
+        #grip
         type="button"
         [attr.aria-label]="'editor.grip' | t"
-        [uiTip]="desktop && blockMenu() !== i && dragging() === null ? ('editor.gripTip' | t) : null"
-        tipSide="bottom"
+        [uiTip]="blockMenu() !== i && dragging() === null ? ('editor.gripTip' | t) : null"
         [attr.aria-expanded]="blockMenu() === i"
         [attr.data-near]="near() === i ? '' : null"
-        class="absolute top-3 grid h-7 w-6 desktop:top-1 desktop:h-6 desktop:w-4 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-5.5 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:data-near:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
+        class="absolute top-1 -left-5.5 grid h-6 w-4 cursor-grab touch-none place-items-center rounded-md text-icon opacity-0 transition-opacity group-hover:opacity-100 hover:bg-tint-strong active:cursor-grabbing data-near:opacity-100 aria-expanded:opacity-100"
         (pointerdown)="gripDown($event, i)"
         (pointermove)="gripMove($event, host)"
         (pointerup)="gripUp()"
         (pointercancel)="gripUp()"
       >
-        <app-icon name="grip" class="size-4.5 desktop:size-4" />
+        <app-icon name="grip" class="size-4" />
       </button>
 
-      <!-- (phones: a card — a soft gray fill, round corners, room inside; desktops: plain text, as
-           Notion's — under the pointer a faint edge round it (and its ⠿ at the left), written in: a
-           faint accent one) -->
+      <!-- (plain text, as Notion's — under the pointer a faint edge round it (and its ⠿ at the left),
+           written in: a faint accent one) -->
       <!-- (only for the teacher: a lock in its corner) -->
       <div
-        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-transparent desktop:px-4 desktop:py-3 desktop:outline-1 desktop:outline-solid desktop:outline-transparent desktop:group-hover:outline-separator desktop:focus-within:outline-accent/15"
+        class="relative rounded-menu px-4 py-3 outline-1 outline-transparent outline-solid group-hover:outline-separator focus-within:outline-accent/15"
         [class.pr-9]="item.private"
       >
         @if (item.private) {
@@ -46,7 +45,7 @@
         <div class="relative">
           <!-- (the same letters as the field's, over it: only the marks faded, links colored) -->
           <!-- prettier-ignore -->
-          <div aria-hidden="true" class="pointer-events-none absolute inset-0 text-body leading-relaxed desktop:text-ui break-words whitespace-pre-wrap">@for (k of marked(item.text); track $index) {<span [class.opacity-30]="k.kind === 'syntax'" [class.text-accent]="k.kind === 'link'">{{ k.t }}</span>}</div>
+          <div aria-hidden="true" class="pointer-events-none absolute inset-0 text-ui leading-relaxed break-words whitespace-pre-wrap">@for (k of marked(item.text); track $index) {<span [class.opacity-30]="k.kind === 'syntax'" [class.text-accent]="k.kind === 'link'">{{ k.t }}</span>}</div>
           <textarea
             #field
             rows="1"
@@ -58,17 +57,14 @@
             (mouseup)="select(i, field)"
             (focus)="select(i, field)"
             (blur)="left(i)"
-            [placeholder]="focused() === i || items().length === 1
-                  ? ('editor.hintPhone' | t)
-                  : ''
-            "
-            class="relative block w-full resize-none overflow-hidden bg-transparent text-body leading-relaxed desktop:min-h-[3lh] desktop:text-ui text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
+            [placeholder]="focused() === i || items().length === 1 ? ('editor.hintPhone' | t) : ''"
+            class="relative block min-h-[3lh] w-full resize-none overflow-hidden bg-transparent text-ui leading-relaxed text-transparent caret-fg outline-none placeholder:text-fg-secondary selection:bg-accent/25"
           ></textarea>
         </div>
       </div>
 
-      <!-- Desktop: a selection in it — B I U S, Link over the block (what's on: gray) -->
-      @if (desktop && focused() === i && (selection().a !== selection().b || linking()?.at === i)) {
+      <!-- A selection in it — B I U S, Link over the block (what's on: gray) -->
+      @if (focused() === i && (selection().a !== selection().b || linking()?.at === i)) {
         <div
           class="absolute bottom-full left-0 z-30 mb-1 flex animate-menu-in items-center gap-0.5 rounded-menu bg-dialog p-1 text-fg shadow-popover"
         >
@@ -121,181 +117,30 @@
         </div>
       }
 
-      <!-- Its menu (its ⠿ tapped): duplicate, delete -->
-      @if (desktop && blockMenu() === i) {
-        <div class="fixed inset-0 z-30" (click)="blockMenu.set(null)"></div>
-        <div
-          role="menu"
-          class="absolute top-8 z-40 flex w-56 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover -left-5.5"
-        >
-          <button
-            type="button"
-            role="menuitem"
-            (click)="blockMenu.set(null); togglePrivate(i)"
-            class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
-          >
-            <app-icon name="lock" colored class="size-icon-menu text-icon" /><span class="flex-1">{{ 'editor.onlyMe' | t }}</span>
-            @if (item.private) {
-              <app-icon name="check" class="size-icon-menu" />
-            }
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            (click)="blockMenu.set(null); copy(i)"
-            [disabled]="!item.text.trim()"
-            class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong disabled:opacity-40"
-          >
-            <app-icon name="page" colored class="size-icon-menu text-icon" />{{ 'editor.copy' | t }}
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            (click)="blockMenu.set(null); duplicate(i)"
-            class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
-          >
-            <app-icon name="duplicate" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
-          </button>
-          <span class="mx-menu-row-x my-1 h-px bg-separator"></span>
-          <button
-            type="button"
-            role="menuitem"
-            (click)="blockMenu.set(null); remove(i)"
-            class="group/del flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong hover:text-danger"
-          >
-            <app-icon name="trash" colored class="size-icon-menu text-icon" />{{
-              'editor.delete' | t
-            }}
-          </button>
-        </div>
+      <!-- Its menu (its ⠿ clicked): only for me, copy, duplicate, delete -->
+      @if (blockMenu() === i) {
+        <ui-menu narrow [origin]="grip" (closed)="blockMenu.set(null)">
+          <button type="button" uiMenuItem icon="lock" [checked]="!!item.private" (click)="togglePrivate(i)">{{ 'editor.onlyMe' | t }}</button>
+          <button type="button" uiMenuItem icon="page" [disabled]="!item.text.trim()" (click)="copy(i)">{{ 'editor.copy' | t }}</button>
+          <button type="button" uiMenuItem icon="duplicate" (click)="duplicate(i)">{{ 'editor.duplicate' | t }}</button>
+          <ui-menu-separator />
+          <button type="button" uiMenuItem icon="trash" danger (click)="remove(i)">{{ 'editor.delete' | t }}</button>
+        </ui-menu>
       }
     </div>
   }
   @if (caret() === items().length) {
     <div class="mt-2.5"><ng-container [ngTemplateOutlet]="caretLine" /></div>
   }
-  <!-- The end of the page: a hint to write on (a tap: a new text there, typed at once), + Text and
-       Assistant; under them, room to tap too -->
-  <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col gap-3" (click)="typeAtEnd()">
+  <!-- The end of the page: a hint to write on (a click: the caret there); under it, room to click too -->
+  <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col" (click)="openCaret(items().length)">
     @if ((items().length > 1 || items()[0]?.text) && caret() === null) {
-      <span class="px-4 text-body text-fg-secondary/70 desktop:text-ui">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
+      <span class="px-4 text-ui text-fg-secondary/70">{{ 'editor.endHint' | t }}</span>
     }
-    <!-- (desktops: the assistant's in the page's head; a click here is a new text) -->
-    <div class="flex items-center gap-2 desktop:hidden" (click)="$event.stopPropagation()">
-      <button type="button" (click)="typeAtEnd()" class="flex h-9 items-center gap-1.5 rounded-full bg-tint px-3.5 text-ui text-fg hover:bg-tint-strong active:bg-tint-strong">
-        <app-icon name="plus" class="size-4.5 text-icon" />{{ 'editor.text' | t }}
-      </button>
-      <button type="button" (click)="ai.emit()" class="flex h-9 items-center gap-1.5 rounded-full bg-tint px-3.5 text-ui text-fg hover:bg-tint-strong active:bg-tint-strong">
-        <app-icon name="sparkle" class="size-4.5" />{{ 'editor.ai' | t }}
-      </button>
-    </div>
   </div>
 </div>
 
-<!-- Phones: while it's written in, just over the keyboard — B I U S, Link, AI on a capsule; ✓ at
-     its right (the keyboard away). A tap on them keeps the caret where it is. Link: the address
-     in the capsule instead. -->
-@if (!desktop && focused() >= 0) {
-  <div
-    class="pointer-events-none fixed inset-x-0 z-40 flex flex-col justify-end"
-    [style.top.px]="area.top()"
-    [style.height.px]="area.height()"
-  >
-    <div class="pointer-events-auto mx-3 mb-2 flex items-center gap-2">
-      <div
-        class="flex h-round min-w-0 flex-1 items-center gap-0.5 rounded-full bg-glass px-1.5 shadow-glass backdrop-blur-[20px] backdrop-saturate-[180%]"
-      >
-        @if (linking()) {
-          <form
-            class="flex min-w-0 flex-1 items-center gap-1 pl-2"
-            (submit)="$event.preventDefault(); applyLink(phoneLink.value)"
-          >
-            <input
-              #phoneLink
-              type="url"
-              inputmode="url"
-              autocomplete="off"
-              placeholder="https://…"
-              class="min-w-0 flex-1 bg-transparent text-body outline-none placeholder:text-fg-secondary"
-            />
-            <button type="submit" class="h-9 rounded-full px-3 text-body font-medium text-accent">
-              OK
-            </button>
-          </form>
-        } @else {
-          @for (s of styles; track s.id) {
-            <button
-              type="button"
-              (pointerdown)="$event.preventDefault()"
-              (click)="style(s.id)"
-              [attr.aria-label]="s.label | t"
-              [attr.aria-pressed]="on().includes(s.id)"
-              class="grid size-9 shrink-0 place-items-center rounded-full text-[1.0625rem] text-fg active:bg-tint-strong aria-pressed:bg-tint-strong"
-              [class]="s.look"
-            >
-              {{ s.mark }}
-            </button>
-          }
-          <button
-            type="button"
-            (pointerdown)="$event.preventDefault()"
-            (click)="startLink()"
-            class="h-9 shrink-0 rounded-full px-2.5 text-[0.9375rem] text-accent active:bg-tint-strong"
-          >
-            {{ 'editor.link' | t }}
-          </button>
-          <span class="flex-1"></span>
-          <button
-            type="button"
-            (pointerdown)="$event.preventDefault()"
-            (click)="ai.emit()"
-            class="h-9 shrink-0 rounded-full px-3 text-[0.9375rem] font-semibold text-accent active:bg-tint-strong"
-          >
-            {{ 'editor.ai' | t }}
-          </button>
-        }
-      </div>
-      <button
-        type="button"
-        (pointerdown)="$event.preventDefault()"
-        (click)="done()"
-        [attr.aria-label]="'editor.done' | t"
-        class="grid size-round shrink-0 place-items-center rounded-full bg-accent text-on-accent shadow-accent transition-[scale] duration-200 active:scale-120"
-      >
-        <app-icon name="check" class="size-7" />
-      </button>
-    </div>
-  </div>
-}
-
-<!-- Phones: a block's menu (its ⠿ tapped) in a sheet — a row each, its icon and words, no cards:
-     only for me (✓ at the end when it is), copy, duplicate, delete (red) -->
-@if (!desktop && blockMenu() !== null) {
-  @let at = blockMenu()!;
-  <ui-sheet #menuSheet (closed)="blockMenu.set(null)">
-    <div class="-mx-2 flex flex-col">
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:transform-none active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); togglePrivate(at)">
-        <app-icon name="lock" colored class="size-icon-menu text-icon" />
-        <span class="flex-1">{{ 'editor.onlyMe' | t }}</span>
-        @if (items()[at]?.private) {
-          <app-icon name="check" class="size-5 text-accent" />
-        }
-      </button>
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:transform-none active:bg-tint disabled:opacity-40" [disabled]="!items()[at]?.text?.trim()" (click)="menuSheet.close(); copy(at)">
-        <app-icon name="page" colored class="size-icon-menu text-icon" />{{ 'editor.copy' | t }}
-      </button>
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body outline-none active:transform-none active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); duplicate(at)">
-        <app-icon name="duplicate" colored class="size-icon-menu text-icon" />{{ 'editor.duplicate' | t }}
-      </button>
-      <button type="button" class="flex h-row w-full items-center gap-3 px-row-x text-left text-body text-danger active:bg-tint disabled:opacity-40" (click)="menuSheet.close(); remove(at)">
-        <app-icon name="trash" colored class="size-icon-menu text-icon" />{{ 'editor.delete' | t }}
-      </button>
-    </div>
-  </ui-sheet>
-}
-
-
-<!-- Desktops: the caret between blocks — a line with its hint, the commands under it at once (a
+<!-- The caret between blocks — a line with its hint, the commands under it at once (a
      click on one, or ↑ ↓ Enter; "/…" filters them); what's typed (or pasted) is a new block there -->
 <ng-template #caretLine>
   <!-- (a line with its hint, no card yet; its words where a block's text starts) -->

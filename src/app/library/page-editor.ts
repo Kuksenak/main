@@ -1,10 +1,9 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChildren } from '@angular/core';
-import { desktop } from '../core/device';
+import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChild, viewChildren } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { VisibleArea } from '../core/services/visible-area';
-import { Icon, IconName, UiSheet } from '../core/ui';
+import { Icon, IconName } from '../core/ui';
+import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { LibraryStore, type PageBlock } from './library.store';
 import { UiTip } from '../core/ui/tip/tip';
 import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
@@ -44,23 +43,20 @@ const STYLES: { id: Mark; mark: string; look: string; label: 'editor.bold' | 'ed
 let nextId = 1;
 
 /**
- * A page's text, edited right on it, as the old app's: blocks of text, each a card (set apart) —
- * a "/" in one is just text; their marks (**bold**, *italic*, __underline__, ~~strike~~,
- * [links](…)) faded over the text. Enter: a new line (only that); Ctrl+Enter (⌘↵): out of
- * it — desktops: the caret's line under it, phones: a new text there. Backspace in an empty one: it goes, the caret up to the one above; ↑ ↓ at the
- * ends: the next one; emptied and left, a text goes. Between two blocks or under the last, a
- * click: desktops — the caret there (a line with its hint and the commands: a new text, the
- * assistant, `ai`; what's typed or pasted, a new block there); phones — a new text, typed at
- * once (under the last: + Text and Assistant too). A selection: B I U S and Link (desktop: a menu
- * over the block; phones: the bar over the keyboard, with the assistant and ✓ too). Each block's
- * ⠿ (desktop: at its left under the pointer; phones: at its right): dragged, it moves (a line
- * where it'd land); tapped, its menu (desktop: a popup; phones: a sheet, just its words) — only
- * for me (a lock on it), copy, duplicate, delete. `blocks`: what it starts with (read once);
- * `changed`: all of them, at each change.
+ * Desktop: a page's text, edited right on it (as Notion's): blocks of text — a "/" in one is just
+ * text; their marks (**bold**, *italic*, __underline__, ~~strike~~, [links](…)) faded over the
+ * text. Enter: a new line (only that); Ctrl+Enter (⌘↵): out of it, the caret's line under it.
+ * Backspace in an empty one: it goes, the caret up to the one above; ↑ ↓ at the ends: the next one;
+ * emptied and left, a text goes. Between two blocks or under the last, a click: the caret there (a
+ * line with its hint and the commands: a new text, the assistant, `ai`; what's typed or pasted, a
+ * new block there). A selection: B I U S and Link (a menu over the block). Each block's ⠿ (at its
+ * left under the pointer): dragged, it moves (a line where it'd land); clicked, its menu — only for
+ * me (a lock on it), copy, duplicate, delete. `blocks`: what it starts with (read once); `changed`:
+ * all of them, at each change. (Phones show a page read only: PageView.)
  */
 @Component({
   selector: 'app-page-editor',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiSheet, UiTip],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiMenu, UiMenuItem, UiMenuSeparator, UiTip],
   templateUrl: './page-editor.html',
   host: { class: 'relative block' },
 })
@@ -71,13 +67,13 @@ export class PageEditor {
 
   private readonly i18n = inject(I18nService);
   private readonly store = inject(LibraryStore);
-  protected readonly area = inject(VisibleArea);
-  protected readonly desktop = desktop;
   protected readonly styles = STYLES;
   protected readonly marked = marked;
 
   protected readonly items = signal<Item[]>([]);
   private readonly fields = viewChildren<ElementRef<HTMLTextAreaElement>>('field');
+  private readonly caretField = viewChild<ElementRef<HTMLInputElement>>('caretField');
+  private readonly linkField = viewChild<ElementRef<HTMLInputElement>>('linkField');
 
   // The block with the caret (-1: none), and the selection in it (empty: a caret)
   protected readonly focused = signal(-1);
@@ -88,7 +84,7 @@ export class PageEditor {
     return at < 0 || a === b ? [] : marksAt(this.items()[at]?.text ?? '', a, b);
   });
 
-  // Desktops: the caret between blocks (a click between them, under the last): a line with its
+  // The caret between blocks (a click between them, under the last): a line with its
   // hint, the commands at once (what's after a "/" filters them); what's typed or pasted there is
   // a new block in that place
   protected readonly caret = signal<number | null>(null);
@@ -118,40 +114,38 @@ export class PageEditor {
   protected readonly blockMenu = signal<number | null>(null);
   private drag: { from: number; startY: number; moved: boolean; to: number } | null = null;
 
-  // Desktops: the block the pointer's at the height of (anywhere across the page, not only over
+  // The block the pointer's at the height of (anywhere across the page, not only over
   // it): its ⠿ shows
   protected readonly near = signal<number | null>(null);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   constructor() {
-    if (desktop) {
-      const onMove = (e: PointerEvent) => {
-        if (this.drag) return;
-        const blocks = [...this.host.nativeElement.querySelectorAll<HTMLElement>('[data-block]')];
-        const box = this.host.nativeElement.getBoundingClientRect();
-        // (the page's own column and its sides — not the sidebar)
-        const inPage = e.clientX > box.left - 120 && e.clientX < window.innerWidth;
-        const at = inPage
-          ? blocks.findIndex((b) => {
-              const r = b.getBoundingClientRect();
-              return e.clientY >= r.top && e.clientY <= r.bottom;
-            })
-          : -1;
-        const near = at < 0 ? null : at;
-        if (near !== this.near()) this.near.set(near);
-      };
-      document.addEventListener('pointermove', onMove, { passive: true });
-      inject(DestroyRef).onDestroy(() => document.removeEventListener('pointermove', onMove));
-    }
+    const onMove = (e: PointerEvent) => {
+      if (this.drag) return;
+      const blocks = [...this.host.nativeElement.querySelectorAll<HTMLElement>('[data-block]')];
+      const box = this.host.nativeElement.getBoundingClientRect();
+      // (the page's own column and its sides — not the sidebar)
+      const inPage = e.clientX > box.left - 120 && e.clientX < window.innerWidth;
+      const at = inPage
+        ? blocks.findIndex((b) => {
+            const r = b.getBoundingClientRect();
+            return e.clientY >= r.top && e.clientY <= r.bottom;
+          })
+        : -1;
+      const near = at < 0 ? null : at;
+      if (near !== this.near()) this.near.set(near);
+    };
+    document.addEventListener('pointermove', onMove, { passive: true });
+    inject(DestroyRef).onDestroy(() => document.removeEventListener('pointermove', onMove));
     afterNextRender(() => {
-      // (an empty page: desktops — no block, the caret's hint instead; phones — one empty block)
-      const blocks = this.blocks().length || desktop ? this.blocks() : [{ kind: 'card' as const, text: '' }];
+      // (an empty page: no block, the caret's hint instead)
+      const blocks = this.blocks();
       this.items.set(blocks.map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private })));
       if (!blocks.length) this.openCaret(0, false, false);
-      setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
+      this.growAll();
     });
     // (the window's width changed: the fields' heights again)
-    const resize = () => this.fields().forEach((f) => this.grow(f.nativeElement));
+    const resize = () => this.growAll();
     window.addEventListener('resize', resize);
     inject(DestroyRef).onDestroy(() => window.removeEventListener('resize', resize));
   }
@@ -164,13 +158,10 @@ export class PageEditor {
     // (the page still empty: its empty block replaced)
     const replace = items.length === 1 && !items[0].text.trim();
     const added = blocks.map((b) => ({ id: nextId++, text: b.text, private: b.private || undefined }));
-    this.items.set(replace ? added : [...items.slice(0, at), ...added, ...items.slice(at)]);
+    this.items.set(replace ? added : putIn(items, at, added));
     if (this.aiAt !== null) this.aiAt = replace ? added.length : at + added.length; // (the next ones after them)
     this.emit();
-    setTimeout(() => {
-      this.fields().forEach((f) => this.grow(f.nativeElement));
-      if (focusLast) this.focusAt(replace ? added.length - 1 : at + added.length - 1, 'end');
-    });
+    this.growAll(() => focusLast && this.focusAt(replace ? added.length - 1 : at + added.length - 1, 'end'));
   }
 
   /** The caret at the start of the first block (e.g. Enter in the title). */
@@ -191,22 +182,16 @@ export class PageEditor {
     this.changed.emit(this.items().map((i) => ({ kind: 'card' as const, text: i.text, private: i.private || undefined })));
   }
 
-  // A click between two blocks: desktops — the caret there (and the commands); phones — a new text
-  protected between(at: number): void {
-    if (desktop) this.openCaret(at);
-    else this.insertAt(at);
-  }
-
-  private openCaret(at: number, menu = true, focus = true): void {
+  // A click between two blocks or under the last: the caret there (and the commands)
+  protected openCaret(at: number, menu = true, focus = true): void {
     this.caret.set(at);
     this.caretMenu.set(menu);
     this.caretQuery.set('');
     this.caretActive.set(0);
-    if (focus) setTimeout(() => document.querySelector<HTMLInputElement>('app-page-editor [data-caret-input]')?.focus());
+    if (focus) setTimeout(() => this.caretField()?.nativeElement.focus());
   }
 
-  // (desktops: an empty page has no block, the caret's hint there instead; phones keep one)
-  private readonly least = desktop ? 0 : 1;
+  // (an empty page has no block, the caret's hint there instead)
   private emptied(): void {
     if (!this.items().length) this.openCaret(0, false, false);
   }
@@ -235,12 +220,9 @@ export class PageEditor {
     const at = this.caret() ?? this.items().length;
     this.caret.set(null);
     const items = this.items();
-    this.items.set([...items.slice(0, at), { id: nextId++, text: v }, ...items.slice(at)]);
+    this.items.set(putIn(items, at, [{ id: nextId++, text: v }]));
     this.emit();
-    setTimeout(() => {
-      this.fields().forEach((f) => this.grow(f.nativeElement));
-      this.focusAt(at, 'end');
-    });
+    this.growAll(() => this.focusAt(at, 'end'));
   }
 
   protected caretKey(e: KeyboardEvent): void {
@@ -266,10 +248,9 @@ export class PageEditor {
       this.insertAt(at);
     } else if (command.id === 'paste') {
       const added = (this.store.clipboard() ?? []).map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private }));
-      const items = this.items();
-      this.items.set([...items.slice(0, at), ...added, ...items.slice(at)]);
+      this.items.set(putIn(this.items(), at, added));
       this.emit();
-      setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
+      this.growAll();
     } else {
       this.aiAt = at;
       this.ai.emit();
@@ -285,27 +266,10 @@ export class PageEditor {
     }, 120);
   }
 
-  // A tap between two blocks: a new text there, typed at once
-  protected insertAt(at: number): void {
-    const items = this.items();
-    this.items.set([...items.slice(0, at), { id: nextId++, text: '' }, ...items.slice(at)]);
+  // The caret's New text: an empty block there, typed in at once
+  private insertAt(at: number): void {
+    this.items.set(putIn(this.items(), at, [{ id: nextId++, text: '' }]));
     setTimeout(() => this.focusAt(at, 'start'));
-  }
-
-  // A tap under the last block: a new text there (the last one, if it's empty), typed at once
-  protected typeAtEnd(): void {
-    const items = this.items();
-    if (desktop) {
-      this.openCaret(items.length);
-      return;
-    }
-    const last = items[items.length - 1];
-    if (last && !last.text) {
-      this.focusAt(items.length - 1, 'end');
-      return;
-    }
-    this.items.set([...items, { id: nextId++, text: '' }]);
-    setTimeout(() => this.focusAt(this.items().length - 1, 'start'));
   }
 
   private setText(at: number, text: string): void {
@@ -340,18 +304,10 @@ export class PageEditor {
     const b = field.selectionEnd;
     const text = field.value;
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      // Ctrl+Enter: out of it, under it — desktops: the caret's line; phones: a new text (a plain
-      // Enter: a new line in it, never more)
+      // Ctrl+Enter: out of it, the caret's line under it (a plain Enter: a new line in it, never more)
       e.preventDefault();
-      if (desktop) {
-        this.openCaret(at + 1, false);
-        return;
-      }
-      const items = this.items();
-      this.items.set([...items.slice(0, at + 1), { id: nextId++, text: '' }, ...items.slice(at + 1)]);
-      this.emit();
-      setTimeout(() => this.focusAt(at + 1, 'start'));
-    } else if (e.key === 'Backspace' && a === 0 && b === 0 && !text && this.items().length > this.least) {
+      this.openCaret(at + 1, false);
+    } else if (e.key === 'Backspace' && a === 0 && b === 0 && !text && this.items().length) {
       // Backspace in an empty one: it goes, the caret up (or down, at the top)
       e.preventDefault();
       this.items.update((items) => items.filter((_, i) => i !== at));
@@ -379,7 +335,7 @@ export class PageEditor {
         this.focused.set(-1);
       }
       const items = this.items();
-      if (items.length > this.least && !items[at]?.text.trim() && this.focused() !== at) {
+      if (!items[at]?.text.trim() && this.focused() !== at) {
         this.items.set(items.filter((_, i) => i !== at));
         this.emit();
         this.emptied();
@@ -404,7 +360,7 @@ export class PageEditor {
     const field = this.fields()[at]?.nativeElement;
     if (!field) return;
     this.linking.set({ at, a: field.selectionStart, b: field.selectionEnd });
-    setTimeout(() => document.querySelector<HTMLInputElement>('app-page-editor input[type=url]')?.focus());
+    setTimeout(() => this.linkField()?.nativeElement.focus());
   }
 
   protected applyLink(url: string): void {
@@ -420,11 +376,6 @@ export class PageEditor {
     } else {
       this.focusAt(link.at, link.b);
     }
-  }
-
-  // Phones' ✓: the keyboard away
-  protected done(): void {
-    (document.activeElement as HTMLElement | null)?.blur();
   }
 
   // ⠿ pressed: a drag may start (moved: it's a drag; let go without moving: its menu)
@@ -479,7 +430,7 @@ export class PageEditor {
     items.splice(to > from ? to - 1 : to, 0, moved);
     this.items.set(items);
     this.emit();
-    setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
+    this.growAll();
   }
 
   // The block's menu: only for the teacher (a lock on it) or not
@@ -497,14 +448,13 @@ export class PageEditor {
 
   protected duplicate(at: number): void {
     const items = this.items();
-    this.items.set([...items.slice(0, at + 1), { ...items[at], id: nextId++ }, ...items.slice(at + 1)]);
+    this.items.set(putIn(items, at + 1, [{ ...items[at], id: nextId++ }]));
     this.emit();
-    setTimeout(() => this.fields().forEach((f) => this.grow(f.nativeElement)));
+    this.growAll();
   }
 
   protected remove(at: number): void {
-    const items = this.items().filter((_, i) => i !== at);
-    this.items.set(items.length || desktop ? items : [{ id: nextId++, text: '' }]);
+    this.items.set(this.items().filter((_, i) => i !== at));
     this.emit();
     this.emptied();
   }
@@ -520,9 +470,22 @@ export class PageEditor {
     field.scrollIntoView({ block: 'nearest' });
   }
 
+  // (all the fields as tall as their texts, once drawn; then `after`)
+  private growAll(after?: () => void): void {
+    setTimeout(() => {
+      this.fields().forEach((f) => this.grow(f.nativeElement));
+      after?.();
+    });
+  }
+
   // A field as tall as its text (the page scrolls, not it)
   protected grow(field: HTMLTextAreaElement): void {
     field.style.height = 'auto';
     field.style.height = `${field.scrollHeight}px`;
   }
+}
+
+// (the items with these put in at `at`)
+function putIn(items: Item[], at: number, added: Item[]): Item[] {
+  return [...items.slice(0, at), ...added, ...items.slice(at)];
 }
