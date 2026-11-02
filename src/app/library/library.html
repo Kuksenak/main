@@ -74,15 +74,7 @@
           [attr.aria-label]="'library.unpick' | t"
         ></button>
       } @else {
-        <button
-          type="button"
-          [disabled]="creating()"
-          (click)="create()"
-          class="inline-flex h-button shrink-0 items-center gap-1.5 rounded-button bg-strong pr-3 pl-2 text-ui font-medium text-on-strong hover:opacity-85 disabled:opacity-50"
-        >
-          <app-icon name="plus" class="size-4.5" />
-          {{ 'library.new' | t }}
-        </button>
+        <ng-container [ngTemplateOutlet]="newPage" />
       }
     </div>
   </div>
@@ -94,15 +86,7 @@
         <div class="flex flex-col items-center gap-4 py-24 text-center">
           <app-icon name="page" colored class="size-14 text-icon" />
           <p class="max-w-xs text-ui text-fg-secondary">{{ 'library.empty' | t }}</p>
-          <button
-          type="button"
-          [disabled]="creating()"
-          (click)="create()"
-          class="inline-flex h-button shrink-0 items-center gap-1.5 rounded-button bg-strong pr-3 pl-2 text-ui font-medium text-on-strong hover:opacity-85 disabled:opacity-50"
-        >
-          <app-icon name="plus" class="size-4.5" />
-            {{ 'library.new' | t }}
-          </button>
+          <ng-container [ngTemplateOutlet]="newPage" />
         </div>
       } @else {
         <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older): each group a
@@ -122,7 +106,7 @@
               class="group/fold flex h-8 w-full shrink-0 items-center gap-2 rounded-md px-2 text-left text-ui text-side-text hover:bg-tint"
             >
               <!-- (as the sidebar's sections, as Notion's: ⌄ right after the name, under the pointer — › folded) -->
-              <span class="inline-flex min-w-0 items-center gap-1"><span class="truncate">{{ group.key | t }}</span><app-icon name="chevron-down" class="size-4 shrink-0 text-icon opacity-0 transition -rotate-90 group-hover/fold:opacity-100 group-aria-expanded/fold:rotate-0" /></span>
+              <ui-fold-name>{{ group.key | t }}</ui-fold-name>
             </button>
             @if (!folded().includes(group.key)) {
               @for (item of group.items; track item.id) {
@@ -173,6 +157,19 @@
       }
     }
   </div>
+
+  <!-- (New page: filled black — the strong buttons' color) -->
+  <ng-template #newPage>
+    <button
+      type="button"
+      [disabled]="creating()"
+      (click)="create()"
+      class="inline-flex h-button shrink-0 items-center gap-1.5 rounded-button bg-strong pr-3 pl-2 text-ui font-medium text-on-strong hover:opacity-85 disabled:opacity-50"
+    >
+      <app-icon name="plus" class="size-4.5" />
+      {{ 'library.new' | t }}
+    </button>
+  </ng-template>
 
   @if (menu(); as m) {
     <app-page-menu [page]="m.page" [origin]="m.at" (closed)="menu.set(null)" />

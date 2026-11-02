@@ -22,4 +22,5 @@ export { UiWheel } from './picker/wheel';
 export { UiRow } from './row/row';
 export { UiEmpty } from './empty/empty';
 export { UiKbd } from './kbd/kbd';
-export { UiTag, TAG_COLORS, tagColorLabel, tagTint, type TagColor } from './tag/tag';
+export { UiTag, UiTagSwatch, TAG_COLORS, tagColorLabel, tagTint, type TagColor } from './tag/tag';
+export { UiFoldName } from './fold/fold';

@@ -5,7 +5,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, IconName, tagTint, Toasts, UiAvatar, UiButton, UiKbd, UiScrollBar } from '../core/ui';
+import { IconName, tagTint, Toasts, UiAvatar, UiButton, UiFoldName, UiKbd, UiScrollBar } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList } from '../core/ui/window';
@@ -31,7 +31,6 @@ import { Search } from './search';
 @Component({
   selector: 'app-desktop-layout',
   imports: [
-    Icon,
     NgTemplateOutlet,
     PageMenu,
     SidebarTags,
@@ -39,6 +38,7 @@ import { Search } from './search';
     Search,
     TranslatePipe,
     UiAvatar,
+    UiFoldName,
     UiKbd,
     UiButton,
     UiMenu,

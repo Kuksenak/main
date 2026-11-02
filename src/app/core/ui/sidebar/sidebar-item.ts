@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, input } from '@angular/core';
+import { Component, Directive, ElementRef, inject, input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Icon, IconName } from '../icon/icon';
 
@@ -78,3 +78,21 @@ export class UiSidebarAction {
   /** (the element: what a `<ui-menu>` opens at) */
   readonly element: HTMLElement = inject(ElementRef).nativeElement;
 }
+
+/**
+ * A row of the sidebar whose insides are the page's own (a tag's: its swatch, its name or a field
+ * renaming it): the rows' look only — gray under the pointer, the current one (aria-current="page")
+ * darker. `<div uiSidebarRow role="link" …>`
+ */
+@Directive({ selector: '[uiSidebarRow]', host: { class: ROW } })
+export class UiSidebarRow {}
+
+/** A field in a sidebar row (a new tag's name, a tag renamed): 24 tall, on the window's color, a thin ring. */
+@Directive({
+  selector: 'input[uiSidebarField]',
+  host: {
+    type: 'text',
+    class: 'h-6 min-w-0 flex-1 rounded-md bg-dialog px-1.5 text-ui text-fg outline-none ring-1 ring-separator placeholder:text-fg-secondary',
+  },
+})
+export class UiSidebarField {}

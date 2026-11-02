@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiList, UiListItem } from '../core/ui';
+import { UiList, UiListItem, UiTagSwatch } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore } from '../library/library.store';
 import { Tag, TagsStore } from '../library/tags.store';
@@ -14,14 +14,14 @@ import { Tag, TagsStore } from '../library/tags.store';
  */
 @Component({
   selector: 'app-tags',
-  imports: [TranslatePipe, UiList, UiListItem],
+  imports: [TranslatePipe, UiList, UiListItem, UiTagSwatch],
   template: `
     <div class="flex flex-col gap-2 px-4 pt-2 pb-24">
       <ui-list>
         @for (tag of store.tags(); track tag.id) {
           <button type="button" uiListItem chevron (click)="open(tag)">
             <span class="flex min-w-0 items-center gap-3">
-              <span [attr.data-tag]="tag.color" class="size-5 shrink-0 rounded-md bg-tag"></span>
+              <ui-tag-swatch [color]="tag.color" class="size-5" />
               <span class="truncate">{{ tag.name }}</span>
             </span>
             <span itemValue class="text-fg-secondary tabular-nums">{{ store.pagesWith(tag.id) ?? '' }}</span>

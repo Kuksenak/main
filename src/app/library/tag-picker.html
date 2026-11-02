@@ -33,7 +33,7 @@
   @for (tag of shown(); track tag.id) {
     <button type="button" uiMenuItem [checked]="tagIds().includes(tag.id)" (click)="pick(tag.id)">
       <span class="flex min-w-0 items-center gap-2.5">
-        <span [attr.data-tag]="tag.color" class="size-3.5 shrink-0 rounded-[0.25rem] bg-tag"></span>
+        <ui-tag-swatch [color]="tag.color" class="size-3.5" />
         <span class="truncate">{{ tag.name }}</span>
       </span>
     </button>

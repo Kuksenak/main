@@ -31,3 +31,16 @@ export const tagTint = (color: string | null | undefined): string | null =>
 export class UiTag {
   readonly color = input<string>('gray');
 }
+
+/**
+ * A tag's color as a small square (its pastel, round corners: 30% of its side) — its size the
+ * page's: `<ui-tag-swatch [color]="tag.color" class="size-4" />`.
+ */
+@Component({
+  selector: 'ui-tag-swatch',
+  host: { class: 'block shrink-0 rounded-[30%] bg-tag', '[attr.data-tag]': 'color()' },
+  template: '',
+})
+export class UiTagSwatch {
+  readonly color = input<string>('gray');
+}

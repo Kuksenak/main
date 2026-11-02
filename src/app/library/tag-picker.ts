@@ -1,7 +1,7 @@
 import { afterNextRender, Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, UiTag } from '../core/ui';
+import { Icon, UiTag, UiTagSwatch } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { TagsStore } from './tags.store';
 
@@ -14,7 +14,7 @@ import { TagsStore } from './tags.store';
  */
 @Component({
   selector: 'app-tag-picker',
-  imports: [Icon, TranslatePipe, UiMenu, UiMenuItem, UiMenuSeparator, UiTag],
+  imports: [Icon, TranslatePipe, UiMenu, UiMenuItem, UiMenuSeparator, UiTag, UiTagSwatch],
   templateUrl: './tag-picker.html',
 })
 export class TagPicker {

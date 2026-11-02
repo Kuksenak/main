@@ -1,7 +1,7 @@
 <!-- Tags, as a place's row (as Favorites'): # Tags, ⌄ right after the name under the pointer (› folded) —
      a click folds them; + at its right under the pointer, as Library's (a new one) -->
 <a uiSidebarItem icon="hash" role="button" tabindex="0" (click)="fold()" (keydown.enter)="fold()" [attr.data-open]="folded() ? null : ''" class="group/fold shrink-0 cursor-pointer">
-  <span class="inline-flex max-w-full items-center gap-1 align-middle"><span class="truncate">{{ 'tags.title' | t }}</span><app-icon name="chevron-down" class="size-4 shrink-0 text-icon opacity-0 transition -rotate-90 group-hover/fold:opacity-100 group-data-open/fold:rotate-0" /></span>
+  <ui-fold-name>{{ 'tags.title' | t }}</ui-fold-name>
   <button itemEnd uiSidebarAction icon="plus" (click)="startAdding()" [uiTip]="'tags.newOne' | t" [attr.aria-label]="'tags.newOne' | t"></button>
 </a>
 
@@ -20,22 +20,22 @@
     @if (adding()) {
       <!-- (a new one's name: Enter makes it, Esc / away — not) -->
       <div class="flex h-side-row shrink-0 items-center gap-2 pr-side-row-x pl-3.5">
-        <span class="grid size-icon-side shrink-0 place-items-center"><span class="size-3 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="store.nextColor()"></span></span>
+        <span class="grid size-icon-side shrink-0 place-items-center"><ui-tag-swatch [color]="store.nextColor()" class="size-3 saturate-[2.5] brightness-95" /></span>
         <input
           #field
-          type="text"
+          uiSidebarField
           maxlength="40"
           [placeholder]="'tags.new' | t"
           (keydown.enter)="add(field)"
           (keydown.escape)="adding.set(false)"
           (blur)="adding.set(false)"
-          class="h-6 min-w-0 flex-1 rounded-md bg-dialog px-1.5 text-ui text-fg outline-none ring-1 ring-separator placeholder:text-fg-secondary"
         />
       </div>
     }
     @for (tag of store.tags(); track tag.id) {
       <!-- (a row: its swatch, its name — a click: its pages; a page dropped here: tagged so) -->
       <div
+        uiSidebarRow
         role="link"
         tabindex="0"
         (click)="renaming() === tag.id ? null : open(tag)"
@@ -45,22 +45,20 @@
         (drop)="drop($event, tag)"
         [attr.aria-current]="current() === tag.id ? 'page' : null"
         [attr.data-drop]="dropOn() === tag.id ? '' : null"
-        class="group/row flex h-side-row shrink-0 cursor-pointer items-center gap-2 rounded-side-row pr-side-row-x pl-3.5 text-ui text-side-text outline-none
-               hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:text-fg data-drop:bg-side-on"
+        class="cursor-pointer pl-3.5! data-drop:bg-side-on"
       >
         <!-- (its swatch in an icon's room: the names in line with the pages') -->
-        <span class="grid size-icon-side shrink-0 place-items-center"><span class="size-3 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="tag.color"></span></span>
+        <span class="grid size-icon-side shrink-0 place-items-center"><ui-tag-swatch [color]="tag.color" class="size-3 saturate-[2.5] brightness-95" /></span>
         @if (renaming() === tag.id) {
           <input
             #field
-            type="text"
+            uiSidebarField
             maxlength="40"
             [value]="tag.name"
             (click)="$event.stopPropagation()"
             (keydown.enter)="field.blur()"
             (keydown.escape)="field.value = tag.name; field.blur()"
             (blur)="rename(tag, field)"
-            class="h-6 min-w-0 flex-1 rounded-md bg-dialog px-1.5 text-ui text-fg outline-none ring-1 ring-separator"
           />
         } @else {
           <span class="min-w-0 flex-1 truncate">{{ tag.name }}</span>
@@ -88,7 +86,7 @@
     @for (color of colors; track color) {
       <button type="button" uiMenuItem [checked]="m.tag.color === color" (click)="recolor(m.tag, color)">
         <span class="flex items-center gap-2.5">
-          <span class="size-4 shrink-0 rounded-[0.3rem] bg-tag" [attr.data-tag]="color"></span>
+          <ui-tag-swatch [color]="color" class="size-4" />
           {{ colorLabel(color) | t }}
         </span>
       </button>

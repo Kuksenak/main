@@ -3,4 +3,4 @@
  * which has no sidebar, doesn't download them.
  */
 export { UiSidebar } from './sidebar';
-export { UiSidebarAction, UiSidebarButton, UiSidebarItem } from './sidebar-item';
+export { UiSidebarAction, UiSidebarButton, UiSidebarField, UiSidebarItem, UiSidebarRow } from './sidebar-item';

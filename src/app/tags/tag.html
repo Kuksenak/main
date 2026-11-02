@@ -18,7 +18,7 @@
       <button type="button" uiListItem (click)="wheelOpen.set(!wheelOpen())" [attr.aria-expanded]="wheelOpen()">
         {{ 'tags.color' | t }}
         <span itemValue class="flex items-center gap-2 text-fg-secondary" [class.text-accent]="wheelOpen()">
-          <span [attr.data-tag]="t.color" class="size-4 shrink-0 rounded-[0.3rem] bg-tag"></span>
+          <ui-tag-swatch [color]="t.color" class="size-4" />
           {{ colorLabel(t.color) | t }}
         </span>
       </button>

@@ -4,9 +4,9 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Confirm, Icon, TAG_COLORS, tagColorLabel, UiScrollBar } from '../core/ui';
+import { Confirm, TAG_COLORS, tagColorLabel, UiFoldName, UiScrollBar, UiTagSwatch } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
-import { UiSidebarAction, UiSidebarItem } from '../core/ui/sidebar';
+import { UiSidebarAction, UiSidebarField, UiSidebarItem, UiSidebarRow } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { keep, kept } from '../core/utils/storage';
 import { LibraryStore } from './library.store';
@@ -24,7 +24,21 @@ export const PAGE_DRAG = 'application/x-page';
  */
 @Component({
   selector: 'app-sidebar-tags',
-  imports: [Icon, UiScrollBar, TranslatePipe, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSidebarAction, UiSidebarItem, UiTip],
+  imports: [
+    UiFoldName,
+    UiScrollBar,
+    TranslatePipe,
+    UiMenu,
+    UiMenuItem,
+    UiMenuLabel,
+    UiMenuSeparator,
+    UiSidebarAction,
+    UiSidebarField,
+    UiSidebarItem,
+    UiSidebarRow,
+    UiTagSwatch,
+    UiTip,
+  ],
   host: { class: 'flex min-h-0 flex-initial flex-col gap-px' },
   templateUrl: './sidebar-tags.html',
 })
