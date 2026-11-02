@@ -173,10 +173,11 @@ ICONS = {
     'filter': fill(YELLOW, 'M12.4 14.2 51.6 13.6 36.2 32.4 36.4 50.8 27.8 54.4 27.6 32.6z')
         + line('M12.4 14.2C25.6 13.8 38.6 14 51.6 13.6 46 20 40.6 26.2 36.2 32.4 36.4 38.6 36.2 44.6 36.4 50.8 33.6 52 30.6 53.2 27.8 54.4 27.6 47 27.8 39.6 27.6 32.6 22.6 26.4 17.4 20.4 12.6 14.6'),
     # rename (as Notion's): a slim pencil aslant, its point at the bottom left, a band by its end, the
-    # line it writes on under it — lines only, a thicker marker
+    # rename (as Notion's): a square open at its top right, a pencil out of it there, aslant — lines only,
+    # a thicker marker
     'pencil': '<g stroke-width="3.6">'
-        + line('M12.2 51.8C13 49 13.8 46.2 14.8 43.4 24.8 33.2 35 23.2 45.1 13.1 47 15 49 17 50.9 18.9 40.8 29 30.6 39.2 20.6 49.2 17.8 50 15 51 12.4 51.6')
-        + line('M40.4 18.2C42.2 20 44 21.8 45.8 23.8M33.6 52.2C39.8 52 46 52.2 52.2 52')
+        + line('M31.6 10.4 15.6 10.6C12.4 10.6 10.6 12.4 10.6 15.6L10.8 48.4C10.8 51.6 12.6 53.4 15.8 53.4L48.4 53.2C51.6 53.2 53.4 51.4 53.4 48.2L53.2 32.4')
+        + line('M47.6 9.8C49.2 8.2 51.8 8.2 53.4 9.8 55 11.4 55 14 53.4 15.6L32 37C31.4 37.6 30.6 38 29.8 38.2L23.6 40C22.8 40.2 22 39.4 22.2 38.6L24 32.4C24.2 31.6 24.6 30.8 25.2 30.2Z')
         + '</g>',
     # tags: a # — two strokes leaning right, two across, a little off
     'hash': line('M27.4 12.8C25.6 25.6 23.6 38.4 21.8 51.2M42.2 12.6C40.4 25.4 38.4 38.2 36.6 51')
