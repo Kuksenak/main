@@ -139,6 +139,10 @@ ICONS = {
     'update': fill(TEAL, ring(32, 32, 10) + 'z')
         + line('M49.3 33.8A17.1 17.7 8 0 1 20.3 44.1M21.5 52.2 20.3 44.1 28.5 44.9')
         + line('M15.1 30.2A17.2 17.9 8 0 1 44.2 19.4M43.0 11.3 44.2 19.4 36.0 18.6'),
+    # recent (the library's Recents): a clock (cream), its two hands at ten past
+    'clock': fill(CREAM, ring(32, 32, 20) + 'z')
+        + line(ring(32, 32, 20))
+        + line('M32.2 19.6C32.1 23.8 32 28 31.9 32.2 35.4 34.2 38.8 36.4 42.2 38.4'),
     # the language: a globe (teal), a meridian, the equator
     'globe': fill(TEAL, ring(32, 32, 20) + 'z')
         + line(ring(32, 32, 20))

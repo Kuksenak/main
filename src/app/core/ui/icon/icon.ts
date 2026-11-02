@@ -30,6 +30,7 @@ export const ICONS = [
   'search',
   'filter',
   'enter',
+  'clock',
   'pencil',
   'arrow-up',
   'arrow-down',

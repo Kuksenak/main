@@ -31,7 +31,7 @@ export class Library {
   protected readonly creating = signal(false);
   // Desktops: the views — all the pages, the favorites, the published ones
   protected readonly views: { id: View; label: TranslationKey; icon: IconName }[] = [
-    { id: 'recents', label: 'library.recents', icon: 'update' },
+    { id: 'recents', label: 'library.recents', icon: 'clock' },
     { id: 'favorites', label: 'library.favorites', icon: 'bookmark' },
     { id: 'published', label: 'library.published', icon: 'globe' },
   ];

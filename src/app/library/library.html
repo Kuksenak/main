@@ -1,8 +1,9 @@
 @if (desktop) {
   <!-- Desktops, as Notion's: the section's name big, under it the views as pills (an icon, its name;
        the one shown: a gray pill) and New page at the right; then the pages -->
-  <div class="flex flex-col px-8 pt-5 pb-12">
-    <h1 class="px-2 text-xl leading-tight font-bold">{{ 'nav.library' | t }}</h1>
+  <div class="flex flex-col px-8 pt-2 pb-12">
+    <!-- (32 tall, 8 from the top: level with the sidebar's Search) -->
+    <h1 class="flex h-8 items-center px-2 text-xl font-bold">{{ 'nav.library' | t }}</h1>
     <!-- (the views' row stays at the top as the pages scroll under it) -->
     <div class="sticky top-0 z-20 mt-2 mb-1 flex items-center gap-1 bg-app py-2">
       @for (v of views; track v.id) {
@@ -30,8 +31,7 @@
         </div>
       } @else {
         <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older: a small gray name
-             over each, as the search's sections) — a row each: its icon, its name, 🔖 if a favorite, 🌐 if
-             published, when (today: the time); gray under the pointer, as Notion's -->
+             over each, as the search's sections) — a row each: its icon, its name, 🌐 if published, when (today: the time); gray under the pointer, as Notion's -->
         @for (group of groups(); track group.key) {
           <p class="px-2 pt-5 pb-1.5 text-footnote font-medium text-fg-secondary first:pt-1">{{ group.key | t }}</p>
           @for (item of group.items; track item.id) {
@@ -42,9 +42,6 @@
             >
               <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
               <span class="min-w-0 truncate text-ui text-fg" [class.text-fg-secondary]="!item.title.trim()">{{ item.title.trim() || ('library.untitled' | t) }}</span>
-              @if (item.favorite) {
-                <app-icon name="bookmark" colored class="size-4 shrink-0 text-icon" />
-              }
               @if (item.published) {
                 <app-icon name="globe" colored class="size-4 shrink-0 text-icon" />
               }
