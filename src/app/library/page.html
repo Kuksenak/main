@@ -1,20 +1,19 @@
 <!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): the page's name at the left, typed over right there (under the pointer or typed
-     in: a field as the sidebar's Search, as wide as the name, ↵ on a chip; Enter: on into the
+     Notion's): the page's name at the left (bold), typed over right there (clicked: a field as the sidebar's Search, as wide as the name, ↵ on a chip; Enter: on into the
      text; a new page: its name selected); saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
 @if (desktop && page(); as p) {
   <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app pr-3 pl-[2.625rem]">
     <div class="mr-2 flex min-w-0 flex-1 items-center">
-      <!-- (plain text till the pointer's over it or it's typed in: then the Search's look — a faint
+      <!-- (plain text till it's clicked: then the Search's look — a faint
            hairline, the sidebar's color; as wide as what's typed: the text's copy under the field
            sizes it) -->
       <form
         class="group/title flex h-8 max-w-full min-w-0 items-center gap-2 rounded-lg border-[0.8px] border-transparent pr-1.5 pl-2 -ml-0.5 text-ui
-               hover:border-fg/7 hover:bg-side focus-within:border-fg/7 focus-within:bg-side"
+               focus-within:border-fg/7 focus-within:bg-side"
         (submit)="$event.preventDefault(); titleDone()"
       >
         <span
-          class="inline-grid min-w-0 after:invisible after:col-start-1 after:row-start-1 after:overflow-hidden after:whitespace-pre after:content-[attr(data-value)]"
+          class="inline-grid min-w-0 after:invisible after:col-start-1 after:row-start-1 after:overflow-hidden after:whitespace-pre after:font-semibold after:content-[attr(data-value)]"
           [attr.data-value]="(title() || ('library.untitled' | t)) + ' '"
         >
           <input
@@ -27,13 +26,13 @@
             [attr.aria-label]="'library.rename' | t"
             maxlength="200"
             autocomplete="off"
-            class="col-start-1 row-start-1 w-full min-w-0 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
+            class="col-start-1 row-start-1 w-full min-w-0 cursor-text bg-transparent text-ui font-semibold text-fg outline-none placeholder:text-fg-secondary"
           />
         </span>
         <button
           type="submit"
           tabindex="-1"
-          class="invisible grid h-5 shrink-0 place-items-center rounded-[0.3rem] bg-tint-strong px-1.5 text-fg-secondary group-hover/title:visible group-focus-within/title:visible hover:text-fg"
+          class="invisible grid h-5 shrink-0 place-items-center rounded-[0.3rem] bg-tint-strong px-1.5 text-fg-secondary group-focus-within/title:visible hover:text-fg"
           [attr.aria-label]="'editor.done' | t"
         >
           <app-icon name="enter" class="size-3.5" />
