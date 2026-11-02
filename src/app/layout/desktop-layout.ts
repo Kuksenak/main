@@ -5,7 +5,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { IconName, tagTint, Toasts, UiAvatar, UiButton, UiFoldName, UiKbd } from '../core/ui';
+import { IconName, tagTint, UiAvatar, UiButton, UiFoldName, UiKbd } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList } from '../core/ui/window';
@@ -105,7 +105,6 @@ export class DesktopLayout {
 
   // A page's ⋯: its menu, at the button
   protected readonly rowMenu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
-  private readonly toasts = inject(Toasts);
 
   // Library's +: a new page, opened with its name selected
   protected createPage(): void {
