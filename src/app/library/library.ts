@@ -38,6 +38,17 @@ export class Library {
     { id: 'published', label: 'library.published', icon: 'globe' },
   ];
   protected readonly view = signal<View>('recents');
+  // The date groups folded away (kept on this device)
+  protected readonly folded = signal<string[]>(readFolded());
+  protected fold(key: string): void {
+    this.folded.update((f) => (f.includes(key) ? f.filter((x) => x !== key) : [...f, key]));
+    try {
+      localStorage.setItem(FOLDED, this.folded().join(','));
+    } catch {
+      // (not kept)
+    }
+  }
+
   // A page's ⋯: its menu (as the sidebar's), at the button
   protected readonly menu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
   // The pages picked (Ctrl+click): Move to trash in the views' row
@@ -109,5 +120,15 @@ export class Library {
     if (time) return this.i18n.date(d, { hour: '2-digit', minute: '2-digit' });
     const sameYear = d.getFullYear() === new Date().getFullYear();
     return this.i18n.date(d, sameYear ? { day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+}
+
+// (the date groups folded away: kept on this device — storage may be off, then it just isn't kept)
+const FOLDED = 'library.folded';
+function readFolded(): string[] {
+  try {
+    return (localStorage.getItem(FOLDED) ?? '').split(',').filter(Boolean);
+  } catch {
+    return [];
   }
 }

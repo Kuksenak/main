@@ -19,13 +19,23 @@
       <span class="flex-1"></span>
       @if (picked().size) {
         <!-- (some picked: how many, Move to trash; ✕ unpicks) -->
-        <span class="mr-1 text-ui text-fg-secondary">{{ 'library.picked' | t }}: {{ picked().size }}</span>
-        <button uiButton type="button" icon="trash" (click)="trashPicked()">{{ 'library.moveToTrash' | t }}</button>
-        <button uiButton type="button" icon="close" (click)="unpick()" [attr.aria-label]="'library.unpick' | t"></button>
+        <span class="mr-1 text-ui text-fg-secondary"
+          >{{ 'library.picked' | t }}: {{ picked().size }}</span
+        >
+        <button uiButton type="button" icon="trash" (click)="trashPicked()">
+          {{ 'library.moveToTrash' | t }}
+        </button>
+        <button
+          uiButton
+          type="button"
+          icon="close"
+          (click)="unpick()"
+          [attr.aria-label]="'library.unpick' | t"
+        ></button>
       } @else {
-      <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">
-        {{ 'library.new' | t }}
-      </button>
+        <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">
+          {{ 'library.new' | t }}
+        </button>
       }
     </div>
   </div>
@@ -42,42 +52,62 @@
           </button>
         </div>
       } @else {
-          <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older): each group a
+        <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older): each group a
              block of its own — its name small and gray over it, room between them. A row each, as
              Notion's: its icon, its name, ⋯ (its menu, under the pointer), when (today: the time);
              gray under the pointer, a picked one tinted. A click opens it; Ctrl+click (⌘ on a Mac)
              picks it -->
         @for (group of groups(); track group.key) {
-          <section class="flex flex-col gap-0.5 not-first:mt-7">
-            <h2 class="flex h-7 items-center px-2 text-footnote font-medium text-fg-secondary">{{ group.key | t }}</h2>
-            @for (item of group.items; track item.id) {
-              <div
-                role="button"
-                tabindex="0"
-                (click)="$event.ctrlKey || $event.metaKey ? pick(item.id) : open(item)"
-                (keydown.enter)="open(item)"
-                [attr.aria-selected]="picked().has(item.id)"
-                class="group flex h-10 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-lg px-2 text-left outline-none hover:bg-tint focus-visible:bg-tint aria-selected:bg-accent/10"
-              >
-                <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
-                <span class="min-w-0 truncate text-ui text-fg" [class.text-fg-secondary]="!item.title.trim()">{{
-                  item.title.trim() || ('library.untitled' | t)
-                }}</span>
-                <span class="flex-1"></span>
-                <button
-                  #more
-                  type="button"
-                  (click)="$event.stopPropagation(); menu.set(menu()?.page?.id === item.id ? null : { page: item, at: more })"
-                  [attr.aria-expanded]="menu()?.page?.id === item.id"
-                  [attr.aria-label]="'library.more' | t"
-                  class="grid size-7 shrink-0 place-items-center rounded-md text-icon opacity-0 group-hover:opacity-100 hover:bg-tint-strong aria-expanded:bg-tint-strong aria-expanded:opacity-100"
+          <section class="flex flex-col not-first:mt-4">
+            <!-- (its name: a click folds it away / back — kept on this device; ⌄ under the pointer) -->
+            <button
+              type="button"
+              (click)="fold(group.key)"
+              [attr.aria-expanded]="!folded().includes(group.key)"
+              class="group/fold flex h-7 w-fit items-center gap-1 rounded-md px-2 text-footnote font-medium text-fg-secondary hover:bg-tint"
+            >
+              {{ group.key | t }}
+              <app-icon
+                name="chevron-down"
+                class="size-3.5 opacity-0 transition group-hover/fold:opacity-70 group-aria-[expanded=false]/fold:-rotate-90 group-aria-[expanded=false]/fold:opacity-70"
+              />
+            </button>
+            @if (!folded().includes(group.key)) {
+              @for (item of group.items; track item.id) {
+                <div
+                  role="button"
+                  tabindex="0"
+                  (click)="$event.ctrlKey || $event.metaKey ? pick(item.id) : open(item)"
+                  (keydown.enter)="open(item)"
+                  [attr.aria-selected]="picked().has(item.id)"
+                  class="group flex h-8 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-md px-2 text-left outline-none hover:bg-tint focus-visible:bg-tint aria-selected:bg-accent/10"
                 >
-                  <app-icon name="dots" class="size-4" />
-                </button>
-                <span class="w-14 shrink-0 text-right text-footnote text-fg-secondary tabular-nums">{{
-                  changed(item, group.key === 'library.today')
-                }}</span>
-              </div>
+                  <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
+                  <span
+                    class="min-w-0 truncate text-ui text-fg"
+                    [class.text-fg-secondary]="!item.title.trim()"
+                    >{{ item.title.trim() || ('library.untitled' | t) }}</span
+                  >
+                  <span class="flex-1"></span>
+                  <button
+                    #more
+                    type="button"
+                    (click)="
+                      $event.stopPropagation();
+                      menu.set(menu()?.page?.id === item.id ? null : { page: item, at: more })
+                    "
+                    [attr.aria-expanded]="menu()?.page?.id === item.id"
+                    [attr.aria-label]="'library.more' | t"
+                    class="grid size-7 shrink-0 place-items-center rounded-md text-icon opacity-0 group-hover:opacity-100 hover:bg-tint-strong aria-expanded:bg-tint-strong aria-expanded:opacity-100"
+                  >
+                    <app-icon name="dots" class="size-4" />
+                  </button>
+                  <span
+                    class="w-14 shrink-0 text-right text-footnote text-fg-secondary tabular-nums"
+                    >{{ changed(item, group.key === 'library.today') }}</span
+                  >
+                </div>
+              }
             }
           </section>
         } @empty {
