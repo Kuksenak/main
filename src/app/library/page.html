@@ -65,9 +65,9 @@
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
     }
-    <!-- Share, always the lock: not shared — a click shares it (its public link made and copied);
-         shared — "Shared" (a click: Stop sharing, asked first — the link stops working) and the
-         link's own button (copied at a click); Preview: in ⋯ -->
+    <!-- Publish, the lock either way: not published — a click publishes it (its public link made and
+         copied); published — "Published" (a click: Unpublish, asked first — the link stops working)
+         and the link's own button (copied at a click); Preview: in ⋯ -->
     @if (p.shareToken) {
       <button uiButton type="button" icon="lock" (click)="unshare($event)" [uiTip]="'library.unpublish' | t">{{ 'library.shared' | t }}</button>
       <button
@@ -79,7 +79,7 @@
         [attr.aria-label]="'library.copyLink' | t"
       ></button>
     } @else {
-      <button uiButton type="button" icon="lock" [outline]="true" (click)="share(true)" [uiTip]="'library.shareNote' | t">{{ 'library.share' | t }}</button>
+      <button uiButton type="button" icon="lock" (click)="share(true)" [uiTip]="'library.shareNote' | t">{{ 'library.share' | t }}</button>
     }
     <!-- 🔖: in the favorites (the sidebar's) or not -->
     <button
