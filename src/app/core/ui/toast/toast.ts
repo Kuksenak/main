@@ -1,5 +1,7 @@
 import { Component, computed, inject, Injectable, signal } from '@angular/core';
 import { desktop } from '../../device';
+import { I18nService } from '../../i18n/i18n.service';
+import { TranslationKey } from '../../i18n/translations';
 import { VisibleArea } from '../../services/visible-area';
 
 /** A toast: its words, whether it's an error (a red dot before them), and a button on it (e.g. Undo). */
@@ -13,13 +15,14 @@ export interface Toast {
 let nextId = 1;
 
 /**
- * The app's toasts (a few words that come and go — an error, "Deleted · Undo"): `error(text)` or
- * `show(text, action?)`; each goes by itself after a few seconds (an error a little later), or
+ * The app's toasts (a few words that come and go — an error, "Deleted · Undo"): `error(text)` (a
+ * call that failed: `fail(key)`, its words by their translation's key) or `show(text, action?)`; each goes by itself after a few seconds (an error a little later), or
  * tapped. At most three at a time (the oldest goes). `<ui-toasts />` (app.html) shows them.
  */
 @Injectable({ providedIn: 'root' })
 export class Toasts {
   readonly list = signal<Toast[]>([]);
+  private readonly i18n = inject(I18nService);
 
   show(text: string, action?: Toast['action']): void {
     this.add({ id: nextId++, text, error: false, action });
@@ -29,6 +32,11 @@ export class Toasts {
     // (the same error again while it's shown: once)
     if (this.list().some((t) => t.error && t.text === text)) return;
     this.add({ id: nextId++, text, error: true });
+  }
+
+  /** A call that failed: its error, by the words' key (`toasts.fail('library.saveError')`). */
+  fail(key: TranslationKey): void {
+    this.error(this.i18n.t(key));
   }
 
   dismiss(id: number): void {

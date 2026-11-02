@@ -17,7 +17,7 @@ import { TagsStore } from '../library/tags.store';
 import { PAGE_DRAG, SidebarTags } from '../library/sidebar-tags';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
-import { keep, kept } from '../core/utils/storage';
+import { keptFolds } from '../core/utils/storage';
 import { Search } from './search';
 
 /**
@@ -89,11 +89,7 @@ export class DesktopLayout {
     return lists;
   });
   // (folded away — kept on this device)
-  protected readonly folded = signal<List[]>((kept(FOLDED) ?? '').split(',').filter((x): x is List => x === 'favorites' || x === 'recents'));
-  protected fold(list: List): void {
-    this.folded.update((f) => (f.includes(list) ? f.filter((x) => x !== list) : [...f, list]));
-    keep(FOLDED, this.folded().join(','));
-  }
+  protected readonly folds = keptFolds<List>(FOLDED);
 
   // A page's icon: in its first tag's pastel
   private readonly tags = inject(TagsStore);

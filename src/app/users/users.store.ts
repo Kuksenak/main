@@ -50,7 +50,7 @@ export class UsersStore {
         this.aiDefault.set(res.aiPerDay);
         this.users.set(res.users);
       },
-      error: () => this.toasts.error(this.i18n.t('users.loadError')),
+      error: () => this.toasts.fail('users.loadError'),
     });
   }
 
@@ -76,7 +76,7 @@ export class UsersStore {
     if (user.aiPerDay === perDay) return;
     this.http.put<User>(`${this.url}/${user.id}/ai-limit`, { perDay }).subscribe({
       next: (saved) => this.users.update((users) => users?.map((u) => (u.id === saved.id ? saved : u)) ?? null),
-      error: () => this.toasts.error(this.i18n.t('users.saveError')),
+      error: () => this.toasts.fail('users.saveError'),
     });
   }
 
@@ -95,7 +95,7 @@ export class UsersStore {
       next: (saved) => this.update(user.id, saved.permissions),
       error: () => {
         this.update(user.id, before);
-        this.toasts.error(this.i18n.t('users.saveError'));
+        this.toasts.fail('users.saveError');
       },
     });
   }

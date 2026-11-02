@@ -6,11 +6,11 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, IconName, tagTint, Toasts, UiButton, UiFloatingButton, UiFoldName, UiList, UiListItem, UiTag } from '../core/ui';
+import { Icon, IconName, tagTint, UiButton, UiFloatingButton, UiFoldName, UiList, UiListItem, UiTag } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 import { PageMenu } from './page-menu';
-import { keep, kept } from '../core/utils/storage';
+import { keptFolds } from '../core/utils/storage';
 import { UiTip } from '../core/ui/tip/tip';
 import { TagPicker } from './tag-picker';
 import { TagsStore } from './tags.store';
@@ -59,11 +59,7 @@ export class Library {
   }
 
   // The date groups folded away (kept on this device)
-  protected readonly folded = signal<string[]>(readFolded());
-  protected fold(key: string): void {
-    this.folded.update((f) => (f.includes(key) ? f.filter((x) => x !== key) : [...f, key]));
-    keep(FOLDED, this.folded().join(','));
-  }
+  protected readonly folds = keptFolds<TranslationKey>(FOLDED);
 
   // A page's ⋯: its menu (as the sidebar's), at the button
   protected readonly menu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
@@ -83,7 +79,7 @@ export class Library {
   }
 
   protected trashPicked(): void {
-    this.store.deleteMany([...this.picked()]).subscribe({ error: () => this.toasts.error(this.i18n.t('library.deleteError')) });
+    this.store.deleteMany([...this.picked()]);
     this.picked.set(new Set());
   }
 
@@ -112,7 +108,6 @@ export class Library {
     }
     return groups.filter((g) => g.items.length);
   });
-  private readonly toasts = inject(Toasts);
 
   constructor() {
     inject(PageTitle).show(computed(() => this.i18n.t('nav.library')));
@@ -138,4 +133,3 @@ export class Library {
 const FOLDED = 'library.folded';
 // (the tag filter's No tag: the pages with none)
 const NO_TAG = '-';
-const readFolded = (): string[] => (kept(FOLDED) ?? '').split(',').filter(Boolean);

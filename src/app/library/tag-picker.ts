@@ -35,7 +35,7 @@ export class TagPicker {
   private readonly words = computed(() => this.query().trim().toLowerCase());
   // The tags with what's typed in their names; the one named just so
   protected readonly shown = computed(() => this.store.tags().filter((t) => t.name.toLowerCase().includes(this.words())));
-  protected readonly exact = computed(() => this.store.tags().find((t) => t.name.toLowerCase() === this.words()) ?? null);
+  protected readonly exact = computed(() => this.store.named(this.words()) ?? null);
 
   private readonly menu = viewChild.required(UiMenu);
   private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');

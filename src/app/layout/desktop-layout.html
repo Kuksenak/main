@@ -30,7 +30,7 @@
     @for (list of lists(); track list.id) {
       @if (list.id === 'recents') {
         <ng-container [ngTemplateOutlet]="listHead" [ngTemplateOutletContext]="{ $implicit: list }" />
-        @if (!folded().includes('recents')) {
+        @if (!folds.has('recents')) {
           @for (page of list.pages; track page.id) {
             <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
           }
@@ -42,7 +42,7 @@
     @for (list of lists(); track list.id) {
       @if (list.id === 'favorites') {
         <ng-container [ngTemplateOutlet]="listHead" [ngTemplateOutletContext]="{ $implicit: list }" />
-        @if (!folded().includes('favorites')) {
+        @if (!folds.has('favorites')) {
           <div uiSidebarScroll>
             @for (page of list.pages; track page.id) {
               <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
@@ -58,7 +58,7 @@
     <span class="flex-1"></span>
     <!-- (a list's head: open — data-open, not aria-expanded: that one's look is a row whose window is open) -->
     <ng-template #listHead let-list>
-      <button uiSidebarItem [icon]="list.icon" (click)="fold(list.id)" [attr.data-open]="folded().includes(list.id) ? null : ''" class="group/fold shrink-0">
+      <button uiSidebarItem [icon]="list.icon" (click)="folds.toggle(list.id)" [attr.data-open]="folds.has(list.id) ? null : ''" class="group/fold shrink-0">
         <ui-fold-name>{{ list.label | t }}</ui-fold-name>
       </button>
     </ng-template>

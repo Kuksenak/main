@@ -2,7 +2,6 @@ import { Component, inject, input, output } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Toasts } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { LibraryStore, PageItem } from './library.store';
 
@@ -35,7 +34,6 @@ export class PageMenu {
   private readonly store = inject(LibraryStore);
   private readonly router = inject(Router);
   private readonly i18n = inject(I18nService);
-  private readonly toasts = inject(Toasts);
 
   protected favorite(): void {
     this.closed.emit();
@@ -50,11 +48,8 @@ export class PageMenu {
   protected trash(): void {
     this.closed.emit();
     const id = this.page().id;
-    this.store.delete(id).subscribe({
-      next: () => {
-        if (this.router.url === `/library/${id}`) this.router.navigateByUrl('/library');
-      },
-      error: () => this.toasts.error(this.i18n.t('library.deleteError')),
+    this.store.delete(id, () => {
+      if (this.router.url === `/library/${id}`) this.router.navigateByUrl('/library');
     });
   }
 

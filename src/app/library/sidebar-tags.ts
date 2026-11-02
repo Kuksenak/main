@@ -8,7 +8,7 @@ import { Confirm, TAG_COLORS, tagColorLabel, UiFoldName, UiTagSwatch } from '../
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { UiSidebarAction, UiSidebarField, UiSidebarItem, UiSidebarRow, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
-import { keep, kept } from '../core/utils/storage';
+import { keptFolds } from '../core/utils/storage';
 import { LibraryStore } from './library.store';
 import { Tag, TagsStore } from './tags.store';
 
@@ -52,11 +52,7 @@ export class SidebarTags {
   protected readonly colorLabel = tagColorLabel;
 
   // (folded away — kept on this device)
-  protected readonly folded = signal(kept(FOLDED) === '1');
-  protected fold(): void {
-    this.folded.update((f) => !f);
-    keep(FOLDED, this.folded() ? '1' : '0');
-  }
+  protected readonly folds = keptFolds<'tags'>(FOLDED);
 
   // The library's tag shown (the address' ?tag=): its row gray
   private readonly url = toSignal(
@@ -94,7 +90,7 @@ export class SidebarTags {
   }
 
   protected startAdding(): void {
-    if (this.folded()) this.fold();
+    if (this.folds.has('tags')) this.folds.toggle('tags');
     this.adding.set(true);
   }
 
@@ -103,7 +99,7 @@ export class SidebarTags {
     const name = field.value.trim();
     this.adding.set(false);
     if (!name) return;
-    const there = this.store.tags().find((t) => t.name.toLowerCase() === name.toLowerCase());
+    const there = this.store.named(name);
     if (there) this.open(there);
     else this.store.create(name).subscribe();
   }
@@ -111,13 +107,7 @@ export class SidebarTags {
   // (Enter or away: saved — not empty, not another tag's name)
   protected rename(tag: Tag, field: HTMLInputElement): void {
     this.renaming.set(null);
-    const name = field.value.trim();
-    if (!name || name === tag.name || this.store.tags().some((t) => t.id !== tag.id && t.name.toLowerCase() === name.toLowerCase())) return;
-    this.store.update({ ...tag, name });
-  }
-
-  protected recolor(tag: Tag, color: Tag['color']): void {
-    if (tag.color !== color) this.store.update({ ...tag, color });
+    this.store.rename(tag, field.value);
   }
 
   protected async remove(tag: Tag, at: HTMLElement): Promise<void> {

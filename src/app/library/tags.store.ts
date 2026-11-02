@@ -45,6 +45,12 @@ export class TagsStore {
     return (tagIds ?? []).map((id) => byId.get(id)).filter((t): t is Tag => !!t);
   }
 
+  /** The tag by that name (any case), if there's one. */
+  named(name: string): Tag | undefined {
+    const words = name.trim().toLowerCase();
+    return this.tags().find((t) => t.name.toLowerCase() === words);
+  }
+
   /** How many of the library's pages have it (the library not loaded yet: undefined). */
   pagesWith(id: string): number | undefined {
     return this.library.items()?.filter((p) => p.tagIds?.includes(id)).length;
@@ -64,7 +70,7 @@ export class TagsStore {
     return this.http.post<Tag>(this.url, { name: name.trim(), color }).pipe(
       tap({
         next: (tag) => this.tags.update((tags) => [...tags, tag].sort(byName)),
-        error: () => this.toasts.error(this.i18n.t('tags.saveError')),
+        error: () => this.toasts.fail('tags.saveError'),
       }),
     );
   }
@@ -76,9 +82,22 @@ export class TagsStore {
     this.http.put<Tag>(`${this.url}/${tag.id}`, { name: tag.name, color: tag.color }).subscribe({
       error: () => {
         this.tags.set(before);
-        this.toasts.error(this.i18n.t('tags.saveError'));
+        this.toasts.fail('tags.saveError');
       },
     });
+  }
+
+  /** Renamed in place (Enter or away): saved — not empty, nor another tag's name (any case); false: not. */
+  rename(tag: Tag, name: string): boolean {
+    name = name.trim();
+    if (!name || name === tag.name || this.tags().some((t) => t.id !== tag.id && t.name.toLowerCase() === name.toLowerCase())) return false;
+    this.update({ ...tag, name });
+    return true;
+  }
+
+  /** Its color picked. */
+  recolor(tag: Tag, color: TagColor): void {
+    if (tag.color !== color) this.update({ ...tag, color });
   }
 
   /** Deleted: off its pages too. */
@@ -88,7 +107,7 @@ export class TagsStore {
         this.tags.update((tags) => tags.filter((t) => t.id !== id));
         this.library.untag(id);
       },
-      error: () => this.toasts.error(this.i18n.t('tags.saveError')),
+      error: () => this.toasts.fail('tags.saveError'),
     });
   }
 }

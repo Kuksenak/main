@@ -50,17 +50,12 @@ export class TagPage {
   }
 
   protected recolor(tag: Tag, color: string): void {
-    if (tag.color !== color) this.store.update({ ...tag, color: color as Tag['color'] });
+    this.store.recolor(tag, color as Tag['color']);
   }
 
-  // (Enter or away: saved — not empty, not another tag's name)
+  // (Enter or away: saved — not empty, not another tag's name; else back as it was)
   protected rename(tag: Tag, field: HTMLInputElement): void {
-    const name = field.value.trim();
-    if (!name || name === tag.name || this.store.tags().some((t) => t.id !== tag.id && t.name.toLowerCase() === name.toLowerCase())) {
-      field.value = tag.name;
-      return;
-    }
-    this.store.update({ ...tag, name });
+    if (!this.store.rename(tag, field.value)) field.value = tag.name;
   }
 
   protected async remove(tag: Tag, e: Event): Promise<void> {

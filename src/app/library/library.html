@@ -101,14 +101,14 @@
                  folds it away / back, kept on this device; its pages under it, a little in) -->
             <button
               type="button"
-              (click)="fold(group.key)"
-              [attr.aria-expanded]="!folded().includes(group.key)"
+              (click)="folds.toggle(group.key)"
+              [attr.aria-expanded]="!folds.has(group.key)"
               class="group/fold flex h-8 w-full shrink-0 items-center gap-2 rounded-md px-2 text-left text-ui text-side-text hover:bg-tint"
             >
               <!-- (as the sidebar's sections, as Notion's: ⌄ right after the name, under the pointer — › folded) -->
               <ui-fold-name>{{ group.key | t }}</ui-fold-name>
             </button>
-            @if (!folded().includes(group.key)) {
+            @if (!folds.has(group.key)) {
               @for (item of group.items; track item.id) {
                 <div
                   role="button"

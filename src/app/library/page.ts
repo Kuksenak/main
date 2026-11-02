@@ -111,7 +111,7 @@ export class PageView {
         this.texts = this.blocks;
         if (fresh && desktop) setTimeout(() => this.titleField()?.nativeElement.select());
       },
-      error: () => this.toasts.error(this.i18n.t('library.pageLoadError')),
+      error: () => this.toasts.fail('library.pageLoadError'),
     });
   }
 
@@ -162,7 +162,7 @@ export class PageView {
       },
       error: () => {
         this.saving.set(false);
-        this.toasts.error(this.i18n.t('library.saveError'));
+        this.toasts.fail('library.saveError');
         this.dirty = true; // (tried again with the next change)
       },
     });
@@ -188,7 +188,7 @@ export class PageView {
         this.page.update((x) => (x ? { ...x, shareToken: p.shareToken } : x));
         if (on) this.copyLink(this.i18n.t('library.publishedCopied'));
       },
-      error: () => this.toasts.error(this.i18n.t('library.shareError')),
+      error: () => this.toasts.fail('library.shareError'),
     });
   }
 
@@ -242,9 +242,6 @@ export class PageView {
 
   protected delete(): void {
     this.dirty = false;
-    this.store.delete(this.page()?.id ?? this.id()).subscribe({
-      next: () => this.router.navigateByUrl('/library'),
-      error: () => this.toasts.error(this.i18n.t('library.deleteError')),
-    });
+    this.store.delete(this.page()?.id ?? this.id(), () => this.router.navigateByUrl('/library'));
   }
 }

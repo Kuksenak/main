@@ -75,7 +75,7 @@ export class LibraryStore {
   load(): void {
     this.http.get<PageItem[]>(this.url).subscribe({
       next: (items) => this.items.set(items),
-      error: () => this.toasts.error(this.i18n.t('library.loadError')),
+      error: () => this.toasts.fail('library.loadError'),
     });
   }
 
@@ -103,7 +103,7 @@ export class LibraryStore {
       },
       error: () => {
         this.creating.set(false);
-        this.toasts.error(this.i18n.t('library.createError'));
+        this.toasts.fail('library.createError');
       },
     });
   }
@@ -115,7 +115,7 @@ export class LibraryStore {
       .pipe(switchMap((content) => this.create(name).pipe(switchMap((copy) => this.save(copy.id, name, content)))))
       .subscribe({
         next: (copy) => this.router.navigate(['/library', copy.id]),
-        error: () => this.toasts.error(this.i18n.t('library.duplicateError')),
+        error: () => this.toasts.fail('library.duplicateError'),
       });
   }
 
@@ -139,7 +139,7 @@ export class LibraryStore {
       tap({
         error: () => {
           set(before);
-          this.toasts.error(this.i18n.t('library.saveError'));
+          this.toasts.fail('library.saveError');
         },
       }),
     );
@@ -156,40 +156,43 @@ export class LibraryStore {
     return this.http.put<Page>(`${this.url}/${id}/favorite`, { on }).pipe(
       tap({ error: () => {
         this.mark(id, !on);
-        this.toasts.error(this.i18n.t('library.saveError'));
+        this.toasts.fail('library.saveError');
       } }),
     );
   }
 
-  /** To the trash: gone from the list; a toast — Undo puts it back. */
-  delete(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`).pipe(
-      tap(() => {
+  /** To the trash (`done`: then — e.g. the page open left): gone from the list; a toast — Undo puts it back. */
+  delete(id: string, done?: () => void): void {
+    this.http.delete<void>(`${this.url}/${id}`).subscribe({
+      next: () => {
         this.items.update((items) => items?.filter((x) => x.id !== id) ?? null);
         this.trash.set(null); // (read again when it's opened)
         this.toasts.show(this.i18n.t('trash.moved'), { label: this.i18n.t('trash.undo'), run: () => this.restore(id) });
-      }),
-    );
+        done?.();
+      },
+      error: () => this.toasts.fail('library.deleteError'),
+    });
   }
 
   /** Several to the trash at once: gone from the list; one toast — Undo puts them all back. */
-  deleteMany(ids: string[]): Observable<unknown> {
-    return forkJoin(ids.map((id) => this.http.delete<void>(`${this.url}/${id}`))).pipe(
-      tap(() => {
+  deleteMany(ids: string[]): void {
+    forkJoin(ids.map((id) => this.http.delete<void>(`${this.url}/${id}`))).subscribe({
+      next: () => {
         this.items.update((items) => items?.filter((x) => !ids.includes(x.id)) ?? null);
         this.trash.set(null);
         this.toasts.show(this.i18n.t('trash.movedMany').replace('{n}', String(ids.length)), {
           label: this.i18n.t('trash.undo'),
           run: () => ids.forEach((id) => this.restore(id)),
         });
-      }),
-    );
+      },
+      error: () => this.toasts.fail('library.deleteError'),
+    });
   }
 
   loadTrash(): void {
     this.http.get<TrashItem[]>(this.trashUrl).subscribe({
       next: (items) => this.trash.set(items),
-      error: () => this.toasts.error(this.i18n.t('trash.loadError')),
+      error: () => this.toasts.fail('trash.loadError'),
     });
   }
 
@@ -201,7 +204,7 @@ export class LibraryStore {
         this.items.update((items) => (items ? [item, ...items.filter((x) => x.id !== id)].sort(byChanged) : items));
         done?.();
       },
-      error: () => this.toasts.error(this.i18n.t('trash.restoreError')),
+      error: () => this.toasts.fail('trash.restoreError'),
     });
   }
 
@@ -212,7 +215,7 @@ export class LibraryStore {
     this.http.delete<void>(id ? `${this.trashUrl}/${id}` : this.trashUrl).subscribe({
       error: () => {
         this.trash.set(before);
-        this.toasts.error(this.i18n.t('trash.deleteError'));
+        this.toasts.fail('trash.deleteError');
       },
     });
   }

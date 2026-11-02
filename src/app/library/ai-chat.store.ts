@@ -69,7 +69,7 @@ export class AiChatStore {
       images = await Promise.all(photos.slice(0, MAX_PHOTOS).map(asJpeg));
     } catch {
       this.busy.set(false);
-      this.toasts.error(this.i18n.t('ai.photoError'));
+      this.toasts.fail('ai.photoError');
       return;
     }
     this.http.post<{ reply: string; blocks: ChatBlock[] }>(this.url, { history, message: text, page, images }).subscribe({

@@ -1,11 +1,11 @@
 <!-- Tags, as a place's row (as Favorites'): # Tags, ⌄ right after the name under the pointer (› folded) —
      a click folds them; + at its right under the pointer, as Library's (a new one) -->
-<a uiSidebarItem icon="hash" role="button" tabindex="0" (click)="fold()" (keydown.enter)="fold()" [attr.data-open]="folded() ? null : ''" class="group/fold shrink-0 cursor-pointer">
+<a uiSidebarItem icon="hash" role="button" tabindex="0" (click)="folds.toggle('tags')" (keydown.enter)="folds.toggle('tags')" [attr.data-open]="folds.has('tags') ? null : ''" class="group/fold shrink-0 cursor-pointer">
   <ui-fold-name>{{ 'tags.title' | t }}</ui-fold-name>
   <button itemEnd uiSidebarAction icon="plus" (click)="startAdding()" [uiTip]="'tags.newOne' | t" [attr.aria-label]="'tags.newOne' | t"></button>
 </a>
 
-@if (!folded()) {
+@if (!folds.has('tags')) {
   <!-- (its rows scroll on their own, as the favorites: fading out at the bottom; scrolled — a hairline
        over them, their top fading too; the bar over them) -->
   <div uiSidebarScroll>
@@ -76,7 +76,7 @@
     <ui-menu-separator />
     <ui-menu-label>{{ 'tags.color' | t }}</ui-menu-label>
     @for (color of colors; track color) {
-      <button type="button" uiMenuItem [checked]="m.tag.color === color" (click)="recolor(m.tag, color)">
+      <button type="button" uiMenuItem [checked]="m.tag.color === color" (click)="store.recolor(m.tag, color)">
         <span class="flex items-center gap-2.5">
           <ui-tag-swatch [color]="color" class="size-4" />
           {{ colorLabel(color) | t }}
