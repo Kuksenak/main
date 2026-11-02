@@ -1,9 +1,10 @@
-import { Directive, ElementRef, OnDestroy, inject, input } from '@angular/core';
+import { booleanAttribute, Directive, ElementRef, OnDestroy, inject, input } from '@angular/core';
 
 /**
  * A hover hint, as Notion's (desktops; not the browser's title): a small dark label by the
  * element — `uiTip="Drag to move"`, all in one color; a line break (\n): a new line. `tipSide`: where it shows (flipped when there's no room). Shown after a short pause on
- * hover; gone on leaving, a press or scrolling. Not on touch screens.
+ * hover; gone on leaving, a press or scrolling. Not on touch screens. `tipIfCut`: only when the
+ * element's text doesn't fit (ends in …) — the hint is then the whole of it.
  */
 @Directive({
   selector: '[uiTip]',
@@ -17,6 +18,7 @@ import { Directive, ElementRef, OnDestroy, inject, input } from '@angular/core';
 export class UiTip implements OnDestroy {
   readonly uiTip = input<string | null | undefined>(null);
   readonly tipSide = input<'left' | 'top' | 'right' | 'bottom'>('bottom');
+  readonly tipIfCut = input(false, { transform: booleanAttribute });
 
   private readonly el: HTMLElement = inject(ElementRef).nativeElement;
   private tip: HTMLElement | null = null;
@@ -26,6 +28,8 @@ export class UiTip implements OnDestroy {
   protected show(): void {
     const text = this.uiTip();
     if (!text || matchMedia('(hover: none)').matches) return;
+    // (all of it shown: no need)
+    if (this.tipIfCut() && ![this.el, ...this.el.querySelectorAll('*')].some((e) => e.scrollWidth > e.clientWidth)) return;
     clearTimeout(this.timer);
     this.timer = setTimeout(() => this.open(text), 350);
   }

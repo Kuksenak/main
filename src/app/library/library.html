@@ -17,8 +17,8 @@
         </button>
       }
       <!-- (a tag: only its pages — # and All tags; a tag picked: the button the tag's own whole (its
-           pastel, # and its name), as a page's; always as wide as All tags (a longer name ends in …,
-           the whole of it in the hint); ▾ — its menu: All, No tag, the tags) -->
+           pastel, # and its name), as a page's; as wide as what's on it, at most as All tags (a longer
+           name ends in …, the whole of it in the hint — only then); ▾ — its menu: All, No tag, the tags) -->
       @if (tags.tags().length) {
         @let picked = tags.byId().get(tagFilter() ?? '');
         <span class="mx-1 h-5 w-px bg-separator"></span>
@@ -32,9 +32,10 @@
           (click)="tagMenu.set(!tagMenu())"
           [attr.aria-expanded]="tagMenu()"
           [attr.aria-label]="'tags.title' | t"
-          [uiTip]="picked?.name"
+          [uiTip]="picked?.name ?? ((tagFilter() === noTag ? 'tags.noTag' : 'tags.all') | t)"
+          tipIfCut
           [attr.data-tag]="picked?.color ?? null"
-          class="w-28 text-left [&>span]:max-w-none [&>span]:flex-1 data-tag:bg-tag data-tag:text-tag-text data-tag:aria-expanded:bg-tag data-tag:not-disabled:hover:bg-tag data-tag:hover:brightness-95"
+          class="max-w-28 text-left [&>span]:max-w-none [&>span]:flex-1 data-tag:bg-tag data-tag:text-tag-text data-tag:aria-expanded:bg-tag data-tag:not-disabled:hover:bg-tag data-tag:hover:brightness-95"
         >
           @if (picked) {
             <app-icon name="hash" class="mr-1 size-4 align-middle -mt-0.5" />{{ picked.name }}
