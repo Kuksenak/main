@@ -121,8 +121,8 @@
               [attr.aria-expanded]="!folded().includes(group.key)"
               class="group/fold flex h-8 w-full shrink-0 items-center gap-2 rounded-md px-2 text-left text-ui text-side-text hover:bg-tint"
             >
-              <span class="min-w-0 flex-1 truncate">{{ group.key | t }}</span>
-              <app-icon name="chevron-down" class="size-4 text-icon transition-[rotate] group-aria-expanded/fold:rotate-180" />
+              <!-- (as the sidebar's sections, as Notion's: ⌄ right after the name, under the pointer — › folded) -->
+              <span class="inline-flex min-w-0 items-center gap-1"><span class="truncate">{{ group.key | t }}</span><app-icon name="chevron-down" class="size-4 shrink-0 text-icon opacity-0 transition -rotate-90 group-hover/fold:opacity-100 group-aria-expanded/fold:rotate-0" /></span>
             </button>
             @if (!folded().includes(group.key)) {
               @for (item of group.items; track item.id) {
