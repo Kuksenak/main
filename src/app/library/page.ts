@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Confirm, Icon, Toasts, UiButton, UiList, UiListItem, UiSheet, UiTag } from '../core/ui';
+import { Confirm, Icon, tagChip, Toasts, UiButton, UiList, UiListItem, UiSheet, UiTag } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow } from '../core/ui/window';
@@ -57,6 +57,10 @@ export class PageView {
   // Phones: the tag's sheet (from the ⋯ sheet)
   protected readonly tagSheetOpen = signal(false);
   private readonly confirm = inject(Confirm);
+  // (the tag's button — a plain one or the tag's own: where the picker opens)
+  private readonly tagsBtn = viewChild('tagsBtn', { read: ElementRef<HTMLElement> });
+  protected readonly tagsAt = computed(() => this.tagsBtn()?.nativeElement ?? null);
+  protected readonly chip = tagChip;
   protected readonly tags = inject(TagsStore);
   private readonly tagsLoaded = this.tags.load();
   // Phones: the page read only; its actions in a sheet (the top bar's ⋯)

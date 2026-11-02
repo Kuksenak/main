@@ -18,6 +18,9 @@ const CHIP: Record<TagColor, string> = {
   red: 'bg-tag-red text-tag-red-text',
 };
 
+/** A color's chip classes (its pastel, its text): for what wears the tag's look whole (a button). */
+export const tagChip = (color: string | null | undefined): string => CHIP[color as TagColor] ?? CHIP.gray;
+
 /** A color's swatch (a dot, a square): its pastel's class, whole for Tailwind. */
 export const TAG_SWATCH: Record<TagColor, string> = {
   gray: 'bg-tag-gray',

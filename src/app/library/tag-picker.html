@@ -23,9 +23,23 @@
       <span class="text-fg-secondary">{{ 'tags.noTag' | t }}</span>
     </button>
   }
+  <!-- (the tags: a swatch and the name, no fill, nothing under the pointer — the chosen one the whole
+       row in its color) -->
   @for (tag of shown(); track tag.id) {
-    <button type="button" uiMenuItem [checked]="tagIds().includes(tag.id)" (click)="pick(tag.id)">
-      <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+    @let on = tagIds().includes(tag.id);
+    <button
+      type="button"
+      role="menuitemradio"
+      [attr.aria-checked]="on"
+      (click)="pick(tag.id)"
+      class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui outline-none"
+      [class]="on ? chip(tag.color) : ''"
+    >
+      <span class="size-3.5 shrink-0 rounded-[0.25rem]" [class]="swatch[tag.color]"></span>
+      <span class="min-w-0 flex-1 truncate">{{ tag.name }}</span>
+      @if (on) {
+        <app-icon name="check" class="size-icon-menu shrink-0" />
+      }
     </button>
   }
   @if (query().trim() && !exact()) {

@@ -41,26 +41,35 @@
         </button>
       </form>
     </div>
-    <!-- Its tags, at the right by its buttons: a button as theirs — # and the tags (none: Tag); a click: the picker -->
-    <button
-      #tagsBtn
-      uiButton
-      type="button"
-      icon="hash"
-      [outline]="true"
-      (click)="tagsOpen.set(!tagsOpen())"
-      [attr.aria-expanded]="tagsOpen()"
-      [attr.aria-label]="'tags.title' | t"
-      class="min-w-0 shrink"
-    >
-      @for (tag of tags.of(p.tagIds); track tag.id) {
-        <ui-tag [color]="tag.color" class="mr-0.5">{{ tag.name }}</ui-tag>
-      } @empty {
-        {{ 'tags.add' | t }}
-      }
-    </button>
+    <!-- Its tag, at the right by its buttons: a button as theirs — # and Tag; a tag on it: the button the
+         tag's own whole (its pastel, its name); a click: the picker -->
+    @if (tags.of(p.tagIds)[0]; as tag) {
+      <button
+        #tagsBtn
+        type="button"
+        (click)="tagsOpen.set(!tagsOpen())"
+        [attr.aria-expanded]="tagsOpen()"
+        [attr.aria-label]="'tags.title' | t"
+        class="mr-1 inline-flex h-button max-w-56 min-w-0 shrink items-center gap-1 rounded-button px-2 text-ui hover:brightness-95"
+        [class]="chip(tag.color)"
+      >
+        <app-icon name="hash" class="size-4 shrink-0" />
+        <span class="min-w-0 truncate">{{ tag.name }}</span>
+      </button>
+    } @else {
+      <button
+        #tagsBtn
+        uiButton
+        type="button"
+        icon="hash"
+        [outline]="true"
+        (click)="tagsOpen.set(!tagsOpen())"
+        [attr.aria-expanded]="tagsOpen()"
+        [attr.aria-label]="'tags.title' | t"
+      >{{ 'tags.add' | t }}</button>
+    }
     @if (tagsOpen()) {
-      <app-tag-picker [origin]="tagsBtn.element" [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagsOpen.set(false)" />
+      <app-tag-picker [origin]="tagsAt()!" [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagsOpen.set(false)" />
     }
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
