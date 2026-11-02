@@ -39,7 +39,7 @@ export class AppSearch {
   }
 
   find(query: string, scope: SearchScope = 'all', actions = true): Found[] {
-    const q = query.trim().toLocaleLowerCase(this.i18n.locale());
+    const q = this.i18n.lower(query.trim());
     const t = (key: Parameters<I18nService['t']>[0]) => this.i18n.t(key);
     const pages = (this.auth.can('library') ? (this.library.items() ?? []) : []).map(
       (p): Found => ({ id: p.id, section: '', label: p.title, icon: 'page', open: () => this.router.navigate(['/library', p.id]) }),
@@ -47,7 +47,7 @@ export class AppSearch {
     if (scope === 'events') return [];
     if (scope === 'pages') {
       const all = pages.map((p) => ({ ...p, section: t('search.pages') }));
-      return q ? all.filter((p) => p.label.toLocaleLowerCase(this.i18n.locale()).includes(q)) : all;
+      return q ? all.filter((p) => this.i18n.lower(p.label).includes(q)) : all;
     }
 
     // Nothing typed: the pages last changed, then the actions
@@ -59,9 +59,9 @@ export class AppSearch {
     }
 
     // Something typed: the names that have it — those starting with it first
-    const has = (name: string) => name.toLocaleLowerCase(this.i18n.locale()).includes(q);
+    const has = (name: string) => this.i18n.lower(name).includes(q);
     const rank = (a: Found, b: Found) =>
-      Number(!a.label.toLocaleLowerCase().startsWith(q)) - Number(!b.label.toLocaleLowerCase().startsWith(q));
+      Number(!this.i18n.lower(a.label).startsWith(q)) - Number(!this.i18n.lower(b.label).startsWith(q));
     const places = visiblePlaces((area) => this.auth.can(area)).map(
       (p): Found => ({ id: p.path, section: t('search.sections'), label: t(p.label), icon: p.icon, open: () => this.router.navigateByUrl(p.path) }),
     );

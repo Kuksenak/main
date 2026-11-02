@@ -2,7 +2,7 @@
   <h1 class="ml-1 flex h-button items-center text-body font-medium mobile:hidden">{{ 'users.title' | t }}</h1>
 
 
-  @if (users(); as users) {
+  @if (store.users(); as users) {
     @if (!users.length) {
       <p class="px-1 text-body text-fg-secondary">{{ 'users.empty' | t }}</p>
     } @else if (desktop) {
@@ -13,10 +13,10 @@
             <th class="h-button px-2 font-normal">{{ 'users.name' | t }}</th>
             <th class="h-button px-2 font-normal">{{ 'users.email' | t }}</th>
             <th class="h-button px-2 font-normal">{{ 'users.lastSignIn' | t }}</th>
-            @for (area of areas(); track area) {
+            @for (area of store.areas(); track area) {
               <th class="h-button px-2 font-normal">{{ areaLabels[area] | t }}</th>
             }
-            @if (aiDefault() !== null) {
+            @if (store.aiDefault() !== null) {
               <th class="h-button px-2 font-normal">{{ 'users.aiPerDay' | t }}</th>
               <th class="h-button px-2 font-normal">{{ 'users.aiToday' | t }}</th>
             }
@@ -26,20 +26,20 @@
           @for (user of users; track user.id) {
             <tr class="border-t-[0.5px] border-separator">
               <td class="h-row max-w-60 truncate px-2">
-                {{ name(user) ?? '—' }}
+                {{ store.name(user) ?? '—' }}
                 @if (user.isAdmin) {
                   <span class="ml-1.5 text-footnote text-fg-secondary">{{ 'users.admin' | t }}</span>
                 }
               </td>
               <td class="h-row max-w-72 truncate px-2 text-fg-secondary">{{ user.email }}</td>
-              <td class="h-row px-2 whitespace-nowrap text-fg-secondary">{{ lastSignIn(user) }}</td>
-              @for (area of areas(); track area) {
+              <td class="h-row px-2 whitespace-nowrap text-fg-secondary">{{ store.lastSignIn(user) }}</td>
+              @for (area of store.areas(); track area) {
                 <td class="h-row px-2" [attr.title]="user.isAdmin ? ('users.locked' | t) : null">
-                  <ui-toggle [checked]="has(user, area)" (checkedChange)="set(user, area, $event)" [disabled]="user.isAdmin" [label]="(areaLabels[area] | t) + ': ' + user.email" />
+                  <ui-toggle [checked]="store.has(user, area)" (checkedChange)="store.set(user, area, $event)" [disabled]="user.isAdmin" [label]="(areaLabels[area] | t) + ': ' + user.email" />
                 </td>
               }
               <!-- AI: questions a day (empty: the app's own number, gray), asked today -->
-              @if (aiDefault() !== null) {
+              @if (store.aiDefault() !== null) {
                 <td class="h-row px-2">
                   <input
                     #limit
@@ -47,8 +47,8 @@
                     min="0"
                     max="10000"
                     [value]="user.aiPerDay ?? ''"
-                    [placeholder]="aiDefault()"
-                    (change)="setAiLimitTyped(user, limit.value)"
+                    [placeholder]="store.aiDefault()"
+                    (change)="store.setAiLimitTyped(user, limit.value)"
                     (keydown.enter)="limit.blur()"
                     [attr.aria-label]="('users.aiPerDay' | t) + ': ' + user.email"
                     class="h-7 w-20 rounded-md bg-transparent px-1.5 outline-none placeholder:text-fg-secondary/60 hover:bg-tint focus:bg-tint"
@@ -65,27 +65,27 @@
       @for (user of users; track user.id) {
         <ui-list>
           <div uiListItem icon="person">
-            {{ name(user) ?? user.email }}
+            {{ store.name(user) ?? user.email }}
             @if (user.isAdmin) {
               <span itemValue class="text-fg-secondary">{{ 'users.admin' | t }}</span>
             }
           </div>
-          @if (name(user)) {
+          @if (store.name(user)) {
             <div uiListItem><span class="text-fg-secondary">{{ user.email }}</span></div>
           }
           <div uiListItem>
             {{ 'users.lastSignIn' | t }}
-            <span itemValue class="text-fg-secondary">{{ lastSignIn(user) }}</span>
+            <span itemValue class="text-fg-secondary">{{ store.lastSignIn(user) }}</span>
           </div>
-          @for (area of areas(); track area) {
+          @for (area of store.areas(); track area) {
             <div uiListItem>
               {{ areaLabels[area] | t }}
               <ui-toggle itemValue
-                [checked]="has(user, area)" (checkedChange)="set(user, area, $event)" [disabled]="user.isAdmin" [label]="(areaLabels[area] | t) + ': ' + user.email" />
+                [checked]="store.has(user, area)" (checkedChange)="store.set(user, area, $event)" [disabled]="user.isAdmin" [label]="(areaLabels[area] | t) + ': ' + user.email" />
             </div>
           }
           <!-- The assistant: requests a day (empty: the app's own number, gray), made today -->
-          @if (aiDefault() !== null) {
+          @if (store.aiDefault() !== null) {
             <div uiListItem>
               {{ 'users.aiPerDay' | t }}
               <input
@@ -96,8 +96,8 @@
                 min="0"
                 max="10000"
                 [value]="user.aiPerDay ?? ''"
-                [placeholder]="aiDefault()"
-                (change)="setAiLimitTyped(user, phoneLimit.value)"
+                [placeholder]="store.aiDefault()"
+                (change)="store.setAiLimitTyped(user, phoneLimit.value)"
                 (keydown.enter)="phoneLimit.blur()"
                 [attr.aria-label]="('users.aiPerDay' | t) + ': ' + user.email"
                 class="w-20 bg-transparent text-right text-fg-secondary outline-none placeholder:text-fg-secondary/50"

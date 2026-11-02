@@ -27,8 +27,8 @@
           uiButton
           type="button"
           [icon]="picked ? undefined : 'hash'"
-          [outline]="true"
-          [caret]="true"
+          outline
+          caret
           (click)="tagMenu.set(!tagMenu())"
           [attr.aria-expanded]="tagMenu()"
           [attr.aria-label]="'tags.title' | t"

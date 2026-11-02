@@ -1,4 +1,4 @@
-import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { refreshThemeColor } from '../../services/theme-color';
 import { VisibleArea } from '../../services/visible-area';
 import { UiScrollBar } from '../scroll-bar/scroll-bar';
@@ -33,7 +33,7 @@ import { UiScrollBar } from '../scroll-bar/scroll-bar';
   templateUrl: './sheet.html',
 })
 export class UiSheet {
-  readonly tall = input(false);
+  readonly tall = input(false, { transform: booleanAttribute });
   readonly closed = output<void>();
 
   protected readonly area = inject(VisibleArea);

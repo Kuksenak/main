@@ -21,19 +21,10 @@ import { UsersStore } from './users.store';
   templateUrl: './users.html',
 })
 export class Users {
-  private readonly store = inject(UsersStore);
+  protected readonly store = inject(UsersStore);
 
   protected readonly desktop = desktop;
   protected readonly areaLabels = AREA_LABELS;
-
-  protected readonly users = this.store.users;
-  protected readonly areas = this.store.areas;
-  protected readonly name = this.store.name.bind(this.store);
-  protected readonly lastSignIn = this.store.lastSignIn.bind(this.store);
-  protected readonly has = this.store.has.bind(this.store);
-  protected readonly set = this.store.set.bind(this.store);
-  protected readonly aiDefault = this.store.aiDefault;
-  protected readonly setAiLimitTyped = this.store.setAiLimitTyped.bind(this.store);
 
   constructor() {
     const i18n = inject(I18nService);

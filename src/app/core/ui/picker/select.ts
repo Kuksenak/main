@@ -1,4 +1,4 @@
-import { Component, input, model, signal } from '@angular/core';
+import { booleanAttribute, Component, input, model, signal } from '@angular/core';
 import { desktop } from '../../device';
 import { Icon, IconName } from '../icon/icon';
 
@@ -87,9 +87,9 @@ export class UiSelect {
   // (the chip's words instead of the chosen one's, e.g. the page's title: the schedule's month)
   readonly text = input<string | null>(null);
   // (as wide as it's given: the words at the left, ▾ at the right; its icon as the lists' — 28px, 16px in)
-  readonly wide = input(false);
+  readonly wide = input(false, { transform: booleanAttribute });
   // (as the floating buttons: glass, their shadow, as tall — e.g. in the phones' top bar)
-  readonly glass = input(false);
+  readonly glass = input(false, { transform: booleanAttribute });
 
   protected readonly desktop = desktop;
   protected readonly open = signal(false);

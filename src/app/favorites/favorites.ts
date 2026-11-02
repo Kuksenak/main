@@ -24,7 +24,7 @@ import { LibraryStore, PageItem } from '../library/library.store';
           <ui-list-title>{{ 'nav.library' | t }}</ui-list-title>
           <ui-list>
             @for (item of pages; track item.id) {
-              <button type="button" uiListItem icon="page" (click)="open(item)" [chevron]="true">{{ item.title }}</button>
+              <button type="button" uiListItem icon="page" (click)="open(item)" chevron>{{ item.title }}</button>
             }
           </ui-list>
         }

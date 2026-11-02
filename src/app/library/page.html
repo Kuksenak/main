@@ -64,8 +64,8 @@
         uiButton
         type="button"
         icon="hash"
-        [outline]="true"
-        [caret]="true"
+        outline
+        caret
         (click)="tagsOpen.set(!tagsOpen())"
         [attr.aria-expanded]="tagsOpen()"
         [attr.aria-label]="'tags.title' | t"
@@ -170,13 +170,13 @@
     <!-- Desktops: the shared window (as the search's: near the top, Esc or a click outside closes
          it), as tall as it may be; its head as the search's field row: ✨ and the name -->
     <ui-window tall (closed)="aiOpen.set(false)">
-      <ui-window-head icon="sparkle" [colored]="true">{{ 'editor.ai' | t }}</ui-window-head>
+      <ui-window-head icon="sparkle" colored>{{ 'editor.ai' | t }}</ui-window-head>
       <div class="flex min-h-0 flex-1 flex-col px-4.5 pb-4.5">
         <app-ai-chat [pageId]="p.id" [page]="pageText()" (add)="editor()?.insert($event)" />
       </div>
     </ui-window>
   } @else {
-    <ui-sheet [tall]="true" (closed)="aiOpen.set(false)">
+    <ui-sheet tall (closed)="aiOpen.set(false)">
       <span sheetHead class="text-body font-semibold">{{ 'editor.ai' | t }}</span>
       <app-ai-chat [pageId]="p.id" [page]="pageText()" (add)="editor()?.insert($event)" />
     </ui-sheet>

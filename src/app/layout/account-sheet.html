@@ -1,4 +1,4 @@
-<ui-sheet #sheet [tall]="true" (closed)="closed.emit()">
+<ui-sheet #sheet tall (closed)="closed.emit()">
   <!-- A page in the sheet: in its head ‹ back and its name; it slides in (back to it: from the left —
        Slide: the head's ‹ and name and the page below are marked for it) -->
   @if (page()) {
@@ -22,7 +22,7 @@
           type="button"
           uiFloatingButton
           round
-          (click)="trashList()?.emptyAll($event)"
+          (click)="library.askDeleteForever(null, $any($event.currentTarget))"
           [attr.aria-label]="'trash.emptyAll' | t"
           class="absolute right-0 text-danger"
         >

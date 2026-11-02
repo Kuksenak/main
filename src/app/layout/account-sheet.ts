@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -39,7 +39,6 @@ export class AccountSheet {
   private readonly slide = inject(Slide);
   // (the trash's: its pages, Empty trash at the head)
   protected readonly library = inject(LibraryStore);
-  protected readonly trashList = viewChild(TrashList);
   // The user whose card is open, and their name over it (the card reads them from UsersStore itself:
   // the users' code is downloaded only when Users is opened — @defer)
   protected readonly userId = signal<string | null>(null);

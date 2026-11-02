@@ -7,7 +7,7 @@
       type="button"
       (click)="searchOpen.set(true)"
       class="mb-1.5 flex h-8 shrink-0 items-center gap-2 rounded-lg border-[0.8px] border-fg/7 pr-1.5 pl-2 text-left text-ui
-             text-fg-secondary outline-none hover:bg-side-hover focus-visible:bg-side-hover active:transform-none"
+             text-fg-secondary outline-none hover:bg-side-hover focus-visible:bg-side-hover"
     >
       <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
       <ui-kbd>{{ shortcut }}</ui-kbd>
@@ -82,7 +82,7 @@
       sidebarFoot
       uiButton
       type="button"
-      [caret]="true"
+      caret
       (click)="menuAt.set(menuAt() ? null : account.element)"
       aria-haspopup="menu"
       [attr.aria-expanded]="!!menuAt()"
@@ -162,7 +162,7 @@
       <ui-window-keys [enter]="'trash.restoreKey' | t">
         <span class="flex-1">{{ 'trash.note' | t }}</span>
         @if (store.trash()?.length) {
-          <button uiButton type="button" (click)="trashList.emptyAll($event)"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
+          <button uiButton type="button" (click)="store.askDeleteForever(null, $any($event.currentTarget))"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
         }
       </ui-window-keys>
     </ui-window-foot>

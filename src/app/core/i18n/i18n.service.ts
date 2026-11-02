@@ -48,6 +48,11 @@ export class I18nService {
     return s.charAt(0).toLocaleUpperCase(this.locale()) + s.slice(1);
   }
 
+  /** Lower-cased by the language's rules (what's typed matched against names). */
+  lower(s: string): string {
+    return s.toLocaleLowerCase(this.locale());
+  }
+
   // A formatter per locale and parts, made once (making one is slow, Safari especially)
   private readonly formatters = new Map<string, Intl.DateTimeFormat>();
 

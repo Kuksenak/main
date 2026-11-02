@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Observable, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
-import { Toasts } from '../core/ui';
+import { Confirm, Toasts } from '../core/ui';
 
 /** A page in the library's list (no content). */
 export interface PageItem {
@@ -69,6 +69,7 @@ export class LibraryStore {
   private readonly toasts = inject(Toasts);
   private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
+  private readonly confirm = inject(Confirm);
   /** A new page on its way (New page: off meanwhile). */
   readonly creating = signal(false);
 
@@ -206,6 +207,16 @@ export class LibraryStore {
       },
       error: () => this.toasts.fail('trash.restoreError'),
     });
+  }
+
+  /** Delete forever / Empty trash (null: all of it) — asked first, at the button that asked (`at`). */
+  async askDeleteForever(id: string | null, at: HTMLElement): Promise<void> {
+    const yes = await this.confirm.ask(at, {
+      text: this.i18n.t(id ? 'trash.confirmOne' : 'trash.confirmAll'),
+      yes: this.i18n.t(id ? 'trash.deleteForever' : 'trash.emptyAll'),
+      danger: true,
+    });
+    if (yes) this.deleteForever(id);
   }
 
   /** Deleted for good (null: all of the trash). */

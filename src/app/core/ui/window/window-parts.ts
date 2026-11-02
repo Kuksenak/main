@@ -1,4 +1,4 @@
-import { afterNextRender, Component, Directive, ElementRef, inject, input, model, output } from '@angular/core';
+import { afterNextRender, booleanAttribute, Component, Directive, ElementRef, inject, input, model, output } from '@angular/core';
 import { I18nService } from '../../i18n/i18n.service';
 import { Icon, IconName } from '../icon/icon';
 import { UiKbd } from '../kbd/kbd';
@@ -23,7 +23,7 @@ import { UiKbd } from '../kbd/kbd';
 })
 export class UiWindowHead {
   readonly icon = input.required<IconName>();
-  readonly colored = input(false);
+  readonly colored = input(false, { transform: booleanAttribute });
 }
 
 /** The field in a window's head: the rest of the row, no edge, the base text — the caret in it as the window opens. */
