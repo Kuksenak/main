@@ -3,14 +3,17 @@ import { Router } from '@angular/router';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, Toasts, UiButton, UiFloatingButton, UiList, UiListItem, UiSheet } from '../core/ui';
+import { TranslationKey } from '../core/i18n/translations';
+import { Icon, Toasts, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
- * Desktop: New page at the top; phones: + floating at the bottom right (Trash: the account's sheet).
+ * Desktops: a row at the top as a page's (the name; a filter, New page), the pages by when they were
+ * changed (Today, 7 days, 30 days, older), a row each as Notion's. Phones: the pages on a card, +
+ * floating at the bottom right (Trash: the account's sheet).
  */
 @Component({
   selector: 'app-library',
@@ -24,6 +27,29 @@ export class Library {
 
   protected readonly desktop = desktop;
   protected readonly creating = signal(false);
+  // Desktops: the filter's words (the pages whose names have them)
+  protected readonly filter = signal('');
+
+  // The pages (filtered) by when they were changed: Today, the last 7 days, 30, older (only those with any)
+  protected readonly groups = computed(() => {
+    const words = this.filter().trim().toLowerCase();
+    const items = (this.store.items() ?? []).filter((i) => !words || i.title.toLowerCase().includes(words));
+    const day = new Date();
+    day.setHours(0, 0, 0, 0);
+    const today = day.getTime();
+    const DAY = 86_400_000;
+    const groups: { key: TranslationKey; items: PageItem[] }[] = [
+      { key: 'library.today', items: [] },
+      { key: 'library.week', items: [] },
+      { key: 'library.month', items: [] },
+      { key: 'library.older', items: [] },
+    ];
+    for (const item of items) {
+      const at = new Date(item.updatedAt).getTime();
+      groups[at >= today ? 0 : at >= today - 7 * DAY ? 1 : at >= today - 30 * DAY ? 2 : 3].items.push(item);
+    }
+    return groups.filter((g) => g.items.length);
+  });
   private readonly toasts = inject(Toasts);
 
   constructor() {
@@ -47,9 +73,10 @@ export class Library {
     });
   }
 
-  // "12 Oct", "12 Oct 2025" (another year)
-  protected changed(item: PageItem): string {
+  // "12 Oct", "12 Oct 2025" (another year); today: "15:02"
+  protected changed(item: PageItem, time = false): string {
     const d = new Date(item.updatedAt);
+    if (time) return this.i18n.date(d, { hour: '2-digit', minute: '2-digit' });
     const sameYear = d.getFullYear() === new Date().getFullYear();
     return this.i18n.date(d, sameYear ? { day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short', year: 'numeric' });
   }

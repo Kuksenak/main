@@ -1,37 +1,91 @@
-<div class="flex flex-col gap-3 px-4 pt-2 pb-24 desktop:max-w-3xl desktop:px-10 desktop:pt-8 desktop:pb-8">
-  <!-- Desktop: the section's name, New page at its right -->
-  <div class="flex h-button items-center mobile:hidden">
-    <h1 class="ml-1 flex-1 text-body font-medium">{{ 'nav.library' | t }}</h1>
+@if (desktop) {
+  <!-- Desktops: a thin row at the top, as a page's (48 tall, staying as it scrolls): the section's
+       name at the left; a filter field (as the sidebar's Search) and New page at the right -->
+  <div class="sticky top-0 z-20 flex h-12 items-center gap-2 bg-app pr-3 pl-8">
+    <h1 class="min-w-0 flex-1 truncate pl-2 text-ui font-semibold">{{ 'nav.library' | t }}</h1>
+    <label
+      class="flex h-8 w-56 items-center gap-2 rounded-lg border-[0.8px] border-fg/7 px-2 text-ui text-fg-secondary hover:bg-side-hover focus-within:bg-side"
+    >
+      <app-icon name="search" class="size-4 shrink-0 text-icon" />
+      <input
+        #filterField
+        type="text"
+        autocomplete="off"
+        [value]="filter()"
+        (input)="filter.set(filterField.value)"
+        (keydown.escape)="filter.set(''); filterField.value = ''"
+        [placeholder]="'library.filter' | t"
+        class="min-w-0 flex-1 bg-transparent text-fg outline-none placeholder:text-fg-secondary"
+      />
+    </label>
     <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
   </div>
 
-
-  @if (store.items(); as items) {
-    @if (!items.length) {
-      <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'library.empty' | t }}</p>
-    } @else {
-      <ui-list>
-        @for (item of items; track item.id) {
-          <button type="button" uiListItem icon="page" (click)="open(item)" [chevron]="!desktop">
-            {{ item.title }}
-            <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
-          </button>
+  <div class="flex flex-col px-8 pt-4 pb-12">
+    @if (store.items(); as items) {
+      @if (!items.length) {
+        <!-- Nothing yet: a big page, a word, New page -->
+        <div class="flex flex-col items-center gap-4 py-24 text-center">
+          <app-icon name="page" colored class="size-14 text-icon" />
+          <p class="max-w-xs text-ui text-fg-secondary">{{ 'library.empty' | t }}</p>
+          <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
+        </div>
+      } @else {
+        <!-- The pages by when they were changed (Today, the last 7 days, 30, older: a small gray name over
+             each, as the search's sections) — a row each: its icon, its name, 🔖 if a favorite, when
+             (today: the time); gray under the pointer, as Notion's -->
+        @for (group of groups(); track group.key) {
+          <p class="px-2 pt-5 pb-1.5 text-footnote font-medium text-fg-secondary first:pt-1">{{ group.key | t }}</p>
+          @for (item of group.items; track item.id) {
+            <button
+              type="button"
+              (click)="open(item)"
+              class="group flex h-9 w-full shrink-0 items-center gap-2.5 rounded-lg px-2 text-left hover:bg-tint active:transform-none"
+            >
+              <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
+              <span class="min-w-0 truncate text-ui text-fg" [class.text-fg-secondary]="!item.title.trim()">{{ item.title.trim() || ('library.untitled' | t) }}</span>
+              @if (item.favorite) {
+                <app-icon name="bookmark" colored class="size-4 shrink-0 text-icon" />
+              }
+              <span class="flex-1"></span>
+              <span class="shrink-0 text-footnote text-fg-secondary tabular-nums">{{ changed(item, group.key === 'library.today') }}</span>
+            </button>
+          }
+        } @empty {
+          <p class="py-16 text-center text-ui text-fg-secondary">{{ 'search.nothing' | t }}</p>
         }
-      </ui-list>
+      }
     }
-  }
-</div>
+  </div>
+} @else {
+  <!-- Phones: the pages on a card (as iOS's lists), + floating at the bottom right -->
+  <div class="flex flex-col gap-3 px-4 pt-2 pb-24">
+    @if (store.items(); as items) {
+      @if (!items.length) {
+        <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'library.empty' | t }}</p>
+      } @else {
+        <ui-list>
+          @for (item of items; track item.id) {
+            <button type="button" uiListItem icon="page" (click)="open(item)" chevron>
+              {{ item.title }}
+              <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
+            </button>
+          }
+        </ui-list>
+      }
+    }
+  </div>
 
-<!-- Phones: + floating at the bottom right, just above the home indicator -->
-<button
-  type="button"
-  uiFloatingButton
-  round
-  accent
-  [disabled]="creating()"
-  (click)="create()"
-  [attr.aria-label]="'library.new' | t"
-  class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20 desktop:hidden"
->
-  <app-icon name="plus" class="size-8" />
-</button>
+  <button
+    type="button"
+    uiFloatingButton
+    round
+    accent
+    [disabled]="creating()"
+    (click)="create()"
+    [attr.aria-label]="'library.new' | t"
+    class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20"
+  >
+    <app-icon name="plus" class="size-8" />
+  </button>
+}
