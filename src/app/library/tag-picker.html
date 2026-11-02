@@ -1,6 +1,6 @@
 <!-- A page's tag, as a choice of a few (as the language's): No tag, the account's tags (the chosen
      one ✓) — a click picks it; at the bottom a field: a new tag's name, Enter makes it (the next
-     color) and picks it. A tag's ⋯ (at its right, under the pointer): the menu becomes the tag's own,
+     color) and picks it. A tag's ⋯ (at its left, under the pointer): the menu becomes the tag's own,
      as Notion's — its name (typed over), its colors as rows (✓ the one it has), Delete; ‹ back. -->
 <ui-menu narrow [origin]="origin()" (closed)="closed.emit()">
   @if (editing(); as tag) {
@@ -50,22 +50,26 @@
       {{ 'tags.delete' | t }}
     </button>
   } @else {
-    <button type="button" uiMenuItem [checked]="!tagIds().length" (click)="pick(null)">
-      <span class="text-fg-secondary">{{ 'tags.noTag' | t }}</span>
-    </button>
+    <!-- (No tag: in line with the tags — the ⋯'s room before it) -->
+    <div class="flex items-center">
+      <span class="mr-0.5 size-8 shrink-0"></span>
+      <button type="button" uiMenuItem [checked]="!tagIds().length" (click)="pick(null)" class="w-auto! min-w-0 flex-1">
+        <span class="text-fg-secondary">{{ 'tags.noTag' | t }}</span>
+      </button>
+    </div>
     @for (tag of store.tags(); track tag.id) {
-      <!-- (a row: the tag — a click picks it; ⋯ at its right under the pointer: the tag's own menu) -->
+      <!-- (a row: ⋯ at its left under the pointer — the tag's own menu; the tag — a click picks it) -->
       <div class="group/tag flex items-center">
-        <button type="button" uiMenuItem [checked]="tagIds().includes(tag.id)" (click)="pick(tag.id)" class="w-auto! min-w-0 flex-1">
-          <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
-        </button>
         <button
           type="button"
           (click)="editing.set(tag)"
           [attr.aria-label]="'tags.edit' | t"
-          class="ml-0.5 grid size-8 shrink-0 place-items-center rounded-button text-icon opacity-0 group-hover/tag:opacity-100 hover:bg-tint-strong"
+          class="mr-0.5 grid size-8 shrink-0 place-items-center rounded-button text-icon opacity-0 group-hover/tag:opacity-100 hover:bg-tint-strong"
         >
           <app-icon name="dots" class="size-icon-menu" />
+        </button>
+        <button type="button" uiMenuItem [checked]="tagIds().includes(tag.id)" (click)="pick(tag.id)" class="w-auto! min-w-0 flex-1">
+          <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
         </button>
       </div>
     }
