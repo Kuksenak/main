@@ -1,47 +1,44 @@
 <!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): the page's name at the left (a click: a field under it, as the link's —
-     Enter or a click outside: done; a new page: open at once, its name selected); saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
+     Notion's): the page's name at the left, typed over right there (under the pointer or typed
+     in: a field as the sidebar's Search, as wide as the name, ↵ on a chip; Enter: on into the
+     text; a new page: its name selected); saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
 @if (desktop && page(); as p) {
   <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app pr-3 pl-[2.625rem]">
-    <div class="relative mr-2 flex min-w-0 flex-1 items-center">
-      <button
-        type="button"
-        (click)="renaming.set(!renaming())"
-        [attr.aria-expanded]="renaming()"
-        [uiTip]="renaming() ? null : ('library.rename' | t)"
-        class="flex h-7 min-w-0 items-center rounded-button px-1.5 text-ui text-fg hover:bg-tint-strong"
+    <div class="mr-2 flex min-w-0 flex-1 items-center">
+      <!-- (plain text till the pointer's over it or it's typed in: then the Search's look — a faint
+           hairline, the sidebar's color; as wide as what's typed: the text's copy under the field
+           sizes it) -->
+      <form
+        class="group/title flex h-8 max-w-full min-w-0 items-center gap-2 rounded-lg border-[0.8px] border-transparent pr-1.5 pl-2 -ml-0.5 text-ui
+               hover:border-fg/7 hover:bg-side focus-within:border-fg/7 focus-within:bg-side"
+        (submit)="$event.preventDefault(); titleDone()"
       >
-        <span class="min-w-0 truncate" [class.text-fg-secondary]="!title()">{{ title() || ('library.untitled' | t) }}</span>
-      </button>
-      @if (renaming()) {
-        <div class="fixed inset-0 z-30" (click)="renaming.set(false)"></div>
-        <!-- (as the sidebar's Search: a field-like box 32 tall, a faint hairline, round corners, the sidebar's color; over the
-             page, no shadow; Enter: the ↵ on a key's chip, a click on it too) -->
-        <form
-          class="absolute top-full left-0 z-40 mt-1 flex h-8 w-72 max-w-[80vw] animate-menu-in items-center gap-2 rounded-lg border-[0.8px] border-fg/7 bg-side pr-1.5 pl-2 text-ui text-fg"
-          (submit)="$event.preventDefault(); titleDone()"
+        <span
+          class="inline-grid min-w-0 after:invisible after:col-start-1 after:row-start-1 after:overflow-hidden after:whitespace-pre after:content-[attr(data-value)]"
+          [attr.data-value]="(title() || ('library.untitled' | t)) + ' '"
         >
           <input
             #titleField
             type="text"
             [value]="title()"
             (input)="typedTitle(titleField.value)"
-            (keydown.escape)="renaming.set(false)"
+            (keydown.escape)="titleField.blur()"
             [placeholder]="'library.untitled' | t"
             [attr.aria-label]="'library.rename' | t"
             maxlength="200"
             autocomplete="off"
-            class="min-w-0 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
+            class="col-start-1 row-start-1 w-full min-w-0 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
           />
-          <button
-            type="submit"
-            class="grid h-5 shrink-0 place-items-center rounded-[0.3rem] bg-tint-strong px-1.5 text-fg-secondary hover:text-fg"
-            [attr.aria-label]="'editor.done' | t"
-          >
-            <app-icon name="enter" class="size-3.5" />
-          </button>
-        </form>
-      }
+        </span>
+        <button
+          type="submit"
+          tabindex="-1"
+          class="invisible grid h-5 shrink-0 place-items-center rounded-[0.3rem] bg-tint-strong px-1.5 text-fg-secondary group-hover/title:visible group-focus-within/title:visible hover:text-fg"
+          [attr.aria-label]="'editor.done' | t"
+        >
+          <app-icon name="enter" class="size-3.5" />
+        </button>
+      </form>
     </div>
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>

@@ -20,11 +20,11 @@ const SAVE_AFTER_MS = 700;
 /**
  * A page of the library (/library/:id): its title and its text (PageEditor: blocks, "/", B I U S,
  * ⠿), edited right there and saved by themselves a moment after the typing stops (and on leaving).
- * A new one ("Untitled") opens with its title's field open, selected; Enter there goes on into the text.
+ * A new one ("Untitled") opens with its title selected; Enter in it goes on into the text.
  * AI (the editor's "/" or its bar, desktop: the button at the top): its chat (AiChat) — a sheet
  * (phones) or a window in the middle (desktop); its texts go in after the caret's block.
  * Delete: the page gone, back to the library. Desktops: one row at the top — the title, the
- * title (a click: its field in a popover), the assistant, ⋯ (Duplicate, Delete; when edited, made).
+ * title (typed over right there), the assistant, ⋯ (Duplicate, Delete; when edited, made).
  * Phones: the title in the top bar, ‹ back to the library.
  */
 @Component({
@@ -50,7 +50,6 @@ export class PageView {
   protected readonly desktop = desktop;
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
-  protected readonly renaming = signal(false);
   // Phones: the page read only; its actions in a sheet (the top bar's ⋯)
   protected readonly actionsOpen = signal(false);
   protected readonly shown = shown;
@@ -85,7 +84,6 @@ export class PageView {
       this.flush();
       this.page.set(null);
       this.menuOpen.set(false);
-      this.renaming.set(false);
       this.open(id);
     });
   });
@@ -99,7 +97,7 @@ export class PageView {
         this.title.set(page.title);
         this.blocks = page.blocks;
         this.texts = this.blocks;
-        if (fresh && desktop) this.renaming.set(true);
+        if (fresh && desktop) setTimeout(() => this.titleField()?.nativeElement.select());
       },
       error: () => this.toasts.error(this.i18n.t('library.pageLoadError')),
     });
@@ -118,15 +116,8 @@ export class PageView {
     this.changed();
   }
 
-  // (the title's field: opened — focused, its name selected)
-  private readonly renameOpened = effect(() => {
-    const field = this.titleField();
-    if (field) setTimeout(() => field.nativeElement.select());
-  });
-
-  // Enter in the title's field: closed, on into the text
+  // Enter in the title: on into the text
   protected titleDone(): void {
-    this.renaming.set(false);
     this.editor()?.focusStart();
   }
 
