@@ -24,6 +24,7 @@ export const PLACES: Place[] = [
   { path: '/schedule', label: 'nav.schedule', icon: 'calendar', area: 'schedule' },
   { path: '/library', label: 'nav.library', icon: 'library', area: 'library' },
   { path: '/favorites', label: 'nav.favorites', icon: 'bookmark', anyOf: ['library'], phone: true },
+  { path: '/tags', label: 'tags.title', icon: 'hash', area: 'library', phone: true },
 ];
 
 /** The sections this user may see. */

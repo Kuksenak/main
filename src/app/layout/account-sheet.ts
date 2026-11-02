@@ -5,21 +5,20 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
-import { Confirm, Icon, TAG_COLORS, tagColorLabel, UiList, UiFloatingButton, UiListItem, UiSheet } from '../core/ui';
-import { Tag, TagsStore } from '../library/tags.store';
+import { Icon, UiList, UiFloatingButton, UiListItem, UiSheet } from '../core/ui';
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
 import { TrashList } from '../library/trash-list';
 import { LibraryStore } from '../library/library.store';
 import type { User } from '../users/users.store';
 
-type Page = 'language' | 'users' | 'user' | 'trash' | 'tags' | 'tag';
+type Page = 'language' | 'users' | 'user' | 'trash';
 
 /**
  * Phones: the account (as the Claude app's) — a sheet from the bottom, a fixed height: the email;
- * Users (the admins only), Tags and Trash (those who can read the library); the language (the current one in gray); at the bottom Update available
+ * Users (the admins only), Trash (those who can read the library); the language (the current one in gray); at the bottom Update available
  * (when a new version is ready), Log out and Log out of all devices. A row with › opens its page
- * right in the sheet, sliding in (‹ back): the languages; the users — and a user tapped, their card; the tags — and a tag tapped, its colors and Delete; the trash's pages.
+ * right in the sheet, sliding in (‹ back): the languages; the users — and a user tapped, their card; the trash's pages.
  */
 @Component({
   selector: 'app-account-sheet',
@@ -41,46 +40,6 @@ export class AccountSheet {
   // (the trash's: its pages, Empty trash at the head)
   protected readonly library = inject(LibraryStore);
   protected readonly trashList = viewChild(TrashList);
-  // (Tags: the account's — a tag tapped: its colors, Delete)
-  protected readonly tags = inject(TagsStore);
-  protected readonly colors = TAG_COLORS;
-  protected readonly colorLabel = tagColorLabel;
-  protected readonly tagId = signal<string | null>(null);
-  protected readonly tag = computed(() => this.tags.byId().get(this.tagId() ?? '') ?? null);
-  private readonly confirm = inject(Confirm);
-
-  protected openTags(): void {
-    this.tags.load();
-    this.open('tags');
-  }
-
-  protected openTag(tag: Tag): void {
-    this.tagId.set(tag.id);
-    this.open('tag');
-  }
-
-  protected recolor(tag: Tag, color: Tag['color']): void {
-    if (tag.color !== color) this.tags.update({ ...tag, color });
-  }
-
-  // (Enter or away: saved — not empty, not another tag's name)
-  protected rename(tag: Tag, field: HTMLInputElement): void {
-    const name = field.value.trim();
-    if (!name || name === tag.name || this.tags.tags().some((t) => t.id !== tag.id && t.name.toLowerCase() === name.toLowerCase())) {
-      field.value = tag.name;
-      return;
-    }
-    this.tags.update({ ...tag, name });
-  }
-
-  protected async removeTag(tag: Tag, e: Event): Promise<void> {
-    // (on no page: gone at once; else asked, saying how many pages it comes off)
-    const text = this.tags.deleteAsk(tag.id);
-    if (text && !(await this.confirm.ask(e.currentTarget as HTMLElement, { text, yes: this.i18n.t('tags.delete'), danger: true }))) return;
-    this.tags.remove(tag.id);
-    this.back();
-  }
-
   // The user whose card is open, and their name over it (the card reads them from UsersStore itself:
   // the users' code is downloaded only when Users is opened — @defer)
   protected readonly userId = signal<string | null>(null);
@@ -124,10 +83,6 @@ export class AccountSheet {
         return this.userName();
       case 'trash':
         return this.i18n.t('trash.title');
-      case 'tags':
-        return this.i18n.t('tags.title');
-      case 'tag':
-        return this.tag()?.name ?? '';
       default:
         return '';
     }
