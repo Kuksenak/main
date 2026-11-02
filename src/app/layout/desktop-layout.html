@@ -163,17 +163,16 @@
         [placeholder]="'trash.search' | t"
       />
     </ui-window-head>
-    <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pt-1 pb-2">
+    <ui-window-list>
       <app-trash-list #trashList [query]="trashQuery()" [(index)]="trashIndex" (restored)="trashOpen.set(false)" />
-    </div>
+    </ui-window-list>
     <ui-window-foot>
-      <ui-window-key key="Esc">{{ 'search.close' | t }}</ui-window-key>
-      <ui-window-key [icons]="['arrow-up', 'arrow-down']">{{ 'search.move' | t }}</ui-window-key>
-      <ui-window-key [icons]="['enter']">{{ 'trash.restoreKey' | t }}</ui-window-key>
-      <span class="flex-1">{{ 'trash.note' | t }}</span>
-      @if (store.trash()?.length) {
-        <button uiButton type="button" (click)="trashList.emptyAll($event)"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
-      }
+      <ui-window-keys [enter]="'trash.restoreKey' | t">
+        <span class="flex-1">{{ 'trash.note' | t }}</span>
+        @if (store.trash()?.length) {
+          <button uiButton type="button" (click)="trashList.emptyAll($event)"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
+        }
+      </ui-window-keys>
     </ui-window-foot>
   </ui-window>
 }

@@ -3,4 +3,13 @@
  * phones' code doesn't download it.
  */
 export { UiWindow } from './window';
-export { UiListKeys, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from './window-parts';
+export {
+  UiListKeys,
+  UiWindowField,
+  UiWindowFoot,
+  UiWindowHead,
+  UiWindowKey,
+  UiWindowKeys,
+  UiWindowList,
+  UiWindowSection,
+} from './window-parts';

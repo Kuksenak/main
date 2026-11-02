@@ -1,4 +1,5 @@
 import { afterNextRender, Component, Directive, ElementRef, inject, input, model, output } from '@angular/core';
+import { I18nService } from '../../i18n/i18n.service';
 import { Icon, IconName } from '../icon/icon';
 import { UiKbd } from '../kbd/kbd';
 
@@ -74,6 +75,25 @@ export class UiListKeys {
 }
 
 /**
+ * A window's list under its head (the search's results, the trash's pages): the rest of the window,
+ * scrolling, the rows a little in from its sides. (`role="listbox"` on it where the keys pick a row.)
+ */
+@Component({
+  selector: 'ui-window-list',
+  host: { class: 'flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pt-1 pb-2' },
+  template: `<ng-content />`,
+})
+export class UiWindowList {}
+
+/** A section's name in a window's list, small and gray, over its first row (as Notion's search). */
+@Component({
+  selector: 'ui-window-section',
+  host: { class: 'block px-2 pt-3 pb-1.5 text-footnote font-medium text-fg-secondary' },
+  template: `<ng-content />`,
+})
+export class UiWindowSection {}
+
+/**
  * A window's foot, under a hairline: the keys (`<ui-window-key>`), then anything at the right
  * (a note, a button).
  */
@@ -106,4 +126,25 @@ export class UiWindowFoot {}
 export class UiWindowKey {
   readonly key = input('');
   readonly icons = input<readonly IconName[]>([]);
+}
+
+/**
+ * The keys of a window whose list the keys walk (the search's, the trash's), in its foot: Esc (close),
+ * ↑ ↓ (move), ↵ — `enter`: what it does there (Open, Restore). What's put in comes after them.
+ *   <ui-window-foot><ui-window-keys [enter]="'search.open' | t" /></ui-window-foot>
+ */
+@Component({
+  selector: 'ui-window-keys',
+  imports: [UiWindowKey],
+  host: { class: 'contents' },
+  template: `
+    <ui-window-key key="Esc">{{ i18n.t('search.close') }}</ui-window-key>
+    <ui-window-key [icons]="['arrow-up', 'arrow-down']">{{ i18n.t('search.move') }}</ui-window-key>
+    <ui-window-key [icons]="['enter']">{{ enter() }}</ui-window-key>
+    <ng-content />
+  `,
+})
+export class UiWindowKeys {
+  readonly enter = input('');
+  protected readonly i18n = inject(I18nService);
 }

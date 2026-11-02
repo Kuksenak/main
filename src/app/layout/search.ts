@@ -13,7 +13,7 @@ import { AppSearch, Found } from './app-search';
       [(query)]="query"
       [placeholder]="i18n.t('search.placeholder')"
       [empty]="i18n.t('search.nothing')"
-      [keys]="[i18n.t('search.close'), i18n.t('search.move'), i18n.t('search.open')]"
+      [enter]="i18n.t('search.open')"
       (picked)="pick($event)"
       (closed)="closed.emit()"
     />
