@@ -124,17 +124,9 @@
   </ui-menu>
 }
 
-<!-- A page's ⋯ in the sidebar (as Notion's): 🔖 in the favorites or not; Duplicate; Move to trash; when
-     it was edited -->
+<!-- A page's ⋯ in the sidebar: its menu (as the library's) -->
 @if (rowMenu(); as m) {
-  <ui-menu narrow [origin]="m.at" (closed)="rowMenu.set(null)">
-    <button type="button" uiMenuItem icon="bookmark" (click)="favorite(m.page)">{{ (m.page.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
-    <button type="button" uiMenuItem icon="duplicate" (click)="duplicate(m.page)">{{ 'library.duplicate' | t }}</button>
-    <ui-menu-separator />
-    <button type="button" uiMenuItem icon="trash" danger (click)="trash(m.page)">{{ 'library.moveToTrash' | t }}</button>
-    <ui-menu-separator />
-    <div class="px-menu-label-x py-1 text-caption text-fg-secondary">{{ 'library.edited' | t }} {{ when(m.page.updatedAt) }}</div>
-  </ui-menu>
+  <app-page-menu [page]="m.page" [origin]="m.at" (closed)="rowMenu.set(null)" />
 }
 
 <!-- The trash: a window as the search's (the shared one) — the field with its loupe (it filters the

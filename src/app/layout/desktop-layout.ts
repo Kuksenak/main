@@ -13,6 +13,7 @@ import { LibraryStore, PageItem } from '../library/library.store';
 import { TranslationKey } from '../core/i18n/translations';
 import { Toasts } from '../core/ui';
 import { TrashList } from '../library/trash-list';
+import { PageMenu } from '../library/page-menu';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
 import { Search } from './search';
@@ -30,6 +31,7 @@ import { Search } from './search';
   imports: [
     Icon,
     NgTemplateOutlet,
+    PageMenu,
     RouterOutlet,
     Search,
     TranslatePipe,
@@ -85,35 +87,6 @@ export class DesktopLayout {
   // A page's ⋯: its menu, at the button
   protected readonly rowMenu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
   private readonly toasts = inject(Toasts);
-
-  protected favorite(page: PageItem): void {
-    this.rowMenu.set(null);
-    this.store.favorite(page.id, !page.favorite).subscribe();
-  }
-
-  protected duplicate(page: PageItem): void {
-    this.rowMenu.set(null);
-    const title = this.i18n.t('library.copyOf').replace('{title}', page.title.trim() || this.i18n.t('library.untitled'));
-    this.store.duplicate(page.id, title).subscribe({
-      next: (copy) => this.router.navigate(['/library', copy.id]),
-      error: () => this.toasts.error(this.i18n.t('library.duplicateError')),
-    });
-  }
-
-  protected trash(page: PageItem): void {
-    this.rowMenu.set(null);
-    this.store.delete(page.id).subscribe({
-      next: () => {
-        if (this.router.url === `/library/${page.id}`) this.router.navigateByUrl('/library');
-      },
-      error: () => this.toasts.error(this.i18n.t('library.deleteError')),
-    });
-  }
-
-  // "26 Oct, 15:02"
-  protected when(at: string): string {
-    return this.i18n.date(new Date(at), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-  }
 
   // Library's +: a new page ("Untitled"), opened with its name selected
   private creating = false;
