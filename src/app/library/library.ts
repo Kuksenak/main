@@ -8,6 +8,7 @@ import { Icon, IconName, tagTint, Toasts, UiButton, UiFloatingButton, UiList, Ui
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 import { PageMenu } from './page-menu';
+import { UiMenu, UiMenuItem } from '../core/ui/menu';
 import { keep, kept } from '../core/utils/storage';
 import { TagsStore } from './tags.store';
 
@@ -15,7 +16,7 @@ import { TagsStore } from './tags.store';
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
  * Desktops, as Notion's: the name big, the views as pills (Recents: all; Favorites; Published) and New
- * page, the view's pages by when they were changed (Today, 7 days, 30 days, older), a row each (Ctrl+click
+ * page, a tag's filter (# — its menu), the view's pages by when they were changed (Today, 7 days, 30 days, older), a row each (Ctrl+click
  * picks it; some picked: to the trash at once), ⋯ its menu (PageMenu). Phones: the pages on a card, +
  * floating at the bottom right (Trash: the account's sheet).
  */
@@ -23,7 +24,7 @@ type View = 'recents' | 'favorites' | 'published';
 
 @Component({
   selector: 'app-library',
-  imports: [Icon, PageMenu, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem, UiTag],
+  imports: [Icon, PageMenu, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem, UiMenu, UiMenuItem, UiTag],
   templateUrl: './library.html',
 })
 export class Library {
@@ -40,6 +41,9 @@ export class Library {
     { id: 'published', label: 'library.published', icon: 'lock' },
   ];
   protected readonly view = signal<View>('recents');
+  // A tag: only its pages (the views' row: # and its menu)
+  protected readonly tagFilter = signal<string | null>(null);
+  protected readonly tagMenu = signal(false);
   // The tags: after a page's name; its icon in its first tag's pastel
   protected readonly tags = inject(TagsStore);
   protected tint(item: PageItem): string | null {
@@ -78,7 +82,10 @@ export class Library {
   // The view's pages by when they were changed: Today, the last 7 days, 30, older (only those with any)
   protected readonly groups = computed(() => {
     const view = this.view();
-    const items = (this.store.items() ?? []).filter((i) => view === 'recents' || (view === 'favorites' ? i.favorite : i.published));
+    const tag = this.tagFilter();
+    const items = (this.store.items() ?? []).filter(
+      (i) => (view === 'recents' || (view === 'favorites' ? i.favorite : i.published)) && (!tag || !!i.tagIds?.includes(tag)),
+    );
     const day = new Date();
     day.setHours(0, 0, 0, 0);
     const today = day.getTime();

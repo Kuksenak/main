@@ -16,6 +16,37 @@
           {{ v.label | t }}
         </button>
       }
+      <!-- (a tag: only its pages — # and the tag picked (none: Tag), its menu: All, the tags) -->
+      @if (tags.tags().length) {
+        <span class="mx-1 h-5 w-px bg-separator"></span>
+        <button
+          #tagBtn
+          uiButton
+          type="button"
+          icon="hash"
+          [outline]="!tagFilter()"
+          [caret]="true"
+          (click)="tagMenu.set(!tagMenu())"
+          [attr.aria-expanded]="tagMenu()"
+          [attr.aria-label]="'tags.title' | t"
+        >
+          @if (tags.byId().get(tagFilter() ?? ''); as tag) {
+            <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+          } @else {
+            {{ 'tags.all' | t }}
+          }
+        </button>
+        @if (tagMenu()) {
+          <ui-menu narrow [origin]="tagBtn.element" (closed)="tagMenu.set(false)">
+            <button type="button" uiMenuItem [checked]="!tagFilter()" (click)="tagFilter.set(null)">{{ 'tags.all' | t }}</button>
+            @for (tag of tags.tags(); track tag.id) {
+              <button type="button" uiMenuItem [checked]="tagFilter() === tag.id" (click)="tagFilter.set(tag.id)">
+                <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+              </button>
+            }
+          </ui-menu>
+        }
+      }
       <span class="flex-1"></span>
       @if (picked().size) {
         <!-- (some picked: how many, Move to trash; ✕ unpicks) -->
@@ -126,7 +157,7 @@
           </section>
         } @empty {
           <p class="py-16 text-center text-ui text-fg-secondary">
-            {{ (view() === 'favorites' ? 'library.noFavorites' : 'library.noPublished') | t }}
+            {{ (tagFilter() ? 'search.nothing' : view() === 'favorites' ? 'library.noFavorites' : 'library.noPublished') | t }}
           </p>
         }
       }

@@ -1,6 +1,6 @@
 {
   "name": "main",
-  "version": "0.0.1180",
+  "version": "0.0.1181",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
