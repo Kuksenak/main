@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -27,6 +28,7 @@ import { Search } from './search';
   selector: 'app-desktop-layout',
   imports: [
     Icon,
+    NgTemplateOutlet,
     RouterOutlet,
     Search,
     TranslatePipe,

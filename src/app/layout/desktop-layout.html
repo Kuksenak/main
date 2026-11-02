@@ -21,12 +21,23 @@
         }
       </a>
     }
-    <!-- The library's pages: Recents (the 5 last changed), then Favorites — each
-         a row as a place's (its icon, its name, ⌄ / ⌃: a click folds it away / back), its pages under
-         it: their icon, their name, ⋯ under the pointer (its menu).
-         Only they scroll (Search, the places and Trash stay), fading out at the bottom; scrolled: a
-         hairline over them, their top fading under it too; their scroll bar over them (the system's took room
-         from the rows) -->
+    <!-- The library's pages: Recents (the 5 last changed), then Favorites — each a row as a place's (its
+         icon, its name, ⌄ / ⌃: a click folds it away / back), its pages under it: their icon, their
+         name, ⋯ under the pointer (its menu). Only the favorites scroll (all else stays), fading out at
+         the bottom; scrolled: a hairline over them, their top fading under it too; their scroll bar
+         over them (the system's took room from the rows) -->
+    @for (list of lists(); track list.id) {
+      <!-- (open: data-open, not aria-expanded — that one's look is a row whose window is open) -->
+      <button uiSidebarItem [icon]="list.icon" (click)="fold(list.id)" [attr.data-open]="folded().includes(list.id) ? null : ''" class="group/fold shrink-0">
+        {{ list.label | t }}
+        <app-icon itemEnd name="chevron-down" class="size-4 text-icon transition-[rotate] group-data-open/fold:rotate-180" />
+      </button>
+      @if (list.id === 'recents' && !folded().includes('recents')) {
+        @for (page of list.pages; track page.id) {
+          <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
+        }
+      }
+    }
     <div
       #scroller
       uiScrollBar
@@ -36,30 +47,27 @@
              [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] data-scrolled:border-separator
              data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-2rem),transparent)]"
     >
-      @for (list of lists(); track list.id) {
-        <!-- (open: data-open, not aria-expanded — that one's look is a row whose window is open) -->
-        <button uiSidebarItem [icon]="list.icon" (click)="fold(list.id)" [attr.data-open]="folded().includes(list.id) ? null : ''" class="group/fold shrink-0">
-          {{ list.label | t }}
-          <app-icon itemEnd name="chevron-down" class="size-4 text-icon transition-[rotate] group-data-open/fold:rotate-180" />
-        </button>
-        @if (!folded().includes(list.id)) {
-          @for (page of list.pages; track page.id) {
-            <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]" class="pl-3.5!">
-              {{ page.title.trim() || ('library.untitled' | t) }}
-              <button
-                itemEnd
-                uiSidebarAction
-                #more
-                icon="dots"
-                (click)="rowMenu.set(rowMenu()?.page?.id === page.id ? null : { page, at: more.element })"
-                [attr.aria-expanded]="rowMenu()?.page?.id === page.id"
-                [attr.aria-label]="'library.more' | t"
-              ></button>
-            </a>
-          }
+      @if (!folded().includes('favorites')) {
+        @for (page of favorites(); track page.id) {
+          <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
         }
       }
     </div>
+    <!-- (a page's row: its icon, its name, ⋯ under the pointer) -->
+    <ng-template #pageRow let-page>
+      <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]" class="pl-3.5!">
+        {{ page.title.trim() || ('library.untitled' | t) }}
+        <button
+          itemEnd
+          uiSidebarAction
+          #more
+          icon="dots"
+          (click)="rowMenu.set(rowMenu()?.page?.id === page.id ? null : { page, at: more.element })"
+          [attr.aria-expanded]="rowMenu()?.page?.id === page.id"
+          [attr.aria-label]="'library.more' | t"
+        ></button>
+      </a>
+    </ng-template>
     <!-- Trash, at the bottom of the list: its window at it -->
     @if (library()) {
       <button
