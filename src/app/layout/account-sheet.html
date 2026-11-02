@@ -16,6 +16,19 @@
       <span class="max-w-[calc(100%-7rem)] truncate text-body font-semibold" data-vt="sheet-title">
         {{ title() }}
       </span>
+      <!-- (the trash: Empty trash at the right, level with ‹ — asked first) -->
+      @if (page() === 'trash' && library.trash()?.length) {
+        <button
+          type="button"
+          uiFloatingButton
+          round
+          (click)="trashList()?.emptyAll($event)"
+          [attr.aria-label]="'trash.emptyAll' | t"
+          class="absolute right-0 text-danger"
+        >
+          <app-icon name="trash" class="size-6" />
+        </button>
+      }
     </div>
   }
   @if (page(); as open) {

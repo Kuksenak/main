@@ -1,4 +1,4 @@
-import { Component, computed, inject, output, signal } from '@angular/core';
+import { Component, computed, inject, output, signal, viewChild } from '@angular/core';
 import { environment } from '@environments/environment';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -9,6 +9,7 @@ import { Icon, UiList, UiFloatingButton, UiListItem, UiSheet } from '../core/ui'
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
 import { TrashList } from '../library/trash-list';
+import { LibraryStore } from '../library/library.store';
 import type { User } from '../users/users.store';
 
 type Page = 'language' | 'users' | 'user' | 'trash';
@@ -36,6 +37,9 @@ export class AccountSheet {
   protected readonly page = computed(() => this.pages().at(-1) ?? null);
   // (one opened slides in from the right; back, the one under it from the left)
   private readonly slide = inject(Slide);
+  // (the trash's: its pages, Empty trash at the head)
+  protected readonly library = inject(LibraryStore);
+  protected readonly trashList = viewChild(TrashList);
 
   // The user whose card is open, and their name over it (the card reads them from UsersStore itself:
   // the users' code is downloaded only when Users is opened — @defer)

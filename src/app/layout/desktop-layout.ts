@@ -8,6 +8,7 @@ import { UpdateService } from '../core/services/update.service';
 import { Icon, IconName, UiAvatar, UiButton, UiScrollBar } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
+import { UiWindow } from '../core/ui/window';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { TranslationKey } from '../core/i18n/translations';
 import { Toasts } from '../core/ui';
@@ -19,7 +20,7 @@ import { Search } from './search';
 /**
  * Desktop: the frame of every page after sign-in (the router puts the page into it) — the sidebar
  * at the left: Search (Ctrl K / ⌘K: the search window), the app's places (Library: + a new page), the
- * library's Recents and Favorites (rows folding their pages; a page's ⋯: its menu), Trash (its
+ * library's Recents and Favorites (rows folding their pages; a page's ⋯: its menu); by the account, Trash (its
  * window at it), the account at the bottom (its letter, the name — else the email
  * — and ▾; its menu: the email, Users (the admins only), the language, Log out, Log out of all
  * devices); the open page beside it. (Phones have their own, MobileLayout: neither downloads the other's.)
@@ -45,6 +46,7 @@ import { Search } from './search';
     UiSidebarItem,
     TrashList,
     UiTip,
+    UiWindow,
   ],
   templateUrl: './desktop-layout.html',
 })
@@ -58,9 +60,11 @@ export class DesktopLayout {
 
   // The library's: its favorites (the store's list — read here, the sidebar needs it at once), Trash
   protected readonly library = computed(() => this.auth.can('library'));
-  private readonly store = inject(LibraryStore);
+  protected readonly store = inject(LibraryStore);
   protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   protected readonly trashOpen = signal(false);
+  // (the trash window's field: its pages filtered)
+  protected readonly trashQuery = signal('');
 
   // The sidebar's lists: Recents (the last changed), Favorites (when there are any)
   protected readonly lists = computed(() => {

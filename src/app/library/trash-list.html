@@ -1,8 +1,8 @@
 <!-- The pages in the trash: each its name, when it was thrown away; Restore and Delete forever at its
-     right (desktops: under the pointer; phones: as big as the round buttons); under them, Empty trash (both asked first: they can't be undone) -->
-@if (store.trash(); as items) {
+     right (desktops: under the pointer; phones: as big as the round buttons); Delete forever asked first: it can't be undone; Empty trash: where it's shown -->
+@if (shown(); as items) {
   @if (!items.length) {
-    <p class="py-10 text-center text-ui text-fg-secondary mobile:text-body">{{ 'trash.empty' | t }}</p>
+    <p class="py-10 text-center text-ui text-fg-secondary mobile:text-body">{{ (query().trim() ? 'search.nothing' : 'trash.empty') | t }}</p>
   } @else {
     <div class="flex flex-col desktop:gap-0.5">
       @for (item of items; track item.id) {
@@ -34,10 +34,6 @@
           </div>
         </div>
       }
-    </div>
-    <div class="flex items-center justify-between gap-2 pt-2 text-footnote text-fg-secondary">
-      <span class="px-2 mobile:px-0">{{ 'trash.note' | t }}</span>
-      <button uiButton type="button" (click)="deleteForever(null, $event)"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
     </div>
   }
 }
