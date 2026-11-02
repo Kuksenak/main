@@ -14,7 +14,6 @@ import { TranslationKey } from '../core/i18n/translations';
 import { TrashList } from '../library/trash-list';
 import { PageMenu } from '../library/page-menu';
 import { TagsStore } from '../library/tags.store';
-import { TagsWindow } from '../library/tags-window';
 import { PAGE_DRAG, SidebarTags } from '../library/sidebar-tags';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
@@ -26,7 +25,7 @@ import { Search } from './search';
  * at the left: Search (Ctrl K / ⌘K: the search window), the app's places (Library: + a new page), the
  * library's Recents and Favorites (rows folding their pages; a page's ⋯: its menu); by the account, Trash (its
  * window at it), the account at the bottom (its letter, the name — else the email
- * — and ▾; its menu: the email, Users (the admins only), Tags (their window), the language, Log out, Log out of all
+ * — and ▾; its menu: the email, Users (the admins only), the language, Log out, Log out of all
  * devices); the open page beside it. (Phones have their own, MobileLayout: neither downloads the other's.)
  */
 @Component({
@@ -35,7 +34,6 @@ import { Search } from './search';
     Icon,
     NgTemplateOutlet,
     PageMenu,
-    TagsWindow,
     SidebarTags,
     RouterOutlet,
     Search,
@@ -76,8 +74,6 @@ export class DesktopLayout {
   protected readonly store = inject(LibraryStore);
   protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   protected readonly trashOpen = signal(false);
-  // (the account's menu → Tags: their window)
-  protected readonly tagsOpen = signal(false);
   // (the trash window's field: its pages filtered)
   protected readonly trashQuery = signal('');
   // (and the row its keys picked)

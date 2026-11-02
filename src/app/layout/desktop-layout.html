@@ -129,10 +129,6 @@
       <button type="button" uiMenuItem icon="lock" (click)="router.navigateByUrl('/users')">{{ 'users.title' | t }}</button>
       <ui-menu-separator />
     }
-    @if (library()) {
-      <button type="button" uiMenuItem icon="hash" (click)="tagsOpen.set(true)">{{ 'tags.title' | t }}</button>
-      <ui-menu-separator />
-    }
     @for (language of i18n.languages; track language.code) {
       <button type="button" uiMenuItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">{{ language.label }}</button>
     }
@@ -180,11 +176,6 @@
       }
     </ui-window-foot>
   </ui-window>
-}
-
-<!-- The account's tags: their colors, Delete — a window as the search's -->
-@if (tagsOpen()) {
-  <app-tags-window (closed)="tagsOpen.set(false)" />
 }
 
 <!-- The search window (as Notion's / Claude's) -->
