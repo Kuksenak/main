@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Icon, Toasts, UiButton, UiList, UiListItem, UiSheet, UiTag } from '../core/ui';
+import { Icon, Toasts, UiButton, UiList, UiListItem, UiSheet, UiTag, UiToggle } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow } from '../core/ui/window';
@@ -31,7 +31,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, TagPicker],
+  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiToggle, UiWindow, TagPicker],
   templateUrl: './page.html',
 })
 export class PageView {
@@ -53,6 +53,7 @@ export class PageView {
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
   protected readonly tagsOpen = signal(false);
+  protected readonly shareOpen = signal(false);
   protected readonly tags = inject(TagsStore);
   // Phones: the page read only; its actions in a sheet (the top bar's ⋯)
   protected readonly actionsOpen = signal(false);
@@ -190,6 +191,11 @@ export class PageView {
       },
       error: () => this.toasts.error(this.i18n.t('library.shareError')),
     });
+  }
+
+  // (its public link, as shown in Share's popover)
+  protected link(token: string): string {
+    return shareUrl(token);
   }
 
   protected copyLink(note = this.i18n.t('library.linkCopied')): void {

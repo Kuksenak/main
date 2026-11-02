@@ -63,20 +63,35 @@
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
     }
-    <!-- Publish: its public link made (and copied); published: Unpublish (a lock) and the link's own
-         button (copied at a click), as Notion's Share; Preview: in ⋯ -->
-    @if (p.shareToken) {
-      <button uiButton type="button" icon="lock" (click)="share(false)" [uiTip]="'library.unpublishTip' | t">{{ 'library.unpublish' | t }}</button>
-      <button
-        uiButton
-        type="button"
-        icon="link"
-        (click)="copyLink()"
-        [uiTip]="'library.copyLinkTip' | t"
-        [attr.aria-label]="'library.copyLink' | t"
-      ></button>
-    } @else {
-      <button uiButton type="button" icon="globe" (click)="share(true)" [uiTip]="'library.publishTip' | t">{{ 'library.publish' | t }}</button>
+    <!-- Share (as Notion's): its popover — Share to web on / off (on: its public link made and copied;
+         off: the link stops working), the link with Copy; Preview: in ⋯ -->
+    <button
+      #shareBtn
+      uiButton
+      type="button"
+      icon="link"
+      (click)="shareOpen.set(!shareOpen())"
+      [attr.aria-expanded]="shareOpen()"
+    >{{ 'library.share' | t }}</button>
+    @if (shareOpen()) {
+      <ui-menu [origin]="shareBtn.element" (closed)="shareOpen.set(false)">
+        <div class="flex w-80 flex-col gap-2 p-2">
+          <div class="flex items-center gap-3">
+            <app-icon name="globe" colored class="size-5 shrink-0 text-icon" />
+            <div class="flex min-w-0 flex-1 flex-col">
+              <span class="text-ui text-fg">{{ 'library.shareWeb' | t }}</span>
+              <span class="text-footnote text-fg-secondary">{{ 'library.shareNote' | t }}</span>
+            </div>
+            <ui-toggle [checked]="!!p.shareToken" (checkedChange)="share($event)" [label]="'library.shareWeb' | t" />
+          </div>
+          @if (p.shareToken; as token) {
+            <div class="flex h-8 items-center gap-1 rounded-md bg-tint pr-0.5 pl-2">
+              <span class="min-w-0 flex-1 truncate text-footnote text-fg-secondary">{{ link(token) }}</span>
+              <button uiButton type="button" (click)="copyLink()">{{ 'library.copyLink' | t }}</button>
+            </div>
+          }
+        </div>
+      </ui-menu>
     }
     <!-- 🔖: in the favorites (the sidebar's) or not -->
     <button
@@ -190,9 +205,9 @@
           @if (canShare) {
             <button type="button" uiListItem icon="popout" (click)="actions.close(); shareLink()">{{ 'library.sendLink' | t }}</button>
           }
-          <button type="button" uiListItem icon="lock" (click)="actions.close(); share(false)">{{ 'library.unpublish' | t }}</button>
+          <button type="button" uiListItem icon="link" (click)="actions.close(); share(false)">{{ 'library.unpublish' | t }}</button>
         } @else {
-          <button type="button" uiListItem icon="globe" (click)="actions.close(); share(true)">{{ 'library.publish' | t }}</button>
+          <button type="button" uiListItem icon="link" (click)="actions.close(); share(true)">{{ 'library.publish' | t }}</button>
         }
       </ui-list>
 
