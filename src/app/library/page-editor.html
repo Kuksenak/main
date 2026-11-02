@@ -33,12 +33,10 @@
 
       <!-- (a card: set apart — a soft gray fill, no edge, round corners, room inside (desktops: as
            Notion's callouts; written in: a faint accent line round it)) -->
-      <!-- (only for the teacher: a lock in its corner, a dashed edge) -->
+      <!-- (only for the teacher: a lock in its corner, the card faint — whole while typed in) -->
       <div
-        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-tint/50 desktop:px-4 desktop:py-3 desktop:focus-within:outline-1 desktop:focus-within:outline-solid desktop:focus-within:outline-accent/15"
-        [class.outline-dashed]="item.private"
-        [class.outline-1]="item.private"
-        [class.outline-separator]="item.private"
+        class="relative rounded-card transition-opacity data-private:opacity-40 data-private:focus-within:opacity-100 bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-tint/50 desktop:px-4 desktop:py-3 desktop:focus-within:outline-1 desktop:focus-within:outline-solid desktop:focus-within:outline-accent/15"
+        [attr.data-private]="item.private ? '' : null"
         [class.pr-9]="item.private"
       >
         @if (item.private) {
