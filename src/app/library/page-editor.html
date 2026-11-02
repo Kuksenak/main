@@ -177,7 +177,7 @@
        Assistant; under them, room to tap too -->
   <div class="mt-2.5 flex min-h-28 flex-1 cursor-text flex-col gap-3" (click)="typeAtEnd()">
     @if ((items().length > 1 || items()[0]?.text) && caret() === null) {
-      <span class="px-4 text-body text-fg-secondary/70 desktop:px-0 desktop:text-ui">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
+      <span class="px-4 text-body text-fg-secondary/70 desktop:text-ui">{{ (desktop ? 'editor.endHint' : 'editor.hintPhone') | t }}</span>
     }
     <!-- (desktops: the assistant's in the page's head; a click here is a new text) -->
     <div class="flex items-center gap-2 desktop:hidden" (click)="$event.stopPropagation()">
@@ -297,8 +297,8 @@
 <!-- Desktops: the caret between blocks — a line with its hint, the commands under it at once (a
      click on one, or ↑ ↓ Enter; "/…" filters them); what's typed (or pasted) is a new block there -->
 <ng-template #caretLine>
-  <!-- (a line with its hint, no card yet) -->
-  <div data-caret class="relative py-0.5">
+  <!-- (a line with its hint, no card yet; its words where a block's text starts) -->
+  <div data-caret class="relative px-4 py-0.5">
     <input
       #caretField
       data-caret-input
@@ -315,7 +315,7 @@
     @if (caretMenu()) {
     <div
       role="listbox"
-      class="absolute top-full left-0 z-30 mt-1 flex w-72 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
+      class="absolute top-full left-2 z-30 mt-1 flex w-72 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
       (mousedown)="$event.preventDefault()"
     >
       @for (command of caretCommands(); track command.id; let k = $index) {
