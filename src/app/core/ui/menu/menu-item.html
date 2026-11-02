@@ -1,6 +1,7 @@
 @if (icon(); as name) {
   @if (danger()) {
-    <app-icon [name]="name" class="size-icon-menu" />
+    <!-- (a danger one: the soft gray of the rest, its color under the pointer) -->
+    <app-icon [name]="name" class="size-icon-menu text-icon group-hover:text-current group-focus-visible:text-current" />
   } @else {
     <app-icon [name]="name" colored class="size-icon-menu text-icon" />
   }
