@@ -37,6 +37,10 @@
           <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
         }
       }
+      <!-- (after Recents: the tags, as folders — a click, their pages; a page dropped on one, tagged) -->
+      @if (list.id === 'recents') {
+        <app-sidebar-tags />
+      }
     }
     <div
       #scroller
@@ -53,9 +57,9 @@
         }
       }
     </div>
-    <!-- (a page's row: its icon, its name, ⋯ under the pointer) -->
+    <!-- (a page's row: its icon, its name, ⋯ under the pointer; dragged onto a tag: tagged so) -->
     <ng-template #pageRow let-page>
-      <a uiSidebarItem icon="page" [tint]="tint(page)" [routerLink]="['/library', page.id]" class="pl-3.5!">
+      <a uiSidebarItem icon="page" [tint]="tint(page)" [routerLink]="['/library', page.id]" draggable="true" (dragstart)="drag($event, page)" class="pl-3.5!">
         {{ page.title.trim() || ('library.untitled' | t) }}
         <button
           itemEnd

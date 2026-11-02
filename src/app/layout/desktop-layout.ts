@@ -15,6 +15,7 @@ import { TrashList } from '../library/trash-list';
 import { PageMenu } from '../library/page-menu';
 import { TagsStore } from '../library/tags.store';
 import { TagsWindow } from '../library/tags-window';
+import { PAGE_DRAG, SidebarTags } from '../library/sidebar-tags';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
 import { keep, kept } from '../core/utils/storage';
@@ -35,6 +36,7 @@ import { Search } from './search';
     NgTemplateOutlet,
     PageMenu,
     TagsWindow,
+    SidebarTags,
     RouterOutlet,
     Search,
     TranslatePipe,
@@ -101,6 +103,12 @@ export class DesktopLayout {
   private readonly tags = inject(TagsStore);
   protected tint(page: PageItem): string | null {
     return tagTint(this.tags.of(page.tagIds)[0]?.color);
+  }
+
+  // A page dragged (onto a tag in the sidebar: tagged so)
+  protected drag(e: DragEvent, page: PageItem): void {
+    e.dataTransfer?.setData(PAGE_DRAG, page.id);
+    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'link';
   }
 
   // A page's ⋯: its menu, at the button

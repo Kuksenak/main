@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -44,6 +45,10 @@ export class Library {
   protected readonly view = signal<View>('recents');
   // A tag: only its pages (the views' row: # and its menu); NO_TAG: only the pages with none
   protected readonly tagFilter = signal<string | null>(null);
+  // (the address' ?tag= — the sidebar's tags: their pages)
+  private readonly tagFromUrl = inject(ActivatedRoute)
+    .queryParamMap.pipe(takeUntilDestroyed())
+    .subscribe((q) => this.tagFilter.set(q.get('tag')));
   protected readonly noTag = NO_TAG;
   protected readonly tagMenu = signal(false);
   // The tags: after a page's name; its icon in its first tag's pastel
