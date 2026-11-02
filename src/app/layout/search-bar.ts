@@ -1,5 +1,4 @@
 import { Component, computed, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { refreshThemeColor } from '../core/services/theme-color';
 import { VisibleArea } from '../core/services/visible-area';
@@ -24,7 +23,6 @@ import { AppSearch, Found, SearchScope } from './app-search';
 })
 export class SearchBar {
   private readonly search = inject(AppSearch);
-  protected readonly i18n = inject(I18nService);
   protected readonly area = inject(VisibleArea);
   private readonly field = viewChild.required<ElementRef<HTMLInputElement>>('field');
 

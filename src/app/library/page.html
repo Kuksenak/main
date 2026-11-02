@@ -97,7 +97,7 @@
       (click)="menuOpen.set(!menuOpen())"
       [attr.aria-expanded]="menuOpen()"
       [attr.aria-label]="'library.more' | t"
-      [uiTip]="menuOpen() ? null : ('library.moreTip' | t)"
+      [uiTip]="menuOpen() ? null : ('library.more' | t)"
     ></button>
     @if (menuOpen()) {
       <!-- The assistant; Duplicate; Move to trash; when edited, made -->

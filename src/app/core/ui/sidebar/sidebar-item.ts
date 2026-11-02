@@ -42,8 +42,8 @@ export class UiSidebarItem {
   }
 }
 
-/** A row of the sidebar that's a button, not a place (e.g. Trash, opening its window; Favorites, folding
- * its pages): the same look; `itemEnd` at its right (e.g. a ⌄). */
+/** A row of the sidebar that's a button, not a place (e.g. Recents, Favorites: folding their pages): the
+ * same look; `itemEnd` at its right (e.g. a ⌄). */
 @Component({
   selector: 'button[uiSidebarItem]',
   imports: [Icon],
@@ -54,8 +54,6 @@ export class UiSidebarButton {
   readonly icon = input.required<IconName>();
   /** (its icon coloured in with another pastel: a page's tag's) */
   readonly tint = input<string | null>(null);
-  /** (the element: what a `<ui-menu>` opens at) */
-  readonly element: HTMLElement = inject(ElementRef).nativeElement;
 }
 
 /**

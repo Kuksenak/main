@@ -36,8 +36,6 @@
   --color-sheet: var(--sheet);
   --color-sheet-card: var(--sheet-card);
   --color-sheet-border: var(--sheet-border);
-  --color-bar: var(--bar);
-  --color-bar-border: var(--bar-border);
   --color-field: var(--field);
   --color-toast: var(--toast);
   --color-toast-text: var(--toast-text);
@@ -87,7 +85,6 @@
   --spacing-cal-row: var(--cal-row-h);
   --spacing-cal-day: var(--cal-day);
   --spacing-round: var(--round-h);
-  --spacing-bar: var(--bar-h);
   --spacing-row: var(--row-h);
   --spacing-row-x: var(--row-px);
   --spacing-toggle: var(--toggle-h);
@@ -128,15 +125,6 @@
   --animate-sheet-up: sheet-up 380ms var(--ease-ios);
   @keyframes sheet-up {
     from { transform: translateY(100%); }
-  }
-  /* A page sliding in (from the right) / back (from the left), e.g. inside a sheet */
-  --animate-pane-in: pane-in 280ms var(--ease-out-quick);
-  @keyframes pane-in {
-    from { opacity: 0; transform: translateX(1.5rem); }
-  }
-  --animate-pane-back: pane-back 280ms var(--ease-out-quick);
-  @keyframes pane-back {
-    from { opacity: 0; transform: translateX(-1.5rem); }
   }
   /* Something loading: a short bar running along the screen's bottom, again and again */
   --animate-loading-bar: loading-bar 1.8s ease-in-out infinite;
