@@ -1,15 +1,14 @@
-import { afterRenderEffect, Component, computed, ElementRef, inject, output, signal, viewChild } from '@angular/core';
+import { afterRenderEffect, Component, ElementRef, inject, output, signal, viewChild } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Confirm, Icon, TAG_COLORS, TAG_COLOR_LABELS, TAG_SWATCH, UiButton, UiTag } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { UiWindow } from '../core/ui/window';
-import { LibraryStore } from './library.store';
 import { Tag, TagsStore } from './tags.store';
 
 /**
  * Desktop: the account's tags (the account's menu → Tags), in the shared window (as the search's),
- * a row each: the tag, how many pages have it, ⋯ — its menu: Rename (a field in its place), its
+ * a row each: the tag (a double click: renamed in place), ⋯ — its menu: Rename, its
  * colors, Delete (asked first: off its pages too).
  */
 @Component({
@@ -21,7 +20,6 @@ export class TagsWindow {
   readonly closed = output<void>();
 
   protected readonly store = inject(TagsStore);
-  private readonly library = inject(LibraryStore);
   private readonly confirm = inject(Confirm);
   private readonly i18n = inject(I18nService);
   protected readonly colors = TAG_COLORS;
@@ -33,13 +31,6 @@ export class TagsWindow {
   // The tag being renamed (a field in its chip's place)
   protected readonly renaming = signal<string | null>(null);
   private readonly name = viewChild<ElementRef<HTMLInputElement>>('name');
-
-  // How many pages have each
-  protected readonly uses = computed(() => {
-    const uses = new Map<string, number>();
-    for (const page of this.library.items() ?? []) for (const id of page.tagIds ?? []) uses.set(id, (uses.get(id) ?? 0) + 1);
-    return uses;
-  });
 
   constructor() {
     this.store.load();

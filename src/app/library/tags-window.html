@@ -1,6 +1,6 @@
-<!-- The account's tags: a row each — the tag (Rename: a field in its place), how many pages have it,
-     ⋯ at the right: its menu — Rename, its colors (a swatch each, ✓ the one it has), Delete (asked
-     first). None yet: a word on where they're made. -->
+<!-- The account's tags: a row each — the tag (a double click, or Rename: a field in its place), ⋯ at
+     the right: its menu — Rename, its colors (a swatch each, ✓ the one it has), Delete (asked first).
+     None yet: a word on where they're made. -->
 <ui-window (closed)="closed.emit()">
   <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
     <app-icon name="hash" class="size-5 shrink-0 text-icon" />
@@ -8,7 +8,7 @@
   </div>
   <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-3">
     @for (tag of store.tags(); track tag.id) {
-      <div class="group flex h-10 shrink-0 items-center gap-2 rounded-xl px-2 hover:bg-tint">
+      <div class="group flex h-10 shrink-0 items-center gap-2 rounded-xl px-2 hover:bg-tint/50">
         @if (renaming() === tag.id) {
           <input
             #name
@@ -18,13 +18,12 @@
             (keydown.enter)="name.blur()"
             (keydown.escape)="name.value = tag.name; name.blur()"
             (blur)="rename(tag, name)"
-            class="h-7 w-56 min-w-0 rounded-md bg-dialog px-2 text-ui text-fg outline-none ring-1 ring-separator"
+            class="h-7 w-56 min-w-0 rounded-md bg-tint px-2 text-ui text-fg outline-none"
           />
         } @else {
-          <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+          <ui-tag [color]="tag.color" (dblclick)="renaming.set(tag.id)" class="cursor-default select-none">{{ tag.name }}</ui-tag>
         }
         <span class="flex-1"></span>
-        <span class="text-footnote text-fg-secondary tabular-nums">{{ uses().get(tag.id) ?? 0 }}</span>
         <button
           #more
           uiButton
