@@ -1,56 +1,78 @@
-<!-- The account's tags: a row each, the whole of it in its color — its name a field (typed over right
-     there), ⋯ at the right: its menu — its colors (a swatch each, ✓ the one it has), Delete (asked
-     first). None yet: a word on where they're made. -->
+<!-- The account's tags: a window as the search's — the field at the top (it filters the tags; ↵ makes a
+     new one by what's typed), a row each: its color's swatch (a click: the colors under it), its name
+     a field (typed over right there), Delete under the pointer; the keys at the bottom. -->
 <ui-window (closed)="closed.emit()">
-  <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
-    <app-icon name="hash" class="size-5 shrink-0 text-icon" />
-    <span class="flex-1 text-base text-fg">{{ 'tags.title' | t }}</span>
-  </div>
-  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-3">
-    @for (tag of store.tags(); track tag.id) {
-      <!-- (a row: the whole of it in the tag's color; its name a field right there — Enter or away:
-           saved, Esc: as it was) -->
-      <div class="mb-1 flex h-10 shrink-0 items-center gap-2 rounded-xl pr-1 pl-3" [class]="chip(tag.color)">
+  <ui-window-head icon="hash">
+    <input #field uiWindowField [value]="query()" (input)="query.set(field.value)" (keydown.enter)="create()" [placeholder]="'tags.find' | t" />
+  </ui-window-head>
+
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pt-1 pb-2">
+    @for (tag of shown(); track tag.id) {
+      <div uiRow>
+        <button
+          rowStart
+          type="button"
+          [attr.data-tag]="tag.color"
+          (click)="paletteFor.set(paletteFor() === tag.id ? null : tag.id)"
+          [attr.aria-expanded]="paletteFor() === tag.id"
+          [uiTip]="'tags.color' | t"
+          [attr.aria-label]="'tags.color' | t"
+          class="grid size-5 shrink-0 place-items-center"
+        >
+          <span class="size-3.5 rounded-[0.25rem] bg-tag"></span>
+        </button>
+        <!-- (its name: Enter or away — saved, Esc — as it was) -->
         <input
           #name
           type="text"
           maxlength="40"
           [value]="tag.name"
           (keydown.enter)="name.blur()"
-          (keydown.escape)="name.value = tag.name; name.blur()"
+          (keydown.escape)="$event.stopPropagation(); name.value = tag.name; name.blur()"
           (blur)="rename(tag, name)"
           [attr.aria-label]="'tags.rename' | t"
-          class="h-8 min-w-0 flex-1 bg-transparent text-ui text-current outline-none"
+          class="h-7 w-full min-w-0 rounded-md bg-transparent px-1 align-middle text-ui text-side-text outline-none focus:bg-tint"
         />
         <button
-          #more
+          rowEnd
           uiButton
           type="button"
-          icon="dots"
-          (click)="menuFor.set(menuFor()?.tag?.id === tag.id ? null : { tag, at: more.element })"
-          [attr.aria-expanded]="menuFor()?.tag?.id === tag.id"
-          [attr.aria-label]="'library.more' | t"
+          icon="trash"
+          (click)="remove(tag, $event)"
+          [uiTip]="'tags.delete' | t"
+          [attr.aria-label]="'tags.delete' | t"
         ></button>
       </div>
-    } @empty {
-      <p class="m-auto py-10 text-center text-ui text-fg-secondary">{{ 'tags.empty' | t }}</p>
+      @if (paletteFor() === tag.id) {
+        <!-- (its colors, a swatch each — the one it has ringed) -->
+        <div class="flex gap-1.5 pt-1 pb-2 pl-9">
+          @for (color of colors; track color) {
+            <button
+              type="button"
+              [attr.data-tag]="color"
+              (click)="recolor(tag, color)"
+              [attr.aria-pressed]="tag.color === color"
+              [uiTip]="colorLabel(color) | t"
+              [attr.aria-label]="colorLabel(color) | t"
+              class="size-5 rounded-[0.3rem] bg-tag outline-fg/20 outline-offset-2 hover:brightness-95 aria-pressed:outline-2"
+            ></button>
+          }
+        </div>
+      }
+    }
+    @if (query().trim() && !exact()) {
+      <!-- (a name none has: ↵ — or a click here — makes it) -->
+      <button type="button" uiRow icon="plus" (click)="create()">
+        {{ 'tags.create' | t }}
+        <ui-tag class="ml-1.5" [color]="store.nextColor()">{{ query().trim() }}</ui-tag>
+      </button>
+    } @else if (!shown().length) {
+      <ui-empty class="m-auto">{{ (query().trim() ? 'search.nothing' : 'tags.emptyHere') | t }}</ui-empty>
     }
   </div>
-</ui-window>
 
-<!-- A tag's ⋯: its colors; Delete (asked first) -->
-@if (menuFor(); as m) {
-  <ui-menu narrow [origin]="m.at" (closed)="menuFor.set(null)">
-    <ui-menu-label>{{ 'tags.color' | t }}</ui-menu-label>
-    @for (color of colors; track color) {
-      <button type="button" uiMenuItem [checked]="m.tag.color === color" (click)="recolor(m.tag, color)">
-        <span class="flex items-center gap-2.5">
-          <span class="size-4 shrink-0 rounded-[0.3rem]" [class]="swatch[color]"></span>
-          {{ colorLabel[color] | t }}
-        </span>
-      </button>
-    }
-    <ui-menu-separator />
-    <button type="button" uiMenuItem icon="trash" danger (click)="remove(m.tag, m.at)">{{ 'tags.delete' | t }}</button>
-  </ui-menu>
-}
+  <ui-window-foot>
+    <ui-window-key key="Esc">{{ 'search.close' | t }}</ui-window-key>
+    <ui-window-key [icons]="['enter']">{{ 'tags.create' | t }}</ui-window-key>
+  </ui-window-foot>
+</ui-window>

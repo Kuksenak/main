@@ -1,6 +1,9 @@
 import { afterNextRender, Component, effect, ElementRef, input, model, output, signal, viewChild } from '@angular/core';
-import { Icon, IconName } from '../icon/icon';
+import { UiEmpty } from '../empty/empty';
+import { IconName } from '../icon/icon';
+import { UiRow } from '../row/row';
 import { UiWindow } from '../window/window';
+import { UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from '../window/window-parts';
 
 /** A result of a `<ui-search-window>`: its icon, its name (a hint after it, gray), the section it's under. */
 export interface UiSearchResult {
@@ -21,7 +24,7 @@ export interface UiSearchResult {
  */
 @Component({
   selector: 'ui-search-window',
-  imports: [Icon, UiWindow],
+  imports: [UiEmpty, UiRow, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey],
   templateUrl: './search-window.html',
 })
 export class UiSearchWindow {

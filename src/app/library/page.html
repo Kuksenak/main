@@ -50,8 +50,8 @@
         (click)="tagsOpen.set(!tagsOpen())"
         [attr.aria-expanded]="tagsOpen()"
         [attr.aria-label]="'tags.title' | t"
-        class="mr-1 inline-flex h-button max-w-56 min-w-0 shrink items-center gap-1 rounded-button px-2 text-ui hover:brightness-95"
-        [class]="chip(tag.color)"
+        class="mr-1 inline-flex h-button max-w-56 min-w-0 shrink items-center gap-1 rounded-button bg-tag px-2 text-ui text-tag-text hover:brightness-95"
+        [attr.data-tag]="tag.color"
       >
         <app-icon name="hash" class="size-4 shrink-0" />
         <span class="min-w-0 truncate">{{ tag.name }}</span>
@@ -167,10 +167,7 @@
     <!-- Desktops: the shared window (as the search's: near the top, Esc or a click outside closes
          it), as tall as it may be; its head as the search's field row: ✨ and the name -->
     <ui-window tall (closed)="aiOpen.set(false)">
-      <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
-        <app-icon name="sparkle" colored class="size-5 shrink-0 text-icon" />
-        <span class="flex-1 text-base text-fg">{{ 'editor.ai' | t }}</span>
-      </div>
+      <ui-window-head icon="sparkle" [colored]="true">{{ 'editor.ai' | t }}</ui-window-head>
       <div class="flex min-h-0 flex-1 flex-col px-4.5 pb-4.5">
         <app-ai-chat [pageId]="p.id" [page]="pageText()" (add)="editor()?.insert($event)" />
       </div>

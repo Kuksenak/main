@@ -5,7 +5,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
-import { Confirm, Icon, TAG_COLOR_LABELS, TAG_COLORS, TAG_SWATCH, UiList, UiFloatingButton, UiListItem, UiSheet, UiTag } from '../core/ui';
+import { Confirm, Icon, TAG_COLORS, tagColorLabel, UiList, UiFloatingButton, UiListItem, UiSheet } from '../core/ui';
 import { Tag, TagsStore } from '../library/tags.store';
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
@@ -23,7 +23,7 @@ type Page = 'language' | 'users' | 'user' | 'trash' | 'tags' | 'tag';
  */
 @Component({
   selector: 'app-account-sheet',
-  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSheet, UiTag, TrashList, UserCard, UsersList],
+  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSheet, TrashList, UserCard, UsersList],
   templateUrl: './account-sheet.html',
 })
 export class AccountSheet {
@@ -44,8 +44,7 @@ export class AccountSheet {
   // (Tags: the account's — a tag tapped: its colors, Delete)
   protected readonly tags = inject(TagsStore);
   protected readonly colors = TAG_COLORS;
-  protected readonly swatch = TAG_SWATCH;
-  protected readonly colorLabel = TAG_COLOR_LABELS;
+  protected readonly colorLabel = tagColorLabel;
   protected readonly tagId = signal<string | null>(null);
   protected readonly tag = computed(() => this.tags.byId().get(this.tagId() ?? '') ?? null);
   private readonly confirm = inject(Confirm);
@@ -64,13 +63,20 @@ export class AccountSheet {
     if (tag.color !== color) this.tags.update({ ...tag, color });
   }
 
+  // (Enter or away: saved — not empty, not another tag's name)
+  protected rename(tag: Tag, field: HTMLInputElement): void {
+    const name = field.value.trim();
+    if (!name || name === tag.name || this.tags.tags().some((t) => t.id !== tag.id && t.name.toLowerCase() === name.toLowerCase())) {
+      field.value = tag.name;
+      return;
+    }
+    this.tags.update({ ...tag, name });
+  }
+
   protected async removeTag(tag: Tag, e: Event): Promise<void> {
-    const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
-      text: this.i18n.t('tags.deleteAsk'),
-      yes: this.i18n.t('tags.delete'),
-      danger: true,
-    });
-    if (!yes) return;
+    // (on no page: gone at once; else asked, saying how many pages it comes off)
+    const text = this.tags.deleteAsk(tag.id);
+    if (text && !(await this.confirm.ask(e.currentTarget as HTMLElement, { text, yes: this.i18n.t('tags.delete'), danger: true }))) return;
     this.tags.remove(tag.id);
     this.back();
   }

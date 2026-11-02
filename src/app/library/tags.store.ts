@@ -45,6 +45,18 @@ export class TagsStore {
     return (tagIds ?? []).map((id) => byId.get(id)).filter((t): t is Tag => !!t);
   }
 
+  /** How many of the library's pages have it (the library not loaded yet: undefined). */
+  pagesWith(id: string): number | undefined {
+    return this.library.items()?.filter((p) => p.tagIds?.includes(id)).length;
+  }
+
+  /** Delete's question: how many pages it comes off (none: no question — null). */
+  deleteAsk(id: string): string | null {
+    const pages = this.pagesWith(id);
+    if (pages === 0) return null;
+    return pages ? this.i18n.t('tags.deleteAskN').replace('{n}', String(pages)) : this.i18n.t('tags.deleteAsk');
+  }
+
   /** A new tag's color: the next one round. */
   readonly nextColor = computed<TagColor>(() => TAG_COLORS[this.tags().length % TAG_COLORS.length]);
 

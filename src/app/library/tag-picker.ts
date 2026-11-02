@@ -1,13 +1,14 @@
 import { afterNextRender, Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, TAG_SWATCH, tagChip, UiTag } from '../core/ui';
+import { Icon, UiTag } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { TagsStore } from './tags.store';
 
 /**
  * Desktop: a page's tag picked at `origin`, as a choice of a few (the language's look): a field on
  * top — what's typed filters the tags; Enter picks the one by that name (any case), or makes it (its
- * color: the next one round) and picks it — then No tag and the tags (✓ the chosen one; a click picks
+ * color: the next one round) and picks it — then No tag and the tags (a swatch and the name, as the
+ * menu's rows: ✓ the chosen one; a click picks
  * it — one a page, for now). `changed`: the page's tags now (one, or none).
  */
 @Component({
@@ -23,8 +24,6 @@ export class TagPicker {
 
   protected readonly store = inject(TagsStore);
   protected readonly query = signal('');
-  protected readonly swatch = TAG_SWATCH;
-  protected readonly chip = tagChip;
   private readonly words = computed(() => this.query().trim().toLowerCase());
   // The tags with what's typed in their names; the one named just so
   protected readonly shown = computed(() => this.store.tags().filter((t) => t.name.toLowerCase().includes(this.words())));

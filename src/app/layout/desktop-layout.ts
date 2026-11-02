@@ -8,7 +8,7 @@ import { UpdateService } from '../core/services/update.service';
 import { Icon, IconName, tagTint, Toasts, UiAvatar, UiButton, UiScrollBar } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
-import { UiWindow } from '../core/ui/window';
+import { UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from '../core/ui/window';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { TranslationKey } from '../core/i18n/translations';
 import { TrashList } from '../library/trash-list';
@@ -52,6 +52,10 @@ import { Search } from './search';
     TrashList,
     UiTip,
     UiWindow,
+    UiWindowField,
+    UiWindowFoot,
+    UiWindowHead,
+    UiWindowKey,
   ],
   templateUrl: './desktop-layout.html',
 })

@@ -137,28 +137,19 @@
      pages), the pages, the keys at the bottom (Esc; Empty trash at the right) -->
 @if (trashOpen()) {
   <ui-window (closed)="trashOpen.set(false)">
-    <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
-      <app-icon name="search" class="size-5 shrink-0 text-icon" />
-      <input
-        #trashField
-        type="text"
-        autocomplete="off"
-        [value]="trashQuery()"
-        (input)="trashQuery.set(trashField.value)"
-        [placeholder]="'trash.search' | t"
-        class="min-w-0 flex-1 bg-transparent text-base text-fg outline-none placeholder:text-fg-secondary"
-      />
-    </div>
+    <ui-window-head icon="search">
+      <input #trashField uiWindowField [value]="trashQuery()" (input)="trashQuery.set(trashField.value)" [placeholder]="'trash.search' | t" />
+    </ui-window-head>
     <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pt-1 pb-2">
       <app-trash-list #trashList [query]="trashQuery()" (restored)="trashOpen.set(false)" />
     </div>
-    <div class="flex h-11 shrink-0 items-center gap-5 border-t-[0.5px] border-separator pr-3 pl-5 text-footnote text-fg-secondary">
-      <span class="flex items-center gap-1.5"><kbd class="font-sans">Esc</kbd>{{ 'search.close' | t }}</span>
+    <ui-window-foot>
+      <ui-window-key key="Esc">{{ 'search.close' | t }}</ui-window-key>
       <span class="flex-1">{{ 'trash.note' | t }}</span>
       @if (store.trash()?.length) {
         <button uiButton type="button" (click)="trashList.emptyAll($event)"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
       }
-    </div>
+    </ui-window-foot>
   </ui-window>
 }
 

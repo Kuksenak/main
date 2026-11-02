@@ -56,12 +56,15 @@
             <app-trash-list (restored)="sheet.close()" />
           }
         }
-        <!-- (the tags: a row each, › — its colors as rows (✓ the one it has), Delete) -->
+        <!-- (the tags: a row each, as the desktop's window — its color's swatch, its name; › — its colors, Delete) -->
         @case ('tags') {
           <ui-list>
             @for (t of tags.tags(); track t.id) {
               <button type="button" uiListItem chevron (click)="openTag(t)">
-                <ui-tag [color]="t.color">{{ t.name }}</ui-tag>
+                <span class="flex min-w-0 items-center gap-3">
+                  <span [attr.data-tag]="t.color" class="size-5 shrink-0 rounded-md bg-tag"></span>
+                  <span class="truncate">{{ t.name }}</span>
+                </span>
               </button>
             } @empty {
               <div uiListItem><span class="text-fg-secondary">{{ 'tags.empty' | t }}</span></div>
@@ -70,29 +73,38 @@
         }
         @case ('tag') {
           @if (tag(); as t) {
-            <!-- (the tag as it looks; its colors as round swatches on a card, ✓ on its own; Delete at the
-                 bottom, as Log out) -->
+            <!-- (its name, a field — Enter or away: saved; its colors as the languages' list, a swatch
+                 and the name each, ✓ on its own; Delete at the bottom, as Log out) -->
             <div class="flex flex-1 flex-col gap-6">
-              <div class="flex justify-center pt-2"><ui-tag [color]="t.color" class="h-7! px-3! text-body!">{{ t.name }}</ui-tag></div>
+              <div class="flex flex-col gap-2">
+                <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'tags.name' | t }}</span>
+                <ui-list>
+                  <div uiListItem>
+                    <input
+                      #name
+                      type="text"
+                      maxlength="40"
+                      enterkeyhint="done"
+                      [value]="t.name"
+                      (keydown.enter)="name.blur()"
+                      (blur)="rename(t, name)"
+                      [attr.aria-label]="'tags.rename' | t"
+                      class="w-full min-w-0 bg-transparent text-body text-fg outline-none"
+                    />
+                  </div>
+                </ui-list>
+              </div>
               <div class="flex flex-col gap-2">
                 <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'tags.color' | t }}</span>
                 <ui-list>
-                  <div class="grid grid-cols-5 justify-items-center gap-y-4 px-row-x py-4">
-                    @for (color of colors; track color) {
-                      <button
-                        type="button"
-                        (click)="recolor(t, color)"
-                        [attr.aria-pressed]="t.color === color"
-                        [attr.aria-label]="colorLabel[color] | t"
-                        class="grid size-11 place-items-center rounded-full ring-fg/60 ring-offset-2 ring-offset-sheet-card aria-pressed:ring-2"
-                        [class]="swatch[color]"
-                      >
-                        @if (t.color === color) {
-                          <app-icon name="check" class="size-5 text-fg" />
-                        }
-                      </button>
-                    }
-                  </div>
+                  @for (color of colors; track color) {
+                    <button type="button" uiListItem [checked]="t.color === color" (click)="recolor(t, color)" class="after:left-12!">
+                      <span class="flex items-center gap-3">
+                        <span [attr.data-tag]="color" class="size-5 shrink-0 rounded-md bg-tag"></span>
+                        {{ colorLabel(color) | t }}
+                      </span>
+                    </button>
+                  }
                 </ui-list>
               </div>
               <ui-list class="mt-auto">

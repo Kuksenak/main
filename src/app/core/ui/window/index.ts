@@ -3,3 +3,4 @@
  * phones' code doesn't download it.
  */
 export { UiWindow } from './window';
+export { UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from './window-parts';

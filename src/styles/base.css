@@ -127,6 +127,21 @@ html.dark {
   --popover-shadow: 0 0 0 1px rgb(255 255 255 / 0.08), 0 3px 8px rgb(0 0 0 / 0.25), 0 12px 32px rgb(0 0 0 / 0.4);
 }
 
+/* What wears a tag's look (data-tag="green"): its pastel and its text as --tag / --tag-text (bg-tag,
+   text-tag-text); an unknown color: gray */
+[data-tag] {
+  --tag: var(--tag-gray);
+  --tag-text: var(--tag-gray-text);
+}
+[data-tag='brown'] { --tag: var(--tag-brown); --tag-text: var(--tag-brown-text); }
+[data-tag='orange'] { --tag: var(--tag-orange); --tag-text: var(--tag-orange-text); }
+[data-tag='yellow'] { --tag: var(--tag-yellow); --tag-text: var(--tag-yellow-text); }
+[data-tag='green'] { --tag: var(--tag-green); --tag-text: var(--tag-green-text); }
+[data-tag='blue'] { --tag: var(--tag-blue); --tag-text: var(--tag-blue-text); }
+[data-tag='purple'] { --tag: var(--tag-purple); --tag-text: var(--tag-purple-text); }
+[data-tag='pink'] { --tag: var(--tag-pink); --tag-text: var(--tag-pink-text); }
+[data-tag='red'] { --tag: var(--tag-red); --tag-text: var(--tag-red-text); }
+
 html,
 body {
   margin: 0;

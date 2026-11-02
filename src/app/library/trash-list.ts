@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Confirm, Icon, UiButton } from '../core/ui';
+import { Confirm, UiButton, UiEmpty, UiRow } from '../core/ui';
 import { UiTip } from '../core/ui/tip/tip';
 import { LibraryStore } from './library.store';
 
@@ -13,7 +13,7 @@ import { LibraryStore } from './library.store';
  */
 @Component({
   selector: 'app-trash-list',
-  imports: [Icon, TranslatePipe, UiButton, UiTip],
+  imports: [TranslatePipe, UiButton, UiEmpty, UiRow, UiTip],
   templateUrl: './trash-list.html',
 })
 export class TrashList {
