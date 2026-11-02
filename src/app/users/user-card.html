@@ -11,7 +11,7 @@
 
     <!-- Their access: a row per area, switched right there (the admins: locked) -->
     <div class="flex flex-col gap-2">
-      <span class="px-row-x text-body font-semibold text-fg-secondary">{{ (user.isAdmin ? 'users.locked' : 'users.access') | t }}</span>
+      <ui-list-title>{{ (user.isAdmin ? 'users.locked' : 'users.access') | t }}</ui-list-title>
       <ui-list>
         @for (area of store.areas(); track area) {
           <div uiListItem>
@@ -27,7 +27,7 @@
          yet: the app's own number) -->
     @if (store.aiDefault() !== null) {
       <div class="flex flex-col gap-2">
-        <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'users.ai' | t }}</span>
+        <ui-list-title>{{ 'users.ai' | t }}</ui-list-title>
         <ui-list>
           <!-- (a tap: a wheel under the row, as Clock's — no keyboard, the sheet doesn't jump about; the
                limit in the accent color while it's open) -->

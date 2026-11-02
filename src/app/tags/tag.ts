@@ -2,7 +2,7 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Confirm, TAG_COLORS, tagColorLabel, tagTint, UiList, UiListItem, UiOption, UiTagSwatch, UiWheel } from '../core/ui';
+import { Confirm, TAG_COLORS, tagColorLabel, tagTint, UiList, UiListItem, UiListTitle, UiOption, UiTagSwatch, UiWheel } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore } from '../library/library.store';
 import { Tag, TagsStore } from '../library/tags.store';
@@ -13,7 +13,7 @@ import { Tag, TagsStore } from '../library/tags.store';
  */
 @Component({
   selector: 'app-tag',
-  imports: [TranslatePipe, UiList, UiListItem, UiTagSwatch, UiWheel],
+  imports: [TranslatePipe, UiList, UiListItem, UiListTitle, UiTagSwatch, UiWheel],
   templateUrl: './tag.html',
 })
 export class TagPage {

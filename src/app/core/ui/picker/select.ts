@@ -60,7 +60,7 @@ export interface UiOption {
     } @else {
       <span
         class="pointer-events-none inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-body text-fg data-wide:w-full data-wide:gap-3 data-wide:pr-3.5 data-wide:pl-4
-               data-glass:h-round data-glass:bg-glass data-glass:shadow-glass data-glass:backdrop-blur-[20px] data-glass:backdrop-saturate-[180%]"
+               data-glass:h-round data-glass:glass"
         [class.pl-2.5]="!!chosenIcon() && !wide()"
         [attr.data-wide]="wide() ? '' : null"
         [attr.data-glass]="glass() ? '' : null"

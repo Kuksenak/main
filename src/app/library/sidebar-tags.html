@@ -8,15 +8,7 @@
 @if (!folded()) {
   <!-- (its rows scroll on their own, as the favorites: fading out at the bottom; scrolled — a hairline
        over them, their top fading too; the bar over them) -->
-  <div
-    #rows
-    uiScrollBar
-    (scroll)="scrolled.set(rows.scrollTop > 0)"
-    [attr.data-scrolled]="scrolled() ? '' : null"
-    class="-mx-3 flex min-h-0 flex-initial flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-2
-           [mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] data-scrolled:border-separator
-           data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-1.5rem),transparent)]"
-  >
+  <div uiSidebarScroll>
     @if (adding()) {
       <!-- (a new one's name: Enter makes it, Esc / away — not) -->
       <div class="flex h-side-row shrink-0 items-center gap-2 pr-side-row-x pl-3.5">

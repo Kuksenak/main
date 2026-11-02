@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, ICONS, UiDate, UiOption, UiSelect, UiTime } from '../core/ui';
+import { Icon, ICONS, UiDate, UiListTitle, UiOption, UiSelect, UiTime } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 
 /**
@@ -11,7 +11,7 @@ import { PageTitle } from '../layout/page-title';
  */
 @Component({
   selector: 'app-home',
-  imports: [Icon, TranslatePipe, UiDate, UiSelect, UiTime],
+  imports: [Icon, TranslatePipe, UiDate, UiListTitle, UiSelect, UiTime],
   templateUrl: './home.html',
 })
 export class Home {

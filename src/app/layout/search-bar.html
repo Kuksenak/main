@@ -18,7 +18,7 @@
     >
       <div class="flex items-center gap-3">
         <form
-          class="flex h-round min-w-0 flex-1 items-center gap-2.5 rounded-full bg-glass px-4 shadow-glass backdrop-blur-[20px] backdrop-saturate-[180%]"
+          class="flex h-round min-w-0 flex-1 items-center gap-2.5 glass rounded-full px-4"
           (submit)="submit($event)"
         >
           <app-icon name="search" class="size-6 shrink-0 text-icon" />
@@ -70,9 +70,9 @@
       >
         @for (section of sections(); track section.name) {
           <div class="flex flex-col gap-1.5">
-            <span class="px-row-x text-body font-semibold text-fg-secondary">{{
+            <ui-list-title>{{
               section.name
-            }}</span>
+            }}</ui-list-title>
             <ui-list>
               @for (found of section.items; track found.id) {
                 <button type="button" uiListItem [icon]="found.icon" (click)="pick(found)">

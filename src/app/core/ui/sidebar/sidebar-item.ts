@@ -1,6 +1,7 @@
-import { Component, Directive, ElementRef, inject, input } from '@angular/core';
+import { Component, Directive, ElementRef, inject, input, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Icon, IconName } from '../icon/icon';
+import { UiScrollBar } from '../scroll-bar/scroll-bar';
 
 // (a row: its look, its icon and name — the places' and the buttons')
 const ROW =
@@ -96,3 +97,26 @@ export class UiSidebarRow {}
   },
 })
 export class UiSidebarField {}
+
+/**
+ * A section's rows that scroll on their own (Favorites' pages, the tags): as tall as they are, at
+ * most what's left; fading out at the bottom; scrolled — a hairline over them, their top fading
+ * under it too; the scroll bar over them (the system's took room from the rows).
+ *   <div uiSidebarScroll>…rows…</div>
+ */
+@Directive({
+  selector: '[uiSidebarScroll]',
+  hostDirectives: [UiScrollBar],
+  host: {
+    class:
+      '-mx-3 flex min-h-0 flex-initial flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-2 ' +
+      '[mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] data-scrolled:border-separator ' +
+      'data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-1.5rem),transparent)]',
+    '[attr.data-scrolled]': "scrolled() ? '' : null",
+    '(scroll)': 'scrolled.set(el.scrollTop > 0)',
+  },
+})
+export class UiSidebarScroll {
+  protected readonly scrolled = signal(false);
+  protected readonly el: HTMLElement = inject(ElementRef).nativeElement;
+}

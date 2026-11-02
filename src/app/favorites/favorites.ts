@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiList, UiListItem } from '../core/ui';
+import { UiList, UiListItem, UiListTitle } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from '../library/library.store';
 
@@ -14,14 +14,14 @@ import { LibraryStore, PageItem } from '../library/library.store';
  */
 @Component({
   selector: 'app-favorites',
-  imports: [TranslatePipe, UiList, UiListItem],
+  imports: [TranslatePipe, UiList, UiListItem, UiListTitle],
   template: `
     <div class="flex flex-col gap-2 px-4 pt-2 pb-24">
       @if (pages(); as pages) {
         @if (!pages.length) {
           <p class="px-row-x py-6 text-body text-fg-secondary">{{ 'favorites.empty' | t }}</p>
         } @else {
-          <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'nav.library' | t }}</span>
+          <ui-list-title>{{ 'nav.library' | t }}</ui-list-title>
           <ui-list>
             @for (item of pages; track item.id) {
               <button type="button" uiListItem icon="page" (click)="open(item)" [chevron]="true">{{ item.title }}</button>

@@ -1,6 +1,6 @@
 <!-- The choosers: a day, a time, a choice of a few -->
 <div class="flex flex-col gap-2 px-4 pt-4 desktop:px-10 desktop:pt-8">
-  <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'home.choosers' | t }}</span>
+  <ui-list-title>{{ 'home.choosers' | t }}</ui-list-title>
   <div class="flex flex-wrap items-center gap-2">
     <ui-date [(value)]="day" />
     <ui-time [(value)]="time" />

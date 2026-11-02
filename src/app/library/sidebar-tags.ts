@@ -4,9 +4,9 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Confirm, TAG_COLORS, tagColorLabel, UiFoldName, UiScrollBar, UiTagSwatch } from '../core/ui';
+import { Confirm, TAG_COLORS, tagColorLabel, UiFoldName, UiTagSwatch } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
-import { UiSidebarAction, UiSidebarField, UiSidebarItem, UiSidebarRow } from '../core/ui/sidebar';
+import { UiSidebarAction, UiSidebarField, UiSidebarItem, UiSidebarRow, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { keep, kept } from '../core/utils/storage';
 import { LibraryStore } from './library.store';
@@ -26,7 +26,6 @@ export const PAGE_DRAG = 'application/x-page';
   selector: 'app-sidebar-tags',
   imports: [
     UiFoldName,
-    UiScrollBar,
     TranslatePipe,
     UiMenu,
     UiMenuItem,
@@ -36,6 +35,7 @@ export const PAGE_DRAG = 'application/x-page';
     UiSidebarField,
     UiSidebarItem,
     UiSidebarRow,
+    UiSidebarScroll,
     UiTagSwatch,
     UiTip,
   ],
@@ -76,8 +76,6 @@ export class SidebarTags {
   // ⋯ : its menu at the button; Rename: a field in its row
   protected readonly menuFor = signal<{ tag: Tag; at: HTMLElement } | null>(null);
   protected readonly renaming = signal<string | null>(null);
-  // (its rows scrolled: a hairline over them, as the favorites')
-  protected readonly scrolled = signal(false);
   // A page dragged over a row: that row gray
   protected readonly dropOn = signal<string | null>(null);
 

@@ -5,8 +5,8 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { IconName, tagTint, Toasts, UiAvatar, UiButton, UiFoldName, UiKbd, UiScrollBar } from '../core/ui';
-import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
+import { IconName, tagTint, Toasts, UiAvatar, UiButton, UiFoldName, UiKbd } from '../core/ui';
+import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList } from '../core/ui/window';
 import { LibraryStore, PageItem } from '../library/library.store';
@@ -45,11 +45,11 @@ import { Search } from './search';
     UiMenuItem,
     UiMenuLabel,
     UiMenuSeparator,
-    UiScrollBar,
     UiSidebar,
     UiSidebarAction,
     UiSidebarButton,
     UiSidebarItem,
+    UiSidebarScroll,
     TrashList,
     UiTip,
     UiWindow,
@@ -88,7 +88,6 @@ export class DesktopLayout {
     if (this.favorites().length) lists.push({ id: 'favorites', label: 'library.favorites', icon: 'bookmark', pages: this.favorites() });
     return lists;
   });
-  protected readonly listsScrolled = signal(false);
   // (folded away — kept on this device)
   protected readonly folded = signal<List[]>((kept(FOLDED) ?? '').split(',').filter((x): x is List => x === 'favorites' || x === 'recents'));
   protected fold(list: List): void {

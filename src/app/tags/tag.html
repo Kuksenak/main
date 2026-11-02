@@ -3,7 +3,7 @@
 @if (tag(); as t) {
   <div class="flex min-h-full flex-col gap-6 px-4 pt-2 pb-24">
     <div class="flex flex-col gap-2">
-      <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'tags.pagesOf' | t }}</span>
+      <ui-list-title>{{ 'tags.pagesOf' | t }}</ui-list-title>
       <ui-list>
         @for (page of pages(); track page.id) {
           <button type="button" uiListItem icon="page" [tint]="tint(t)" chevron (click)="openPage(page.id)">{{ page.title }}</button>

@@ -2,7 +2,7 @@ import { Component, computed, DestroyRef, ElementRef, inject, signal, viewChild 
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { refreshThemeColor } from '../core/services/theme-color';
 import { VisibleArea } from '../core/services/visible-area';
-import { Icon, UiFloatingButton, UiList, UiListItem } from '../core/ui';
+import { Icon, UiFloatingButton, UiList, UiListItem, UiListTitle } from '../core/ui';
 import { AppSearch, Found, SearchScope } from './app-search';
 
 /**
@@ -18,7 +18,7 @@ import { AppSearch, Found, SearchScope } from './app-search';
  */
 @Component({
   selector: 'app-search-bar',
-  imports: [Icon, TranslatePipe, UiFloatingButton, UiList, UiListItem],
+  imports: [Icon, TranslatePipe, UiFloatingButton, UiList, UiListItem, UiListTitle],
   templateUrl: './search-bar.html',
 })
 export class SearchBar {

@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Confirm, Icon, Toasts, UiButton, UiList, UiListItem, UiSheet, UiTag } from '../core/ui';
+import { Confirm, Icon, Toasts, UiButton, UiKbd, UiList, UiListItem, UiSheet, UiTag } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow, UiWindowHead } from '../core/ui/window';
@@ -32,7 +32,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, UiWindowHead, TagPicker, TagSheet],
+  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, UiWindowHead, TagPicker, TagSheet],
   templateUrl: './page.html',
 })
 export class PageView {
