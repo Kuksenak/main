@@ -76,12 +76,12 @@ ICONS = {
             [(x, y) for y in (15.5, 32, 48.5) for x in (24, 40)],
             [(.4, -.3, 4.6, .93, 20), (-.3, .4, 4.4, 1, 0), (.3, .2, 4.6, .95, -30),
              (-.4, .2, 4.5, .94, 40), (.2, .5, 4.6, .94, 10), (-.3, -.2, 4.5, .93, -40)])),
-    # more (a page's menu, ⋯): three small dots in a row, close together (as Notion's) — dabbed as
+    # more (a page's menu, ⋯): three dots in a row, round and full enough to read small (as Notion's) — dabbed as
     # the grip's
     'dots': ''.join(
         f'<path stroke="none" fill="{MARKER}" '
         f'transform="translate({x + dx} 32.2) rotate({t}) scale(1 {q})" d="{ring(0, 0, r)}z"/>'
-        for x, (dx, r, q, t) in zip((20, 32, 44), [(.2, 3.3, .93, 20), (-.1, 3.2, 1, 0), (.1, 3.3, .95, -30)])),
+        for x, (dx, r, q, t) in zip((18.4, 32, 45.6), [(.2, 4.7, .93, 20), (-.1, 4.6, 1, 0), (.1, 4.7, .95, -30)])),
     # a link (copy a page's link), as Notion's: two halves of a chain link, open to each other, a bar
     # between them, aslant, narrow; a thicker marker — lines only
     'link': '<g transform="rotate(-45 32 32)" stroke-width="3.8">'

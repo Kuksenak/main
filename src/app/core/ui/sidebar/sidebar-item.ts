@@ -71,7 +71,7 @@ export class UiSidebarButton {
       'aria-expanded:opacity-100 aria-expanded:bg-side-on -mr-1',
     '(click)': '$event.preventDefault(); $event.stopPropagation()',
   },
-  template: `<app-icon [name]="icon()" class="size-4" />`,
+  template: `<app-icon [name]="icon()" class="size-4.5" />`,
 })
 export class UiSidebarAction {
   readonly icon = input.required<IconName>();
