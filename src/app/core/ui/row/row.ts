@@ -5,8 +5,8 @@ import { Icon, IconName } from '../icon/icon';
  * A row of a window's list (the search's, the trash's, the tags'), as Notion's: 36 tall, round —
  * at the left its icon (`icon`, coloured in) or what's put in with `rowStart` (a tag's swatch);
  * its name, a hint after it gray (`hint`: "— 26 Oct"); at the right what's put in with `rowEnd`
- * (its buttons: on desktops shown under the pointer only). Gray under the pointer (`hover`: off
- * where the keys pick one — `aria-selected` grays it then); phones: as tall as a list's row.
+ * (its buttons: on desktops shown under the pointer, or while it's picked). Gray under the pointer
+ * (`hover`: off where the keys pick one — `aria-selected` grays it then); phones: as tall as a list's row.
  *   <div uiRow icon="page" [hint]="when">{{ title }}<button rowEnd uiButton icon="trash"></button></div>
  */
 @Component({
@@ -29,7 +29,7 @@ import { Icon, IconName } from '../icon/icon';
         <span class="text-footnote whitespace-pre text-fg-secondary"> — {{ hint() }}</span>
       }
     </span>
-    <span class="flex shrink-0 items-center gap-0.5 empty:hidden desktop:opacity-0 desktop:group-hover:opacity-100 desktop:focus-within:opacity-100"
+    <span class="flex shrink-0 items-center gap-0.5 empty:hidden desktop:opacity-0 desktop:group-hover:opacity-100 desktop:group-aria-selected:opacity-100 desktop:focus-within:opacity-100"
       ><ng-content select="[rowEnd]"
     /></span>
   `,

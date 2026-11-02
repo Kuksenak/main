@@ -3,12 +3,23 @@
      a field (typed over right there), Delete under the pointer; the keys at the bottom. -->
 <ui-window (closed)="closed.emit()">
   <ui-window-head icon="hash">
-    <input #field uiWindowField [value]="query()" (input)="query.set(field.value)" (keydown.enter)="create()" [placeholder]="'tags.find' | t" />
+    <input
+      #field
+      uiWindowField
+      uiListKeys
+      [count]="rows()"
+      [(index)]="index"
+      (chosen)="choose($event)"
+      [value]="query()"
+      (input)="query.set(field.value)"
+      [placeholder]="'tags.find' | t"
+    />
   </ui-window-head>
 
   <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pt-1 pb-2">
-    @for (tag of shown(); track tag.id) {
-      <div uiRow>
+    <!-- (the keys pick a row — gray, its buttons shown; ↵ on a tag: its name to type over) -->
+    @for (tag of shown(); track tag.id; let i = $index) {
+      <div uiRow [hover]="false" [attr.aria-selected]="i === index()" (mouseenter)="index.set(i)">
         <button
           rowStart
           type="button"
@@ -27,8 +38,8 @@
           type="text"
           maxlength="40"
           [value]="tag.name"
-          (keydown.enter)="name.blur()"
-          (keydown.escape)="$event.stopPropagation(); name.value = tag.name; name.blur()"
+          (keydown.enter)="name.blur(); field.focus()"
+          (keydown.escape)="$event.stopPropagation(); name.value = tag.name; name.blur(); field.focus()"
           (blur)="rename(tag, name)"
           [attr.aria-label]="'tags.rename' | t"
           class="h-7 w-full min-w-0 rounded-md bg-transparent px-1 align-middle text-ui text-side-text outline-none focus:bg-tint"
@@ -60,9 +71,17 @@
         </div>
       }
     }
-    @if (query().trim() && !exact()) {
-      <!-- (a name none has: ↵ — or a click here — makes it) -->
-      <button type="button" uiRow icon="plus" (click)="create()">
+    @if (canCreate()) {
+      <!-- (a name none has: ↵ — or a click here — makes it; picked at first) -->
+      <button
+        type="button"
+        uiRow
+        icon="plus"
+        [hover]="false"
+        [attr.aria-selected]="index() === shown().length"
+        (mouseenter)="index.set(shown().length)"
+        (click)="create()"
+      >
         {{ 'tags.create' | t }}
         <ui-tag class="ml-1.5" [color]="store.nextColor()">{{ query().trim() }}</ui-tag>
       </button>
@@ -73,6 +92,7 @@
 
   <ui-window-foot>
     <ui-window-key key="Esc">{{ 'search.close' | t }}</ui-window-key>
-    <ui-window-key [icons]="['enter']">{{ 'tags.create' | t }}</ui-window-key>
+    <ui-window-key [icons]="['arrow-up', 'arrow-down']">{{ 'search.move' | t }}</ui-window-key>
+    <ui-window-key [icons]="['enter']">{{ (index() === shown().length ? 'tags.createKey' : 'tags.renameKey') | t }}</ui-window-key>
   </ui-window-foot>
 </ui-window>

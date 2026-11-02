@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, computed, inject, input, model, output } from '@angular/core';
 import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -24,12 +24,23 @@ export class TrashList {
   readonly restored = output<void>();
   /** Only the pages whose names have these words (the desktop's window: its field). */
   readonly query = input('');
+  /** The row the keys picked (the desktop's window: its field's ↑ ↓, ↵ restores it); null: none. */
+  readonly index = model<number | null>(null);
 
   protected readonly shown = computed(() => {
     const words = this.query().trim().toLowerCase();
     const items = this.store.trash();
     return items && words ? items.filter((i) => i.title.toLowerCase().includes(words)) : items;
   });
+
+  /** How many rows are shown (the keys go round them). */
+  readonly count = computed(() => this.shown()?.length ?? 0);
+
+  /** The row the keys picked, restored (↵). */
+  restoreAt(i: number): void {
+    const item = this.shown()?.[i];
+    if (item) this.restore(item.id);
+  }
 
   protected restore(id: string): void {
     this.store.restore(id, () => {

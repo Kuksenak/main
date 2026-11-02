@@ -8,8 +8,9 @@ import { Icon, IconName, tagTint, Toasts, UiButton, UiFloatingButton, UiList, Ui
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 import { PageMenu } from './page-menu';
-import { UiMenu, UiMenuItem } from '../core/ui/menu';
 import { keep, kept } from '../core/utils/storage';
+import { UiTip } from '../core/ui/tip/tip';
+import { TagPicker } from './tag-picker';
 import { TagsStore } from './tags.store';
 
 /**
@@ -24,7 +25,7 @@ type View = 'recents' | 'favorites' | 'published';
 
 @Component({
   selector: 'app-library',
-  imports: [Icon, PageMenu, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem, UiMenu, UiMenuItem, UiTag],
+  imports: [Icon, PageMenu, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem, UiTag, UiTip, TagPicker],
   templateUrl: './library.html',
 })
 export class Library {
@@ -41,8 +42,9 @@ export class Library {
     { id: 'published', label: 'library.published', icon: 'lock' },
   ];
   protected readonly view = signal<View>('recents');
-  // A tag: only its pages (the views' row: # and its menu)
+  // A tag: only its pages (the views' row: # and its menu); NO_TAG: only the pages with none
   protected readonly tagFilter = signal<string | null>(null);
+  protected readonly noTag = NO_TAG;
   protected readonly tagMenu = signal(false);
   // The tags: after a page's name; its icon in its first tag's pastel
   protected readonly tags = inject(TagsStore);
@@ -84,7 +86,9 @@ export class Library {
     const view = this.view();
     const tag = this.tagFilter();
     const items = (this.store.items() ?? []).filter(
-      (i) => (view === 'recents' || (view === 'favorites' ? i.favorite : i.published)) && (!tag || !!i.tagIds?.includes(tag)),
+      (i) =>
+        (view === 'recents' || (view === 'favorites' ? i.favorite : i.published)) &&
+        (!tag || (tag === NO_TAG ? !i.tagIds?.length : !!i.tagIds?.includes(tag))),
     );
     const day = new Date();
     day.setHours(0, 0, 0, 0);
@@ -126,4 +130,6 @@ export class Library {
 
 // (the date groups folded away: kept on this device — storage may be off, then it just isn't kept)
 const FOLDED = 'library.folded';
+// (the tag filter's No tag: the pages with none)
+const NO_TAG = '-';
 const readFolded = (): string[] => (kept(FOLDED) ?? '').split(',').filter(Boolean);

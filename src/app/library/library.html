@@ -16,35 +16,44 @@
           {{ v.label | t }}
         </button>
       }
-      <!-- (a tag: only its pages — # and the tag picked (none: Tag), its menu: All, the tags) -->
+      <!-- (a tag: only its pages — # and All tags; a tag picked: the button the tag's own whole (its
+           pastel, # and its name), as a page's; always as wide as All tags (a longer name ends in …,
+           the whole of it in the hint); ▾ — its menu: All, No tag, the tags) -->
       @if (tags.tags().length) {
+        @let picked = tags.byId().get(tagFilter() ?? '');
         <span class="mx-1 h-5 w-px bg-separator"></span>
         <button
           #tagBtn
           uiButton
           type="button"
-          icon="hash"
-          [outline]="!tagFilter()"
+          [icon]="picked ? undefined : 'hash'"
+          [outline]="true"
           [caret]="true"
           (click)="tagMenu.set(!tagMenu())"
           [attr.aria-expanded]="tagMenu()"
           [attr.aria-label]="'tags.title' | t"
+          [uiTip]="picked?.name"
+          [attr.data-tag]="picked?.color ?? null"
+          class="w-28 text-left [&>span]:max-w-none [&>span]:flex-1 data-tag:bg-tag data-tag:text-tag-text data-tag:aria-expanded:bg-tag data-tag:not-disabled:hover:bg-tag data-tag:hover:brightness-95"
         >
-          @if (tags.byId().get(tagFilter() ?? ''); as tag) {
-            <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+          @if (picked) {
+            <app-icon name="hash" class="mr-1 size-4 align-middle -mt-0.5" />{{ picked.name }}
           } @else {
-            {{ 'tags.all' | t }}
+            {{ (tagFilter() === noTag ? 'tags.noTag' : 'tags.all') | t }}
           }
         </button>
         @if (tagMenu()) {
-          <ui-menu narrow [origin]="tagBtn.element" (closed)="tagMenu.set(false)">
-            <button type="button" uiMenuItem [checked]="!tagFilter()" (click)="tagFilter.set(null)">{{ 'tags.all' | t }}</button>
-            @for (tag of tags.tags(); track tag.id) {
-              <button type="button" uiMenuItem [checked]="tagFilter() === tag.id" (click)="tagFilter.set(tag.id)">
-                <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
-              </button>
-            }
-          </ui-menu>
+          <!-- (the page's tag menu, but no new tags here; No tag: the pages with none) -->
+          <app-tag-picker
+            [origin]="tagBtn.element"
+            [tagIds]="picked ? [picked.id] : []"
+            [creatable]="false"
+            none="tags.all"
+            [untagged]="tagFilter() === noTag"
+            (changed)="tagFilter.set($event.length ? $event[0] : null)"
+            (untaggedPicked)="tagFilter.set(noTag)"
+            (closed)="tagMenu.set(false)"
+          />
         }
       }
       <span class="flex-1"></span>

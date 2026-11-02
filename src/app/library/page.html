@@ -42,7 +42,7 @@
       </form>
     </div>
     <!-- Its tag, at the right by its buttons: a button as theirs — # and Tag; a tag on it: the button the
-         tag's own whole (its pastel, its name); a click: the picker -->
+         tag's own whole (its pastel, its name); ▾ either way (a choice) — a click: the picker -->
     @if (tags.of(p.tagIds)[0]; as tag) {
       <button
         #tagsBtn
@@ -55,6 +55,7 @@
       >
         <app-icon name="hash" class="size-4 shrink-0" />
         <span class="min-w-0 truncate">{{ tag.name }}</span>
+        <app-icon name="chevron-down" class="-ml-0.5 size-4 shrink-0 opacity-50" />
       </button>
     } @else {
       <button
@@ -63,6 +64,7 @@
         type="button"
         icon="hash"
         [outline]="true"
+        [caret]="true"
         (click)="tagsOpen.set(!tagsOpen())"
         [attr.aria-expanded]="tagsOpen()"
         [attr.aria-label]="'tags.title' | t"

@@ -1,9 +1,9 @@
-import { afterNextRender, Component, computed, ElementRef, inject, output, signal, viewChild } from '@angular/core';
+import { Component, computed, ElementRef, inject, linkedSignal, output, signal, viewChildren } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Confirm, TAG_COLORS, tagColorLabel, UiButton, UiEmpty, UiRow, UiTag } from '../core/ui';
 import { UiTip } from '../core/ui/tip/tip';
-import { UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from '../core/ui/window';
+import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from '../core/ui/window';
 import { Tag, TagsStore } from './tags.store';
 
 /**
@@ -14,7 +14,7 @@ import { Tag, TagsStore } from './tags.store';
  */
 @Component({
   selector: 'app-tags-window',
-  imports: [TranslatePipe, UiButton, UiEmpty, UiRow, UiTag, UiTip, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey],
+  imports: [TranslatePipe, UiButton, UiEmpty, UiRow, UiTag, UiTip, UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey],
   templateUrl: './tags-window.html',
 })
 export class TagsWindow {
@@ -31,18 +31,33 @@ export class TagsWindow {
   // The tags with what's typed in their names; the one named just so
   protected readonly shown = computed(() => this.store.tags().filter((t) => t.name.toLowerCase().includes(this.words())));
   protected readonly exact = computed(() => this.store.tags().find((t) => t.name.toLowerCase() === this.words()) ?? null);
+  protected readonly canCreate = computed(() => !!this.words() && !this.exact());
+
+  // The rows the keys go round (the tags shown, then Create), and the picked one — a new query:
+  // Create if it's there, else the first
+  protected readonly rows = computed(() => this.shown().length + (this.canCreate() ? 1 : 0));
+  protected readonly index = linkedSignal<string, number | null>({
+    source: this.words,
+    computation: () => (this.canCreate() ? this.shown().length : 0),
+  });
+  private readonly names = viewChildren<ElementRef<HTMLInputElement>>('name');
 
   // The tag whose colors are open under it
   protected readonly paletteFor = signal<string | null>(null);
 
-  private readonly field = viewChild.required<ElementRef<HTMLInputElement>>('field');
 
   constructor() {
     this.store.load();
-    afterNextRender(() => this.field().nativeElement.focus());
   }
 
-  // ↵: a tag by what's typed, unless there's one by that name already
+  // ↵ on a row: a tag — its name to type over; Create — made
+  protected choose(i: number): void {
+    const name = this.names()[i]?.nativeElement;
+    if (name) name.select();
+    else this.create();
+  }
+
+  // A tag by what's typed, unless there's one by that name already
   protected create(): void {
     const name = this.query().trim();
     if (!name || this.exact()) return;

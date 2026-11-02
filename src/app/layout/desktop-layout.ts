@@ -5,10 +5,10 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, IconName, tagTint, Toasts, UiAvatar, UiButton, UiScrollBar } from '../core/ui';
+import { Icon, IconName, tagTint, Toasts, UiAvatar, UiButton, UiKbd, UiScrollBar } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
-import { UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from '../core/ui/window';
+import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from '../core/ui/window';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { TranslationKey } from '../core/i18n/translations';
 import { TrashList } from '../library/trash-list';
@@ -39,6 +39,7 @@ import { Search } from './search';
     Search,
     TranslatePipe,
     UiAvatar,
+    UiKbd,
     UiButton,
     UiMenu,
     UiMenuItem,
@@ -56,6 +57,7 @@ import { Search } from './search';
     UiWindowFoot,
     UiWindowHead,
     UiWindowKey,
+    UiListKeys,
   ],
   templateUrl: './desktop-layout.html',
 })
@@ -76,6 +78,8 @@ export class DesktopLayout {
   protected readonly tagsOpen = signal(false);
   // (the trash window's field: its pages filtered)
   protected readonly trashQuery = signal('');
+  // (and the row its keys picked)
+  protected readonly trashIndex = signal<number | null>(0);
 
   // The sidebar's lists: Recents (the last changed), Favorites (when there are any)
   protected readonly lists = computed(() => {

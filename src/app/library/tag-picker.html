@@ -1,6 +1,6 @@
-<!-- A page's tag, as a choice of a few (as the language's): a field on top — what's typed filters the
-     tags; Enter picks the one by that name, or makes it (its color: the next one round) and picks it;
-     then No tag and the tags (the chosen one ✓) — a click picks it. -->
+<!-- A tag, as a choice of a few (as the language's): a field on top — what's typed filters the tags;
+     Enter picks the one by that name, or (`creatable`) makes it (its color: the next one round) and
+     picks it; then the none's row (No tag / All tags) and the tags (the chosen one ✓) — a click picks it. -->
 <ui-menu narrow [origin]="origin()" (closed)="closed.emit()">
   <div class="flex h-8 items-center gap-2 px-menu-row-x">
     <app-icon name="hash" class="size-icon-menu shrink-0 text-icon" />
@@ -11,7 +11,7 @@
       autocomplete="off"
       [value]="query()"
       (input)="query.set(field.value)"
-      [placeholder]="'tags.new' | t"
+      [placeholder]="(creatable() ? 'tags.new' : 'tags.search') | t"
       (keydown)="$event.stopPropagation()"
       (keydown.enter)="enter()"
       class="min-w-0 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
@@ -19,9 +19,15 @@
   </div>
   <ui-menu-separator />
   @if (!query().trim()) {
-    <button type="button" uiMenuItem [checked]="!tagIds().length" (click)="pick(null)">
-      <span class="text-fg-secondary">{{ 'tags.noTag' | t }}</span>
+    <button type="button" uiMenuItem [checked]="!tagIds().length && !untagged()" (click)="pick(null)">
+      <span class="text-fg-secondary">{{ none() | t }}</span>
     </button>
+    @if (untagged() !== null) {
+      <!-- (the library's filter: the pages with no tag) -->
+      <button type="button" uiMenuItem [checked]="!!untagged()" (click)="untaggedPicked.emit()">
+        <span class="text-fg-secondary">{{ 'tags.noTag' | t }}</span>
+      </button>
+    }
   }
   <!-- (the tags: a swatch and the name, as the menu's rows — the chosen one ✓) -->
   @for (tag of shown(); track tag.id) {
@@ -32,10 +38,12 @@
       </span>
     </button>
   }
-  @if (query().trim() && !exact()) {
+  @if (creatable() && query().trim() && !exact()) {
     <!-- (a name none has: Enter — or a click here — makes it) -->
     <button type="button" uiMenuItem icon="plus" (click)="enter()">
       <ui-tag [color]="store.nextColor()">{{ query().trim() }}</ui-tag>
     </button>
+  } @else if (query().trim() && !shown().length) {
+    <p class="px-menu-row-x py-2 text-ui text-fg-secondary">{{ 'search.nothing' | t }}</p>
   }
 </ui-menu>
