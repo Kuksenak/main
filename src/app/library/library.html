@@ -69,20 +69,20 @@
              Notion's: its icon, its name, ⋯ (its menu, under the pointer), when (today: the time);
              gray under the pointer, a picked one tinted. A click opens it; Ctrl+click (⌘ on a Mac)
              picks it -->
-        @for (group of groups(); track group.key) {
-          <section class="flex flex-col not-first:mt-4">
-            <!-- (its name: a click folds it away / back — kept on this device; ⌄ under the pointer) -->
+        @for (group of groups(); track group.key; let first = $first) {
+          <!-- (open ones: room before them; folded ones: their heads one under another, no room) -->
+          <section class="flex flex-col" [class.mt-4]="!first && !folded().includes(group.key)">
+            <!-- (its head, the whole row: ⌄ / › and its name, a hairline under it — a click folds it away
+                 / back, kept on this device) -->
             <button
               type="button"
               (click)="fold(group.key)"
               [attr.aria-expanded]="!folded().includes(group.key)"
-              class="group/fold flex h-7 w-fit items-center gap-1 rounded-md px-2 text-footnote font-medium text-fg-secondary hover:bg-tint"
+              class="group/fold flex h-8 w-full items-center gap-1.5 border-b-[0.5px] border-separator px-2 text-left text-footnote font-medium text-fg-secondary hover:bg-tint"
             >
+              <app-icon name="chevron-down" class="size-3.5 opacity-70 transition group-aria-[expanded=false]/fold:-rotate-90" />
               {{ group.key | t }}
-              <app-icon
-                name="chevron-down"
-                class="size-3.5 opacity-0 transition group-hover/fold:opacity-70 group-aria-[expanded=false]/fold:-rotate-90 group-aria-[expanded=false]/fold:opacity-70"
-              />
+              <span class="ml-auto tabular-nums opacity-70">{{ group.items.length }}</span>
             </button>
             @if (!folded().includes(group.key)) {
               @for (item of group.items; track item.id) {
