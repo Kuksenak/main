@@ -4,7 +4,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, IconName, UiAvatar, UiButton } from '../core/ui';
+import { Icon, IconName, UiAvatar, UiButton, UiScrollBar } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { LibraryStore, PageItem } from '../library/library.store';
@@ -36,6 +36,7 @@ import { Search } from './search';
     UiMenuItem,
     UiMenuLabel,
     UiMenuSeparator,
+    UiScrollBar,
     UiSidebar,
     UiSidebarAction,
     UiSidebarButton,
@@ -59,11 +60,11 @@ export class DesktopLayout {
   protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   protected readonly trashOpen = signal(false);
 
-  // The sidebar's lists: Recents (the last changed; more: View all), Favorites (when there are any)
+  // The sidebar's lists: Recents (the last changed), Favorites (when there are any)
   protected readonly lists = computed(() => {
     const items = this.store.items() ?? [];
-    const lists: { id: List; label: TranslationKey; icon: IconName; pages: PageItem[]; more?: boolean }[] = [];
-    if (this.library()) lists.push({ id: 'recents', label: 'library.recents', icon: 'clock', pages: items.slice(0, RECENTS), more: items.length > RECENTS });
+    const lists: { id: List; label: TranslationKey; icon: IconName; pages: PageItem[] }[] = [];
+    if (this.library()) lists.push({ id: 'recents', label: 'library.recents', icon: 'clock', pages: items.slice(0, RECENTS) });
     if (this.favorites().length) lists.push({ id: 'favorites', label: 'library.favorites', icon: 'bookmark', pages: this.favorites() });
     return lists;
   });

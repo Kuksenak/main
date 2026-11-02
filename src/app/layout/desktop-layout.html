@@ -21,16 +21,18 @@
         }
       </a>
     }
-    <!-- The library's pages: Recents (the 5 last changed; View all: the library), then Favorites — each
+    <!-- The library's pages: Recents (the 5 last changed), then Favorites — each
          a row as a place's (its icon, its name, ⌄ / ⌃: a click folds it away / back), its pages under
          it: their icon, their name, ⋯ under the pointer (its menu).
          Only they scroll (Search, the places and Trash stay), fading out at the bottom; scrolled: a
-         hairline over them, their top fading under it too -->
+         hairline over them, their top fading under it too; their scroll bar over them (the system's took room
+         from the rows) -->
     <div
       #scroller
+      uiScrollBar
       (scroll)="listsScrolled.set(scroller.scrollTop > 0)"
       [attr.data-scrolled]="listsScrolled() ? '' : null"
-      class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4 [scrollbar-width:thin]
+      class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4
              [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] data-scrolled:border-separator
              data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-2rem),transparent)]"
     >
@@ -53,11 +55,6 @@
                 [attr.aria-expanded]="rowMenu()?.page?.id === page.id"
                 [attr.aria-label]="'library.more' | t"
               ></button>
-            </a>
-          }
-          @if (list.id === 'recents' && list.more) {
-            <a routerLink="/library" class="flex h-side-row shrink-0 items-center rounded-side-row pr-side-row-x pl-10 text-ui text-fg-secondary hover:bg-side-hover">
-              {{ 'sidebar.viewAll' | t }}
             </a>
           }
         }
