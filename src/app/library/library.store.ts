@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, switchMap, tap } from 'rxjs';
+import { Observable, forkJoin, switchMap, tap } from 'rxjs';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
 import { Toasts } from '../core/ui';
@@ -120,6 +120,20 @@ export class LibraryStore {
         this.items.update((items) => items?.filter((x) => x.id !== id) ?? null);
         this.trash.set(null); // (read again when it's opened)
         this.toasts.show(this.i18n.t('trash.moved'), { label: this.i18n.t('trash.undo'), run: () => this.restore(id) });
+      }),
+    );
+  }
+
+  /** Several to the trash at once: gone from the list; one toast — Undo puts them all back. */
+  deleteMany(ids: string[]): Observable<unknown> {
+    return forkJoin(ids.map((id) => this.http.delete<void>(`${this.url}/${id}`))).pipe(
+      tap(() => {
+        this.items.update((items) => items?.filter((x) => !ids.includes(x.id)) ?? null);
+        this.trash.set(null);
+        this.toasts.show(this.i18n.t('trash.movedMany').replace('{n}', String(ids.length)), {
+          label: this.i18n.t('trash.undo'),
+          run: () => ids.forEach((id) => this.restore(id)),
+        });
       }),
     );
   }

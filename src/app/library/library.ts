@@ -7,19 +7,21 @@ import { TranslationKey } from '../core/i18n/translations';
 import { Icon, IconName, Toasts, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
+import { PageMenu } from './page-menu';
 
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
  * Desktops, as Notion's: the name big, the views as pills (Recents: all; Favorites; Published) and New
- * page, the view's pages by when they were changed (Today, 7 days, 30 days, older), a row each. Phones: the pages on a card, +
+ * page, the view's pages by when they were changed (Today, 7 days, 30 days, older), a row each: a box to
+ * pick it (some picked: to the favorites / the trash at once), ⋯ its menu (PageMenu). Phones: the pages on a card, +
  * floating at the bottom right (Trash: the account's sheet).
  */
 type View = 'recents' | 'favorites' | 'published';
 
 @Component({
   selector: 'app-library',
-  imports: [Icon, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem],
+  imports: [Icon, PageMenu, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem],
   templateUrl: './library.html',
 })
 export class Library {
@@ -36,6 +38,32 @@ export class Library {
     { id: 'published', label: 'library.published', icon: 'globe' },
   ];
   protected readonly view = signal<View>('recents');
+  // A page's ⋯: its menu (as the sidebar's), at the button
+  protected readonly menu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
+  // The pages picked (their boxes): what to do with them in the views' row
+  protected readonly picked = signal<Set<string>>(new Set());
+
+  protected pick(id: string): void {
+    this.picked.update((p) => {
+      const next = new Set(p);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }
+
+  protected unpick(): void {
+    this.picked.set(new Set());
+  }
+
+  protected favoritePicked(): void {
+    for (const id of this.picked()) this.store.favorite(id, true).subscribe();
+    this.picked.set(new Set());
+  }
+
+  protected trashPicked(): void {
+    this.store.deleteMany([...this.picked()]).subscribe({ error: () => this.toasts.error(this.i18n.t('library.deleteError')) });
+    this.picked.set(new Set());
+  }
 
   // The view's pages by when they were changed: Today, the last 7 days, 30, older (only those with any)
   protected readonly groups = computed(() => {

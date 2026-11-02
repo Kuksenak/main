@@ -8,7 +8,7 @@
       @for (v of views; track v.id) {
         <button
           type="button"
-          (click)="view.set(v.id)"
+          (click)="view.set(v.id); unpick()"
           [attr.aria-pressed]="view() === v.id"
           class="flex h-8 items-center gap-1.5 rounded-full px-3 text-ui text-fg-secondary hover:bg-tint aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
         >
@@ -17,13 +17,21 @@
         </button>
       }
       <span class="flex-1"></span>
+      @if (picked().size) {
+        <!-- (some picked: how many, what to do with them — to the favorites, to the trash; ✕ unpicks) -->
+        <span class="mr-1 text-ui text-fg-secondary">{{ 'library.picked' | t }}: {{ picked().size }}</span>
+        <button uiButton type="button" icon="bookmark" (click)="favoritePicked()">{{ 'library.favorite' | t }}</button>
+        <button uiButton type="button" icon="trash" (click)="trashPicked()">{{ 'library.moveToTrash' | t }}</button>
+        <button uiButton type="button" icon="close" (click)="unpick()" [attr.aria-label]="'library.unpick' | t"></button>
+      } @else {
       <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">
         {{ 'library.new' | t }}
       </button>
+      }
     </div>
   </div>
 
-  <div class="flex flex-col px-8 pt-2 pb-12">
+  <div class="flex flex-col px-8 pt-4 pb-12">
     @if (store.items(); as items) {
       @if (!items.length) {
         <!-- Nothing yet: a big page, a word, New page -->
@@ -35,30 +43,60 @@
           </button>
         </div>
       } @else {
-        <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older: a small gray name
-             over each, as the search's sections) — a row each: its icon, its name, when (today: the time); gray under the pointer, as Notion's -->
+          <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older): each group a
+             block of its own — its name small and gray over it, room between them. A row each, as
+             Notion's: a box to pick it (under the pointer, or all of them while any is picked), its
+             icon, its name, ⋯ (its menu, under the pointer), when (today: the time); gray under the
+             pointer, a picked one tinted. A click opens it; while some are picked: picks it -->
         @for (group of groups(); track group.key) {
-          <p class="px-2 pt-5 pb-1.5 text-footnote font-medium text-fg-secondary first:pt-1">
-            {{ group.key | t }}
-          </p>
-          @for (item of group.items; track item.id) {
-            <button
-              type="button"
-              (click)="open(item)"
-              class="group flex h-9 w-full shrink-0 items-center gap-2.5 rounded-lg px-2 text-left hover:bg-tint active:transform-none"
-            >
-              <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
-              <span
-                class="min-w-0 truncate text-ui text-fg"
-                [class.text-fg-secondary]="!item.title.trim()"
-                >{{ item.title.trim() || ('library.untitled' | t) }}</span
+          <section class="flex flex-col gap-0.5 not-first:mt-7">
+            <h2 class="flex h-7 items-center px-2 text-footnote font-medium text-fg-secondary">{{ group.key | t }}</h2>
+            @for (item of group.items; track item.id) {
+              <div
+                role="button"
+                tabindex="0"
+                (click)="picked().size ? pick(item.id) : open(item)"
+                (keydown.enter)="open(item)"
+                [attr.aria-selected]="picked().has(item.id)"
+                [attr.data-picking]="picked().size ? '' : null"
+                class="group flex h-10 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-lg pr-2 pl-1 text-left outline-none hover:bg-tint focus-visible:bg-tint aria-selected:bg-accent/10"
               >
-              <span class="flex-1"></span>
-              <span class="shrink-0 text-footnote text-fg-secondary tabular-nums">{{
-                changed(item, group.key === 'library.today')
-              }}</span>
-            </button>
-          }
+                <button
+                  type="button"
+                  (click)="$event.stopPropagation(); pick(item.id)"
+                  [attr.aria-label]="'library.pick' | t"
+                  [attr.aria-pressed]="picked().has(item.id)"
+                  class="grid size-6 shrink-0 place-items-center rounded-md opacity-0 group-hover:opacity-100 group-data-picking:opacity-100"
+                >
+                  <span
+                    class="grid size-4 place-items-center rounded-[0.3rem] border-[1.5px] border-fg/25 text-on-accent group-aria-selected:border-accent group-aria-selected:bg-accent"
+                  >
+                    @if (picked().has(item.id)) {
+                      <app-icon name="check" class="size-3" />
+                    }
+                  </span>
+                </button>
+                <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
+                <span class="min-w-0 truncate text-ui text-fg" [class.text-fg-secondary]="!item.title.trim()">{{
+                  item.title.trim() || ('library.untitled' | t)
+                }}</span>
+                <span class="flex-1"></span>
+                <button
+                  #more
+                  type="button"
+                  (click)="$event.stopPropagation(); menu.set(menu()?.page?.id === item.id ? null : { page: item, at: more })"
+                  [attr.aria-expanded]="menu()?.page?.id === item.id"
+                  [attr.aria-label]="'library.more' | t"
+                  class="grid size-7 shrink-0 place-items-center rounded-md text-icon opacity-0 group-hover:opacity-100 hover:bg-tint-strong aria-expanded:bg-tint-strong aria-expanded:opacity-100"
+                >
+                  <app-icon name="dots" class="size-4" />
+                </button>
+                <span class="w-14 shrink-0 text-right text-footnote text-fg-secondary tabular-nums">{{
+                  changed(item, group.key === 'library.today')
+                }}</span>
+              </div>
+            }
+          </section>
         } @empty {
           <p class="py-16 text-center text-ui text-fg-secondary">
             {{ (view() === 'favorites' ? 'library.noFavorites' : 'library.noPublished') | t }}
@@ -67,6 +105,10 @@
       }
     }
   </div>
+
+  @if (menu(); as m) {
+    <app-page-menu [page]="m.page" [origin]="m.at" (closed)="menu.set(null)" />
+  }
 } @else {
   <!-- Phones: the pages on a card (as iOS's lists), + floating at the bottom right -->
   <div class="flex flex-col gap-3 px-4 pt-2 pb-24">

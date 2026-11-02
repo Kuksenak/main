@@ -133,12 +133,9 @@ ICONS = {
         + line('M43.6 50.6C40.6 40.4 37.6 30 34.6 19.6 37.2 18.8 39.8 18.1 42.4 17.4 45.4 27.8 48.4 38 51.4 48.4')
         + thin('M15 23.4 18.8 23.3M25.2 19.6 29.2 19.5M25.1 24 29.1 23.9')
         + line('M8.8 51.6C24 50.8 39.6 51 55.4 50.6'),
-    # an update: two arrows chasing each other round (as a refresh), a gap between them, each
-    # its own curve; a teal dab
-    # in the middle
-    'update': fill(TEAL, ring(32, 32, 10) + 'z')
-        + line('M49.3 33.8A17.1 17.7 8 0 1 20.3 44.1M21.5 52.2 20.3 44.1 28.5 44.9')
-        + line('M15.1 30.2A17.2 17.9 8 0 1 44.2 19.4M43.0 11.3 44.2 19.4 36.0 18.6'),
+    # an update / restore (as Notion's): one round arrow, open at the top right, its head there — lines only
+    'update': line('M47.8 26.2C48.6 28 49 30 49 32 49.1 41.4 41.4 49.2 32 49.1 22.6 49.2 14.9 41.4 15 32 15 22.6 22.6 14.9 32 15 35.4 15 38.6 16 41.2 17.8')
+        + line('M33.6 9.6 41.4 17.6 33.8 24.4'),
     # recent (the library's Recents): a clock (cream), its two hands at ten past
     'clock': fill(CREAM, ring(32, 32, 20) + 'z')
         + line(ring(32, 32, 20))
