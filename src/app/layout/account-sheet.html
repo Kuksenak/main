@@ -56,6 +56,37 @@
             <app-trash-list (restored)="sheet.close()" />
           }
         }
+        <!-- (the tags: a row each, › — its colors as rows (✓ the one it has), Delete) -->
+        @case ('tags') {
+          <ui-list>
+            @for (t of tags.tags(); track t.id) {
+              <button type="button" uiListItem chevron (click)="openTag(t)">
+                <ui-tag [color]="t.color">{{ t.name }}</ui-tag>
+              </button>
+            } @empty {
+              <div uiListItem><span class="text-fg-secondary">{{ 'tags.empty' | t }}</span></div>
+            }
+          </ui-list>
+        }
+        @case ('tag') {
+          @if (tag(); as t) {
+            <div class="flex flex-col gap-6">
+              <ui-list>
+                @for (color of colors; track color) {
+                  <button type="button" uiListItem [checked]="t.color === color" (click)="recolor(t, color)">
+                    <span class="flex items-center gap-3">
+                      <span class="size-6 shrink-0 rounded-lg" [class]="swatch[color]"></span>
+                      <ui-tag [color]="color">{{ t.name }}</ui-tag>
+                    </span>
+                  </button>
+                }
+              </ui-list>
+              <ui-list>
+                <button type="button" uiListItem icon="trash" danger (click)="removeTag(t, $event)">{{ 'tags.delete' | t }}</button>
+              </ui-list>
+            </div>
+          }
+        }
         @case ('user') {
           @defer (on immediate) {
             <app-user-card [userId]="userId()!" />
@@ -87,6 +118,7 @@
           <span itemValue class="text-fg-secondary">{{ language() }}</span>
         </button>
         @if (auth.can('library')) {
+          <button type="button" uiListItem icon="hash" chevron (click)="openTags()">{{ 'tags.title' | t }}</button>
           <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
         }
       </ui-list>

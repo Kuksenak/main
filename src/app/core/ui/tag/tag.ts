@@ -17,6 +17,19 @@ const CHIP: Record<TagColor, string> = {
   red: 'bg-tag-red text-tag-red-text',
 };
 
+/** A color's swatch (a dot, a square): its pastel's class, whole for Tailwind. */
+export const TAG_SWATCH: Record<TagColor, string> = {
+  gray: 'bg-tag-gray',
+  brown: 'bg-tag-brown',
+  orange: 'bg-tag-orange',
+  yellow: 'bg-tag-yellow',
+  green: 'bg-tag-green',
+  blue: 'bg-tag-blue',
+  purple: 'bg-tag-purple',
+  pink: 'bg-tag-pink',
+  red: 'bg-tag-red',
+};
+
 /** A color's pastel, for what's painted by it (a page's icon: `<app-icon colored [tint]>`). */
 export const tagTint = (color: string | null | undefined): string | null =>
   color && (TAG_COLORS as readonly string[]).includes(color) ? `var(--tag-${color})` : null;

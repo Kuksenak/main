@@ -4,6 +4,7 @@ import { environment } from '@environments/environment';
 import { Observable, tap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TAG_COLORS, TagColor, Toasts } from '../core/ui';
+import { LibraryStore } from './library.store';
 
 /** A tag of the account's: its name, its color. */
 export interface Tag {
@@ -14,13 +15,15 @@ export interface Tag {
 
 /**
  * The account's tags (the API's /tags), by name: `load()`, `create` (a name, a color — none given:
- * the next one round). `byId` for the pages' rows. (Changing or deleting one: later.)
+ * the next one round), `update` (its color), `remove` (off the pages too) — the account's menu → Tags.
+ * `byId` for the pages' rows.
  */
 @Injectable({ providedIn: 'root' })
 export class TagsStore {
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
   private readonly toasts = inject(Toasts);
+  private readonly library = inject(LibraryStore);
   private readonly url = `${environment.apiUrl}/tags`;
 
   readonly tags = signal<Tag[]>([]);
@@ -52,6 +55,29 @@ export class TagsStore {
         error: () => this.toasts.error(this.i18n.t('tags.saveError')),
       }),
     );
+  }
+
+  /** Its color (or name) changed: shown at once; back as it was if that fails. */
+  update(tag: Tag): void {
+    const before = this.tags();
+    this.tags.update((tags) => tags.map((t) => (t.id === tag.id ? tag : t)).sort(byName));
+    this.http.put<Tag>(`${this.url}/${tag.id}`, { name: tag.name, color: tag.color }).subscribe({
+      error: () => {
+        this.tags.set(before);
+        this.toasts.error(this.i18n.t('tags.saveError'));
+      },
+    });
+  }
+
+  /** Deleted: off its pages too. */
+  remove(id: string): void {
+    this.http.delete<void>(`${this.url}/${id}`).subscribe({
+      next: () => {
+        this.tags.update((tags) => tags.filter((t) => t.id !== id));
+        this.library.untag(id);
+      },
+      error: () => this.toasts.error(this.i18n.t('tags.saveError')),
+    });
   }
 }
 

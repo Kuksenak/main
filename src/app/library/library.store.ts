@@ -145,6 +145,11 @@ export class LibraryStore {
     );
   }
 
+  /** A tag gone: off the pages here too. */
+  untag(tagId: string): void {
+    this.items.update((items) => items?.map((x) => (x.tagIds?.includes(tagId) ? { ...x, tagIds: x.tagIds.filter((t) => t !== tagId) } : x)) ?? null);
+  }
+
   /** In the favorites or not (the list follows at once; back as it was if that fails). */
   favorite(id: string, on: boolean): Observable<Page> {
     this.mark(id, on);

@@ -5,24 +5,25 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, UiList, UiFloatingButton, UiListItem, UiSheet } from '../core/ui';
+import { Confirm, Icon, TAG_COLORS, TAG_SWATCH, UiList, UiFloatingButton, UiListItem, UiSheet, UiTag } from '../core/ui';
+import { Tag, TagsStore } from '../library/tags.store';
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
 import { TrashList } from '../library/trash-list';
 import { LibraryStore } from '../library/library.store';
 import type { User } from '../users/users.store';
 
-type Page = 'language' | 'users' | 'user' | 'trash';
+type Page = 'language' | 'users' | 'user' | 'trash' | 'tags' | 'tag';
 
 /**
  * Phones: the account (as the Claude app's) — a sheet from the bottom, a fixed height: the email;
- * Users (the admins only), Trash (those who can read the library); the language (the current one in gray); at the bottom Update available
+ * Users (the admins only), Tags and Trash (those who can read the library); the language (the current one in gray); at the bottom Update available
  * (when a new version is ready), Log out and Log out of all devices. A row with › opens its page
- * right in the sheet, sliding in (‹ back): the languages; the users — and a user tapped, their card; the trash's pages.
+ * right in the sheet, sliding in (‹ back): the languages; the users — and a user tapped, their card; the tags — and a tag tapped, its colors and Delete; the trash's pages.
  */
 @Component({
   selector: 'app-account-sheet',
-  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSheet, TrashList, UserCard, UsersList],
+  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSheet, UiTag, TrashList, UserCard, UsersList],
   templateUrl: './account-sheet.html',
 })
 export class AccountSheet {
@@ -40,6 +41,38 @@ export class AccountSheet {
   // (the trash's: its pages, Empty trash at the head)
   protected readonly library = inject(LibraryStore);
   protected readonly trashList = viewChild(TrashList);
+  // (Tags: the account's — a tag tapped: its colors, Delete)
+  protected readonly tags = inject(TagsStore);
+  protected readonly colors = TAG_COLORS;
+  protected readonly swatch = TAG_SWATCH;
+  protected readonly tagId = signal<string | null>(null);
+  protected readonly tag = computed(() => this.tags.byId().get(this.tagId() ?? '') ?? null);
+  private readonly confirm = inject(Confirm);
+
+  protected openTags(): void {
+    this.tags.load();
+    this.open('tags');
+  }
+
+  protected openTag(tag: Tag): void {
+    this.tagId.set(tag.id);
+    this.open('tag');
+  }
+
+  protected recolor(tag: Tag, color: Tag['color']): void {
+    if (tag.color !== color) this.tags.update({ ...tag, color });
+  }
+
+  protected async removeTag(tag: Tag, e: Event): Promise<void> {
+    const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
+      text: this.i18n.t('tags.deleteAsk'),
+      yes: this.i18n.t('tags.delete'),
+      danger: true,
+    });
+    if (!yes) return;
+    this.tags.remove(tag.id);
+    this.back();
+  }
 
   // The user whose card is open, and their name over it (the card reads them from UsersStore itself:
   // the users' code is downloaded only when Users is opened — @defer)
@@ -84,6 +117,10 @@ export class AccountSheet {
         return this.userName();
       case 'trash':
         return this.i18n.t('trash.title');
+      case 'tags':
+        return this.i18n.t('tags.title');
+      case 'tag':
+        return this.tag()?.name ?? '';
       default:
         return '';
     }
