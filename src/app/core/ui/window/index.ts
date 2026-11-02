@@ -1,0 +1,5 @@
+/**
+ * The desktop window (search, the page assistant) — not in the kit's own index (core/ui), so the
+ * phones' code doesn't download it.
+ */
+export { UiWindow } from './window';

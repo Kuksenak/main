@@ -1,5 +1,6 @@
-import { afterNextRender, Component, DestroyRef, effect, ElementRef, inject, input, model, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, effect, ElementRef, input, model, output, signal, viewChild } from '@angular/core';
 import { Icon, IconName } from '../icon/icon';
+import { UiWindow } from '../window/window';
 
 /** A result of a `<ui-search-window>`: its icon, its name (a hint after it, gray), the section it's under. */
 export interface UiSearchResult {
@@ -11,7 +12,7 @@ export interface UiSearchResult {
 }
 
 /**
- * A search window, as Notion's (measured: 600 wide, results 36 tall; nothing dims): near the top of the screen — the field with its
+ * A search window, as Notion's (the shared `ui-window`; results 36 tall) — the field with its
  * loupe (`[(query)]`), the `results` under it by section (a section's name small and gray over its
  * first one; a result: its icon, its name, a hint after a dash), the picked one gray; at the bottom,
  * under a hairline, the keys (Esc, ↑↓, ↵). ↑ ↓ move, ↵ or a click picks (`picked`), Esc or a click
@@ -20,7 +21,7 @@ export interface UiSearchResult {
  */
 @Component({
   selector: 'ui-search-window',
-  imports: [Icon],
+  imports: [Icon, UiWindow],
   templateUrl: './search-window.html',
 })
 export class UiSearchWindow {
@@ -46,10 +47,6 @@ export class UiSearchWindow {
       this.index.set(0);
     });
     afterNextRender(() => this.field().nativeElement.focus());
-    // Esc closes it, from anywhere
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && this.closed.emit();
-    document.addEventListener('keydown', onKey);
-    inject(DestroyRef).onDestroy(() => document.removeEventListener('keydown', onKey));
   }
 
   protected key(e: KeyboardEvent): void {

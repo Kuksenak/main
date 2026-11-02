@@ -135,22 +135,17 @@
 <!-- The AI's chat: a window in the middle (desktop), a sheet (phones) -->
 @if (aiOpen() && page(); as p) {
   @if (desktop) {
-    <!-- Desktops: a window in the middle (as the old lesson's), nothing dimmed; a click outside or
-         Esc closes it -->
-    <div class="fixed inset-0 z-40 flex items-center justify-center p-4" (click)="aiOpen.set(false)" (document:keydown.escape)="aiOpen.set(false)">
-      <div
-        role="dialog"
-        class="flex h-[min(78vh,46rem)] max-h-full w-full max-w-3xl animate-menu-in flex-col gap-3 rounded-2xl bg-dialog p-4 shadow-popover"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="flex h-button items-center gap-2">
-          <app-icon name="sparkle" colored class="size-5 text-icon" />
-          <span class="flex-1 text-ui font-medium">{{ 'editor.ai' | t }}</span>
-          <button uiButton type="button" icon="close" (click)="aiOpen.set(false)" [attr.aria-label]="'search.close' | t"></button>
-        </div>
+    <!-- Desktops: the shared window (as the search's: near the top, Esc or a click outside closes
+         it), as tall as it may be; its head as the search's field row: ✨ and the name -->
+    <ui-window tall (closed)="aiOpen.set(false)">
+      <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
+        <app-icon name="sparkle" colored class="size-5 shrink-0 text-icon" />
+        <span class="flex-1 text-base text-fg">{{ 'editor.ai' | t }}</span>
+      </div>
+      <div class="flex min-h-0 flex-1 flex-col px-4.5 pb-4.5">
         <app-ai-chat [pageId]="p.id" [page]="pageText()" (add)="editor()?.insert($event)" />
       </div>
-    </div>
+    </ui-window>
   } @else {
     <ui-sheet [tall]="true" (closed)="aiOpen.set(false)">
       <span sheetHead class="text-body font-semibold">{{ 'editor.ai' | t }}</span>

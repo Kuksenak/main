@@ -7,6 +7,7 @@ import { desktop } from '../core/device';
 import { Icon, Toasts, UiButton, UiList, UiListItem, UiSheet } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
+import { UiWindow } from '../core/ui/window';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
 import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
@@ -28,7 +29,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTip],
+  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTip, UiWindow],
   templateUrl: './page.html',
 })
 export class PageView {

@@ -14,8 +14,9 @@
   (`core/device.ts`; e.g. app.routes loads `DesktopLayout` or `MobileLayout`). Then neither device
   downloads the other's code.
 - Pieces of one device only stay out of the kit's index (else the other device downloads them
-  too): the desktop's menus (`core/ui/menu`, CDK overlay), sidebar (`core/ui/sidebar`) and search
-  window (`core/ui/search`) are imported from their own folders.
+  too): the desktop's menus (`core/ui/menu`, CDK overlay), sidebar (`core/ui/sidebar`), window
+  (`core/ui/window`: the search's and the assistant's frame) and search window (`core/ui/search`) are
+  imported from their own folders.
 
 ## Styles
 - Tailwind classes only, in the markup or in `host: { class: … }`. States are variants too:
