@@ -55,7 +55,7 @@
     </div>
     <!-- (a page's row: its icon, its name, ⋯ under the pointer) -->
     <ng-template #pageRow let-page>
-      <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]" class="pl-3.5!">
+      <a uiSidebarItem icon="page" [tint]="tint(page)" [routerLink]="['/library', page.id]" class="pl-3.5!">
         {{ page.title.trim() || ('library.untitled' | t) }}
         <button
           itemEnd

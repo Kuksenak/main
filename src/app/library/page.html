@@ -40,6 +40,25 @@
           <app-icon name="enter" class="size-3.5" />
         </button>
       </form>
+      <!-- Its tags, after its name (a click: the picker — as Notion's); none: a quiet + Tag -->
+      <button
+        #tagsBtn
+        type="button"
+        (click)="tagsOpen.set(!tagsOpen())"
+        [attr.aria-expanded]="tagsOpen()"
+        [attr.aria-label]="'tags.title' | t"
+        class="ml-1 flex h-7 min-w-0 shrink items-center gap-1 overflow-hidden rounded-md px-1.5 text-footnote text-fg-secondary hover:bg-tint aria-expanded:bg-tint"
+      >
+        @for (tag of tags.of(p.tagIds); track tag.id) {
+          <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+        } @empty {
+          <app-icon name="plus" class="size-3.5" />
+          {{ 'tags.add' | t }}
+        }
+      </button>
+      @if (tagsOpen()) {
+        <app-tag-picker [origin]="tagsBtn" [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagsOpen.set(false)" />
+      }
     </div>
     @if (saving()) {
       <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>

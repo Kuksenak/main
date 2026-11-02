@@ -82,12 +82,15 @@
                   [attr.aria-selected]="picked().has(item.id)"
                   class="group flex h-8 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-md px-2 text-left outline-none hover:bg-tint focus-visible:bg-tint aria-selected:bg-accent/10"
                 >
-                  <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
+                  <app-icon name="page" colored [tint]="tint(item)" class="size-5 shrink-0 text-icon" />
                   <span
                     class="min-w-0 truncate text-ui text-fg"
                     [class.text-fg-secondary]="!item.title.trim()"
                     >{{ item.title.trim() || ('library.untitled' | t) }}</span
                   >
+                  @for (tag of tags.of(item.tagIds); track tag.id) {
+                    <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+                  }
                   <span class="flex-1"></span>
                   <button
                     #more

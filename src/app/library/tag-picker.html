@@ -1,0 +1,102 @@
+<!-- The page's tags (as Notion's): a field — the chosen ones in it (× takes one off; Backspace in an
+     empty field, the last), what's typed after them; under it the account's tags (typed: those with
+     it) — a click puts one on / takes it off, ⋯ (under the pointer): its name, its color, Delete;
+     typed a new name: Create, in the next color. ↑ ↓ Enter too. -->
+<ui-menu [origin]="origin()" (closed)="closed.emit()">
+  <div class="flex w-72 flex-col gap-1">
+    @if (editing(); as tag) {
+      <!-- A tag's own: its name (typed over), its color, Delete; ‹ back -->
+      <div class="flex items-center gap-1">
+        <button uiButton type="button" icon="chevron-left" (click)="editing.set(null)" [attr.aria-label]="'action.back' | t"></button>
+        <input
+          #name
+          type="text"
+          [value]="tag.name"
+          (change)="rename(tag, name.value)"
+          (keydown.enter)="rename(tag, name.value); editing.set(null)"
+          maxlength="40"
+          class="h-8 min-w-0 flex-1 rounded-md bg-tint px-2 text-ui text-fg outline-none"
+        />
+      </div>
+      <p class="px-2 pt-1 text-footnote text-fg-secondary">{{ 'tags.colors' | t }}</p>
+      @for (color of colors; track color) {
+        <button
+          type="button"
+          (click)="recolor(tag, color)"
+          class="flex min-h-menu-row items-center gap-2.5 rounded-button px-menu-row-x text-left text-ui hover:bg-tint-strong"
+        >
+          <ui-tag [color]="color" class="w-5 px-0!">&nbsp;</ui-tag>
+          <span class="flex-1">{{ colorLabel[color] | t }}</span>
+          @if (tag.color === color) {
+            <app-icon name="check" class="size-4" />
+          }
+        </button>
+      }
+      <div class="my-1 h-px bg-separator"></div>
+      <button
+        type="button"
+        (click)="remove(tag)"
+        class="flex min-h-menu-row items-center gap-2.5 rounded-button px-menu-row-x text-left text-ui text-danger hover:bg-tint-strong"
+      >
+        <app-icon name="trash" class="size-icon-menu" />
+        {{ 'tags.delete' | t }}
+      </button>
+    } @else {
+      <!-- The field: the chosen ones, then what's typed -->
+      <div class="flex min-h-8 flex-wrap items-center gap-1 rounded-md bg-tint px-1.5 py-1">
+        @for (tag of chosen(); track tag.id) {
+          <ui-tag [color]="tag.color" class="pr-0.5">
+            {{ tag.name }}
+            <button type="button" (click)="toggle(tag)" [attr.aria-label]="'tags.remove' | t" class="ml-0.5 grid size-4 place-items-center rounded-sm opacity-60 hover:opacity-100">
+              <app-icon name="close" class="size-3" />
+            </button>
+          </ui-tag>
+        }
+        <input
+          #field
+          type="text"
+          autocomplete="off"
+          maxlength="40"
+          [value]="query()"
+          (input)="query.set(field.value); index.set(0)"
+          (keydown)="key($event)"
+          [placeholder]="chosen().length ? '' : ('tags.placeholder' | t)"
+          class="h-6 min-w-16 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
+        />
+      </div>
+      <p class="px-2 pt-1 text-footnote text-fg-secondary">{{ 'tags.hint' | t }}</p>
+      <div class="flex max-h-64 flex-col overflow-y-auto">
+        @for (option of options(); track option.key; let i = $index) {
+          <div
+            role="option"
+            [attr.aria-selected]="i === index()"
+            (click)="pickOption(option)"
+            (mouseenter)="index.set(i)"
+            class="group flex min-h-menu-row cursor-pointer items-center gap-2 rounded-button px-menu-row-x text-ui aria-selected:bg-tint-strong"
+          >
+            @if (option.tag; as tag) {
+              <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+              <span class="flex-1"></span>
+              @if (isChosen(tag)) {
+                <app-icon name="check" class="size-4" />
+              }
+              <button
+                type="button"
+                (click)="$event.stopPropagation(); editing.set(tag)"
+                [attr.aria-label]="'tags.edit' | t"
+                class="grid size-6 place-items-center rounded-md text-icon opacity-0 group-hover:opacity-100 hover:bg-tint-strong"
+              >
+                <app-icon name="dots" class="size-4" />
+              </button>
+            } @else {
+              <span class="text-fg-secondary">{{ 'tags.create' | t }}</span>
+              <ui-tag [color]="nextColor()">{{ query().trim() }}</ui-tag>
+            }
+          </div>
+        } @empty {
+          <p class="px-2 py-2 text-ui text-fg-secondary">{{ 'tags.none' | t }}</p>
+        }
+      </div>
+    }
+  </div>
+</ui-menu>

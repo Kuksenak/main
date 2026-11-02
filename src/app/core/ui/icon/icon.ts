@@ -75,7 +75,17 @@ export type IconName = (typeof ICONS)[number];
       @if (colored()) {
         <!-- (small, coloured in: the pastel under, the lines over it in the text's color) -->
         <span class="relative block size-full">
-          <img [src]="fillsUrl()" alt="" draggable="false" class="absolute inset-0 size-full select-none dark:invert dark:hue-rotate-180" />
+          @if (tint(); as tint) {
+            <!-- (its pastel another's: the fills' shapes painted with it) -->
+            <span
+              class="absolute inset-0 block [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+              [style.background]="tint"
+              [style.mask-image]="'url(&quot;' + fillsUrl() + '&quot;)'"
+              [style.-webkit-mask-image]="'url(&quot;' + fillsUrl() + '&quot;)'"
+            ></span>
+          } @else {
+            <img [src]="fillsUrl()" alt="" draggable="false" class="absolute inset-0 size-full select-none dark:invert dark:hue-rotate-180" />
+          }
           <span
             class="absolute inset-0 block bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
             [style.mask-image]="linesUrl()"
@@ -101,6 +111,8 @@ export class Icon {
   readonly filled = input(false, { transform: booleanAttribute });
   // (small and coloured in: menus, rows — the pastel, a thinner marker)
   readonly colored = input(false, { transform: booleanAttribute });
+  // (coloured in with another pastel: a CSS color — a page's tag's, tagTint)
+  readonly tint = input<string | null>(null);
   // (the brands' marks: drawn here; the rest: their files)
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
   // (from the app's own code, not a file each: no request each — ICON_DATA, tools/icons.py)

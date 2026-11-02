@@ -8,7 +8,7 @@ const ROW =
   'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-fg ' +
   'aria-expanded:bg-side-on';
 const TEMPLATE = `
-  <app-icon [name]="icon()" colored class="size-icon-side text-icon" />
+  <app-icon [name]="icon()" colored [tint]="tint()" class="size-icon-side text-icon" />
   <span class="min-w-0 flex-1 truncate"><ng-content /></span>
   <ng-content select="[itemEnd]" />
 `;
@@ -31,6 +31,8 @@ const TEMPLATE = `
 })
 export class UiSidebarItem {
   readonly icon = input.required<IconName>();
+  /** (its icon coloured in with another pastel: a page's tag's) */
+  readonly tint = input<string | null>(null);
 
   constructor() {
     // (the current one: marked by aria-current, which its look follows — no class of its own)
@@ -50,6 +52,8 @@ export class UiSidebarItem {
 })
 export class UiSidebarButton {
   readonly icon = input.required<IconName>();
+  /** (its icon coloured in with another pastel: a page's tag's) */
+  readonly tint = input<string | null>(null);
   /** (the element: what a `<ui-menu>` opens at) */
   readonly element: HTMLElement = inject(ElementRef).nativeElement;
 }

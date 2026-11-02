@@ -4,10 +4,11 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, IconName, Toasts, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
+import { Icon, IconName, tagTint, Toasts, UiButton, UiFloatingButton, UiList, UiListItem, UiTag } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 import { PageMenu } from './page-menu';
+import { TagsStore } from './tags.store';
 
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
@@ -21,7 +22,7 @@ type View = 'recents' | 'favorites' | 'published';
 
 @Component({
   selector: 'app-library',
-  imports: [Icon, PageMenu, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem],
+  imports: [Icon, PageMenu, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem, UiTag],
   templateUrl: './library.html',
 })
 export class Library {
@@ -38,6 +39,12 @@ export class Library {
     { id: 'published', label: 'library.published', icon: 'globe' },
   ];
   protected readonly view = signal<View>('recents');
+  // The tags: after a page's name; its icon in its first tag's pastel
+  protected readonly tags = inject(TagsStore);
+  protected tint(item: PageItem): string | null {
+    return tagTint(this.tags.of(item.tagIds)[0]?.color);
+  }
+
   // The date groups folded away (kept on this device)
   protected readonly folded = signal<string[]>(readFolded());
   protected fold(key: string): void {
@@ -96,6 +103,7 @@ export class Library {
   constructor() {
     inject(PageTitle).show(computed(() => this.i18n.t('nav.library')));
     this.store.load();
+    this.tags.load();
   }
 
   protected open(item: PageItem): void {

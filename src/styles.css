@@ -43,6 +43,24 @@
   --color-toast-text: var(--toast-text);
   --color-toast-action: var(--toast-action);
   --color-loading: var(--loading);
+  --color-tag-gray: var(--tag-gray);
+  --color-tag-gray-text: var(--tag-gray-text);
+  --color-tag-brown: var(--tag-brown);
+  --color-tag-brown-text: var(--tag-brown-text);
+  --color-tag-orange: var(--tag-orange);
+  --color-tag-orange-text: var(--tag-orange-text);
+  --color-tag-yellow: var(--tag-yellow);
+  --color-tag-yellow-text: var(--tag-yellow-text);
+  --color-tag-green: var(--tag-green);
+  --color-tag-green-text: var(--tag-green-text);
+  --color-tag-blue: var(--tag-blue);
+  --color-tag-blue-text: var(--tag-blue-text);
+  --color-tag-purple: var(--tag-purple);
+  --color-tag-purple-text: var(--tag-purple-text);
+  --color-tag-pink: var(--tag-pink);
+  --color-tag-pink-text: var(--tag-pink-text);
+  --color-tag-red: var(--tag-red);
+  --color-tag-red-text: var(--tag-red-text);
   --color-grabber: var(--grabber);
   --color-highlight: var(--highlight);
 

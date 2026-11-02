@@ -5,7 +5,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, IconName, UiAvatar, UiButton, UiScrollBar } from '../core/ui';
+import { Icon, IconName, tagTint, UiAvatar, UiButton, UiScrollBar } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow } from '../core/ui/window';
@@ -14,6 +14,7 @@ import { TranslationKey } from '../core/i18n/translations';
 import { Toasts } from '../core/ui';
 import { TrashList } from '../library/trash-list';
 import { PageMenu } from '../library/page-menu';
+import { TagsStore } from '../library/tags.store';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
 import { Search } from './search';
@@ -84,6 +85,12 @@ export class DesktopLayout {
     write(FOLDED, this.folded().join(','));
   }
 
+  // A page's icon: in its first tag's pastel
+  private readonly tags = inject(TagsStore);
+  protected tint(page: PageItem): string | null {
+    return tagTint(this.tags.of(page.tagIds)[0]?.color);
+  }
+
   // A page's ⋯: its menu, at the button
   protected readonly rowMenu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
   private readonly toasts = inject(Toasts);
@@ -116,7 +123,10 @@ export class DesktopLayout {
   protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl+K';
 
   constructor() {
-    if (this.library()) this.store.load();
+    if (this.library()) {
+      this.store.load();
+      this.tags.load();
+    }
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'k' && (this.mac ? e.metaKey : e.ctrlKey)) {
         e.preventDefault();

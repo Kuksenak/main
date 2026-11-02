@@ -14,6 +14,8 @@ export interface PageItem {
   favorite: boolean;
   // (it has a public link)
   published?: boolean;
+  // (its tags: TagsStore's, in the order given)
+  tagIds?: string[];
 }
 
 /** A block of a page's content: a text right on it, or a card (set apart: material, what the AI wrote). */
@@ -102,6 +104,26 @@ export class LibraryStore {
     );
   }
 
+  /** A page's tags, as a whole (the list follows at once; back as it was if that fails). */
+  setTags(id: string, tagIds: string[]): Observable<Page> {
+    const before = this.items()?.find((x) => x.id === id)?.tagIds ?? [];
+    const set = (ids: string[]) => this.items.update((items) => items?.map((x) => (x.id === id ? { ...x, tagIds: ids } : x)) ?? null);
+    set(tagIds);
+    return this.http.put<Page>(`${this.url}/${id}/tags`, { tagIds }).pipe(
+      tap({
+        error: () => {
+          set(before);
+          this.toasts.error(this.i18n.t('library.saveError'));
+        },
+      }),
+    );
+  }
+
+  /** A tag gone: off the pages here too. */
+  untag(tagId: string): void {
+    this.items.update((items) => items?.map((x) => (x.tagIds?.includes(tagId) ? { ...x, tagIds: x.tagIds.filter((t) => t !== tagId) } : x)) ?? null);
+  }
+
   /** In the favorites or not (the list follows at once; back as it was if that fails). */
   favorite(id: string, on: boolean): Observable<Page> {
     this.mark(id, on);
@@ -171,7 +193,14 @@ export class LibraryStore {
 
   // (a page made or changed: to the top of the list, as the API orders it)
   private put(page: Page): void {
-    const item: PageItem = { id: page.id, title: page.title, updatedAt: page.updatedAt, favorite: page.favorite, published: !!page.shareToken };
+    const item: PageItem = {
+      id: page.id,
+      title: page.title,
+      updatedAt: page.updatedAt,
+      favorite: page.favorite,
+      published: !!page.shareToken,
+      tagIds: page.tagIds,
+    };
     this.items.update((items) => (items ? [item, ...items.filter((x) => x.id !== item.id)] : items));
   }
 

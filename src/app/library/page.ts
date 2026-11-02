@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Icon, Toasts, UiButton, UiList, UiListItem, UiSheet } from '../core/ui';
+import { Icon, Toasts, UiButton, UiList, UiListItem, UiSheet, UiTag } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow } from '../core/ui/window';
@@ -13,6 +13,8 @@ import { AiChat } from './ai-chat';
 import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
 import { shown } from './marks';
 import { PageEditor } from './page-editor';
+import { TagPicker } from './tag-picker';
+import { TagsStore } from './tags.store';
 
 // How long after the last keystroke a change is saved
 const SAVE_AFTER_MS = 700;
@@ -24,12 +26,12 @@ const SAVE_AFTER_MS = 700;
  * AI (the editor's "/" or its bar, desktop: the button at the top): its chat (AiChat) — a sheet
  * (phones) or a window in the middle (desktop); its texts go in after the caret's block.
  * Delete: the page gone, back to the library. Desktops: one row at the top — the title, the
- * title (typed over right there), the assistant, ⋯ (Duplicate, Delete; when edited, made).
+ * title (typed over right there), its tags (a click: TagPicker), the assistant, ⋯ (Duplicate, Delete; when edited, made).
  * Phones: the title in the top bar, ‹ back to the library.
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTip, UiWindow],
+  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, TagPicker],
   templateUrl: './page.html',
 })
 export class PageView {
@@ -50,6 +52,8 @@ export class PageView {
   protected readonly desktop = desktop;
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
+  protected readonly tagsOpen = signal(false);
+  protected readonly tags = inject(TagsStore);
   // Phones: the page read only; its actions in a sheet (the top bar's ⋯)
   protected readonly actionsOpen = signal(false);
   protected readonly shown = shown;
@@ -208,6 +212,14 @@ export class PageView {
   protected shareLink(): void {
     const token = this.page()?.shareToken;
     if (token) navigator.share?.({ title: this.title(), url: shareUrl(token) }).catch(() => {});
+  }
+
+  // Its tags: picked at the top row (the library's list follows)
+  protected setTags(tagIds: string[]): void {
+    const page = this.page();
+    if (!page) return;
+    this.page.set({ ...page, tagIds });
+    this.store.setTags(page.id, tagIds).subscribe({ error: () => this.page.update((x) => (x ? { ...x, tagIds: page.tagIds } : x)) });
   }
 
   protected favorite(): void {
