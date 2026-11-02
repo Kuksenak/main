@@ -31,6 +31,7 @@
   - colors (light and dark) in `src/styles/base.css`;
   - sizes per device in `src/styles/mobile.css` / `desktop.css`.
 - Never raw colors, and no `[var(--…)]` where a token name exists.
+- Phones' glass (floating buttons, the top bar's choice, …) is the `glass` utility (styles.css).
 - Plain CSS only where Tailwind can't: `src/styles/base.css` (page defaults) and
   `src/styles/components.css` (`btn-strong`, the rotate hint).
 - No SCSS: Tailwind v4 doesn't work with Sass.
@@ -44,8 +45,8 @@ The account sheet's language list sets the size for everything on phones:
 - 28px icons (`size-icon-menu`), ✓ / › 20px;
 - hairlines between rows from the text on;
 - round buttons 44px (`h-round`), as iOS's;
-- a card's title over it (as iOS 26's Settings): `text-body font-semibold text-fg-secondary`,
-  `px-row-x`, no icon; a note under one: `text-footnote text-fg-secondary`.
+- a card's title over it (as iOS 26's Settings): `<ui-list-title>` (`text-body font-semibold
+  text-fg-secondary`, `px-row-x`, no icon); a note under one: `text-footnote text-fg-secondary`.
 
 New phone screens use these tokens (`styles/mobile.css`), not sizes of their own.
 
@@ -60,7 +61,7 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 
 ## Toasts
 - Errors (a call that failed) and short notices ("Deleted · Undo") are toasts: `inject(Toasts)`
-  (`core/ui`) — `.error(text)`, `.show(text, { label, run })`. No red lines in the page for them.
+  (`core/ui`) — `.error(text)` (a failed call: `.fail('its.key')`), `.show(text, { label, run })`. No red lines in the page for them.
   `<ui-toasts />` in app.html shows them (phones: a bar as wide as the screen at the bottom, over the floating buttons; desktops: the bottom right corner, as wide as the sidebar, scrolling past 80vh).
 
 ## Status bar color (keeps breaking — read before touching it)
