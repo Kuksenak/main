@@ -23,7 +23,8 @@
     }
     <!-- The library's pages: Recents (the 5 last changed), then Favorites — each a row as a place's (its
          icon, its name, ⌄ / ⌃: a click folds it away / back), its pages under it: their icon, their
-         name, ⋯ under the pointer (its menu). Only the favorites scroll (all else stays), fading out at
+         name, ⋯ under the pointer (its menu). The favorites scroll on their own (as tall as they are, at
+         most what's left), fading out at
          the bottom; scrolled: a hairline over them, their top fading under it too; their scroll bar
          over them (the system's took room from the rows) -->
     @for (list of lists(); track list.id) {
@@ -43,7 +44,7 @@
       uiScrollBar
       (scroll)="listsScrolled.set(scroller.scrollTop > 0)"
       [attr.data-scrolled]="listsScrolled() ? '' : null"
-      class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4
+      class="-mx-3 flex min-h-0 flex-initial flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4
              [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] data-scrolled:border-separator
              data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-2rem),transparent)]"
     >
@@ -52,12 +53,14 @@
           <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
         }
       }
-      <!-- (then the tags, as folders, in a row with Favorites: a click — their pages; a page dropped on
-           one — tagged so) -->
-      @if (library()) {
-        <app-sidebar-tags />
-      }
     </div>
+    <!-- Then the tags, as folders, right under Favorites — their own scroll (a third of the height at
+         most): a click — their pages; a page dropped on one — tagged so -->
+    @if (library()) {
+      <div class="-mx-3 flex max-h-[35vh] min-h-0 shrink-0 flex-col gap-px overflow-y-auto px-3 pb-2 [scrollbar-width:thin]">
+        <app-sidebar-tags />
+      </div>
+    }
     <!-- (a page's row: its icon, its name, ⋯ under the pointer; dragged onto a tag: tagged so) -->
     <ng-template #pageRow let-page>
       <a uiSidebarItem icon="page" [tint]="tint(page)" [routerLink]="['/library', page.id]" draggable="true" (dragstart)="drag($event, page)" class="pl-3.5!">
