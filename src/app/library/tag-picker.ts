@@ -2,18 +2,18 @@ import { Component, inject, input, output, signal, viewChild } from '@angular/co
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon, TAG_COLORS, TagColor, UiTag } from '../core/ui';
-import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
+import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { Tag, TagsStore } from './tags.store';
 
 /**
  * Desktop: a page's tag picked at `origin`, as a choice of a few (the language's look): No tag, the
  * account's tags (✓ the chosen one); a click picks it (one a page, for now). A field at the bottom:
- * a new name, Enter — made in the next color and picked. A tag's ⋯ (under the pointer): its colors
- * (a dot each) and Delete under it. `changed`: the page's tags now (one, or none).
+ * a new name, Enter — made in the next color and picked. A tag's ⋯ (under the pointer): the menu its
+ * own — its name, its colors as rows, Delete; ‹ back. `changed`: the page's tags now (one, or none).
  */
 @Component({
   selector: 'app-tag-picker',
-  imports: [Icon, TranslatePipe, UiMenu, UiMenuItem, UiMenuSeparator, UiTag],
+  imports: [Icon, TranslatePipe, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiTag],
   templateUrl: './tag-picker.html',
 })
 export class TagPicker {
@@ -24,8 +24,8 @@ export class TagPicker {
 
   protected readonly store = inject(TagsStore);
   protected readonly colors = TAG_COLORS;
-  // (a color's dot: its pastel, whole classes for Tailwind)
-  protected readonly dot: Record<TagColor, string> = {
+  // (a color's swatch: its pastel, whole classes for Tailwind)
+  protected readonly swatch: Record<TagColor, string> = {
     gray: 'bg-tag-gray',
     brown: 'bg-tag-brown',
     orange: 'bg-tag-orange',
@@ -47,8 +47,8 @@ export class TagPicker {
     pink: 'tags.pink',
     red: 'tags.red',
   };
-  // The tag whose ⋯ was clicked: its colors and Delete under it
-  protected readonly editing = signal<string | null>(null);
+  // The tag whose ⋯ was clicked: the menu its own (its name, colors, Delete)
+  protected readonly editing = signal<Tag | null>(null);
   private readonly menu = viewChild.required(UiMenu);
 
   constructor() {
@@ -68,7 +68,15 @@ export class TagPicker {
   }
 
   protected recolor(tag: Tag, color: TagColor): void {
-    this.store.update({ ...tag, color });
+    const recolored = { ...tag, color };
+    this.store.update(recolored);
+    this.editing.set(recolored);
+  }
+
+  protected rename(tag: Tag, name: string): void {
+    const trimmed = name.trim();
+    if (!trimmed || trimmed === tag.name) return;
+    this.store.update({ ...tag, name: trimmed });
   }
 
   protected remove(tag: Tag): void {

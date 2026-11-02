@@ -1,64 +1,87 @@
 <!-- A page's tag, as a choice of a few (as the language's): No tag, the account's tags (the chosen
      one ✓) — a click picks it; at the bottom a field: a new tag's name, Enter makes it (the next
-     color) and picks it. A tag's ⋯ (at its right, under the pointer): its colors and Delete, right
-     under it. -->
+     color) and picks it. A tag's ⋯ (at its right, under the pointer): the menu becomes the tag's own,
+     as Notion's — its name (typed over), its colors as rows (✓ the one it has), Delete; ‹ back. -->
 <ui-menu narrow [origin]="origin()" (closed)="closed.emit()">
-  <button type="button" uiMenuItem [checked]="!tagIds().length" (click)="pick(null)">
-    <span class="text-fg-secondary">{{ 'tags.noTag' | t }}</span>
-  </button>
-  @for (tag of store.tags(); track tag.id) {
-    <!-- (a row: the tag — a click picks it; ⋯ at its right under the pointer: its colors and Delete under it) -->
-    <div class="group/tag flex items-center">
-      <button type="button" uiMenuItem [checked]="tagIds().includes(tag.id)" (click)="pick(tag.id)" class="w-auto! min-w-0 flex-1">
-        <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
-      </button>
+  @if (editing(); as tag) {
+    <div class="flex items-center gap-1 pb-1">
       <button
         type="button"
-        (click)="editing.set(editing() === tag.id ? null : tag.id)"
-        [attr.aria-expanded]="editing() === tag.id"
-        [attr.aria-label]="'tags.edit' | t"
-        class="ml-0.5 grid size-7 shrink-0 place-items-center rounded-button text-icon opacity-0 group-hover/tag:opacity-100 hover:bg-tint-strong aria-expanded:bg-tint-strong aria-expanded:opacity-100"
+        (click)="editing.set(null)"
+        [attr.aria-label]="'action.back' | t"
+        class="grid size-8 shrink-0 place-items-center rounded-button text-icon hover:bg-tint-strong"
       >
-        <app-icon name="dots" class="size-5" />
+        <app-icon name="chevron-left" class="size-icon-menu" />
       </button>
+      <input
+        #name
+        type="text"
+        maxlength="40"
+        autocomplete="off"
+        [value]="tag.name"
+        (keydown)="$event.stopPropagation()"
+        (keydown.enter)="rename(tag, name.value); editing.set(null)"
+        (blur)="rename(tag, name.value)"
+        class="h-8 min-w-0 flex-1 rounded-button bg-tint px-2 text-ui text-fg outline-none"
+      />
     </div>
-    @if (editing() === tag.id) {
-      <!-- (its colors, a dot each — the one it has ringed; Delete at the end) -->
-      <div class="flex items-center gap-1.5 px-menu-row-x pt-0.5 pb-1.5">
-        @for (color of colors; track color) {
-          <button
-            type="button"
-            (click)="recolor(tag, color)"
-            [attr.aria-label]="colorLabel[color] | t"
-            [attr.aria-pressed]="tag.color === color"
-            class="size-4 rounded-full ring-fg ring-offset-1 ring-offset-dialog aria-pressed:ring-2"
-            [class]="dot[color]"
-          ></button>
+    <ui-menu-label>{{ 'tags.color' | t }}</ui-menu-label>
+    @for (color of colors; track color) {
+      <!-- (not menu items: a click here keeps the menu open) -->
+      <button
+        type="button"
+        (click)="recolor(tag, color)"
+        class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui text-fg hover:bg-tint-strong"
+      >
+        <span class="size-4.5 shrink-0 rounded-[0.3rem]" [class]="swatch[color]"></span>
+        <span class="flex-1">{{ colorLabel[color] | t }}</span>
+        @if (tag.color === color) {
+          <app-icon name="check" class="size-icon-menu" />
         }
-        <span class="flex-1"></span>
+      </button>
+    }
+    <ui-menu-separator />
+    <button
+      type="button"
+      (click)="remove(tag)"
+      class="flex min-h-menu-row w-full items-center gap-2 rounded-button px-menu-row-x py-1 text-left text-ui text-fg hover:bg-tint-strong hover:text-danger"
+    >
+      <app-icon name="trash" class="size-icon-menu" />
+      {{ 'tags.delete' | t }}
+    </button>
+  } @else {
+    <button type="button" uiMenuItem [checked]="!tagIds().length" (click)="pick(null)">
+      <span class="text-fg-secondary">{{ 'tags.noTag' | t }}</span>
+    </button>
+    @for (tag of store.tags(); track tag.id) {
+      <!-- (a row: the tag — a click picks it; ⋯ at its right under the pointer: the tag's own menu) -->
+      <div class="group/tag flex items-center">
+        <button type="button" uiMenuItem [checked]="tagIds().includes(tag.id)" (click)="pick(tag.id)" class="w-auto! min-w-0 flex-1">
+          <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+        </button>
         <button
           type="button"
-          (click)="remove(tag)"
-          [attr.aria-label]="'tags.delete' | t"
-          class="grid size-6 place-items-center rounded-md text-icon hover:bg-tint-strong hover:text-danger"
+          (click)="editing.set(tag)"
+          [attr.aria-label]="'tags.edit' | t"
+          class="ml-0.5 grid size-8 shrink-0 place-items-center rounded-button text-icon opacity-0 group-hover/tag:opacity-100 hover:bg-tint-strong"
         >
-          <app-icon name="trash" class="size-4" />
+          <app-icon name="dots" class="size-icon-menu" />
         </button>
       </div>
     }
+    <ui-menu-separator />
+    <div class="flex h-8 items-center gap-2 px-menu-row-x">
+      <app-icon name="hash" class="size-icon-menu shrink-0 text-icon" />
+      <input
+        #field
+        type="text"
+        maxlength="40"
+        autocomplete="off"
+        [placeholder]="'tags.new' | t"
+        (keydown)="$event.stopPropagation()"
+        (keydown.enter)="create(field.value)"
+        class="min-w-0 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
+      />
+    </div>
   }
-  <ui-menu-separator />
-  <div class="flex h-8 items-center gap-2 px-menu-row-x">
-    <app-icon name="hash" class="size-icon-menu shrink-0 text-icon" />
-    <input
-      #field
-      type="text"
-      maxlength="40"
-      autocomplete="off"
-      [placeholder]="'tags.new' | t"
-      (keydown)="$event.stopPropagation()"
-      (keydown.enter)="create(field.value)"
-      class="min-w-0 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
-    />
-  </div>
 </ui-menu>
