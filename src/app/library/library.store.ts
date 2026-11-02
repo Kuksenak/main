@@ -12,6 +12,8 @@ export interface PageItem {
   updatedAt: string;
   // (in the favorites: the sidebar's, the library's top)
   favorite: boolean;
+  // (it has a public link)
+  published?: boolean;
 }
 
 /** A block of a page's content: a text right on it, or a card (set apart: material, what the AI wrote). */
@@ -90,7 +92,9 @@ export class LibraryStore {
 
   /** Published (on: its link made — the same one again if it had one) or not. */
   share(id: string, on: boolean): Observable<Page> {
-    return this.http.put<Page>(`${this.url}/${id}/shared`, { on });
+    return this.http.put<Page>(`${this.url}/${id}/shared`, { on }).pipe(
+      tap(() => this.items.update((items) => items?.map((x) => (x.id === id ? { ...x, published: on } : x)) ?? null)),
+    );
   }
 
   /** In the favorites or not (the list follows at once; back as it was if that fails). */
@@ -148,7 +152,7 @@ export class LibraryStore {
 
   // (a page made or changed: to the top of the list, as the API orders it)
   private put(page: Page): void {
-    const item: PageItem = { id: page.id, title: page.title, updatedAt: page.updatedAt, favorite: page.favorite };
+    const item: PageItem = { id: page.id, title: page.title, updatedAt: page.updatedAt, favorite: page.favorite, published: !!page.shareToken };
     this.items.update((items) => (items ? [item, ...items.filter((x) => x.id !== item.id)] : items));
   }
 

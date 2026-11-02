@@ -4,17 +4,19 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, Toasts, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
+import { Icon, IconName, Toasts, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
- * Desktops: a row at the top as a page's (the name; a filter, New page), the pages by when they were
- * changed (Today, 7 days, 30 days, older), a row each as Notion's. Phones: the pages on a card, +
+ * Desktops, as Notion's: the name big, the views as pills (Recents: all; Favorites; Published) and New
+ * page, the view's pages by when they were changed (Today, 7 days, 30 days, older), a row each. Phones: the pages on a card, +
  * floating at the bottom right (Trash: the account's sheet).
  */
+type View = 'recents' | 'favorites' | 'published';
+
 @Component({
   selector: 'app-library',
   imports: [Icon, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem],
@@ -27,13 +29,18 @@ export class Library {
 
   protected readonly desktop = desktop;
   protected readonly creating = signal(false);
-  // Desktops: the filter's words (the pages whose names have them)
-  protected readonly filter = signal('');
+  // Desktops: the views — all the pages, the favorites, the published ones
+  protected readonly views: { id: View; label: TranslationKey; icon: IconName }[] = [
+    { id: 'recents', label: 'library.recents', icon: 'update' },
+    { id: 'favorites', label: 'library.favorites', icon: 'bookmark' },
+    { id: 'published', label: 'library.published', icon: 'globe' },
+  ];
+  protected readonly view = signal<View>('recents');
 
-  // The pages (filtered) by when they were changed: Today, the last 7 days, 30, older (only those with any)
+  // The view's pages by when they were changed: Today, the last 7 days, 30, older (only those with any)
   protected readonly groups = computed(() => {
-    const words = this.filter().trim().toLowerCase();
-    const items = (this.store.items() ?? []).filter((i) => !words || i.title.toLowerCase().includes(words));
+    const view = this.view();
+    const items = (this.store.items() ?? []).filter((i) => view === 'recents' || (view === 'favorites' ? i.favorite : i.published));
     const day = new Date();
     day.setHours(0, 0, 0, 0);
     const today = day.getTime();

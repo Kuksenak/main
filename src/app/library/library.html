@@ -1,27 +1,24 @@
 @if (desktop) {
-  <!-- Desktops: a thin row at the top, as a page's (48 tall, staying as it scrolls): the section's
-       name at the left; a filter field (as the sidebar's Search) and New page at the right -->
-  <div class="sticky top-0 z-20 flex h-12 items-center gap-2 bg-app pr-3 pl-8">
-    <h1 class="min-w-0 flex-1 truncate pl-2 text-ui font-semibold">{{ 'nav.library' | t }}</h1>
-    <label
-      class="flex h-8 w-56 items-center gap-2 rounded-lg border-[0.8px] border-fg/7 px-2 text-ui text-fg-secondary hover:bg-side-hover focus-within:bg-side"
-    >
-      <app-icon name="search" class="size-4 shrink-0 text-icon" />
-      <input
-        #filterField
-        type="text"
-        autocomplete="off"
-        [value]="filter()"
-        (input)="filter.set(filterField.value)"
-        (keydown.escape)="filter.set(''); filterField.value = ''"
-        [placeholder]="'library.filter' | t"
-        class="min-w-0 flex-1 bg-transparent text-fg outline-none placeholder:text-fg-secondary"
-      />
-    </label>
-    <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
-  </div>
+  <!-- Desktops, as Notion's: the section's name big, under it the views as pills (an icon, its name;
+       the one shown: a gray pill) and New page at the right; then the pages -->
+  <div class="flex flex-col px-8 pt-10 pb-12">
+    <h1 class="px-2 text-[2rem] leading-tight font-bold">{{ 'nav.library' | t }}</h1>
+    <div class="mt-4 mb-2 flex items-center gap-1">
+      @for (v of views; track v.id) {
+        <button
+          type="button"
+          (click)="view.set(v.id)"
+          [attr.aria-pressed]="view() === v.id"
+          class="flex h-8 items-center gap-1.5 rounded-full px-3 text-ui text-fg-secondary hover:bg-tint aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
+        >
+          <app-icon [name]="v.icon" class="size-4.5" />
+          {{ v.label | t }}
+        </button>
+      }
+      <span class="flex-1"></span>
+      <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
+    </div>
 
-  <div class="flex flex-col px-8 pt-4 pb-12">
     @if (store.items(); as items) {
       @if (!items.length) {
         <!-- Nothing yet: a big page, a word, New page -->
@@ -31,9 +28,9 @@
           <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
         </div>
       } @else {
-        <!-- The pages by when they were changed (Today, the last 7 days, 30, older: a small gray name over
-             each, as the search's sections) — a row each: its icon, its name, 🔖 if a favorite, when
-             (today: the time); gray under the pointer, as Notion's -->
+        <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older: a small gray name
+             over each, as the search's sections) — a row each: its icon, its name, 🔖 if a favorite, 🌐 if
+             published, when (today: the time); gray under the pointer, as Notion's -->
         @for (group of groups(); track group.key) {
           <p class="px-2 pt-5 pb-1.5 text-footnote font-medium text-fg-secondary first:pt-1">{{ group.key | t }}</p>
           @for (item of group.items; track item.id) {
@@ -47,12 +44,15 @@
               @if (item.favorite) {
                 <app-icon name="bookmark" colored class="size-4 shrink-0 text-icon" />
               }
+              @if (item.published) {
+                <app-icon name="globe" colored class="size-4 shrink-0 text-icon" />
+              }
               <span class="flex-1"></span>
               <span class="shrink-0 text-footnote text-fg-secondary tabular-nums">{{ changed(item, group.key === 'library.today') }}</span>
             </button>
           }
         } @empty {
-          <p class="py-16 text-center text-ui text-fg-secondary">{{ 'search.nothing' | t }}</p>
+          <p class="py-16 text-center text-ui text-fg-secondary">{{ (view() === 'favorites' ? 'library.noFavorites' : 'library.noPublished') | t }}</p>
         }
       }
     }
