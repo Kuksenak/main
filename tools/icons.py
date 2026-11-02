@@ -82,11 +82,12 @@ ICONS = {
         f'<path stroke="none" fill="{MARKER}" '
         f'transform="translate({x + dx} 32.2) rotate({t}) scale(1 {q})" d="{ring(0, 0, r)}z"/>'
         for x, (dx, r, q, t) in zip((20, 32, 44), [(.2, 3.3, .93, 20), (-.1, 3.2, 1, 0), (.1, 3.3, .95, -30)])),
-    # a link (copy a page's link): two chain links — long round loops, aslant, one's end inside
-    # the other's — lines only
-    'link': '<g transform="rotate(-45 32 32)">'
-        + line('M22.4 24.6 30.6 24.4C34.8 24.4 38 27.6 38 31.8 38 36 34.8 39.4 30.6 39.4L15.6 39.6C11.4 39.6 8.2 36.2 8.2 32 8.2 27.8 11.4 24.6 15.6 24.6L22.6 24.8')
-        + line('M33.2 24.6 48.4 24.4C52.6 24.4 55.8 27.8 55.8 32 55.8 36.2 52.6 39.6 48.4 39.6L33.4 39.4C29.2 39.4 26 36 26 31.8 26 27.6 29.2 24.4 33.4 24.8')
+    # a link (copy a page's link), as Notion's: two halves of a chain link, open to each other, a bar
+    # between them, aslant, narrow; a thicker marker — lines only
+    'link': '<g transform="rotate(-45 32 32)" stroke-width="3.8">'
+        + line('M26.4 42 18 42C12.5 42 8 37.5 8 32 8 26.5 12.5 22 18 22L26.4 22')
+        + line('M37.6 22 46 22C51.5 22 56 26.5 56 32 56 37.5 51.5 42 46 42L37.6 42')
+        + line('M23.4 32 40.6 32')
         + '</g>',
     # preview (see it as others do): an eye — its almond, the iris (teal) in it
     'eye': fill(TEAL, ring(32.2, 32.4, 8.4) + 'z')
