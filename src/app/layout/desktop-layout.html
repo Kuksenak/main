@@ -21,36 +21,28 @@
         }
       </a>
     }
-    <!-- The library's pages, as the old app's (Claude's Starred / Recents): Favorites, then Recents (the
-         last changed; View all: the library) — each under a small gray name (a click folds it away /
-         back, ⌄ under the pointer); a row each: its icon, its name, ⋯ under the pointer (its menu).
+    <!-- The library's pages: Recents (the 5 last changed; View all: the library), then Favorites — each
+         a row as a place's (its icon, its name, ⌄ / ⌃: a click folds it away / back), its pages under
+         it: their icon, their name, ⋯ under the pointer (its menu).
          Only they scroll (Search, the places and Trash stay), fading out at the bottom; scrolled: a
          hairline over them, their top fading under it too -->
     <div
       #scroller
       (scroll)="listsScrolled.set(scroller.scrollTop > 0)"
       [attr.data-scrolled]="listsScrolled() ? '' : null"
-      class="-mx-3 mt-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4 [scrollbar-width:thin]
+      class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4 [scrollbar-width:thin]
              [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] data-scrolled:border-separator
              data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-2rem),transparent)]"
     >
       @for (list of lists(); track list.id) {
-        <button
-          type="button"
-          (click)="fold(list.id)"
-          [attr.aria-label]="list.label | t"
-          class="group/label flex h-7 shrink-0 items-center gap-1 rounded-side-row px-side-row-x text-left text-footnote font-medium text-fg-secondary hover:bg-side-hover not-first:mt-3"
-        >
+        <!-- (open: data-open, not aria-expanded — that one's look is a row whose window is open) -->
+        <button uiSidebarItem [icon]="list.icon" (click)="fold(list.id)" [attr.data-open]="folded().includes(list.id) ? null : ''" class="group/fold shrink-0">
           {{ list.label | t }}
-          <app-icon
-            name="chevron-down"
-            class="size-3.5 opacity-0 transition group-hover/label:opacity-70 data-folded:-rotate-90"
-            [attr.data-folded]="folded().includes(list.id) ? '' : null"
-          />
+          <app-icon itemEnd name="chevron-down" class="size-4 text-icon transition-[rotate] group-data-open/fold:rotate-180" />
         </button>
         @if (!folded().includes(list.id)) {
           @for (page of list.pages; track page.id) {
-            <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]">
+            <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]" class="pl-3.5!">
               {{ page.title.trim() || ('library.untitled' | t) }}
               <button
                 itemEnd
@@ -64,7 +56,7 @@
             </a>
           }
           @if (list.id === 'recents' && list.more) {
-            <a routerLink="/library" class="flex h-side-row shrink-0 items-center rounded-side-row px-side-row-x text-ui text-fg-secondary hover:bg-side-hover">
+            <a routerLink="/library" class="flex h-side-row shrink-0 items-center rounded-side-row pr-side-row-x pl-10 text-ui text-fg-secondary hover:bg-side-hover">
               {{ 'sidebar.viewAll' | t }}
             </a>
           }
