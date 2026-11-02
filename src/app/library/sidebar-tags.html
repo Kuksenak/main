@@ -1,25 +1,15 @@
-<!-- Tags, as a place's row: # Tags, ⌄ / › after the name (folds them); + under the pointer, by the ⌄ (a new one) — its
-     own button over the row (a button in a button: not allowed) -->
-<div class="group/row relative flex shrink-0 flex-col">
-  <button uiSidebarItem icon="hash" (click)="fold()" [attr.data-open]="folded() ? null : ''" class="group/fold">
-    <!-- (as Notion's: ⌄ right after the name, under the pointer — › folded) -->
-    <span class="inline-flex max-w-full items-center gap-1 align-middle"><span class="truncate">{{ 'tags.title' | t }}</span><app-icon name="chevron-down" class="size-3.5 shrink-0 text-icon opacity-0 transition -rotate-90 group-hover/fold:opacity-100 group-data-open/fold:rotate-0" /></span>
-  </button>
-  <button
-    uiSidebarAction
-    icon="plus"
-    (click)="startAdding()"
-    [uiTip]="'tags.newOne' | t"
-    [attr.aria-label]="'tags.newOne' | t"
-    class="absolute top-1/2 right-7 -translate-y-1/2"
-  ></button>
-</div>
+<!-- Tags, as a place's row (as Favorites'): # Tags, ⌄ right after the name under the pointer (› folded) —
+     a click folds them; + at its right under the pointer, as Library's (a new one) -->
+<a uiSidebarItem icon="hash" role="button" tabindex="0" (click)="fold()" (keydown.enter)="fold()" [attr.data-open]="folded() ? null : ''" class="group/fold shrink-0 cursor-pointer">
+  <span class="inline-flex max-w-full items-center gap-1 align-middle"><span class="truncate">{{ 'tags.title' | t }}</span><app-icon name="chevron-down" class="size-4 shrink-0 text-icon opacity-0 transition -rotate-90 group-hover/fold:opacity-100 group-data-open/fold:rotate-0" /></span>
+  <button itemEnd uiSidebarAction icon="plus" (click)="startAdding()" [uiTip]="'tags.newOne' | t" [attr.aria-label]="'tags.newOne' | t"></button>
+</a>
 
 @if (!folded()) {
   @if (adding()) {
     <!-- (a new one's name: Enter makes it, Esc / away — not) -->
     <div class="flex h-side-row shrink-0 items-center gap-2 pr-side-row-x pl-3.5">
-      <span class="size-3 shrink-0 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="store.nextColor()"></span>
+      <span class="grid size-icon-side shrink-0 place-items-center"><span class="size-3 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="store.nextColor()"></span></span>
       <input
         #field
         type="text"
@@ -47,7 +37,8 @@
       class="group/row flex h-side-row shrink-0 cursor-pointer items-center gap-2 rounded-side-row pr-side-row-x pl-3.5 text-ui text-side-text outline-none
              hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:text-fg data-drop:bg-side-on"
     >
-      <span class="size-3 shrink-0 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="tag.color"></span>
+      <!-- (its swatch in an icon's room: the names in line with the pages') -->
+      <span class="grid size-icon-side shrink-0 place-items-center"><span class="size-3 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="tag.color"></span></span>
       @if (renaming() === tag.id) {
         <input
           #field

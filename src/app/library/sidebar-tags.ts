@@ -6,7 +6,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Confirm, Icon, TAG_COLORS, tagColorLabel } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
-import { UiSidebarAction, UiSidebarButton } from '../core/ui/sidebar';
+import { UiSidebarAction, UiSidebarItem } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { keep, kept } from '../core/utils/storage';
 import { LibraryStore } from './library.store';
@@ -24,7 +24,7 @@ export const PAGE_DRAG = 'application/x-page';
  */
 @Component({
   selector: 'app-sidebar-tags',
-  imports: [Icon, TranslatePipe, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSidebarAction, UiSidebarButton, UiTip],
+  imports: [Icon, TranslatePipe, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSidebarAction, UiSidebarItem, UiTip],
   host: { class: 'contents' },
   templateUrl: './sidebar-tags.html',
 })
