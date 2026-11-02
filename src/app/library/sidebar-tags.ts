@@ -4,7 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Confirm, Icon, TAG_COLORS, tagColorLabel } from '../core/ui';
+import { Confirm, Icon, TAG_COLORS, tagColorLabel, UiScrollBar } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { UiSidebarAction, UiSidebarItem } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
@@ -24,8 +24,8 @@ export const PAGE_DRAG = 'application/x-page';
  */
 @Component({
   selector: 'app-sidebar-tags',
-  imports: [Icon, TranslatePipe, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSidebarAction, UiSidebarItem, UiTip],
-  host: { class: 'contents' },
+  imports: [Icon, UiScrollBar, TranslatePipe, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSidebarAction, UiSidebarItem, UiTip],
+  host: { class: 'flex min-h-0 flex-initial flex-col gap-px' },
   templateUrl: './sidebar-tags.html',
 })
 export class SidebarTags {
@@ -62,6 +62,8 @@ export class SidebarTags {
   // ⋯ : its menu at the button; Rename: a field in its row
   protected readonly menuFor = signal<{ tag: Tag; at: HTMLElement } | null>(null);
   protected readonly renaming = signal<string | null>(null);
+  // (its rows scrolled: a hairline over them, as the favorites')
+  protected readonly scrolled = signal(false);
   // A page dragged over a row: that row gray
   protected readonly dropOn = signal<string | null>(null);
 

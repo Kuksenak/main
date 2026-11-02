@@ -24,9 +24,9 @@
     <!-- The library's pages: Recents (the 5 last changed), Favorites, Tags (as folders) — each a row as a
          place's (its icon, its name; ⌄ right after it under the pointer, › folded — a click folds it),
          its rows under it: a page's icon and name, ⋯ under the pointer (its menu); a tag's swatch and
-         name (a click: its pages; a page dropped on it: tagged so). Recents stay; Favorites and Tags
-         scroll together under them, fading out at the bottom; scrolled: a hairline over them, their
-         top fading under it too; their scroll bar over them (the system's took room from the rows) -->
+         name (a click: its pages; a page dropped on it: tagged so). Recents stay; Favorites' pages and
+         the tags each scroll on their own, fading out at the bottom; scrolled: a hairline over them,
+         their top fading under it too; their scroll bars over them (the system's took room from the rows) -->
     @for (list of lists(); track list.id) {
       @if (list.id === 'recents') {
         <ng-container [ngTemplateOutlet]="listHead" [ngTemplateOutletContext]="{ $implicit: list }" />
@@ -37,29 +37,33 @@
         }
       }
     }
-    <div
-      #scroller
-      uiScrollBar
-      (scroll)="listsScrolled.set(scroller.scrollTop > 0)"
-      [attr.data-scrolled]="listsScrolled() ? '' : null"
-      class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4
-             [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] data-scrolled:border-separator
-             data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-2rem),transparent)]"
-    >
-      @for (list of lists(); track list.id) {
-        @if (list.id === 'favorites') {
-          <ng-container [ngTemplateOutlet]="listHead" [ngTemplateOutletContext]="{ $implicit: list }" />
-          @if (!folded().includes('favorites')) {
+    <!-- Favorites: their row stays, their pages scroll on their own (as tall as they are, at most what's
+         left), fading out at the bottom; scrolled — a hairline over them, their top fading too -->
+    @for (list of lists(); track list.id) {
+      @if (list.id === 'favorites') {
+        <ng-container [ngTemplateOutlet]="listHead" [ngTemplateOutletContext]="{ $implicit: list }" />
+        @if (!folded().includes('favorites')) {
+          <div
+            #scroller
+            uiScrollBar
+            (scroll)="listsScrolled.set(scroller.scrollTop > 0)"
+            [attr.data-scrolled]="listsScrolled() ? '' : null"
+            class="-mx-3 flex min-h-0 flex-initial flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-2
+                   [mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] data-scrolled:border-separator
+                   data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-1.5rem),transparent)]"
+          >
             @for (page of list.pages; track page.id) {
               <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
             }
-          }
+          </div>
         }
       }
-      @if (library()) {
-        <app-sidebar-tags />
-      }
-    </div>
+    }
+    <!-- Tags: the same — their row stays, their rows scroll on their own -->
+    @if (library()) {
+      <app-sidebar-tags />
+    }
+    <span class="flex-1"></span>
     <!-- (a list's head: open — data-open, not aria-expanded: that one's look is a row whose window is open) -->
     <ng-template #listHead let-list>
       <button uiSidebarItem [icon]="list.icon" (click)="fold(list.id)" [attr.data-open]="folded().includes(list.id) ? null : ''" class="group/fold shrink-0">

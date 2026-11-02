@@ -6,64 +6,77 @@
 </a>
 
 @if (!folded()) {
-  @if (adding()) {
-    <!-- (a new one's name: Enter makes it, Esc / away — not) -->
-    <div class="flex h-side-row shrink-0 items-center gap-2 pr-side-row-x pl-3.5">
-      <span class="grid size-icon-side shrink-0 place-items-center"><span class="size-3 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="store.nextColor()"></span></span>
-      <input
-        #field
-        type="text"
-        maxlength="40"
-        [placeholder]="'tags.new' | t"
-        (keydown.enter)="add(field)"
-        (keydown.escape)="adding.set(false)"
-        (blur)="adding.set(false)"
-        class="h-6 min-w-0 flex-1 rounded-md bg-dialog px-1.5 text-ui text-fg outline-none ring-1 ring-separator placeholder:text-fg-secondary"
-      />
-    </div>
-  }
-  @for (tag of store.tags(); track tag.id) {
-    <!-- (a row: its swatch, its name — a click: its pages; a page dropped here: tagged so) -->
-    <div
-      role="link"
-      tabindex="0"
-      (click)="renaming() === tag.id ? null : open(tag)"
-      (keydown.enter)="open(tag)"
-      (dragover)="over($event, tag)"
-      (dragleave)="dropOn.set(null)"
-      (drop)="drop($event, tag)"
-      [attr.aria-current]="current() === tag.id ? 'page' : null"
-      [attr.data-drop]="dropOn() === tag.id ? '' : null"
-      class="group/row flex h-side-row shrink-0 cursor-pointer items-center gap-2 rounded-side-row pr-side-row-x pl-3.5 text-ui text-side-text outline-none
-             hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:text-fg data-drop:bg-side-on"
-    >
-      <!-- (its swatch in an icon's room: the names in line with the pages') -->
-      <span class="grid size-icon-side shrink-0 place-items-center"><span class="size-3 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="tag.color"></span></span>
-      @if (renaming() === tag.id) {
+  <!-- (its rows scroll on their own, as the favorites: fading out at the bottom; scrolled — a hairline
+       over them, their top fading too; the bar over them) -->
+  <div
+    #rows
+    uiScrollBar
+    (scroll)="scrolled.set(rows.scrollTop > 0)"
+    [attr.data-scrolled]="scrolled() ? '' : null"
+    class="-mx-3 flex min-h-0 flex-initial flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-2
+           [mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] data-scrolled:border-separator
+           data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-1.5rem),transparent)]"
+  >
+    @if (adding()) {
+      <!-- (a new one's name: Enter makes it, Esc / away — not) -->
+      <div class="flex h-side-row shrink-0 items-center gap-2 pr-side-row-x pl-3.5">
+        <span class="grid size-icon-side shrink-0 place-items-center"><span class="size-3 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="store.nextColor()"></span></span>
         <input
           #field
           type="text"
           maxlength="40"
-          [value]="tag.name"
-          (click)="$event.stopPropagation()"
-          (keydown.enter)="field.blur()"
-          (keydown.escape)="field.value = tag.name; field.blur()"
-          (blur)="rename(tag, field)"
-          class="h-6 min-w-0 flex-1 rounded-md bg-dialog px-1.5 text-ui text-fg outline-none ring-1 ring-separator"
+          [placeholder]="'tags.new' | t"
+          (keydown.enter)="add(field)"
+          (keydown.escape)="adding.set(false)"
+          (blur)="adding.set(false)"
+          class="h-6 min-w-0 flex-1 rounded-md bg-dialog px-1.5 text-ui text-fg outline-none ring-1 ring-separator placeholder:text-fg-secondary"
         />
-      } @else {
-        <span class="min-w-0 flex-1 truncate">{{ tag.name }}</span>
-        <button
-          uiSidebarAction
-          #more
-          icon="dots"
-          (click)="menuFor.set(menuFor()?.tag?.id === tag.id ? null : { tag, at: more.element })"
-          [attr.aria-expanded]="menuFor()?.tag?.id === tag.id"
-          [attr.aria-label]="'library.more' | t"
-        ></button>
-      }
-    </div>
-  }
+      </div>
+    }
+    @for (tag of store.tags(); track tag.id) {
+      <!-- (a row: its swatch, its name — a click: its pages; a page dropped here: tagged so) -->
+      <div
+        role="link"
+        tabindex="0"
+        (click)="renaming() === tag.id ? null : open(tag)"
+        (keydown.enter)="open(tag)"
+        (dragover)="over($event, tag)"
+        (dragleave)="dropOn.set(null)"
+        (drop)="drop($event, tag)"
+        [attr.aria-current]="current() === tag.id ? 'page' : null"
+        [attr.data-drop]="dropOn() === tag.id ? '' : null"
+        class="group/row flex h-side-row shrink-0 cursor-pointer items-center gap-2 rounded-side-row pr-side-row-x pl-3.5 text-ui text-side-text outline-none
+               hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:text-fg data-drop:bg-side-on"
+      >
+        <!-- (its swatch in an icon's room: the names in line with the pages') -->
+        <span class="grid size-icon-side shrink-0 place-items-center"><span class="size-3 rounded-[0.25rem] bg-tag saturate-[2.5] brightness-95" [attr.data-tag]="tag.color"></span></span>
+        @if (renaming() === tag.id) {
+          <input
+            #field
+            type="text"
+            maxlength="40"
+            [value]="tag.name"
+            (click)="$event.stopPropagation()"
+            (keydown.enter)="field.blur()"
+            (keydown.escape)="field.value = tag.name; field.blur()"
+            (blur)="rename(tag, field)"
+            class="h-6 min-w-0 flex-1 rounded-md bg-dialog px-1.5 text-ui text-fg outline-none ring-1 ring-separator"
+          />
+        } @else {
+          <span class="min-w-0 flex-1 truncate">{{ tag.name }}</span>
+          <button
+            uiSidebarAction
+            #more
+            icon="dots"
+            (click)="menuFor.set(menuFor()?.tag?.id === tag.id ? null : { tag, at: more.element })"
+            [attr.aria-expanded]="menuFor()?.tag?.id === tag.id"
+            [attr.aria-label]="'library.more' | t"
+          ></button>
+        }
+      </div>
+    }
+
+  </div>
 }
 
 <!-- A tag's ⋯: Rename; its colors; Delete (asked first) -->
