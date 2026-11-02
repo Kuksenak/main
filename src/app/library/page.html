@@ -2,14 +2,15 @@
      Notion's): the page's name at the left (bold), typed over right there (clicked: a field as the sidebar's Search, as wide as the name, ↵ on a chip; Enter: on into the
      text; a new page: its name selected); saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
 @if (desktop && page(); as p) {
-  <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app pr-3 pl-[2.625rem]">
+  <div class="sticky top-0 z-20 flex h-11 items-center gap-0.5 bg-app pr-3 pl-8">
     <div class="mr-2 flex min-w-0 flex-1 items-center">
-      <!-- (plain text till it's clicked: then the Search's look — a faint
+      <!-- (its box's left edge in line with the blocks'; plain text, grayed under the pointer as a
+           button is, till it's clicked: then the Search's look — a faint
            hairline, the sidebar's color; as wide as what's typed: the text's copy under the field
            sizes it) -->
       <form
-        class="group/title flex h-8 max-w-full min-w-0 items-center gap-2 rounded-lg border-[0.8px] border-transparent pr-1.5 pl-2 -ml-0.5 text-ui
-               focus-within:border-fg/7 focus-within:bg-side"
+        class="group/title flex h-8 max-w-full min-w-0 items-center gap-2 rounded-lg border-[0.8px] border-transparent pr-1.5 pl-2 text-ui
+               hover:not-focus-within:bg-side-hover focus-within:border-fg/7 focus-within:bg-side"
         (submit)="$event.preventDefault(); titleDone()"
       >
         <span
@@ -26,7 +27,7 @@
             [attr.aria-label]="'library.rename' | t"
             maxlength="200"
             autocomplete="off"
-            class="col-start-1 row-start-1 w-full min-w-0 cursor-text bg-transparent text-ui font-semibold text-fg outline-none placeholder:text-fg-secondary"
+            class="col-start-1 row-start-1 w-full min-w-0 cursor-pointer bg-transparent focus:cursor-text text-ui font-semibold text-fg outline-none placeholder:text-fg-secondary"
           />
         </span>
         <button
@@ -97,7 +98,7 @@
   </div>
 }
 
-<!-- (desktops: the blocks nearly the window's whole width, their text under the top row's name) -->
+<!-- (desktops: the blocks nearly the window's whole width, their left edge under the top row's name's) -->
 <div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-8 desktop:pt-6">
 
   @if (page(); as p) {
