@@ -1,22 +1,26 @@
 @if (desktop) {
-  <!-- Desktops, as Notion's: one row at the top, staying as the pages scroll under it (48 tall: level
-       with the sidebar's Search) — the section's name, the views as pills (an icon, its name; the one
-       shown: a gray pill), New page at the right; then the pages -->
-  <div class="sticky top-0 z-20 flex h-12 items-center gap-1 bg-app pr-3 pl-8">
-    <h1 class="mr-3 px-2 text-lg font-semibold">{{ 'nav.library' | t }}</h1>
-    @for (v of views; track v.id) {
-      <button
-        type="button"
-        (click)="view.set(v.id)"
-        [attr.aria-pressed]="view() === v.id"
-        class="flex h-8 items-center gap-1.5 rounded-full px-3 text-ui text-fg-secondary hover:bg-tint aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
-      >
-        <app-icon [name]="v.icon" colored class="size-5.5 text-icon" />
-        {{ v.label | t }}
+  <!-- Desktops, as Notion's: at the top, staying as the pages scroll under it — the section's name (a
+       48-tall row: level with the sidebar's Search), under it the views as pills (an icon, its name;
+       the one shown: a gray pill) and New page at the right; then the pages -->
+  <div class="sticky top-0 z-20 flex flex-col bg-app pr-3 pb-1 pl-8">
+    <h1 class="flex h-12 items-center px-2 text-lg font-semibold">{{ 'nav.library' | t }}</h1>
+    <div class="flex items-center gap-1">
+      @for (v of views; track v.id) {
+        <button
+          type="button"
+          (click)="view.set(v.id)"
+          [attr.aria-pressed]="view() === v.id"
+          class="flex h-8 items-center gap-1.5 rounded-full px-3 text-ui text-fg-secondary hover:bg-tint aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
+        >
+          <app-icon [name]="v.icon" colored class="size-5.5 text-icon" />
+          {{ v.label | t }}
+        </button>
+      }
+      <span class="flex-1"></span>
+      <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">
+        {{ 'library.new' | t }}
       </button>
-    }
-    <span class="flex-1"></span>
-    <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
+    </div>
   </div>
 
   <div class="flex flex-col px-8 pt-2 pb-12">
@@ -26,13 +30,17 @@
         <div class="flex flex-col items-center gap-4 py-24 text-center">
           <app-icon name="page" colored class="size-14 text-icon" />
           <p class="max-w-xs text-ui text-fg-secondary">{{ 'library.empty' | t }}</p>
-          <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
+          <button uiButton type="button" icon="plus" [disabled]="creating()" (click)="create()">
+            {{ 'library.new' | t }}
+          </button>
         </div>
       } @else {
         <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older: a small gray name
-             over each, as the search's sections) — a row each: its icon, its name, 🌐 if published, when (today: the time); gray under the pointer, as Notion's -->
+             over each, as the search's sections) — a row each: its icon, its name, when (today: the time); gray under the pointer, as Notion's -->
         @for (group of groups(); track group.key) {
-          <p class="px-2 pt-5 pb-1.5 text-footnote font-medium text-fg-secondary first:pt-1">{{ group.key | t }}</p>
+          <p class="px-2 pt-5 pb-1.5 text-footnote font-medium text-fg-secondary first:pt-1">
+            {{ group.key | t }}
+          </p>
           @for (item of group.items; track item.id) {
             <button
               type="button"
@@ -40,16 +48,21 @@
               class="group flex h-9 w-full shrink-0 items-center gap-2.5 rounded-lg px-2 text-left hover:bg-tint active:transform-none"
             >
               <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
-              <span class="min-w-0 truncate text-ui text-fg" [class.text-fg-secondary]="!item.title.trim()">{{ item.title.trim() || ('library.untitled' | t) }}</span>
-              @if (item.published) {
-                <app-icon name="globe" colored class="size-4 shrink-0 text-icon" />
-              }
+              <span
+                class="min-w-0 truncate text-ui text-fg"
+                [class.text-fg-secondary]="!item.title.trim()"
+                >{{ item.title.trim() || ('library.untitled' | t) }}</span
+              >
               <span class="flex-1"></span>
-              <span class="shrink-0 text-footnote text-fg-secondary tabular-nums">{{ changed(item, group.key === 'library.today') }}</span>
+              <span class="shrink-0 text-footnote text-fg-secondary tabular-nums">{{
+                changed(item, group.key === 'library.today')
+              }}</span>
             </button>
           }
         } @empty {
-          <p class="py-16 text-center text-ui text-fg-secondary">{{ (view() === 'favorites' ? 'library.noFavorites' : 'library.noPublished') | t }}</p>
+          <p class="py-16 text-center text-ui text-fg-secondary">
+            {{ (view() === 'favorites' ? 'library.noFavorites' : 'library.noPublished') | t }}
+          </p>
         }
       }
     }
