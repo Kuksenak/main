@@ -13,32 +13,61 @@
       <span class="shrink-0 rounded-[0.3rem] bg-tint-strong px-1.5 py-px text-footnote">{{ shortcut }}</span>
     </button>
     @for (place of places(); track place.path) {
-      <!-- (the start page: current only on itself) -->
-      <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
+      <!-- (the start page: current only on itself; Library: + under the pointer — a new page) -->
+      <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">
+        {{ place.label | t }}
+        @if (place.path === '/library') {
+          <button itemEnd uiSidebarAction icon="plus" (click)="createPage()" [uiTip]="'library.new' | t" [attr.aria-label]="'library.new' | t"></button>
+        }
+      </a>
     }
-    <!-- Favorites (the library's pages starred): their names under a small gray title — only they
-         scroll (Search, the places and Trash stay), fading out at the bottom; scrolled (as the old
-         app's): a hairline over them, their top fading under it too; a thin thumb -->
-    <!-- (its row stays put over them, as a place's: 🔖, the name, ⌄ / ⌃ — a click folds them away /
-         back) -->
-    @if (favorites().length) {
-      <!-- (open: data-open, not aria-expanded — that one's look is a row whose window is open) -->
-      <button uiSidebarItem icon="bookmark" (click)="toggleFavs()" [attr.data-open]="favsFolded() ? null : ''" class="group/fav shrink-0">
-        {{ 'library.favorites' | t }}
-        <app-icon itemEnd name="chevron-down" class="size-4 text-icon transition-[rotate] group-data-open/fav:rotate-180" />
-      </button>
-    }
+    <!-- The library's pages, as the old app's (Claude's Starred / Recents): Favorites, then Recents (the
+         last changed; View all: the library) — each under a small gray name (a click folds it away /
+         back, ⌄ under the pointer); a row each: its icon, its name, ⋯ under the pointer (its menu).
+         Only they scroll (Search, the places and Trash stay), fading out at the bottom; scrolled: a
+         hairline over them, their top fading under it too -->
     <div
-      #favs
-      (scroll)="favsScrolled.set(favs.scrollTop > 0)"
-      [attr.data-scrolled]="favsScrolled() ? '' : null"
-      class="-mx-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4 [scrollbar-width:thin]
+      #scroller
+      (scroll)="listsScrolled.set(scroller.scrollTop > 0)"
+      [attr.data-scrolled]="listsScrolled() ? '' : null"
+      class="-mx-3 mt-3 flex min-h-0 flex-1 flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-4 [scrollbar-width:thin]
              [mask-image:linear-gradient(to_bottom,black_calc(100%-2rem),transparent)] data-scrolled:border-separator
              data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-2rem),transparent)]"
     >
-      @if (!favsFolded()) {
-        @for (page of favorites(); track page.id) {
-          <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]" class="pl-3.5!">{{ page.title }}</a>
+      @for (list of lists(); track list.id) {
+        <button
+          type="button"
+          (click)="fold(list.id)"
+          [attr.aria-label]="list.label | t"
+          class="group/label flex h-7 shrink-0 items-center gap-1 rounded-side-row px-side-row-x text-left text-footnote font-medium text-fg-secondary hover:bg-side-hover not-first:mt-3"
+        >
+          {{ list.label | t }}
+          <app-icon
+            name="chevron-down"
+            class="size-3.5 opacity-0 transition group-hover/label:opacity-70 data-folded:-rotate-90"
+            [attr.data-folded]="folded().includes(list.id) ? '' : null"
+          />
+        </button>
+        @if (!folded().includes(list.id)) {
+          @for (page of list.pages; track page.id) {
+            <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]">
+              {{ page.title.trim() || ('library.untitled' | t) }}
+              <button
+                itemEnd
+                uiSidebarAction
+                #more
+                icon="dots"
+                (click)="rowMenu.set(rowMenu()?.page?.id === page.id ? null : { page, at: more.element })"
+                [attr.aria-expanded]="rowMenu()?.page?.id === page.id"
+                [attr.aria-label]="'library.more' | t"
+              ></button>
+            </a>
+          }
+          @if (list.id === 'recents' && list.more) {
+            <a routerLink="/library" class="flex h-side-row shrink-0 items-center rounded-side-row px-side-row-x text-ui text-fg-secondary hover:bg-side-hover">
+              {{ 'sidebar.viewAll' | t }}
+            </a>
+          }
         }
       }
     </div>
@@ -98,6 +127,19 @@
     }
     <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
     <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
+  </ui-menu>
+}
+
+<!-- A page's ⋯ in the sidebar (as Notion's): 🔖 in the favorites or not; Duplicate; Move to trash; when
+     it was edited -->
+@if (rowMenu(); as m) {
+  <ui-menu narrow [origin]="m.at" (closed)="rowMenu.set(null)">
+    <button type="button" uiMenuItem icon="bookmark" (click)="favorite(m.page)">{{ (m.page.favorite ? 'library.unfavorite' : 'library.favorite') | t }}</button>
+    <button type="button" uiMenuItem icon="duplicate" (click)="duplicate(m.page)">{{ 'library.duplicate' | t }}</button>
+    <ui-menu-separator />
+    <button type="button" uiMenuItem icon="trash" danger (click)="trash(m.page)">{{ 'library.moveToTrash' | t }}</button>
+    <ui-menu-separator />
+    <div class="px-menu-label-x py-1 text-caption text-fg-secondary">{{ 'library.edited' | t }} {{ when(m.page.updatedAt) }}</div>
   </ui-menu>
 }
 

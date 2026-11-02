@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, switchMap, tap } from 'rxjs';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
 import { Toasts } from '../core/ui';
@@ -84,6 +84,11 @@ export class LibraryStore {
 
   create(title: string): Observable<Page> {
     return this.http.post<Page>(this.url, { title }).pipe(tap((page) => this.put(page)));
+  }
+
+  /** A copy of a page (its blocks too), named `title`. */
+  duplicate(id: string, title: string): Observable<Page> {
+    return this.get(id).pipe(switchMap((page) => this.create(title).pipe(switchMap((copy) => this.save(copy.id, title, page.blocks)))));
   }
 
   save(id: string, title: string, blocks: PageBlock[]): Observable<Page> {

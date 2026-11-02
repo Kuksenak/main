@@ -5,8 +5,11 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
 import { Icon, UiAvatar, UiButton } from '../core/ui';
-import { UiSidebar, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
-import { LibraryStore } from '../library/library.store';
+import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem } from '../core/ui/sidebar';
+import { UiTip } from '../core/ui/tip/tip';
+import { LibraryStore, PageItem } from '../library/library.store';
+import { TranslationKey } from '../core/i18n/translations';
+import { Toasts } from '../core/ui';
 import { TrashList } from '../library/trash-list';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
@@ -14,7 +17,8 @@ import { Search } from './search';
 
 /**
  * Desktop: the frame of every page after sign-in (the router puts the page into it) — the sidebar
- * at the left: Search (Ctrl K / ⌘K: the search window), the app's places, the favorite pages, Trash (its
+ * at the left: Search (Ctrl K / ⌘K: the search window), the app's places (Library: + a new page), the
+ * library's Favorites and Recents (folding; a page's ⋯: its menu), Trash (its
  * window at it), the account at the bottom (its letter, the name — else the email
  * — and ▾; its menu: the email, Users (the admins only), the language, Log out, Log out of all
  * devices); the open page beside it. (Phones have their own, MobileLayout: neither downloads the other's.)
@@ -33,9 +37,11 @@ import { Search } from './search';
     UiMenuLabel,
     UiMenuSeparator,
     UiSidebar,
+    UiSidebarAction,
     UiSidebarButton,
     UiSidebarItem,
     TrashList,
+    UiTip,
   ],
   templateUrl: './desktop-layout.html',
 })
@@ -52,12 +58,71 @@ export class DesktopLayout {
   private readonly store = inject(LibraryStore);
   protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   protected readonly trashOpen = signal(false);
-  protected readonly favsScrolled = signal(false);
-  // (folded away or not — kept on this device)
-  protected readonly favsFolded = signal(read(FOLDED) === '1');
-  protected toggleFavs(): void {
-    this.favsFolded.set(!this.favsFolded());
-    write(FOLDED, this.favsFolded() ? '1' : '0');
+
+  // The sidebar's lists: Favorites (when there are any), Recents (the last changed; more: View all)
+  protected readonly lists = computed(() => {
+    const items = this.store.items() ?? [];
+    const lists: { id: List; label: TranslationKey; pages: PageItem[]; more?: boolean }[] = [];
+    if (this.favorites().length) lists.push({ id: 'favorites', label: 'library.favorites', pages: this.favorites() });
+    if (this.library()) lists.push({ id: 'recents', label: 'library.recents', pages: items.slice(0, RECENTS), more: items.length > RECENTS });
+    return lists;
+  });
+  protected readonly listsScrolled = signal(false);
+  // (folded away — kept on this device)
+  protected readonly folded = signal<List[]>((read(FOLDED) ?? '').split(',').filter((x): x is List => x === 'favorites' || x === 'recents'));
+  protected fold(list: List): void {
+    this.folded.update((f) => (f.includes(list) ? f.filter((x) => x !== list) : [...f, list]));
+    write(FOLDED, this.folded().join(','));
+  }
+
+  // A page's ⋯: its menu, at the button
+  protected readonly rowMenu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
+  private readonly toasts = inject(Toasts);
+
+  protected favorite(page: PageItem): void {
+    this.rowMenu.set(null);
+    this.store.favorite(page.id, !page.favorite).subscribe();
+  }
+
+  protected duplicate(page: PageItem): void {
+    this.rowMenu.set(null);
+    const title = this.i18n.t('library.copyOf').replace('{title}', page.title.trim() || this.i18n.t('library.untitled'));
+    this.store.duplicate(page.id, title).subscribe({
+      next: (copy) => this.router.navigate(['/library', copy.id]),
+      error: () => this.toasts.error(this.i18n.t('library.duplicateError')),
+    });
+  }
+
+  protected trash(page: PageItem): void {
+    this.rowMenu.set(null);
+    this.store.delete(page.id).subscribe({
+      next: () => {
+        if (this.router.url === `/library/${page.id}`) this.router.navigateByUrl('/library');
+      },
+      error: () => this.toasts.error(this.i18n.t('library.deleteError')),
+    });
+  }
+
+  // "26 Oct, 15:02"
+  protected when(at: string): string {
+    return this.i18n.date(new Date(at), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Library's +: a new page ("Untitled"), opened with its name selected
+  private creating = false;
+  protected createPage(): void {
+    if (this.creating) return;
+    this.creating = true;
+    this.store.create(this.i18n.t('library.untitled')).subscribe({
+      next: (page) => {
+        this.creating = false;
+        this.router.navigate(['/library', page.id], { state: { fresh: true } });
+      },
+      error: () => {
+        this.creating = false;
+        this.toasts.error(this.i18n.t('library.createError'));
+      },
+    });
   }
 
   // The account's menu: open at its button
@@ -83,8 +148,11 @@ export class DesktopLayout {
   }
 }
 
-// (the favorites folded: kept on this device — storage may be off, then it just isn't kept)
-const FOLDED = 'sidebar.favorites.folded';
+type List = 'favorites' | 'recents';
+// (how many of the last changed pages Recents shows)
+const RECENTS = 8;
+// (the lists folded away: kept on this device — storage may be off, then it just isn't kept)
+const FOLDED = 'sidebar.folded';
 const read = (key: string): string | null => {
   try {
     return localStorage.getItem(key);

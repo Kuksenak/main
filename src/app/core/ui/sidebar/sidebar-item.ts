@@ -4,7 +4,7 @@ import { Icon, IconName } from '../icon/icon';
 
 // (a row: its look, its icon and name — the places' and the buttons')
 const ROW =
-  'flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-left text-ui text-side-text outline-none ' +
+  'group/row flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-left text-ui text-side-text outline-none ' +
   'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-fg ' +
   'aria-expanded:bg-side-on';
 const TEMPLATE = `
@@ -49,6 +49,29 @@ export class UiSidebarItem {
   template: TEMPLATE,
 })
 export class UiSidebarButton {
+  readonly icon = input.required<IconName>();
+  /** (the element: what a `<ui-menu>` opens at) */
+  readonly element: HTMLElement = inject(ElementRef).nativeElement;
+}
+
+/**
+ * A row's own small button, at its right (`itemEnd`): + (a new one), ⋯ (its menu) — seen only under
+ * the pointer (or while its menu is open: aria-expanded); a click on it isn't the row's.
+ *   <a uiSidebarItem …><button itemEnd uiSidebarAction icon="plus" (click)="…"></button></a>
+ */
+@Component({
+  selector: 'button[uiSidebarAction]',
+  imports: [Icon],
+  host: {
+    type: 'button',
+    class:
+      'grid size-6 shrink-0 place-items-center rounded-md text-icon opacity-0 group-hover/row:opacity-100 hover:bg-side-on ' +
+      'aria-expanded:opacity-100 aria-expanded:bg-side-on -mr-1',
+    '(click)': '$event.preventDefault(); $event.stopPropagation()',
+  },
+  template: `<app-icon [name]="icon()" class="size-4" />`,
+})
+export class UiSidebarAction {
   readonly icon = input.required<IconName>();
   /** (the element: what a `<ui-menu>` opens at) */
   readonly element: HTMLElement = inject(ElementRef).nativeElement;
