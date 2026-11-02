@@ -32,7 +32,7 @@
     </div>
   }
   @if (page(); as open) {
-    <div class="flex flex-col" data-vt="sheet-pane">
+    <div class="flex flex-1 flex-col" data-vt="sheet-pane">
       @switch (open) {
         @case ('language') {
           <ui-list>
@@ -70,18 +70,32 @@
         }
         @case ('tag') {
           @if (tag(); as t) {
-            <div class="flex flex-col gap-6">
-              <ui-list>
-                @for (color of colors; track color) {
-                  <button type="button" uiListItem [checked]="t.color === color" (click)="recolor(t, color)">
-                    <span class="flex items-center gap-3">
-                      <span class="size-6 shrink-0 rounded-lg" [class]="swatch[color]"></span>
-                      <ui-tag [color]="color">{{ t.name }}</ui-tag>
-                    </span>
-                  </button>
-                }
-              </ui-list>
-              <ui-list>
+            <!-- (the tag as it looks; its colors as round swatches on a card, ✓ on its own; Delete at the
+                 bottom, as Log out) -->
+            <div class="flex flex-1 flex-col gap-6">
+              <div class="flex justify-center pt-2"><ui-tag [color]="t.color" class="h-7! px-3! text-body!">{{ t.name }}</ui-tag></div>
+              <div class="flex flex-col gap-2">
+                <span class="px-row-x text-body font-semibold text-fg-secondary">{{ 'tags.color' | t }}</span>
+                <ui-list>
+                  <div class="grid grid-cols-5 justify-items-center gap-y-4 px-row-x py-4">
+                    @for (color of colors; track color) {
+                      <button
+                        type="button"
+                        (click)="recolor(t, color)"
+                        [attr.aria-pressed]="t.color === color"
+                        [attr.aria-label]="colorLabel[color] | t"
+                        class="grid size-11 place-items-center rounded-full ring-fg/60 ring-offset-2 ring-offset-sheet-card aria-pressed:ring-2"
+                        [class]="swatch[color]"
+                      >
+                        @if (t.color === color) {
+                          <app-icon name="check" class="size-5 text-fg" />
+                        }
+                      </button>
+                    }
+                  </div>
+                </ui-list>
+              </div>
+              <ui-list class="mt-auto">
                 <button type="button" uiListItem icon="trash" danger (click)="removeTag(t, $event)">{{ 'tags.delete' | t }}</button>
               </ui-list>
             </div>

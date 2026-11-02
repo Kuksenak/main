@@ -19,4 +19,4 @@ export { UiSelect, type UiOption } from './picker/select';
 export { UiDate } from './picker/date';
 export { UiTime } from './picker/time';
 export { UiWheel } from './picker/wheel';
-export { UiTag, TAG_COLORS, TAG_SWATCH, tagTint, type TagColor } from './tag/tag';
+export { UiTag, TAG_COLORS, TAG_COLOR_LABELS, TAG_SWATCH, tagTint, type TagColor } from './tag/tag';

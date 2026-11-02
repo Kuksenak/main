@@ -1,4 +1,5 @@
 import { Component, computed, input } from '@angular/core';
+import { TranslationKey } from '../../i18n/translations';
 
 /** A tag's colors (as Notion's): the API's names, in the pickers' order. */
 export const TAG_COLORS = ['gray', 'brown', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'red'] as const;
@@ -28,6 +29,19 @@ export const TAG_SWATCH: Record<TagColor, string> = {
   purple: 'bg-tag-purple',
   pink: 'bg-tag-pink',
   red: 'bg-tag-red',
+};
+
+/** A color's name (translations' keys). */
+export const TAG_COLOR_LABELS: Record<TagColor, TranslationKey> = {
+  gray: 'tags.gray',
+  brown: 'tags.brown',
+  orange: 'tags.orange',
+  yellow: 'tags.yellow',
+  green: 'tags.green',
+  blue: 'tags.blue',
+  purple: 'tags.purple',
+  pink: 'tags.pink',
+  red: 'tags.red',
 };
 
 /** A color's pastel, for what's painted by it (a page's icon: `<app-icon colored [tint]>`). */

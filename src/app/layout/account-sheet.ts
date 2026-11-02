@@ -5,7 +5,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
-import { Confirm, Icon, TAG_COLORS, TAG_SWATCH, UiList, UiFloatingButton, UiListItem, UiSheet, UiTag } from '../core/ui';
+import { Confirm, Icon, TAG_COLOR_LABELS, TAG_COLORS, TAG_SWATCH, UiList, UiFloatingButton, UiListItem, UiSheet, UiTag } from '../core/ui';
 import { Tag, TagsStore } from '../library/tags.store';
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
@@ -45,6 +45,7 @@ export class AccountSheet {
   protected readonly tags = inject(TagsStore);
   protected readonly colors = TAG_COLORS;
   protected readonly swatch = TAG_SWATCH;
+  protected readonly colorLabel = TAG_COLOR_LABELS;
   protected readonly tagId = signal<string | null>(null);
   protected readonly tag = computed(() => this.tags.byId().get(this.tagId() ?? '') ?? null);
   private readonly confirm = inject(Confirm);
