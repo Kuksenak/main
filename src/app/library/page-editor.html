@@ -14,7 +14,8 @@
     } @else if (i > 0) {
       <div class="h-2.5 cursor-text desktop:h-5" (click)="between(i)"></div>
     }
-    <div data-block class="group relative transition-opacity" [class.opacity-35]="dragging() === i">
+    <!-- (desktops: the pointer over it or over its ⠿ — the strip at its left, a pseudo-element: hovered as one) -->
+    <div data-block class="group relative transition-opacity desktop:before:absolute desktop:before:inset-y-0 desktop:before:-left-7 desktop:before:w-7" [class.opacity-35]="dragging() === i">
       <button
         type="button"
         [attr.aria-label]="'editor.grip' | t"
@@ -36,7 +37,7 @@
            faint accent one) -->
       <!-- (only for the teacher: a lock in its corner) -->
       <div
-        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-transparent desktop:px-4 desktop:py-3 desktop:outline-1 desktop:outline-solid desktop:outline-transparent desktop:hover:outline-separator desktop:focus-within:outline-accent/15"
+        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-transparent desktop:px-4 desktop:py-3 desktop:outline-1 desktop:outline-solid desktop:outline-transparent desktop:group-hover:outline-separator desktop:focus-within:outline-accent/15"
         [class.pr-9]="item.private"
       >
         @if (item.private) {
