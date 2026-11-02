@@ -1,19 +1,9 @@
 <!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): ‹ back (where it was opened from) in the margin, the page's name at the left (bold), typed over right there (clicked: a field as the sidebar's Search, as wide as the name, ↵ on a chip; Enter: on into the
+     Notion's): the page's name at the left (bold), typed over right there (clicked: a field as the sidebar's Search, as wide as the name, ↵ on a chip; Enter: on into the
      text; a new page: its name selected); saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
 @if (desktop && page(); as p) {
   <!-- (48 tall: its 32-tall name and buttons at the height of the sidebar's Search — 8 from the top) -->
   <div class="sticky top-0 z-20 flex h-12 items-center gap-0.5 bg-app pr-3 pl-8">
-    <!-- (in the 32px margin left of the name, so the name stays in line with the blocks) -->
-    <button
-      uiButton
-      type="button"
-      icon="chevron-left"
-      (click)="goBack()"
-      [attr.aria-label]="'action.back' | t"
-      [uiTip]="'action.back' | t"
-      class="absolute left-1"
-    ></button>
     <div class="mr-2 flex min-w-0 flex-1 items-center">
       <!-- (its box's left edge in line with the blocks'; plain text, grayed under the pointer as a
            button is, till it's clicked: then the Search's look — a faint
