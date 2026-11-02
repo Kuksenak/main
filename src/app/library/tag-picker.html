@@ -1,20 +1,27 @@
 <!-- A page's tag, as a choice of a few (as the language's): No tag, the account's tags (the chosen
      one ✓) — a click picks it; at the bottom a field: a new tag's name, Enter makes it (the next
-     color) and picks it. A tag right-clicked: its colors and Delete, right under it. -->
+     color) and picks it. A tag's ⋯ (at its right, under the pointer): its colors and Delete, right
+     under it. -->
 <ui-menu narrow [origin]="origin()" (closed)="closed.emit()">
   <button type="button" uiMenuItem [checked]="!tagIds().length" (click)="pick(null)">
     <span class="text-fg-secondary">{{ 'tags.noTag' | t }}</span>
   </button>
   @for (tag of store.tags(); track tag.id) {
-    <button
-      type="button"
-      uiMenuItem
-      [checked]="tagIds().includes(tag.id)"
-      (click)="pick(tag.id)"
-      (contextmenu)="$event.preventDefault(); editing.set(editing() === tag.id ? null : tag.id)"
-    >
-      <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
-    </button>
+    <!-- (a row: the tag — a click picks it; ⋯ at its right under the pointer: its colors and Delete under it) -->
+    <div class="group/tag flex items-center">
+      <button type="button" uiMenuItem [checked]="tagIds().includes(tag.id)" (click)="pick(tag.id)" class="w-auto! min-w-0 flex-1">
+        <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+      </button>
+      <button
+        type="button"
+        (click)="editing.set(editing() === tag.id ? null : tag.id)"
+        [attr.aria-expanded]="editing() === tag.id"
+        [attr.aria-label]="'tags.edit' | t"
+        class="ml-0.5 grid size-7 shrink-0 place-items-center rounded-button text-icon opacity-0 group-hover/tag:opacity-100 hover:bg-tint-strong aria-expanded:bg-tint-strong aria-expanded:opacity-100"
+      >
+        <app-icon name="dots" class="size-5" />
+      </button>
+    </div>
     @if (editing() === tag.id) {
       <!-- (its colors, a dot each — the one it has ringed; Delete at the end) -->
       <div class="flex items-center gap-1.5 px-menu-row-x pt-0.5 pb-1.5">

@@ -8,8 +8,8 @@ import { Tag, TagsStore } from './tags.store';
 /**
  * Desktop: a page's tag picked at `origin`, as a choice of a few (the language's look): No tag, the
  * account's tags (✓ the chosen one); a click picks it (one a page, for now). A field at the bottom:
- * a new name, Enter — made in the next color and picked. A tag right-clicked: its colors (a dot
- * each) and Delete under it. `changed`: the page's tags now (one, or none).
+ * a new name, Enter — made in the next color and picked. A tag's ⋯ (under the pointer): its colors
+ * (a dot each) and Delete under it. `changed`: the page's tags now (one, or none).
  */
 @Component({
   selector: 'app-tag-picker',
@@ -47,7 +47,7 @@ export class TagPicker {
     pink: 'tags.pink',
     red: 'tags.red',
   };
-  // The tag right-clicked: its colors and Delete under it
+  // The tag whose ⋯ was clicked: its colors and Delete under it
   protected readonly editing = signal<string | null>(null);
   private readonly menu = viewChild.required(UiMenu);
 
