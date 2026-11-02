@@ -157,13 +157,13 @@ export class PageEditor {
   }
 
   /** Texts put in after the block with the caret (none: at the end) — e.g. the assistant's. */
-  insert(texts: string[], focusLast = false): void {
+  insert(blocks: { text: string; private?: boolean }[], focusLast = false): void {
     const items = this.items();
     // (where: the caret's place the assistant was asked from; else after the caret's block)
     const at = this.aiAt ?? (this.focused() >= 0 ? this.focused() + 1 : items.length);
     // (the page still empty: its empty block replaced)
     const replace = items.length === 1 && !items[0].text.trim();
-    const added = texts.map((text) => ({ id: nextId++, text }));
+    const added = blocks.map((b) => ({ id: nextId++, text: b.text, private: b.private || undefined }));
     this.items.set(replace ? added : [...items.slice(0, at), ...added, ...items.slice(at)]);
     if (this.aiAt !== null) this.aiAt = replace ? added.length : at + added.length; // (the next ones after them)
     this.emit();
