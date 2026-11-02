@@ -8,6 +8,7 @@ import { Icon, IconName, tagTint, Toasts, UiButton, UiFloatingButton, UiList, Ui
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 import { PageMenu } from './page-menu';
+import { keep, kept } from '../core/utils/storage';
 import { TagsStore } from './tags.store';
 
 /**
@@ -31,7 +32,7 @@ export class Library {
   private readonly i18n = inject(I18nService);
 
   protected readonly desktop = desktop;
-  protected readonly creating = signal(false);
+  protected readonly creating = this.store.creating;
   // Desktops: the views — all the pages, the favorites, the published ones
   protected readonly views: { id: View; label: TranslationKey; icon: IconName }[] = [
     { id: 'recents', label: 'library.recents', icon: 'clock' },
@@ -49,11 +50,7 @@ export class Library {
   protected readonly folded = signal<string[]>(readFolded());
   protected fold(key: string): void {
     this.folded.update((f) => (f.includes(key) ? f.filter((x) => x !== key) : [...f, key]));
-    try {
-      localStorage.setItem(FOLDED, this.folded().join(','));
-    } catch {
-      // (not kept)
-    }
+    keep(FOLDED, this.folded().join(','));
   }
 
   // A page's ⋯: its menu (as the sidebar's), at the button
@@ -111,32 +108,15 @@ export class Library {
   }
 
   protected create(): void {
-    if (this.creating()) return;
-    this.creating.set(true);
-    this.store.create(this.i18n.t('library.untitled')).subscribe({
-      next: (page) => this.router.navigate(['/library', page.id], { state: { fresh: true } }),
-      error: () => {
-        this.creating.set(false);
-        this.toasts.error(this.i18n.t('library.createError'));
-      },
-    });
+    this.store.createAndOpen();
   }
 
   // "12 Oct", "12 Oct 2025" (another year); today: "15:02"
   protected changed(item: PageItem, time = false): string {
-    const d = new Date(item.updatedAt);
-    if (time) return this.i18n.date(d, { hour: '2-digit', minute: '2-digit' });
-    const sameYear = d.getFullYear() === new Date().getFullYear();
-    return this.i18n.date(d, sameYear ? { day: 'numeric', month: 'short' } : { day: 'numeric', month: 'short', year: 'numeric' });
+    return time ? this.i18n.time(item.updatedAt) : this.i18n.day(item.updatedAt);
   }
 }
 
 // (the date groups folded away: kept on this device — storage may be off, then it just isn't kept)
 const FOLDED = 'library.folded';
-function readFolded(): string[] {
-  try {
-    return (localStorage.getItem(FOLDED) ?? '').split(',').filter(Boolean);
-  } catch {
-    return [];
-  }
-}
+const readFolded = (): string[] => (kept(FOLDED) ?? '').split(',').filter(Boolean);

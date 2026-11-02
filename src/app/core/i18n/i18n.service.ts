@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { keep, kept } from '../utils/storage';
 import { DICTIONARIES, LANGUAGES, LanguageCode, TranslationKey } from './translations';
 
 const STORAGE_KEY = 'lang';
@@ -28,6 +29,20 @@ export class I18nService {
     return f.format(d);
   }
 
+  /** "26 Oct" ("26 Oct 2025": another year); `time`: "26 Oct, 15:02". */
+  day(at: string | Date, time = false): string {
+    const d = new Date(at);
+    const parts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    if (d.getFullYear() !== new Date().getFullYear()) parts.year = 'numeric';
+    if (time) Object.assign(parts, { hour: '2-digit', minute: '2-digit' });
+    return this.date(d, parts);
+  }
+
+  /** "15:02" */
+  time(at: string | Date): string {
+    return this.date(new Date(at), { hour: '2-digit', minute: '2-digit' });
+  }
+
   /** First letter uppercased (month / weekday names are lowercase in some languages). */
   capitalize(s: string): string {
     return s.charAt(0).toLocaleUpperCase(this.locale()) + s.slice(1);
@@ -43,22 +58,14 @@ export class I18nService {
   setLang(code: LanguageCode): void {
     this.lang.set(code);
     document.documentElement.lang = code;
-    try {
-      localStorage.setItem(STORAGE_KEY, code);
-    } catch {
-      /* storage unavailable — keep the choice for this session only */
-    }
+    keep(STORAGE_KEY, code);
   }
 
   // Saved choice, else the browser language if supported, else English.
   private initialLang(): LanguageCode {
     const supported = (c: string | null): c is LanguageCode => LANGUAGES.some((l) => l.code === c);
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (supported(saved)) return saved;
-    } catch {
-      /* ignore */
-    }
+    const saved = kept(STORAGE_KEY);
+    if (supported(saved)) return saved;
     const browser = navigator.language.slice(0, 2);
     return supported(browser) ? browser : 'en';
   }

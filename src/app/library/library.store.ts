@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { Observable, forkJoin, switchMap, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { Observable, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
 import { Toasts } from '../core/ui';
@@ -67,6 +68,9 @@ export class LibraryStore {
   readonly clipboard = signal<PageBlock[] | null>(null);
   private readonly toasts = inject(Toasts);
   private readonly i18n = inject(I18nService);
+  private readonly router = inject(Router);
+  /** A new page on its way (New page: off meanwhile). */
+  readonly creating = signal(false);
 
   load(): void {
     this.http.get<PageItem[]>(this.url).subscribe({
@@ -88,9 +92,31 @@ export class LibraryStore {
     return this.http.post<Page>(this.url, { title }).pipe(tap((page) => this.put(page)));
   }
 
-  /** A copy of a page (its blocks too), named `title`. */
-  duplicate(id: string, title: string): Observable<Page> {
-    return this.get(id).pipe(switchMap((page) => this.create(title).pipe(switchMap((copy) => this.save(copy.id, title, page.blocks)))));
+  /** New page: an empty one ("Untitled"), opened with its name selected (one at a time). */
+  createAndOpen(): void {
+    if (this.creating()) return;
+    this.creating.set(true);
+    this.create(this.i18n.t('library.untitled')).subscribe({
+      next: (page) => {
+        this.creating.set(false);
+        this.router.navigate(['/library', page.id], { state: { fresh: true } });
+      },
+      error: () => {
+        this.creating.set(false);
+        this.toasts.error(this.i18n.t('library.createError'));
+      },
+    });
+  }
+
+  /** Duplicate: a copy of a page ("… (copy)"; its blocks — given, else the saved ones), opened. */
+  duplicate(id: string, title: string, blocks?: PageBlock[]): void {
+    const name = this.i18n.t('library.copyOf').replace('{title}', title.trim() || this.i18n.t('library.untitled'));
+    (blocks ? of(blocks) : this.get(id).pipe(map((p) => p.blocks)))
+      .pipe(switchMap((content) => this.create(name).pipe(switchMap((copy) => this.save(copy.id, name, content)))))
+      .subscribe({
+        next: (copy) => this.router.navigate(['/library', copy.id]),
+        error: () => this.toasts.error(this.i18n.t('library.duplicateError')),
+      });
   }
 
   save(id: string, title: string, blocks: PageBlock[]): Observable<Page> {

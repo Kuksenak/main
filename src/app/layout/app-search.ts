@@ -72,8 +72,6 @@ export class AppSearch {
   }
 
   private newPage(): void {
-    this.library.create(this.i18n.t('library.untitled')).subscribe((page) =>
-      this.router.navigate(['/library', page.id], { state: { fresh: true } }),
-    );
+    this.library.createAndOpen();
   }
 }

@@ -44,12 +44,7 @@ export class PageMenu {
 
   protected duplicate(): void {
     this.closed.emit();
-    const page = this.page();
-    const title = this.i18n.t('library.copyOf').replace('{title}', page.title.trim() || this.i18n.t('library.untitled'));
-    this.store.duplicate(page.id, title).subscribe({
-      next: (copy) => this.router.navigate(['/library', copy.id]),
-      error: () => this.toasts.error(this.i18n.t('library.duplicateError')),
-    });
+    this.store.duplicate(this.page().id, this.page().title);
   }
 
   protected trash(): void {
@@ -65,6 +60,6 @@ export class PageMenu {
 
   // "26 Oct, 15:02"
   protected edited(): string {
-    return this.i18n.date(new Date(this.page().updatedAt), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return this.i18n.day(this.page().updatedAt, true);
   }
 }

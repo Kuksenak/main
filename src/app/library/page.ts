@@ -164,20 +164,12 @@ export class PageView {
   // ⋯ → Duplicate: a copy of it (what's typed in it too), opened
   protected duplicate(): void {
     this.flush();
-    const title = this.i18n.t('library.copyOf').replace('{title}', this.title().trim() || this.i18n.t('library.untitled'));
-    const blocks = this.blocks.filter((b) => b.text?.trim());
-    this.store
-      .create(title)
-      .pipe(switchMap((page) => this.store.save(page.id, title, blocks)))
-      .subscribe({
-        next: (page) => this.router.navigate(['/library', page.id]),
-        error: () => this.toasts.error(this.i18n.t('library.duplicateError')),
-      });
+    this.store.duplicate(this.id(), this.title(), this.blocks.filter((b) => b.text?.trim()));
   }
 
   // "26 Oct, 15:02"
   protected when(at: string): string {
-    return this.i18n.date(new Date(at), { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+    return this.i18n.day(at, true);
   }
 
   // Publish: its link made and copied (a toast says so); off: the link answers nothing any more

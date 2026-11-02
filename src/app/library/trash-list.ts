@@ -59,6 +59,6 @@ export class TrashList {
 
   // "26 Oct"
   protected when(at: string): string {
-    return this.i18n.date(new Date(at), { day: 'numeric', month: 'short' });
+    return this.i18n.day(at);
   }
 }

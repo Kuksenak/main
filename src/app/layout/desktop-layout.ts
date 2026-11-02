@@ -16,6 +16,7 @@ import { PageMenu } from '../library/page-menu';
 import { TagsStore } from '../library/tags.store';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
+import { keep, kept } from '../core/utils/storage';
 import { Search } from './search';
 
 /**
@@ -78,10 +79,10 @@ export class DesktopLayout {
   });
   protected readonly listsScrolled = signal(false);
   // (folded away — kept on this device)
-  protected readonly folded = signal<List[]>((read(FOLDED) ?? '').split(',').filter((x): x is List => x === 'favorites' || x === 'recents'));
+  protected readonly folded = signal<List[]>((kept(FOLDED) ?? '').split(',').filter((x): x is List => x === 'favorites' || x === 'recents'));
   protected fold(list: List): void {
     this.folded.update((f) => (f.includes(list) ? f.filter((x) => x !== list) : [...f, list]));
-    write(FOLDED, this.folded().join(','));
+    keep(FOLDED, this.folded().join(','));
   }
 
   // A page's icon: in its first tag's pastel
@@ -94,21 +95,9 @@ export class DesktopLayout {
   protected readonly rowMenu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
   private readonly toasts = inject(Toasts);
 
-  // Library's +: a new page ("Untitled"), opened with its name selected
-  private creating = false;
+  // Library's +: a new page, opened with its name selected
   protected createPage(): void {
-    if (this.creating) return;
-    this.creating = true;
-    this.store.create(this.i18n.t('library.untitled')).subscribe({
-      next: (page) => {
-        this.creating = false;
-        this.router.navigate(['/library', page.id], { state: { fresh: true } });
-      },
-      error: () => {
-        this.creating = false;
-        this.toasts.error(this.i18n.t('library.createError'));
-      },
-    });
+    this.store.createAndOpen();
   }
 
   // The account's menu: open at its button
@@ -142,17 +131,3 @@ type List = 'favorites' | 'recents';
 const RECENTS = 5;
 // (the lists folded away: kept on this device — storage may be off, then it just isn't kept)
 const FOLDED = 'sidebar.folded';
-const read = (key: string): string | null => {
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-};
-const write = (key: string, value: string): void => {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // (not kept)
-  }
-};
