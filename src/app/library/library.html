@@ -146,9 +146,14 @@
       } @else {
         <ui-list>
           @for (item of items; track item.id) {
-            <button type="button" uiListItem icon="page" (click)="open(item)" chevron>
+            <button type="button" uiListItem icon="page" [tint]="tint(item)" (click)="open(item)" chevron>
               {{ item.title }}
-              <span itemValue class="shrink-0 text-fg-secondary">{{ changed(item) }}</span>
+              <span itemValue class="flex shrink-0 items-center gap-2 text-fg-secondary">
+                @for (tag of tags.of(item.tagIds); track tag.id) {
+                  <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
+                }
+                {{ changed(item) }}
+              </span>
             </button>
           }
         </ui-list>

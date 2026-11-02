@@ -27,6 +27,8 @@ import { Icon, IconName } from '../icon/icon';
 })
 export class UiListItem {
   readonly icon = input<IconName>();
+  /** (its icon coloured in with another pastel: a page's tag's) */
+  readonly tint = input<string | null>(null);
   readonly chevron = input(false, { transform: booleanAttribute });
   readonly checked = input<boolean>();
   readonly danger = input(false, { transform: booleanAttribute });

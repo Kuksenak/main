@@ -13,8 +13,8 @@ interface Option {
 
 /**
  * Desktop: a page's tags picked at `origin` (as Notion's) — the chosen ones in a field, what's typed
- * filters the account's tags under it; a click (or Enter) puts one on / takes it off; a new name:
- * Create (made in the next color, put on). A tag's ⋯: its name, its color, Delete. `changed`: the
+ * filters the account's tags under it; a click (or Enter) puts one on — one a page, for now: it
+ * replaces the one there — or takes it off; a new name: Create (made in the next color, put on). A tag's ⋯: its name, its color, Delete. `changed`: the
  * page's tags now (the ids, in order).
  */
 @Component({
@@ -74,9 +74,9 @@ export class TagPicker {
     return this.tagIds().includes(tag.id);
   }
 
+  // (one tag a page, for now — its icon's color: picking one replaces it; the chosen one again: none)
   protected toggle(tag: Tag): void {
-    const ids = this.tagIds();
-    this.changed.emit(ids.includes(tag.id) ? ids.filter((id) => id !== tag.id) : [...ids, tag.id]);
+    this.changed.emit(this.tagIds().includes(tag.id) ? [] : [tag.id]);
   }
 
   protected pickOption(option: Option): void {
@@ -90,7 +90,7 @@ export class TagPicker {
   private createTyped(): void {
     const name = this.query().trim();
     if (!name) return;
-    this.store.create(name).subscribe((tag) => this.changed.emit([...this.tagIds(), tag.id]));
+    this.store.create(name).subscribe((tag) => this.changed.emit([tag.id]));
   }
 
   protected key(e: KeyboardEvent): void {

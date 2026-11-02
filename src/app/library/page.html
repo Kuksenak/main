@@ -131,6 +131,9 @@
     } @else {
       <!-- Phones: read only, as it'd be read — the blocks (cards; "only for me": a lock);
            its title: the top bar's; what can be done with it: the top bar's ⋯ -->
+      @for (tag of tags.of(p.tagIds); track tag.id) {
+        <ui-tag [color]="tag.color" class="self-start">{{ tag.name }}</ui-tag>
+      }
       @for (block of p.blocks; track $index) {
         <div
           class="relative rounded-card bg-tint px-4 py-3 text-body leading-relaxed break-words whitespace-pre-wrap"
@@ -178,8 +181,14 @@
   <ui-sheet #actions (closed)="actionsOpen.set(false)">
     <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold">{{ title() || ('library.untitled' | t) }}</span>
     <div class="flex flex-col gap-6">
-      <!-- (the page: keep it, a copy) -->
+      <!-- (the page: its tag (its own sheet), keep it, a copy) -->
       <ui-list>
+        <button type="button" uiListItem icon="hash" chevron (click)="actions.close(); tagSheetOpen.set(true)">
+          {{ 'tags.title' | t }}
+          @for (tag of tags.of(p.tagIds); track tag.id) {
+            <ui-tag itemValue [color]="tag.color">{{ tag.name }}</ui-tag>
+          }
+        </button>
         <button type="button" uiListItem icon="bookmark" (click)="actions.close(); favorite()">
           {{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}
         </button>
@@ -216,4 +225,9 @@
       </ui-list>
     </div>
   </ui-sheet>
+}
+
+<!-- Phones: the page's tag, picked in its own sheet -->
+@if (!desktop && tagSheetOpen() && page(); as p) {
+  <app-tag-sheet [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagSheetOpen.set(false)" />
 }

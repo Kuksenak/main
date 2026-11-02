@@ -14,6 +14,7 @@ import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
 import { shown } from './marks';
 import { PageEditor } from './page-editor';
 import { TagPicker } from './tag-picker';
+import { TagSheet } from './tag-sheet';
 import { TagsStore } from './tags.store';
 
 // How long after the last keystroke a change is saved
@@ -31,7 +32,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, TagPicker],
+  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, TagPicker, TagSheet],
   templateUrl: './page.html',
 })
 export class PageView {
@@ -53,8 +54,11 @@ export class PageView {
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
   protected readonly tagsOpen = signal(false);
+  // Phones: the tag's sheet (from the ⋯ sheet)
+  protected readonly tagSheetOpen = signal(false);
   private readonly confirm = inject(Confirm);
   protected readonly tags = inject(TagsStore);
+  private readonly tagsLoaded = this.tags.load();
   // Phones: the page read only; its actions in a sheet (the top bar's ⋯)
   protected readonly actionsOpen = signal(false);
   protected readonly shown = shown;
