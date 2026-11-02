@@ -31,6 +31,7 @@ export const ICONS = [
   'filter',
   'enter',
   'clock',
+  'hash',
   'pencil',
   'arrow-up',
   'arrow-down',

@@ -37,7 +37,7 @@ export class Library {
   protected readonly views: { id: View; label: TranslationKey; icon: IconName }[] = [
     { id: 'recents', label: 'library.recents', icon: 'clock' },
     { id: 'favorites', label: 'library.favorites', icon: 'bookmark' },
-    { id: 'published', label: 'library.published', icon: 'link' },
+    { id: 'published', label: 'library.published', icon: 'lock' },
   ];
   protected readonly view = signal<View>('recents');
   // The tags: after a page's name; its icon in its first tag's pastel

@@ -1,7 +1,7 @@
 @if (desktop) {
   <!-- Desktops, as Notion's: at the top, staying as the pages scroll under it — the section's name (a
        48-tall row: level with the sidebar's Search), under it the views as pills (an icon, its name;
-       the one shown: a gray pill) and New page at the right (the accent's, filled, as Notion's New); then the pages -->
+       the one shown: a gray pill) and New page at the right (filled black — the strong buttons' color); then the pages -->
   <div class="sticky top-0 z-20 flex flex-col bg-app pr-3 pb-1 pl-8">
     <h1 class="flex h-12 items-center px-2 text-lg font-semibold">{{ 'nav.library' | t }}</h1>
     <div class="flex items-center gap-1">
@@ -37,7 +37,7 @@
           type="button"
           [disabled]="creating()"
           (click)="create()"
-          class="inline-flex h-button shrink-0 items-center gap-1.5 rounded-button bg-accent pr-3 pl-2 text-ui font-medium text-on-accent hover:bg-accent/90 disabled:opacity-50"
+          class="inline-flex h-button shrink-0 items-center gap-1.5 rounded-button bg-strong pr-3 pl-2 text-ui font-medium text-on-strong hover:opacity-85 disabled:opacity-50"
         >
           <app-icon name="plus" class="size-4.5" />
           {{ 'library.new' | t }}
@@ -57,7 +57,7 @@
           type="button"
           [disabled]="creating()"
           (click)="create()"
-          class="inline-flex h-button shrink-0 items-center gap-1.5 rounded-button bg-accent pr-3 pl-2 text-ui font-medium text-on-accent hover:bg-accent/90 disabled:opacity-50"
+          class="inline-flex h-button shrink-0 items-center gap-1.5 rounded-button bg-strong pr-3 pl-2 text-ui font-medium text-on-strong hover:opacity-85 disabled:opacity-50"
         >
           <app-icon name="plus" class="size-4.5" />
             {{ 'library.new' | t }}

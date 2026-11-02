@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Icon, Toasts, UiButton, UiList, UiListItem, UiSheet, UiTag, UiToggle } from '../core/ui';
+import { Confirm, Icon, Toasts, UiButton, UiList, UiListItem, UiSheet, UiTag } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow } from '../core/ui/window';
@@ -31,7 +31,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiToggle, UiWindow, TagPicker],
+  imports: [AiChat, Icon, PageEditor, TranslatePipe, UiButton, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTip, UiWindow, TagPicker],
   templateUrl: './page.html',
 })
 export class PageView {
@@ -53,7 +53,7 @@ export class PageView {
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
   protected readonly tagsOpen = signal(false);
-  protected readonly shareOpen = signal(false);
+  private readonly confirm = inject(Confirm);
   protected readonly tags = inject(TagsStore);
   // Phones: the page read only; its actions in a sheet (the top bar's ⋯)
   protected readonly actionsOpen = signal(false);
@@ -185,9 +185,14 @@ export class PageView {
     });
   }
 
-  // (its public link, as shown in Share's popover)
-  protected link(token: string): string {
-    return shareUrl(token);
+  // "Shared" clicked: Stop sharing — asked first (the link stops working)
+  protected async unshare(e: Event): Promise<void> {
+    const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
+      text: this.i18n.t('library.unshareAsk'),
+      yes: this.i18n.t('library.unpublish'),
+      danger: true,
+    });
+    if (yes) this.share(false);
   }
 
   protected copyLink(note = this.i18n.t('library.linkCopied')): void {
