@@ -18,9 +18,8 @@
       }
       <span class="flex-1"></span>
       @if (picked().size) {
-        <!-- (some picked: how many, what to do with them — to the favorites, to the trash; ✕ unpicks) -->
+        <!-- (some picked: how many, Move to trash; ✕ unpicks) -->
         <span class="mr-1 text-ui text-fg-secondary">{{ 'library.picked' | t }}: {{ picked().size }}</span>
-        <button uiButton type="button" icon="bookmark" (click)="favoritePicked()">{{ 'library.favorite' | t }}</button>
         <button uiButton type="button" icon="trash" (click)="trashPicked()">{{ 'library.moveToTrash' | t }}</button>
         <button uiButton type="button" icon="close" (click)="unpick()" [attr.aria-label]="'library.unpick' | t"></button>
       } @else {
@@ -45,9 +44,9 @@
       } @else {
           <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older): each group a
              block of its own — its name small and gray over it, room between them. A row each, as
-             Notion's: a box to pick it (under the pointer, or all of them while any is picked), its
-             icon, its name, ⋯ (its menu, under the pointer), when (today: the time); gray under the
-             pointer, a picked one tinted. A click opens it; while some are picked: picks it -->
+             Notion's: its icon, its name, ⋯ (its menu, under the pointer), when (today: the time);
+             gray under the pointer, a picked one tinted. A click opens it; Ctrl+click (⌘ on a Mac)
+             picks it -->
         @for (group of groups(); track group.key) {
           <section class="flex flex-col gap-0.5 not-first:mt-7">
             <h2 class="flex h-7 items-center px-2 text-footnote font-medium text-fg-secondary">{{ group.key | t }}</h2>
@@ -55,27 +54,11 @@
               <div
                 role="button"
                 tabindex="0"
-                (click)="picked().size ? pick(item.id) : open(item)"
+                (click)="$event.ctrlKey || $event.metaKey ? pick(item.id) : open(item)"
                 (keydown.enter)="open(item)"
                 [attr.aria-selected]="picked().has(item.id)"
-                [attr.data-picking]="picked().size ? '' : null"
-                class="group flex h-10 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-lg pr-2 pl-1 text-left outline-none hover:bg-tint focus-visible:bg-tint aria-selected:bg-accent/10"
+                class="group flex h-10 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-lg px-2 text-left outline-none hover:bg-tint focus-visible:bg-tint aria-selected:bg-accent/10"
               >
-                <button
-                  type="button"
-                  (click)="$event.stopPropagation(); pick(item.id)"
-                  [attr.aria-label]="'library.pick' | t"
-                  [attr.aria-pressed]="picked().has(item.id)"
-                  class="grid size-6 shrink-0 place-items-center rounded-md opacity-0 group-hover:opacity-100 group-data-picking:opacity-100"
-                >
-                  <span
-                    class="grid size-4 place-items-center rounded-[0.3rem] border-[1.5px] border-fg/25 text-on-accent group-aria-selected:border-accent group-aria-selected:bg-accent"
-                  >
-                    @if (picked().has(item.id)) {
-                      <app-icon name="check" class="size-3" />
-                    }
-                  </span>
-                </button>
                 <app-icon name="page" colored class="size-5 shrink-0 text-icon" />
                 <span class="min-w-0 truncate text-ui text-fg" [class.text-fg-secondary]="!item.title.trim()">{{
                   item.title.trim() || ('library.untitled' | t)
