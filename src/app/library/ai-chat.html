@@ -17,7 +17,7 @@
       </div>
     } @else {
       <!-- The assistant's: its reply, then the blocks it wrote for the page as cards (the teacher's
-           only — answers: a lock, faint, as on the page), "Add to the page" -->
+           only — answers: a lock, as on the page), "Add to the page" -->
       <div class="flex flex-col gap-2">
         @if (turn.text) {
           <p class="px-1 text-body whitespace-pre-wrap">{{ turn.text }}</p>
@@ -25,8 +25,7 @@
         @if (turn.blocks?.length) {
           @for (block of turn.blocks; track $index) {
             <div
-              class="relative rounded-card data-private:opacity-40 bg-tint px-4 py-3 desktop:rounded-menu desktop:bg-tint/50"
-              [attr.data-private]="block.private ? '' : null"
+              class="relative rounded-card bg-tint px-4 py-3 desktop:rounded-menu desktop:bg-tint/50"
               [class.pr-9]="block.private"
             >
               @if (block.private) {

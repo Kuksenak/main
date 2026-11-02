@@ -22,7 +22,7 @@
         tipSide="bottom"
         [attr.aria-expanded]="blockMenu() === i"
         [attr.data-near]="near() === i ? '' : null"
-        class="absolute top-3 grid h-7 w-6 desktop:top-1 desktop:h-6 desktop:w-4 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-5.5 desktop:opacity-0 desktop:data-near:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
+        class="absolute top-3 grid h-7 w-6 desktop:top-1 desktop:h-6 desktop:w-4 cursor-grab touch-none place-items-center rounded-md text-icon transition-opacity hover:bg-tint-strong active:cursor-grabbing desktop:-left-5.5 desktop:opacity-0 desktop:group-hover:opacity-100 desktop:data-near:opacity-100 desktop:aria-expanded:opacity-100 mobile:-right-2 mobile:opacity-50"
         (pointerdown)="gripDown($event, i)"
         (pointermove)="gripMove($event, host)"
         (pointerup)="gripUp()"
@@ -31,12 +31,12 @@
         <app-icon name="grip" class="size-4.5 desktop:size-4" />
       </button>
 
-      <!-- (a card: set apart — a soft gray fill, no edge, round corners, room inside (desktops: as
-           Notion's callouts; written in: a faint accent line round it)) -->
-      <!-- (only for the teacher: a lock in its corner, the card faint — whole while typed in) -->
+      <!-- (phones: a card — a soft gray fill, round corners, room inside; desktops: plain text, as
+           Notion's — under the pointer a faint edge round it (and its ⠿ at the left), written in: a
+           faint accent one) -->
+      <!-- (only for the teacher: a lock in its corner) -->
       <div
-        class="relative rounded-card transition-opacity data-private:opacity-40 data-private:focus-within:opacity-100 bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-tint/50 desktop:px-4 desktop:py-3 desktop:focus-within:outline-1 desktop:focus-within:outline-solid desktop:focus-within:outline-accent/15"
-        [attr.data-private]="item.private ? '' : null"
+        class="relative rounded-card bg-tint px-4 py-3 mobile:mr-6 desktop:rounded-menu desktop:bg-transparent desktop:px-4 desktop:py-3 desktop:outline-1 desktop:outline-solid desktop:outline-transparent desktop:hover:outline-separator desktop:focus-within:outline-accent/15"
         [class.pr-9]="item.private"
       >
         @if (item.private) {

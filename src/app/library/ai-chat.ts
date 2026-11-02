@@ -8,7 +8,7 @@ import { marked } from './marks';
 /**
  * The page assistant's chat (AiChatStore), for a page: the turns — the teacher's on the right (their
  * photos over it), the assistant's on the left, the blocks it wrote for the page under its reply as
- * cards (the teacher's only — answers: a lock, faint), "Add to the page" under them (`add`:
+ * cards (the teacher's only — answers: a lock), "Add to the page" under them (`add`:
  * the page puts them in) — and the field at the bottom (Enter sends; Shift+Enter, a new line; +:
  * photos — a book's page, say — pasted or dropped in too, up to 5). Nothing yet: a few words on what
  * to ask. The page around it: a sheet (phones) or a window (desktop).
