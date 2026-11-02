@@ -1,19 +1,19 @@
-import { afterRenderEffect, Component, ElementRef, inject, output, signal, viewChild } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Confirm, Icon, TAG_COLORS, TAG_COLOR_LABELS, TAG_SWATCH, UiButton, UiTag } from '../core/ui';
+import { Confirm, Icon, TAG_COLORS, TAG_COLOR_LABELS, TAG_SWATCH, tagChip, UiButton } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { UiWindow } from '../core/ui/window';
 import { Tag, TagsStore } from './tags.store';
 
 /**
  * Desktop: the account's tags (the account's menu → Tags), in the shared window (as the search's),
- * a row each: the tag (a double click: renamed in place), ⋯ — its menu: Rename, its
+ * a row each, the whole of it in its color: its name a field (typed over right there), ⋯ — its menu: its
  * colors, Delete (asked first: off its pages too).
  */
 @Component({
   selector: 'app-tags-window',
-  imports: [Icon, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiTag, UiWindow],
+  imports: [Icon, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiWindow],
   templateUrl: './tags-window.html',
 })
 export class TagsWindow {
@@ -25,19 +25,13 @@ export class TagsWindow {
   protected readonly colors = TAG_COLORS;
   protected readonly swatch = TAG_SWATCH;
   protected readonly colorLabel = TAG_COLOR_LABELS;
+  protected readonly chip = tagChip;
 
   // A tag's ⋯ menu, at its button
   protected readonly menuFor = signal<{ tag: Tag; at: HTMLElement } | null>(null);
-  // The tag being renamed (a field in its chip's place)
-  protected readonly renaming = signal<string | null>(null);
-  private readonly name = viewChild<ElementRef<HTMLInputElement>>('name');
 
   constructor() {
     this.store.load();
-    // (Rename: the field focused, its name selected)
-    afterRenderEffect(() => {
-      if (this.renaming()) this.name()?.nativeElement.select();
-    });
   }
 
   protected recolor(tag: Tag, color: Tag['color']): void {
@@ -46,9 +40,11 @@ export class TagsWindow {
 
   // (Enter or away: saved — not empty, not another tag's name)
   protected rename(tag: Tag, field: HTMLInputElement): void {
-    this.renaming.set(null);
     const name = field.value.trim();
-    if (!name || name === tag.name || this.store.tags().some((t) => t.id !== tag.id && t.name.toLowerCase() === name.toLowerCase())) return;
+    if (!name || name === tag.name || this.store.tags().some((t) => t.id !== tag.id && t.name.toLowerCase() === name.toLowerCase())) {
+      field.value = tag.name;
+      return;
+    }
     this.store.update({ ...tag, name });
   }
 

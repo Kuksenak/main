@@ -1,6 +1,6 @@
-<!-- The account's tags: a row each — the tag (a double click, or Rename: a field in its place), ⋯ at
-     the right: its menu — Rename, its colors (a swatch each, ✓ the one it has), Delete (asked first).
-     None yet: a word on where they're made. -->
+<!-- The account's tags: a row each, the whole of it in its color — its name a field (typed over right
+     there), ⋯ at the right: its menu — its colors (a swatch each, ✓ the one it has), Delete (asked
+     first). None yet: a word on where they're made. -->
 <ui-window (closed)="closed.emit()">
   <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
     <app-icon name="hash" class="size-5 shrink-0 text-icon" />
@@ -8,22 +8,20 @@
   </div>
   <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-3">
     @for (tag of store.tags(); track tag.id) {
-      <div class="group flex h-10 shrink-0 items-center gap-2 rounded-xl px-2 hover:bg-tint/50">
-        @if (renaming() === tag.id) {
-          <input
-            #name
-            type="text"
-            maxlength="40"
-            [value]="tag.name"
-            (keydown.enter)="name.blur()"
-            (keydown.escape)="name.value = tag.name; name.blur()"
-            (blur)="rename(tag, name)"
-            class="h-7 w-56 min-w-0 rounded-md bg-tint px-2 text-ui text-fg outline-none"
-          />
-        } @else {
-          <ui-tag [color]="tag.color" (dblclick)="renaming.set(tag.id)" class="cursor-default select-none">{{ tag.name }}</ui-tag>
-        }
-        <span class="flex-1"></span>
+      <!-- (a row: the whole of it in the tag's color; its name a field right there — Enter or away:
+           saved, Esc: as it was) -->
+      <div class="mb-1 flex h-10 shrink-0 items-center gap-2 rounded-xl pr-1 pl-3" [class]="chip(tag.color)">
+        <input
+          #name
+          type="text"
+          maxlength="40"
+          [value]="tag.name"
+          (keydown.enter)="name.blur()"
+          (keydown.escape)="name.value = tag.name; name.blur()"
+          (blur)="rename(tag, name)"
+          [attr.aria-label]="'tags.rename' | t"
+          class="h-8 min-w-0 flex-1 bg-transparent text-ui text-current outline-none"
+        />
         <button
           #more
           uiButton
@@ -40,11 +38,9 @@
   </div>
 </ui-window>
 
-<!-- A tag's ⋯: Rename; its colors; Delete (asked first) -->
+<!-- A tag's ⋯: its colors; Delete (asked first) -->
 @if (menuFor(); as m) {
   <ui-menu narrow [origin]="m.at" (closed)="menuFor.set(null)">
-    <button type="button" uiMenuItem (click)="renaming.set(m.tag.id)">{{ 'tags.rename' | t }}</button>
-    <ui-menu-separator />
     <ui-menu-label>{{ 'tags.color' | t }}</ui-menu-label>
     @for (color of colors; track color) {
       <button type="button" uiMenuItem [checked]="m.tag.color === color" (click)="recolor(m.tag, color)">
