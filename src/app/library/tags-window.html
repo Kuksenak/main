@@ -1,90 +1,61 @@
-<!-- The account's tags as a table (as Notion's properties): Tag (its chip; Rename: a field in its
-     place), Color (its swatch and name ▾ — the colors' menu), Pages (how many have it), ⋯ (Rename,
-     Delete — asked first). None yet: a word on where they're made. -->
+<!-- The account's tags: a row each — the tag (Rename: a field in its place), how many pages have it,
+     ⋯ at the right: its menu — Rename, its colors (a swatch each, ✓ the one it has), Delete (asked
+     first). None yet: a word on where they're made. -->
 <ui-window (closed)="closed.emit()">
   <div class="flex h-12 shrink-0 items-center gap-3 px-4.5">
     <app-icon name="hash" class="size-5 shrink-0 text-icon" />
     <span class="flex-1 text-base text-fg">{{ 'tags.title' | t }}</span>
   </div>
-  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-4.5 pb-4">
-    @if (store.tags().length) {
-      <div class="grid grid-cols-[minmax(0,1fr)_9rem_4rem_2rem] items-center">
-        <!-- (the heads: small and gray, a hairline under them) -->
-        <span class="border-b-[0.5px] border-separator px-2 py-1.5 text-footnote text-fg-secondary">{{ 'tags.tag' | t }}</span>
-        <span class="border-b-[0.5px] border-separator px-2 py-1.5 text-footnote text-fg-secondary">{{ 'tags.color' | t }}</span>
-        <span class="border-b-[0.5px] border-separator px-2 py-1.5 text-right text-footnote text-fg-secondary">{{ 'tags.pages' | t }}</span>
-        <span class="border-b-[0.5px] border-separator py-1.5"></span>
-        @for (tag of store.tags(); track tag.id) {
-          <!-- (a row: its cells, a hairline under each) -->
-          <div class="flex h-10 min-w-0 items-center border-b-[0.5px] border-separator px-2">
-            @if (renaming() === tag.id) {
-              <input
-                #name
-                type="text"
-                maxlength="40"
-                [value]="tag.name"
-                (keydown.enter)="name.blur()"
-                (keydown.escape)="name.value = tag.name; name.blur()"
-                (blur)="rename(tag, name)"
-                class="h-7 w-full min-w-0 rounded-md bg-tint px-2 text-ui text-fg outline-none"
-              />
-            } @else {
-              <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
-            }
-          </div>
-          <div class="flex h-10 items-center border-b-[0.5px] border-separator px-1">
-            <button
-              #colorBtn
-              type="button"
-              (click)="colorsFor.set(colorsFor()?.tag?.id === tag.id ? null : { tag, at: colorBtn })"
-              [attr.aria-expanded]="colorsFor()?.tag?.id === tag.id"
-              class="flex h-7 min-w-0 items-center gap-2 rounded-button px-1.5 text-ui text-fg hover:bg-tint aria-expanded:bg-tint"
-            >
-              <span class="size-3.5 shrink-0 rounded-[0.25rem]" [class]="swatch[tag.color]"></span>
-              <span class="min-w-0 truncate">{{ colorLabel[tag.color] | t }}</span>
-              <app-icon name="chevron-down" class="size-4 shrink-0 opacity-50" />
-            </button>
-          </div>
-          <span class="flex h-10 items-center justify-end border-b-[0.5px] border-separator px-2 text-ui text-fg-secondary tabular-nums">{{
-            uses().get(tag.id) ?? 0
-          }}</span>
-          <div class="flex h-10 items-center justify-end border-b-[0.5px] border-separator">
-            <button
-              #more
-              uiButton
-              type="button"
-              icon="dots"
-              (click)="menuFor.set(menuFor()?.tag?.id === tag.id ? null : { tag, at: more.element })"
-              [attr.aria-expanded]="menuFor()?.tag?.id === tag.id"
-              [attr.aria-label]="'library.more' | t"
-            ></button>
-          </div>
+  <div class="flex min-h-0 flex-1 flex-col overflow-y-auto px-3.5 pb-3">
+    @for (tag of store.tags(); track tag.id) {
+      <div class="group flex h-10 shrink-0 items-center gap-2 rounded-xl px-2 hover:bg-tint">
+        @if (renaming() === tag.id) {
+          <input
+            #name
+            type="text"
+            maxlength="40"
+            [value]="tag.name"
+            (keydown.enter)="name.blur()"
+            (keydown.escape)="name.value = tag.name; name.blur()"
+            (blur)="rename(tag, name)"
+            class="h-7 w-56 min-w-0 rounded-md bg-dialog px-2 text-ui text-fg outline-none ring-1 ring-separator"
+          />
+        } @else {
+          <ui-tag [color]="tag.color">{{ tag.name }}</ui-tag>
         }
+        <span class="flex-1"></span>
+        <span class="text-footnote text-fg-secondary tabular-nums">{{ uses().get(tag.id) ?? 0 }}</span>
+        <button
+          #more
+          uiButton
+          type="button"
+          icon="dots"
+          (click)="menuFor.set(menuFor()?.tag?.id === tag.id ? null : { tag, at: more.element })"
+          [attr.aria-expanded]="menuFor()?.tag?.id === tag.id"
+          [attr.aria-label]="'library.more' | t"
+        ></button>
       </div>
-    } @else {
+    } @empty {
       <p class="m-auto py-10 text-center text-ui text-fg-secondary">{{ 'tags.empty' | t }}</p>
     }
   </div>
 </ui-window>
 
-<!-- A tag's color: its menu, the colors by name -->
-@if (colorsFor(); as c) {
-  <ui-menu narrow [origin]="c.at" (closed)="colorsFor.set(null)">
+<!-- A tag's ⋯: Rename; its colors; Delete (asked first) -->
+@if (menuFor(); as m) {
+  <ui-menu narrow [origin]="m.at" (closed)="menuFor.set(null)">
+    <button type="button" uiMenuItem (click)="renaming.set(m.tag.id)">{{ 'tags.rename' | t }}</button>
+    <ui-menu-separator />
+    <ui-menu-label>{{ 'tags.color' | t }}</ui-menu-label>
     @for (color of colors; track color) {
-      <button type="button" uiMenuItem [checked]="c.tag.color === color" (click)="recolor(c.tag, color)">
+      <button type="button" uiMenuItem [checked]="m.tag.color === color" (click)="recolor(m.tag, color)">
         <span class="flex items-center gap-2.5">
           <span class="size-4 shrink-0 rounded-[0.3rem]" [class]="swatch[color]"></span>
           {{ colorLabel[color] | t }}
         </span>
       </button>
     }
-  </ui-menu>
-}
-
-<!-- A tag's ⋯: Rename, Delete (asked first) -->
-@if (menuFor(); as m) {
-  <ui-menu narrow [origin]="m.at" (closed)="menuFor.set(null)">
-    <button type="button" uiMenuItem icon="pencil" (click)="startRename(m.tag)">{{ 'tags.rename' | t }}</button>
+    <ui-menu-separator />
     <button type="button" uiMenuItem icon="trash" danger (click)="remove(m.tag, m.at)">{{ 'tags.delete' | t }}</button>
   </ui-menu>
 }

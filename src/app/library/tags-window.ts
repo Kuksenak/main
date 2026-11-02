@@ -2,19 +2,19 @@ import { afterRenderEffect, Component, computed, ElementRef, inject, output, sig
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Confirm, Icon, TAG_COLORS, TAG_COLOR_LABELS, TAG_SWATCH, UiButton, UiTag } from '../core/ui';
-import { UiMenu, UiMenuItem } from '../core/ui/menu';
+import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { UiWindow } from '../core/ui/window';
 import { LibraryStore } from './library.store';
 import { Tag, TagsStore } from './tags.store';
 
 /**
  * Desktop: the account's tags (the account's menu → Tags), in the shared window (as the search's),
- * as a table (as Notion's properties): Tag, Color (its menu), Pages (how many have it), ⋯ — Rename
- * (a field in its place), Delete (asked first: off its pages too).
+ * a row each: the tag, how many pages have it, ⋯ — its menu: Rename (a field in its place), its
+ * colors, Delete (asked first: off its pages too).
  */
 @Component({
   selector: 'app-tags-window',
-  imports: [Icon, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiTag, UiWindow],
+  imports: [Icon, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiTag, UiWindow],
   templateUrl: './tags-window.html',
 })
 export class TagsWindow {
@@ -28,8 +28,7 @@ export class TagsWindow {
   protected readonly swatch = TAG_SWATCH;
   protected readonly colorLabel = TAG_COLOR_LABELS;
 
-  // The menus open: a tag's colors, a tag's ⋯ — at their buttons
-  protected readonly colorsFor = signal<{ tag: Tag; at: HTMLElement } | null>(null);
+  // A tag's ⋯ menu, at its button
   protected readonly menuFor = signal<{ tag: Tag; at: HTMLElement } | null>(null);
   // The tag being renamed (a field in its chip's place)
   protected readonly renaming = signal<string | null>(null);
@@ -52,10 +51,6 @@ export class TagsWindow {
 
   protected recolor(tag: Tag, color: Tag['color']): void {
     if (tag.color !== color) this.store.update({ ...tag, color });
-  }
-
-  protected startRename(tag: Tag): void {
-    this.renaming.set(tag.id);
   }
 
   // (Enter or away: saved — not empty, not another tag's name)
