@@ -65,7 +65,8 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 ## Status bar color (keeps breaking — read before touching it)
 - Now: the theme is read once as the app starts; a system theme switch reloads the app (at once,
   or as it comes back if it was away) — after a reload iOS always got the bar right. Before it,
-  `app-reload` on window: a page saves what's typed. No `theme-color` tag (nor in the manifest).
+  `app-reload` on window: a page saves what's typed. No `theme-color` tag on phones (nor in the
+  manifest); desktops get one at load (index.html): an installed app's title bar in the page's color.
 - Everything tried with a tag fell out of step somewhere: a new tag per switch (stuck after a
   switch made while away / while the bar was hidden sideways), two tags with `media` (black in
   light: iOS took the last), one-shade-off nudges (flickered), a gray cover (it can't cover the
