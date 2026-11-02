@@ -61,9 +61,11 @@ export class PageView {
   private dirty = false;
   private saveSub: Subscription | null = null;
 
+  // ‹ back where it was opened from: the library, or Favorites
+  private readonly back = (history.state as { back?: string } | null)?.back ?? '/library';
+
   constructor() {
-    // (‹ back where it was opened from: the library, or Favorites)
-    const back = (history.state as { back?: string } | null)?.back ?? '/library';
+    const back = this.back;
     inject(PageTitle).show(computed(() => this.title() || this.i18n.t('library.untitled')), back, desktop ? null : () => this.actionsOpen.set(true));
     // (leaving with a change not saved yet: saved now)
     inject(DestroyRef).onDestroy(() => this.flush());
@@ -216,6 +218,11 @@ export class PageView {
     const on = !page.favorite;
     this.page.set({ ...page, favorite: on });
     this.store.favorite(page.id, on).subscribe({ error: () => this.page.update((x) => (x ? { ...x, favorite: !on } : x)) });
+  }
+
+  // Desktops: the top row's ‹
+  protected goBack(): void {
+    this.router.navigateByUrl(this.back);
   }
 
   protected delete(): void {
