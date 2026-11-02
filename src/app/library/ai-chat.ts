@@ -32,6 +32,8 @@ export class AiChat {
   // The photos to go with the next message
   protected readonly photos = signal<{ blob: Blob; url: string }[]>([]);
   protected readonly maxPhotos = MAX_PHOTOS;
+  // (something typed: ↵ lit)
+  protected readonly typed = signal(false);
 
   private readonly field = viewChild.required<ElementRef<HTMLTextAreaElement>>('field');
   private readonly end = viewChild<ElementRef<HTMLElement>>('end');
@@ -52,6 +54,7 @@ export class AiChat {
     this.photos.set([]);
     field.value = '';
     field.style.height = '';
+    this.typed.set(false);
     setTimeout(() => this.scrollDown());
   }
 
