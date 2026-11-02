@@ -1,25 +1,19 @@
-import { afterRenderEffect, Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, TAG_COLORS, TagColor, UiButton, UiTag } from '../core/ui';
-import { UiMenu } from '../core/ui/menu';
+import { Icon, TAG_COLORS, TagColor, UiTag } from '../core/ui';
+import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { Tag, TagsStore } from './tags.store';
 
-/** A row under the field: a tag, or Create (what's typed, as a new one). */
-interface Option {
-  key: string;
-  tag?: Tag;
-}
-
 /**
- * Desktop: a page's tags picked at `origin` (as Notion's) — the chosen ones in a field, what's typed
- * filters the account's tags under it; a click (or Enter) puts one on — one a page, for now: it
- * replaces the one there — or takes it off; a new name: Create (made in the next color, put on). A tag's ⋯: its name, its color, Delete. `changed`: the
- * page's tags now (the ids, in order).
+ * Desktop: a page's tag picked at `origin`, as a choice of a few (the language's look): No tag, the
+ * account's tags (✓ the chosen one); a click picks it (one a page, for now). A field at the bottom:
+ * a new name, Enter — made in the next color and picked. A tag right-clicked: its colors (a dot
+ * each) and Delete under it. `changed`: the page's tags now (one, or none).
  */
 @Component({
   selector: 'app-tag-picker',
-  imports: [Icon, TranslatePipe, UiButton, UiMenu, UiTag],
+  imports: [Icon, TranslatePipe, UiMenu, UiMenuItem, UiMenuSeparator, UiTag],
   templateUrl: './tag-picker.html',
 })
 export class TagPicker {
@@ -30,6 +24,18 @@ export class TagPicker {
 
   protected readonly store = inject(TagsStore);
   protected readonly colors = TAG_COLORS;
+  // (a color's dot: its pastel, whole classes for Tailwind)
+  protected readonly dot: Record<TagColor, string> = {
+    gray: 'bg-tag-gray',
+    brown: 'bg-tag-brown',
+    orange: 'bg-tag-orange',
+    yellow: 'bg-tag-yellow',
+    green: 'bg-tag-green',
+    blue: 'bg-tag-blue',
+    purple: 'bg-tag-purple',
+    pink: 'bg-tag-pink',
+    red: 'bg-tag-red',
+  };
   protected readonly colorLabel: Record<TagColor, TranslationKey> = {
     gray: 'tags.gray',
     brown: 'tags.brown',
@@ -41,91 +47,33 @@ export class TagPicker {
     pink: 'tags.pink',
     red: 'tags.red',
   };
-
-  protected readonly query = signal('');
-  protected readonly index = signal(0);
-  protected readonly editing = signal<Tag | null>(null);
-  protected readonly chosen = computed(() => this.store.of(this.tagIds()));
-  protected readonly nextColor = computed(() => TAG_COLORS[this.store.tags().length % TAG_COLORS.length]);
-
-  // The account's tags with what's typed in their names; a name none has: Create, last
-  protected readonly options = computed<Option[]>(() => {
-    const typed = this.query().trim();
-    const words = typed.toLowerCase();
-    const tags = this.store.tags().filter((t) => !words || t.name.toLowerCase().includes(words));
-    const options: Option[] = tags.map((tag) => ({ key: tag.id, tag }));
-    if (typed && !this.store.tags().some((t) => t.name.toLowerCase() === words)) options.push({ key: '+' });
-    return options;
-  });
-
-  private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');
-  private readonly name = viewChild<ElementRef<HTMLInputElement>>('name');
+  // The tag right-clicked: its colors and Delete under it
+  protected readonly editing = signal<string | null>(null);
+  private readonly menu = viewChild.required(UiMenu);
 
   constructor() {
     this.store.load();
-    // (open, or back from a tag's own: the field focused; a tag's own: its name)
-    afterRenderEffect(() => {
-      if (this.editing()) this.name()?.nativeElement.focus();
-      else this.field()?.nativeElement.focus();
+  }
+
+  protected pick(id: string | null): void {
+    this.changed.emit(id ? [id] : []);
+  }
+
+  protected create(name: string): void {
+    if (!name.trim()) return;
+    this.store.create(name).subscribe((tag) => {
+      this.changed.emit([tag.id]);
+      this.menu().close();
     });
   }
 
-  protected isChosen(tag: Tag): boolean {
-    return this.tagIds().includes(tag.id);
-  }
-
-  // (one tag a page, for now — its icon's color: picking one replaces it; the chosen one again: none)
-  protected toggle(tag: Tag): void {
-    this.changed.emit(this.tagIds().includes(tag.id) ? [] : [tag.id]);
-  }
-
-  protected pickOption(option: Option): void {
-    if (option.tag) this.toggle(option.tag);
-    else this.createTyped();
-    this.query.set('');
-    this.index.set(0);
-    this.field()?.nativeElement.focus();
-  }
-
-  private createTyped(): void {
-    const name = this.query().trim();
-    if (!name) return;
-    this.store.create(name).subscribe((tag) => this.changed.emit([tag.id]));
-  }
-
-  protected key(e: KeyboardEvent): void {
-    const n = this.options().length;
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      e.stopPropagation();
-      if (n) this.index.set((this.index() + (e.key === 'ArrowDown' ? 1 : n - 1)) % n);
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      const option = this.options()[this.index()];
-      if (option) this.pickOption(option);
-    } else if (e.key === 'Backspace' && !this.query()) {
-      const last = this.chosen().at(-1);
-      if (last) this.toggle(last);
-    }
-  }
-
-  protected rename(tag: Tag, name: string): void {
-    const trimmed = name.trim();
-    if (!trimmed || trimmed === tag.name) return;
-    const renamed = { ...tag, name: trimmed };
-    this.store.update(renamed);
-    this.editing.set(renamed);
-  }
-
   protected recolor(tag: Tag, color: TagColor): void {
-    const recolored = { ...tag, color };
-    this.store.update(recolored);
-    this.editing.set(recolored);
+    this.store.update({ ...tag, color });
   }
 
   protected remove(tag: Tag): void {
     this.store.remove(tag.id);
-    if (this.isChosen(tag)) this.changed.emit(this.tagIds().filter((id) => id !== tag.id));
+    if (this.tagIds().includes(tag.id)) this.changed.emit([]);
     this.editing.set(null);
   }
 }
