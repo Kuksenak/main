@@ -184,22 +184,13 @@
           <ng-container [ngTemplateOutlet]="repeats" [ngTemplateOutletContext]="{ row: phoneRow }" />
         </ui-list>
         @if (hasLibrary) {
-          <div class="flex flex-col gap-2">
-            <ui-list-title>{{ 'schedule.pages' | t }}</ui-list-title>
-            <ui-list>
-              @for (page of pages(); track page.id) {
-                <div uiListItem icon="page">
-                  <span class="min-w-0 flex-1 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
-                  <button type="button" (click)="removePage(page.id)" [attr.aria-label]="'schedule.removePage' | t" class="-mr-2 grid size-9 shrink-0 place-items-center text-icon">
-                    <app-icon name="close" class="size-5" />
-                  </button>
-                </div>
-              }
-              <button type="button" uiListItem chevron (click)="adding.set(true)" [disabled]="!addable().length" class="disabled:text-fg-secondary">
-                {{ 'schedule.addPage' | t }}
-              </button>
-            </ui-list>
-          </div>
+          <!-- (its pages, as iOS's Invitees: how many, › — a page of their own) -->
+          <ui-list>
+            <button type="button" uiListItem chevron (click)="sub.set('pages')">
+              {{ 'schedule.pages' | t }}
+              <span itemValue class="text-fg-secondary">{{ pages().length || ('schedule.none' | t) }}</span>
+            </button>
+          </ui-list>
         }
         @if (current()) {
           <ui-list class="mt-2">
@@ -208,19 +199,55 @@
         }
       </div>
     </div>
-    <!-- (its sheets inside it: over it — it's in the top layer) -->
-    <!-- (Add a page: the library's others — a tap adds one) -->
-    @if (adding()) {
-      <ui-sheet #addSheet (closed)="adding.set(false)">
-        <span sheetHead class="text-body font-semibold">{{ 'schedule.addPage' | t }}</span>
-        <ui-list>
-          @for (page of addable(); track page.id) {
-            <button type="button" uiListItem icon="page" (click)="addPage(page); addSheet.close()">
-              <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
-            </button>
+    <!-- Its pages (as iOS's Invitees), over it, from the right: ‹ back, its name; Add Pages › (the
+         library's, a tap ✓ / un-✓ one), then the ones it goes with — a row swiped left: Remove -->
+    @if (sub(); as at) {
+      <div class="absolute inset-0 z-20 flex animate-panel-in flex-col bg-app">
+        <header class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-linear-to-b from-app from-40% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5">
+          <button type="button" uiFloatingButton round (click)="sub.set(at === 'add' ? 'pages' : null)" class="pointer-events-auto" [attr.aria-label]="'action.back' | t">
+            <app-icon name="chevron-left" class="-ml-0.5 size-8" />
+          </button>
+          <span class="min-w-0 flex-1 truncate text-center text-body font-semibold">{{ (at === 'add' ? 'schedule.addPages' : 'schedule.pages') | t }}</span>
+          <span class="w-round shrink-0"></span>
+        </header>
+        <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-[calc(env(safe-area-inset-top)+4.75rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+          @if (at === 'pages') {
+            <div class="flex flex-col gap-6">
+              <ui-list>
+                <button type="button" uiListItem chevron (click)="sub.set('add')">{{ 'schedule.addPages' | t }}</button>
+              </ui-list>
+              @if (pages().length) {
+                <div class="flex flex-col gap-2">
+                  <ui-list-title>{{ 'schedule.attached' | t }}</ui-list-title>
+                  <ui-list>
+                    @for (page of pages(); track page.id) {
+                      @let x = swipe()?.id === page.id ? swipe()!.x : 0;
+                      <div class="relative overflow-hidden" (touchstart)="swipeStart($event, page.id)" (touchmove)="swipeMove($event)" (touchend)="swipeEnd()" (touchcancel)="swipeEnd()">
+                        <button type="button" (click)="removePage(page.id); swipe.set(null)" class="absolute inset-y-0 right-0 w-24 bg-danger text-body font-medium text-on-accent" [class.invisible]="!x">
+                          {{ 'schedule.remove' | t }}
+                        </button>
+                        <div uiListItem icon="page" class="bg-sheet-card" [style.transform]="x ? 'translateX(' + x + 'px)' : null" [class.transition-transform]="!swiping">
+                          <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
+                        </div>
+                      </div>
+                    }
+                  </ui-list>
+                </div>
+              }
+            </div>
+          } @else {
+            <ui-list>
+              @for (page of library.items() ?? []; track page.id) {
+                <button type="button" uiListItem icon="page" [checked]="pageIds().includes(page.id)" (click)="togglePage(page)">
+                  <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
+                </button>
+              } @empty {
+                <div uiListItem><span class="text-fg-secondary">{{ 'search.nothing' | t }}</span></div>
+              }
+            </ui-list>
           }
-        </ui-list>
-      </ui-sheet>
+        </div>
+      </div>
     }
   </div>
 }
