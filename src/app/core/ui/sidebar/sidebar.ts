@@ -7,7 +7,7 @@ import { Component } from '@angular/core';
  */
 @Component({
   selector: 'ui-sidebar',
-  host: { class: 'flex h-full w-nav shrink-0 flex-col border-r-[0.5px] border-separator bg-side text-fg' },
+  host: { class: 'flex h-full w-nav shrink-0 flex-col border-r-[0.5px] border-separator bg-side text-fg select-none' },
   templateUrl: './sidebar.html',
 })
 export class UiSidebar {}
