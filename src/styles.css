@@ -107,6 +107,11 @@
     }
   }
   /* A sheet coming up from the bottom */
+  /* A panel sliding in from the right (desktops: an event's) */
+  --animate-panel-in: panel-in 240ms var(--ease-out-quick);
+  @keyframes panel-in {
+    from { transform: translateX(100%); }
+  }
   --animate-sheet-up: sheet-up 380ms var(--ease-ios);
   @keyframes sheet-up {
     from { transform: translateY(100%); }

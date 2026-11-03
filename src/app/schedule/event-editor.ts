@@ -6,7 +6,6 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Confirm, Icon, UiButton, UiDate, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSheet, UiTime } from '../core/ui';
-import { UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey } from '../core/ui/window';
 import { LibraryStore } from '../library/library.store';
 import { dayKey, EventInput, EventsStore, Occurrence, Repeat, Scope } from './events.store';
 
@@ -22,12 +21,12 @@ const REPEATS: { value: Repeat; label: TranslationKey }[] = [
  * An event, new (`event` none: on `day`, at the next hour) or as it is — its title, its day and time,
  * how long, how it repeats (until a day), the library's pages it goes with; Save, Delete (asked
  * first). A repeat changed or deleted: for this one, it and the later ones, or all of them (a choice
- * of its own). Desktops: the shared window (as the search's — the title in its head); phones: a sheet
- * (as iOS's lists). `closed` as it goes.
+ * of its own). Desktops: a panel at the right (the schedule in sight — the title in its head); phones: a
+ * sheet (as iOS's lists). `closed` as it goes.
  */
 @Component({
   selector: 'app-event-editor',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiList, UiListItem, UiListTitle, UiSelect, UiSheet, UiTime, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKey],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiList, UiListItem, UiListTitle, UiSelect, UiSheet, UiTime],
   templateUrl: './event-editor.html',
 })
 export class EventEditor implements OnInit {

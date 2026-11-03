@@ -49,32 +49,41 @@
 </ng-template>
 
 @if (desktop) {
-  <!-- Desktops: the shared window — its head the title (a field), the rows under it, the keys and
-       Delete / Save at the bottom -->
-  <ui-window (closed)="closed.emit()">
-    <ui-window-head icon="calendar" colored>
+  <!-- Desktops: a panel at the right, the window's whole height, sliding in (the schedule stays in
+       sight): its head — the title (a field), ✕; the rows under it; Delete and Save at the bottom. Esc
+       closes it too. -->
+  <aside
+    role="dialog"
+    (document:keydown.escape)="closed.emit()"
+    class="fixed inset-y-0 right-0 z-40 flex w-[27rem] max-w-[90vw] animate-panel-in flex-col border-l-[0.5px] border-separator bg-dialog text-fg shadow-popover"
+  >
+    <div class="flex h-14 shrink-0 items-center gap-3 pr-3 pl-5">
+      <app-icon name="calendar" colored class="size-5 shrink-0 text-icon" />
       <input
         #titleField
-        uiWindowField
+        type="text"
+        autocomplete="off"
         [value]="title()"
         (input)="title.set(titleField.value)"
         (keydown.enter)="save()"
         maxlength="200"
         [placeholder]="'schedule.titlePlaceholder' | t"
+        class="min-w-0 flex-1 bg-transparent text-lg font-semibold text-fg outline-none placeholder:text-fg-secondary"
       />
-    </ui-window-head>
-    <div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto border-t-[0.5px] border-separator px-4.5 py-3">
+      <button uiButton type="button" icon="close" (click)="closed.emit()" [attr.aria-label]="'search.close' | t"></button>
+    </div>
+    <div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto border-t-[0.5px] border-separator px-5 py-3">
       <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: deskRow }" />
       @if (hasLibrary) {
         <ng-container [ngTemplateOutlet]="deskRow" [ngTemplateOutletContext]="{ label: 'schedule.pages', tpl: pagesTpl }" />
       }
     </div>
-    <ui-window-foot>
-      <ui-window-key key="Esc">{{ 'search.close' | t }}</ui-window-key>
-      <span class="flex-1"></span>
+    <div class="flex h-14 shrink-0 items-center gap-2 border-t-[0.5px] border-separator px-4">
       @if (event()) {
         <button uiButton type="button" icon="trash" (click)="remove($event)">{{ 'schedule.delete' | t }}</button>
       }
+      <span class="flex-1"></span>
+      <button uiButton type="button" (click)="closed.emit()">{{ 'action.cancel' | t }}</button>
       <button
         type="button"
         (click)="save()"
@@ -83,8 +92,8 @@
       >
         {{ 'schedule.save' | t }}
       </button>
-    </ui-window-foot>
-  </ui-window>
+    </div>
+  </aside>
 } @else {
   <!-- Phones: a sheet — the title a field on a card, the rows on a card (their values at the right),
        the pages on one, Save under them, Delete at the bottom -->
