@@ -40,10 +40,6 @@
         <ui-select [options]="places()" [value]="here()" [text]="title()" wide glass (valueChange)="go($event)" [label]="'nav.menu' | t" />
       </div>
     }
-    <!-- (a section's own word, e.g. Tags' Edit / Done: a pill before 🔍) -->
-    @if (!back() && act(); as a) {
-      <button type="button" uiFloatingButton (click)="a.run()" class="px-4 text-body font-medium text-accent">{{ a.label() }}</button>
-    }
     <!-- (not inside a page opened from a list: there, only ‹ and its title) -->
     @if (!back()) {
       <button
