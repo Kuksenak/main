@@ -181,29 +181,21 @@
   <ui-sheet #actions (closed)="actionsOpen.set(false)">
     <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold">{{ title() || ('library.untitled' | t) }}</span>
     <div class="flex flex-col gap-6">
-      <!-- (its tag: the account's tags as chips, each its color — the one on it ringed, ✓; a tap puts it
-           on, the one on it again takes it off) -->
+      <!-- (its tag: the account's tags as a list — a swatch and the name, no fill; ✓ on its own; a tap puts
+           it on, the one on it again takes it off) -->
       @if (tags.tags().length) {
         <div class="flex flex-col gap-2">
           <ui-list-title>{{ 'tags.title' | t }}</ui-list-title>
           <ui-list>
-            <div class="flex flex-wrap gap-2 px-row-x py-3.5">
-              @for (tag of tags.tags(); track tag.id) {
-                @let on = !!p.tagIds?.includes(tag.id);
-                <button
-                  type="button"
-                  [attr.data-tag]="tag.color"
-                  [attr.aria-pressed]="on"
-                  (click)="setTags(on ? [] : [tag.id])"
-                  class="flex h-9 max-w-full items-center gap-1.5 rounded-full bg-tag px-4 text-body text-tag-text ring-fg/70 ring-offset-2 ring-offset-sheet-card aria-pressed:ring-2 aria-pressed:pl-3"
-                >
-                  @if (on) {
-                    <app-icon name="check" class="size-4.5 shrink-0" />
-                  }
+            @for (tag of tags.tags(); track tag.id) {
+              @let on = !!p.tagIds?.includes(tag.id);
+              <button type="button" uiListItem [checked]="on" (click)="setTags(on ? [] : [tag.id])" class="after:left-12!">
+                <span class="flex min-w-0 items-center gap-3">
+                  <ui-tag-swatch [color]="tag.color" class="size-5" />
                   <span class="truncate">{{ tag.name }}</span>
-                </button>
-              }
-            </div>
+                </span>
+              </button>
+            }
           </ui-list>
         </div>
       }
