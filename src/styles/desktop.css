@@ -60,9 +60,12 @@ html.dark[data-device='desktop'] {
   --side-bg: #191919;
   --side-hover: #2a2a2a;
   --side-on: #2f2f2f;
-  --side-text: #a8a8a6;
+  --side-text: #dcdcda;
   --dialog-bg: #262626;
-  --text: #e8e8e6;
+  --text: #ededeb;
+  /* (grays crisper than the light theme's: the secondary text and the icons nearer white) */
+  --text-secondary: color-mix(in srgb, var(--text) 64%, transparent);
+  --icon: color-mix(in srgb, var(--text) 78%, transparent);
   --separator: rgb(255 255 255 / 0.09);
   --tint: color-mix(in srgb, var(--text) 8%, transparent);
   --tint-strong: color-mix(in srgb, var(--text) 13%, transparent);
