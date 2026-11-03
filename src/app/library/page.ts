@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Confirm, Icon, Toasts, UiFloatingButton, UiButton, UiKbd, UiList, UiListItem, UiSheet, UiTag, UiTagSwatch } from '../core/ui';
+import { Confirm, Icon, Toasts, UiFloatingButton, UiScrollBar, UiButton, UiKbd, UiList, UiListItem, UiSheet, UiTag, UiTagSwatch } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow, UiWindowHead } from '../core/ui/window';
@@ -32,7 +32,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, UiFloatingButton],
+  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, UiFloatingButton, UiScrollBar],
   templateUrl: './page.html',
 })
 export class PageView {
