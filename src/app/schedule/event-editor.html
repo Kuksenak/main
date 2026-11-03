@@ -71,15 +71,15 @@
 
 @if (desktop) {
   <!-- Desktops: a panel at the right, the window's whole height, the page's color, a line at its left
-       (the schedule in sight): its head — the title (a field), Delete, ✕; the rows under it (not
+       (the schedule in sight): its head — the title (a field), Delete; the rows under it (not
        scrolled: what opens in them doesn't jump); the keys at the bottom — Enter saves, Esc closes -->
   <aside
     role="dialog"
-    (document:keydown.escape)="escape()"
+    (document:keydown.escape)="escape(head)"
     (document:keydown.enter)="enter($event)"
     class="fixed inset-y-0 right-0 z-40 flex w-[25rem] max-w-[90vw] animate-panel-in flex-col border-l-[0.5px] border-separator bg-app text-fg"
   >
-    <div class="flex h-14 shrink-0 items-center gap-1 pr-3 pl-5">
+    <div #head class="flex h-14 shrink-0 items-center gap-1 pr-3 pl-5">
       <input
         #titleField
         type="text"
@@ -94,7 +94,6 @@
       @if (event()) {
         <button uiButton type="button" icon="trash" (click)="remove($event)" [attr.aria-label]="'schedule.delete' | t"></button>
       }
-      <button uiButton type="button" icon="close" (click)="closed.emit()" [attr.aria-label]="'search.close' | t"></button>
     </div>
     <div class="flex min-h-0 flex-1 flex-col gap-0.5 px-5 py-2">
       <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: deskRow }" />

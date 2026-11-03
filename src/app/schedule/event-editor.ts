@@ -140,6 +140,7 @@ export class EventEditor implements OnInit {
       this.pageIds.set(e.pageIds);
       if (this.preset() === 'custom') this.custom.set(true);
     }
+    this.opened = this.state();
   }
 
   // A new start: the end keeps the length it had
@@ -169,10 +170,24 @@ export class EventEditor implements OnInit {
     menu?.close();
   }
 
-  // Esc: the dropdown's own (it closes), else the panel closes
-  protected escape(): void {
-    if (!this.picking()) this.closed.emit();
+  // Esc: the dropdown's own (it closes), else the panel closes — anything changed: asked first (by its head)
+  private asking = false;
+  protected async escape(head: HTMLElement): Promise<void> {
+    if (this.picking() || this.asking) return;
+    if (this.state() !== this.opened) {
+      this.asking = true;
+      const yes = await this.confirm.ask(head, { text: this.i18n.t('schedule.discardAsk'), yes: this.i18n.t('schedule.discard'), danger: true });
+      this.asking = false;
+      if (!yes) return;
+    }
+    this.closed.emit();
   }
+
+  // (what's set, as one string — as it opened: `opened`; another now: changed)
+  private opened = '';
+  private readonly state = computed(() =>
+    JSON.stringify([this.title().trim(), this.date(), this.start(), this.end(), this.repeat(), this.every(), this.until(), this.pageIds()]),
+  );
 
   protected removePage(id: string): void {
     this.pageIds.update((ids) => ids.filter((x) => x !== id));
