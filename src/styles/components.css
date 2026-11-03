@@ -1,5 +1,5 @@
 /* The few global pieces outside the UI kit (core/ui): the sign-in buttons, the "turn your phone
-   upright" notice. */
+   upright" notice, the installed desktop app's title bar row. */
 
 @layer components {
   /* Strong neutral action: black (white in dark theme), e.g. sign-in buttons */
@@ -22,5 +22,26 @@
     [data-device='mobile'] app-root > :not(.rotate-hint) {
       visibility: hidden;
     }
+  }
+}
+
+/* An installed desktop app with its title bar hidden (Chrome / Edge's Window Controls Overlay): a
+   page's head row (`data-titlebar`) in the bar's place — as tall as the bar was, the window dragged
+   by it (not by its buttons, fields, links), clear of the window's buttons at the right (Windows; a
+   Mac's are over the sidebar); a page with none: its content under the bar's height. (Plain CSS:
+   app-region and the display mode.) */
+@media (display-mode: window-controls-overlay) {
+  [data-titlebar] {
+    height: env(titlebar-area-height, 2.25rem) !important;
+    padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem) !important;
+    app-region: drag;
+    -webkit-app-region: drag;
+  }
+  [data-titlebar] :is(button, a, input, select, textarea, form, [role='button']) {
+    app-region: no-drag;
+    -webkit-app-region: no-drag;
+  }
+  main:not(:has([data-titlebar])) {
+    padding-top: env(titlebar-area-height, 0px);
   }
 }

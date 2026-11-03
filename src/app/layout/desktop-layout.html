@@ -1,13 +1,11 @@
 <!-- An installed app with its title bar hidden (Chrome / Edge's Window Controls Overlay — Windows:
-     the window's buttons at the right, Mac's at the left): a strip as tall as the bar was, over all of
-     it — the sidebar's part and the page's (the sidebar's line going on up), the window dragged by it;
-     else none (0 tall) -->
-<div class="flex h-full flex-col bg-app text-fg">
-<div class="flex h-[env(titlebar-area-height,0px)] shrink-0 [-webkit-app-region:drag] [app-region:drag]">
-  <div class="w-nav shrink-0 border-r-[0.5px] border-separator bg-side"></div>
-</div>
-<div class="flex min-h-0 flex-1">
-  <ui-sidebar>
+     the window's buttons at the right, Mac's at the left): over the sidebar a strip as tall as the bar
+     was (the window dragged by it; Mac's buttons on it); the page up to the window's top, its head
+     row in the bar's place (`data-titlebar`: components.css); else the strip 0 tall -->
+<div class="flex h-full bg-app text-fg">
+<div class="flex w-nav shrink-0 flex-col">
+  <div class="h-[env(titlebar-area-height,0px)] shrink-0 border-r-[0.5px] border-separator bg-side [-webkit-app-region:drag] [app-region:drag]"></div>
+  <ui-sidebar class="h-auto! min-h-0 flex-1">
     <!-- Search (Ctrl+K / ⌘K too), over the sections, as Notion's (measured): a field-like box 32 tall,
          as wide as the rows (12 in from the sidebar's sides), a faint hairline, no fill (a gray one under the pointer), its words
          gray, the keys on a chip -->
@@ -164,10 +162,10 @@
       </ng-container>
     }
   </ui-sidebar>
+</div>
   <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
     <router-outlet />
   </main>
-</div>
 </div>
 
 @if (menuAt(); as at) {

@@ -3,7 +3,7 @@
        48-tall row: level with the sidebar's Search), under it the views as pills (an icon, its name;
        the one shown: a gray pill); New page at the name's right (filled black — the strong buttons' color); then the pages -->
   <div class="sticky top-0 z-20 flex flex-col bg-app px-8 pb-1">
-    <div class="flex h-12 items-center">
+    <div data-titlebar class="flex h-12 items-center">
       <h1 class="flex-1 px-2 text-lg font-semibold">{{ 'nav.library' | t }}</h1>
       @if (!picked().size) {
         <ng-container [ngTemplateOutlet]="newPage" />

@@ -4,7 +4,7 @@
      events under it; Today floating at the bottom left, + at the bottom right. -->
 @if (desktop) {
   <div class="sticky top-0 z-20 flex flex-col bg-app px-8 pb-1">
-    <div class="flex h-12 items-center">
+    <div data-titlebar class="flex h-12 items-center">
       <h1 class="flex-1 px-2 text-lg font-semibold">{{ title() }}</h1>
       <button uiPrimary icon="plus" (click)="create()">{{ 'schedule.newEvent' | t }}</button>
     </div>
