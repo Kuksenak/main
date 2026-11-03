@@ -228,7 +228,7 @@
                   <ui-list-title>{{ 'schedule.attached' | t }}</ui-list-title>
                   <ui-list>
                     @for (page of pages(); track page.id) {
-                      <ui-swipe [end]="'schedule.remove' | t" (endPicked)="removePage(page.id)">
+                      <ui-swipe [actions]="[{ value: 'remove', label: ('schedule.remove' | t), tone: 'danger' }]" (picked)="removePage(page.id)">
                         <div uiListItem icon="page">
                           <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
                         </div>

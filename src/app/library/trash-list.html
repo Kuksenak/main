@@ -21,9 +21,14 @@
             <button rowEnd uiButton type="button" icon="trash" (click)="deleteForever(item.id, $event.currentTarget)" [uiTip]="'trash.deleteForever' | t" [attr.aria-label]="'trash.deleteForever' | t"></button>
           </div>
         } @else {
-          <!-- (phones, as iOS's lists: swiped right — Restore; left — Delete forever, asked first) -->
-          <ui-swipe [start]="'trash.restore' | t" [end]="'trash.deleteForever' | t" (startPicked)="restore(item.id)" (endPicked)="deleteForever(item.id, $event)">
-            <div uiRow icon="page">
+          <!-- (phones, as iOS's lists: swiped left — or tapped — Restore and Delete (forever, asked
+               first) at its right; the first row shows them for a moment, the first time) -->
+          <ui-swipe
+            #swipe
+            [actions]="[{ value: 'restore', label: ('trash.restore' | t), tone: 'gray' }, { value: 'delete', label: ('trash.delete' | t), tone: 'danger' }]"
+            (picked)="$event.value === 'restore' ? restore(item.id) : deleteForever(item.id, $event.row)"
+          >
+            <div uiRow icon="page" (click)="swipe.toggle()" class="mobile:min-h-14!">
               {{ item.title }}
               <!-- (when it was thrown away, at the right: the day over the time) -->
               <span rowEnd class="flex flex-col items-end text-footnote leading-tight text-fg-secondary tabular-nums">
