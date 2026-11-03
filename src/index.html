@@ -50,14 +50,17 @@
       document.addEventListener('visibilitychange', reloadIfSwitched);
       window.addEventListener('pageshow', reloadIfSwitched);
 
-      // Desktops (an installed app's window, e.g. on Windows): its title bar the page's own color
-      // (--app-bg, base.css), not the system's gray — phones: none, as above
+      // Desktops (an installed app's window, e.g. on Windows): its title bar — and, with it hidden,
+      // the window's buttons' strip — the page's own color, not the system's gray; phones: none, as
+      // above. In from the start (a tag put in only at load, the window's buttons kept the system's
+      // color): the desktops' --app-bg (styles/desktop.css, base.css), then the computed one at load.
       if (!mobile) {
+        var meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = started ? '#191919' : '#fbfbf9';
+        document.head.appendChild(meta);
         window.addEventListener('load', function () {
-          var meta = document.createElement('meta');
-          meta.name = 'theme-color';
-          meta.content = getComputedStyle(root).getPropertyValue('--app-bg').trim();
-          document.head.appendChild(meta);
+          meta.content = getComputedStyle(root).getPropertyValue('--app-bg').trim() || meta.content;
         });
       }
 
