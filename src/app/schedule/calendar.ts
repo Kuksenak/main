@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ElementRef, inject, model, viewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, input, model, viewChild } from '@angular/core';
+import { dayKey } from './events.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { addDays, sameDay, sameMonth, startOfDay, startOfMonth, startOfWeek, WEEK_MS } from '../core/utils/date';
 
@@ -10,7 +11,8 @@ const WEEKS = 53;
  * The schedule's calendar, as iOS Calendar's month: the weekdays' row (Monday first), then the
  * weeks one under another, scrolling on and on, six of them in view (any month fits). The days of
  * the month mostly in view are clear, the rest dimmed (`[(month)]`: that month — for the page's title);
- * today in the accent color; the picked day (`[(selected)]`) on a dark circle.
+ * today in the accent color; the picked day (`[(selected)]`) on a dark circle; a day with events
+ * (`marked`): a small dot under it.
  *   <app-calendar [(selected)]="day" [(month)]="month" />  …  calendar.show(today)
  */
 @Component({
@@ -22,6 +24,8 @@ export class Calendar implements AfterViewInit {
   readonly selected = model(startOfDay(new Date()));
   /** The month in view (its first day): `[(month)]`, for the page's title. */
   readonly month = model(startOfMonth(new Date()));
+  /** The days with events ("2026-11-03"): a dot under each. */
+  readonly marked = input<ReadonlySet<string>>(new Set());
 
   protected readonly weekdays = inject(I18nService).weekdays;
   private readonly first = addDays(startOfWeek(new Date()), -WEEKS_BEFORE * 7);
@@ -63,6 +67,10 @@ export class Calendar implements AfterViewInit {
 
   protected isSelected(day: Date): boolean {
     return sameDay(day, this.selected());
+  }
+
+  protected hasEvents(day: Date): boolean {
+    return this.marked().has(dayKey(day));
   }
 
   protected isToday(day: Date): boolean {

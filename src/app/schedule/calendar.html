@@ -17,7 +17,7 @@
         <button
           type="button"
           (click)="selected.set(day)"
-          class="group flex justify-center pt-1 mobile:items-center mobile:pt-0"
+          class="group relative flex justify-center pt-1 mobile:items-center mobile:pt-0"
           [class.opacity-35]="!inMonth(day)"
           [attr.aria-pressed]="isSelected(day)"
           [attr.data-today]="isToday(day) && !isSelected(day) ? '' : null"
@@ -27,6 +27,10 @@
                    group-[:hover:not([aria-pressed=true])]:bg-tint group-data-today:font-semibold group-data-today:text-accent
                    group-aria-pressed:bg-fg group-aria-pressed:font-semibold group-aria-pressed:text-app"
           >{{ day.getDate() }}</span>
+          <!-- (its events: a dot under it) -->
+          @if (hasEvents(day)) {
+            <span class="absolute bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full bg-fg-secondary group-aria-pressed:bg-fg"></span>
+          }
         </button>
       }
     </div>

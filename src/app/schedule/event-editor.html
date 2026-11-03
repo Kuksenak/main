@@ -1,0 +1,140 @@
+<!-- The event's fields, the same on both devices (in a window's rows on desktops, in iOS's lists on
+     phones): its day and time, how long, how it repeats (until a day), its pages (× takes one off; Add
+     page — the library's others), and for a repeat: which of them a change / deletion is for -->
+<ng-template #fields let-row="row">
+  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.date', tpl: dateTpl }" />
+  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.duration', tpl: durationTpl }" />
+  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.repeat', tpl: repeatTpl }" />
+  @if (repeat() !== 'Never') {
+    <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.until', tpl: untilTpl }" />
+  }
+  @if (repeating()) {
+    <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.scope', tpl: scopeTpl }" />
+  }
+</ng-template>
+<ng-template #dateTpl>
+  <span class="flex items-center gap-1.5">
+    <ui-date [(value)]="date" />
+    <ui-time [(value)]="time" />
+  </span>
+</ng-template>
+<ng-template #durationTpl><ui-select [options]="durations()" [(value)]="duration" [label]="'schedule.duration' | t" /></ng-template>
+<ng-template #repeatTpl><ui-select [options]="repeats()" [value]="repeat()" (valueChange)="repeat.set($any($event))" [label]="'schedule.repeat' | t" /></ng-template>
+<ng-template #untilTpl>
+  <span class="flex items-center gap-1">
+    <ui-date [(value)]="until" />
+    @if (until()) {
+      <button uiButton type="button" icon="close" (click)="until.set(null)" [attr.aria-label]="'schedule.untilNone' | t"></button>
+    }
+  </span>
+</ng-template>
+<ng-template #scopeTpl><ui-select [options]="scopes()" [value]="scope()" (valueChange)="scope.set($any($event))" [label]="'schedule.scope' | t" /></ng-template>
+
+<!-- (its pages: a chip each, × off; Add page — the library's others) -->
+<ng-template #pagesTpl>
+  <div class="flex flex-wrap items-center gap-1.5">
+    @for (page of pages(); track page.id) {
+      <span class="inline-flex h-7 max-w-56 items-center gap-1 rounded-full bg-tint pr-1 pl-2.5 text-ui text-fg">
+        <app-icon name="page" colored class="size-4 shrink-0 text-icon" />
+        <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
+        <button type="button" (click)="removePage(page.id)" [attr.aria-label]="'schedule.removePage' | t" class="grid size-5 place-items-center rounded-full text-icon hover:bg-tint-strong">
+          <app-icon name="close" class="size-3" />
+        </button>
+      </span>
+    }
+    @if (addable().length) {
+      <ui-select [options]="addable()" [value]="null" [text]="'schedule.addPage' | t" (valueChange)="addPage($event)" [label]="'schedule.addPage' | t" />
+    }
+  </div>
+</ng-template>
+
+@if (desktop) {
+  <!-- Desktops: the shared window — its head the title (a field), the rows under it, the keys and
+       Delete / Save at the bottom -->
+  <ui-window (closed)="closed.emit()">
+    <ui-window-head icon="calendar" colored>
+      <input
+        #titleField
+        uiWindowField
+        [value]="title()"
+        (input)="title.set(titleField.value)"
+        (keydown.enter)="save()"
+        maxlength="200"
+        [placeholder]="'schedule.titlePlaceholder' | t"
+      />
+    </ui-window-head>
+    <div class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto border-t-[0.5px] border-separator px-4.5 py-3">
+      <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: deskRow }" />
+      @if (hasLibrary) {
+        <ng-container [ngTemplateOutlet]="deskRow" [ngTemplateOutletContext]="{ label: 'schedule.pages', tpl: pagesTpl }" />
+      }
+    </div>
+    <ui-window-foot>
+      <ui-window-key key="Esc">{{ 'search.close' | t }}</ui-window-key>
+      <span class="flex-1"></span>
+      @if (event()) {
+        <button uiButton type="button" icon="trash" (click)="remove($event)">{{ 'schedule.delete' | t }}</button>
+      }
+      <button
+        type="button"
+        (click)="save()"
+        [disabled]="!canSave()"
+        class="inline-flex h-button items-center rounded-button bg-strong px-3 text-ui font-medium text-on-strong hover:opacity-85 disabled:opacity-40"
+      >
+        {{ 'schedule.save' | t }}
+      </button>
+    </ui-window-foot>
+  </ui-window>
+} @else {
+  <!-- Phones: a sheet — the title a field on a card, the rows on a card (their values at the right),
+       the pages on one, Save under them, Delete at the bottom -->
+  <ui-sheet #sheet tall (closed)="closed.emit()">
+    <span sheetHead class="text-body font-semibold">{{ (event() ? 'schedule.event' : 'schedule.newEvent') | t }}</span>
+    <div class="flex min-h-full flex-col gap-6">
+      <ui-list>
+        <div uiListItem icon="calendar">
+          <input
+            #phoneTitle
+            type="text"
+            maxlength="200"
+            enterkeyhint="done"
+            [value]="title()"
+            (input)="title.set(phoneTitle.value)"
+            (keydown.enter)="phoneTitle.blur()"
+            [placeholder]="'schedule.titlePlaceholder' | t"
+            class="w-full min-w-0 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary"
+          />
+        </div>
+      </ui-list>
+      <ui-list>
+        <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: phoneRow }" />
+      </ui-list>
+      @if (hasLibrary) {
+      <div class="flex flex-col gap-2">
+        <ui-list-title>{{ 'schedule.pages' | t }}</ui-list-title>
+        <ui-list><div class="px-row-x py-3"><ng-container [ngTemplateOutlet]="pagesTpl" /></div></ui-list>
+      </div>
+      }
+      <button type="button" class="btn-strong w-full" [disabled]="!canSave()" (click)="save(sheet)">{{ 'schedule.save' | t }}</button>
+      @if (event()) {
+        <ui-list class="mt-auto">
+          <button type="button" uiListItem icon="trash" danger (click)="remove($event, sheet)">{{ 'schedule.delete' | t }}</button>
+        </ui-list>
+      }
+    </div>
+  </ui-sheet>
+}
+
+<!-- A row: its name at the left, what sets it at the right -->
+<ng-template #deskRow let-label="label" let-tpl="tpl">
+  <div class="flex min-h-10 items-center gap-3">
+    <span class="w-28 shrink-0 text-ui text-fg-secondary">{{ label | t }}</span>
+    <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="tpl" /></div>
+  </div>
+</ng-template>
+<ng-template #phoneRow let-label="label" let-tpl="tpl">
+  <div uiListItem>
+    {{ label | t }}
+    <span itemValue><ng-container [ngTemplateOutlet]="tpl" /></span>
+  </div>
+</ng-template>
