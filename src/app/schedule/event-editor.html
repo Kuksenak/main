@@ -5,8 +5,10 @@
   <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'calendar', label: 'schedule.starts', tpl: startsTpl }" />
   <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'calendar', label: 'schedule.ends', tpl: endsTpl }" />
   <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'update', label: 'schedule.repeat', tpl: repeatTpl }" />
-  @if (repeat() !== 'Never') {
+  @if (preset() === 'custom') {
     <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'update', label: 'schedule.every', tpl: everyTpl }" />
+  }
+  @if (repeat() !== 'Never') {
     <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'update', label: 'schedule.endRepeat', tpl: endRepeatTpl }" />
     @if (until()) {
       <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'calendar', label: 'schedule.endDate', tpl: untilTpl }" />
@@ -19,11 +21,14 @@
 <ng-template #startsTpl>
   <span class="flex items-center gap-1.5"><ui-date [(value)]="date" /><ui-time [value]="start()" (valueChange)="setStart($event)" /></span>
 </ng-template>
-<!-- (its end: not after the start — orange) -->
+<!-- (its end: the start's day — pale — and a time; not after the start: orange, the day struck through) -->
 <ng-template #endsTpl>
-  <span [class.text-danger]="minutes() === null"><ui-time [(value)]="end" /></span>
+  <span class="flex items-center gap-1.5" [class.text-danger]="minutes() === null">
+    <span class="px-1 text-fg-secondary" [class.line-through]="minutes() === null" [class.text-danger]="minutes() === null">{{ endDay() }}</span>
+    <ui-time [(value)]="end" />
+  </span>
 </ng-template>
-<ng-template #repeatTpl><ui-select [options]="repeats()" [value]="repeat()" (valueChange)="repeat.set($any($event))" [label]="'schedule.repeat' | t" /></ng-template>
+<ng-template #repeatTpl><ui-select [options]="presets()" [value]="preset()" (valueChange)="setPreset($event)" [label]="'schedule.repeat' | t" /></ng-template>
 <ng-template #everyTpl><ui-select [options]="intervals()" [(value)]="every" [label]="'schedule.every' | t" /></ng-template>
 <ng-template #endRepeatTpl><ui-select [options]="endRepeats()" [value]="until() ? 'date' : 'never'" (valueChange)="setEndRepeat($event)" [label]="'schedule.endRepeat' | t" /></ng-template>
 <ng-template #untilTpl><ui-date [(value)]="until" /></ng-template>
@@ -34,13 +39,7 @@
 <ng-template #pagesTpl>
   <div class="flex flex-col gap-px">
     @for (page of pages(); track page.id) {
-      <div class="group flex h-8 items-center gap-2 rounded-md px-1.5 hover:bg-tint">
-        <app-icon name="page" colored class="size-4.5 shrink-0 text-icon" />
-        <span class="min-w-0 flex-1 truncate text-ui text-fg">{{ page.title.trim() || ('library.untitled' | t) }}</span>
-        <button type="button" (click)="removePage(page.id)" [attr.aria-label]="'schedule.removePage' | t" class="grid size-6 place-items-center rounded-md text-icon opacity-0 group-hover:opacity-100 hover:bg-tint-strong">
-          <app-icon name="close" class="size-3.5" />
-        </button>
-      </div>
+      <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ page }" />
     }
     <div class="flex h-8 items-center gap-2 px-1.5">
       <app-icon name="search" class="size-4.5 shrink-0 text-icon" />
@@ -76,7 +75,7 @@
        scrolled: what opens in them doesn't jump); the keys at the bottom — Enter saves, Esc closes -->
   <aside
     role="dialog"
-    (document:keydown.escape)="closed.emit()"
+    (document:keydown.escape)="escape()"
     (document:keydown.enter)="enter($event)"
     class="fixed inset-y-0 right-0 z-40 flex w-[27rem] max-w-[90vw] animate-panel-in flex-col border-l-[0.5px] border-separator bg-app text-fg"
   >
@@ -100,14 +99,54 @@
     <div class="flex min-h-0 flex-1 flex-col gap-0.5 px-5 py-2">
       <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: deskRow }" />
       @if (hasLibrary) {
-        <p class="mt-4 mb-1 px-1 text-footnote font-medium text-fg-secondary">{{ 'schedule.pages' | t }}</p>
-        <ng-container [ngTemplateOutlet]="pagesTpl" />
+        <p class="mt-5 mb-1 text-ui font-medium text-fg-secondary">{{ 'schedule.pages' | t }}</p>
+        <div class="-mx-1.5 flex flex-col gap-px">
+          @for (page of pages(); track page.id) {
+            <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ page }" />
+          }
+          <!-- (Add a page: a dropdown — a field on top filters the library, a click / Enter adds one) -->
+          <button
+            #addRow
+            type="button"
+            (click)="picking.set(picking() ? null : addRow)"
+            [attr.aria-expanded]="!!picking()"
+            class="flex h-9 items-center gap-2 rounded-md px-1.5 text-left text-body text-fg-secondary hover:bg-tint hover:text-fg"
+          >
+            <app-icon name="plus" class="size-4.5 shrink-0 text-icon" />{{ 'schedule.addPage' | t }}
+          </button>
+        </div>
+        @if (picking(); as at) {
+          <ui-menu #pick [origin]="at" (closed)="closePicker()">
+            <div class="flex h-8 items-center gap-2 px-menu-row-x">
+              <app-icon name="search" class="size-icon-menu shrink-0 text-icon" />
+              <input
+                #pickField
+                type="text"
+                autocomplete="off"
+                [value]="find()"
+                (input)="find.set(pickField.value)"
+                (keydown)="$event.stopPropagation()"
+                (keydown.enter)="findEnter($event, pick)"
+                [placeholder]="'schedule.findPage' | t"
+                class="min-w-0 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
+              />
+            </div>
+            <ui-menu-separator />
+            @for (page of found(); track page.id) {
+              <button type="button" uiMenuItem icon="page" (click)="addPage(page, pick)">
+                <span class="truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
+              </button>
+            } @empty {
+              <p class="px-menu-row-x py-2 text-ui text-fg-secondary">{{ 'search.nothing' | t }}</p>
+            }
+          </ui-menu>
+        }
       }
     </div>
     <!-- (the keys, as the windows': Esc closes, Enter saves) -->
     <div class="flex h-11 shrink-0 items-center gap-5 border-t-[0.5px] border-separator px-5 text-footnote text-fg-secondary">
       <span class="flex items-center gap-1.5"><ui-kbd>Esc</ui-kbd>{{ 'search.close' | t }}</span>
-      <span class="flex items-center gap-1.5" [class.opacity-40]="!canSave()"><ui-kbd><app-icon name="enter" class="my-0.5 size-3.5" /></ui-kbd>{{ 'schedule.save' | t }}</span>
+      <span class="flex items-center gap-1.5" [class.opacity-40]="!canSave()"><ui-kbd><app-icon name="enter" class="my-0.5 size-3.5" /></ui-kbd>{{ 'schedule.saveKey' | t }}</span>
     </div>
   </aside>
 } @else {
@@ -150,11 +189,22 @@
   </ui-sheet>
 }
 
-<!-- A row: its icon and name at the left, what sets it at the right -->
+<!-- A page it goes with: its icon, its title; × (under the pointer) takes it off -->
+<ng-template #pageRow let-page="page">
+  <div class="group flex h-9 items-center gap-2 rounded-md px-1.5 hover:bg-tint">
+    <app-icon name="page" colored class="size-4.5 shrink-0 text-icon" />
+    <span class="min-w-0 flex-1 truncate text-body text-fg">{{ page.title.trim() || ('library.untitled' | t) }}</span>
+    <button type="button" (click)="removePage(page.id)" [attr.aria-label]="'schedule.removePage' | t" class="grid size-6 place-items-center rounded-md text-icon opacity-0 group-hover:opacity-100 hover:bg-tint-strong">
+      <app-icon name="close" class="size-3.5" />
+    </button>
+  </div>
+</ng-template>
+
+<!-- A row: its icon and name at the left (as big as the text), what sets it at the right -->
 <ng-template #deskRow let-icon="icon" let-label="label" let-tpl="tpl">
   <div class="flex min-h-10 items-center gap-3">
-    <span class="flex w-32 shrink-0 items-center gap-2 text-ui text-fg-secondary"><app-icon [name]="icon" class="size-4 text-icon" />{{ label | t }}</span>
-    <div class="min-w-0 flex-1"><ng-container [ngTemplateOutlet]="tpl" /></div>
+    <span class="flex w-36 shrink-0 items-center gap-2 text-body text-fg-secondary"><app-icon [name]="icon" class="size-4.5 text-icon" />{{ label | t }}</span>
+    <div class="flex min-w-0 flex-1 justify-end"><ng-container [ngTemplateOutlet]="tpl" /></div>
   </div>
 </ng-template>
 <ng-template #phoneRow let-label="label" let-tpl="tpl">
