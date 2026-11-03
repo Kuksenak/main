@@ -54,46 +54,46 @@
      screen.orientation.lock(): on iOS home-screen apps it shrinks the launch viewport by the
      bottom safe area (a blank strip until the phone is rotated). */
   --app-h: 100dvh;
-  /* the tags' colors (as Notion's): a pastel each (a tag's chip, its pages' icon), its text */
-  --tag-gray: #e3e2e0;
+  /* the tags' colors (as Notion's, a little brighter): a pastel each (a tag's chip, its pages' icon), its text */
+  --tag-gray: #d9d7d2;
   --tag-gray-text: #32302c;
-  --tag-brown: #eee0da;
+  --tag-brown: #e9cfc2;
   --tag-brown-text: #442a1e;
-  --tag-orange: #fadec9;
+  --tag-orange: #fbc9a2;
   --tag-orange-text: #49290e;
-  --tag-yellow: #fdecc8;
+  --tag-yellow: #fce09a;
   --tag-yellow-text: #402c1b;
-  --tag-green: #dbeddb;
+  --tag-green: #c2e4c3;
   --tag-green-text: #1c3829;
-  --tag-blue: #d3e5ef;
+  --tag-blue: #b9d9ef;
   --tag-blue-text: #183347;
-  --tag-purple: #e8deee;
+  --tag-purple: #dcc7ee;
   --tag-purple-text: #412454;
-  --tag-pink: #f5e0e9;
+  --tag-pink: #f4c8dc;
   --tag-pink-text: #4c2337;
-  --tag-red: #ffe2dd;
+  --tag-red: #fdc5bb;
   --tag-red-text: #5d1715;
 }
 
 html.dark {
   --app-bg: #000000;
-  --tag-gray: #373737;
+  --tag-gray: #474644;
   --tag-gray-text: #e3e2e0;
-  --tag-brown: #4a3228;
+  --tag-brown: #5e4033;
   --tag-brown-text: #eee0da;
-  --tag-orange: #5c3b23;
+  --tag-orange: #78492a;
   --tag-orange-text: #fadec9;
-  --tag-yellow: #564328;
+  --tag-yellow: #6f5629;
   --tag-yellow-text: #fdecc8;
-  --tag-green: #243d30;
+  --tag-green: #2c5b40;
   --tag-green-text: #dbeddb;
-  --tag-blue: #143a4e;
+  --tag-blue: #1c5070;
   --tag-blue-text: #d3e5ef;
-  --tag-purple: #3c2d49;
+  --tag-purple: #503968;
   --tag-purple-text: #e8deee;
-  --tag-pink: #4e2c3c;
+  --tag-pink: #68374f;
   --tag-pink-text: #f5e0e9;
-  --tag-red: #522e2a;
+  --tag-red: #703731;
   --tag-red-text: #ffe2dd;
   --text: #f5f5f5;
   --danger: #ff8a55;
