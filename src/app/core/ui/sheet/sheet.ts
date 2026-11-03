@@ -62,9 +62,10 @@ export class UiSheet {
     destroyed.onDestroy(() => document.removeEventListener('keydown', onKey));
     // (its own listeners: a pull must be able to stop the scrolling — not passive)
     // (moved to the body: a page's fade at the top / bottom — a mask on what scrolls, where a page's
-    // own sheet is put — made it see-through too, and lost its blur)
+    // own sheet is put — made it see-through too, and lost its blur; opened from a page in the top
+    // layer — a phone's event — into that page instead: the body's under it, the sheet unseen)
     const host: HTMLElement = inject(ElementRef).nativeElement;
-    afterNextRender(() => document.body.appendChild(host));
+    afterNextRender(() => (host.parentElement?.closest(':popover-open') ?? document.body).appendChild(host));
     destroyed.onDestroy(() => host.remove());
     afterNextRender(() => {
       const top = this.top().nativeElement;
