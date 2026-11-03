@@ -14,9 +14,6 @@
       <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'calendar', label: 'schedule.endDate', tpl: untilTpl }" />
     }
   }
-  @if (repeating()) {
-    <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'duplicate', label: 'schedule.scope', tpl: scopeTpl }" />
-  }
 </ng-template>
 <ng-template #startsTpl>
   <span class="flex items-center gap-1.5"><ui-date [(value)]="date" /><ui-time [value]="start()" (valueChange)="setStart($event)" /></span>
@@ -32,7 +29,6 @@
 <ng-template #everyTpl><ui-select [options]="intervals()" [(value)]="every" [label]="'schedule.every' | t" /></ng-template>
 <ng-template #endRepeatTpl><ui-select [options]="endRepeats()" [value]="until() ? 'date' : 'never'" (valueChange)="setEndRepeat($event)" [label]="'schedule.endRepeat' | t" /></ng-template>
 <ng-template #untilTpl><ui-date [(value)]="until" /></ng-template>
-<ng-template #scopeTpl><ui-select [options]="scopes()" [value]="scope()" (valueChange)="scope.set($any($event))" [label]="'schedule.scope' | t" /></ng-template>
 
 <!-- Its pages: a row each (× off under the pointer), then a field finding the library's others — the
      ones found right under it (not over the panel: nothing jumps); a click, or Enter, adds one -->
@@ -97,6 +93,15 @@
     </div>
     <div class="flex min-h-0 flex-1 flex-col gap-0.5 px-5 py-2">
       <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: deskRow }" />
+      <!-- (a repeat saved / deleted: which of them — a menu at the head / the trash) -->
+      @if (choice(); as c) {
+        <ui-menu [origin]="c.at!" (closed)="choice.set(null)">
+          <ui-menu-label>{{ (c.kind === 'save' ? 'schedule.saveWhich' : 'schedule.deleteWhich') | t }}</ui-menu-label>
+          @for (s of scopes; track s.value) {
+            <button type="button" uiMenuItem [danger]="c.kind === 'delete'" (click)="chosen(s.value)">{{ s.label | t }}</button>
+          }
+        </ui-menu>
+      }
       @if (hasLibrary) {
         <p class="mt-5 mb-1 text-ui font-medium text-fg-secondary">{{ 'schedule.pages' | t }}</p>
         <div class="-mx-1.5 flex flex-col gap-px">
@@ -178,11 +183,34 @@
           <ui-list><div class="px-3 py-2"><ng-container [ngTemplateOutlet]="pagesTpl" /></div></ui-list>
         </div>
       }
-      <button type="button" class="btn-strong w-full" [disabled]="!canSave()" (click)="save(sheet)">{{ 'schedule.save' | t }}</button>
+      @if (choice()?.kind === 'save') {
+        <!-- (a repeat: which of them — in Save's place) -->
+        <div class="flex flex-col gap-2">
+          <ui-list-title>{{ 'schedule.saveWhich' | t }}</ui-list-title>
+          <ui-list>
+            @for (s of scopes; track s.value) {
+              <button type="button" uiListItem (click)="chosen(s.value, sheet)">{{ s.label | t }}</button>
+            }
+          </ui-list>
+        </div>
+      } @else {
+        <button type="button" class="btn-strong w-full" [disabled]="!canSave()" (click)="save(sheet)">{{ 'schedule.save' | t }}</button>
+      }
       @if (event()) {
-        <ui-list class="mt-auto">
-          <button type="button" uiListItem icon="trash" danger (click)="remove($event, sheet)">{{ 'schedule.delete' | t }}</button>
-        </ui-list>
+        <div class="mt-auto flex flex-col gap-2">
+          @if (choice()?.kind === 'delete') {
+            <ui-list-title>{{ 'schedule.deleteWhich' | t }}</ui-list-title>
+            <ui-list>
+              @for (s of scopes; track s.value) {
+                <button type="button" uiListItem danger (click)="chosen(s.value, sheet)">{{ s.label | t }}</button>
+              }
+            </ui-list>
+          } @else {
+            <ui-list>
+              <button type="button" uiListItem icon="trash" danger (click)="remove($event, sheet)">{{ 'schedule.delete' | t }}</button>
+            </ui-list>
+          }
+        </div>
       }
     </div>
   </ui-sheet>

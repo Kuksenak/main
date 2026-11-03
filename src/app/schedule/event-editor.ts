@@ -1,11 +1,11 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
 import { AuthStore } from '../auth/auth.store';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
+import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { Confirm, Icon, UiButton, UiDate, UiKbd, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSheet, UiTime } from '../core/ui';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { dayKey, EventInput, EventsStore, Occurrence, Repeat, Scope } from './events.store';
@@ -33,7 +33,7 @@ const INTERVALS = Array.from({ length: 12 }, (_, i) => i + 1);
  */
 @Component({
   selector: 'app-event-editor',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiKbd, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuSeparator, UiSelect, UiSheet, UiTime],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiKbd, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSelect, UiSheet, UiTime],
   templateUrl: './event-editor.html',
 })
 export class EventEditor implements OnInit {
@@ -55,7 +55,10 @@ export class EventEditor implements OnInit {
   protected readonly every = signal('1');
   protected readonly until = signal<string | null>(null);
   protected readonly pageIds = signal<string[]>([]);
-  protected readonly scope = signal<Scope>('this');
+  // A repeat saved / deleted: which of them it's for — asked (desktops: a menu at the head / the trash;
+  // phones: the choices in place of Save / Delete)
+  protected readonly choice = signal<{ kind: 'save' | 'delete'; at: HTMLElement | null } | null>(null);
+  private readonly head = viewChild<ElementRef<HTMLElement>>('head');
   protected readonly saving = signal(false);
   // The pages' field: what's typed (the library's pages with it listed under it)
   protected readonly find = signal('');
@@ -83,11 +86,11 @@ export class EventEditor implements OnInit {
     { value: 'never', label: this.i18n.t('schedule.untilNone') },
     { value: 'date', label: this.i18n.t('schedule.onDay') },
   ]);
-  protected readonly scopes = computed<UiOption[]>(() => [
-    { value: 'this', label: this.i18n.t('schedule.scopeThis') },
-    { value: 'following', label: this.i18n.t('schedule.scopeFollowing') },
-    { value: 'all', label: this.i18n.t('schedule.scopeAll') },
-  ]);
+  protected readonly scopes: { value: Scope; label: TranslationKey }[] = [
+    { value: 'this', label: 'schedule.scopeThis' },
+    { value: 'following', label: 'schedule.scopeFollowing' },
+    { value: 'all', label: 'schedule.scopeAll' },
+  ];
 
   // Ends' day: the start's ("Tue, 3 Nov")
   protected readonly endDay = computed(() => {
@@ -173,7 +176,7 @@ export class EventEditor implements OnInit {
   // Esc: the dropdown's own (it closes), else the panel closes — anything changed: asked first (by its head)
   private asking = false;
   protected async escape(head: HTMLElement): Promise<void> {
-    if (this.picking() || this.asking) return;
+    if (this.picking() || this.choice() || this.asking) return;
     if (this.state() !== this.opened) {
       this.asking = true;
       const yes = await this.confirm.ask(head, { text: this.i18n.t('schedule.discardAsk'), yes: this.i18n.t('schedule.discard'), danger: true });
@@ -235,24 +238,45 @@ export class EventEditor implements OnInit {
     else this.closed.emit();
   }
 
+  // Save: nothing changed — just closed; a repeat — which of them, asked first
   protected save(sheet?: UiSheet): void {
-    if (!this.canSave()) return;
+    if (!this.canSave() || this.choice()) return;
+    if (this.event() && this.state() === this.opened) return this.done(sheet);
+    if (this.repeating()) this.choice.set({ kind: 'save', at: this.head()?.nativeElement ?? null });
+    else this.saveFor('this', sheet);
+  }
+
+  // Delete: a repeat — which of them, asked; one event — "Delete this event?"
+  protected async remove(e: Event, sheet?: UiSheet): Promise<void> {
+    const event = this.event();
+    if (!event) return;
+    if (this.repeating()) return this.choice.set({ kind: 'delete', at: e.currentTarget as HTMLElement });
+    const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
+      text: this.i18n.t('schedule.deleteAsk'),
+      yes: this.i18n.t('schedule.delete'),
+      danger: true,
+    });
+    if (yes) this.deleteFor('this', sheet);
+  }
+
+  // (the choice made: saved / deleted for those)
+  protected chosen(scope: Scope, sheet?: UiSheet): void {
+    const kind = this.choice()?.kind;
+    this.choice.set(null);
+    if (kind === 'save') this.saveFor(scope, sheet);
+    else if (kind === 'delete') this.deleteFor(scope, sheet);
+  }
+
+  private saveFor(scope: Scope, sheet?: UiSheet): void {
     this.saving.set(true);
-    this.store.save(this.input(), this.event(), this.scope()).subscribe({
+    this.store.save(this.input(), this.event(), scope).subscribe({
       next: () => this.done(sheet),
       error: () => this.saving.set(false),
     });
   }
 
-  protected async remove(e: Event, sheet?: UiSheet): Promise<void> {
-    const event = this.event();
-    if (!event) return;
-    const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
-      text: this.i18n.t(this.repeating() ? 'schedule.deleteAskScope' : 'schedule.deleteAsk'),
-      yes: this.i18n.t('schedule.delete'),
-      danger: true,
-    });
-    if (yes) this.store.remove(event, this.scope()).subscribe(() => this.done(sheet));
+  private deleteFor(scope: Scope, sheet?: UiSheet): void {
+    this.store.remove(this.event()!, scope).subscribe(() => this.done(sheet));
   }
 }
 
