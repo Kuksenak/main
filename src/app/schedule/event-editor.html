@@ -39,11 +39,11 @@
 @if (desktop) {
   <!-- Desktops: a panel at the right, the window's whole height, the page's color, a line at its left
        (the schedule in sight): its head — the title (a field), Delete; the rows under it (not
-       scrolled: what opens in them doesn't jump); saved as it's changed — Esc / Enter close it; at the
-       bottom the key and Saving… / Saved -->
+       scrolled: what opens in them doesn't jump); Enter / a click out of it saves, Esc closes
+       (changed: asks first) — the keys at the bottom -->
   <aside
     role="dialog"
-    (document:keydown.escape)="close()"
+    (document:keydown.escape)="escape()"
     (document:keydown.enter)="enter($event)"
     (document:mousedown)="outside($event, panel)"
     #panel
@@ -56,7 +56,7 @@
         autocomplete="off"
         [value]="title()"
         (input)="title.set(titleField.value)"
-        (keydown.enter)="close()"
+        (keydown.enter)="commit()"
         maxlength="200"
         [placeholder]="'schedule.titlePlaceholder' | t"
         class="min-w-0 flex-1 bg-transparent text-lg font-semibold text-fg outline-none placeholder:text-fg-secondary"
@@ -70,7 +70,7 @@
       <ng-container [ngTemplateOutlet]="repeats" [ngTemplateOutletContext]="{ row: deskRow }" />
       <!-- (a repeat saved / deleted: which of them — a menu at the head / the trash) -->
       @if (choice(); as c) {
-        <ui-menu [origin]="c.at!" (closed)="choiceClosed()">
+        <ui-menu [origin]="c.at!" (closed)="choice.set(null)">
           <ui-menu-label>{{ (c.kind === 'save' ? 'schedule.saveWhich' : 'schedule.deleteWhich') | t }}</ui-menu-label>
           @for (s of scopes; track s.value) {
             <button type="button" uiMenuItem [danger]="c.kind === 'delete'" (click)="chosen(s.value)">{{ s.label | t }}</button>
@@ -125,10 +125,7 @@
     <!-- (the keys, as the windows': Esc closes, Enter saves) -->
     <div class="flex h-11 shrink-0 items-center gap-5 border-t-[0.5px] border-separator px-5 text-footnote text-fg-secondary">
       <span class="flex items-center gap-1.5"><ui-kbd>Esc</ui-kbd>{{ 'search.close' | t }}</span>
-      <span class="flex-1"></span>
-      @if (status(); as s) {
-        <span>{{ (s === 'saving' ? 'schedule.saving' : 'schedule.saved') | t }}</span>
-      }
+      <span class="flex items-center gap-1.5" [class.opacity-40]="!canSave()"><ui-kbd><app-icon name="enter" class="my-0.5 size-3.5" /></ui-kbd>{{ 'schedule.saveKey' | t }}</span>
     </div>
   </aside>
 } @else {

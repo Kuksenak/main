@@ -104,14 +104,6 @@ export class EventsStore {
     return call.pipe(tap({ next: () => this.read(), error: () => this.toasts.fail('schedule.saveError') }));
   }
 
-  /** An event changed as a whole, as it is (its id: its first start, its rule — e.g. one just made). */
-  put(id: string, input: EventInput): Observable<string> {
-    return this.http.put(`${this.url}/${id}`, input).pipe(
-      map(() => id),
-      tap({ next: () => this.read(), error: () => this.toasts.fail('schedule.saveError') }),
-    );
-  }
-
   /** Deleted (a repeat: `scope` — this one, it and the later ones, all of the series). */
   remove(editing: Occurrence, scope: Scope): Observable<unknown> {
     const call: Observable<unknown> =
