@@ -56,10 +56,10 @@
             <button uiSidebarAction icon="plus" (click)="openEvent(null)" [uiTip]="'schedule.newEvent' | t" [attr.aria-label]="'schedule.newEvent' | t"></button>
           </span>
         </a>
-        <!-- (under it: the next 5 events — no icon (its place kept: in line with the pages), when, the title; a click opens it in the schedule; more: View all) -->
+        <!-- (under it: the next 5 events — no icon (the text where it would be), when, the title; a click opens it in the schedule; more: View all) -->
         @if (!folds.has('events')) {
           @for (event of upcoming(); track event.id + event.startsAt) {
-            <button uiSidebarItem icon="calendar" (click)="openEvent(event)" class="pl-3.5! [&>app-icon]:invisible">
+            <button uiSidebarItem icon="calendar" (click)="openEvent(event)" class="pl-3.5! [&>app-icon]:hidden">
               <span class="text-fg-secondary tabular-nums">{{ when(event) }}</span> {{ event.title }}
             </button>
           }
