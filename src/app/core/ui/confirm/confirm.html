@@ -4,7 +4,7 @@
 <div
   role="alertdialog"
   class="fixed flex animate-menu-in flex-col text-fg
-         mobile:w-72 mobile:gap-2 mobile:rounded-[2rem] mobile:glass mobile:p-3
+         mobile:w-72 mobile:max-w-[calc(100vw-1rem)] mobile:gap-1.5 mobile:rounded-[1.75rem] mobile:glass mobile:p-2
          desktop:w-72 desktop:gap-1 desktop:rounded-menu desktop:bg-dialog desktop:p-1 desktop:shadow-popover"
   [style.top.px]="place().top"
   [style.bottom.px]="place().bottom"
@@ -20,11 +20,11 @@
       }
     </div>
   } @else {
-    <p class="px-3 pt-2 pb-2 text-body text-balance">{{ text() }}</p>
+    <p class="px-3 pt-2 pb-1 text-body leading-snug text-balance">{{ text() }}</p>
     @for (c of choices(); track c.value) {
       <button
         type="button"
-        class="h-13 rounded-full bg-tint px-4 text-center text-body font-medium active:bg-tint-strong"
+        class="min-h-11 rounded-full bg-tint px-4 py-2 text-center text-body font-medium leading-tight active:bg-tint-strong"
         [class.text-danger]="c.danger"
         (click)="answer(c.value)"
       >

@@ -88,7 +88,7 @@ export class UiConfirm {
   // over it lower down (no button: the middle of the screen)
   protected readonly place = computed(() => {
     const el = this.origin();
-    const width = desktop ? 288 : 256;
+    const width = 288; // (as wide as its w-72 — both devices)
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     if (!el) return { top: vh / 2 - 80, bottom: null, left: (vw - width) / 2 };
