@@ -1,17 +1,17 @@
-<!-- The event's rows, the same on both devices (desktops: its icon and name at the left; phones: iOS's
+<!-- The event's rows, the same on both devices (desktops: its name at the left; phones: iOS's
      lists, the value at the right): Starts, Ends, Repeat, Every, End repeat (its day), and for a repeat
      which of them a change / deletion is for -->
 <ng-template #fields let-row="row">
-  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'calendar', label: 'schedule.starts', tpl: startsTpl }" />
-  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'clock', label: 'schedule.ends', tpl: endsTpl }" />
-  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'update', label: 'schedule.repeat', tpl: repeatTpl }" />
+  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.starts', tpl: startsTpl }" />
+  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.ends', tpl: endsTpl }" />
+  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.repeat', tpl: repeatTpl }" />
   @if (preset() === 'custom') {
-    <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'update', label: 'schedule.every', tpl: everyTpl }" />
+    <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.every', tpl: everyTpl }" />
   }
   @if (repeat() !== 'Never') {
-    <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'update', label: 'schedule.endRepeat', tpl: endRepeatTpl }" />
+    <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.endRepeat', tpl: endRepeatTpl }" />
     @if (until()) {
-      <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'calendar', label: 'schedule.endDate', tpl: untilTpl }" />
+      <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.endDate', tpl: untilTpl }" />
     }
   }
 </ng-template>
@@ -227,10 +227,10 @@
   </div>
 </ng-template>
 
-<!-- A row: its icon and name at the left (as big as the text), what sets it at the right -->
-<ng-template #deskRow let-icon="icon" let-label="label" let-tpl="tpl">
+<!-- A row: its name at the left (no icon), what sets it at the right -->
+<ng-template #deskRow let-label="label" let-tpl="tpl">
   <div class="flex min-h-10 items-center gap-3">
-    <span class="flex w-36 shrink-0 items-center gap-2 text-body text-fg-secondary"><app-icon [name]="icon" colored class="size-5.5 shrink-0 text-icon" />{{ label | t }}</span>
+    <span class="w-32 shrink-0 text-body text-fg-secondary">{{ label | t }}</span>
     <div class="flex min-w-0 flex-1 justify-end"><ng-container [ngTemplateOutlet]="tpl" /></div>
   </div>
 </ng-template>
