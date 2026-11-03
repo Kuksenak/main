@@ -41,16 +41,6 @@ export const routes: Routes = [
         loadComponent: () => import('./favorites/favorites').then((m) => m.Favorites),
         canActivate: [areaGuard('library')],
       },
-      {
-        path: 'tags',
-        loadComponent: () => import('./tags/tags').then((m) => m.Tags),
-        canActivate: [areaGuard('library')],
-      },
-      {
-        path: 'tags/:id',
-        loadComponent: () => import('./tags/tag').then((m) => m.TagPage),
-        canActivate: [areaGuard('library')],
-      },
       { path: 'users', loadComponent: () => import('./users/users').then((m) => m.Users), canActivate: [adminGuard] },
     ],
   },
