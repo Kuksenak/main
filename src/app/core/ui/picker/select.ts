@@ -73,7 +73,7 @@ export interface UiOption {
         }
         <span class="min-w-0 truncate data-wide:flex-1" [attr.data-wide]="wide() ? '' : null">{{ chosen() }}</span>
         @if (options().length > 1) {
-          <app-icon [name]="plain() ? 'chevrons-up-down' : 'chevron-down'" class="size-4 shrink-0 text-icon data-glass:size-5.5 data-plain:size-5" [attr.data-glass]="glass() ? '' : null" [attr.data-plain]="plain() ? '' : null" />
+          <app-icon [name]="plain() ? 'chevrons-up-down' : 'chevron-down'" class="size-4 shrink-0 text-icon data-glass:size-5.5 data-plain:size-6" [attr.data-glass]="glass() ? '' : null" [attr.data-plain]="plain() ? '' : null" />
         }
       </span>
       <!-- (the system's own select over the chip, unseen: a tap opens iOS's menu — one option only: none) -->

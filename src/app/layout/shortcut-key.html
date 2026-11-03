@@ -1,0 +1,55 @@
+<!-- The key: made on, last used (none: Off); New key; the key just made — this once, tapped: copied;
+     Turn off. Then how the shortcut sends a page: its address (tapped: copied), the steps -->
+@if (shortcut() !== undefined) {
+  <div class="flex flex-col gap-6">
+    <div class="flex flex-col gap-2">
+      <ui-list>
+        @if (shortcut(); as s) {
+          <div uiListItem>
+            {{ 'shortcut.created' | t }}
+            <span itemValue class="text-fg-secondary">{{ when(s.createdAt) }}</span>
+          </div>
+          <div uiListItem>
+            {{ 'shortcut.lastUsed' | t }}
+            <span itemValue class="text-fg-secondary">{{ s.lastUsedAt ? when(s.lastUsedAt) : ('shortcut.never' | t) }}</span>
+          </div>
+        } @else {
+          <div uiListItem><span class="text-fg-secondary">{{ 'shortcut.none' | t }}</span></div>
+        }
+        <button type="button" uiListItem (click)="create($event)" class="text-accent">{{ 'shortcut.newKey' | t }}</button>
+      </ui-list>
+    </div>
+
+    @if (key(); as k) {
+      <!-- (the key: shown this once — tapped, copied) -->
+      <div class="flex flex-col gap-2">
+        <ui-list-title>{{ 'shortcut.key' | t }}</ui-list-title>
+        <ui-list>
+          <button type="button" (click)="copy(k)" class="flex w-full items-center gap-3 px-row-x py-3 text-left active:bg-highlight">
+            <span class="min-w-0 flex-1 font-mono text-footnote break-all">{{ k }}</span>
+            <span class="shrink-0 text-body text-accent">{{ 'shortcut.copy' | t }}</span>
+          </button>
+        </ui-list>
+        <p class="px-row-x text-footnote text-fg-secondary">{{ 'shortcut.keyOnce' | t }}</p>
+      </div>
+    }
+
+    <!-- (how the shortcut sends: its address, the steps) -->
+    <div class="flex flex-col gap-2">
+      <ui-list-title>{{ 'shortcut.how' | t }}</ui-list-title>
+      <ui-list>
+        <button type="button" (click)="copy(address)" class="flex w-full items-center gap-3 px-row-x py-3 text-left active:bg-highlight">
+          <span class="min-w-0 flex-1 font-mono text-footnote break-all">{{ address }}</span>
+          <span class="shrink-0 text-body text-accent">{{ 'shortcut.copy' | t }}</span>
+        </button>
+      </ui-list>
+      <p class="px-row-x text-footnote whitespace-pre-line text-fg-secondary">{{ 'shortcut.steps' | t }}</p>
+    </div>
+
+    @if (shortcut()) {
+      <ui-list>
+        <button type="button" uiListItem danger (click)="turnOff($event)">{{ 'shortcut.off' | t }}</button>
+      </ui-list>
+    }
+  </div>
+}

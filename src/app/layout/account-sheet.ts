@@ -9,20 +9,21 @@ import { Icon, UiList, UiFloatingButton, UiListItem, UiOption, UiSelect, UiSheet
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
 import { TrashList } from '../library/trash-list';
+import { ShortcutKey } from './shortcut-key';
 import { LibraryStore } from '../library/library.store';
 import type { User } from '../users/users.store';
 
-type Page = 'users' | 'user' | 'trash';
+type Page = 'users' | 'user' | 'trash' | 'shortcut';
 
 /**
  * Phones: the account (as the Claude app's) — a sheet from the bottom, a fixed height: the email;
- * Users (the admins only), Trash (those who can read the library); the language (the system's own select); at the bottom Update available
+ * Users (the admins only), Shortcut (the iPhone shortcut's key) and Trash (those who can read the library); the language (the system's own select); at the bottom Update available
  * (when a new version is ready), Log out and Log out of all devices. A row with › opens its page
  * right in the sheet, sliding in (‹ back): the users — and a user tapped, their card; the trash's pages.
  */
 @Component({
   selector: 'app-account-sheet',
-  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSelect, UiSheet, TrashList, UserCard, UsersList],
+  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSelect, UiSheet, ShortcutKey, TrashList, UserCard, UsersList],
   templateUrl: './account-sheet.html',
 })
 export class AccountSheet {
@@ -80,6 +81,8 @@ export class AccountSheet {
         return this.userName();
       case 'trash':
         return this.i18n.t('trash.title');
+      case 'shortcut':
+        return this.i18n.t('shortcut.title');
       default:
         return '';
     }

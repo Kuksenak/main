@@ -47,6 +47,11 @@
             <app-trash-list (restored)="sheet.close()" />
           }
         }
+        @case ('shortcut') {
+          @defer (on immediate) {
+            <app-shortcut-key />
+          }
+        }
         @case ('user') {
           @defer (on immediate) {
             <app-user-card [userId]="userId()!" />
@@ -79,6 +84,8 @@
           <ui-select itemValue plain [options]="languages" [value]="i18n.lang()" (valueChange)="i18n.setLang($any($event))" [label]="'account.language' | t" />
         </div>
         @if (auth.can('library')) {
+          <!-- (the iPhone shortcut's key: pages added from Apple's Shortcuts) -->
+          <button type="button" uiListItem icon="link" chevron (click)="open('shortcut')">{{ 'shortcut.title' | t }}</button>
           <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
         }
       </ui-list>
