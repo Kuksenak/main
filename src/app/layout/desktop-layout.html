@@ -140,9 +140,8 @@
       <ui-avatar [name]="userName()" [dot]="updates.ready()" />
       {{ userName() }}
     </button>
-    <!-- Trash: by the account, at the right — its window as the search's (everyone's: the schedule's
-         events go there too) -->
-    @if (true) {
+    <!-- Trash: by the account, at the right — its window as the search's -->
+    @if (library()) {
       <ng-container ngProjectAs="[sidebarFoot]">
       <span class="flex-1"></span>
       <button

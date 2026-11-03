@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { map, Observable, of, switchMap, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { environment } from '@environments/environment';
-import { I18nService } from '../core/i18n/i18n.service';
 import { Toasts } from '../core/ui';
 import { addDays, sameDay, startOfMonth } from '../core/utils/date';
 
@@ -44,7 +43,6 @@ export type Scope = 'this' | 'following' | 'all';
 export class EventsStore {
   private readonly http = inject(HttpClient);
   private readonly toasts = inject(Toasts);
-  private readonly i18n = inject(I18nService);
   private readonly url = `${environment.apiUrl}/events`;
 
   readonly events = signal<Occurrence[]>([]);
@@ -77,8 +75,7 @@ export class EventsStore {
     return this.events().filter((e) => sameDay(new Date(e.startsAt), day));
   }
 
-  /** The events read again (the months around the one in view). */
-  read(from = this.from, to = this.to): void {
+  private read(from = this.from, to = this.to): void {
     if (!from || !to) return;
     this.from = from;
     this.to = to;
@@ -107,38 +104,13 @@ export class EventsStore {
     return call.pipe(tap({ next: () => this.read(), error: () => this.toasts.fail('schedule.saveError') }));
   }
 
-  /**
-   * To the trash (a repeat: `scope` — this one, it and the later ones: taken out of the series as an
-   * event of their own, that one thrown away; all of the series) — a toast: Undo brings it back.
-   */
+  /** Deleted (a repeat: `scope` — this one, it and the later ones, all of the series). */
   remove(editing: Occurrence, scope: Scope): Observable<unknown> {
-    const id$: Observable<string> =
+    const call: Observable<unknown> =
       editing.repeat === 'Never' || scope === 'all'
-        ? of(editing.id)
-        : this.http
-            .post<{ id: string }>(`${this.url}/${editing.id}/occurrence`, {
-              at: editing.startsAt,
-              change: scope === 'this' ? { ...asInput(editing), repeat: 'Never', repeatInterval: 1, repeatUntil: null } : asInput(editing),
-              following: scope === 'following',
-            })
-            .pipe(map((r) => r.id));
-    return id$.pipe(
-      switchMap((id) => this.http.delete(`${this.url}/${id}`).pipe(map(() => id))),
-      tap({
-        next: (id) => {
-          this.read();
-          this.toasts.show(this.i18n.t('trash.moved'), { label: this.i18n.t('trash.undo'), run: () => this.restore(id).subscribe() });
-        },
-        error: () => this.toasts.fail('schedule.saveError'),
-      }),
-    );
-  }
-
-  /** Out of the trash, back in the schedule. */
-  restore(id: string): Observable<unknown> {
-    return this.http.post(`${environment.apiUrl}/trash/events/${id}/restore`, {}).pipe(
-      tap({ next: () => this.read(), error: () => this.toasts.fail('trash.restoreError') }),
-    );
+        ? this.http.delete(`${this.url}/${editing.id}`)
+        : this.http.post(`${this.url}/${editing.id}/occurrence`, { at: editing.startsAt, change: null, following: scope === 'following' });
+    return call.pipe(tap({ next: () => this.read(), error: () => this.toasts.fail('schedule.saveError') }));
   }
 
   // (all of a series changed from one of its repeats: the series keeps its first day, at the time picked)
@@ -148,19 +120,6 @@ export class EventsStore {
     first.setHours(at.getHours(), at.getMinutes(), 0, 0);
     return { ...input, startsAt: first.toISOString() };
   }
-}
-
-// (an occurrence as it is: what makes it — a repeat's, the series' rule kept)
-function asInput(e: Occurrence): EventInput {
-  return {
-    title: e.title,
-    startsAt: e.startsAt,
-    durationMinutes: e.durationMinutes,
-    repeat: e.repeat,
-    repeatInterval: e.repeatInterval,
-    repeatUntil: e.repeatUntil,
-    pageIds: e.pageIds,
-  };
 }
 
 /** A day as a key: "2026-11-03" (local). */

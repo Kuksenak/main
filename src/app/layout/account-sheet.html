@@ -86,8 +86,9 @@
           {{ 'account.language' | t }}
           <span itemValue class="text-fg-secondary">{{ language() }}</span>
         </button>
-        <!-- (everyone's: the schedule's events go there too) -->
-        <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
+        @if (auth.can('library')) {
+          <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
+        }
       </ui-list>
 
       <div class="mt-auto flex flex-col gap-3">

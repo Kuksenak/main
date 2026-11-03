@@ -34,13 +34,11 @@ export interface Page extends PageItem {
   shareToken: string | null;
 }
 
-/** In the trash: a page or an event (its start too), when it went there. */
+/** A page in the trash: when it went there. */
 export interface TrashItem {
   id: string;
-  kind: 'page' | 'event';
   title: string;
   deletedAt: string;
-  startsAt: string | null;
 }
 
 /** A published page, as anyone with its link sees it (its private blocks left out). */
@@ -196,17 +194,6 @@ export class LibraryStore {
     this.http.get<TrashItem[]>(this.trashUrl).subscribe({
       next: (items) => this.trash.set(items),
       error: () => this.toasts.fail('trash.loadError'),
-    });
-  }
-
-  /** An event out of the trash, back in the schedule (`done`: then — the trash's list opens the schedule). */
-  restoreEvent(id: string, done?: () => void): void {
-    this.http.post(`${this.trashUrl}/events/${id}/restore`, {}).subscribe({
-      next: () => {
-        this.trash.update((items) => items?.filter((x) => x.id !== id) ?? null);
-        done?.();
-      },
-      error: () => this.toasts.fail('trash.restoreError'),
     });
   }
 

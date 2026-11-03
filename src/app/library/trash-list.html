@@ -1,4 +1,4 @@
-<!-- The pages and events in the trash: each its name, when it was thrown away; Restore and Delete forever at its
+<!-- The pages in the trash: each its name, when it was thrown away; Restore and Delete forever at its
      right (desktops: under the pointer; phones: as big as the round buttons); Delete forever asked first: it can't be undone; Empty trash: where it's shown -->
 @if (shown(); as items) {
   @if (!items.length) {
@@ -9,7 +9,7 @@
         <!-- (the desktop's window: the keys pick one — gray, its buttons shown) -->
         <div
           uiRow
-          [icon]="item.kind === 'event' ? 'calendar' : 'page'"
+          icon="page"
           [hint]="when(item.deletedAt)"
           [hover]="index() === null"
           [attr.aria-selected]="index() === null ? null : i === index()"
@@ -21,7 +21,7 @@
             uiButton
             type="button"
             icon="update"
-            (click)="restore(item)"
+            (click)="restore(item.id)"
             class="mobile:size-11!"
             [uiTip]="'trash.restore' | t"
             [attr.aria-label]="'trash.restore' | t"

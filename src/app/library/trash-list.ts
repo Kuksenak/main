@@ -4,11 +4,10 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UiButton, UiEmpty, UiRow } from '../core/ui';
 import { UiTip } from '../core/ui/tip/tip';
-import { EventsStore } from '../schedule/events.store';
-import { LibraryStore, TrashItem } from './library.store';
+import { LibraryStore } from './library.store';
 
 /**
- * The trash's pages and events (read as it's shown): each its name and when it was thrown away; Restore (back
+ * The trash's pages (read as it's shown): each its name and when it was thrown away; Restore (back
  * in the library, then opened — `restored`: where it's shown closes) and Delete forever (asked first, by the button; Empty trash: where it's shown has it — the store's `askDeleteForever(null, …)`). In the desktop's trash window (as the search's: its field
  * filters them, its foot has Empty trash) and the phones' sheet (the account's Trash row).
  */
@@ -19,7 +18,6 @@ import { LibraryStore, TrashItem } from './library.store';
 })
 export class TrashList {
   protected readonly store = inject(LibraryStore);
-  private readonly events = inject(EventsStore);
   private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
   readonly restored = output<void>();
@@ -40,22 +38,13 @@ export class TrashList {
   /** The row the keys picked, restored (↵). */
   restoreAt(i: number): void {
     const item = this.shown()?.[i];
-    if (item) this.restore(item);
+    if (item) this.restore(item.id);
   }
 
-  // (back where it was, then opened there: a page — it; an event — the schedule, it on its day)
-  protected restore(item: TrashItem): void {
-    if (item.kind === 'event') {
-      this.store.restoreEvent(item.id, () => {
-        this.restored.emit();
-        this.events.read();
-        this.router.navigate(['/schedule']);
-      });
-      return;
-    }
-    this.store.restore(item.id, () => {
+  protected restore(id: string): void {
+    this.store.restore(id, () => {
       this.restored.emit();
-      this.router.navigate(['/library', item.id]);
+      this.router.navigate(['/library', id]);
     });
   }
 

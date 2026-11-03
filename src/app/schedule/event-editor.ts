@@ -347,7 +347,7 @@ export class EventEditor implements OnInit {
     if (scope) this.saveFor(scope as Scope);
   }
 
-  // Move to trash: one event — at once (the toast's Undo brings it back); a repeat — which of them, asked
+  // Delete: one event — "Delete this event?"; a repeat — which of them, asked
   protected async remove(e: Event): Promise<void> {
     if (!this.current()) return;
     if (this.repeating() && desktop) return this.choice.set({ kind: 'delete', at: e.currentTarget as HTMLElement });
@@ -359,7 +359,12 @@ export class EventEditor implements OnInit {
       if (scope) this.deleteFor(scope as Scope);
       return;
     }
-    this.deleteFor('all');
+    const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
+      text: this.i18n.t('schedule.deleteAsk'),
+      yes: this.i18n.t('schedule.delete'),
+      danger: true,
+    });
+    if (yes) this.deleteFor('all');
   }
 
   // (the choice made: saved / deleted for those)

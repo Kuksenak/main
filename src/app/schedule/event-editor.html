@@ -120,7 +120,7 @@
       }
     </div>
     @if (current()) {
-      <!-- (Move to trash: at the bottom, over the keys) -->
+      <!-- (Delete: at the bottom, over the keys) -->
       <div class="shrink-0 px-4 pb-2">
         <button uiButton type="button" icon="trash" (click)="remove($event)" class="hover:text-danger">{{ 'schedule.delete' | t }}</button>
       </div>
@@ -164,7 +164,7 @@
       </button>
     </header>
     <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-[calc(env(safe-area-inset-top)+4.75rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
-      <!-- (as tall as the screen at least: Move to trash at its bottom) -->
+      <!-- (as tall as the screen at least: Delete at its bottom) -->
       <div class="flex min-h-full flex-col gap-6">
         <ui-list>
           <div uiListItem>
