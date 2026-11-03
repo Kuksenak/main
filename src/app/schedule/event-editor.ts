@@ -1,5 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, ElementRef, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, ElementRef, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -27,8 +28,8 @@ const INTERVALS = Array.from({ length: 12 }, (_, i) => i + 1);
  * app's): its title; Starts (a day, a time), Ends (a time — not after the start: orange, not saved);
  * Repeat, Every (n days / weeks / months), End repeat (never, or on a day); the library's pages it
  * goes with; a repeat saved / deleted: which of them, asked. Desktops: a panel at the right, the
- * page's color, a line at its left (the schedule in sight) — Enter saves, Esc closes, Delete in its
- * head; phones (as the old app's): a page of its own sliding in from the right — ‹ (changed: ✕) · its
+ * page's color, a line at its left (the schedule in sight) — saved as it's changed (as Notion's), Esc
+ * / Enter close it, Delete in its head; phones (as the old app's): a page of its own sliding in from the right — ‹ (changed: ✕) · its
  * name · ✓, iOS's cards, Delete at the end. `closed` as it goes.
  */
 @Component({
@@ -69,7 +70,11 @@ export class EventEditor implements OnInit {
   // (a rule none of the presets is: Custom, its Every shown)
   private readonly custom = signal(false);
 
-  protected readonly repeating = computed(() => !!this.event() && this.event()!.repeat !== 'Never');
+  // The event as it is now (none: not made yet) — desktops: the one the changes went to, as they're saved
+  protected readonly current = signal<Occurrence | null>(null);
+  // (changes go to `current` as a whole — made here, one on its own, a series of its own: no "which of them")
+  private readonly whole = signal(false);
+  protected readonly repeating = computed(() => !!this.current() && this.current()!.repeat !== 'Never' && !this.whole());
   protected readonly preset = computed(() =>
     this.custom() ? 'custom' : (PRESETS.find((p) => p.repeat === this.repeat() && p.every === Number(this.every()))?.key ?? 'custom'),
   );
@@ -128,6 +133,80 @@ export class EventEditor implements OnInit {
 
   constructor() {
     if (this.hasLibrary) this.library.load();
+    // (desktops: a change — saved 0.8s after the last one)
+    effect(() => {
+      const state = this.state();
+      if (!desktop || state === this.saved()) return;
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => this.flush(), 800);
+    });
+    inject(DestroyRef).onDestroy(() => clearTimeout(this.timer));
+  }
+
+  // Desktops: saved as it's changed — what was sent last; Saving… / Saved in the foot
+  private readonly saved = signal('');
+  protected readonly status = signal<'saving' | 'saved' | null>(null);
+  private timer = 0;
+  private sending = false;
+  // (a repeat's changes: for which of them — asked at the first, then all go there)
+  private scope: Scope | null = null;
+  // (that menu closed with none picked: closing doesn't ask again — the changes left unsaved)
+  private declined = false;
+
+  protected choiceClosed(): void {
+    if (this.choice()?.kind === 'save' && desktop) this.declined = true;
+    this.choice.set(null);
+  }
+  private readonly valid = computed(() => !!this.title().trim() && !!this.date() && this.minutes() !== null);
+
+  // What's changed sent: a new one made (then put as it is); a repeat — asked which of them first (a
+  // menu at the head; then this one / the later ones: an event of their own, put as it is after)
+  private async flush(): Promise<void> {
+    clearTimeout(this.timer);
+    const state = this.state();
+    if (state === this.saved() || !this.valid() || this.sending) return;
+    const current = this.current();
+    if (this.repeating() && !this.scope) {
+      if (!this.choice()) this.choice.set({ kind: 'save', at: this.head()?.nativeElement ?? null });
+      return;
+    }
+    this.sending = true;
+    this.status.set('saving');
+    const input = this.input();
+    const scope = this.scope;
+    try {
+      const id = await firstValueFrom(
+        !current ? this.store.save(input, null, 'all')
+        : !this.repeating() ? this.store.put(current.id, input)
+        : this.store.save(input, current, scope!),
+      );
+      this.saved.set(state);
+      this.status.set('saved');
+      if (!current || (this.repeating() && scope !== 'all')) {
+        // (made / one of its own now: the changes go to it, as a whole)
+        const single = !!current && scope === 'this';
+        this.current.set({ ...input, id, seriesStartsAt: input.startsAt, ...(single ? { repeat: 'Never', repeatInterval: 1, repeatUntil: null } : {}) });
+        this.whole.set(true);
+        if (single) {
+          this.repeat.set('Never');
+          this.until.set(null);
+        }
+      }
+    } catch {
+      this.status.set(null);
+    } finally {
+      this.sending = false;
+    }
+    // (changed while it was sent: again)
+    if (this.state() !== this.saved()) this.flush();
+  }
+
+  // Desktops: Esc / Enter — what's changed saved, closed (a repeat not yet asked: the menu first)
+  protected async close(): Promise<void> {
+    if (this.picking() || this.choice()) return;
+    if (this.declined) return this.closed.emit();
+    await this.flush();
+    if (!this.choice()) this.closed.emit();
   }
 
   // (as it opens — its inputs in: the event's, else a new one on the day picked, at the next hour, an hour long)
@@ -146,7 +225,9 @@ export class EventEditor implements OnInit {
       this.pageIds.set(e.pageIds);
       if (this.preset() === 'custom') this.custom.set(true);
     }
+    this.current.set(e);
     this.opened.set(this.state());
+    this.saved.set(this.state());
   }
 
   // A new start: the end keeps the length it had
@@ -176,19 +257,6 @@ export class EventEditor implements OnInit {
     menu?.close();
   }
 
-  // Esc: the dropdown's own (it closes), else the panel closes — anything changed: asked first (by its head)
-  private asking = false;
-  protected async escape(head: HTMLElement): Promise<void> {
-    if (this.picking() || this.choice() || this.asking) return;
-    if (this.changed()) {
-      this.asking = true;
-      const yes = await this.confirm.ask(head, { text: this.i18n.t('schedule.discardAsk'), yes: this.i18n.t('schedule.discard'), danger: true });
-      this.asking = false;
-      if (!yes) return;
-    }
-    this.closed.emit();
-  }
-
   // (what's set, as one string — as it opened: `opened`; another now: changed)
   private readonly opened = signal('');
   private readonly state = computed(() =>
@@ -214,7 +282,6 @@ export class EventEditor implements OnInit {
     e.preventDefault();
     const first = this.found()[0];
     if (this.find().trim() && first) this.addPage(first, menu);
-    else if (!menu) this.save();
   }
 
   protected closePicker(): void {
@@ -222,12 +289,12 @@ export class EventEditor implements OnInit {
     this.find.set('');
   }
 
-  // Desktops: Enter saves — anywhere but in a field or on a button (they do their own)
+  // Desktops: Enter closes (saved) — anywhere but in a field or on a button (they do their own)
   protected enter(e: Event): void {
     const at = e.target as HTMLElement;
     if (at.closest('input, textarea, button, select, [role=menu], [role=listbox]')) return;
     e.preventDefault();
-    this.save();
+    this.close();
   }
 
   private input(): EventInput {
@@ -256,15 +323,14 @@ export class EventEditor implements OnInit {
   // Save: nothing changed — just closed; a repeat — which of them, asked first
   protected save(): void {
     if (!this.canSave() || this.choice()) return;
-    if (this.event() && !this.changed()) return this.done();
+    if (this.current() && !this.changed()) return this.done();
     if (this.repeating()) this.choice.set({ kind: 'save', at: this.head()?.nativeElement ?? null });
     else this.saveFor('this');
   }
 
   // Delete: a repeat — which of them, asked; one event — "Delete this event?"
   protected async remove(e: Event): Promise<void> {
-    const event = this.event();
-    if (!event) return;
+    if (!this.current()) return;
     if (this.repeating()) return this.choice.set({ kind: 'delete', at: e.currentTarget as HTMLElement });
     const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
       text: this.i18n.t('schedule.deleteAsk'),
@@ -274,24 +340,30 @@ export class EventEditor implements OnInit {
     if (yes) this.deleteFor('this');
   }
 
-  // (the choice made: saved / deleted for those)
+  // (the choice made: saved / deleted for those — desktops' changes: all of them for those, from now on)
   protected chosen(scope: Scope): void {
     const kind = this.choice()?.kind;
     this.choice.set(null);
-    if (kind === 'save') this.saveFor(scope);
+    if (kind === 'save' && desktop) {
+      this.scope = scope;
+      this.declined = false;
+      this.flush();
+    } else if (kind === 'save') this.saveFor(scope);
     else if (kind === 'delete') this.deleteFor(scope);
   }
 
   private saveFor(scope: Scope): void {
     this.saving.set(true);
-    this.store.save(this.input(), this.event(), scope).subscribe({
+    this.store.save(this.input(), this.current(), scope).subscribe({
       next: () => this.done(),
       error: () => this.saving.set(false),
     });
   }
 
   private deleteFor(scope: Scope): void {
-    this.store.remove(this.event()!, scope).subscribe(() => this.done());
+    clearTimeout(this.timer);
+    this.saved.set(this.state()); // (nothing more to save)
+    this.store.remove(this.current()!, this.repeating() ? scope : 'all').subscribe(() => this.done());
   }
 }
 

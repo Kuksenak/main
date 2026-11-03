@@ -33,10 +33,11 @@
 @if (desktop) {
   <!-- Desktops: a panel at the right, the window's whole height, the page's color, a line at its left
        (the schedule in sight): its head — the title (a field), Delete; the rows under it (not
-       scrolled: what opens in them doesn't jump); the keys at the bottom — Enter saves, Esc closes -->
+       scrolled: what opens in them doesn't jump); saved as it's changed — Esc / Enter close it; at the
+       bottom the key and Saving… / Saved -->
   <aside
     role="dialog"
-    (document:keydown.escape)="escape(head)"
+    (document:keydown.escape)="close()"
     (document:keydown.enter)="enter($event)"
     class="fixed inset-y-0 right-0 z-40 flex w-[25rem] max-w-[90vw] animate-panel-in flex-col border-l-[0.5px] border-separator bg-app text-fg"
   >
@@ -47,12 +48,12 @@
         autocomplete="off"
         [value]="title()"
         (input)="title.set(titleField.value)"
-        (keydown.enter)="save()"
+        (keydown.enter)="close()"
         maxlength="200"
         [placeholder]="'schedule.titlePlaceholder' | t"
         class="min-w-0 flex-1 bg-transparent text-lg font-semibold text-fg outline-none placeholder:text-fg-secondary"
       />
-      @if (event()) {
+      @if (current()) {
         <button uiButton type="button" icon="trash" (click)="remove($event)" [attr.aria-label]="'schedule.delete' | t"></button>
       }
     </div>
@@ -60,7 +61,7 @@
       <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: deskRow }" />
       <!-- (a repeat saved / deleted: which of them — a menu at the head / the trash) -->
       @if (choice(); as c) {
-        <ui-menu [origin]="c.at!" (closed)="choice.set(null)">
+        <ui-menu [origin]="c.at!" (closed)="choiceClosed()">
           <ui-menu-label>{{ (c.kind === 'save' ? 'schedule.saveWhich' : 'schedule.deleteWhich') | t }}</ui-menu-label>
           @for (s of scopes; track s.value) {
             <button type="button" uiMenuItem [danger]="c.kind === 'delete'" (click)="chosen(s.value)">{{ s.label | t }}</button>
@@ -115,7 +116,10 @@
     <!-- (the keys, as the windows': Esc closes, Enter saves) -->
     <div class="flex h-11 shrink-0 items-center gap-5 border-t-[0.5px] border-separator px-5 text-footnote text-fg-secondary">
       <span class="flex items-center gap-1.5"><ui-kbd>Esc</ui-kbd>{{ 'search.close' | t }}</span>
-      <span class="flex items-center gap-1.5" [class.opacity-40]="!canSave()"><ui-kbd><app-icon name="enter" class="my-0.5 size-3.5" /></ui-kbd>{{ 'schedule.saveKey' | t }}</span>
+      <span class="flex-1"></span>
+      @if (status(); as s) {
+        <span>{{ (s === 'saving' ? 'schedule.saving' : 'schedule.saved') | t }}</span>
+      }
     </div>
   </aside>
 } @else {
@@ -137,7 +141,7 @@
           <app-icon name="chevron-left" class="-ml-0.5 size-8" />
         }
       </button>
-      <span class="min-w-0 flex-1 truncate text-center text-body font-semibold">{{ (event() ? 'schedule.event' : 'schedule.newEvent') | t }}</span>
+      <span class="min-w-0 flex-1 truncate text-center text-body font-semibold">{{ (current() ? 'schedule.event' : 'schedule.newEvent') | t }}</span>
       <button
         type="button"
         uiFloatingButton
@@ -190,7 +194,7 @@
             </ui-list>
           </div>
         }
-        @if (event()) {
+        @if (current()) {
           <ui-list class="mt-2">
             <button type="button" uiListItem danger (click)="remove($event)" class="justify-center">{{ 'schedule.delete' | t }}</button>
           </ui-list>

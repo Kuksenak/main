@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { environment } from '@environments/environment';
 import { Toasts } from '../core/ui';
 import { addDays, sameDay, startOfMonth } from '../core/utils/date';
@@ -85,18 +85,31 @@ export class EventsStore {
     });
   }
 
-  /** A new one, or one changed (a repeat: `scope` — this one, it and the later ones, all of the series). */
-  save(input: EventInput, editing: Occurrence | null, scope: Scope): Observable<unknown> {
-    const call: Observable<unknown> = !editing
-      ? this.http.post(this.url, input)
+  /**
+   * A new one, or one changed (a repeat: `scope` — this one, it and the later ones, all of the
+   * series) — the id of the event it ended up in (new; this one / the later ones: a new one of their own).
+   */
+  save(input: EventInput, editing: Occurrence | null, scope: Scope): Observable<string> {
+    const call: Observable<string> = !editing
+      ? this.http.post<{ id: string }>(this.url, input).pipe(map((e) => e.id))
       : editing.repeat === 'Never' || scope === 'all'
-        ? this.http.put(`${this.url}/${editing.id}`, scope === 'all' ? this.asSeries(input, editing) : input)
-        : this.http.post(`${this.url}/${editing.id}/occurrence`, {
-            at: editing.startsAt,
-            change: scope === 'this' ? { ...input, repeat: 'Never', repeatInterval: 1, repeatUntil: null } : input,
-            following: scope === 'following',
-          });
+        ? this.http.put(`${this.url}/${editing.id}`, scope === 'all' ? this.asSeries(input, editing) : input).pipe(map(() => editing.id))
+        : this.http
+            .post<{ id: string | null }>(`${this.url}/${editing.id}/occurrence`, {
+              at: editing.startsAt,
+              change: scope === 'this' ? { ...input, repeat: 'Never', repeatInterval: 1, repeatUntil: null } : input,
+              following: scope === 'following',
+            })
+            .pipe(map((r) => r.id ?? editing.id));
     return call.pipe(tap({ next: () => this.read(), error: () => this.toasts.fail('schedule.saveError') }));
+  }
+
+  /** An event changed as a whole, as it is (its id: its first start, its rule — e.g. one just made). */
+  put(id: string, input: EventInput): Observable<string> {
+    return this.http.put(`${this.url}/${id}`, input).pipe(
+      map(() => id),
+      tap({ next: () => this.read(), error: () => this.toasts.fail('schedule.saveError') }),
+    );
   }
 
   /** Deleted (a repeat: `scope` — this one, it and the later ones, all of the series). */
