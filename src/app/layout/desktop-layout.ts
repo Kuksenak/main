@@ -1,6 +1,8 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
@@ -90,6 +92,11 @@ export class DesktopLayout {
   });
   // (folded away — kept on this device)
   protected readonly folds = keptFolds<List>(FOLDED);
+  // (the library — or one of its pages — open: Library's row gray)
+  private readonly url = toSignal(this.router.events.pipe(filter((e) => e instanceof NavigationEnd), map(() => this.router.url)), {
+    initialValue: this.router.url,
+  });
+  protected readonly onLibrary = computed(() => /^\/library(\/|\?|$)/.test(this.url()));
 
   // A page's icon: in its first tag's pastel
   private readonly tags = inject(TagsStore);

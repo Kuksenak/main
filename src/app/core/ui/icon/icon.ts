@@ -34,6 +34,7 @@ export const ICONS = [
   'hash',
   'pencil',
   'arrow-up',
+  'arrow-up-right',
   'arrow-down',
   'close',
   'chevron-left',

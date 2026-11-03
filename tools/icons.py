@@ -185,6 +185,9 @@ ICONS = {
     # enter (↵): down, then back to the left, its head
     'enter': line('M47.4 15.2C47.6 22 47.4 28.6 47.2 34.4 47.1 37.2 45.6 38.6 42.8 38.6 34 38.6 25.4 38.4 16.8 38.6')
         + line('M25.4 29.6C22.4 32.6 19.8 35.4 16.6 38.6 19.6 41.6 22.4 44.6 25.6 47.6'),
+    # open the whole of it (the sidebar's Library: the library): an arrow up to the right, its head
+    'arrow-up-right': line('M17.8 46.4C27.2 37 36.6 27.6 46 18.2')
+        + line('M24.2 17.8C31.6 17.6 39 17.8 46.4 17.6 46.6 25 46.4 32.4 46.6 39.8'),
     # up / down (the search window's keys): a line, its head, a little off
     'arrow-up': line('M32.2 51.2C32 39 32.1 26.8 31.9 14.2')
         + line('M19.4 26.6C23.6 22.4 27.6 18.2 31.9 13.8 36.2 18 40.4 22.2 44.8 26.6'),

@@ -13,24 +13,31 @@
       <ui-kbd>{{ shortcut }}</ui-kbd>
     </button>
     @for (place of places(); track place.path) {
-      <!-- (Library: + (a new page) and ⌄ (its last pages under it, folding — › folded) under the pointer;
-           a click on its name: the library) -->
-      <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">
-        {{ place.label | t }}
-        @if (place.path === '/library') {
+      @if (place.path === '/library') {
+        <!-- (Library, as a section's row: a click folds its last pages away / back — ⌄ right after its name
+             under the pointer, › folded; at its right under the pointer + (a new page) and ↗ (the whole
+             library); gray while the library's open) -->
+        <a
+          uiSidebarItem
+          [icon]="place.icon"
+          role="button"
+          tabindex="0"
+          (click)="folds.toggle('recents')"
+          (keydown.enter)="folds.toggle('recents')"
+          [attr.data-open]="folds.has('recents') ? null : ''"
+          [class.bg-side-on]="onLibrary()"
+          [class.text-fg]="onLibrary()"
+          class="group/fold cursor-pointer"
+        >
+          <ui-fold-name>{{ place.label | t }}</ui-fold-name>
           <span itemEnd class="flex items-center gap-0.5">
             <button uiSidebarAction icon="plus" (click)="createPage()" [uiTip]="'library.new' | t" [attr.aria-label]="'library.new' | t"></button>
-            <button
-              uiSidebarAction
-              icon="chevron-down"
-              (click)="folds.toggle('recents')"
-              [attr.data-folded]="folds.has('recents') ? '' : null"
-              [attr.aria-label]="'library.recents' | t"
-              class="transition-[rotate] data-folded:-rotate-90"
-            ></button>
+            <button uiSidebarAction icon="arrow-up-right" (click)="router.navigateByUrl('/library')" [uiTip]="'library.open' | t" [attr.aria-label]="'library.open' | t"></button>
           </span>
-        }
-      </a>
+        </a>
+      } @else {
+        <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
+      }
       <!-- (under Library: its 5 last changed pages, View all — the library — the last row) -->
       @if (place.path === '/library' && !folds.has('recents')) {
         @for (list of lists(); track list.id) {
