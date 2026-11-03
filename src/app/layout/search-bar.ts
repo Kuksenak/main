@@ -3,6 +3,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { refreshThemeColor } from '../core/services/theme-color';
 import { VisibleArea } from '../core/services/visible-area';
 import { Icon, UiFloatingButton, UiList, UiListItem, UiListTitle } from '../core/ui';
+import { AuthStore } from '../auth/auth.store';
 import { AppSearch, Found, SearchScope } from './app-search';
 
 /**
@@ -29,11 +30,16 @@ export class SearchBar {
   readonly open = signal(false);
   protected readonly query = signal('');
   protected readonly scope = signal<SearchScope>('all');
-  protected readonly tabs = [
-    { scope: 'all', label: 'search.all' },
-    { scope: 'pages', label: 'search.pages' },
-    { scope: 'events', label: 'search.events' },
-  ] as const;
+  // The tabs: All, then one per section this user may open (Pages: the library; Events: the schedule) —
+  // only one of them: no tabs (nothing to choose)
+  private readonly auth = inject(AuthStore);
+  protected readonly tabs = computed(() => {
+    const own = [
+      ...(this.auth.can('library') ? [{ scope: 'pages' as const, label: 'search.pages' as const }] : []),
+      ...(this.auth.can('schedule') ? [{ scope: 'events' as const, label: 'search.events' as const }] : []),
+    ];
+    return own.length > 1 ? [{ scope: 'all' as const, label: 'search.all' as const }, ...own] : [];
+  });
   // What's found, by section, in order
   protected readonly sections = computed(() => {
     const sections: { name: string; items: Found[] }[] = [];

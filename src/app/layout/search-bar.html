@@ -44,20 +44,23 @@
         </button>
       </div>
 
-      <!-- The tabs (as Telegram's): All, Pages, Events — the picked one lifted -->
-      <div class="flex h-10 items-center rounded-full bg-field p-1" role="tablist">
-        @for (tab of tabs; track tab.scope) {
-          <button
-            type="button"
-            role="tab"
-            [attr.aria-selected]="scope() === tab.scope"
-            (click)="scope.set(tab.scope)"
-            class="h-full flex-1 rounded-full text-[0.9375rem] font-medium text-fg-secondary transition-colors duration-200 aria-selected:bg-glass aria-selected:text-fg aria-selected:shadow-glass"
-          >
-            {{ tab.label | t }}
-          </button>
-        }
-      </div>
+      <!-- The tabs (as Telegram's): All, Pages, Events — the picked one lifted; only the sections this
+           user may open (one only: no tabs) -->
+      @if (tabs().length) {
+        <div class="flex h-10 items-center rounded-full bg-field p-1" role="tablist">
+          @for (tab of tabs(); track tab.scope) {
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="scope() === tab.scope"
+              (click)="scope.set(tab.scope)"
+              class="h-full flex-1 rounded-full text-[0.9375rem] font-medium text-fg-secondary transition-colors duration-200 aria-selected:bg-glass aria-selected:text-fg aria-selected:shadow-glass"
+            >
+              {{ tab.label | t }}
+            </button>
+          }
+        </div>
+      }
     </div>
 
     <!-- What's found: a list per section, its name small and gray over it; scrolled on its own, down
@@ -65,14 +68,14 @@
     @if (open()) {
       <div
         class="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-4 pt-1"
-        [style.padding-bottom]="area.keyboard() ? area.keyboard() + 16 + 'px' : 'max(1rem, env(safe-area-inset-bottom))'"
+        [style.padding-bottom]="
+          area.keyboard() ? area.keyboard() + 16 + 'px' : 'max(1rem, env(safe-area-inset-bottom))'
+        "
         (touchmove)="scrolled()"
       >
         @for (section of sections(); track section.name) {
           <div class="flex flex-col gap-1.5">
-            <ui-list-title>{{
-              section.name
-            }}</ui-list-title>
+            <ui-list-title>{{ section.name }}</ui-list-title>
             <ui-list>
               @for (found of section.items; track found.id) {
                 <button type="button" uiListItem [icon]="found.icon" (click)="pick(found)">
