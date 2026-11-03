@@ -15,8 +15,8 @@
     @for (place of places(); track place.path) {
       @if (place.path === '/library') {
         <!-- (Library, as a section's row: a click folds its last pages away / back — ⌄ right after its name
-             under the pointer, › folded; at its right under the pointer + (a new page) and ↗ (the whole
-             library); gray while the library's open) -->
+             under the pointer, › folded; at its right under the pointer ↗ (the whole library) and + (a
+             new page); gray while the library's open) -->
         <a
           uiSidebarItem
           [icon]="place.icon"
@@ -31,8 +31,8 @@
         >
           <ui-fold-name>{{ place.label | t }}</ui-fold-name>
           <span itemEnd class="flex items-center gap-0.5">
-            <button uiSidebarAction icon="plus" (click)="createPage()" [uiTip]="'library.new' | t" [attr.aria-label]="'library.new' | t"></button>
             <button uiSidebarAction icon="arrow-up-right" (click)="router.navigateByUrl('/library')" [uiTip]="'library.open' | t" [attr.aria-label]="'library.open' | t"></button>
+            <button uiSidebarAction icon="plus" (click)="createPage()" [uiTip]="'library.new' | t" [attr.aria-label]="'library.new' | t"></button>
           </span>
         </a>
       } @else {
