@@ -23,7 +23,14 @@
         } @else {
           <!-- (phones, as iOS's lists: swiped right — Restore; left — Delete forever, asked first) -->
           <ui-swipe [start]="'trash.restore' | t" [end]="'trash.deleteForever' | t" (startPicked)="restore(item.id)" (endPicked)="deleteForever(item.id, $event)">
-            <div uiRow icon="page" [hint]="when(item.deletedAt)">{{ item.title }}</div>
+            <div uiRow icon="page">
+              {{ item.title }}
+              <!-- (when it was thrown away, at the right: the day over the time) -->
+              <span rowEnd class="flex flex-col items-end text-footnote leading-tight text-fg-secondary tabular-nums">
+                <span>{{ when(item.deletedAt) }}</span>
+                <span>{{ time(item.deletedAt) }}</span>
+              </span>
+            </div>
           </ui-swipe>
         }
       }

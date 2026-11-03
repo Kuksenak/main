@@ -59,8 +59,12 @@ export class TrashList {
     this.store.askDeleteForever(id, at as HTMLElement);
   }
 
-  // "26 Oct"
+  // "26 Oct", "14:05"
   protected when(at: string): string {
     return this.i18n.day(at);
+  }
+
+  protected time(at: string): string {
+    return this.i18n.time(at);
   }
 }

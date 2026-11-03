@@ -3,7 +3,7 @@ import { Component, DestroyRef, ElementRef, inject, input, output, signal } from
 // (one row open at a time: another swiped — the open one closes)
 let opened: UiSwipe | null = null;
 
-const OPEN = 104; // (an action's width, the row open)
+const OPEN = 120; // (an action's room, the row open)
 
 /**
  * Phones: a row swiped sideways (as iOS's lists) — to the left: its `end` action at the right (red:
@@ -15,34 +15,29 @@ const OPEN = 104; // (an action's width, the row open)
 @Component({
   selector: 'ui-swipe',
   host: {
-    // (in a card: its list row's hairline kept — each row's the only one in its swipe, "last" — but
-    // the card's last swipe's)
-    class: 'relative block overflow-hidden [&_[uiListItem]]:after:block! [&:last-child_[uiListItem]]:after:hidden!',
+    // (its row's hairline kept — each row's the only one in its swipe, "last" — but the last swipe's)
+    // (touch-action: the browser scrolls up / down, the sideways moves are its)
+    class: 'relative block touch-pan-y overflow-hidden [&_[uiListItem]]:after:block! [&:last-child_[uiListItem]]:after:hidden! [&_[uiRow]]:after:block! [&:last-child_[uiRow]]:after:hidden!',
     '(touchstart)': 'start($event)',
     '(touchmove)': 'move($event)',
     '(touchend)': 'end()',
     '(touchcancel)': 'end()',
   },
   template: `
+    <!-- (an action, as iOS 26's: a round button of its own in the room the row left, not a block) -->
     @if (x() > 0 && startLabel()) {
-      <button
-        type="button"
-        (click)="pick('start')"
-        class="absolute inset-y-0 left-0 overflow-hidden bg-accent px-2 text-body leading-tight font-medium text-on-accent"
-        [style.width.px]="x()"
-      >
-        {{ startLabel() }}
-      </button>
+      <div class="absolute inset-y-0 left-0 flex overflow-hidden py-1.5 pr-2 pl-1" [style.width.px]="x()">
+        <button type="button" (click)="pick('start')" class="min-w-0 flex-1 rounded-2xl bg-accent px-3 text-body leading-tight font-medium text-on-accent">
+          {{ startLabel() }}
+        </button>
+      </div>
     }
     @if (x() < 0 && endLabel()) {
-      <button
-        type="button"
-        (click)="pick('end')"
-        class="absolute inset-y-0 right-0 overflow-hidden bg-danger px-2 text-body leading-tight font-medium text-on-accent"
-        [style.width.px]="-x()"
-      >
-        {{ endLabel() }}
-      </button>
+      <div class="absolute inset-y-0 right-0 flex overflow-hidden py-1.5 pr-1 pl-2" [style.width.px]="-x()">
+        <button type="button" (click)="pick('end')" class="min-w-0 flex-1 rounded-2xl bg-danger px-3 text-body leading-tight font-medium text-on-accent">
+          {{ endLabel() }}
+        </button>
+      </div>
     }
     <div [style.transform]="x() ? 'translateX(' + x() + 'px)' : null" [class.transition-transform]="!dragging()">
       <ng-content />
@@ -88,6 +83,9 @@ export class UiSwipe {
       touch.mode = Math.abs(dx) > Math.abs(dy) ? 'swipe' : 'scroll';
       if (touch.mode === 'scroll') return;
     }
+    // (sideways: its own — not the page's scrolling, nor a sheet's pull down: it jumped up and down)
+    e.stopPropagation();
+    if (e.cancelable) e.preventDefault();
     this.dragging.set(true);
     const min = this.endLabel() ? -OPEN * 1.25 : 0;
     const max = this.startLabel() ? OPEN * 1.25 : 0;
