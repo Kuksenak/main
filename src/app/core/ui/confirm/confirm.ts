@@ -23,6 +23,13 @@ export interface ConfirmAsk {
   danger?: boolean;
 }
 
+/** One of several answers (`choose`): its value, its words, in the danger color (a delete). */
+export interface ConfirmChoice {
+  value: string;
+  label: string;
+  danger?: boolean;
+}
+
 /**
  * A question before something that can't be undone (Delete forever, Empty trash): `ask(button, {…})`
  * — true when it's answered yes. Right by the button that asked, no dimming (as the old app's):
@@ -35,12 +42,18 @@ export class Confirm {
   private readonly injector = inject(EnvironmentInjector);
 
   ask(origin: HTMLElement | null, ask: ConfirmAsk): Promise<boolean> {
+    return this.choose(origin, ask.text, [{ value: 'yes', label: ask.yes, danger: ask.danger }]).then((v) => v === 'yes');
+  }
+
+  /** The question and several answers (a big round button each, one under another) — the one picked, or null. */
+  choose(origin: HTMLElement | null, text: string, choices: ConfirmChoice[]): Promise<string | null> {
     return new Promise((done) => {
       const ref = createComponent(UiConfirm, { environmentInjector: this.injector });
       ref.setInput('origin', origin);
-      ref.setInput('ask', ask);
-      ref.instance.answered.subscribe((yes) => {
-        done(yes);
+      ref.setInput('text', text);
+      ref.setInput('choices', choices);
+      ref.instance.answered.subscribe((value) => {
+        done(value);
         this.app.detachView(ref.hostView);
         ref.destroy();
       });
@@ -57,14 +70,15 @@ export class Confirm {
   host: {
     popover: 'manual',
     class: 'fixed inset-0 m-0 size-full max-h-none max-w-none overflow-visible border-0 bg-transparent p-0',
-    '(click)': 'answer(false)',
+    '(click)': 'answer(null)',
   },
   templateUrl: './confirm.html',
 })
 export class UiConfirm {
   readonly origin = input<HTMLElement | null>(null);
-  readonly ask = input.required<ConfirmAsk>();
-  readonly answered = output<boolean>();
+  readonly text = input.required<string>();
+  readonly choices = input.required<ConfirmChoice[]>();
+  readonly answered = output<string | null>();
 
   protected readonly desktop = desktop;
   private readonly el: HTMLElement = inject(ElementRef).nativeElement;
@@ -88,7 +102,7 @@ export class UiConfirm {
     // (Esc: only this — not the menu under it too)
     e.stopPropagation();
     e.preventDefault();
-    this.answer(false);
+    this.answer(null);
   };
 
   constructor() {
@@ -96,10 +110,10 @@ export class UiConfirm {
     document.addEventListener('keydown', this.onKey, true);
   }
 
-  protected answer(yes: boolean): void {
+  protected answer(value: string | null): void {
     if (this.done) return;
     this.done = true;
     document.removeEventListener('keydown', this.onKey, true);
-    this.answered.emit(yes);
+    this.answered.emit(value);
   }
 }

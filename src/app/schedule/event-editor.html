@@ -144,20 +144,20 @@
       class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-linear-to-b from-app from-40% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5"
     >
       <button type="button" uiFloatingButton round (click)="back($event)" class="pointer-events-auto" [attr.aria-label]="'search.close' | t">
-        <app-icon name="close" class="size-6" />
+        <app-icon name="close" class="size-7" />
       </button>
       <span class="min-w-0 flex-1 truncate text-center text-body font-semibold">{{ (current() ? 'schedule.event' : 'schedule.newEvent') | t }}</span>
       <button
         type="button"
         uiFloatingButton
         round
-        [accent]="canSave()"
-        [disabled]="!canSave()"
-        (click)="save()"
-        class="pointer-events-auto disabled:opacity-40"
+        [accent]="canCommit()"
+        [disabled]="!canCommit()"
+        (click)="save($event)"
+        class="pointer-events-auto disabled:*:opacity-50"
         [attr.aria-label]="'schedule.save' | t"
       >
-        <app-icon name="check" class="size-7" />
+        <app-icon name="check" class="size-8" />
       </button>
     </header>
     <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-[calc(env(safe-area-inset-top)+4.75rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
@@ -195,9 +195,8 @@
                   </button>
                 </div>
               }
-              <button type="button" uiListItem (click)="adding.set(true)" [disabled]="!addable().length" class="text-accent disabled:text-fg-secondary">
-                <span class="flex-1">{{ 'schedule.addPage' | t }}</span>
-                <app-icon name="plus" class="-mr-0.5 size-5" />
+              <button type="button" uiListItem chevron (click)="adding.set(true)" [disabled]="!addable().length" class="disabled:text-fg-secondary">
+                {{ 'schedule.addPage' | t }}
               </button>
             </ui-list>
           </div>
@@ -219,17 +218,6 @@
             <button type="button" uiListItem icon="page" (click)="addPage(page); addSheet.close()">
               <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
             </button>
-          }
-        </ui-list>
-      </ui-sheet>
-    }
-    <!-- (a repeat saved / deleted: which of them — a sheet of the three) -->
-    @if (choice(); as c) {
-      <ui-sheet (closed)="choice.set(null)">
-        <span sheetHead class="text-body font-semibold">{{ (c.kind === 'save' ? 'schedule.saveWhich' : 'schedule.deleteWhich') | t }}</span>
-        <ui-list>
-          @for (s of scopes; track s.value) {
-            <button type="button" uiListItem [danger]="c.kind === 'delete'" (click)="chosen(s.value)">{{ s.label | t }}</button>
           }
         </ui-list>
       </ui-sheet>

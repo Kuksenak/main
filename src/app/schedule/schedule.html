@@ -45,9 +45,10 @@
         }
       </div>
     } @else {
-      <ui-list>
+      <!-- (plain rows, as iOS's Calendar: no card) -->
+      <div class="flex flex-col">
         @for (event of events(); track event.id + event.startsAt) {
-          <button type="button" uiListItem chevron (click)="open(event)" [class.opacity-50]="past(event)">
+          <button type="button" uiListItem (click)="open(event)" [class.opacity-50]="past(event)">
             <span class="flex min-w-0 items-center gap-3">
               <span class="w-12 shrink-0 text-fg-secondary tabular-nums">{{ start(event) }}</span>
               <span class="truncate">{{ event.title }}</span>
@@ -59,7 +60,7 @@
         } @empty {
           <div uiListItem><span class="text-fg-secondary">{{ 'schedule.noEvents' | t }}</span></div>
         }
-      </ui-list>
+      </div>
     }
   </section>
 </div>

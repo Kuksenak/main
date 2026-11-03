@@ -124,6 +124,8 @@ export class EventEditor implements OnInit {
       .filter((p) => !this.pageIds().includes(p.id) && (!words || this.i18n.lower(p.title).includes(words)))
       .slice(0, 6);
   });
+  // (phones' ✓: lit once there's something to save)
+  protected readonly canCommit = computed(() => this.canSave() && (this.changed() || !this.current()));
   protected readonly canSave = computed(() => !!this.title().trim() && !!this.date() && this.minutes() !== null && !this.saving());
 
   // (its pages: only for those who can read the library)
@@ -287,18 +289,32 @@ export class EventEditor implements OnInit {
     setTimeout(() => this.closed.emit(), 240);
   }
 
-  // Save: nothing changed — just closed; a repeat — which of them, asked first
-  protected save(): void {
+  // Save: nothing changed — just closed; a repeat — which of them, asked first (desktops: a menu at
+  // the head; phones, as iOS's: this one only / the future ones, by ✓)
+  protected async save(e?: Event): Promise<void> {
     if (!this.canSave() || this.choice()) return;
     if (this.current() && !this.changed()) return this.done();
-    if (this.repeating()) this.choice.set({ kind: 'save', at: this.head()?.nativeElement ?? null });
-    else this.saveFor('this');
+    if (!this.repeating()) return this.saveFor('this');
+    if (desktop) return this.choice.set({ kind: 'save', at: this.head()?.nativeElement ?? null });
+    const scope = await this.confirm.choose((e?.currentTarget as HTMLElement) ?? null, this.i18n.t('schedule.saveAskScope'), [
+      { value: 'this', label: this.i18n.t('schedule.saveThis') },
+      { value: 'following', label: this.i18n.t('schedule.saveFollowing') },
+    ]);
+    if (scope) this.saveFor(scope as Scope);
   }
 
   // Delete: a repeat — which of them, asked; one event — "Delete this event?"
   protected async remove(e: Event): Promise<void> {
     if (!this.current()) return;
-    if (this.repeating()) return this.choice.set({ kind: 'delete', at: e.currentTarget as HTMLElement });
+    if (this.repeating() && desktop) return this.choice.set({ kind: 'delete', at: e.currentTarget as HTMLElement });
+    if (this.repeating()) {
+      const scope = await this.confirm.choose(e.currentTarget as HTMLElement, this.i18n.t('schedule.deleteAskRepeat'), [
+        { value: 'this', label: this.i18n.t('schedule.deleteThis'), danger: true },
+        { value: 'following', label: this.i18n.t('schedule.deleteFollowing'), danger: true },
+      ]);
+      if (scope) this.deleteFor(scope as Scope);
+      return;
+    }
     const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
       text: this.i18n.t('schedule.deleteAsk'),
       yes: this.i18n.t('schedule.delete'),
