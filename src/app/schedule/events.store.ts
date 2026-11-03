@@ -50,6 +50,17 @@ export class EventsStore {
   private from: Date | null = null;
   private to: Date | null = null;
 
+  /** The next ones (from now on, the soonest first): the sidebar's, under Schedule. */
+  readonly upcoming = computed(() => {
+    const now = Date.now();
+    return this.events()
+      .filter((e) => new Date(e.startsAt).getTime() + e.durationMinutes * 60_000 > now)
+      .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+  });
+
+  /** An event to open (none in it: a new one) — asked from elsewhere (the sidebar); the schedule opens it. */
+  readonly ask = signal<{ event: Occurrence | null } | null>(null);
+
   /** The days with events ("2026-11-03"). */
   readonly marked = computed(() => new Set(this.events().map((e) => dayKey(new Date(e.startsAt)))));
 

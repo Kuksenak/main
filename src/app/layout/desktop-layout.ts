@@ -20,6 +20,8 @@ import { PAGE_DRAG, SidebarTags } from '../library/sidebar-tags';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
 import { keptFolds } from '../core/utils/storage';
+import { sameDay } from '../core/utils/date';
+import { EventsStore, Occurrence } from '../schedule/events.store';
 import { Search } from './search';
 
 /**
@@ -97,6 +99,22 @@ export class DesktopLayout {
     initialValue: this.router.url,
   });
   protected readonly onLibrary = computed(() => /^\/library(\/|\?|$)/.test(this.url()));
+  protected readonly onSchedule = computed(() => /^\/schedule(\/|\?|$)/.test(this.url()));
+
+  // Schedule's next events (the 5 soonest), under it; one clicked (none: a new one) — opened in the schedule
+  protected readonly events = inject(EventsStore);
+  protected readonly upcoming = computed(() => this.events.upcoming().slice(0, 5));
+  protected openEvent(event: Occurrence | null): void {
+    this.events.ask.set({ event });
+    if (!this.onSchedule()) this.router.navigateByUrl('/schedule');
+  }
+
+  // "Today 15:00", "Thu 09:30"
+  protected when(event: Occurrence): string {
+    const at = new Date(event.startsAt);
+    const day = sameDay(at, new Date()) ? this.i18n.t('schedule.today') : this.i18n.date(at, { weekday: 'short' });
+    return `${day} ${this.i18n.time(at)}`;
+  }
 
   // A page's icon: in its first tag's pastel
   private readonly tags = inject(TagsStore);
@@ -129,6 +147,7 @@ export class DesktopLayout {
   protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl+K';
 
   constructor() {
+    this.events.show(new Date());
     if (this.library()) {
       this.store.load();
       this.tags.load();
@@ -144,7 +163,7 @@ export class DesktopLayout {
   }
 }
 
-type List = 'favorites' | 'recents';
+type List = 'favorites' | 'recents' | 'events';
 // (how many of the last changed pages Recents shows)
 const RECENTS = 5;
 // (the lists folded away: kept on this device — storage may be off, then it just isn't kept)

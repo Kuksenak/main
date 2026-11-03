@@ -47,6 +47,14 @@ export class Schedule {
     // (the month in view — or the day picked: its events read)
     effect(() => this.store.show(this.month()));
     effect(() => this.store.show(this.selected()));
+    // (an event asked for from elsewhere — the sidebar: its day picked, it opened)
+    effect(() => {
+      const asked = this.store.ask();
+      if (!asked) return;
+      this.store.ask.set(null);
+      if (asked.event) this.selected.set(startOfDay(new Date(asked.event.startsAt)));
+      this.editing.set(asked);
+    });
   }
 
   protected today(): void {
