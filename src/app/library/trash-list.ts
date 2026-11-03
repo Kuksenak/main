@@ -2,7 +2,8 @@ import { Component, computed, inject, input, model, output } from '@angular/core
 import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiButton, UiEmpty, UiRow } from '../core/ui';
+import { desktop } from '../core/device';
+import { UiButton, UiEmpty, UiRow, UiSwipe } from '../core/ui';
 import { UiTip } from '../core/ui/tip/tip';
 import { LibraryStore } from './library.store';
 
@@ -13,11 +14,12 @@ import { LibraryStore } from './library.store';
  */
 @Component({
   selector: 'app-trash-list',
-  imports: [TranslatePipe, UiButton, UiEmpty, UiRow, UiTip],
+  imports: [TranslatePipe, UiButton, UiEmpty, UiRow, UiSwipe, UiTip],
   templateUrl: './trash-list.html',
 })
 export class TrashList {
   protected readonly store = inject(LibraryStore);
+  protected readonly desktop = desktop;
   private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
   readonly restored = output<void>();
@@ -52,9 +54,9 @@ export class TrashList {
     this.store.loadTrash();
   }
 
-  // (asked first, at its button)
-  protected deleteForever(id: string, e: Event): void {
-    this.store.askDeleteForever(id, e.currentTarget as HTMLElement);
+  // (asked first, at its button / its row)
+  protected deleteForever(id: string, at: EventTarget | null): void {
+    this.store.askDeleteForever(id, at as HTMLElement);
   }
 
   // "26 Oct"

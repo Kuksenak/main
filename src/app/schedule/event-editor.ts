@@ -6,7 +6,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
-import { Confirm, Icon, UiButton, UiDate, UiFloatingButton, UiKbd, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiTime } from '../core/ui';
+import { Confirm, Icon, UiButton, UiDate, UiFloatingButton, UiKbd, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSwipe, UiTime } from '../core/ui';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { dayKey, EventInput, EventsStore, Occurrence, Repeat, Scope } from './events.store';
 
@@ -33,7 +33,7 @@ const INTERVALS = Array.from({ length: 12 }, (_, i) => i + 1);
  */
 @Component({
   selector: 'app-event-editor',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiFloatingButton, UiKbd, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSelect, UiTime],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiFloatingButton, UiKbd, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSelect, UiSwipe, UiTime],
   templateUrl: './event-editor.html',
 })
 export class EventEditor implements OnInit {
@@ -67,41 +67,6 @@ export class EventEditor implements OnInit {
   protected readonly sub = signal<'pages' | 'add' | null>(null);
   // (Add Pages opened: its field empty)
   private readonly clearFind = effect(() => this.sub() === 'add' && this.find.set(''));
-  // (phones: a page's row swiped left — Remove under it; `swiping`: following the finger, no easing)
-  protected readonly swipe = signal<{ id: string; x: number } | null>(null);
-  protected swiping = false;
-  private touch: { id: string; x: number; y: number; from: number; mode: 'unknown' | 'swipe' | 'scroll' } | null = null;
-
-  protected swipeStart(e: TouchEvent, id: string): void {
-    const t = e.touches[0];
-    const open = this.swipe();
-    if (open && open.id !== id) this.swipe.set(null);
-    this.touch = { id, x: t.clientX, y: t.clientY, from: open?.id === id ? open.x : 0, mode: 'unknown' };
-  }
-
-  protected swipeMove(e: TouchEvent): void {
-    const touch = this.touch;
-    if (!touch || touch.mode === 'scroll') return;
-    const t = e.touches[0];
-    const dx = t.clientX - touch.x;
-    const dy = t.clientY - touch.y;
-    if (touch.mode === 'unknown') {
-      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-      touch.mode = Math.abs(dx) > Math.abs(dy) ? 'swipe' : 'scroll';
-      if (touch.mode === 'scroll') return;
-    }
-    this.swiping = true;
-    this.swipe.set({ id: touch.id, x: Math.max(-120, Math.min(0, touch.from + dx)) });
-  }
-
-  // (let go: past half of Remove — it stays open; else back)
-  protected swipeEnd(): void {
-    const s = this.swipe();
-    this.swiping = false;
-    this.touch = null;
-    if (s) this.swipe.set(s.x < -48 ? { id: s.id, x: -96 } : null);
-  }
-
   protected togglePage(page: PageItem): void {
     if (this.pageIds().includes(page.id)) this.removePage(page.id);
     else this.pageIds.update((ids) => [...ids, page.id]);

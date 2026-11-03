@@ -21,6 +21,7 @@ export { UiDate } from './picker/date';
 export { UiTime } from './picker/time';
 export { UiWheel } from './picker/wheel';
 export { UiRow } from './row/row';
+export { UiSwipe } from './swipe/swipe';
 export { UiEmpty } from './empty/empty';
 export { UiKbd } from './kbd/kbd';
 export { UiTag, UiTagSwatch, TAG_COLORS, tagColorLabel, tagTint, type TagColor } from './tag/tag';

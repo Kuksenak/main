@@ -228,15 +228,11 @@
                   <ui-list-title>{{ 'schedule.attached' | t }}</ui-list-title>
                   <ui-list>
                     @for (page of pages(); track page.id) {
-                      @let x = swipe()?.id === page.id ? swipe()!.x : 0;
-                      <div class="relative overflow-hidden" (touchstart)="swipeStart($event, page.id)" (touchmove)="swipeMove($event)" (touchend)="swipeEnd()" (touchcancel)="swipeEnd()">
-                        <button type="button" (click)="removePage(page.id); swipe.set(null)" class="absolute inset-y-0 right-0 overflow-hidden bg-danger text-body font-medium whitespace-nowrap text-on-accent" [style.width.px]="-x" [class.invisible]="!x">
-                          {{ 'schedule.remove' | t }}
-                        </button>
-                        <div uiListItem icon="page" [style.transform]="x ? 'translateX(' + x + 'px)' : null" [class.transition-transform]="!swiping">
+                      <ui-swipe [end]="'schedule.remove' | t" (endPicked)="removePage(page.id)">
+                        <div uiListItem icon="page">
                           <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
                         </div>
-                      </div>
+                      </ui-swipe>
                     }
                   </ui-list>
                 </div>
