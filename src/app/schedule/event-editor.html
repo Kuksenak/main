@@ -133,8 +133,11 @@
        back out) — its top bar over it, the page passing under it (as iOS's Calendar): ✕ (changed:
        asking first), its name, ✓ (saves; gray till it can); cards: the title, the rows (their values at the right), its
        pages (× takes one off; Add a page: a sheet of the library's); Delete at the end -->
+  <!-- (in the browser's top layer, as the sheets' questions are: over the app's top bar and its menu) -->
   <div
-    class="fixed inset-0 z-40 flex animate-panel-in flex-col bg-app text-fg transition-transform duration-240 ease-out data-leaving:translate-x-full"
+    #phonePage
+    popover="manual"
+    class="fixed inset-0 m-0 flex size-full max-h-none max-w-none animate-panel-in flex-col border-0 bg-app p-0 text-fg transition-transform duration-240 ease-out data-leaving:translate-x-full"
     [attr.data-leaving]="leaving() ? '' : null"
   >
     <header
@@ -206,31 +209,32 @@
         }
       </div>
     </div>
+    <!-- (its sheets inside it: over it — it's in the top layer) -->
+    <!-- (Add a page: the library's others — a tap adds one) -->
+    @if (adding()) {
+      <ui-sheet #addSheet (closed)="adding.set(false)">
+        <span sheetHead class="text-body font-semibold">{{ 'schedule.addPage' | t }}</span>
+        <ui-list>
+          @for (page of addable(); track page.id) {
+            <button type="button" uiListItem icon="page" (click)="addPage(page); addSheet.close()">
+              <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
+            </button>
+          }
+        </ui-list>
+      </ui-sheet>
+    }
+    <!-- (a repeat saved / deleted: which of them — a sheet of the three) -->
+    @if (choice(); as c) {
+      <ui-sheet (closed)="choice.set(null)">
+        <span sheetHead class="text-body font-semibold">{{ (c.kind === 'save' ? 'schedule.saveWhich' : 'schedule.deleteWhich') | t }}</span>
+        <ui-list>
+          @for (s of scopes; track s.value) {
+            <button type="button" uiListItem [danger]="c.kind === 'delete'" (click)="chosen(s.value)">{{ s.label | t }}</button>
+          }
+        </ui-list>
+      </ui-sheet>
+    }
   </div>
-  <!-- (Add a page: the library's others — a tap adds one) -->
-  @if (adding()) {
-    <ui-sheet #addSheet (closed)="adding.set(false)">
-      <span sheetHead class="text-body font-semibold">{{ 'schedule.addPage' | t }}</span>
-      <ui-list>
-        @for (page of addable(); track page.id) {
-          <button type="button" uiListItem icon="page" (click)="addPage(page); addSheet.close()">
-            <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
-          </button>
-        }
-      </ui-list>
-    </ui-sheet>
-  }
-  <!-- (a repeat saved / deleted: which of them — a sheet of the three) -->
-  @if (choice(); as c) {
-    <ui-sheet (closed)="choice.set(null)">
-      <span sheetHead class="text-body font-semibold">{{ (c.kind === 'save' ? 'schedule.saveWhich' : 'schedule.deleteWhich') | t }}</span>
-      <ui-list>
-        @for (s of scopes; track s.value) {
-          <button type="button" uiListItem [danger]="c.kind === 'delete'" (click)="chosen(s.value)">{{ s.label | t }}</button>
-        }
-      </ui-list>
-    </ui-sheet>
-  }
 }
 
 <!-- A page it goes with: its icon, its title; × (under the pointer) takes it off -->
@@ -254,6 +258,6 @@
 <ng-template #phoneRow let-label="label" let-tpl="tpl">
   <div uiListItem>
     {{ label | t }}
-    <span itemValue><ng-container [ngTemplateOutlet]="tpl" /></span>
+    <span itemValue class="shrink-0"><ng-container [ngTemplateOutlet]="tpl" /></span>
   </div>
 </ng-template>

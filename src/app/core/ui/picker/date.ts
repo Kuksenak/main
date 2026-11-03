@@ -38,7 +38,10 @@ export class UiDate {
   protected readonly day = computed(() => parse(this.value()));
   protected readonly label = computed(() => {
     const d = this.day();
-    return d ? this.i18n.date(d, { weekday: 'short', day: 'numeric', month: 'short' }) : '—';
+    if (!d) return '—';
+    // (phones, as iOS's: "3 Nov" — another year: "3 Nov 2027"; desktops: "Tue, 3 Nov")
+    if (!desktop) return this.i18n.date(d, { day: 'numeric', month: 'short', ...(d.getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) });
+    return this.i18n.date(d, { weekday: 'short', day: 'numeric', month: 'short' });
   });
 
   // The month shown in the calendar (its 1st)

@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, ElementRef, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
 import { AuthStore } from '../auth/auth.store';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -129,8 +129,12 @@ export class EventEditor implements OnInit {
   // (its pages: only for those who can read the library)
   protected readonly hasLibrary = inject(AuthStore).can('library');
 
+  // (phones: the page put in the top layer as it's drawn)
+  private readonly phonePage = viewChild<ElementRef<HTMLElement>>('phonePage');
+
   constructor() {
     if (this.hasLibrary) this.library.load();
+    afterNextRender(() => this.phonePage()?.nativeElement.showPopover());
   }
 
   // Desktops: a click out of the panel closes it (not in what opened from it: a menu, a question)
