@@ -38,14 +38,14 @@
       } @else {
         <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
       }
-      <!-- (under Library: its 5 last changed pages, View all — the library — the last row) -->
+      <!-- (under Library: its 5 last changed pages; more than those: View all — the library — the last row) -->
       @if (place.path === '/library' && !folds.has('recents')) {
         @for (list of lists(); track list.id) {
           @if (list.id === 'recents') {
             @for (page of list.pages; track page.id) {
               <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
             }
-            @if (list.pages.length) {
+            @if ((store.items()?.length ?? 0) > list.pages.length) {
               <a routerLink="/library" class="flex h-side-row shrink-0 items-center rounded-side-row pr-side-row-x pl-10 text-ui text-fg-secondary hover:bg-side-hover">
                 {{ 'sidebar.viewAll' | t }}
               </a>
