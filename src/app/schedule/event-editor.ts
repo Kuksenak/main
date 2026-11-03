@@ -17,6 +17,7 @@ const PRESETS: { key: string; repeat: Repeat; every: number; label: TranslationK
   { key: 'week', repeat: 'Weekly', every: 1, label: 'schedule.weekly' },
   { key: 'twoWeeks', repeat: 'Weekly', every: 2, label: 'schedule.twoWeeks' },
   { key: 'month', repeat: 'Monthly', every: 1, label: 'schedule.monthly' },
+  { key: 'year', repeat: 'Yearly', every: 1, label: 'schedule.yearly' },
 ];
 // (Every, for Custom: 1 to 12 of the repeat's days / weeks / months)
 const INTERVALS = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -74,7 +75,8 @@ export class EventEditor implements OnInit {
     ...(this.preset() === 'custom' ? [{ value: 'custom', label: this.i18n.t('schedule.custom') }] : []),
   ]);
   protected readonly intervals = computed<UiOption[]>(() => {
-    const unit = this.i18n.t(this.repeat() === 'Daily' ? 'schedule.days' : this.repeat() === 'Weekly' ? 'schedule.weeks' : 'schedule.months');
+    const r = this.repeat();
+    const unit = this.i18n.t(r === 'Daily' ? 'schedule.days' : r === 'Weekly' ? 'schedule.weeks' : r === 'Yearly' ? 'schedule.years' : 'schedule.months');
     return INTERVALS.map((n) => ({ value: String(n), label: `${n} ${unit}` }));
   });
   protected readonly endRepeats = computed<UiOption[]>(() => [

@@ -1,4 +1,5 @@
-import { afterRenderEffect, Component, computed, ElementRef, model, signal, viewChildren } from '@angular/core';
+import { afterRenderEffect, Component, computed, ElementRef, inject, model, signal, viewChildren } from '@angular/core';
+import { atEnd } from './side';
 import { desktop } from '../../device';
 
 /**
@@ -24,7 +25,11 @@ export class UiTime {
   // Now (its hour, its minute down to a five), in the accent color in the columns — taken as it opens
   protected readonly now = signal({ hour: -1, minute: -1 });
 
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  protected readonly end = signal(false);
+
   protected toggle(): void {
+    this.end.set(atEnd(this.host.nativeElement));
     const d = new Date();
     this.now.set({ hour: d.getHours(), minute: d.getMinutes() - (d.getMinutes() % 5) });
     this.open.set(!this.open());

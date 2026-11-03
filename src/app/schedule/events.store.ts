@@ -5,7 +5,7 @@ import { environment } from '@environments/environment';
 import { Toasts } from '../core/ui';
 import { addDays, sameDay, startOfMonth } from '../core/utils/date';
 
-export type Repeat = 'Never' | 'Daily' | 'Weekly' | 'Monthly';
+export type Repeat = 'Never' | 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';
 
 /** An event as the schedule shows it: one start of it (a repeat: its own), how long, how it repeats, its pages. */
 export interface Occurrence {

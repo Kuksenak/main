@@ -1,4 +1,5 @@
-import { booleanAttribute, Component, input, model, signal } from '@angular/core';
+import { booleanAttribute, Component, ElementRef, inject, input, model, signal } from '@angular/core';
+import { atEnd } from './side';
 import { desktop } from '../../device';
 import { Icon, IconName } from '../icon/icon';
 
@@ -24,7 +25,7 @@ export interface UiOption {
     @if (desktop) {
       <button
         type="button"
-        (click)="open.set(!open())"
+        (click)="toggle()"
         [attr.aria-expanded]="open()"
         [attr.aria-label]="label() || null"
         class="inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-ui text-fg hover:bg-tint-strong"
@@ -38,7 +39,7 @@ export interface UiOption {
       </button>
       @if (open()) {
         <div class="fixed inset-0 z-40" (click)="open.set(false)"></div>
-        <div role="listbox" class="absolute top-full left-0 z-50 mt-1.5 flex w-max min-w-[200%] animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover">
+        <div role="listbox" [attr.data-end]="end() ? '' : null" class="absolute top-full left-0 z-50 data-end:right-0 data-end:left-auto mt-1.5 flex w-max min-w-[200%] animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover">
           @for (option of options(); track option.value) {
             <button
               type="button"
@@ -98,6 +99,13 @@ export class UiSelect {
 
   protected readonly desktop = desktop;
   protected readonly open = signal(false);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  protected readonly end = signal(false);
+
+  protected toggle(): void {
+    this.end.set(atEnd(this.host.nativeElement));
+    this.open.set(!this.open());
+  }
 
   protected chosenIcon(): IconName | undefined {
     return this.options().find((o) => o.value === this.value())?.icon;

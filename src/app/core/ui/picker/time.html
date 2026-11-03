@@ -5,7 +5,7 @@
   @if (open()) {
     <div class="fixed inset-0 z-40" (click)="open.set(false)"></div>
     <!-- Two narrow columns under the chip, their ends fading out -->
-    <div class="absolute top-full left-0 z-50 mt-1.5 flex animate-menu-in gap-1 rounded-menu bg-dialog p-1.5 text-fg shadow-popover">
+    <div [attr.data-end]="end() ? '' : null" class="absolute top-full left-0 z-50 data-end:right-0 data-end:left-auto mt-1.5 flex animate-menu-in gap-1 rounded-menu bg-dialog p-1.5 text-fg shadow-popover">
       <div #column class="flex max-h-52 flex-col gap-px overflow-y-auto [scrollbar-width:none] [mask-image:linear-gradient(transparent,black_18%,black_82%,transparent)]">
         @for (h of hours; track h) {
           <button type="button" (click)="set(h, minute())" [attr.data-on]="h === hour() ? '' : null" [class.text-accent]="h === now().hour" class="w-12 shrink-0 rounded-md py-1 text-center text-ui tabular-nums hover:bg-tint-strong data-on:bg-tint-strong data-on:font-semibold">

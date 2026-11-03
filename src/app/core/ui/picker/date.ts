@@ -1,4 +1,5 @@
-import { Component, computed, inject, model, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, model, signal } from '@angular/core';
+import { atEnd } from './side';
 import { desktop } from '../../device';
 import { I18nService } from '../../i18n/i18n.service';
 import { Icon } from '../icon/icon';
@@ -31,6 +32,8 @@ export class UiDate {
   protected readonly i18n = inject(I18nService);
   protected readonly desktop = desktop;
   protected readonly open = signal(false);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  protected readonly end = signal(false);
 
   protected readonly day = computed(() => parse(this.value()));
   protected readonly label = computed(() => {
@@ -61,6 +64,7 @@ export class UiDate {
   });
 
   protected toggle(): void {
+    this.end.set(atEnd(this.host.nativeElement));
     const d = this.day() ?? new Date();
     this.month.set(new Date(d.getFullYear(), d.getMonth(), 1));
     this.open.set(!this.open());

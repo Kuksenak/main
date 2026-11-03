@@ -3,7 +3,7 @@
      which of them a change / deletion is for -->
 <ng-template #fields let-row="row">
   <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'calendar', label: 'schedule.starts', tpl: startsTpl }" />
-  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'calendar', label: 'schedule.ends', tpl: endsTpl }" />
+  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'clock', label: 'schedule.ends', tpl: endsTpl }" />
   <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'update', label: 'schedule.repeat', tpl: repeatTpl }" />
   @if (preset() === 'custom') {
     <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ icon: 'update', label: 'schedule.every', tpl: everyTpl }" />
@@ -203,7 +203,7 @@
 <!-- A row: its icon and name at the left (as big as the text), what sets it at the right -->
 <ng-template #deskRow let-icon="icon" let-label="label" let-tpl="tpl">
   <div class="flex min-h-10 items-center gap-3">
-    <span class="flex w-36 shrink-0 items-center gap-2 text-body text-fg-secondary"><app-icon [name]="icon" class="size-4.5 text-icon" />{{ label | t }}</span>
+    <span class="flex w-36 shrink-0 items-center gap-2 text-body text-fg-secondary"><app-icon [name]="icon" colored class="size-5.5 shrink-0 text-icon" />{{ label | t }}</span>
     <div class="flex min-w-0 flex-1 justify-end"><ng-container [ngTemplateOutlet]="tpl" /></div>
   </div>
 </ng-template>
