@@ -1,0 +1,58 @@
+<!-- Phones: the tags (as Reminders' lists) — a row each: its swatch, its name, how many pages have it,
+     › (its pages). Edit (the top bar's right): each row its own — – (Delete, asked when it's on
+     pages), its swatch a tap away from its colors (the system's own menu), its name a field (Done or
+     away: saved); Done: as it was. -->
+<div class="flex flex-col gap-2 px-4 pt-2 pb-24">
+  <ui-list>
+    @for (tag of store.tags(); track tag.id) {
+      @if (editing()) {
+        <div uiListItem>
+          <span class="flex min-w-0 flex-1 items-center gap-3">
+            <button
+              type="button"
+              (click)="remove(tag, $event)"
+              [attr.aria-label]="'tags.delete' | t"
+              class="grid size-6 shrink-0 place-items-center rounded-full bg-danger text-on-accent"
+            >
+              <span class="h-0.5 w-2.5 rounded-full bg-current"></span>
+            </button>
+            <!-- (its swatch, the system's color menu over it, unseen) -->
+            <span class="relative grid size-7 shrink-0 place-items-center">
+              <ui-tag-swatch [color]="tag.color" class="size-6 rounded-full!" />
+              <select
+                class="absolute inset-0 opacity-0"
+                [attr.aria-label]="'tags.color' | t"
+                (change)="store.recolor(tag, $any($event.target).value)"
+              >
+                @for (color of colors; track color) {
+                  <option [value]="color" [selected]="tag.color === color">{{ colorLabel(color) | t }}</option>
+                }
+              </select>
+            </span>
+            <input
+              #name
+              type="text"
+              maxlength="40"
+              enterkeyhint="done"
+              [value]="tag.name"
+              (keydown.enter)="name.blur()"
+              (blur)="store.rename(tag, name.value) || (name.value = tag.name)"
+              [attr.aria-label]="'tags.rename' | t"
+              class="h-9 min-w-0 flex-1 rounded-lg bg-field px-2.5 text-body text-fg outline-none"
+            />
+          </span>
+        </div>
+      } @else {
+        <button type="button" uiListItem chevron (click)="open(tag)">
+          <span class="flex min-w-0 items-center gap-3">
+            <ui-tag-swatch [color]="tag.color" class="size-5" />
+            <span class="truncate">{{ tag.name }}</span>
+          </span>
+          <span itemValue class="text-fg-secondary tabular-nums">{{ store.pagesWith(tag.id) ?? '' }}</span>
+        </button>
+      }
+    } @empty {
+      <div uiListItem><span class="text-fg-secondary">{{ 'tags.empty' | t }}</span></div>
+    }
+  </ui-list>
+</div>
