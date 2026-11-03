@@ -192,7 +192,7 @@
       <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold" data-vt="sheet-title">{{ title() || ('library.untitled' | t) }}</span>
     }
     @if (actionsPage() === 'tags') {
-      <div uiScrollBar class="flex flex-col overflow-y-auto overscroll-contain" data-vt="sheet-pane" [style.height.px]="actionsHeight()">
+      <div uiScrollBar class="flex flex-col overflow-y-auto overscroll-contain *:shrink-0" data-vt="sheet-pane" [style.height.px]="actionsHeight()">
         <ui-list>
           @for (tag of tags.tags(); track tag.id) {
             @let on = !!p.tagIds?.includes(tag.id);
