@@ -29,13 +29,14 @@
 
   <!-- What's in it, scrolling (at the bottom: room for the home indicator — none over the keyboard); at
        the top room for the grabber and the head (as tall as they are, measured), what scrolls up under
-       them seen through, fading in as they come out (the scroll bar: only on what's seen) -->
+       them seen through, fading in as they come out (the scroll bar: only on what's seen); what's in it
+       never squeezed (a long list cut off at the bottom — it scrolls instead) -->
   <div
     #scroller
     uiScrollBar
     [barTop]="topH()"
     [barBottom]="24"
-    class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5"
+    class="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-5 *:shrink-0"
     [style.padding-top.px]="topH()"
     [style.mask-image]="topMask()"
     [style.-webkit-mask-image]="topMask()"
