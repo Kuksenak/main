@@ -46,8 +46,8 @@
               <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
             }
             @if ((store.items()?.length ?? 0) > list.pages.length) {
-              <!-- (a row as the pages': ⋯ for its icon, gray words; a click — the library) -->
-              <button uiSidebarItem icon="dots" (click)="router.navigateByUrl('/library')" class="pl-3.5! text-fg-secondary">{{ 'sidebar.viewAll' | t }}</button>
+              <!-- (a row as the pages': ⋯ for its icon (smaller, paler), gray words; a click — the library) -->
+              <button uiSidebarItem icon="dots" (click)="router.navigateByUrl('/library')" class="pl-3.5! text-fg-secondary! [&>app-icon]:scale-75 [&>app-icon]:opacity-40">{{ 'sidebar.viewAll' | t }}</button>
             }
           }
         }
