@@ -39,10 +39,13 @@ export class LastSection {
   }
 }
 
-/** The start page at the app's start: the last section instead, if there's one (later, the start page as it is). */
+/**
+ * The start page (not in the menus): a section instead — the last one used, else the first this user
+ * may open; none of them: the start page as it is.
+ */
 export const lastSectionGuard: CanActivateFn = () => {
   const router = inject(Router);
-  if (router.navigated) return true;
-  const section = inject(LastSection).start();
+  const auth = inject(AuthStore);
+  const section = inject(LastSection).start() ?? AREAS.find((a) => auth.can(a)) ?? null;
   return section ? router.createUrlTree(['/', section]) : true;
 };

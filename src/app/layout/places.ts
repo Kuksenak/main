@@ -20,7 +20,6 @@ export interface Place {
 
 /** The app's sections, in this order. */
 export const PLACES: Place[] = [
-  { path: '/', label: 'nav.home', icon: 'home' },
   { path: '/schedule', label: 'nav.schedule', icon: 'calendar', area: 'schedule' },
   { path: '/library', label: 'nav.library', icon: 'library', area: 'library' },
   { path: '/favorites', label: 'nav.favorites', icon: 'bookmark', anyOf: ['library'], phone: true },
