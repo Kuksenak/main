@@ -136,9 +136,9 @@
     >
       <button type="button" uiFloatingButton round (click)="back($event)" class="pointer-events-auto" [attr.aria-label]="(changed() ? 'schedule.discard' : 'action.back') | t">
         @if (changed()) {
-          <app-icon name="close" class="size-7" />
+          <app-icon name="close" class="size-6" />
         } @else {
-          <app-icon name="chevron-left" class="-ml-0.5 size-8" />
+          <app-icon name="chevron-left" class="-ml-0.5 size-7" />
         }
       </button>
       <span class="min-w-0 flex-1 truncate text-center text-body font-semibold">{{ (current() ? 'schedule.event' : 'schedule.newEvent') | t }}</span>
