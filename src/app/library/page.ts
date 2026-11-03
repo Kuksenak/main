@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Confirm, Icon, Toasts, UiButton, UiKbd, UiList, UiListItem, UiSheet, UiTag, UiTagSwatch } from '../core/ui';
+import { Confirm, Icon, Toasts, UiFloatingButton, UiButton, UiKbd, UiList, UiListItem, UiSheet, UiTag, UiTagSwatch } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow, UiWindowHead } from '../core/ui/window';
@@ -14,7 +14,7 @@ import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
 import { ReadBlock } from './read-block';
 import { PageEditor } from './page-editor';
 import { TagPicker } from './tag-picker';
-import { TagSheet } from './tag-sheet';
+import { Slide } from '../core/services/slide';
 import { TagsStore } from './tags.store';
 
 // How long after the last keystroke a change is saved
@@ -32,7 +32,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, TagSheet],
+  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, UiFloatingButton],
   templateUrl: './page.html',
 })
 export class PageView {
@@ -54,8 +54,20 @@ export class PageView {
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
   protected readonly tagsOpen = signal(false);
-  // Phones: the tag's own sheet (from the ⋯ sheet's Tag row)
-  protected readonly tagSheetOpen = signal(false);
+  // Phones: the ⋯ sheet's page (Tags: ‹ back), as tall as the sheet was (its actions' height)
+  protected readonly actionsPage = signal<'tags' | null>(null);
+  protected readonly actionsHeight = signal(0);
+  private readonly actionsPane = viewChild<ElementRef<HTMLElement>>('actionsPane');
+  private readonly slide = inject(Slide);
+
+  protected openActionsTags(): void {
+    this.actionsHeight.set(this.actionsPane()?.nativeElement.offsetHeight ?? 0);
+    this.slide.run('forward', () => this.actionsPage.set('tags'));
+  }
+
+  protected actionsBack(): void {
+    this.slide.run('back', () => this.actionsPage.set(null));
+  }
   private readonly confirm = inject(Confirm);
   // (the tag's button — a plain one or the tag's own: where the picker opens)
   private readonly tagsBtn = viewChild('tagsBtn', { read: ElementRef<HTMLElement> });

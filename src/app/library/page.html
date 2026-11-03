@@ -178,13 +178,39 @@
      on cards (as iOS's grouped lists) — the page (keep it, a copy), its link, when it was edited and
      made, the trash on a card of its own -->
 @if (!desktop && actionsOpen() && page(); as p) {
-  <ui-sheet #actions (closed)="actionsOpen.set(false)">
-    <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold">{{ title() || ('library.untitled' | t) }}</span>
-    <div class="flex flex-col gap-6">
-      <!-- (the page: its tag — a row with the one on it, › its own sheet; keep it, a copy) -->
+  <ui-sheet #actions (closed)="actionsOpen.set(false); actionsPage.set(null)">
+    <!-- (Tags: a page in the sheet, as the account's Language — ‹ back and its name in the head; it slides
+         in, as tall as the sheet was) -->
+    @if (actionsPage() === 'tags') {
+      <div sheetHead class="contents">
+        <button type="button" uiFloatingButton round (click)="actionsBack()" [attr.aria-label]="'action.back' | t" class="absolute left-0" data-vt="sheet-back">
+          <app-icon name="chevron-left" class="-ml-0.5 size-8" />
+        </button>
+        <span class="max-w-[calc(100%-7rem)] truncate text-body font-semibold" data-vt="sheet-title">{{ 'tags.title' | t }}</span>
+      </div>
+    } @else {
+      <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold" data-vt="sheet-title">{{ title() || ('library.untitled' | t) }}</span>
+    }
+    @if (actionsPage() === 'tags') {
+      <div class="flex flex-col" data-vt="sheet-pane" [style.min-height.px]="actionsHeight()">
+        <ui-list>
+          @for (tag of tags.tags(); track tag.id) {
+            @let on = !!p.tagIds?.includes(tag.id);
+            <button type="button" uiListItem [checked]="on" (click)="setTags(on ? [] : [tag.id]); actionsBack()" class="after:left-12!">
+              <span class="flex min-w-0 items-center gap-3">
+                <ui-tag-swatch [color]="tag.color" class="size-5" />
+                <span class="truncate">{{ tag.name }}</span>
+              </span>
+            </button>
+          }
+        </ui-list>
+      </div>
+    } @else {
+    <div #actionsPane class="flex flex-col gap-6" data-vt="sheet-pane">
+      <!-- (the page: its tag — a row with the one on it, › its page in the sheet; keep it, a copy) -->
       <ui-list>
         @if (tags.tags().length) {
-          <button type="button" uiListItem icon="hash" chevron (click)="actions.close(); tagSheetOpen.set(true)">
+          <button type="button" uiListItem icon="hash" chevron (click)="openActionsTags()">
             {{ 'tags.title' | t }}
             @if (tags.of(p.tagIds)[0]; as tag) {
               <span itemValue class="flex min-w-0 items-center gap-2 text-fg-secondary">
@@ -229,11 +255,8 @@
         <button type="button" uiListItem icon="trash" danger (click)="actions.close(); delete()">{{ 'library.moveToTrash' | t }}</button>
       </ui-list>
     </div>
+    }
   </ui-sheet>
 }
 
-<!-- Phones: the page's tag, picked in a sheet of its own -->
-@if (!desktop && tagSheetOpen() && page(); as p) {
-  <app-tag-sheet [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagSheetOpen.set(false)" />
-}
 
