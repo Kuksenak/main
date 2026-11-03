@@ -85,7 +85,8 @@
   <app-icon name="plus" class="size-8" />
 </button>
 
-<!-- An event: new, or as it is -->
-@if (editing(); as e) {
-  <app-event-editor [event]="e.event" [day]="selected()" (closed)="editing.set(null)" />
+<!-- An event: new, or as it is (another one opened: an editor of its own; one closing as another
+     opens — a click on it out of the panel — doesn't close the new one) -->
+@for (e of editing() ? [editing()!] : []; track e) {
+  <app-event-editor [event]="e.event" [day]="selected()" (closed)="editing() === e && editing.set(null)" />
 }

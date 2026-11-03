@@ -52,6 +52,7 @@ export class EventEditor implements OnInit {
   protected readonly date = signal<string | null>(null);
   protected readonly start = signal<string | null>(null);
   protected readonly end = signal<string | null>(null);
+  protected readonly endDate = signal<string | null>(null);
   protected readonly repeat = signal<Repeat>('Never');
   protected readonly every = signal('1');
   protected readonly until = signal<string | null>(null);
@@ -100,7 +101,7 @@ export class EventEditor implements OnInit {
 
   // Ends' day: the start's ("Tue, 3 Nov")
   protected readonly endDay = computed(() => {
-    const d = this.date();
+    const d = this.endDate();
     if (!d) return '';
     const [y, mo, day] = d.split('-').map(Number);
     return this.i18n.date(new Date(y, mo - 1, day), { weekday: 'short', month: 'short', day: 'numeric' });
@@ -108,9 +109,9 @@ export class EventEditor implements OnInit {
 
   // How long (minutes): the end less the start (not after it: none)
   protected readonly minutes = computed(() => {
-    const s = toMinutes(this.start());
-    const e = toMinutes(this.end());
-    return s === null || e === null || e <= s ? null : e - s;
+    const s = at(this.date(), this.start());
+    const e = at(this.endDate(), this.end());
+    return !s || !e || e <= s ? null : Math.round((e.getTime() - s.getTime()) / 60_000);
   });
 
   // The pages it goes with (gone ones left out); the field's finds: the rest with what's typed
@@ -201,6 +202,13 @@ export class EventEditor implements OnInit {
     if (this.state() !== this.saved()) this.flush();
   }
 
+  // Desktops: a click out of the panel closes it (not in what opened from it: a menu, a question)
+  protected outside(e: Event, panel: HTMLElement): void {
+    const at = e.target as HTMLElement;
+    if (!at.isConnected || panel.contains(at) || at.closest('.cdk-overlay-container, ui-confirm')) return;
+    this.close();
+  }
+
   // Desktops: Esc / Enter — what's changed saved, closed (a repeat not yet asked: the menu first)
   protected async close(): Promise<void> {
     if (this.picking() || this.choice()) return;
@@ -217,7 +225,8 @@ export class EventEditor implements OnInit {
     this.title.set(e?.title ?? '');
     this.date.set(dayKey(at));
     this.start.set(hhmm(at));
-    this.end.set(dayKey(to) === dayKey(at) ? hhmm(to) : '23:55');
+    this.endDate.set(dayKey(to));
+    this.end.set(hhmm(to));
     if (e) {
       this.repeat.set(e.repeat);
       this.every.set(String(e.repeatInterval));
@@ -230,12 +239,25 @@ export class EventEditor implements OnInit {
     this.saved.set(this.state());
   }
 
-  // A new start: the end keeps the length it had
+  // A new start (its day, its time): the end keeps the length it had
   protected setStart(value: string | null): void {
     const length = this.minutes() ?? 60;
     this.start.set(value);
-    const s = toMinutes(value);
-    if (s !== null) this.end.set(fromMinutes(Math.min(s + length, 23 * 60 + 55)));
+    this.moveEnd(length);
+  }
+
+  protected setDate(value: string | null): void {
+    const length = this.minutes() ?? 60;
+    this.date.set(value);
+    this.moveEnd(length);
+  }
+
+  private moveEnd(length: number): void {
+    const s = at(this.date(), this.start());
+    if (!s) return;
+    const e = new Date(s.getTime() + length * 60_000);
+    this.endDate.set(dayKey(e));
+    this.end.set(hhmm(e));
   }
 
   protected setPreset(key: string | null): void {
@@ -260,7 +282,7 @@ export class EventEditor implements OnInit {
   // (what's set, as one string — as it opened: `opened`; another now: changed)
   private readonly opened = signal('');
   private readonly state = computed(() =>
-    JSON.stringify([this.title().trim(), this.date(), this.start(), this.end(), this.repeat(), this.every(), this.until(), this.pageIds()]),
+    JSON.stringify([this.title().trim(), this.date(), this.start(), this.endDate(), this.end(), this.repeat(), this.every(), this.until(), this.pageIds()]),
   );
   protected readonly changed = computed(() => this.state() !== this.opened());
 
@@ -298,12 +320,10 @@ export class EventEditor implements OnInit {
   }
 
   private input(): EventInput {
-    const [y, mo, d] = this.date()!.split('-').map(Number);
-    const s = toMinutes(this.start())!;
     const until = this.repeat() !== 'Never' && this.until() ? this.until()!.split('-').map(Number) : null;
     return {
       title: this.title().trim(),
-      startsAt: new Date(y, mo - 1, d, Math.floor(s / 60), s % 60).toISOString(),
+      startsAt: at(this.date(), this.start())!.toISOString(),
       durationMinutes: this.minutes()!,
       repeat: this.repeat(),
       repeatInterval: this.repeat() === 'Never' ? 1 : Number(this.every()),
@@ -370,7 +390,13 @@ export class EventEditor implements OnInit {
 const pad = (n: number): string => String(n).padStart(2, '0');
 const hhmm = (d: Date): string => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 const toMinutes = (t: string | null): number | null => (t ? Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5)) : null);
-const fromMinutes = (m: number): string => `${pad(Math.floor(m / 60))}:${pad(m % 60)}`;
+// (a day and a time: when — either missing: none)
+function at(day: string | null, time: string | null): Date | null {
+  const m = toMinutes(time);
+  if (!day || m === null) return null;
+  const [y, mo, d] = day.split('-').map(Number);
+  return new Date(y, mo - 1, d, Math.floor(m / 60), m % 60);
+}
 
 // (a new one: the day picked, at the hour after now — another day: at 9)
 function nextHour(day: Date): Date {

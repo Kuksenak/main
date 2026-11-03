@@ -62,17 +62,18 @@ export interface UiOption {
     } @else {
       <span
         class="pointer-events-none inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-body text-fg data-wide:w-full data-wide:gap-3 data-wide:pr-3.5 data-wide:pl-4
-               data-glass:h-round data-glass:glass"
+               data-glass:h-round data-glass:glass data-plain:gap-1 data-plain:bg-transparent data-plain:px-0 data-plain:text-fg-secondary"
         [class.pl-2.5]="!!chosenIcon() && !wide()"
         [attr.data-wide]="wide() ? '' : null"
         [attr.data-glass]="glass() ? '' : null"
+        [attr.data-plain]="plain() ? '' : null"
       >
         @if (chosenIcon(); as icon) {
           <app-icon [name]="icon" colored class="size-6 shrink-0 text-icon data-wide:size-icon-menu" [attr.data-wide]="wide() ? '' : null" />
         }
         <span class="min-w-0 truncate data-wide:flex-1" [attr.data-wide]="wide() ? '' : null">{{ chosen() }}</span>
         @if (options().length > 1) {
-          <app-icon name="chevron-down" class="size-4 shrink-0 text-icon data-glass:size-5.5" [attr.data-glass]="glass() ? '' : null" />
+          <app-icon [name]="plain() ? 'chevrons-up-down' : 'chevron-down'" class="size-4 shrink-0 text-icon data-glass:size-5.5 data-plain:size-5" [attr.data-glass]="glass() ? '' : null" [attr.data-plain]="plain() ? '' : null" />
         }
       </span>
       <!-- (the system's own select over the chip, unseen: a tap opens iOS's menu — one option only: none) -->
@@ -96,6 +97,8 @@ export class UiSelect {
   readonly wide = input(false, { transform: booleanAttribute });
   // (as the floating buttons: glass, their shadow, as tall — e.g. in the phones' top bar)
   readonly glass = input(false, { transform: booleanAttribute });
+  // (phones: no chip — the chosen one in gray, ⌃⌄; as iOS's lists' rows: Repeat  Never ⌃⌄)
+  readonly plain = input(false, { transform: booleanAttribute });
 
   protected readonly desktop = desktop;
   protected readonly open = signal(false);

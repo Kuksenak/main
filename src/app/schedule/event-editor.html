@@ -1,9 +1,11 @@
 <!-- The event's rows, the same on both devices (desktops: its name at the left; phones: iOS's
-     lists, the value at the right): Starts, Ends, Repeat, Every, End repeat (its day), and for a repeat
-     which of them a change / deletion is for -->
-<ng-template #fields let-row="row">
+     lists, the value at the right): when — Starts, Ends (`ends`: the desktop's its day as words, the
+     phones' a day of its own); how it repeats — Repeat, Every (Custom), End repeat, End date -->
+<ng-template #when let-row="row" let-ends="ends">
   <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.starts', tpl: startsTpl }" />
-  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.ends', tpl: endsTpl }" />
+  <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.ends', tpl: ends }" />
+</ng-template>
+<ng-template #repeats let-row="row">
   <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.repeat', tpl: repeatTpl }" />
   @if (preset() === 'custom') {
     <ng-container [ngTemplateOutlet]="row" [ngTemplateOutletContext]="{ label: 'schedule.every', tpl: everyTpl }" />
@@ -16,18 +18,22 @@
   }
 </ng-template>
 <ng-template #startsTpl>
-  <span class="flex items-center gap-1.5"><ui-date [(value)]="date" /><ui-time [value]="start()" (valueChange)="setStart($event)" /></span>
+  <span class="flex items-center gap-1.5"><ui-date [value]="date()" (valueChange)="setDate($event)" /><ui-time [value]="start()" (valueChange)="setStart($event)" /></span>
 </ng-template>
-<!-- (its end: the start's day — pale — and a time; not after the start: orange, the day struck through) -->
+<!-- (its end, desktops: its day — pale — and a time; phones: a day and a time; not after the start:
+     orange, the day struck through) -->
+<ng-template #endsChips>
+  <span class="flex items-center gap-1.5" [class.text-danger]="minutes() === null"><ui-date [(value)]="endDate" /><ui-time [(value)]="end" /></span>
+</ng-template>
 <ng-template #endsTpl>
   <span class="flex items-center gap-1.5" [class.text-danger]="minutes() === null">
     <span class="px-1 text-fg-secondary" [class.line-through]="minutes() === null" [class.text-danger]="minutes() === null">{{ endDay() }}</span>
     <ui-time [(value)]="end" />
   </span>
 </ng-template>
-<ng-template #repeatTpl><ui-select [options]="presets()" [value]="preset()" (valueChange)="setPreset($event)" [label]="'schedule.repeat' | t" /></ng-template>
-<ng-template #everyTpl><ui-select [options]="intervals()" [(value)]="every" [label]="'schedule.every' | t" /></ng-template>
-<ng-template #endRepeatTpl><ui-select [options]="endRepeats()" [value]="until() ? 'date' : 'never'" (valueChange)="setEndRepeat($event)" [label]="'schedule.endRepeat' | t" /></ng-template>
+<ng-template #repeatTpl><ui-select [plain]="!desktop" [options]="presets()" [value]="preset()" (valueChange)="setPreset($event)" [label]="'schedule.repeat' | t" /></ng-template>
+<ng-template #everyTpl><ui-select [plain]="!desktop" [options]="intervals()" [(value)]="every" [label]="'schedule.every' | t" /></ng-template>
+<ng-template #endRepeatTpl><ui-select [plain]="!desktop" [options]="endRepeats()" [value]="until() ? 'date' : 'never'" (valueChange)="setEndRepeat($event)" [label]="'schedule.endRepeat' | t" /></ng-template>
 <ng-template #untilTpl><ui-date [(value)]="until" /></ng-template>
 
 @if (desktop) {
@@ -39,6 +45,8 @@
     role="dialog"
     (document:keydown.escape)="close()"
     (document:keydown.enter)="enter($event)"
+    (document:mousedown)="outside($event, panel)"
+    #panel
     class="fixed inset-y-0 right-0 z-40 flex w-[25rem] max-w-[90vw] animate-panel-in flex-col border-l-[0.5px] border-separator bg-app text-fg"
   >
     <div #head class="flex h-14 shrink-0 items-center gap-1 pr-3 pl-5">
@@ -58,7 +66,8 @@
       }
     </div>
     <div class="flex min-h-0 flex-1 flex-col gap-0.5 px-5 py-2">
-      <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: deskRow }" />
+      <ng-container [ngTemplateOutlet]="when" [ngTemplateOutletContext]="{ row: deskRow, ends: endsTpl }" />
+      <ng-container [ngTemplateOutlet]="repeats" [ngTemplateOutletContext]="{ row: deskRow }" />
       <!-- (a repeat saved / deleted: which of them — a menu at the head / the trash) -->
       @if (choice(); as c) {
         <ui-menu [origin]="c.at!" (closed)="choiceClosed()">
@@ -124,8 +133,8 @@
   </aside>
 } @else {
   <!-- Phones (as the old app's): a page of its own over the schedule, sliding in from the right (and
-       back out) — its top bar over it, the page passing under it: ‹ (changed: ✕, asking first), its
-       name, ✓ (saves; gray till it can); cards: the title, the rows (their values at the right), its
+       back out) — its top bar over it, the page passing under it (as iOS's Calendar): ✕ (changed:
+       asking first), its name, ✓ (saves; gray till it can); cards: the title, the rows (their values at the right), its
        pages (× takes one off; Add a page: a sheet of the library's); Delete at the end -->
   <div
     class="fixed inset-0 z-40 flex animate-panel-in flex-col bg-app text-fg transition-transform duration-240 ease-out data-leaving:translate-x-full"
@@ -134,12 +143,8 @@
     <header
       class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-linear-to-b from-app from-40% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5"
     >
-      <button type="button" uiFloatingButton round (click)="back($event)" class="pointer-events-auto" [attr.aria-label]="(changed() ? 'schedule.discard' : 'action.back') | t">
-        @if (changed()) {
-          <app-icon name="close" class="size-6" />
-        } @else {
-          <app-icon name="chevron-left" class="-ml-0.5 size-7" />
-        }
+      <button type="button" uiFloatingButton round (click)="back($event)" class="pointer-events-auto" [attr.aria-label]="'search.close' | t">
+        <app-icon name="close" class="size-6" />
       </button>
       <span class="min-w-0 flex-1 truncate text-center text-body font-semibold">{{ (current() ? 'schedule.event' : 'schedule.newEvent') | t }}</span>
       <button
@@ -173,7 +178,10 @@
           </div>
         </ui-list>
         <ui-list>
-          <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: phoneRow }" />
+          <ng-container [ngTemplateOutlet]="when" [ngTemplateOutletContext]="{ row: phoneRow, ends: endsChips }" />
+        </ui-list>
+        <ui-list>
+          <ng-container [ngTemplateOutlet]="repeats" [ngTemplateOutletContext]="{ row: phoneRow }" />
         </ui-list>
         @if (hasLibrary) {
           <div class="flex flex-col gap-2">
