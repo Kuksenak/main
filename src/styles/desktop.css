@@ -50,13 +50,14 @@
   --font-cal-weekday: 0.75rem;
 }
 
-/* The dark theme on desktops (as Notion's): not black — a dark gray page, the sidebar a step lighter,
-   cards and menus lighter still, the text a soft white; the grays out of the text a little stronger
+/* The dark theme on desktops (as Notion's): not black — a dark gray page, the sidebar the same gray
+   (as the light theme: one color with the page and an installed app's title bar, a hairline between —
+   a lighter sidebar broke the window in two under the bar), cards and menus lighter, the text a soft white; the grays out of the text a little stronger
    (on gray, 5% of white was lost). Phones keep black (iOS's, the OLED screens). (More specific than
    base.css's html.dark: the app's styles load after this file.) */
 html.dark[data-device='desktop'] {
   --app-bg: #191919;
-  --side-bg: #202020;
+  --side-bg: #191919;
   --side-hover: #2a2a2a;
   --side-on: #2f2f2f;
   --side-text: #a8a8a6;
