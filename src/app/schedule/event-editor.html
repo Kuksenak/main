@@ -30,41 +30,6 @@
 <ng-template #endRepeatTpl><ui-select [options]="endRepeats()" [value]="until() ? 'date' : 'never'" (valueChange)="setEndRepeat($event)" [label]="'schedule.endRepeat' | t" /></ng-template>
 <ng-template #untilTpl><ui-date [(value)]="until" /></ng-template>
 
-<!-- Its pages: a row each (× off under the pointer), then a field finding the library's others — the
-     ones found right under it (not over the panel: nothing jumps); a click, or Enter, adds one -->
-<ng-template #pagesTpl>
-  <div class="flex flex-col gap-px">
-    @for (page of pages(); track page.id) {
-      <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ page }" />
-    }
-    <div class="flex h-8 items-center gap-2 px-1.5">
-      <app-icon name="search" class="size-4.5 shrink-0 text-icon" />
-      <input
-        #findField
-        type="text"
-        autocomplete="off"
-        [value]="find()"
-        (input)="find.set(findField.value)"
-        (focus)="finding.set(true)"
-        (blur)="finding.set(false)"
-        (keydown.enter)="findEnter($event)"
-        [placeholder]="'schedule.findPage' | t"
-        class="min-w-0 flex-1 bg-transparent text-ui text-fg outline-none placeholder:text-fg-secondary"
-      />
-    </div>
-    @if (finding() || find()) {
-      @for (page of found(); track page.id) {
-        <button type="button" (mousedown)="$event.preventDefault()" (click)="addPage(page)" class="flex h-8 items-center gap-2 rounded-md pr-1.5 pl-8 text-left text-ui text-fg-secondary hover:bg-tint hover:text-fg">
-          <app-icon name="page" colored class="size-4.5 shrink-0 text-icon" />
-          <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
-        </button>
-      } @empty {
-        <span class="pl-8 text-ui text-fg-secondary">{{ 'search.nothing' | t }}</span>
-      }
-    }
-  </div>
-</ng-template>
-
 @if (desktop) {
   <!-- Desktops: a panel at the right, the window's whole height, the page's color, a line at its left
        (the schedule in sight): its head — the title (a field), Delete; the rows under it (not
@@ -154,66 +119,109 @@
     </div>
   </aside>
 } @else {
-  <!-- Phones: a sheet — the title a field on a card, the rows on a card (their values at the right),
-       the pages on one, Save under them, Delete at the bottom -->
-  <ui-sheet #sheet tall (closed)="closed.emit()">
-    <span sheetHead class="text-body font-semibold">{{ (event() ? 'schedule.event' : 'schedule.newEvent') | t }}</span>
-    <div class="flex min-h-full flex-col gap-6">
-      <ui-list>
-        <div uiListItem icon="calendar">
-          <input
-            #phoneTitle
-            type="text"
-            maxlength="200"
-            enterkeyhint="done"
-            [value]="title()"
-            (input)="title.set(phoneTitle.value)"
-            (keydown.enter)="phoneTitle.blur()"
-            [placeholder]="'schedule.titlePlaceholder' | t"
-            class="w-full min-w-0 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary"
-          />
-        </div>
-      </ui-list>
-      <ui-list>
-        <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: phoneRow }" />
-      </ui-list>
-      @if (hasLibrary) {
-        <div class="flex flex-col gap-2">
-          <ui-list-title>{{ 'schedule.pages' | t }}</ui-list-title>
-          <ui-list><div class="px-3 py-2"><ng-container [ngTemplateOutlet]="pagesTpl" /></div></ui-list>
-        </div>
-      }
-      @if (choice()?.kind === 'save') {
-        <!-- (a repeat: which of them — in Save's place) -->
-        <div class="flex flex-col gap-2">
-          <ui-list-title>{{ 'schedule.saveWhich' | t }}</ui-list-title>
-          <ui-list>
-            @for (s of scopes; track s.value) {
-              <button type="button" uiListItem (click)="chosen(s.value, sheet)">{{ s.label | t }}</button>
-            }
-          </ui-list>
-        </div>
-      } @else {
-        <button type="button" class="btn-strong w-full" [disabled]="!canSave()" (click)="save(sheet)">{{ 'schedule.save' | t }}</button>
-      }
-      @if (event()) {
-        <div class="mt-auto flex flex-col gap-2">
-          @if (choice()?.kind === 'delete') {
-            <ui-list-title>{{ 'schedule.deleteWhich' | t }}</ui-list-title>
+  <!-- Phones (as the old app's): a page of its own over the schedule, sliding in from the right (and
+       back out) — its top bar over it, the page passing under it: ‹ (changed: ✕, asking first), its
+       name, ✓ (saves; gray till it can); cards: the title, the rows (their values at the right), its
+       pages (× takes one off; Add a page: a sheet of the library's); Delete at the end -->
+  <div
+    class="fixed inset-0 z-40 flex animate-panel-in flex-col bg-app text-fg transition-transform duration-240 ease-out data-leaving:translate-x-full"
+    [attr.data-leaving]="leaving() ? '' : null"
+  >
+    <header
+      class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-linear-to-b from-app from-40% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5"
+    >
+      <button type="button" uiFloatingButton round (click)="back($event)" class="pointer-events-auto" [attr.aria-label]="(changed() ? 'schedule.discard' : 'action.back') | t">
+        @if (changed()) {
+          <app-icon name="close" class="size-7" />
+        } @else {
+          <app-icon name="chevron-left" class="-ml-0.5 size-8" />
+        }
+      </button>
+      <span class="min-w-0 flex-1 truncate text-center text-body font-semibold">{{ (event() ? 'schedule.event' : 'schedule.newEvent') | t }}</span>
+      <button
+        type="button"
+        uiFloatingButton
+        round
+        [accent]="canSave()"
+        [disabled]="!canSave()"
+        (click)="save()"
+        class="pointer-events-auto disabled:opacity-40"
+        [attr.aria-label]="'schedule.save' | t"
+      >
+        <app-icon name="check" class="size-7" />
+      </button>
+    </header>
+    <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-[calc(env(safe-area-inset-top)+4.75rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+      <div class="flex flex-col gap-6">
+        <ui-list>
+          <div uiListItem>
+            <input
+              #phoneTitle
+              type="text"
+              maxlength="200"
+              enterkeyhint="done"
+              [value]="title()"
+              (input)="title.set(phoneTitle.value)"
+              (keydown.enter)="phoneTitle.blur()"
+              [placeholder]="'schedule.titlePlaceholder' | t"
+              class="w-full min-w-0 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary"
+            />
+          </div>
+        </ui-list>
+        <ui-list>
+          <ng-container [ngTemplateOutlet]="fields" [ngTemplateOutletContext]="{ row: phoneRow }" />
+        </ui-list>
+        @if (hasLibrary) {
+          <div class="flex flex-col gap-2">
+            <ui-list-title>{{ 'schedule.pages' | t }}</ui-list-title>
             <ui-list>
-              @for (s of scopes; track s.value) {
-                <button type="button" uiListItem danger (click)="chosen(s.value, sheet)">{{ s.label | t }}</button>
+              @for (page of pages(); track page.id) {
+                <div uiListItem icon="page">
+                  <span class="min-w-0 flex-1 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
+                  <button type="button" (click)="removePage(page.id)" [attr.aria-label]="'schedule.removePage' | t" class="-mr-2 grid size-9 shrink-0 place-items-center text-icon">
+                    <app-icon name="close" class="size-5" />
+                  </button>
+                </div>
               }
+              <button type="button" uiListItem (click)="adding.set(true)" [disabled]="!addable().length" class="text-accent disabled:text-fg-secondary">
+                <span class="flex-1">{{ 'schedule.addPage' | t }}</span>
+                <app-icon name="plus" class="-mr-0.5 size-5" />
+              </button>
             </ui-list>
-          } @else {
-            <ui-list>
-              <button type="button" uiListItem icon="trash" danger (click)="remove($event, sheet)">{{ 'schedule.delete' | t }}</button>
-            </ui-list>
-          }
-        </div>
-      }
+          </div>
+        }
+        @if (event()) {
+          <ui-list class="mt-2">
+            <button type="button" uiListItem danger (click)="remove($event)" class="justify-center">{{ 'schedule.delete' | t }}</button>
+          </ui-list>
+        }
+      </div>
     </div>
-  </ui-sheet>
+  </div>
+  <!-- (Add a page: the library's others — a tap adds one) -->
+  @if (adding()) {
+    <ui-sheet #addSheet (closed)="adding.set(false)">
+      <span sheetHead class="text-body font-semibold">{{ 'schedule.addPage' | t }}</span>
+      <ui-list>
+        @for (page of addable(); track page.id) {
+          <button type="button" uiListItem icon="page" (click)="addPage(page); addSheet.close()">
+            <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
+          </button>
+        }
+      </ui-list>
+    </ui-sheet>
+  }
+  <!-- (a repeat saved / deleted: which of them — a sheet of the three) -->
+  @if (choice(); as c) {
+    <ui-sheet (closed)="choice.set(null)">
+      <span sheetHead class="text-body font-semibold">{{ (c.kind === 'save' ? 'schedule.saveWhich' : 'schedule.deleteWhich') | t }}</span>
+      <ui-list>
+        @for (s of scopes; track s.value) {
+          <button type="button" uiListItem [danger]="c.kind === 'delete'" (click)="chosen(s.value)">{{ s.label | t }}</button>
+        }
+      </ui-list>
+    </ui-sheet>
+  }
 }
 
 <!-- A page it goes with: its icon, its title; × (under the pointer) takes it off -->

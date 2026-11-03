@@ -6,7 +6,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
-import { Confirm, Icon, UiButton, UiDate, UiKbd, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSheet, UiTime } from '../core/ui';
+import { Confirm, Icon, UiButton, UiDate, UiFloatingButton, UiKbd, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSheet, UiTime } from '../core/ui';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { dayKey, EventInput, EventsStore, Occurrence, Repeat, Scope } from './events.store';
 
@@ -26,14 +26,14 @@ const INTERVALS = Array.from({ length: 12 }, (_, i) => i + 1);
  * An event, new (`event` none: on `day`, at the next hour, an hour long) or as it is (as the old
  * app's): its title; Starts (a day, a time), Ends (a time — not after the start: orange, not saved);
  * Repeat, Every (n days / weeks / months), End repeat (never, or on a day); the library's pages it
- * goes with (a field finds them — the list right under it, no popover); a repeat: which of them a
- * change / deletion is for. Desktops: a panel at the right, the page's color, a line at its left (the
- * schedule in sight) — Enter saves, Esc closes, Delete in its head; phones: a sheet (iOS's lists),
- * Save, Delete. `closed` as it goes.
+ * goes with; a repeat saved / deleted: which of them, asked. Desktops: a panel at the right, the
+ * page's color, a line at its left (the schedule in sight) — Enter saves, Esc closes, Delete in its
+ * head; phones (as the old app's): a page of its own sliding in from the right — ‹ (changed: ✕) · its
+ * name · ✓, iOS's cards, Delete at the end. `closed` as it goes.
  */
 @Component({
   selector: 'app-event-editor',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiKbd, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSelect, UiSheet, UiTime],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiFloatingButton, UiKbd, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSelect, UiSheet, UiTime],
   templateUrl: './event-editor.html',
 })
 export class EventEditor implements OnInit {
@@ -62,7 +62,8 @@ export class EventEditor implements OnInit {
   protected readonly saving = signal(false);
   // The pages' field: what's typed (the library's pages with it listed under it)
   protected readonly find = signal('');
-  protected readonly finding = signal(false);
+  // (phones: the library's pages to add — a sheet)
+  protected readonly adding = signal(false);
   // (desktops: the pages' dropdown open — at its row)
   protected readonly picking = signal<HTMLElement | null>(null);
   // (a rule none of the presets is: Custom, its Every shown)
@@ -112,6 +113,8 @@ export class EventEditor implements OnInit {
     const byId = new Map((this.library.items() ?? []).map((p) => [p.id, p]));
     return this.pageIds().flatMap((id) => (byId.get(id) ? [byId.get(id)!] : []));
   });
+  // (phones: all the library's others, to add)
+  protected readonly addable = computed(() => (this.library.items() ?? []).filter((p) => !this.pageIds().includes(p.id)));
   protected readonly found = computed<PageItem[]>(() => {
     const words = this.i18n.lower(this.find().trim());
     return (this.library.items() ?? [])
@@ -143,7 +146,7 @@ export class EventEditor implements OnInit {
       this.pageIds.set(e.pageIds);
       if (this.preset() === 'custom') this.custom.set(true);
     }
-    this.opened = this.state();
+    this.opened.set(this.state());
   }
 
   // A new start: the end keeps the length it had
@@ -177,7 +180,7 @@ export class EventEditor implements OnInit {
   private asking = false;
   protected async escape(head: HTMLElement): Promise<void> {
     if (this.picking() || this.choice() || this.asking) return;
-    if (this.state() !== this.opened) {
+    if (this.changed()) {
       this.asking = true;
       const yes = await this.confirm.ask(head, { text: this.i18n.t('schedule.discardAsk'), yes: this.i18n.t('schedule.discard'), danger: true });
       this.asking = false;
@@ -187,10 +190,20 @@ export class EventEditor implements OnInit {
   }
 
   // (what's set, as one string — as it opened: `opened`; another now: changed)
-  private opened = '';
+  private readonly opened = signal('');
   private readonly state = computed(() =>
     JSON.stringify([this.title().trim(), this.date(), this.start(), this.end(), this.repeat(), this.every(), this.until(), this.pageIds()]),
   );
+  protected readonly changed = computed(() => this.state() !== this.opened());
+
+  // Phones' ‹ / ✕: back to the schedule — anything changed: asked first (by the button)
+  protected async back(e: Event): Promise<void> {
+    if (this.changed()) {
+      const yes = await this.confirm.ask(e.currentTarget as HTMLElement, { text: this.i18n.t('schedule.discardAsk'), yes: this.i18n.t('schedule.discard'), danger: true });
+      if (!yes) return;
+    }
+    this.done();
+  }
 
   protected removePage(id: string): void {
     this.pageIds.update((ids) => ids.filter((x) => x !== id));
@@ -232,22 +245,24 @@ export class EventEditor implements OnInit {
     };
   }
 
-  // (done: the phones' sheet slides down, the desktop's panel just goes)
-  private done(sheet?: UiSheet): void {
-    if (sheet) sheet.close();
-    else this.closed.emit();
+  // (done: the desktop's panel just goes; the phones' page slides back out to the right first)
+  protected readonly leaving = signal(false);
+  private done(): void {
+    if (desktop) return this.closed.emit();
+    this.leaving.set(true);
+    setTimeout(() => this.closed.emit(), 240);
   }
 
   // Save: nothing changed — just closed; a repeat — which of them, asked first
-  protected save(sheet?: UiSheet): void {
+  protected save(): void {
     if (!this.canSave() || this.choice()) return;
-    if (this.event() && this.state() === this.opened) return this.done(sheet);
+    if (this.event() && !this.changed()) return this.done();
     if (this.repeating()) this.choice.set({ kind: 'save', at: this.head()?.nativeElement ?? null });
-    else this.saveFor('this', sheet);
+    else this.saveFor('this');
   }
 
   // Delete: a repeat — which of them, asked; one event — "Delete this event?"
-  protected async remove(e: Event, sheet?: UiSheet): Promise<void> {
+  protected async remove(e: Event): Promise<void> {
     const event = this.event();
     if (!event) return;
     if (this.repeating()) return this.choice.set({ kind: 'delete', at: e.currentTarget as HTMLElement });
@@ -256,27 +271,27 @@ export class EventEditor implements OnInit {
       yes: this.i18n.t('schedule.delete'),
       danger: true,
     });
-    if (yes) this.deleteFor('this', sheet);
+    if (yes) this.deleteFor('this');
   }
 
   // (the choice made: saved / deleted for those)
-  protected chosen(scope: Scope, sheet?: UiSheet): void {
+  protected chosen(scope: Scope): void {
     const kind = this.choice()?.kind;
     this.choice.set(null);
-    if (kind === 'save') this.saveFor(scope, sheet);
-    else if (kind === 'delete') this.deleteFor(scope, sheet);
+    if (kind === 'save') this.saveFor(scope);
+    else if (kind === 'delete') this.deleteFor(scope);
   }
 
-  private saveFor(scope: Scope, sheet?: UiSheet): void {
+  private saveFor(scope: Scope): void {
     this.saving.set(true);
     this.store.save(this.input(), this.event(), scope).subscribe({
-      next: () => this.done(sheet),
+      next: () => this.done(),
       error: () => this.saving.set(false),
     });
   }
 
-  private deleteFor(scope: Scope, sheet?: UiSheet): void {
-    this.store.remove(this.event()!, scope).subscribe(() => this.done(sheet));
+  private deleteFor(scope: Scope): void {
+    this.store.remove(this.event()!, scope).subscribe(() => this.done());
   }
 }
 
