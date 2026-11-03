@@ -40,6 +40,6 @@
   }
 } @else {
   <!-- Phones: the chip, the system's own date picker over it, unseen (a tap opens it) -->
-  <span class="pointer-events-none inline-flex h-button items-center rounded-lg bg-tint px-3 text-body whitespace-nowrap text-fg">{{ label() }}</span>
+  <span class="pointer-events-none inline-flex h-8.5 items-center rounded-lg bg-tint px-3 text-body whitespace-nowrap text-fg">{{ label() }}</span>
   <input #field type="date" class="absolute inset-0 opacity-0" [value]="value() ?? ''" (change)="typed(field.value)" />
 }
