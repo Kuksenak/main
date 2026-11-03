@@ -12,8 +12,6 @@ import {
   signal,
 } from '@angular/core';
 import { desktop } from '../../device';
-import { TranslatePipe } from '../../i18n/t.pipe';
-import { UiButton } from '../button/button';
 
 /** What's asked: the question ("Delete … forever? It can't be undone."), the answer that does it. */
 export interface ConfirmAsk {
@@ -34,7 +32,7 @@ export interface ConfirmChoice {
  * A question before something that can't be undone (Delete forever, Empty trash): `ask(button, {…})`
  * — true when it's answered yes. Right by the button that asked, no dimming (as the old app's):
  * phones: a glass panel, the question in gray, the answer a big round button (a tap outside: no);
- * desktops: a small card — the question, Cancel and the answer at its right (Esc, a click outside: no).
+ * desktops: the same, in the menus' gray (Esc, a click outside: no).
  */
 @Injectable({ providedIn: 'root' })
 export class Confirm {
@@ -65,7 +63,6 @@ export class Confirm {
 
 @Component({
   selector: 'ui-confirm',
-  imports: [TranslatePipe, UiButton],
   // (in the browser's top layer, as the menus are — over a menu or a sheet that asked)
   host: {
     popover: 'manual',

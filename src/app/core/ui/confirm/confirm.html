@@ -1,35 +1,26 @@
-<!-- By the button that asked (no dimming) — phones (as iOS's): a glass panel, the question, the answers
-     big round buttons one under another; desktops: a small card, the question, Cancel and the answers at
-     its right -->
+<!-- By the button that asked (no dimming), as iOS's on both devices: a panel (phones: glass; desktops:
+     the menus' gray), the question, the answers round buttons one under another (none: a click
+     outside, Esc) -->
 <div
   role="alertdialog"
-  class="fixed flex animate-menu-in flex-col text-fg
-         mobile:w-72 mobile:max-w-[calc(100vw-1rem)] mobile:gap-1.5 mobile:rounded-[1.75rem] mobile:glass mobile:p-2
-         desktop:w-72 desktop:gap-1 desktop:rounded-menu desktop:bg-dialog desktop:p-1 desktop:shadow-popover"
+  class="fixed flex w-72 max-w-[calc(100vw-1rem)] animate-menu-in flex-col gap-1.5 text-fg
+         mobile:rounded-[1.75rem] mobile:glass mobile:p-2
+         desktop:rounded-[1.25rem] desktop:border-[0.5px] desktop:border-separator desktop:bg-dialog desktop:p-1.5 desktop:shadow-popover"
   [style.top.px]="place().top"
   [style.bottom.px]="place().bottom"
   [style.left.px]="place().left"
   (click)="$event.stopPropagation()"
 >
-  @if (desktop) {
-    <p class="px-2 pt-2 pb-1 text-ui leading-snug text-balance">{{ text() }}</p>
-    <div class="flex flex-wrap items-center justify-end gap-1 p-1">
-      <button uiButton type="button" (click)="answer(null)">{{ 'action.cancel' | t }}</button>
-      @for (c of choices(); track c.value) {
-        <button uiButton type="button" class="font-semibold" [class.text-danger]="c.danger" (click)="answer(c.value)">{{ c.label }}</button>
-      }
-    </div>
-  } @else {
-    <p class="px-3 pt-2 pb-1 text-body leading-snug text-balance">{{ text() }}</p>
-    @for (c of choices(); track c.value) {
-      <button
-        type="button"
-        class="min-h-11 rounded-full bg-tint px-4 py-2 text-center text-body font-medium leading-tight active:bg-tint-strong"
-        [class.text-danger]="c.danger"
-        (click)="answer(c.value)"
-      >
-        {{ c.label }}
-      </button>
-    }
+  <p class="pt-2 pb-1 leading-snug text-balance mobile:px-3 mobile:text-body desktop:px-2.5 desktop:text-ui">{{ text() }}</p>
+  @for (c of choices(); track c.value) {
+    <button
+      type="button"
+      class="rounded-full bg-tint px-4 text-center font-medium leading-tight hover:bg-tint-strong active:bg-tint-strong
+             mobile:min-h-11 mobile:py-2 mobile:text-body desktop:min-h-8 desktop:py-1.5 desktop:text-ui"
+      [class.text-danger]="c.danger"
+      (click)="answer(c.value)"
+    >
+      {{ c.label }}
+    </button>
   }
 </div>
