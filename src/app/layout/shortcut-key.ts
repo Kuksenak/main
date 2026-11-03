@@ -36,8 +36,8 @@ export class ShortcutKey {
   protected readonly address = new URL(`${environment.apiUrl}/shortcut/pages`, location.origin).href;
 
   constructor() {
-    this.http.get<Shortcut | null>(this.url).subscribe({
-      next: (s) => this.shortcut.set(s),
+    this.http.get<Shortcut & { on: boolean }>(this.url).subscribe({
+      next: (s) => this.shortcut.set(s.on ? s : null),
       error: () => this.toasts.fail('shortcut.loadError'),
     });
   }
