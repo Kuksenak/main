@@ -4,7 +4,7 @@ import { Subscription, switchMap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { Confirm, Icon, Toasts, UiButton, UiKbd, UiList, UiListItem, UiListTitle, UiSheet, UiTag, UiTagSwatch } from '../core/ui';
+import { Confirm, Icon, Toasts, UiButton, UiKbd, UiList, UiListItem, UiSheet, UiTag, UiTagSwatch } from '../core/ui';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow, UiWindowHead } from '../core/ui/window';
@@ -14,6 +14,7 @@ import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
 import { ReadBlock } from './read-block';
 import { PageEditor } from './page-editor';
 import { TagPicker } from './tag-picker';
+import { TagSheet } from './tag-sheet';
 import { TagsStore } from './tags.store';
 
 // How long after the last keystroke a change is saved
@@ -31,7 +32,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker],
+  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiList, UiListItem, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, TagSheet],
   templateUrl: './page.html',
 })
 export class PageView {
@@ -53,6 +54,8 @@ export class PageView {
   protected readonly aiOpen = signal(false);
   protected readonly menuOpen = signal(false);
   protected readonly tagsOpen = signal(false);
+  // Phones: the tag's own sheet (from the ⋯ sheet's Tag row)
+  protected readonly tagSheetOpen = signal(false);
   private readonly confirm = inject(Confirm);
   // (the tag's button — a plain one or the tag's own: where the picker opens)
   private readonly tagsBtn = viewChild('tagsBtn', { read: ElementRef<HTMLElement> });

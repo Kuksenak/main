@@ -181,26 +181,19 @@
   <ui-sheet #actions (closed)="actionsOpen.set(false)">
     <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold">{{ title() || ('library.untitled' | t) }}</span>
     <div class="flex flex-col gap-6">
-      <!-- (its tag: the account's tags as a list — a swatch and the name, no fill; ✓ on its own; a tap puts
-           it on, the one on it again takes it off) -->
-      @if (tags.tags().length) {
-        <div class="flex flex-col gap-2">
-          <ui-list-title>{{ 'tags.title' | t }}</ui-list-title>
-          <ui-list>
-            @for (tag of tags.tags(); track tag.id) {
-              @let on = !!p.tagIds?.includes(tag.id);
-              <button type="button" uiListItem [checked]="on" (click)="setTags(on ? [] : [tag.id])" class="after:left-12!">
-                <span class="flex min-w-0 items-center gap-3">
-                  <ui-tag-swatch [color]="tag.color" class="size-5" />
-                  <span class="truncate">{{ tag.name }}</span>
-                </span>
-              </button>
-            }
-          </ui-list>
-        </div>
-      }
-      <!-- (the page: keep it, a copy) -->
+      <!-- (the page: its tag — a row with the one on it, › its own sheet; keep it, a copy) -->
       <ui-list>
+        @if (tags.tags().length) {
+          <button type="button" uiListItem icon="hash" chevron (click)="actions.close(); tagSheetOpen.set(true)">
+            {{ 'tags.title' | t }}
+            @if (tags.of(p.tagIds)[0]; as tag) {
+              <span itemValue class="flex min-w-0 items-center gap-2 text-fg-secondary">
+                <ui-tag-swatch [color]="tag.color" class="size-4" />
+                <span class="truncate">{{ tag.name }}</span>
+              </span>
+            }
+          </button>
+        }
         <button type="button" uiListItem icon="bookmark" (click)="actions.close(); favorite()">
           {{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}
         </button>
@@ -237,5 +230,10 @@
       </ui-list>
     </div>
   </ui-sheet>
+}
+
+<!-- Phones: the page's tag, picked in a sheet of its own -->
+@if (!desktop && tagSheetOpen() && page(); as p) {
+  <app-tag-sheet [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagSheetOpen.set(false)" />
 }
 
