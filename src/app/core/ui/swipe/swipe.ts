@@ -15,7 +15,9 @@ const OPEN = 104; // (an action's width, the row open)
 @Component({
   selector: 'ui-swipe',
   host: {
-    class: 'relative block overflow-hidden',
+    // (in a card: its row's hairline kept — each row's the only one in its swipe, "last" — but the
+    // card's last swipe's)
+    class: 'relative block overflow-hidden [&_[uiListItem]]:after:block! [&:last-child_[uiListItem]]:after:hidden!',
     '(touchstart)': 'start($event)',
     '(touchmove)': 'move($event)',
     '(touchend)': 'end()',

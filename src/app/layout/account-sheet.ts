@@ -5,24 +5,24 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, UiList, UiFloatingButton, UiListItem, UiSheet } from '../core/ui';
+import { Icon, UiList, UiFloatingButton, UiListItem, UiOption, UiSelect, UiSheet } from '../core/ui';
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
 import { TrashList } from '../library/trash-list';
 import { LibraryStore } from '../library/library.store';
 import type { User } from '../users/users.store';
 
-type Page = 'language' | 'users' | 'user' | 'trash';
+type Page = 'users' | 'user' | 'trash';
 
 /**
  * Phones: the account (as the Claude app's) — a sheet from the bottom, a fixed height: the email;
- * Users (the admins only), Trash (those who can read the library); the language (the current one in gray); at the bottom Update available
+ * Users (the admins only), Trash (those who can read the library); the language (the system's own select); at the bottom Update available
  * (when a new version is ready), Log out and Log out of all devices. A row with › opens its page
- * right in the sheet, sliding in (‹ back): the languages; the users — and a user tapped, their card; the trash's pages.
+ * right in the sheet, sliding in (‹ back): the users — and a user tapped, their card; the trash's pages.
  */
 @Component({
   selector: 'app-account-sheet',
-  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSheet, TrashList, UserCard, UsersList],
+  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSelect, UiSheet, TrashList, UserCard, UsersList],
   templateUrl: './account-sheet.html',
 })
 export class AccountSheet {
@@ -55,7 +55,7 @@ export class AccountSheet {
     if (this.taps.length === 3 && this.taps[2] - this.taps[0] < 1200) this.showVersion.set(true);
   }
 
-  protected readonly language = computed(() => this.i18n.languages.find((l) => l.code === this.i18n.lang())!.label);
+  protected readonly languages: UiOption[] = this.i18n.languages.map((l) => ({ value: l.code, label: l.label }));
 
   protected open(page: Page): void {
     this.slide.run('forward', () => this.pages.update((pages) => [...pages, page]));
@@ -74,8 +74,6 @@ export class AccountSheet {
   /** The open page's name, in the middle over it. */
   protected readonly title = computed(() => {
     switch (this.page()) {
-      case 'language':
-        return this.i18n.t('account.language');
       case 'users':
         return this.i18n.t('users.title');
       case 'user':

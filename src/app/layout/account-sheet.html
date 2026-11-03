@@ -34,15 +34,6 @@
   @if (page(); as open) {
     <div class="flex flex-1 flex-col" data-vt="sheet-pane">
       @switch (open) {
-        @case ('language') {
-          <ui-list>
-            @for (language of i18n.languages; track language.code) {
-              <button type="button" uiListItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code); back()">
-                {{ language.label }}
-              </button>
-            }
-          </ui-list>
-        }
         <!-- (the users' code: downloaded only now, the first time) -->
         @case ('users') {
           @defer (on immediate) {
@@ -82,10 +73,11 @@
         @if (auth.isAdmin()) {
           <button type="button" uiListItem icon="lock" chevron (click)="open('users')">{{ 'users.title' | t }}</button>
         }
-        <button type="button" uiListItem icon="globe" chevron (click)="open('language')">
+        <!-- (the language: the system's own select — a tap opens iOS's menu) -->
+        <div uiListItem icon="globe">
           {{ 'account.language' | t }}
-          <span itemValue class="text-fg-secondary">{{ language() }}</span>
-        </button>
+          <ui-select itemValue plain [options]="languages" [value]="i18n.lang()" (valueChange)="i18n.setLang($any($event))" [label]="'account.language' | t" />
+        </div>
         @if (auth.can('library')) {
           <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
         }
