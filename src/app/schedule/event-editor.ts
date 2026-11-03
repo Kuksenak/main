@@ -5,7 +5,7 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Confirm, Icon, UiButton, UiDate, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSheet, UiTime } from '../core/ui';
+import { Confirm, Icon, UiButton, UiDate, UiList, UiListItem, UiListTitle, UiOption, UiPrimary, UiSelect, UiSheet, UiTime } from '../core/ui';
 import { LibraryStore } from '../library/library.store';
 import { dayKey, EventInput, EventsStore, Occurrence, Repeat, Scope } from './events.store';
 
@@ -26,7 +26,7 @@ const REPEATS: { value: Repeat; label: TranslationKey }[] = [
  */
 @Component({
   selector: 'app-event-editor',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiList, UiListItem, UiListTitle, UiSelect, UiSheet, UiTime],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiList, UiListItem, UiListTitle, UiPrimary, UiSelect, UiSheet, UiTime],
   templateUrl: './event-editor.html',
 })
 export class EventEditor implements OnInit {

@@ -2,8 +2,7 @@ import { Component, computed, effect, inject, signal, viewChild } from '@angular
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, UiButton, UiFloatingButton, UiList, UiListItem } from '../core/ui';
-import { UiTip } from '../core/ui/tip/tip';
+import { Icon, UiButton, UiFloatingButton, UiList, UiListItem, UiPrimary } from '../core/ui';
 import { startOfDay, startOfMonth } from '../core/utils/date';
 import { PageTitle } from '../layout/page-title';
 import { Calendar } from './calendar';
@@ -18,7 +17,7 @@ import { EventsStore, Occurrence } from './events.store';
  */
 @Component({
   selector: 'app-schedule',
-  imports: [Calendar, EventEditor, Icon, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem, UiTip],
+  imports: [Calendar, EventEditor, Icon, TranslatePipe, UiButton, UiFloatingButton, UiList, UiListItem, UiPrimary],
   templateUrl: './schedule.html',
 })
 export class Schedule {

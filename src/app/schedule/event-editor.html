@@ -84,14 +84,7 @@
       }
       <span class="flex-1"></span>
       <button uiButton type="button" (click)="closed.emit()">{{ 'action.cancel' | t }}</button>
-      <button
-        type="button"
-        (click)="save()"
-        [disabled]="!canSave()"
-        class="inline-flex h-button items-center rounded-button bg-strong px-3 text-ui font-medium text-on-strong hover:opacity-85 disabled:opacity-40"
-      >
-        {{ 'schedule.save' | t }}
-      </button>
+      <button uiPrimary (click)="save()" [disabled]="!canSave()" class="pl-3">{{ 'schedule.save' | t }}</button>
     </div>
   </aside>
 } @else {

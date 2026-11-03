@@ -160,15 +160,7 @@
 
   <!-- (New page: filled black — the strong buttons' color) -->
   <ng-template #newPage>
-    <button
-      type="button"
-      [disabled]="creating()"
-      (click)="create()"
-      class="inline-flex h-button shrink-0 items-center gap-1.5 rounded-button bg-strong pr-3 pl-2 text-ui font-medium text-on-strong hover:opacity-85 disabled:opacity-50"
-    >
-      <app-icon name="plus" class="size-4.5" />
-      {{ 'library.new' | t }}
-    </button>
+    <button uiPrimary icon="plus" [disabled]="creating()" (click)="create()">{{ 'library.new' | t }}</button>
   </ng-template>
 
   @if (menu(); as m) {

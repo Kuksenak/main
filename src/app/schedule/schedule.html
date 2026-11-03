@@ -1,13 +1,19 @@
-<!-- Desktops: the calendar at the left (the month, Today, New event over it), the picked day's events at
-     its right. Phones: the calendar edge to edge, the day's events under it; Today floating at the
-     bottom left, + at the bottom right. -->
-<div class="flex flex-col gap-4 px-4 pt-2 pb-24 desktop:flex-row desktop:gap-10 desktop:px-10 desktop:pt-8 desktop:pb-10">
-  <section class="flex w-full shrink-0 flex-col gap-1 desktop:w-68">
-    <div class="flex h-button items-center gap-0.5 mobile:hidden">
-      <h1 class="ml-1 flex-1 text-body font-medium">{{ title() }}</h1>
+<!-- Desktops, as the library: at the top, staying as the days scroll under it — the month (a 48-tall row:
+     level with the sidebar's Search), under it Today and New event at the right; then the calendar at
+     the left and the picked day's events at its right. Phones: the calendar edge to edge, the day's
+     events under it; Today floating at the bottom left, + at the bottom right. -->
+@if (desktop) {
+  <div class="sticky top-0 z-20 flex flex-col bg-app px-8 pb-1">
+    <h1 class="flex h-12 items-center px-2 text-lg font-semibold">{{ title() }}</h1>
+    <div class="flex items-center gap-1">
       <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
-      <button uiButton type="button" icon="plus" (click)="create()" [uiTip]="'schedule.newEvent' | t" [attr.aria-label]="'schedule.newEvent' | t"></button>
+      <span class="flex-1"></span>
+      <button uiPrimary icon="plus" (click)="create()">{{ 'schedule.newEvent' | t }}</button>
     </div>
+  </div>
+}
+<div class="flex flex-col gap-4 px-4 pt-2 pb-24 desktop:flex-row desktop:gap-10 desktop:px-8 desktop:pt-4 desktop:pb-12">
+  <section class="flex w-full shrink-0 flex-col gap-1 desktop:w-68 desktop:px-2">
     <app-calendar [(selected)]="selected" [(month)]="month" [marked]="store.marked()" />
   </section>
 

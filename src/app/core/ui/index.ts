@@ -7,6 +7,7 @@
 export { Icon, ICONS, type IconName } from './icon/icon';
 export { UiAvatar } from './avatar/avatar';
 export { UiButton } from './button/button';
+export { UiPrimary } from './button/primary';
 export { UiFloatingButton } from './floating-button/floating-button';
 export { UiList, UiListTitle } from './list/list';
 export { UiListItem } from './list/list-item';

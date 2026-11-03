@@ -6,7 +6,7 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, IconName, tagTint, UiButton, UiFoldName, UiList, UiListItem, UiTag } from '../core/ui';
+import { Icon, IconName, tagTint, UiButton, UiFoldName, UiList, UiListItem, UiPrimary, UiTag } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 import { PageMenu } from './page-menu';
@@ -27,7 +27,7 @@ type View = 'recents' | 'favorites' | 'published';
 
 @Component({
   selector: 'app-library',
-  imports: [Icon, NgTemplateOutlet, PageMenu, TranslatePipe, UiButton, UiFoldName, UiList, UiListItem, UiTag, UiTip, TagPicker],
+  imports: [Icon, NgTemplateOutlet, PageMenu, TranslatePipe, UiButton, UiFoldName, UiList, UiListItem, UiPrimary, UiTag, UiTip, TagPicker],
   templateUrl: './library.html',
 })
 export class Library {
