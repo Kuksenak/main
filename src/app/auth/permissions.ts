@@ -8,6 +8,9 @@ import { TranslationKey } from '../core/i18n/translations';
 export const AREAS = ['schedule', 'library'] as const;
 export type Area = (typeof AREAS)[number];
 
+/** The areas every user has, not given or taken (the API's Permissions.Always): the schedule. */
+export const ALWAYS: readonly Area[] = ['schedule'];
+
 /** Each area's name, as its section's. */
 export const AREA_LABELS: Record<Area, TranslationKey> = {
   schedule: 'nav.schedule',

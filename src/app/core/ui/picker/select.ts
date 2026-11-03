@@ -13,6 +13,7 @@ export interface UiOption {
  * A choice of a few, shown as a chip with the chosen one's words and ▾. Phones: the system's own
  * select (iOS's menu); desktops: our menu under the chip (as the app's others: the rows — an icon
  * each, if they have one — ✓ at the chosen one; the chosen one's icon on the chip too). `[(value)]`, `options`.
+ * One option only: just the chip — no ▾, nothing opens (phones).
  *   <ui-select [options]="levels" [(value)]="level" />
  */
 @Component({
@@ -69,14 +70,18 @@ export interface UiOption {
           <app-icon [name]="icon" colored class="size-6 shrink-0 text-icon data-wide:size-icon-menu" [attr.data-wide]="wide() ? '' : null" />
         }
         <span class="min-w-0 truncate data-wide:flex-1" [attr.data-wide]="wide() ? '' : null">{{ chosen() }}</span>
-        <app-icon name="chevron-down" class="size-4 shrink-0 text-icon data-glass:size-5.5" [attr.data-glass]="glass() ? '' : null" />
-      </span>
-      <!-- (the system's own select over the chip, unseen: a tap opens iOS's menu) -->
-      <select class="absolute inset-0 opacity-0" (change)="value.set($any($event.target).value)" [attr.aria-label]="label() || null">
-        @for (option of options(); track option.value) {
-          <option [value]="option.value" [selected]="option.value === value()">{{ option.label }}</option>
+        @if (options().length > 1) {
+          <app-icon name="chevron-down" class="size-4 shrink-0 text-icon data-glass:size-5.5" [attr.data-glass]="glass() ? '' : null" />
         }
-      </select>
+      </span>
+      <!-- (the system's own select over the chip, unseen: a tap opens iOS's menu — one option only: none) -->
+      @if (options().length > 1) {
+        <select class="absolute inset-0 opacity-0" (change)="value.set($any($event.target).value)" [attr.aria-label]="label() || null">
+          @for (option of options(); track option.value) {
+            <option [value]="option.value" [selected]="option.value === value()">{{ option.label }}</option>
+          }
+        </select>
+      }
     }
   `,
 })

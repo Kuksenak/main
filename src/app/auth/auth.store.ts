@@ -3,7 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, Observable, of, tap, timeout } from 'rxjs';
 import { environment } from '@environments/environment';
-import { Area } from './permissions';
+import { ALWAYS, Area } from './permissions';
 
 export interface UserProfile {
   firstName: string | null;
@@ -43,10 +43,10 @@ export class AuthStore {
   });
   readonly isAdmin = computed(() => this._user()?.isAdmin ?? false);
 
-  /** Whether the user may open the area (the admins: every one). */
+  /** Whether the user may open the area (the admins: every one; everyone: the schedule). */
   can(area: Area): boolean {
     const u = this._user();
-    return !!u && (u.isAdmin || !!u.permissions?.[area]);
+    return !!u && (u.isAdmin || ALWAYS.includes(area) || !!u.permissions?.[area]);
   }
 
   initAuth(): Observable<UserProfile | null> {
