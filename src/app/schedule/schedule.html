@@ -1,14 +1,15 @@
 <!-- Desktops, as the library: at the top, staying as the days scroll under it — the month (a 48-tall row:
-     level with the sidebar's Search), under it Today and New event at the right; then the calendar at
+     level with the sidebar's Search; New event at its right), under it Today; then the calendar at
      the left and the picked day's events at its right. Phones: the calendar edge to edge, the day's
      events under it; Today floating at the bottom left, + at the bottom right. -->
 @if (desktop) {
   <div class="sticky top-0 z-20 flex flex-col bg-app px-8 pb-1">
-    <h1 class="flex h-12 items-center px-2 text-lg font-semibold">{{ title() }}</h1>
+    <div class="flex h-12 items-center">
+      <h1 class="flex-1 px-2 text-lg font-semibold">{{ title() }}</h1>
+      <button uiPrimary icon="plus" (click)="create()">{{ 'schedule.newEvent' | t }}</button>
+    </div>
     <div class="flex items-center gap-1">
       <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
-      <span class="flex-1"></span>
-      <button uiPrimary icon="plus" (click)="create()">{{ 'schedule.newEvent' | t }}</button>
     </div>
   </div>
 }
