@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
-import { UiButton, UiEmpty, UiList, UiListItem, UiRow, UiSwipe } from '../core/ui';
+import { UiButton, UiEmpty, UiRow, UiSwipe } from '../core/ui';
 import { UiTip } from '../core/ui/tip/tip';
 import { LibraryStore } from './library.store';
 
@@ -14,7 +14,7 @@ import { LibraryStore } from './library.store';
  */
 @Component({
   selector: 'app-trash-list',
-  imports: [TranslatePipe, UiButton, UiEmpty, UiList, UiListItem, UiRow, UiSwipe, UiTip],
+  imports: [TranslatePipe, UiButton, UiEmpty, UiRow, UiSwipe, UiTip],
   templateUrl: './trash-list.html',
 })
 export class TrashList {

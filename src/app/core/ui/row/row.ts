@@ -6,7 +6,8 @@ import { Icon, IconName } from '../icon/icon';
  * at the left its icon (`icon`, coloured in) or what's put in with `rowStart` (a tag's swatch);
  * its name, a hint after it gray (`hint`: "— 26 Oct"); at the right what's put in with `rowEnd`
  * (its buttons: on desktops shown under the pointer, or while it's picked). Gray under the pointer
- * (`hover`: off where the keys pick one — `aria-selected` grays it then); phones: as tall as a list's row.
+ * (`hover`: off where the keys pick one — `aria-selected` grays it then); phones: as tall as a list's row,
+ * a hairline under it as theirs.
  *   <div uiRow icon="page" [hint]="when">{{ title }}<button rowEnd uiButton icon="trash"></button></div>
  */
 @Component({
@@ -15,8 +16,12 @@ import { Icon, IconName } from '../icon/icon';
   host: {
     class:
       'group flex min-h-9 w-full shrink-0 items-center gap-2.5 rounded-xl px-2 py-1 text-left ' +
-      'aria-selected:bg-tint desktop:data-hover:hover:bg-tint mobile:min-h-row mobile:px-0',
+      'aria-selected:bg-tint desktop:data-hover:hover:bg-tint mobile:min-h-row mobile:px-0 ' +
+      // (phones: a hairline under it from the text on, as the lists' rows — not under the last)
+      'mobile:relative mobile:after:absolute mobile:after:right-0 mobile:after:bottom-0 mobile:after:left-0 mobile:after:h-[0.5px] ' +
+      'mobile:after:bg-separator mobile:last:after:hidden mobile:data-icon:after:left-[2.375rem]',
     '[attr.data-hover]': "hover() ? '' : null",
+    '[attr.data-icon]': "icon() ? '' : null",
   },
   template: `
     <ng-content select="[rowStart]" />

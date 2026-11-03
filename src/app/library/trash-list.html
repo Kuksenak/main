@@ -4,9 +4,9 @@
   @if (!items.length) {
     <ui-empty>{{ (query().trim() ? 'search.nothing' : 'trash.empty') | t }}</ui-empty>
   } @else {
-    @if (desktop) {
-      <div class="flex flex-col gap-0.5">
-        @for (item of items; track item.id; let i = $index) {
+    <div class="flex flex-col desktop:gap-0.5">
+      @for (item of items; track item.id; let i = $index) {
+        @if (desktop) {
           <!-- (the desktop's window: the keys pick one — gray, its buttons shown) -->
           <div
             uiRow
@@ -20,21 +20,13 @@
             <button rowEnd uiButton type="button" icon="update" (click)="restore(item.id)" [uiTip]="'trash.restore' | t" [attr.aria-label]="'trash.restore' | t"></button>
             <button rowEnd uiButton type="button" icon="trash" (click)="deleteForever(item.id, $event.currentTarget)" [uiTip]="'trash.deleteForever' | t" [attr.aria-label]="'trash.deleteForever' | t"></button>
           </div>
-        }
-      </div>
-    } @else {
-      <!-- (phones, as the account's menu: a card, a row each — its name, when at the right; swiped
-           right: Restore, left: Delete forever, asked first) -->
-      <ui-list>
-        @for (item of items; track item.id) {
+        } @else {
+          <!-- (phones, as iOS's lists: swiped right — Restore; left — Delete forever, asked first) -->
           <ui-swipe [start]="'trash.restore' | t" [end]="'trash.deleteForever' | t" (startPicked)="restore(item.id)" (endPicked)="deleteForever(item.id, $event)">
-            <div uiListItem icon="page">
-              {{ item.title }}
-              <span itemValue class="shrink-0 text-footnote text-fg-secondary">{{ when(item.deletedAt) }}</span>
-            </div>
+            <div uiRow icon="page" [hint]="when(item.deletedAt)">{{ item.title }}</div>
           </ui-swipe>
         }
-      </ui-list>
-    }
+      }
+    </div>
   }
 }
