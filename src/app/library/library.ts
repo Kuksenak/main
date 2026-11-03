@@ -6,7 +6,7 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, IconName, tagTint, UiButton, UiFloatingButton, UiFoldName, UiList, UiListItem, UiTag } from '../core/ui';
+import { Icon, IconName, tagTint, UiButton, UiFoldName, UiList, UiListItem, UiTag } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from './library.store';
 import { PageMenu } from './page-menu';
@@ -20,14 +20,14 @@ import { TagsStore } from './tags.store';
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
  * Desktops, as Notion's: the name big, the views as pills (Recents: all; Favorites; Published) and New
  * page, a tag's filter (# — its menu), the view's pages by when they were changed (Today, 7 days, 30 days, older), a row each (Ctrl+click
- * picks it; some picked: to the trash at once), ⋯ its menu (PageMenu). Phones: the pages on a card, +
- * floating at the bottom right (Trash: the account's sheet).
+ * picks it; some picked: to the trash at once), ⋯ its menu (PageMenu). Phones: the pages on a card, no New page
+ * (pages are written on a desktop; Trash: the account's sheet).
  */
 type View = 'recents' | 'favorites' | 'published';
 
 @Component({
   selector: 'app-library',
-  imports: [Icon, NgTemplateOutlet, PageMenu, TranslatePipe, UiButton, UiFloatingButton, UiFoldName, UiList, UiListItem, UiTag, UiTip, TagPicker],
+  imports: [Icon, NgTemplateOutlet, PageMenu, TranslatePipe, UiButton, UiFoldName, UiList, UiListItem, UiTag, UiTip, TagPicker],
   templateUrl: './library.html',
 })
 export class Library {

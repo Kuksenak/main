@@ -175,7 +175,7 @@
     <app-page-menu [page]="m.page" [origin]="m.at" (closed)="menu.set(null)" />
   }
 } @else {
-  <!-- Phones: the pages on a card (as iOS's lists), + floating at the bottom right -->
+  <!-- Phones: the pages on a card (as iOS's lists) — read only there, no New page -->
   <div class="flex flex-col gap-3 px-4 pt-2 pb-24">
     @if (store.items(); as items) {
       @if (!items.length) {
@@ -197,17 +197,4 @@
       }
     }
   </div>
-
-  <button
-    type="button"
-    uiFloatingButton
-    round
-    accent
-    [disabled]="creating()"
-    (click)="create()"
-    [attr.aria-label]="'library.new' | t"
-    class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20"
-  >
-    <app-icon name="plus" class="size-8" />
-  </button>
 }
