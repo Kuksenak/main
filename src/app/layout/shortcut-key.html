@@ -1,5 +1,6 @@
 <!-- The key: made on, last used (none: Off); New key; the key just made — this once, tapped: copied;
-     Turn off. Then how the shortcut sends a page: its address (tapped: copied), the steps -->
+     Add to Shortcuts (the ready one); how the shortcut sends a page: its address (tapped: copied), the
+     steps; Turn off -->
 @if (shortcut() !== undefined) {
   <div class="flex flex-col gap-6">
     <div class="flex flex-col gap-2">
@@ -34,7 +35,15 @@
       </div>
     }
 
-    <!-- (how the shortcut sends: its address, the steps) -->
+    <!-- (the ready shortcut: Apple's Shortcuts adds it, asking for the key — pasted from above) -->
+    <div class="flex flex-col gap-2">
+      <ui-list>
+        <a uiListItem icon="link" chevron [href]="shortcutLink" target="_blank" rel="noopener" class="text-accent">{{ 'shortcut.add' | t }}</a>
+      </ui-list>
+      <p class="px-row-x text-footnote text-fg-secondary">{{ 'shortcut.addNote' | t }}</p>
+    </div>
+
+    <!-- (how the shortcut sends: its address, the steps — to make one of one's own) -->
     <div class="flex flex-col gap-2">
       <ui-list-title>{{ 'shortcut.how' | t }}</ui-list-title>
       <ui-list>

@@ -14,7 +14,8 @@ interface Shortcut {
  * Phones (the account's Shortcut): the key for an iPhone shortcut (Apple's Shortcuts app) to add
  * pages to the library — its text sent to the API with it, no sign-in. The key: none yet / made on
  * (when, last used); New key (the old one stops) — shown this once, Copy; Turn off. Under it what
- * the shortcut sends (its address, Copy) — a page from its text (the first line its title).
+ * the shortcut sends (its address, Copy) — a page from its text (the first line its title); Add to
+ * Shortcuts: the ready one (an iCloud link — it asks for the key as it's added).
  */
 @Component({
   selector: 'app-shortcut-key',
@@ -32,6 +33,8 @@ export class ShortcutKey {
   protected readonly shortcut = signal<Shortcut | null | undefined>(undefined);
   // The key just made (shown this once)
   protected readonly key = signal<string | null>(null);
+  // The ready shortcut (iCloud): added in Apple's Shortcuts, it asks for the key
+  protected readonly shortcutLink = 'https://www.icloud.com/shortcuts/32f17a08b13c45509b8ec9f5bbffee20';
   // (whole — the dev server's API is a path on this site)
   protected readonly address = new URL(`${environment.apiUrl}/shortcut/pages`, location.origin).href;
 
