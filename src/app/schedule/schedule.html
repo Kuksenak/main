@@ -18,8 +18,8 @@
     <app-calendar [(selected)]="selected" [(month)]="month" [marked]="store.marked()" />
   </section>
 
-  <!-- The picked day's events: a row each — when (its start and end), its title, ⟲ if it repeats, its
-       pages' count; past ones gray; a click opens it -->
+  <!-- The picked day's events: a row each — its title, ⟲ if it repeats, its pages' count (desktops),
+       its start over its end at the right; past ones gray; a click opens it -->
   <section class="flex min-w-0 flex-1 flex-col gap-2">
     <h2 class="px-1 text-body font-medium mobile:font-semibold mobile:text-fg-secondary">{{ dayTitle() }}</h2>
     @if (desktop) {
@@ -29,9 +29,8 @@
             type="button"
             (click)="open(event)"
             [class.opacity-50]="past(event)"
-            class="flex h-10 w-full items-center gap-3 rounded-lg px-2 text-left hover:bg-tint"
+            class="flex h-11 w-full items-center gap-3 rounded-lg px-2 text-left hover:bg-tint"
           >
-            <span class="w-24 shrink-0 text-ui text-fg-secondary tabular-nums">{{ span(event) }}</span>
             <span class="min-w-0 flex-1 truncate text-ui text-fg">{{ event.title }}</span>
             @if (event.repeat !== 'Never') {
               <app-icon name="update" class="size-4 shrink-0 text-icon" />
@@ -39,6 +38,7 @@
             @if (event.pageIds.length) {
               <span class="flex shrink-0 items-center gap-1 text-footnote text-fg-secondary"><app-icon name="page" class="size-4 text-icon" />{{ event.pageIds.length }}</span>
             }
+            <ng-container [ngTemplateOutlet]="times" [ngTemplateOutletContext]="{ event }" />
           </button>
         } @empty {
           <p class="px-1 py-6 text-ui text-fg-secondary">{{ 'schedule.noEvents' | t }}</p>
@@ -49,13 +49,13 @@
       <div class="flex flex-col">
         @for (event of events(); track event.id + event.startsAt) {
           <button type="button" uiListItem (click)="open(event)" [class.opacity-50]="past(event)">
-            <span class="flex min-w-0 items-center gap-3">
-              <span class="w-12 shrink-0 text-fg-secondary tabular-nums">{{ start(event) }}</span>
-              <span class="truncate">{{ event.title }}</span>
+            {{ event.title }}
+            <span itemValue class="flex shrink-0 items-center gap-2">
+              @if (event.repeat !== 'Never') {
+                <app-icon name="update" class="size-4 text-icon" />
+              }
+              <ng-container [ngTemplateOutlet]="times" [ngTemplateOutletContext]="{ event }" />
             </span>
-            @if (event.repeat !== 'Never') {
-              <app-icon itemValue name="update" class="size-4 text-icon" />
-            }
           </button>
         } @empty {
           <div uiListItem><span class="text-fg-secondary">{{ 'schedule.noEvents' | t }}</span></div>
@@ -85,6 +85,14 @@
 >
   <app-icon name="plus" class="size-8" />
 </button>
+
+<!-- (an event's times, as iOS's: its start over its end — paler) -->
+<ng-template #times let-event="event">
+  <span class="flex shrink-0 flex-col items-end text-footnote leading-tight tabular-nums">
+    <span class="text-fg">{{ start(event) }}</span>
+    <span class="text-fg-secondary">{{ end(event) }}</span>
+  </span>
+</ng-template>
 
 <!-- An event: new, or as it is (another one opened: an editor of its own; one closing as another
      opens — a click on it out of the panel — doesn't close the new one) -->

@@ -61,9 +61,6 @@
         [placeholder]="'schedule.titlePlaceholder' | t"
         class="min-w-0 flex-1 bg-transparent text-lg font-semibold text-fg outline-none placeholder:text-fg-secondary"
       />
-      @if (current()) {
-        <button uiButton type="button" icon="trash" (click)="remove($event)" [attr.aria-label]="'schedule.delete' | t"></button>
-      }
     </div>
     <div class="flex min-h-0 flex-1 flex-col gap-0.5 px-5 py-2">
       <ng-container [ngTemplateOutlet]="when" [ngTemplateOutletContext]="{ row: deskRow, ends: endsTpl }" />
@@ -122,6 +119,12 @@
         }
       }
     </div>
+    @if (current()) {
+      <!-- (Move to trash: at the bottom, over the keys) -->
+      <div class="shrink-0 px-4 pb-2">
+        <button uiButton type="button" icon="trash" (click)="remove($event)" class="hover:text-danger">{{ 'schedule.delete' | t }}</button>
+      </div>
+    }
     <!-- (the keys, as the windows': Esc closes, Enter saves) -->
     <div class="flex h-11 shrink-0 items-center gap-5 border-t-[0.5px] border-separator px-5 text-footnote text-fg-secondary">
       <span class="flex items-center gap-1.5"><ui-kbd>Esc</ui-kbd>{{ 'search.close' | t }}</span>
@@ -161,7 +164,8 @@
       </button>
     </header>
     <div class="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-[calc(env(safe-area-inset-top)+4.75rem)] pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
-      <div class="flex flex-col gap-6">
+      <!-- (as tall as the screen at least: Move to trash at its bottom) -->
+      <div class="flex min-h-full flex-col gap-6">
         <ui-list>
           <div uiListItem>
             <input
@@ -193,7 +197,7 @@
           </ui-list>
         }
         @if (current()) {
-          <ui-list class="mt-2">
+          <ui-list class="mt-auto">
             <button type="button" uiListItem danger (click)="remove($event)" class="justify-center">{{ 'schedule.delete' | t }}</button>
           </ui-list>
         }
@@ -236,8 +240,23 @@
               }
             </div>
           } @else {
+            <!-- (a field on top: the library's pages with what's typed) -->
+            <label class="mb-4 flex h-10 items-center gap-2 rounded-full bg-tint px-3">
+              <app-icon name="search" class="size-5 shrink-0 text-icon" />
+              <input
+                #addFind
+                type="search"
+                enterkeyhint="search"
+                autocomplete="off"
+                [value]="find()"
+                (input)="find.set(addFind.value)"
+                (keydown.enter)="addFind.blur()"
+                [placeholder]="'schedule.findPage' | t"
+                class="min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary"
+              />
+            </label>
             <ui-list>
-              @for (page of library.items() ?? []; track page.id) {
+              @for (page of matching(); track page.id) {
                 <button type="button" uiListItem icon="page" [checked]="pageIds().includes(page.id)" (click)="togglePage(page)">
                   <span class="min-w-0 truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
                 </button>

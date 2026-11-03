@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { afterNextRender, Component, computed, ElementRef, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, effect, ElementRef, inject, input, OnInit, output, signal, viewChild } from '@angular/core';
 import { AuthStore } from '../auth/auth.store';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -65,6 +65,8 @@ export class EventEditor implements OnInit {
   protected readonly find = signal('');
   // (phones: its pages' own page — and the library's to add, over it)
   protected readonly sub = signal<'pages' | 'add' | null>(null);
+  // (Add Pages opened: its field empty)
+  private readonly clearFind = effect(() => this.sub() === 'add' && this.find.set(''));
   // (phones: a page's row swiped left — Remove under it; `swiping`: following the finger, no easing)
   protected readonly swipe = signal<{ id: string; x: number } | null>(null);
   protected swiping = false;
@@ -154,6 +156,11 @@ export class EventEditor implements OnInit {
   protected readonly pages = computed(() => {
     const byId = new Map((this.library.items() ?? []).map((p) => [p.id, p]));
     return this.pageIds().flatMap((id) => (byId.get(id) ? [byId.get(id)!] : []));
+  });
+  // (phones' Add Pages: all the library's with what's typed — on or not)
+  protected readonly matching = computed(() => {
+    const words = this.i18n.lower(this.find().trim());
+    return (this.library.items() ?? []).filter((p) => !words || this.i18n.lower(p.title).includes(words));
   });
   protected readonly found = computed<PageItem[]>(() => {
     const words = this.i18n.lower(this.find().trim());
@@ -340,7 +347,7 @@ export class EventEditor implements OnInit {
     if (scope) this.saveFor(scope as Scope);
   }
 
-  // Delete: a repeat — which of them, asked; one event — "Delete this event?"
+  // Move to trash: one event — at once (the toast's Undo brings it back); a repeat — which of them, asked
   protected async remove(e: Event): Promise<void> {
     if (!this.current()) return;
     if (this.repeating() && desktop) return this.choice.set({ kind: 'delete', at: e.currentTarget as HTMLElement });
@@ -352,12 +359,7 @@ export class EventEditor implements OnInit {
       if (scope) this.deleteFor(scope as Scope);
       return;
     }
-    const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
-      text: this.i18n.t('schedule.deleteAsk'),
-      yes: this.i18n.t('schedule.delete'),
-      danger: true,
-    });
-    if (yes) this.deleteFor('this');
+    this.deleteFor('all');
   }
 
   // (the choice made: saved / deleted for those)

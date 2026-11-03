@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -17,7 +18,7 @@ import { EventsStore, Occurrence } from './events.store';
  */
 @Component({
   selector: 'app-schedule',
-  imports: [Calendar, EventEditor, Icon, TranslatePipe, UiButton, UiFloatingButton, UiListItem, UiPrimary],
+  imports: [Calendar, NgTemplateOutlet, EventEditor, Icon, TranslatePipe, UiButton, UiFloatingButton, UiListItem, UiPrimary],
   templateUrl: './schedule.html',
 })
 export class Schedule {
@@ -71,14 +72,13 @@ export class Schedule {
     this.editing.set({ event });
   }
 
-  // "09:00", "09:00–10:30"
+  // "09:00" (its start, its end)
   protected start(event: Occurrence): string {
     return this.i18n.time(event.startsAt);
   }
 
-  protected span(event: Occurrence): string {
-    const end = new Date(new Date(event.startsAt).getTime() + event.durationMinutes * 60_000);
-    return `${this.i18n.time(event.startsAt)}–${this.i18n.time(end)}`;
+  protected end(event: Occurrence): string {
+    return this.i18n.time(new Date(new Date(event.startsAt).getTime() + event.durationMinutes * 60_000));
   }
 
   protected past(event: Occurrence): boolean {
