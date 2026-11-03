@@ -1,4 +1,12 @@
-<div class="flex h-full bg-app text-fg">
+<!-- An installed app with its title bar hidden (Chrome / Edge's Window Controls Overlay — Windows:
+     the window's buttons at the right, Mac's at the left): a strip as tall as the bar was, over all of
+     it — the sidebar's part and the page's (the sidebar's line going on up), the window dragged by it;
+     else none (0 tall) -->
+<div class="flex h-full flex-col bg-app text-fg">
+<div class="flex h-[env(titlebar-area-height,0px)] shrink-0 [-webkit-app-region:drag] [app-region:drag]">
+  <div class="w-nav shrink-0 border-r-[0.5px] border-separator bg-side"></div>
+</div>
+<div class="flex min-h-0 flex-1">
   <ui-sidebar>
     <!-- Search (Ctrl+K / ⌘K too), over the sections, as Notion's (measured): a field-like box 32 tall,
          as wide as the rows (12 in from the sidebar's sides), a faint hairline, no fill (a gray one under the pointer), its words
@@ -159,6 +167,7 @@
   <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
     <router-outlet />
   </main>
+</div>
 </div>
 
 @if (menuAt(); as at) {

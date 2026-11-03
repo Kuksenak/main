@@ -66,6 +66,7 @@
     }
   ],
   "display": "standalone",
+  "display_override": ["window-controls-overlay"],
   "background_color": "#000000",
   "orientation": "portrait",
   "launch_handler": {
