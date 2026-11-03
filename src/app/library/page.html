@@ -180,7 +180,7 @@
 @if (!desktop && actionsOpen() && page(); as p) {
   <ui-sheet #actions (closed)="actionsOpen.set(false); actionsPage.set(null)">
     <!-- (Tags: a page in the sheet, as the account's Language — ‹ back and its name in the head; it slides
-         in, as tall as the sheet was) -->
+         in, just as tall as the sheet was — more tags than fit: they scroll) -->
     @if (actionsPage() === 'tags') {
       <div sheetHead class="contents">
         <button type="button" uiFloatingButton round (click)="actionsBack()" [attr.aria-label]="'action.back' | t" class="absolute left-0" data-vt="sheet-back">
@@ -192,7 +192,7 @@
       <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold" data-vt="sheet-title">{{ title() || ('library.untitled' | t) }}</span>
     }
     @if (actionsPage() === 'tags') {
-      <div class="flex flex-col" data-vt="sheet-pane" [style.min-height.px]="actionsHeight()">
+      <div class="flex flex-col overflow-y-auto overscroll-contain" data-vt="sheet-pane" [style.height.px]="actionsHeight()">
         <ui-list>
           @for (tag of tags.tags(); track tag.id) {
             @let on = !!p.tagIds?.includes(tag.id);
