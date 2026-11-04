@@ -174,89 +174,62 @@
   }
 }
 
-<!-- Phones: the page's ⋯ (the top bar) — a sheet as the account's: its title in the head, the actions
-     on cards (as iOS's grouped lists) — the page (keep it, a copy), its link, when it was edited and
-     made, the trash on a card of its own -->
+<!-- Phones: the page's ⋯ (the top bar) — a menu as iOS 26's, by the bar's right: its tag (›: the tags,
+     in the menu), keep it, a copy; its link; when it was edited and made (gray); to the trash (red) -->
 @if (!desktop && actionsOpen() && page(); as p) {
-  <ui-sheet #actions (closed)="actionsOpen.set(false); actionsPage.set(null)">
-    <!-- (Tags: a page in the sheet, as the account's Language — ‹ back and its name in the head; it slides
-         in, just as tall as the sheet was — more tags than fit: they scroll) -->
+  <ui-popover #actions (closed)="actionsOpen.set(false); actionsPage.set(null)">
     @if (actionsPage() === 'tags') {
-      <div sheetHead class="contents">
-        <button type="button" uiFloatingButton round (click)="actionsBack()" [attr.aria-label]="'action.back' | t" class="absolute left-0" data-vt="sheet-back">
-          <app-icon name="chevron-left" class="-ml-0.5 size-8" />
-        </button>
-        <span class="max-w-[calc(100%-7rem)] truncate text-body font-semibold" data-vt="sheet-title">{{ 'tags.title' | t }}</span>
-      </div>
-    } @else {
-      <span sheetHead class="min-w-0 truncate px-12 text-body font-semibold" data-vt="sheet-title">{{ title() || ('library.untitled' | t) }}</span>
-    }
-    @if (actionsPage() === 'tags') {
-      <div uiScrollBar class="flex flex-col overflow-y-auto overscroll-contain *:shrink-0" data-vt="sheet-pane" [style.height.px]="actionsHeight()">
-        <ui-list>
-          @for (tag of tags.tags(); track tag.id) {
-            @let on = !!p.tagIds?.includes(tag.id);
-            <button type="button" uiListItem [checked]="on" (click)="setTags(on ? [] : [tag.id]); actionsBack()" class="after:left-12!">
-              <span class="flex min-w-0 items-center gap-3">
-                <ui-tag-swatch [color]="tag.color" class="size-5" />
-                <span class="truncate">{{ tag.name }}</span>
-              </span>
-            </button>
+      <!-- (the tags: ‹ back to the menu; a tap picks one — or takes it off) -->
+      <button type="button" uiPopItem icon="chevron-left" (click)="actionsPage.set(null)" class="font-semibold">{{ 'tags.title' | t }}</button>
+      <ui-pop-separator />
+      @for (tag of tags.tags(); track tag.id) {
+        @let on = !!p.tagIds?.includes(tag.id);
+        <button type="button" uiPopItem (click)="setTags(on ? [] : [tag.id]); actions.close()">
+          <span class="flex min-w-0 items-center gap-3">
+            <ui-tag-swatch [color]="tag.color" class="size-5" />
+            <span class="truncate">{{ tag.name }}</span>
+          </span>
+          @if (on) {
+            <app-icon itemValue name="check" class="size-5 shrink-0 text-accent" />
           }
-        </ui-list>
-      </div>
+        </button>
+      }
     } @else {
-    <div #actionsPane class="flex flex-col gap-6" data-vt="sheet-pane">
-      <!-- (the page: its tag — a row with the one on it, › its page in the sheet; keep it, a copy) -->
-      <ui-list>
-        @if (tags.tags().length) {
-          <button type="button" uiListItem icon="hash" chevron (click)="openActionsTags()">
-            {{ 'tags.title' | t }}
+      @if (tags.tags().length) {
+        <button type="button" uiPopItem icon="hash" (click)="actionsPage.set('tags')">
+          {{ 'tags.title' | t }}
+          <span itemValue class="flex max-w-28 min-w-0 items-center gap-2 text-fg-secondary">
             @if (tags.of(p.tagIds)[0]; as tag) {
-              <span itemValue class="flex min-w-0 items-center gap-2 text-fg-secondary">
-                <ui-tag-swatch [color]="tag.color" class="size-4" />
-                <span class="truncate">{{ tag.name }}</span>
-              </span>
+              <ui-tag-swatch [color]="tag.color" class="size-4" />
+              <span class="truncate">{{ tag.name }}</span>
             }
-          </button>
-        }
-        <button type="button" uiListItem icon="bookmark" (click)="actions.close(); favorite()">
-          {{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}
+            <app-icon name="chevron-right" class="size-4 shrink-0 opacity-50" />
+          </span>
         </button>
-        <button type="button" uiListItem icon="duplicate" (click)="actions.close(); duplicate()">{{ 'library.duplicate' | t }}</button>
-      </ui-list>
-
-      <!-- (its link) -->
-      <ui-list>
-        @if (p.shareToken) {
-          <button type="button" uiListItem icon="link" (click)="actions.close(); copyLink()">{{ 'library.copyLink' | t }}</button>
-          @if (canShare) {
-            <button type="button" uiListItem icon="popout" (click)="actions.close(); shareLink()">{{ 'library.sendLink' | t }}</button>
-          }
-          <button type="button" uiListItem icon="lock" (click)="actions.close(); share(false)">{{ 'library.unpublish' | t }}</button>
-        } @else {
-          <button type="button" uiListItem icon="lock" (click)="actions.close(); share(true)">{{ 'library.publish' | t }}</button>
+      }
+      <button type="button" uiPopItem icon="bookmark" (click)="actions.close(); favorite()">
+        {{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}
+      </button>
+      <button type="button" uiPopItem icon="duplicate" (click)="actions.close(); duplicate()">{{ 'library.duplicate' | t }}</button>
+      <ui-pop-separator />
+      @if (p.shareToken) {
+        <button type="button" uiPopItem icon="link" (click)="actions.close(); copyLink()">{{ 'library.copyLink' | t }}</button>
+        @if (canShare) {
+          <button type="button" uiPopItem icon="popout" (click)="actions.close(); shareLink()">{{ 'library.sendLink' | t }}</button>
         }
-      </ui-list>
-
-      <!-- (when it was edited, made: a row each, the time in gray at the right — as the account's version) -->
-      <ui-list>
-        <div uiListItem>
-          {{ 'library.edited' | t }}
-          <span itemValue class="text-fg-secondary">{{ when(p.updatedAt) }}</span>
-        </div>
-        <div uiListItem>
-          {{ 'library.created' | t }}
-          <span itemValue class="text-fg-secondary">{{ when(p.createdAt) }}</span>
-        </div>
-      </ui-list>
-
-      <ui-list>
-        <button type="button" uiListItem icon="trash" danger (click)="actions.close(); delete()">{{ 'library.moveToTrash' | t }}</button>
-      </ui-list>
-    </div>
+        <button type="button" uiPopItem icon="lock" (click)="actions.close(); share(false)">{{ 'library.unpublish' | t }}</button>
+      } @else {
+        <button type="button" uiPopItem icon="lock" (click)="actions.close(); share(true)">{{ 'library.publish' | t }}</button>
+      }
+      <ui-pop-separator />
+      <!-- (when it was edited, made: small, gray) -->
+      <p class="px-5 py-1 text-footnote leading-snug text-fg-secondary">
+        {{ 'library.edited' | t }} {{ when(p.updatedAt) }}<br />{{ 'library.created' | t }} {{ when(p.createdAt) }}
+      </p>
+      <ui-pop-separator />
+      <button type="button" uiPopItem icon="trash" danger (click)="actions.close(); delete()">{{ 'library.moveToTrash' | t }}</button>
     }
-  </ui-sheet>
+  </ui-popover>
 }
 
 
