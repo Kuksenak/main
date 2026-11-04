@@ -1,21 +1,23 @@
 import { Component, computed, DestroyRef, ElementRef, inject, input, output, signal } from '@angular/core';
+import { Icon, IconName } from '../icon/icon';
 
 // (one row open at a time: another swiped or tapped — the open one closes)
 let opened: UiSwipe | null = null;
 
-/** An action under a swiped row: its value (given back picked), its words, its color. */
+/** An action under a swiped row: its value (given back picked), its icon, its words (under it), its color. */
 export interface SwipeAction {
   value: string;
+  icon: IconName;
   label: string;
   tone?: 'gray' | 'danger' | 'accent';
 }
 
-const WIDTH = 92; // (an action's width)
-const GAP = 8;
+const WIDTH = 64; // (an action's column: its circle, its words under it)
 
 /**
- * Phones: a row swiped to the left (as iOS 26's lists) — its actions at the right, round buttons
- * of their own, whole from the start (uncovered as the row goes, never squeezed). Let go past half
+ * Phones: a row swiped to the left (as iOS 26's Mail) — the row a card of its own as it goes (round
+ * at its right), its actions at the right: circles with their icons, their words under them in
+ * gray, growing as they're uncovered (never squeezed). Let go past half
  * of them: open, a tap does one (`picked`: its value, the row); else back. `toggle()` opens /
  * closes it (a tap on the row), `hint()` shows them for a moment (what's to swipe, once). A
  * vertical move scrolls as ever; a sideways one is its own — not a sheet's pull.
@@ -23,6 +25,7 @@ const GAP = 8;
  */
 @Component({
   selector: 'ui-swipe',
+  imports: [Icon],
   host: {
     // (touch-action: the browser scrolls up / down, the sideways moves are its; its row's hairline
     // kept — each row's the only one in its swipe, "last" — but the last swipe's)
@@ -35,25 +38,35 @@ const GAP = 8;
     '(touchcancel)': 'end()',
   },
   template: `
-    <!-- (the actions: as wide as they are from the start, at the right — only what the row's
-         uncovered of them seen) -->
-    <div class="absolute inset-y-0 right-0 overflow-hidden" [style.width.px]="-x()" [class.invisible]="!x()">
-      <div class="absolute inset-y-0 right-0 flex gap-2 py-1.5 pr-2" [style.width.px]="open()">
-        @for (a of actions(); track a.value) {
-          <button
-            type="button"
-            (click)="pick(a.value)"
-            class="flex-1 rounded-2xl px-2 text-body leading-tight font-medium text-on-accent"
+    <!-- (the actions at the right: a circle each, its words under it — growing as they're uncovered) -->
+    <div class="absolute inset-y-0 right-0 flex items-center pr-1" [style.width.px]="open()" [class.invisible]="!x()">
+      @for (a of actions(); track a.value) {
+        <button
+          type="button"
+          (click)="pick(a.value)"
+          class="flex flex-1 flex-col items-center gap-0.5 transition-transform duration-150"
+          [style.transform]="'scale(' + grown() + ')'"
+          [style.opacity]="grown()"
+        >
+          <span
+            class="grid size-10 place-items-center rounded-full text-on-accent"
             [class.bg-danger]="a.tone === 'danger'"
             [class.bg-accent]="a.tone === 'accent'"
             [class.bg-fg-secondary]="!a.tone || a.tone === 'gray'"
           >
-            {{ a.label }}
-          </button>
-        }
-      </div>
+            <app-icon [name]="a.icon" class="size-5.5" />
+          </span>
+          <span class="text-caption leading-tight text-fg-secondary">{{ a.label }}</span>
+        </button>
+      }
     </div>
-    <div [style.transform]="x() ? 'translateX(' + x() + 'px)' : null" [class.transition-transform]="!dragging()" class="duration-300">
+    <!-- (the row: moved, a card of its own — round at its right, a gray of its own, no hairline) -->
+    <div
+      [style.transform]="x() ? 'translateX(' + x() + 'px)' : null"
+      [attr.data-moved]="x() ? '' : null"
+      [attr.data-eased]="dragging() ? null : ''"
+      class="duration-300 data-eased:transition-[transform,border-radius,background-color] data-moved:rounded-r-[1.75rem] data-moved:bg-tint data-moved:*:after:opacity-0"
+    >
       <ng-content />
     </div>
   `,
@@ -64,10 +77,15 @@ export class UiSwipe {
 
   protected readonly x = signal(0);
   protected readonly dragging = signal(false);
-  // (open: the actions' room — theirs, the gaps, the margin at the right)
+  // (open: the actions' room — their columns, a margin at each side)
   protected readonly open = computed(() => {
     const n = this.actions().length;
-    return n ? n * WIDTH + (n - 1) * GAP + 8 : 0;
+    return n ? n * WIDTH + 16 : 0;
+  });
+  // (how far they've grown: half uncovered — 0.4, whole — 1)
+  protected readonly grown = computed(() => {
+    const o = this.open();
+    return o ? Math.max(0.4, Math.min(1, -this.x() / o)) : 0;
   });
   private touch: { x: number; y: number; from: number; mode: 'unknown' | 'swipe' | 'scroll' } | null = null;
   private readonly host: HTMLElement = inject(ElementRef).nativeElement;

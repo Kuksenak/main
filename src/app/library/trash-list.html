@@ -25,7 +25,7 @@
                first) at its right; the first row shows them for a moment, the first time) -->
           <ui-swipe
             #swipe
-            [actions]="[{ value: 'restore', label: ('trash.restore' | t), tone: 'gray' }, { value: 'delete', label: ('trash.delete' | t), tone: 'danger' }]"
+            [actions]="[{ value: 'restore', icon: 'update', label: ('trash.restore' | t), tone: 'gray' }, { value: 'delete', icon: 'trash', label: ('trash.delete' | t), tone: 'danger' }]"
             (picked)="$event.value === 'restore' ? restore(item.id) : deleteForever(item.id, $event.row)"
           >
             <div uiRow icon="page" (click)="swipe.toggle()" class="mobile:min-h-14!">
