@@ -74,24 +74,23 @@ html.dark[data-device='desktop'] {
   --highlight: rgb(255 255 255 / 0.1);
 }
 
-/* The window as macOS 27's, tinted (option B): the sidebar to the window's edge, full height, and one bar
-   across the top (the sidebar's top and the pages' heads in one color: main [data-toolbar], plain CSS
-   below) — nearly opaque, tinted a little with the accent (a blue-gray); a hairline between the sidebar
-   and the page, under the heads; the current row blue with white text, the heads' + blue; the page white.
-   Contrast as the older macOS's, the shapes Liquid Glass's (capsules, round corners). The installed
-   app's title bar the bar's color (index.html: --title-bar). (Dark: a blue-graphite.) */
+/* The window as macOS 27's, clear (option A): the sidebar to the window's edge, full height, and one bar
+   across the top (the sidebar's top and the pages' heads in one color) — both nearly clear glass: the
+   page scrolls under the heads, blurred; a hairline between the sidebar and the page, under the heads;
+   the current row a soft gray, the heads' + blue; the page white. The installed app's title bar the
+   bar's color (index.html: --title-bar). */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
-  --side-bg: #edf1f8;
-  --title-bar: #edf1f8;
+  --side-bg: rgb(246 246 248 / 0.72);
+  --title-bar: #f9f9fa;
   --side-shadow: none;
   --side-text: #1c1c1e;
   --text: #000000;
   --text-secondary: #6e6e73;
   --separator: rgb(0 0 0 / 0.12);
   --side-hover: rgb(0 0 0 / 0.05);
-  --side-on: var(--accent);
-  --side-on-text: #ffffff;
+  --side-on: rgb(0 0 0 / 0.07);
+  --side-on-text: #000000;
   --round-side-row: 0.5rem;
   /* (menus and windows: Liquid Glass — white frosted, a bright rim, a clear edge) */
   --menu-bg: rgb(255 255 255 / 0.78);
@@ -103,8 +102,8 @@ html[data-device='desktop'] {
 }
 html.dark[data-device='desktop'] {
   --app-bg: #1e1e1e;
-  --side-bg: #22262f;
-  --title-bar: #22262f;
+  --side-bg: rgb(44 44 46 / 0.6);
+  --title-bar: #262627;
   --side-shadow: none;
   --side-text: #e5e5ea;
   --dialog-bg: #2a2a2c;
@@ -112,7 +111,7 @@ html.dark[data-device='desktop'] {
   --text-secondary: #98989f;
   --separator: rgb(255 255 255 / 0.1);
   --side-hover: rgb(255 255 255 / 0.06);
-  --side-on: var(--accent);
+  --side-on: rgb(255 255 255 / 0.12);
   --side-on-text: #ffffff;
   --menu-bg: rgb(48 48 52 / 0.72);
   --menu-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.16), 0 12px 32px rgb(0 0 0 / 0.5);
@@ -120,8 +119,11 @@ html.dark[data-device='desktop'] {
   --bar-button-hover: rgb(255 255 255 / 0.16);
   --bar-button-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.12);
 }
-/* (the pages' heads: the bar's color, a hairline under — one bar with the sidebar's top) */
+/* (the pages' heads: the bar's clear glass — the page blurred under it — a hairline under; one bar with
+   the sidebar's top) */
 html[data-device='desktop'] main [data-toolbar] {
   background-color: var(--side-bg);
   box-shadow: inset 0 -0.5px 0 var(--separator);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
 }

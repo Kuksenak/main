@@ -6,7 +6,7 @@ import { UiTip } from '../core/ui/tip/tip';
 
 /**
  * Desktops: a section's head at its right, as macOS 26's toolbar — its + (the section's new one: a
- * page, an event) a round blue button of its own (macOS 27's, tinted). (Search
+ * page, an event) a round blue button of its own (macOS 27's). (Search
  * and the account: in the sidebar.)
  *   <app-toolbar-end addLabel="library.new" (add)="create()" />
  */

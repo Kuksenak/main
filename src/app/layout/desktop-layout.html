@@ -1,4 +1,4 @@
-<!-- The window as macOS 27's (tinted): the sidebar at its left edge, full height, its top one bar with
+<!-- The window as macOS 27's (clear): the sidebar at its left edge, full height, its top one bar with
      the pages' heads; the page white beside it; with the title bar hidden (an installed app), a Mac's window buttons inside
      the panel's top (UiSidebar); the page's head row in the bar's place (`data-titlebar`: components.css) -->
 <div class="flex h-full bg-app text-fg">
@@ -20,7 +20,7 @@
       @if (place.path === '/library') {
         <!-- (Library, as a section's row: a click folds its last pages away / back — ⌄ right after its name
              under the pointer, › folded; at its right under the pointer ↗ (the whole library) and + (a
-             new page); blue while the library's open) -->
+             new page); gray while the library's open) -->
         <a
           uiSidebarItem
           [icon]="place.icon"
@@ -40,7 +40,7 @@
         </a>
       } @else if (place.path === '/schedule') {
         <!-- (Schedule, as Library: a click folds its next events away / back; ↗ the whole schedule, + a new
-             event; blue while the schedule's open) -->
+             event; gray while the schedule's open) -->
         <a
           uiSidebarItem
           [icon]="place.icon"
