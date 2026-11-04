@@ -143,11 +143,11 @@
   <div
     #phonePage
     popover="manual"
-    class="fixed inset-0 m-0 flex size-full max-h-none max-w-none animate-panel-in flex-col border-0 bg-grouped p-0 text-fg transition-transform duration-240 ease-out data-leaving:translate-x-full [&_ui-list]:bg-card"
+    class="fixed inset-0 m-0 flex size-full max-h-none max-w-none animate-panel-in flex-col border-0 bg-app p-0 text-fg transition-transform duration-240 ease-out data-leaving:translate-x-full"
     [attr.data-leaving]="leaving() ? '' : null"
   >
     <header
-      class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-linear-to-b from-grouped from-40% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5"
+      class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-linear-to-b from-app from-40% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5"
     >
       <button type="button" uiFloatingButton round (click)="back($event)" class="pointer-events-auto" [attr.aria-label]="'search.close' | t">
         <app-icon name="close" class="size-7" />
@@ -209,8 +209,8 @@
     <!-- Its pages (as iOS's Invitees), over it, from the right: ‹ back, its name; Add Pages › (the
          library's, a tap ✓ / un-✓ one), then the ones it goes with — a row swiped left: Remove -->
     @if (sub(); as at) {
-      <div class="absolute inset-0 z-20 flex animate-panel-in flex-col bg-grouped">
-        <header class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-linear-to-b from-grouped from-40% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5">
+      <div class="absolute inset-0 z-20 flex animate-panel-in flex-col bg-app">
+        <header class="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-center gap-2 bg-linear-to-b from-app from-40% to-transparent px-4 pt-[calc(env(safe-area-inset-top)+0.5rem)] pb-5">
           <button type="button" uiFloatingButton round (click)="sub.set(at === 'add' ? 'pages' : null)" class="pointer-events-auto" [attr.aria-label]="'action.back' | t">
             <app-icon name="chevron-left" class="-ml-0.5 size-8" />
           </button>

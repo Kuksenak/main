@@ -13,8 +13,8 @@ import { EventsStore, Occurrence } from './events.store';
 /**
  * The schedule: the month in view and Today over the calendar's days (the days with events: a dot),
  * the picked day's events by it (desktops: at its right; phones: under it) — a click opens one (the
- * event's panel / page: EventEditor); New event (desktops: by the month; phones: + on the top bar's
- * capsule) — on the picked day. Phones: the month in the top bar, Today floating at the bottom left.
+ * event's window / sheet: EventEditor); New event (desktops: + by Today; phones: + floating at the
+ * bottom right) — on the picked day. Phones: the month in the top bar, Today floating at the bottom left.
  */
 @Component({
   selector: 'app-schedule',
@@ -43,8 +43,8 @@ export class Schedule {
   protected readonly events = computed(() => this.store.ofDay(this.selected()));
 
   constructor() {
-    // (phones: the month in the top bar; + — a new event on the picked day — on its capsule)
-    inject(PageTitle).show(this.title, null, null, { label: 'schedule.newEvent', run: () => this.create() });
+    // (phones: the month in the top bar)
+    inject(PageTitle).show(this.title);
     // (the month in view — or the day picked: its events read)
     effect(() => this.store.show(this.month()));
     effect(() => this.store.show(this.selected()));
