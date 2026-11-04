@@ -114,8 +114,6 @@
       [attr.aria-label]="'library.more' | t"
       [uiTip]="menuOpen() ? null : ('library.more' | t)"
     ></button>
-    <!-- (as the sections' heads: 🔍 and the account at the right) -->
-    <app-toolbar-end class="ml-1.5" />
     @if (menuOpen()) {
       <!-- The assistant, Preview; Duplicate; Move to trash -->
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">

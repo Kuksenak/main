@@ -4,7 +4,17 @@
 <div class="flex h-full bg-app text-fg">
 <div class="flex w-[calc(var(--nav-w)+0.5rem)] shrink-0 flex-col py-2 pl-2">
   <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
-    <!-- (Search: at the heads' right — ToolbarEnd's 🔍, or Ctrl K / ⌘K) -->
+    <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — the loupe, its
+         word gray, the keys on a chip; a click: the search window -->
+    <button
+      type="button"
+      (click)="search.open.set(true)"
+      class="mb-2 flex h-8 shrink-0 items-center gap-2 rounded-full bg-tint pr-1.5 pl-2.5 text-left text-ui text-fg-secondary outline-none hover:bg-tint-strong focus-visible:bg-tint-strong"
+    >
+      <app-icon name="search" class="size-4.5 shrink-0 text-icon" />
+      <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
+      <ui-kbd>{{ shortcut }}</ui-kbd>
+    </button>
     @for (place of places(); track place.path) {
       @if (place.path === '/library') {
         <!-- (Library, as a section's row: a click folds its last pages away / back — ⌄ right after its name

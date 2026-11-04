@@ -27,7 +27,7 @@
   --side-row-h: 1.875rem;
   --side-row-px: 0.4375rem;
   --icon-side: 1.625rem;
-  --round-side-row: 0.5rem;
+  --round-side-row: 0.75rem; /* (rounder, as macOS 26's sidebars) */
   /* Menus, as Claude's (measured): 272 wide, 28 tall rows, the icon as the sidebar's; the
      labels (the email) and lines start where the icons' drawings do */
   --menu-w: 17rem;
