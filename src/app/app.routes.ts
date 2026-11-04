@@ -19,8 +19,11 @@ export const routes: Routes = [
         : import('./layout/mobile-layout').then((m) => m.MobileLayout),
     canActivate: [authGuard],
     children: [
-      // (at the app's start: the section used last instead, if there's one — LastSection)
-      { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home), canActivate: [lastSectionGuard] },
+      // (at the app's start — desktops: the section used last instead, if there's one (LastSection);
+      // phones: the start, its sections in a list (Hub) — ‹ back to it from each)
+      desktop
+        ? { path: '', pathMatch: 'full', loadComponent: () => import('./home/home').then((m) => m.Home), canActivate: [lastSectionGuard] }
+        : { path: '', pathMatch: 'full', loadComponent: () => import('./layout/hub').then((m) => m.Hub) },
       {
         path: 'schedule',
         loadComponent: () => import('./schedule/schedule').then((m) => m.Schedule),

@@ -34,11 +34,8 @@
         <span class="w-round shrink-0"></span>
       }
     } @else {
-      <!-- A section: a pill with its icon and name, ▾ — the shared select (phones: the system's own
-           menu of the sections): one picked, it opens -->
-      <div class="min-w-0 flex-1">
-        <ui-select [options]="places()" [value]="here()" [text]="title()" wide glass (valueChange)="go($event)" [label]="'nav.menu' | t" />
-      </div>
+      <!-- The start (Hub): its name, big, at the left (as iOS's Settings); 🔍 and the account at the right -->
+      <span class="min-w-0 flex-1 truncate pl-1 text-[1.75rem] font-bold tracking-tight">{{ title() }}</span>
     }
     <!-- (not inside a page opened from a list: there, only ‹ and its title) -->
     @if (!back()) {
