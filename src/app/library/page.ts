@@ -173,11 +173,6 @@ export class PageView {
     this.store.duplicate(this.id(), this.title(), this.blocks.filter((b) => b.text?.trim()));
   }
 
-  // "26 Oct, 15:02"
-  protected when(at: string): string {
-    return this.i18n.day(at, true);
-  }
-
   // Publish: its link made and copied (a toast says so); off: the link answers nothing any more
   protected share(on: boolean): void {
     const page = this.page();
