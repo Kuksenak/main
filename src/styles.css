@@ -136,7 +136,7 @@
    shadow (--glass, --glass-shadow) — the floating buttons, the top bar's choice, the search's field, a
    question's panel, a menu. */
 @utility glass {
-  @apply bg-glass shadow-glass backdrop-blur-[8px] backdrop-saturate-[180%];
+  @apply bg-glass shadow-glass backdrop-blur-(--glass-blur) backdrop-saturate-[180%];
 }
 
 /* base (colors, the page, scrollbars, press feedback) → components (the few shared pieces) */
