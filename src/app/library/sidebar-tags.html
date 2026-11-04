@@ -37,7 +37,7 @@
         (drop)="drop($event, tag)"
         [attr.aria-current]="current() === tag.id ? 'page' : null"
         [attr.data-drop]="dropOn() === tag.id ? '' : null"
-        class="cursor-pointer pl-3.5! data-drop:bg-side-on"
+        class="cursor-pointer pl-3.5! data-drop:bg-tint-strong"
       >
         <!-- (its swatch in an icon's room: the names in line with the pages') -->
         <span class="grid size-icon-side shrink-0 place-items-center"><ui-tag-swatch [color]="tag.color" class="size-3 saturate-[2.5] brightness-95" /></span>

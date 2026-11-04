@@ -6,7 +6,7 @@ import { UiTip } from '../core/ui/tip/tip';
 
 /**
  * Desktops: a section's head at its right, as macOS 26's toolbar — its + (the section's new one: a
- * page, an event) a round button of its own: the page's white, a hairline, a soft shadow. (Search
+ * page, an event) a round blue button of its own (macOS 27's, tinted). (Search
  * and the account: in the sidebar.)
  *   <app-toolbar-end addLabel="library.new" (add)="create()" />
  */
@@ -21,7 +21,7 @@ import { UiTip } from '../core/ui/tip/tip';
         (click)="add.emit()"
         [uiTip]="label | t"
         [attr.aria-label]="label | t"
-        class="grid size-8 place-items-center rounded-full bg-(--bar-button) text-fg shadow-(--bar-button-shadow) hover:bg-(--bar-button-hover)"
+        class="grid size-8 place-items-center rounded-full bg-accent text-on-accent shadow-accent hover:brightness-110"
       >
         <app-icon name="plus" class="size-5" />
       </button>

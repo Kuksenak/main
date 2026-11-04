@@ -1,16 +1,16 @@
-<!-- The window as macOS 26's: white, the sidebar a gray panel floating at its left (8 in from its
-     edges), the page flat beside it; with the title bar hidden (an installed app), a Mac's window buttons inside
+<!-- The window as macOS 27's (tinted): the sidebar at its left edge, full height, its top one bar with
+     the pages' heads; the page white beside it; with the title bar hidden (an installed app), a Mac's window buttons inside
      the panel's top (UiSidebar); the page's head row in the bar's place (`data-titlebar`: components.css) -->
 <div class="flex h-full bg-app text-fg">
-<div class="flex w-[calc(var(--nav-w)+0.5rem)] shrink-0 flex-col py-2 pl-2">
+<div class="flex w-nav shrink-0 flex-col">
   <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
-    <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — white on the gray panel, a hairline,
+    <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — as the heads' buttons (white, a hairline),
          the loupe, its word gray, the keys as quiet gray text at its right (as macOS menus show
          shortcuts: keycaps there looked busy); a click: the search window -->
     <button
       type="button"
       (click)="search.open.set(true)"
-      class="mb-2 flex h-8 shrink-0 items-center gap-2 rounded-full bg-side-on pr-3 pl-2.5 text-left text-ui text-fg-secondary shadow-[0_0_0_0.5px_rgb(0_0_0/0.08)] outline-none hover:bg-app focus-visible:bg-app"
+      class="mb-2 flex h-8 shrink-0 items-center gap-2 rounded-full bg-(--bar-button) pr-3 pl-2.5 text-left text-ui text-fg-secondary shadow-(--bar-button-shadow) outline-none hover:bg-(--bar-button-hover) focus-visible:bg-(--bar-button-hover)"
     >
       <app-icon name="search" class="size-4.5 shrink-0 text-icon" />
       <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
@@ -20,7 +20,7 @@
       @if (place.path === '/library') {
         <!-- (Library, as a section's row: a click folds its last pages away / back — ⌄ right after its name
              under the pointer, › folded; at its right under the pointer ↗ (the whole library) and + (a
-             new page); gray while the library's open) -->
+             new page); blue while the library's open) -->
         <a
           uiSidebarItem
           [icon]="place.icon"
@@ -29,9 +29,8 @@
           (click)="folds.toggle('recents')"
           (keydown.enter)="folds.toggle('recents')"
           [attr.data-open]="folds.has('recents') ? null : ''"
-          [class.bg-side-on]="onLibrary()"
-          [class.text-fg]="onLibrary()"
-          class="group/fold cursor-pointer"
+          [attr.data-on]="onLibrary() ? '' : null"
+          class="group/fold cursor-pointer data-on:bg-side-on data-on:text-side-on-text data-on:[&>app-icon]:text-current"
         >
           <ui-fold-name>{{ place.label | t }}</ui-fold-name>
           <span itemEnd class="flex items-center gap-0.5">
@@ -41,7 +40,7 @@
         </a>
       } @else if (place.path === '/schedule') {
         <!-- (Schedule, as Library: a click folds its next events away / back; ↗ the whole schedule, + a new
-             event; gray while the schedule's open) -->
+             event; blue while the schedule's open) -->
         <a
           uiSidebarItem
           [icon]="place.icon"
@@ -50,9 +49,8 @@
           (click)="folds.toggle('events')"
           (keydown.enter)="folds.toggle('events')"
           [attr.data-open]="folds.has('events') ? null : ''"
-          [class.bg-side-on]="onSchedule()"
-          [class.text-fg]="onSchedule()"
-          class="group/fold cursor-pointer"
+          [attr.data-on]="onSchedule() ? '' : null"
+          class="group/fold cursor-pointer data-on:bg-side-on data-on:text-side-on-text data-on:[&>app-icon]:text-current"
         >
           <ui-fold-name>{{ place.label | t }}</ui-fold-name>
           <span itemEnd class="flex items-center gap-0.5">

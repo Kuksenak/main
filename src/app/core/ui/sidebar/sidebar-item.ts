@@ -6,8 +6,8 @@ import { UiScrollBar } from '../scroll-bar/scroll-bar';
 // (a row: its look, its icon and name — the places' and the buttons')
 const ROW =
   'group/row flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-left text-ui text-side-text outline-none ' +
-  'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:shadow-[0_0_0_0.5px_rgb(0_0_0/0.08),0_1px_3px_rgb(0_0_0/0.1)] aria-[current=page]:font-[450] aria-[current=page]:text-fg ' +
-  'aria-expanded:bg-side-on';
+  'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-side-on-text aria-[current=page]:[&>app-icon]:text-current ' +
+  'aria-expanded:bg-tint-strong';
 const TEMPLATE = `
   <app-icon [name]="icon()" colored [tint]="tint()" class="size-icon-side text-icon" />
   <span class="min-w-0 flex-1 truncate"><ng-content /></span>
@@ -68,8 +68,8 @@ export class UiSidebarButton {
   host: {
     type: 'button',
     class:
-      'grid size-6 shrink-0 place-items-center rounded-md text-icon opacity-0 group-hover/row:opacity-100 hover:bg-side-on ' +
-      'aria-expanded:opacity-100 aria-expanded:bg-side-on -mr-1',
+      'grid size-6 shrink-0 place-items-center rounded-md text-icon opacity-0 group-hover/row:opacity-100 hover:bg-tint-strong ' +
+      'aria-expanded:opacity-100 aria-expanded:bg-tint-strong -mr-1',
     '(click)': '$event.preventDefault(); $event.stopPropagation()',
   },
   template: `<app-icon [name]="icon()" class="size-4.5" />`,
