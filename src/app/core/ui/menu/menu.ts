@@ -5,8 +5,8 @@ import { booleanAttribute, Component, input, output, viewChild } from '@angular/
 const ROWS = '[role^="menuitem"]:not(:disabled)';
 
 /**
- * A menu at its button (as Notion's: a plain list on the dialogs' color, a soft shadow, nothing
- * dims): under the button, its right edge at the button's (above it, or from its left edge, when
+ * A menu at its button (as the phones' — iOS 26's: big round corners, a hairline, a soft shadow, its
+ * rows round; nothing dims): under the button, its right edge at the button's (above it, or from its left edge, when
  * there's no room). Render it with @if; `closed` fires on a click outside, Esc, Tab or a picked
  * row (`<button uiMenuItem>`). ↑ ↓ move between the rows; the first one has the focus.
  *   <button uiButton #b (click)="open.set(!open())" [attr.aria-expanded]="open()">…</button>

@@ -45,3 +45,22 @@
     padding-top: env(titlebar-area-height, 0px);
   }
 }
+
+/* Desktops' toolbar buttons, as macOS 26's: on a head (`data-toolbar`) its buttons (uiButton) are capsules
+   of their own — the page's white (dark: a gray), a hairline and a soft shadow, a little taller; just an
+   icon: a circle. (Plain CSS: every head's buttons at once, the kit's uiButton elsewhere as it is.) */
+[data-device='desktop'] [data-toolbar] :is(button, a)[uibutton] {
+  height: 2rem;
+  padding-inline: 0.75rem;
+  border-radius: 9999px;
+  background-color: var(--bar-button);
+  box-shadow: var(--bar-button-shadow);
+}
+[data-device='desktop'] [data-toolbar] :is(button, a)[uibutton]:has(> span:empty) {
+  width: 2rem;
+  padding-inline: 0;
+}
+[data-device='desktop'] [data-toolbar] :is(button, a)[uibutton]:not(:disabled):hover,
+[data-device='desktop'] [data-toolbar] :is(button, a)[uibutton][aria-expanded='true'] {
+  background-color: var(--bar-button-hover);
+}

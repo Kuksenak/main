@@ -9,6 +9,7 @@ import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiWindow, UiWindowHead } from '../core/ui/window';
 import { PageTitle } from '../layout/page-title';
+import { ToolbarEnd } from '../layout/toolbar-end';
 import { AiChat } from './ai-chat';
 import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
 import { ReadBlock } from './read-block';
@@ -31,7 +32,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, UiPopover, UiPopItem, UiPopSeparator],
+  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiKbd, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, ToolbarEnd, UiPopover, UiPopItem, UiPopSeparator],
   templateUrl: './page.html',
 })
 export class PageView {

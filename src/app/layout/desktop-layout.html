@@ -6,13 +6,8 @@
 <div class="flex w-[calc(var(--nav-w)+0.5rem)] shrink-0 flex-col py-2 pl-2">
   <div class="h-[env(titlebar-area-height,0px)] shrink-0 [-webkit-app-region:drag] [app-region:drag]"></div>
   <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
-    <!-- Search (Ctrl+K / ⌘K too): a row as the sections', the keys on a chip at its right -->
-    <button uiSidebarItem icon="search" (click)="searchOpen.set(true)">
-      {{ 'search.title' | t }}
-      <ui-kbd itemEnd>{{ shortcut }}</ui-kbd>
-    </button>
     <!-- The sections: a row each (as macOS's: just them — their pages and events on their own pages); +
-         under the pointer: a new page / event -->
+         under the pointer: a new page / event. (Search and the account: at the heads' right — ToolbarEnd) -->
     @for (place of places(); track place.path) {
       <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path">
         {{ place.label | t }}
@@ -61,47 +56,12 @@
         ></button>
       </a>
     </ng-template>
-    <button
-      #account
-      sidebarFoot
-      uiButton
-      type="button"
-      caret
-      (click)="menuAt.set(menuAt() ? null : account.element)"
-      aria-haspopup="menu"
-      [attr.aria-expanded]="!!menuAt()"
-      [attr.aria-label]="'account.title' | t"
-    >
-      <!-- (a new version ready: a green dot on it) -->
-      <ui-avatar [name]="userName()" [dot]="updates.ready()" />
-      {{ userName() }}
-    </button>
   </ui-sidebar>
 </div>
   <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
     <router-outlet />
   </main>
 </div>
-
-@if (menuAt(); as at) {
-  <ui-menu [origin]="at" (closed)="menuAt.set(null)">
-    <ui-menu-label>{{ auth.email() }}</ui-menu-label>
-    <ui-menu-separator />
-    @if (auth.isAdmin()) {
-      <button type="button" uiMenuItem icon="lock" (click)="router.navigateByUrl('/users')">{{ 'users.title' | t }}</button>
-      <ui-menu-separator />
-    }
-    @for (language of i18n.languages; track language.code) {
-      <button type="button" uiMenuItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">{{ language.label }}</button>
-    }
-    <ui-menu-separator />
-    @if (updates.ready()) {
-      <button type="button" uiMenuItem icon="update" (click)="updates.apply()"><span class="text-accent">{{ 'account.update' | t }}</span></button>
-    }
-    <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
-    <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
-  </ui-menu>
-}
 
 <!-- A page's ⋯ in the sidebar: its menu (as the library's) -->
 @if (rowMenu(); as m) {
@@ -140,6 +100,6 @@
 }
 
 <!-- The search window (as Notion's / Claude's) -->
-@if (searchOpen()) {
-  <app-search (closed)="searchOpen.set(false)" />
+@if (search.open()) {
+  <app-search (closed)="search.open.set(false)" />
 }

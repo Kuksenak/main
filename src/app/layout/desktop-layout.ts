@@ -1,36 +1,29 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, map } from 'rxjs';
+import { Router, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
-import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UpdateService } from '../core/services/update.service';
-import { IconName, tagTint, UiAvatar, UiButton, UiFoldName, UiKbd } from '../core/ui';
-import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarScroll } from '../core/ui/sidebar';
+import { tagTint, UiButton, UiFoldName } from '../core/ui';
+import { UiSidebar, UiSidebarAction, UiSidebarItem, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList } from '../core/ui/window';
 import { LibraryStore, PageItem } from '../library/library.store';
-import { TranslationKey } from '../core/i18n/translations';
 import { TrashList } from '../library/trash-list';
 import { PageMenu } from '../library/page-menu';
 import { TagsStore } from '../library/tags.store';
 import { PAGE_DRAG, SidebarTags } from '../library/sidebar-tags';
-import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
 import { keptFolds } from '../core/utils/storage';
-import { sameDay } from '../core/utils/date';
 import { EventsStore, Occurrence } from '../schedule/events.store';
+import { DesktopSearch } from './desktop-search';
 import { Search } from './search';
 
 /**
- * Desktop: the frame of every page after sign-in (the router puts the page into it) — the sidebar
- * at the left: Search (Ctrl K / ⌘K: the search window), the app's places (Library: + a new page), the
- * library's Recents and Favorites (rows folding their pages; a page's ⋯: its menu); by the account, Trash (its
- * window at it), the account at the bottom (its letter, the name — else the email
- * — and ▾; its menu: the email, Users (the admins only), the language, Log out, Log out of all
- * devices); the open page beside it. (Phones have their own, MobileLayout: neither downloads the other's.)
+ * Desktop: the frame of every page after sign-in (the router puts the page into it), as macOS 26's —
+ * the sidebar a panel floating at the left: the app's places (Library, Schedule: + a new one under
+ * the pointer), Favorites (folding their pages; a page's ⋯: its menu), Tags, Trash at the bottom (its
+ * window as the search's); the open page beside it — the search (Ctrl K / ⌘K) and the account at
+ * its head's right (ToolbarEnd). (Phones have their own, MobileLayout: neither downloads the other's.)
  */
 @Component({
   selector: 'app-desktop-layout',
@@ -41,17 +34,10 @@ import { Search } from './search';
     RouterOutlet,
     Search,
     TranslatePipe,
-    UiAvatar,
     UiFoldName,
-    UiKbd,
     UiButton,
-    UiMenu,
-    UiMenuItem,
-    UiMenuLabel,
-    UiMenuSeparator,
     UiSidebar,
     UiSidebarAction,
-    UiSidebarButton,
     UiSidebarItem,
     UiSidebarScroll,
     TrashList,
@@ -68,8 +54,6 @@ import { Search } from './search';
 })
 export class DesktopLayout {
   protected readonly auth = inject(AuthStore);
-  protected readonly i18n = inject(I18nService);
-  protected readonly updates = inject(UpdateService);
   protected readonly router = inject(Router);
   // (the sections this user can read)
   protected readonly places = computed(() => visiblePlaces((area) => this.auth.can(area)));
@@ -113,15 +97,9 @@ export class DesktopLayout {
     this.store.createAndOpen();
   }
 
-  // The account's menu: open at its button
-  protected readonly menuAt = signal<HTMLElement | null>(null);
-  // The account button: the user's name, else the email
-  protected readonly userName = computed(() => this.auth.name() ?? this.auth.email() ?? '');
-
-  // The search window: open from the sidebar's Search, or Ctrl K (⌘K on a Mac) from anywhere
-  protected readonly searchOpen = signal(false);
+  // The search window: open from a head's 🔍, or Ctrl K (⌘K on a Mac) from anywhere
+  protected readonly search = inject(DesktopSearch);
   private readonly mac = /mac/i.test(navigator.platform);
-  protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl+K';
 
   constructor() {
     if (this.library()) {
@@ -131,7 +109,7 @@ export class DesktopLayout {
     const onKey = (e: KeyboardEvent) => {
       if (e.key.toLowerCase() === 'k' && (this.mac ? e.metaKey : e.ctrlKey)) {
         e.preventDefault();
-        this.searchOpen.set(!this.searchOpen());
+        this.search.open.set(!this.search.open());
       }
     };
     document.addEventListener('keydown', onKey);
