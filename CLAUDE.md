@@ -44,7 +44,7 @@
   on purpose says so in the code. Desktops follow Notion / Claude instead.
 
 ## Sizes on phones
-The account sheet's language list sets the size for everything on phones:
+The account sheet's lists set the size for everything on phones:
 - list rows 48px tall (`h-row`), in cards (`ui-list`, 24px corners: `rounded-card`);
 - 17px text (`text-body`), 16px side padding (`px-row-x`);
 - 28px icons (`size-icon-menu`), ✓ / › 20px;
