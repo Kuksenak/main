@@ -35,6 +35,8 @@
   --color-on-accent: var(--on-accent);
   --color-sheet: var(--sheet);
   --color-sheet-card: var(--sheet-card);
+  --color-grouped: var(--grouped);
+  --color-card: var(--card);
   --color-sheet-border: var(--sheet-border);
   --color-field: var(--field);
   --color-toast: var(--toast);

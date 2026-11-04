@@ -37,6 +37,9 @@
   --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.55), inset 0 0 0 0.5px rgb(255 255 255 / 0.2), 0 2px 12px rgb(0 0 0 / 0.12);
   --sheet: rgb(255 255 255 / 0.55);
   --sheet-card: rgb(255 255 255 / 0.75);
+  /* a screen of cards (as iOS's grouped lists: Settings, an event): a light gray, its cards white */
+  --grouped: #f2f2f7;
+  --card: #ffffff;
   --sheet-border: rgb(255 255 255 / 0.7);
   /* the bar over the keyboard (the filter's), as iOS's own just under it: glass, a hairline rim */
   /* a field's fill on the page (the search's, as iOS's): gray, see-through */
@@ -117,6 +120,8 @@ html.dark {
   --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.35), inset 0 0 0 0.5px rgb(255 255 255 / 0.12), 0 2px 12px rgb(0 0 0 / 0.35);
   --sheet: rgb(28 28 30 / 0.78);
   --sheet-card: rgb(255 255 255 / 0.07);
+  --grouped: #000000;
+  --card: #1c1c1e;
   --sheet-border: rgb(255 255 255 / 0.14);
   --field: rgb(118 118 128 / 0.24);
   --toast: rgb(58 58 60 / 0.96);

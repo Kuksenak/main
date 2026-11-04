@@ -1,7 +1,7 @@
 <!-- Over the whole screen, the page's color; unseen and not taken till open (it fades in, nothing
      moving: a slide as the keyboard comes made it jump) -->
 <div
-  class="pointer-events-none fixed inset-0 z-50 bg-app text-fg opacity-0 transition-opacity duration-200 data-open:pointer-events-auto data-open:opacity-100"
+  class="pointer-events-none fixed inset-0 z-50 bg-grouped text-fg opacity-0 [&_ui-list]:bg-card transition-opacity duration-200 data-open:pointer-events-auto data-open:opacity-100"
   [attr.data-open]="open() ? '' : null"
   [attr.aria-hidden]="open() ? null : 'true'"
 >

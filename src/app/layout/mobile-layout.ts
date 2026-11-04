@@ -31,6 +31,7 @@ export class MobileLayout {
   protected readonly title = this.page.text;
   protected readonly back = this.page.back;
   protected readonly menu = this.page.menu;
+  protected readonly add = this.page.add;
   protected readonly area = inject(VisibleArea);
   protected readonly searchBar = viewChild.required(SearchBar);
   // (the scroll bar from under the top bar: as far down as the page's room for it)

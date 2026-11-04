@@ -65,7 +65,7 @@
   </section>
 </div>
 
-<!-- Phones: Today floating at the bottom left, + (a new event on the picked day) at the bottom right -->
+<!-- Phones: Today floating at the bottom left (+, a new event: in the top bar) -->
 <button
   type="button"
   uiFloatingButton
@@ -73,16 +73,6 @@
   class="fixed bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] left-4 z-20 desktop:hidden"
 >
   {{ 'schedule.today' | t }}
-</button>
-<button
-  type="button"
-  uiFloatingButton
-  round
-  (click)="create()"
-  [attr.aria-label]="'schedule.newEvent' | t"
-  class="fixed right-4 bottom-[max(0.75rem,calc(env(safe-area-inset-bottom)-0.25rem))] z-20 desktop:hidden"
->
-  <app-icon name="plus" class="size-8" />
 </button>
 
 <!-- (an event's times, as iOS's: its start over its end — paler) -->

@@ -42,7 +42,8 @@
     }
     <!-- (not inside a page opened from a list: there, only ‹ and its title) -->
     @if (!back()) {
-      <!-- (as iOS 27's: the search and the account on one glass capsule) -->
+      <!-- (as iOS 27's: the search, the page's + (a new event, …) and the account on one glass capsule;
+           the account's letter plain, as the bar's symbols — no circle of its own) -->
       <div uiFloatingGroup>
         <button
           type="button"
@@ -54,6 +55,11 @@
         >
           <app-icon name="search" class="size-7" />
         </button>
+        @if (add(); as a) {
+          <button type="button" uiFloatingButton round bare (click)="a.run()" [attr.aria-label]="a.label | t">
+            <app-icon name="plus" class="size-8" />
+          </button>
+        }
         <button
           type="button"
           uiFloatingButton
@@ -63,7 +69,7 @@
           class="relative"
           [attr.aria-label]="'account.title' | t"
         >
-          <span class="grid size-9 place-items-center rounded-full bg-accent text-[1.125rem] font-medium text-on-accent uppercase">{{ initial() }}</span>
+          <span class="text-[1.25rem] font-semibold uppercase">{{ initial() }}</span>
           <!-- (a new version ready: a green dot on it) -->
           @if (updates.ready()) {
             <span
