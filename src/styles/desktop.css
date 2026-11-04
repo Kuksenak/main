@@ -73,18 +73,29 @@ html.dark[data-device='desktop'] {
   --highlight: rgb(255 255 255 / 0.1);
 }
 
-/* The window as macOS 26's: the page white, the sidebar a panel of its own floating in it — a light
-   gray, round corners, a hairline and a soft shadow (dark: a step over the page). */
+/* The window as macOS 26's, in the phones' colors (iOS's): the page white, the sidebar a panel of its
+   own floating in it — the phones' grouped gray, round corners, a hairline and a soft shadow; the
+   text black, the secondary gray, the hairlines solid (dark: the page black, the panel iOS's dark
+   gray). */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
-  --side-bg: #f3f3f5;
+  --side-bg: #f2f2f6;
+  --side-text: #1c1c1e;
+  --text: #000000;
+  --text-secondary: #8a8a8d;
+  --separator: #e7e7e7;
   --side-hover: rgb(0 0 0 / 0.045);
   --side-on: rgb(0 0 0 / 0.075);
   --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 4px 20px rgb(0 0 0 / 0.05);
 }
 html.dark[data-device='desktop'] {
-  --app-bg: #1b1b1d;
-  --side-bg: #262628;
+  --app-bg: #000000;
+  --side-bg: #1c1c1e;
+  --side-text: #e5e5ea;
+  --dialog-bg: #1c1c1e;
+  --text: #f5f5f5;
+  --text-secondary: #8d8d93;
+  --separator: rgb(255 255 255 / 0.12);
   --side-hover: rgb(255 255 255 / 0.06);
   --side-on: rgb(255 255 255 / 0.1);
   --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.08), 0 4px 20px rgb(0 0 0 / 0.3);
