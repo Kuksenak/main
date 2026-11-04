@@ -1,6 +1,6 @@
 <!-- (an installed app with its title bar hidden: the room at the top, the window's buttons in it — the
      window dragged by it; else 0 tall) -->
 <div class="absolute inset-x-0 top-0 h-[env(titlebar-area-height,0px)] [-webkit-app-region:drag] [app-region:drag]"></div>
-<nav class="flex min-h-0 flex-1 flex-col gap-px overflow-y-auto px-3 py-2"><ng-content /></nav>
+<nav class="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-2"><ng-content /></nav>
 <!-- (a foot: only with something in it — the account moved to the heads, ToolbarEnd) -->
 <div class="flex shrink-0 items-center border-t-[0.5px] border-separator px-3 py-1.5 empty:hidden"><ng-content select="[sidebarFoot]" /></div>

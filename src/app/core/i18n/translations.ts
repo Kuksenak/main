@@ -91,7 +91,7 @@ const en = {
   'tags.search': 'Find a tag…',
   'trash.restoreKey': 'restore',
   'tags.deleteAskN': 'Delete this tag? It comes off {n} pages too.',
-  'trash.title': 'Trash',
+  'trash.title': 'Recycle bin',
   'trash.search': 'Search the trash…',
   'trash.empty': 'Trash is empty',
   'trash.note': 'Items here can be restored',
