@@ -38,6 +38,11 @@
 - Device differences use the `mobile:` / `desktop:` variants (from `<html data-device>`, set in
   `index.html`) or the per-device size tokens, never width breakpoints.
 
+## Phones follow Apple's HIG
+- The phone UI follows iOS's Human Interface Guidelines (Liquid Glass): docs/hig.md — glass, buttons,
+  bars, lists, sheets, questions, text, color. Read it before changing a phone screen; a rule broken
+  on purpose says so in the code. Desktops follow Notion / Claude instead.
+
 ## Sizes on phones
 The account sheet's language list sets the size for everything on phones:
 - list rows 48px tall (`h-row`), in cards (`ui-list`, 24px corners: `rounded-card`);
