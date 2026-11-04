@@ -1,10 +1,10 @@
-<!-- The window as macOS 26's: a soft wash, the sidebar's rows right on it at the left, the page a white
-     card beside it (8 in from the window's edges); with the title bar hidden (an installed app), a Mac's window buttons inside
+<!-- The window as macOS 26's: white, the sidebar a gray panel floating at its left (8 in from its
+     edges), the page flat beside it; with the title bar hidden (an installed app), a Mac's window buttons inside
      the panel's top (UiSidebar); the page's head row in the bar's place (`data-titlebar`: components.css) -->
-<div class="flex h-full text-fg">
+<div class="flex h-full bg-app text-fg">
 <div class="flex w-[calc(var(--nav-w)+0.5rem)] shrink-0 flex-col py-2 pl-2">
   <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
-    <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — a white one on the wash, a hairline,
+    <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — white on the gray panel, a hairline,
          the loupe, its word gray, the keys as quiet gray text at its right (as macOS menus show
          shortcuts: keycaps there looked busy); a click: the search window -->
     <button
@@ -152,8 +152,7 @@
     </button>
   </ui-sidebar>
 </div>
-  <!-- (the page: a white card beside the sidebar, round corners, a soft shadow) -->
-  <main class="my-2 mr-2 min-h-0 min-w-0 flex-1 overflow-y-auto rounded-[1.125rem] bg-app shadow-page">
+  <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
     <router-outlet />
   </main>
 </div>

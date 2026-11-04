@@ -74,55 +74,45 @@ html.dark[data-device='desktop'] {
   --highlight: rgb(255 255 255 / 0.1);
 }
 
-/* The window as macOS 26's (option 2): a soft wash behind everything; the sidebar no panel of its own —
-   its rows right on the wash (capsules, the current one a white pill); the page a white card with round
-   corners and a soft shadow beside it (its heads the page's white); the menus and windows glass. The
-   wash runs top to bottom, so its top is one color — the installed app's title bar painted in it
-   (index.html: --title-bar). (Dark: a deep wash, the page a dark gray card.) */
+/* The window as macOS 26's Finder / Notes (option 3): the window and the page white and flat; the sidebar
+   a solid light gray panel floating at the left (round corners, a hairline, a soft shadow — no glass:
+   white glass on white was lost), its rows capsules — gray under the pointer, the current one a white
+   pill with a hairline and a shadow; menus and windows white with a clear edge. The installed app's
+   title bar the page's white (index.html: --title-bar). (Dark: the page a dark gray, the panel lighter.) */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
-  --app-wash: linear-gradient(180deg, #e3e7ee, #e8e6ea 55%, #ebe8e2);
-  --title-bar: #e3e7ee;
-  --side-bg: transparent;
-  --page-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.1), 0 4px 18px rgb(0 0 0 / 0.07);
+  --title-bar: #ffffff;
+  --side-bg: #f0f0f3;
+  --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.1), 0 6px 20px rgb(0 0 0 / 0.07);
   --side-text: #1c1c1e;
   --text: #000000;
   --text-secondary: #6e6e73;
   --separator: rgb(0 0 0 / 0.12);
-  /* (under the pointer: a gray — white on white glass was lost; the current row: a white pill with
-     a hairline and a shadow) */
   --side-hover: rgb(0 0 0 / 0.05);
-  --side-on: rgb(255 255 255 / 0.85);
-  --side-shadow: none;
+  --side-on: #ffffff;
   --round-side-row: 9999px;
-  --menu-bg: rgb(255 255 255 / 0.86);
-  --menu-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.9), 0 0 0 0.5px rgb(0 0 0 / 0.14), 0 12px 32px rgb(0 0 0 / 0.16);
+  --menu-bg: #ffffff;
+  --menu-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.16), 0 12px 32px rgb(0 0 0 / 0.16);
   /* (the heads' buttons: capsules, white, a hairline, a soft shadow) */
   --bar-button: #ffffff;
   --bar-button-hover: #f5f5f7;
   --bar-button-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.12), 0 1px 3px rgb(0 0 0 / 0.07);
 }
 html.dark[data-device='desktop'] {
-  --app-bg: #1c1c1e;
-  --app-wash: linear-gradient(180deg, #121419, #141317 60%, #161512);
-  --title-bar: #121419;
-  --side-bg: transparent;
-  --page-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.08), 0 4px 18px rgb(0 0 0 / 0.4);
+  --app-bg: #1e1e1e;
+  --title-bar: #1e1e1e;
+  --side-bg: #2a2a2c;
+  --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.1), 0 6px 20px rgb(0 0 0 / 0.4);
   --side-text: #e5e5ea;
-  --dialog-bg: #1c1c1e;
+  --dialog-bg: #2a2a2c;
   --text: #f5f5f5;
-  --text-secondary: #8d8d93;
+  --text-secondary: #98989f;
   --separator: rgb(255 255 255 / 0.14);
-  --side-hover: rgb(255 255 255 / 0.07);
-  --side-on: rgb(255 255 255 / 0.14);
-  --side-shadow: none;
-  --menu-bg: rgb(44 44 48 / 0.72);
-  --menu-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.16), 0 12px 32px rgb(0 0 0 / 0.5);
+  --side-hover: rgb(255 255 255 / 0.06);
+  --side-on: rgb(255 255 255 / 0.13);
+  --menu-bg: #2c2c2e;
+  --menu-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.14), 0 12px 32px rgb(0 0 0 / 0.5);
   --bar-button: #2c2c2e;
   --bar-button-hover: #3a3a3c;
   --bar-button-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.1), 0 1px 3px rgb(0 0 0 / 0.4);
-}
-/* (the wash: behind the window; plain CSS: a gradient isn't a color token) */
-html[data-device='desktop'] body {
-  background: var(--app-wash);
 }
