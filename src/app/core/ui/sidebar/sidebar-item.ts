@@ -6,7 +6,7 @@ import { UiScrollBar } from '../scroll-bar/scroll-bar';
 // (a row: its look, its icon and name — the places' and the buttons')
 const ROW =
   'group/row flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-left text-ui text-side-text outline-none ' +
-  'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:shadow-[0_1px_3px_rgb(0_0_0/0.08)] aria-[current=page]:font-[450] aria-[current=page]:text-fg ' +
+  'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:shadow-[0_0_0_0.5px_rgb(0_0_0/0.08),0_1px_3px_rgb(0_0_0/0.1)] aria-[current=page]:font-[450] aria-[current=page]:text-fg ' +
   'aria-expanded:bg-side-on';
 const TEMPLATE = `
   <app-icon [name]="icon()" colored [tint]="tint()" class="size-icon-side text-icon" />
