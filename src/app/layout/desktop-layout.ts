@@ -8,7 +8,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
 import { Icon, IconName, tagTint, UiAvatar, UiButton, UiFoldName, UiKbd } from '../core/ui';
-import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarScroll } from '../core/ui/sidebar';
+import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarRow, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList } from '../core/ui/window';
 import { LibraryStore, PageItem } from '../library/library.store';
@@ -55,6 +55,7 @@ import { Search } from './search';
     UiSidebarAction,
     UiSidebarButton,
     UiSidebarItem,
+    UiSidebarRow,
     UiSidebarScroll,
     TrashList,
     UiTip,
