@@ -27,14 +27,10 @@
   --side-hover: #f6f5f2;
   --side-on: #f0efeb;
   --side-text: #52514e;
-  /* Phones' glass, as Apple's own picture of Liquid Glass (apple.com/os, the capsule with 🗑 📁 ↩) —
-     measured, and checked rendered at 3x: see-through white, the color under it showing (blurred);
-     its edge black and white — a thin dark line outside it (darker at the sides), a bright white
-     line right inside it, brightest along the top and the bottom; a light band inside along the top */
-  --glass: rgb(255 255 255 / 0.6);
-  --glass-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7), inset 0 1px 0 rgb(255 255 255), inset 0 -1px 0 rgb(255 255 255),
-    inset 0 7px 8px -7px rgb(255 255 255 / 0.7), 0 0 0 0.67px rgb(0 0 0 / 0.18),
-    0.6px 0 0 0 rgb(0 0 0 / 0.2), -0.6px 0 0 0 rgb(0 0 0 / 0.2), 0 2px 8px rgb(0 0 0 / 0.05);
+  /* Phones' glass, kept simple (as Apple's own picture of a sheet's ✕, measured): a light gray fill
+     (#f6), a hairline round it barely there, a soft faint shadow */
+  --glass: rgb(246 246 247 / 0.92);
+  --glass-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 1px 6px rgb(0 0 0 / 0.05);
   --on-accent: #ffffff;
   --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.55), inset 0 0 0 0.5px rgb(255 255 255 / 0.2), 0 2px 12px rgb(0 0 0 / 0.12);
   --sheet: rgb(255 255 255 / 0.55);
@@ -117,12 +113,9 @@ html.dark {
   --side-text: #c7c7cc;
   /* (as the accent button's: a light rim along the top and round the edge — on black, a plain
      shadow showed nothing and the buttons looked flat) */
-  /* (dark, measured off Files' ⋯ and checked rendered at 3x: nearly black — a step over the page
-     (29); a bright edge along the top and the bottom fading inward within a point, none at the sides —
-     no wide glows: those made it a ball) */
-  --glass: rgb(30 30 32 / 0.95);
-  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), inset 0 -1px 0 rgb(255 255 255 / 0.3),
-    inset 0 2px 2px -1px rgb(255 255 255 / 0.12), inset 0 -2px 2px -1px rgb(255 255 255 / 0.12);
+  /* (dark, as simple: a gray a step over the page, a faint light hairline) */
+  --glass: rgb(38 38 40 / 0.92);
+  --glass-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.1), 0 1px 6px rgb(0 0 0 / 0.3);
   --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.35), inset 0 0 0 0.5px rgb(255 255 255 / 0.12), 0 2px 12px rgb(0 0 0 / 0.35);
   --sheet: rgb(28 28 30 / 0.78);
   --sheet-card: rgb(255 255 255 / 0.07);
