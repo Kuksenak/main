@@ -57,10 +57,11 @@
       if (!mobile) {
         var meta = document.createElement('meta');
         meta.name = 'theme-color';
-        meta.content = started ? '#000000' : '#ffffff';
+        meta.content = started ? '#1c2331' : '#e8eef8';
         document.head.appendChild(meta);
         window.addEventListener('load', function () {
-          meta.content = getComputedStyle(root).getPropertyValue('--app-bg').trim() || meta.content;
+          var style = getComputedStyle(root);
+          meta.content = (style.getPropertyValue('--title-bar') || style.getPropertyValue('--app-bg')).trim() || meta.content;
         });
       }
 

@@ -77,10 +77,12 @@ html.dark[data-device='desktop'] {
 /* The window as macOS 26's Liquid Glass (option B; dark: F): a soft pastel wash behind everything (the
    heads painted with the same wash, fixed — seamless, and opaque over what scrolls under them), the
    sidebar a panel of frosted glass floating on it, its rows capsules (the current one a white pill), the
-   menus glass too; the text black, the secondary gray (dark: a deep tinted wash, smoky glass). */
+   menus glass too; the wash runs top to bottom, so its top is one color — the installed app's title
+   bar painted in it (index.html: --title-bar); the text black, the secondary gray (dark: a deep tinted wash, smoky glass). */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
-  --app-wash: linear-gradient(135deg, #e4ecf8, #f5ecf1 55%, #f7f2e6);
+  --app-wash: linear-gradient(180deg, #e8eef8, #f4edf2 55%, #f7f2e8);
+  --title-bar: #e8eef8;
   --side-bg: rgb(255 255 255 / 0.55);
   --side-text: #1c1c1e;
   --text: #000000;
@@ -99,7 +101,8 @@ html[data-device='desktop'] {
 }
 html.dark[data-device='desktop'] {
   --app-bg: #000000;
-  --app-wash: linear-gradient(135deg, #1b2433, #251b2a 60%, #2a2418);
+  --app-wash: linear-gradient(180deg, #1c2331, #241c29 60%, #29231a);
+  --title-bar: #1c2331;
   --side-bg: rgb(40 40 44 / 0.55);
   --side-text: #e5e5ea;
   --dialog-bg: #1c1c1e;
