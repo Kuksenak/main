@@ -40,3 +40,9 @@
   --font-cal-day: 1.25rem;
   --font-cal-weekday: 0.8125rem;
 }
+
+/* Phones' page, as iOS's Calendar: white (the light theme's — the dark one stays black). (More
+   specific than base.css's :root: the app's styles load after this file.) */
+html[data-device='mobile']:not(.dark) {
+  --app-bg: #ffffff;
+}
