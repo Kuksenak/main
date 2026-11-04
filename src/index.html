@@ -57,7 +57,7 @@
       if (!mobile) {
         var meta = document.createElement('meta');
         meta.name = 'theme-color';
-        meta.content = started ? '#191919' : '#fbfbf9';
+        meta.content = started ? '#1b1b1d' : '#ffffff';
         document.head.appendChild(meta);
         window.addEventListener('load', function () {
           meta.content = getComputedStyle(root).getPropertyValue('--app-bg').trim() || meta.content;

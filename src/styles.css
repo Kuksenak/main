@@ -87,6 +87,7 @@
   --shadow-popover: var(--popover-shadow);
   --shadow-toast: var(--toast-shadow);
   --shadow-glass: var(--glass-shadow);
+  --shadow-side: var(--side-shadow);
   --shadow-accent: var(--accent-shadow);
   --shadow-sheet: var(--sheet-shadow);
 }

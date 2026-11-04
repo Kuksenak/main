@@ -84,36 +84,13 @@ export class DesktopLayout {
   // (and the row its keys picked)
   protected readonly trashIndex = signal<number | null>(0);
 
-  // The sidebar's lists: Recents (the last changed), Favorites (when there are any)
-  protected readonly lists = computed(() => {
-    const items = this.store.items() ?? [];
-    const lists: { id: List; label: TranslationKey; icon: IconName; pages: PageItem[] }[] = [];
-    if (this.library()) lists.push({ id: 'recents', label: 'library.recents', icon: 'clock', pages: items.slice(0, RECENTS) });
-    if (this.favorites().length) lists.push({ id: 'favorites', label: 'library.favorites', icon: 'bookmark', pages: this.favorites() });
-    return lists;
-  });
   // (folded away — kept on this device)
   protected readonly folds = keptFolds<List>(FOLDED);
-  // (the library — or one of its pages — open: Library's row gray)
-  private readonly url = toSignal(this.router.events.pipe(filter((e) => e instanceof NavigationEnd), map(() => this.router.url)), {
-    initialValue: this.router.url,
-  });
-  protected readonly onLibrary = computed(() => /^\/library(\/|\?|$)/.test(this.url()));
-  protected readonly onSchedule = computed(() => /^\/schedule(\/|\?|$)/.test(this.url()));
-
-  // Schedule's next events (the 5 soonest), under it; one clicked (none: a new one) — opened in the schedule
-  protected readonly events = inject(EventsStore);
-  protected readonly upcoming = computed(() => this.events.upcoming().slice(0, 5));
+  // Schedule's +: a new event, opened in the schedule
+  private readonly events = inject(EventsStore);
   protected openEvent(event: Occurrence | null): void {
     this.events.ask.set({ event });
-    if (!this.onSchedule()) this.router.navigateByUrl('/schedule');
-  }
-
-  // "Today 15:00", "Thu 09:30"
-  protected when(event: Occurrence): string {
-    const at = new Date(event.startsAt);
-    const day = sameDay(at, new Date()) ? this.i18n.t('schedule.today') : this.i18n.date(at, { weekday: 'short' });
-    return `${day} ${this.i18n.time(at)}`;
+    if (!/^\/schedule(\/|\?|$)/.test(this.router.url)) this.router.navigateByUrl('/schedule');
   }
 
   // A page's icon: in its first tag's pastel
@@ -147,7 +124,6 @@ export class DesktopLayout {
   protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl+K';
 
   constructor() {
-    this.events.show(new Date());
     if (this.library()) {
       this.store.load();
       this.tags.load();
@@ -163,8 +139,6 @@ export class DesktopLayout {
   }
 }
 
-type List = 'favorites' | 'recents' | 'events';
-// (how many of the last changed pages Recents shows)
-const RECENTS = 5;
+type List = 'favorites';
 // (the lists folded away: kept on this device — storage may be off, then it just isn't kept)
 const FOLDED = 'sidebar.folded';

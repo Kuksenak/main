@@ -1,26 +1,29 @@
 @if (desktop) {
-  <!-- Desktops, as Notion's: at the top, staying as the pages scroll under it — the section's name (a
-       48-tall row: level with the sidebar's Search), under it the views as pills (an icon, its name;
-       the one shown: a gray pill); New page at the name's right (filled black — the strong buttons' color); then the pages -->
+  <!-- Desktops, as macOS 26's: at the top, staying as the pages scroll under it — the section's name big
+       and bold (a 48-tall row), under it the views as segments (an icon, its name; the one shown: a
+       raised white segment); New page at the name's right (filled black — the strong buttons' color); then the pages -->
   <div class="sticky top-0 z-20 flex flex-col bg-app px-8 pb-1">
     <div data-titlebar class="flex h-12 items-center">
-      <h1 class="flex-1 px-2 text-lg font-semibold">{{ 'nav.library' | t }}</h1>
+      <h1 class="flex-1 px-2 text-[1.375rem] font-bold tracking-tight">{{ 'nav.library' | t }}</h1>
       @if (!picked().size) {
         <ng-container [ngTemplateOutlet]="newPage" />
       }
     </div>
     <div class="flex items-center gap-1">
-      @for (v of views; track v.id) {
-        <button
-          type="button"
-          (click)="view.set(v.id); unpick()"
-          [attr.aria-pressed]="view() === v.id"
-          class="flex h-8 items-center gap-1.5 rounded-full px-3 text-ui text-fg-secondary hover:bg-tint aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
-        >
-          <app-icon [name]="v.icon" colored class="size-5.5 text-icon" />
-          {{ v.label | t }}
-        </button>
-      }
+      <!-- (the views as macOS's segments: one gray track, the one shown a raised white segment) -->
+      <span class="flex rounded-[0.5625rem] bg-tint p-0.5">
+        @for (v of views; track v.id) {
+          <button
+            type="button"
+            (click)="view.set(v.id); unpick()"
+            [attr.aria-pressed]="view() === v.id"
+            class="flex h-7 items-center gap-1.5 rounded-[0.4375rem] px-3 text-ui text-fg-secondary hover:text-fg aria-pressed:bg-app aria-pressed:font-medium aria-pressed:text-fg aria-pressed:shadow-[0_1px_3px_rgb(0_0_0/0.1)]"
+          >
+            <app-icon [name]="v.icon" colored class="size-5 text-icon" />
+            {{ v.label | t }}
+          </button>
+        }
+      </span>
       <!-- (a tag: only its pages — # and All tags; a tag picked: the button the tag's own whole (its
            pastel, # and its name), as a page's; as wide as what's on it, at most as All tags (a longer
            name ends in …, the whole of it in the hint — only then); ▾ — its menu: All, No tag, the tags) -->

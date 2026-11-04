@@ -72,3 +72,20 @@ html.dark[data-device='desktop'] {
   --sheet-card: rgb(255 255 255 / 0.06);
   --highlight: rgb(255 255 255 / 0.1);
 }
+
+/* The window as macOS 26's: the page white, the sidebar a panel of its own floating in it — a light
+   gray, round corners, a hairline and a soft shadow (dark: a step over the page). */
+html[data-device='desktop'] {
+  --app-bg: #ffffff;
+  --side-bg: #f3f3f5;
+  --side-hover: rgb(0 0 0 / 0.045);
+  --side-on: rgb(0 0 0 / 0.075);
+  --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 4px 20px rgb(0 0 0 / 0.05);
+}
+html.dark[data-device='desktop'] {
+  --app-bg: #1b1b1d;
+  --side-bg: #262628;
+  --side-hover: rgb(255 255 255 / 0.06);
+  --side-on: rgb(255 255 255 / 0.1);
+  --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.08), 0 4px 20px rgb(0 0 0 / 0.3);
+}

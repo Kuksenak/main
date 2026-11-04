@@ -1,108 +1,40 @@
-<!-- An installed app with its title bar hidden (Chrome / Edge's Window Controls Overlay — Windows:
-     the window's buttons at the right, Mac's at the left): over the sidebar a strip as tall as the bar
-     was (the window dragged by it; Mac's buttons on it); the page up to the window's top, its head
-     row in the bar's place (`data-titlebar`: components.css); else the strip 0 tall -->
+<!-- The window as macOS 26's: the sidebar a panel floating at its left (8 in from its edges), the
+     page white beside it. An installed app with its title bar hidden (Window Controls Overlay — a
+     Mac's buttons at the left, Windows' at the right): over the sidebar room as tall as the bar was,
+     the window dragged by it; the page's head row in the bar's place (`data-titlebar`: components.css) -->
 <div class="flex h-full bg-app text-fg">
-<div class="flex w-nav shrink-0 flex-col">
-  <div class="h-[env(titlebar-area-height,0px)] shrink-0 border-r-[0.5px] border-separator bg-side [-webkit-app-region:drag] [app-region:drag]"></div>
-  <ui-sidebar class="h-auto! min-h-0 flex-1">
-    <!-- Search (Ctrl+K / ⌘K too), over the sections, as Notion's (measured): a field-like box 32 tall,
-         as wide as the rows (12 in from the sidebar's sides), a faint hairline, no fill (a gray one under the pointer), its words
-         gray, the keys on a chip -->
-    <button
-      type="button"
-      (click)="searchOpen.set(true)"
-      class="mb-1.5 flex h-8 shrink-0 items-center gap-2 rounded-lg border-[0.8px] border-fg/7 pr-1.5 pl-2 text-left text-ui
-             text-fg-secondary outline-none hover:bg-side-hover focus-visible:bg-side-hover"
-    >
-      <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
-      <ui-kbd>{{ shortcut }}</ui-kbd>
+<div class="flex w-[calc(var(--nav-w)+0.5rem)] shrink-0 flex-col py-2 pl-2">
+  <div class="h-[env(titlebar-area-height,0px)] shrink-0 [-webkit-app-region:drag] [app-region:drag]"></div>
+  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
+    <!-- Search (Ctrl+K / ⌘K too): a row as the sections', the keys on a chip at its right -->
+    <button uiSidebarItem icon="search" (click)="searchOpen.set(true)">
+      {{ 'search.title' | t }}
+      <ui-kbd itemEnd>{{ shortcut }}</ui-kbd>
     </button>
+    <!-- The sections: a row each (as macOS's: just them — their pages and events on their own pages); +
+         under the pointer: a new page / event -->
     @for (place of places(); track place.path) {
-      @if (place.path === '/library') {
-        <!-- (Library, as a section's row: a click folds its last pages away / back — ⌄ right after its name
-             under the pointer, › folded; at its right under the pointer ↗ (the whole library) and + (a
-             new page); gray while the library's open) -->
-        <a
-          uiSidebarItem
-          [icon]="place.icon"
-          role="button"
-          tabindex="0"
-          (click)="folds.toggle('recents')"
-          (keydown.enter)="folds.toggle('recents')"
-          [attr.data-open]="folds.has('recents') ? null : ''"
-          [class.bg-side-on]="onLibrary()"
-          [class.text-fg]="onLibrary()"
-          class="group/fold cursor-pointer"
-        >
-          <ui-fold-name>{{ place.label | t }}</ui-fold-name>
-          <span itemEnd class="flex items-center gap-0.5">
-            <button uiSidebarAction icon="arrow-up-right" (click)="router.navigateByUrl('/library')" [uiTip]="'library.open' | t" [attr.aria-label]="'library.open' | t"></button>
-            <button uiSidebarAction icon="plus" (click)="createPage()" [uiTip]="'library.new' | t" [attr.aria-label]="'library.new' | t"></button>
-          </span>
-        </a>
-      } @else if (place.path === '/schedule') {
-        <!-- (Schedule, as Library: a click folds its next events away / back; ↗ the whole schedule, + a new
-             event; gray while the schedule's open) -->
-        <a
-          uiSidebarItem
-          [icon]="place.icon"
-          role="button"
-          tabindex="0"
-          (click)="folds.toggle('events')"
-          (keydown.enter)="folds.toggle('events')"
-          [attr.data-open]="folds.has('events') ? null : ''"
-          [class.bg-side-on]="onSchedule()"
-          [class.text-fg]="onSchedule()"
-          class="group/fold cursor-pointer"
-        >
-          <ui-fold-name>{{ place.label | t }}</ui-fold-name>
-          <span itemEnd class="flex items-center gap-0.5">
-            <button uiSidebarAction icon="arrow-up-right" (click)="router.navigateByUrl('/schedule')" [uiTip]="'schedule.open' | t" [attr.aria-label]="'schedule.open' | t"></button>
-            <button uiSidebarAction icon="plus" (click)="openEvent(null)" [uiTip]="'schedule.newEvent' | t" [attr.aria-label]="'schedule.newEvent' | t"></button>
-          </span>
-        </a>
-        <!-- (under it: the next 5 events — no icon (the text where it would be), when, the title; a click opens it in the schedule; more: View all) -->
-        @if (!folds.has('events')) {
-          @for (event of upcoming(); track event.id + event.startsAt) {
-            <button uiSidebarItem icon="calendar" (click)="openEvent(event)" class="pl-3.5! [&>app-icon]:hidden">
-              <span class="text-fg-secondary tabular-nums">{{ when(event) }}</span> {{ event.title }}
-            </button>
-          }
-          @if (events.upcoming().length > upcoming().length) {
-            <button uiSidebarItem icon="dots" (click)="router.navigateByUrl('/schedule')" class="pl-3.5! text-fg-secondary! [&>app-icon]:scale-75 [&>app-icon]:opacity-40">{{ 'sidebar.viewAll' | t }}</button>
-          }
+      <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path">
+        {{ place.label | t }}
+        @if (place.path === '/library') {
+          <button itemEnd uiSidebarAction icon="plus" (click)="$event.preventDefault(); $event.stopPropagation(); createPage()" [uiTip]="'library.new' | t" [attr.aria-label]="'library.new' | t"></button>
+        } @else if (place.path === '/schedule') {
+          <button itemEnd uiSidebarAction icon="plus" (click)="$event.preventDefault(); $event.stopPropagation(); openEvent(null)" [uiTip]="'schedule.newEvent' | t" [attr.aria-label]="'schedule.newEvent' | t"></button>
         }
-      } @else {
-        <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
-      }
-      <!-- (under Library: its 5 last changed pages; more than those: View all — the library — the last row) -->
-      @if (place.path === '/library' && !folds.has('recents')) {
-        @for (list of lists(); track list.id) {
-          @if (list.id === 'recents') {
-            @for (page of list.pages; track page.id) {
-              <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
-            }
-            @if ((store.items()?.length ?? 0) > list.pages.length) {
-              <!-- (a row as the pages': ⋯ for its icon (smaller, paler), gray words; a click — the library) -->
-              <button uiSidebarItem icon="dots" (click)="router.navigateByUrl('/library')" class="pl-3.5! text-fg-secondary! [&>app-icon]:scale-75 [&>app-icon]:opacity-40">{{ 'sidebar.viewAll' | t }}</button>
-            }
-          }
-        }
-      }
+      </a>
     }
     <!-- Favorites: their row stays, their pages scroll on their own (as tall as they are, at most what's
          left), fading out at the bottom; scrolled — a hairline over them, their top fading too -->
-    @for (list of lists(); track list.id) {
-      @if (list.id === 'favorites') {
-        <ng-container [ngTemplateOutlet]="listHead" [ngTemplateOutletContext]="{ $implicit: list }" />
-        @if (!folds.has('favorites')) {
-          <div uiSidebarScroll>
-            @for (page of list.pages; track page.id) {
-              <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
-            }
-          </div>
-        }
+    @if (favorites().length) {
+      <button uiSidebarItem icon="bookmark" (click)="folds.toggle('favorites')" [attr.data-open]="folds.has('favorites') ? null : ''" class="group/fold mt-3 shrink-0">
+        <ui-fold-name>{{ 'library.favorites' | t }}</ui-fold-name>
+      </button>
+      @if (!folds.has('favorites')) {
+        <div uiSidebarScroll>
+          @for (page of favorites(); track page.id) {
+            <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
+          }
+        </div>
       }
     }
     <!-- Tags: the same — their row stays, their rows scroll on their own -->
@@ -110,12 +42,10 @@
       <app-sidebar-tags />
     }
     <span class="flex-1"></span>
-    <!-- (a list's head: open — data-open, not aria-expanded: that one's look is a row whose window is open) -->
-    <ng-template #listHead let-list>
-      <button uiSidebarItem [icon]="list.icon" (click)="folds.toggle(list.id)" [attr.data-open]="folds.has(list.id) ? null : ''" class="group/fold shrink-0">
-        <ui-fold-name>{{ list.label | t }}</ui-fold-name>
-      </button>
-    </ng-template>
+    <!-- Trash: the last row (its window as the search's) -->
+    @if (library()) {
+      <button uiSidebarItem icon="trash" (click)="trashOpen.set(!trashOpen())" [attr.aria-expanded]="trashOpen()" class="shrink-0">{{ 'trash.title' | t }}</button>
+    }
     <!-- (a page's row: its icon, its name, ⋯ under the pointer; dragged onto a tag: tagged so) -->
     <ng-template #pageRow let-page>
       <a uiSidebarItem icon="page" [tint]="tint(page)" [routerLink]="['/library', page.id]" draggable="true" (dragstart)="drag($event, page)" class="pl-3.5!">
@@ -146,21 +76,6 @@
       <ui-avatar [name]="userName()" [dot]="updates.ready()" />
       {{ userName() }}
     </button>
-    <!-- Trash: by the account, at the right — its window as the search's -->
-    @if (library()) {
-      <ng-container ngProjectAs="[sidebarFoot]">
-      <span class="flex-1"></span>
-      <button
-        uiButton
-        type="button"
-        icon="trash"
-        (click)="trashOpen.set(!trashOpen())"
-        [attr.aria-expanded]="trashOpen()"
-        [uiTip]="'trash.title' | t"
-        [attr.aria-label]="'trash.title' | t"
-      ></button>
-      </ng-container>
-    }
   </ui-sidebar>
 </div>
   <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
