@@ -130,10 +130,10 @@
   }
 }
 
-/* Phones' glass, as iOS 26's: see-through, a strong blur, the colors under it brighter, its shadow —
+/* Phones' glass, as iOS 27's: see-through, a light blur (iOS 27's: 6), the colors under it brighter, its rim —
    the floating buttons, the top bar's choice, the search's field, a question's panel. */
 @utility glass {
-  @apply bg-glass shadow-glass backdrop-blur-[16px] backdrop-brightness-110 backdrop-saturate-[180%];
+  @apply bg-glass shadow-glass backdrop-blur-[6px] backdrop-saturate-[180%];
 }
 
 /* base (colors, the page, scrollbars, press feedback) → components (the few shared pieces) */
