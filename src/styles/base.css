@@ -27,20 +27,14 @@
   --side-hover: #f6f5f2;
   --side-on: #f0efeb;
   --side-text: #52514e;
-  /* Phones' glass, as iOS 26/27's — measured off native buttons (Files' ⋯, the Claude app's ≡),
-     side by side with ours, pixel by pixel: the fill a little lighter than the page; a thin rim,
-     dark round its sides (#a1–#c9), gray at the top and the bottom (#d9–#e3); a white band right
-     inside it along the top and the bottom only; a faint shadow under it */
-  /* (the fill nearly solid: the rim's gradient is drawn under it, through the border — a see-through
-     fill let its gray in and the button came out darker than the page) */
-  --glass: rgb(249 249 250 / 0.96);
-  --glass-shadow: inset 0 3px 3px -1px rgb(255 255 255), inset 0 -3px 3px -1px rgb(255 255 255),
-    0 1px 4px rgb(0 0 0 / 0.03);
-  /* (the sides darkest at their middle, lighter going up, lightest going down — the same left and
-     right; checked rendered at 3x against iOS Files' ⋯: sides 183 / 161 / 192 (iOS 181 / 161 / 194),
-     top 223 (217–227), bottom 215 (214–224), fill 249 (245–248)) */
-  --glass-rim: linear-gradient(180deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0) 42% 52%, rgb(255 255 255 / 0.38)),
-    linear-gradient(90deg, rgb(0 0 0 / 0.35), rgb(0 0 0 / 0.15) 15%, rgb(0 0 0 / 0.15) 85%, rgb(0 0 0 / 0.35));
+  /* Phones' glass, as Apple's own picture of Liquid Glass (apple.com/os, the capsule with 🗑 📁 ↩) —
+     measured, and checked rendered at 3x: see-through white, the color under it showing (blurred);
+     its edge black and white — a thin dark line outside it (darker at the sides), a bright white
+     line right inside it, brightest along the top and the bottom; a light band inside along the top */
+  --glass: rgb(255 255 255 / 0.6);
+  --glass-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.7), inset 0 1px 0 rgb(255 255 255), inset 0 -1px 0 rgb(255 255 255),
+    inset 0 7px 8px -7px rgb(255 255 255 / 0.7), 0 0 0 0.67px rgb(0 0 0 / 0.18),
+    0.6px 0 0 0 rgb(0 0 0 / 0.2), -0.6px 0 0 0 rgb(0 0 0 / 0.2), 0 2px 8px rgb(0 0 0 / 0.05);
   --on-accent: #ffffff;
   --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.55), inset 0 0 0 0.5px rgb(255 255 255 / 0.2), 0 2px 12px rgb(0 0 0 / 0.12);
   --sheet: rgb(255 255 255 / 0.55);
@@ -124,12 +118,11 @@ html.dark {
   /* (as the accent button's: a light rim along the top and round the edge — on black, a plain
      shadow showed nothing and the buttons looked flat) */
   /* (dark, measured off Files' ⋯ and checked rendered at 3x: nearly black — a step over the page
-     (29); a bright edge along the top and the bottom (96 / 90) fading inward within a point, none at
-     the sides — no wide glows: those made it a ball) */
+     (29); a bright edge along the top and the bottom fading inward within a point, none at the sides —
+     no wide glows: those made it a ball) */
   --glass: rgb(30 30 32 / 0.95);
-  --glass-shadow: inset 0 1px 1px rgb(255 255 255 / 0.13), inset 0 -1px 1px rgb(255 255 255 / 0.13),
-    inset 0 6px 6px -5px rgb(255 255 255 / 0.05), inset 0 -6px 6px -5px rgb(255 255 255 / 0.05);
-  --glass-rim: linear-gradient(180deg, rgb(255 255 255 / 0.36), rgb(255 255 255 / 0) 22%, rgb(255 255 255 / 0) 78%, rgb(255 255 255 / 0.36));
+  --glass-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), inset 0 -1px 0 rgb(255 255 255 / 0.3),
+    inset 0 2px 2px -1px rgb(255 255 255 / 0.12), inset 0 -2px 2px -1px rgb(255 255 255 / 0.12);
   --accent-shadow: inset 0 1px 0.5px rgb(255 255 255 / 0.35), inset 0 0 0 0.5px rgb(255 255 255 / 0.12), 0 2px 12px rgb(0 0 0 / 0.35);
   --sheet: rgb(28 28 30 / 0.78);
   --sheet-card: rgb(255 255 255 / 0.07);

@@ -132,16 +132,11 @@
   }
 }
 
-/* Phones' glass, as iOS 27's: see-through, a light blur (iOS 27's: 6), the colors under it brighter;
-   its rim a 1px border of light — white along the top, darker down its sides (--glass-rim: drawn
-   under the fill, through its border) — the floating buttons, the top bar's choice, the search's
-   field, a question's panel. (Plain CSS: a gradient border.) */
+/* Phones' glass, as iOS 27's: see-through, a light blur, the colors under it brighter; its edge (a
+   dark line outside, a bright one inside) in --glass-shadow — the floating buttons, the top bar's
+   choice, the search's field, a question's panel, a menu. */
 @utility glass {
-  border: 0.67px solid transparent; /* (two pixels of a phone's three: as thin as iOS's) */
-  background: linear-gradient(var(--glass), var(--glass)) padding-box, var(--glass-rim) border-box;
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: blur(6px) saturate(180%);
-  -webkit-backdrop-filter: blur(6px) saturate(180%);
+  @apply bg-glass shadow-glass backdrop-blur-[8px] backdrop-saturate-[180%];
 }
 
 /* base (colors, the page, scrollbars, press feedback) → components (the few shared pieces) */
