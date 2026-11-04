@@ -32,6 +32,7 @@
   --color-side-on: var(--side-on);
   --color-side-text: var(--side-text);
   --color-glass: var(--glass);
+  --color-menu: var(--menu-bg);
   --color-on-accent: var(--on-accent);
   --color-sheet: var(--sheet);
   --color-sheet-card: var(--sheet-card);
@@ -88,6 +89,7 @@
   --shadow-toast: var(--toast-shadow);
   --shadow-glass: var(--glass-shadow);
   --shadow-side: var(--side-shadow);
+  --shadow-menu: var(--menu-shadow);
   --shadow-accent: var(--accent-shadow);
   --shadow-sheet: var(--sheet-shadow);
 }

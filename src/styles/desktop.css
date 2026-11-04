@@ -34,7 +34,7 @@
   --menu-w: 15rem;
   --menu-row-h: 1.75rem;
   --menu-row-px: 0.6875rem;
-  --menu-label-px: 0.5rem;
+  --menu-label-px: 0.625rem;
   --icon-menu: 1.25rem;
   --round-menu: 0.625rem;
   /* Round buttons as tall as the others; list rows 44 */
@@ -74,20 +74,24 @@ html.dark[data-device='desktop'] {
   --highlight: rgb(255 255 255 / 0.1);
 }
 
-/* The window as macOS 26's, in the phones' colors (iOS's): the page white, the sidebar a panel of its
-   own floating in it — the phones' grouped gray, round corners, a hairline and a soft shadow; the
-   text black, the secondary gray, the hairlines solid (dark: the page black, the panel iOS's dark
-   gray). */
+/* The window as macOS 26's Liquid Glass (option B; dark: F): a soft pastel wash behind everything (the
+   heads painted with the same wash, fixed — seamless, and opaque over what scrolls under them), the
+   sidebar a panel of frosted glass floating on it, its rows capsules (the current one a white pill), the
+   menus glass too; the text black, the secondary gray (dark: a deep tinted wash, smoky glass). */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
-  --side-bg: #f2f2f6;
+  --app-wash: linear-gradient(135deg, #e4ecf8, #f5ecf1 55%, #f7f2e6);
+  --side-bg: rgb(255 255 255 / 0.55);
   --side-text: #1c1c1e;
   --text: #000000;
   --text-secondary: #8a8a8d;
-  --separator: #e7e7e7;
-  --side-hover: rgb(0 0 0 / 0.045);
-  --side-on: rgb(0 0 0 / 0.075);
-  --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 4px 20px rgb(0 0 0 / 0.05);
+  --separator: rgb(0 0 0 / 0.1);
+  --side-hover: rgb(255 255 255 / 0.5);
+  --side-on: rgb(255 255 255 / 0.9);
+  --side-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.9), 0 0 0 0.5px rgb(0 0 0 / 0.06), 0 8px 30px rgb(0 0 0 / 0.08);
+  --round-side-row: 9999px;
+  --menu-bg: rgb(255 255 255 / 0.62);
+  --menu-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.9), 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 12px 32px rgb(0 0 0 / 0.14);
   /* (the heads' buttons: capsules, white, a hairline, a soft shadow) */
   --bar-button: #ffffff;
   --bar-button-hover: #f5f5f7;
@@ -95,16 +99,25 @@ html[data-device='desktop'] {
 }
 html.dark[data-device='desktop'] {
   --app-bg: #000000;
-  --side-bg: #1c1c1e;
+  --app-wash: linear-gradient(135deg, #1b2433, #251b2a 60%, #2a2418);
+  --side-bg: rgb(40 40 44 / 0.55);
   --side-text: #e5e5ea;
   --dialog-bg: #1c1c1e;
   --text: #f5f5f5;
   --text-secondary: #8d8d93;
-  --separator: rgb(255 255 255 / 0.12);
-  --side-hover: rgb(255 255 255 / 0.06);
-  --side-on: rgb(255 255 255 / 0.1);
-  --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.08), 0 4px 20px rgb(0 0 0 / 0.3);
+  --separator: rgb(255 255 255 / 0.14);
+  --side-hover: rgb(255 255 255 / 0.07);
+  --side-on: rgb(255 255 255 / 0.14);
+  --side-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.14), 0 8px 30px rgb(0 0 0 / 0.4);
+  --menu-bg: rgb(44 44 48 / 0.72);
+  --menu-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.16), 0 12px 32px rgb(0 0 0 / 0.5);
   --bar-button: #2c2c2e;
   --bar-button-hover: #3a3a3c;
   --bar-button-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.1), 0 1px 3px rgb(0 0 0 / 0.4);
+}
+/* (the wash: behind the window and on the heads, fixed to the window so they meet without a seam; plain
+   CSS: a gradient isn't a color token) */
+html[data-device='desktop'] body,
+html[data-device='desktop'] [data-toolbar] {
+  background: var(--app-wash) fixed;
 }
