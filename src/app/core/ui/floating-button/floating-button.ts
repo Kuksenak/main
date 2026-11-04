@@ -3,7 +3,8 @@ import { booleanAttribute, Component, input } from '@angular/core';
 /**
  * Phones: a button floating over the page, as iOS 26's — frosted glass with a white rim and a
  * soft wide shadow (`accent`: solid, in the accent color); it grows under the finger (a fifth bigger) (its
- * action when let go). `round`: a circle (an icon, a letter); else a capsule with its label (e.g. Today).
+ * action when let go). `round`: a circle (an icon, a letter); else a capsule with its label (e.g. Today);
+ * `bare`: on a group's capsule (`uiFloatingGroup`).
  */
 @Component({
   selector: 'button[uiFloatingButton], a[uiFloatingButton]',
@@ -14,7 +15,7 @@ import { booleanAttribute, Component, input } from '@angular/core';
       'backdrop-blur-[20px] backdrop-saturate-[180%]',
     '[class.w-round]': 'round()',
     '[class.px-capsule-x]': '!round()',
-    '[class.glass]': '!accent()',
+    '[class.glass]': '!accent() && !bare()',
     '[class.text-fg]': '!accent()',
     '[class.bg-accent]': 'accent()',
     '[class.text-on-accent]': 'accent()',
@@ -25,4 +26,18 @@ import { booleanAttribute, Component, input } from '@angular/core';
 export class UiFloatingButton {
   readonly accent = input(false, { transform: booleanAttribute });
   readonly round = input(false, { transform: booleanAttribute });
+  /** In a group (`uiFloatingGroup`): no glass, no shadow of its own — the group's. */
+  readonly bare = input(false, { transform: booleanAttribute });
 }
+
+/**
+ * Phones: floating buttons side by side on one glass capsule (as iOS 27's: [🔍 | +]) — its buttons
+ * `uiFloatingButton round bare`.
+ *   <div uiFloatingGroup><button uiFloatingButton round bare>…</button>…</div>
+ */
+@Component({
+  selector: 'div[uiFloatingGroup]',
+  host: { class: 'inline-flex h-round shrink-0 items-center rounded-full glass *:h-full' },
+  template: `<ng-content />`,
+})
+export class UiFloatingGroup {}

@@ -7,7 +7,7 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Slide } from '../core/services/slide';
 import { UpdateService } from '../core/services/update.service';
 import { VisibleArea } from '../core/services/visible-area';
-import { Icon, UiFloatingButton, UiOption, UiScrollBar, UiSelect } from '../core/ui';
+import { Icon, UiFloatingButton, UiFloatingGroup, UiOption, UiScrollBar, UiSelect } from '../core/ui';
 import { AccountSheet } from './account-sheet';
 import { PageTitle } from './page-title';
 import { visiblePlaces } from './places';
@@ -20,7 +20,7 @@ import { SearchBar } from './search-bar';
  */
 @Component({
   selector: 'app-mobile-layout',
-  imports: [AccountSheet, Icon, RouterLink, RouterOutlet, SearchBar, TranslatePipe, UiFloatingButton, UiScrollBar, UiSelect],
+  imports: [AccountSheet, Icon, RouterLink, RouterOutlet, SearchBar, TranslatePipe, UiFloatingButton, UiFloatingGroup, UiScrollBar, UiSelect],
   templateUrl: './mobile-layout.html',
 })
 export class MobileLayout {
