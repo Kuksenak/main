@@ -3,7 +3,8 @@ import { booleanAttribute, Component, DestroyRef, inject, input, output } from '
 /**
  * A desktop window, as Notion's search (measured: 600 wide, nothing dims): near the top of the
  * screen, round corners, a hairline edge; what's in it is the page's. Esc or a click outside
- * closes it (`closed`); `tall`: as tall as it may be (a chat), else as its content. The search
+ * closes it (`closed`); always as tall as it may be (76% of the screen: it doesn't jump as results
+ * come and go), glass as the menus (Liquid Glass). (`tall`: kept, no longer needed.) The search
  * window and the page assistant's are this. Render it with @if.
  *   @if (open()) { <ui-window (closed)="open.set(false)">…</ui-window> }
  */
@@ -15,10 +16,9 @@ import { booleanAttribute, Component, DestroyRef, inject, input, output } from '
       <div
         role="dialog"
         aria-modal="true"
-        class="flex max-h-[76vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-[1.25rem] border-[0.5px] border-separator
-               bg-dialog text-fg shadow-popover data-tall:h-[76vh]"
-        [attr.data-tall]="tall() ? '' : null"
-        (mousedown)="$event.stopPropagation()"
+        class="flex h-[76vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-[1.375rem] bg-menu text-fg shadow-menu
+               backdrop-blur-2xl backdrop-saturate-[180%]"
+                (mousedown)="$event.stopPropagation()"
       >
         <ng-content />
       </div>

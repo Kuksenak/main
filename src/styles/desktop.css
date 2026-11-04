@@ -81,8 +81,8 @@ html.dark[data-device='desktop'] {
    bar painted in it (index.html: --title-bar); the text black, the secondary gray (dark: a deep tinted wash, smoky glass). */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
-  --app-wash: linear-gradient(180deg, #e8eef8, #f4edf2 55%, #f7f2e8);
-  --title-bar: #e8eef8;
+  --app-wash: linear-gradient(180deg, #eef1f6, #f3f1f3 55%, #f5f3ef);
+  --title-bar: #eef1f6;
   --side-bg: rgb(255 255 255 / 0.55);
   --side-text: #1c1c1e;
   --text: #000000;
@@ -101,8 +101,8 @@ html[data-device='desktop'] {
 }
 html.dark[data-device='desktop'] {
   --app-bg: #000000;
-  --app-wash: linear-gradient(180deg, #1c2331, #241c29 60%, #29231a);
-  --title-bar: #1c2331;
+  --app-wash: linear-gradient(180deg, #1d2027, #211f24 60%, #23211e);
+  --title-bar: #1d2027;
   --side-bg: rgb(40 40 44 / 0.55);
   --side-text: #e5e5ea;
   --dialog-bg: #1c1c1e;
