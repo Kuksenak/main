@@ -1,16 +1,16 @@
-<!-- The window as macOS 26's: the sidebar a panel floating at its left (8 in from its edges), the
-     page white beside it; with the title bar hidden (an installed app), a Mac's window buttons inside
+<!-- The window as macOS 26's: a soft wash, the sidebar's rows right on it at the left, the page a white
+     card beside it (8 in from the window's edges); with the title bar hidden (an installed app), a Mac's window buttons inside
      the panel's top (UiSidebar); the page's head row in the bar's place (`data-titlebar`: components.css) -->
 <div class="flex h-full text-fg">
 <div class="flex w-[calc(var(--nav-w)+0.5rem)] shrink-0 flex-col py-2 pl-2">
   <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
-    <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — a faint gray (a hovered row's),
+    <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — a white one on the wash, a hairline,
          the loupe, its word gray, the keys as quiet gray text at its right (as macOS menus show
          shortcuts: keycaps there looked busy); a click: the search window -->
     <button
       type="button"
       (click)="search.open.set(true)"
-      class="mb-2 flex h-8 shrink-0 items-center gap-2 rounded-full bg-side-hover pr-3 pl-2.5 text-left text-ui text-fg-secondary outline-none hover:bg-side-on focus-visible:bg-side-on"
+      class="mb-2 flex h-8 shrink-0 items-center gap-2 rounded-full bg-side-on pr-3 pl-2.5 text-left text-ui text-fg-secondary shadow-[0_0_0_0.5px_rgb(0_0_0/0.08)] outline-none hover:bg-app focus-visible:bg-app"
     >
       <app-icon name="search" class="size-4.5 shrink-0 text-icon" />
       <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
@@ -152,7 +152,8 @@
     </button>
   </ui-sidebar>
 </div>
-  <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
+  <!-- (the page: a white card beside the sidebar, round corners, a soft shadow) -->
+  <main class="my-2 mr-2 min-h-0 min-w-0 flex-1 overflow-y-auto rounded-[1.125rem] bg-app shadow-page">
     <router-outlet />
   </main>
 </div>

@@ -90,6 +90,7 @@
   --shadow-glass: var(--glass-shadow);
   --shadow-side: var(--side-shadow);
   --shadow-menu: var(--menu-shadow);
+  --shadow-page: var(--page-shadow);
   --shadow-accent: var(--accent-shadow);
   --shadow-sheet: var(--sheet-shadow);
 }
