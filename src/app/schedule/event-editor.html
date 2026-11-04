@@ -37,22 +37,21 @@
 <ng-template #untilTpl><ui-date [(value)]="until" /></ng-template>
 
 @if (desktop) {
-  <!-- Desktops: a panel at the right, the window's whole height, the page's color, a line at its left
-       (the schedule in sight): its head — the title (a field), Delete; the rows under it (not
-       scrolled: what opens in them doesn't jump); Enter / a click out of it saves, Esc closes
-       (changed: asks first) — the keys at the bottom -->
-  <aside
+  <!-- Desktops: a window as the search's (near the top, round, a hairline, nothing dims): its head —
+       📅 and the title (a field); the rows under it (not scrolled: what opens in them doesn't jump);
+       Enter / a click out of it saves, Esc closes (changed: asks first) — the keys at the bottom -->
+  <div class="fixed inset-0 z-50 flex items-start justify-center pt-[8vh]">
+  <div
     role="dialog"
+    aria-modal="true"
     (document:keydown.escape)="escape()"
     (document:keydown.enter)="enter($event)"
     (document:mousedown)="outside($event, panel)"
     #panel
-    class="fixed inset-y-0 right-0 z-40 flex w-[25rem] max-w-[90vw] animate-panel-in flex-col border-l-[0.5px] border-separator bg-app text-fg"
+    class="flex max-h-[84vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-[1.25rem] border-[0.5px] border-separator bg-dialog text-fg shadow-popover"
   >
-    <!-- (an installed app with its title bar hidden: the panel up to the window's top, its line too —
-         the bar's height of it to drag the window by, the window's buttons over it; else 0 tall) -->
-    <div class="h-[env(titlebar-area-height,0px)] shrink-0 [-webkit-app-region:drag] [app-region:drag]"></div>
-    <div #head data-toolbar class="flex h-14 shrink-0 items-center gap-1.5 pr-3 pl-5">
+    <div #head data-toolbar class="flex h-12 shrink-0 items-center gap-3 pr-3 pl-4.5">
+      <app-icon name="calendar" colored class="size-5 shrink-0 text-icon" />
       <input
         #titleField
         type="text"
@@ -62,10 +61,10 @@
         (keydown.enter)="commit()"
         maxlength="200"
         [placeholder]="'schedule.titlePlaceholder' | t"
-        class="min-w-0 flex-1 bg-transparent text-lg font-semibold text-fg outline-none placeholder:text-fg-secondary"
+        class="min-w-0 flex-1 bg-transparent text-base font-semibold text-fg outline-none placeholder:text-fg-secondary"
       />
     </div>
-    <div class="flex min-h-0 flex-1 flex-col gap-0.5 px-5 py-2">
+    <div class="flex min-h-0 flex-1 flex-col gap-0.5 border-t-[0.5px] border-separator px-5 py-2">
       <ng-container [ngTemplateOutlet]="when" [ngTemplateOutletContext]="{ row: deskRow, ends: endsTpl }" />
       <ng-container [ngTemplateOutlet]="repeats" [ngTemplateOutletContext]="{ row: deskRow }" />
       <!-- (a repeat saved / deleted: which of them — a menu at the head / the trash) -->
@@ -122,18 +121,17 @@
         }
       }
     </div>
-    @if (current()) {
-      <!-- (Delete: at the bottom, over the keys) -->
-      <div class="shrink-0 px-4 pb-2">
-        <button uiButton type="button" icon="trash" (click)="remove($event)" class="hover:text-danger">{{ 'schedule.delete' | t }}</button>
-      </div>
-    }
-    <!-- (the keys, as the windows': Esc closes, Enter saves) -->
-    <div class="flex h-11 shrink-0 items-center gap-5 border-t-[0.5px] border-separator px-5 text-footnote text-fg-secondary">
+    <!-- (the foot, as the windows': the keys — Esc closes, Enter saves; Delete at the right, in red) -->
+    <div class="flex h-11 shrink-0 items-center gap-5 border-t-[0.5px] border-separator pr-3 pl-5 text-footnote text-fg-secondary">
       <span class="flex items-center gap-1.5"><ui-kbd>Esc</ui-kbd>{{ 'search.close' | t }}</span>
       <span class="flex items-center gap-1.5" [class.opacity-40]="!canSave()"><ui-kbd><app-icon name="enter" class="my-0.5 size-3.5" /></ui-kbd>{{ 'schedule.saveKey' | t }}</span>
+      <span class="flex-1"></span>
+      @if (current()) {
+        <button uiButton type="button" icon="trash" (click)="remove($event)"><span class="text-danger">{{ 'schedule.delete' | t }}</span></button>
+      }
     </div>
-  </aside>
+  </div>
+  </div>
 } @else {
   <!-- Phones (as the old app's): a page of its own over the schedule, sliding in from the right (and
        back out) — its top bar over it, the page passing under it (as iOS's Calendar): ✕ (changed:
