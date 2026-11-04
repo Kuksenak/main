@@ -10,9 +10,9 @@
     <button
       type="button"
       (click)="search.open.set(true)"
-      class="mb-2 flex h-7 shrink-0 items-center gap-1.5 rounded-full bg-side-hover pr-2.5 pl-2 text-left text-ui text-fg-secondary outline-none hover:bg-side-on focus-visible:bg-side-on"
+      class="mb-2 flex h-8 shrink-0 items-center gap-2 rounded-full bg-side-hover pr-3 pl-2.5 text-left text-ui text-fg-secondary outline-none hover:bg-side-on focus-visible:bg-side-on"
     >
-      <app-icon name="search" class="size-4 shrink-0 text-icon" />
+      <app-icon name="search" class="size-4.5 shrink-0 text-icon" />
       <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
       <span class="shrink-0 text-caption tracking-wide text-fg-secondary/70">{{ shortcut }}</span>
     </button>
@@ -144,10 +144,10 @@
       aria-haspopup="menu"
       [attr.aria-expanded]="!!menuAt()"
       [attr.aria-label]="'account.title' | t"
-      class="h-9! w-full gap-2!"
+      class="h-10! w-full gap-2.5!"
     >
       <!-- (a new version ready: a green dot on it) -->
-      <ui-avatar [name]="userName()" [dot]="updates.ready()" class="size-6! rounded-full! text-[0.6875rem]!" />
+      <ui-avatar [name]="userName()" [dot]="updates.ready()" class="size-7! rounded-full! text-[0.8125rem]!" />
       <span class="min-w-0 flex-1 truncate text-fg">{{ userName() }}</span>
     </button>
   </ui-sidebar>
