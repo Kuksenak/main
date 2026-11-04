@@ -137,7 +137,7 @@
    under the fill, through its border) — the floating buttons, the top bar's choice, the search's
    field, a question's panel. (Plain CSS: a gradient border.) */
 @utility glass {
-  border: 1px solid transparent;
+  border: 0.67px solid transparent; /* (two pixels of a phone's three: as thin as iOS's) */
   background: linear-gradient(var(--glass), var(--glass)) padding-box, var(--glass-rim) border-box;
   box-shadow: var(--glass-shadow);
   backdrop-filter: blur(6px) saturate(180%);
