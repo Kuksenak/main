@@ -7,7 +7,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, IconName, tagTint, UiAvatar, UiButton, UiFoldName, UiKbd } from '../core/ui';
+import { Icon, IconName, tagTint, UiAvatar, UiButton, UiFoldName } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarRow, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList } from '../core/ui/window';
@@ -45,7 +45,6 @@ import { Search } from './search';
     TranslatePipe,
     UiAvatar,
     UiFoldName,
-    UiKbd,
     UiButton,
     UiMenu,
     UiMenuItem,
@@ -147,8 +146,8 @@ export class DesktopLayout {
   // The search window: open from a head's 🔍 (ToolbarEnd), or Ctrl K (⌘K on a Mac) from anywhere
   protected readonly search = inject(DesktopSearch);
   private readonly mac = /mac/i.test(navigator.platform);
-  // (its keys, a keycap each)
-  protected readonly shortcut = this.mac ? ['⌘', 'K'] : ['Ctrl', 'K'];
+  // (its keys, shown in the field)
+  protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl K';
 
   constructor() {
     this.events.show(new Date());
