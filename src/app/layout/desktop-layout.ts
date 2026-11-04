@@ -147,7 +147,8 @@ export class DesktopLayout {
   // The search window: open from a head's 🔍 (ToolbarEnd), or Ctrl K (⌘K on a Mac) from anywhere
   protected readonly search = inject(DesktopSearch);
   private readonly mac = /mac/i.test(navigator.platform);
-  protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl+K';
+  // (its keys, a keycap each)
+  protected readonly shortcut = this.mac ? ['⌘', 'K'] : ['Ctrl', 'K'];
 
   constructor() {
     this.events.show(new Date());

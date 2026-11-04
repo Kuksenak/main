@@ -13,7 +13,11 @@
     >
       <app-icon name="search" class="size-4.5 shrink-0 text-icon" />
       <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
-      <ui-kbd>{{ shortcut }}</ui-kbd>
+      <span class="flex gap-0.5">
+        @for (key of shortcut; track $index) {
+          <ui-kbd>{{ key }}</ui-kbd>
+        }
+      </span>
     </button>
     @for (place of places(); track place.path) {
       @if (place.path === '/library') {
