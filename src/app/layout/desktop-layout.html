@@ -133,7 +133,7 @@
         ></button>
       </a>
     </ng-template>
-    <!-- The account: a row as the sections' under the hairline at the bottom, a little bigger — its
+    <!-- The account: a row as the sections' under the hairline at the bottom, as tall as they are — its
          letter in a circle, the name (else the email); its menu at it -->
     <button
       #account
@@ -144,10 +144,10 @@
       aria-haspopup="menu"
       [attr.aria-expanded]="!!menuAt()"
       [attr.aria-label]="'account.title' | t"
-      class="h-10! w-full gap-2.5!"
+      class="w-full gap-2!"
     >
       <!-- (a new version ready: a green dot on it) -->
-      <ui-avatar [name]="userName()" [dot]="updates.ready()" class="size-7! rounded-full! text-[0.8125rem]!" />
+      <ui-avatar [name]="userName()" [dot]="updates.ready()" class="size-5.5! rounded-full! text-[0.625rem]!" />
       <span class="min-w-0 flex-1 truncate text-fg">{{ userName() }}</span>
     </button>
   </ui-sidebar>
