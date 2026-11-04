@@ -41,8 +41,15 @@
   --font-cal-weekday: 0.8125rem;
 }
 
-/* Phones' page, as iOS's Calendar: white (the light theme's — the dark one stays black). (More
-   specific than base.css's :root: the app's styles load after this file.) */
+/* Phones' colors (the light theme's — the dark one stays as base.css's), measured off iOS's Settings:
+   the page its grouped gray, the cards white, the text black, the secondary gray, the hairlines a
+   solid light gray. (More specific than base.css's :root: the app's styles load after this file.) */
 html[data-device='mobile']:not(.dark) {
-  --app-bg: #ffffff;
+  --app-bg: #f2f2f6;
+  --grouped: #f2f2f6;
+  --card: #ffffff;
+  --sheet-card: #ffffff;
+  --text: #000000;
+  --text-secondary: #8a8a8d;
+  --separator: #e7e7e7;
 }
