@@ -21,9 +21,9 @@ import { UiTip } from '../core/ui/tip/tip';
         (click)="add.emit()"
         [uiTip]="label | t"
         [attr.aria-label]="label | t"
-        class="grid size-8 place-items-center rounded-full bg-accent text-on-accent shadow-accent hover:brightness-110"
+        class="grid size-button place-items-center rounded-full bg-accent text-on-accent shadow-accent hover:brightness-110"
       >
-        <app-icon name="plus" class="size-5" />
+        <app-icon name="plus" class="size-icon-ui" />
       </button>
     }
   `,
