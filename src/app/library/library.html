@@ -1,25 +1,19 @@
 @if (desktop) {
-  <!-- Desktops, as macOS 26's: at the top, staying as the pages scroll under it — the section's name big
-       and bold (a 48-tall row), under it the views as segments (an icon, its name; the one shown: a
-       raised white segment); at the name's right [+ | 🔍] and the account (ToolbarEnd); its buttons as
-       macOS's toolbar's (data-toolbar); then the pages -->
-  <div data-toolbar class="sticky top-0 z-20 flex flex-col bg-app px-8 pb-1">
-    <div data-titlebar class="flex h-12 items-center">
-      <h1 class="flex-1 px-2 text-[1.375rem] font-bold tracking-tight">{{ 'nav.library' | t }}</h1>
-      <!-- (as macOS's: [+ | 🔍] and the account at the right — + a new page) -->
-      <app-toolbar-end [addLabel]="picked().size ? null : 'library.new'" (add)="create()" />
-    </div>
-    <div class="flex items-center gap-1">
-      <!-- (the views as macOS's segments: one gray track, the one shown a raised white segment) -->
-      <span class="flex rounded-[0.5625rem] bg-tint p-0.5">
+  <!-- Desktops, as macOS 27's toolbar: one bar at the top (52 tall, the sidebar's top with it), staying
+       as the pages scroll under it — the section's name (bold), the views as pills (the one shown gray),
+       the tag's filter; at the right the picked ones' actions and + (ToolbarEnd); its buttons as macOS's
+       toolbar's (data-toolbar); then the pages -->
+  <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-1 bg-app px-6">
+    <h1 class="mr-2 px-2 text-body font-bold tracking-tight">{{ 'nav.library' | t }}</h1>
+      <!-- (the views as pills: gray under the pointer, the one shown gray and its name darker) -->
+      <span class="flex items-center gap-0.5">
         @for (v of views; track v.id) {
           <button
             type="button"
             (click)="view.set(v.id); unpick()"
             [attr.aria-pressed]="view() === v.id"
-            class="flex h-7 items-center gap-1.5 rounded-[0.4375rem] px-3 text-ui text-fg-secondary hover:text-fg aria-pressed:bg-app aria-pressed:font-medium aria-pressed:text-fg aria-pressed:shadow-[0_1px_3px_rgb(0_0_0/0.1)]"
+            class="flex h-7 items-center rounded-full px-3 text-ui text-fg-secondary hover:bg-tint hover:text-fg aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
           >
-            <app-icon [name]="v.icon" colored class="size-5 text-icon" />
             {{ v.label | t }}
           </button>
         }
@@ -82,7 +76,8 @@
           [attr.aria-label]="'library.unpick' | t"
         ></button>
       }
-    </div>
+      <!-- (+ a new page, at the bar's right — none while some are picked) -->
+      <app-toolbar-end [addLabel]="picked().size ? null : 'library.new'" (add)="create()" />
   </div>
 
   <div class="flex flex-col px-8 pt-4 pb-12">

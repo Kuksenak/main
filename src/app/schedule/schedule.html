@@ -1,16 +1,13 @@
-<!-- Desktops, as the library: at the top, staying as the days scroll under it — the month (a 48-tall row:
-     level with the sidebar's Search; New event at its right), under it Today; then the calendar at
+<!-- Desktops, as the library: one bar at the top (macOS 27's toolbar, 52 tall), staying as the days scroll
+     under it — the month (bold), Today, New event at its right; then the calendar at
      the left and the picked day's events at its right. Phones: the calendar edge to edge, the day's
      events under it; Today floating at the bottom left, + at the bottom right. -->
 @if (desktop) {
-  <div data-toolbar class="sticky top-0 z-20 flex flex-col gap-1 bg-app px-8 pb-1">
-    <div data-titlebar class="flex h-12 items-center">
-      <h1 class="flex-1 px-2 text-[1.375rem] font-bold tracking-tight">{{ title() }}</h1>
-      <app-toolbar-end [addLabel]="'schedule.newEvent'" (add)="create()" />
-    </div>
-    <div class="flex items-center gap-1">
-      <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
-    </div>
+  <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-6">
+    <h1 class="px-2 text-body font-bold tracking-tight">{{ title() }}</h1>
+    <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
+    <span class="flex-1"></span>
+    <app-toolbar-end [addLabel]="'schedule.newEvent'" (add)="create()" />
   </div>
 }
 <div class="flex flex-col gap-4 px-4 pt-2 pb-24 desktop:flex-row desktop:gap-10 desktop:px-8 desktop:pt-4 desktop:pb-12">

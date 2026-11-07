@@ -25,6 +25,9 @@
   /* The sidebar, as Notion's (measured): 270 wide, its rows 30 tall, 12 in from its sides; the
      icon 22 (its drawing ~15: the files keep a margin), 12 from the icon's drawing to the name */
   --nav-w: 16.875rem;
+  /* The bar across the window's top (macOS 27's toolbar): the sidebar's top and the pages' heads, 52
+     tall — an installed app's too, never lower than the system's own bar (components.css) */
+  --bar-h: 3.25rem;
   --side-row-h: 1.875rem; /* (30) */
   --side-row-px: 0.4375rem;
   --icon-side: 1.625rem;
