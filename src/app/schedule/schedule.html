@@ -1,12 +1,11 @@
 <!-- Desktops, as the library: one bar at the top (macOS 27's toolbar, 52 tall), staying as the days scroll
-     under it — the month (bold), Today, New event at its right; then the calendar at
+     under it — left to right: the month (bold), Today, + New event; then the calendar at
      the left and the picked day's events at its right. Phones: the calendar edge to edge, the day's
      events under it; Today floating at the bottom left, + at the bottom right. -->
 @if (desktop) {
   <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-6">
     <h1 class="px-2 text-body font-bold tracking-tight">{{ title() }}</h1>
     <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
-    <span class="flex-1"></span>
     <app-toolbar-end [addLabel]="'schedule.newEvent'" (add)="create()" />
   </div>
 }

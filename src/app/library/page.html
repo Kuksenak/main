@@ -1,48 +1,11 @@
-<!-- Desktops: a thin row at the very top, the window's whole width, staying as the page scrolls (as
-     Notion's): the page's name at the left (bold), typed over right there (clicked: a field as the sidebar's Search, as wide as the name, ↵ on a chip; Enter: on into the
-     text; a new page: its name selected); saving…, Publish, 🔖, ⋯ (its menu: the assistant…) at the right -->
+<!-- Desktops: a row at the very top (the bar's), staying as the page scrolls — its buttons only, left to
+     right: the tag, saving…, Publish, 🔖 and ⋯ (its menu: the assistant…); the page's name under it, a
+     big title at the top of the text (typed over right there; Enter: on into the text; a new page: its
+     name selected) -->
 @if (desktop && page(); as p) {
   <!-- (the bar's height, 52 — as the sections' heads and the sidebar's top: one bar across the window) -->
-  <div data-titlebar data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app pr-3 pl-8">
-    <div class="mr-2 flex min-w-0 flex-1 items-center">
-      <!-- (its box's left edge in line with the blocks'; plain text, grayed under the pointer as a
-           button is, till it's clicked: then the Search's look — a faint
-           hairline, the sidebar's color; as wide as what's typed: the text's copy under the field
-           sizes it) -->
-      <form
-        class="group/title flex h-8 max-w-full min-w-0 items-center gap-2 rounded-lg border-[0.8px] border-transparent pr-1.5 pl-2 text-ui
-               hover:not-focus-within:bg-side-hover focus-within:border-fg/7 focus-within:bg-side"
-        (submit)="$event.preventDefault(); titleDone()"
-      >
-        <span
-          class="inline-grid min-w-0 after:invisible after:col-start-1 after:row-start-1 after:overflow-hidden after:whitespace-pre after:font-semibold after:content-[attr(data-value)]"
-          [attr.data-value]="(title() || ('library.untitled' | t)) + ' '"
-        >
-          <input
-            #titleField
-            type="text"
-            [value]="title()"
-            (input)="typedTitle(titleField.value)"
-            (keydown.escape)="titleField.blur()"
-            [placeholder]="'library.untitled' | t"
-            [attr.aria-label]="'library.rename' | t"
-            maxlength="200"
-            autocomplete="off"
-            class="col-start-1 row-start-1 w-full min-w-0 cursor-pointer bg-transparent focus:cursor-text text-ui font-semibold text-fg outline-none placeholder:text-fg-secondary"
-          />
-        </span>
-        <button
-          type="submit"
-          tabindex="-1"
-          uiKbd
-          class="invisible h-5 group-focus-within/title:visible hover:text-fg"
-          [attr.aria-label]="'editor.done' | t"
-        >
-          <app-icon name="enter" class="size-3.5" />
-        </button>
-      </form>
-    </div>
-    <!-- Its tag, at the right by its buttons: a button as theirs — # and Tag; a tag on it: the button the
+  <div data-titlebar data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app pr-6 pl-8">
+    <!-- Its tag, the row's first: a button as the others — # and Tag; a tag on it: the button the
          tag's own whole (its pastel, its name); ▾ either way (a choice) — a click: the picker -->
     @if (tags.of(p.tagIds)[0]; as tag) {
       <button
@@ -138,6 +101,21 @@
 
   @if (page(); as p) {
     @if (desktop) {
+      <!-- Its name: a big title over the text, typed over right there; Enter — on into the text -->
+      <form (submit)="$event.preventDefault(); titleDone()">
+        <input
+          #titleField
+          type="text"
+          [value]="title()"
+          (input)="typedTitle(titleField.value)"
+          (keydown.escape)="titleField.blur()"
+          [placeholder]="'library.untitled' | t"
+          [attr.aria-label]="'library.rename' | t"
+          maxlength="200"
+          autocomplete="off"
+          class="w-full bg-transparent text-3xl font-bold tracking-tight text-fg outline-none placeholder:text-fg-secondary/50"
+        />
+      </form>
       <!-- The text: blocks, written right on the page -->
       <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
     } @else {

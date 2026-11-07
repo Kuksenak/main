@@ -50,21 +50,28 @@
       document.addEventListener('visibilitychange', reloadIfSwitched);
       window.addEventListener('pageshow', reloadIfSwitched);
 
-      // Desktops (an installed app's window): its title bar — and, with it hidden, the strip under
-      // the window's buttons — the window's frame's gray (the sidebar and the heads, --title-bar), not
-      // the system's: the window's top is all that one color, so it matches with the bar shown or
-      // hidden, a Mac's buttons at the left or Windows' at the right. Phones: none, as above. In from
-      // the start (a tag put in only at load, the window's buttons kept the system's color), then the
-      // computed one at load (styles/desktop.css).
+      // Desktops (an installed app's window): its title bar's color (theme-color), not the system's
+      // gray. With the bar hidden (Window Controls Overlay) only the strip under the window's buttons
+      // is painted: the color of what they sit over — a Mac's at the left, over the sidebar (its gray,
+      // --title-bar); Windows' (and Linux's) at the right, over the page's head (the page's, --app-bg).
+      // With the bar shown (its ⌃ / menu: the display mode switches) it's one strip across the window:
+      // the sidebar's gray, the page round under it (desktop.css). Phones: none, as above. In from the
+      // start (a tag put in only at load, the window's buttons kept the system's color), then the
+      // computed one at load and at each switch.
       if (!mobile) {
+        var mac = /Mac/.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '');
+        var overlay = window.matchMedia('(display-mode: window-controls-overlay)');
         var meta = document.createElement('meta');
         meta.name = 'theme-color';
-        meta.content = started ? '#262627' : '#f1f1f4';
+        var page = function () { return overlay.matches && !mac; };
+        meta.content = page() ? (started ? '#1e1e1e' : '#ffffff') : (started ? '#262627' : '#f1f1f4');
         document.head.appendChild(meta);
-        window.addEventListener('load', function () {
+        var paint = function () {
           var style = getComputedStyle(root);
-          meta.content = (style.getPropertyValue('--title-bar') || style.getPropertyValue('--app-bg')).trim() || meta.content;
-        });
+          meta.content = style.getPropertyValue(page() ? '--app-bg' : '--title-bar').trim() || meta.content;
+        };
+        window.addEventListener('load', paint);
+        overlay.addEventListener('change', paint);
       }
 
       // iOS Safari only applies :active styles once a touchstart listener exists.

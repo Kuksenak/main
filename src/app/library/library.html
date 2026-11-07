@@ -1,8 +1,8 @@
 @if (desktop) {
   <!-- Desktops, as macOS 27's toolbar: one bar at the top (52 tall, the sidebar's top with it), staying
-       as the pages scroll under it — the section's name (bold), the views as pills (the one shown gray),
-       the tag's filter; at the right the picked ones' actions and + (ToolbarEnd); its buttons as macOS's
-       toolbar's (data-toolbar); then the pages -->
+       as the pages scroll under it — left to right, nothing pushed to the far end: the section's name
+       (bold), the views as pills (the one shown gray), the tag's filter, + New page (ToolbarEnd), the
+       picked ones' actions; its buttons as macOS's toolbar's (data-toolbar); then the pages -->
   <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-1 bg-app px-6">
     <h1 class="mr-2 px-2 text-body font-bold tracking-tight">{{ 'nav.library' | t }}</h1>
       <!-- (the views as pills: gray under the pointer, the one shown gray and its name darker) -->
@@ -59,10 +59,11 @@
           />
         }
       }
-      <span class="flex-1"></span>
+      <!-- (+ a new page — none while some are picked) -->
+      <app-toolbar-end [addLabel]="picked().size ? null : 'library.new'" (add)="create()" />
       @if (picked().size) {
         <!-- (some picked: how many, Move to trash; ✕ unpicks) -->
-        <span class="mr-1 text-ui text-fg-secondary"
+        <span class="mx-1 text-ui text-fg-secondary"
           >{{ 'library.picked' | t }}: {{ picked().size }}</span
         >
         <button uiButton type="button" icon="trash" (click)="trashPicked()">
@@ -76,8 +77,6 @@
           [attr.aria-label]="'library.unpick' | t"
         ></button>
       }
-      <!-- (+ a new page, at the bar's right — none while some are picked) -->
-      <app-toolbar-end [addLabel]="picked().size ? null : 'library.new'" (add)="create()" />
   </div>
 
   <div class="flex flex-col px-8 pt-4 pb-12">

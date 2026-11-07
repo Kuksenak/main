@@ -28,17 +28,23 @@
 /* An installed desktop app with its title bar hidden (Chrome / Edge's Window Controls Overlay): a
    page's head row (`data-titlebar`) in the bar's place — the bar's own height (--bar-h, 52, as macOS
    27's toolbar; never lower than the system's bar), the window dragged by it (not by its buttons,
-   fields, links), clear of the window's buttons at the right (Windows; a Mac's — and the browser's ⌃
-   by them — sit in the sidebar's top, only as tall as the system's bar: its rows start right under
-   them); a page with none: its content under the system bar's
-   height. (Plain CSS: app-region and the display mode.) */
+   fields, links), clear of the window's buttons at the right (Windows'); what's on it in the window
+   buttons' row — centered in that row, 6 off the window's top as the account's row is off its bottom,
+   the rest of the 52 under it. The
+   sidebar up to the window's top too, its Search in that row: at the left (Windows: the buttons at the
+   right), or right after a Mac's buttons (and the browser's ⌃ by them: titlebar-area-x). A page with
+   no head: its content under the system bar's height. (Plain CSS: app-region and the display mode.) */
 @media (display-mode: window-controls-overlay) {
   /* (:root twice: over desktop.css's own 52, which loads after this file) */
   :root:root {
-    --bar-h: max(env(titlebar-area-height, 0px), 3.25rem);
+    /* (the row what's on the bar sits in: Search's 32 and 6 over and under it — as the account's row
+       at the sidebar's bottom sits off its edge; never lower than the system's bar) */
+    --bar-row: max(env(titlebar-area-height, 0px), 2.75rem);
+    --bar-h: max(var(--bar-row), 3.25rem);
   }
   [data-titlebar] {
-    padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem) !important;
+    padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 1rem) !important;
+    padding-bottom: calc(var(--bar-h) - var(--bar-row)) !important;
     app-region: drag;
     -webkit-app-region: drag;
   }
@@ -47,7 +53,21 @@
     -webkit-app-region: no-drag;
   }
   main:not(:has([data-titlebar])) {
-    border-top: env(titlebar-area-height, 0px) solid var(--side-bg);
+    padding-top: env(titlebar-area-height, 0px);
+  }
+  ui-sidebar {
+    padding-top: 0 !important;
+  }
+  ui-sidebar > nav {
+    position: relative;
+    padding-top: calc((var(--bar-row) - 2rem) / 2) !important;
+  }
+  ui-sidebar [data-bar-search] {
+    margin-left: max(0px, calc(env(titlebar-area-x, 0px) - 0.75rem));
+  }
+  ui-sidebar :is(button, a, input) {
+    app-region: no-drag;
+    -webkit-app-region: no-drag;
   }
 }
 
