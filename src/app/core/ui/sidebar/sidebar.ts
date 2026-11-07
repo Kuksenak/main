@@ -11,7 +11,7 @@ import { Component } from '@angular/core';
   selector: 'ui-sidebar',
   host: {
     class:
-      'relative flex h-full w-nav shrink-0 flex-col border-r-[0.5px] border-separator bg-side pt-[env(titlebar-area-height,0px)] text-fg select-none',
+      'relative flex h-full w-nav shrink-0 flex-col bg-side pt-[env(titlebar-area-height,0px)] text-fg select-none',
   },
   templateUrl: './sidebar.html',
 })

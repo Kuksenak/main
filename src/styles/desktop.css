@@ -84,8 +84,12 @@ html.dark[data-device='desktop'] {
    bar's color (index.html: --title-bar). */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
-  --side-bg: rgb(246 246 248 / 0.72);
-  --title-bar: #f9f9fa;
+  /* (the sidebar a gray of its own — no line between it and the page — solid, one color with the
+     installed app's title bar on a Mac: its window's buttons sit on it, the strip under them painted
+     in the title bar's color (index.html's theme-color; a clear sidebar's mix came out a shade off).
+     Windows' buttons sit over the page's head at the right: theirs the page's color, --app-bg) */
+  --side-bg: #f1f1f4;
+  --title-bar: #f1f1f4;
   --side-shadow: none;
   --side-text: #1c1c1e;
   --text: #000000;
@@ -105,7 +109,7 @@ html[data-device='desktop'] {
 }
 html.dark[data-device='desktop'] {
   --app-bg: #1e1e1e;
-  --side-bg: rgb(44 44 46 / 0.6);
+  --side-bg: #262627;
   --title-bar: #262627;
   --side-shadow: none;
   --side-text: #e5e5ea;
@@ -122,11 +126,10 @@ html.dark[data-device='desktop'] {
   --bar-button-hover: rgb(255 255 255 / 0.16);
   --bar-button-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.12);
 }
-/* (the pages' heads: the bar's clear glass — the page blurred under it — a hairline under; one bar with
-   the sidebar's top) */
+/* (the pages' heads: the page's own color, as clear glass — the page blurred under it; no hairline under,
+   as macOS 27's: the sidebar and the page told apart by their colors alone) */
 html[data-device='desktop'] main [data-toolbar] {
-  background-color: var(--side-bg);
-  box-shadow: inset 0 -0.5px 0 var(--separator);
+  background-color: color-mix(in srgb, var(--app-bg) 82%, transparent);
   -webkit-backdrop-filter: blur(22px) saturate(180%);
   backdrop-filter: blur(22px) saturate(180%);
 }

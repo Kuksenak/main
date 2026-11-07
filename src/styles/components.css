@@ -29,18 +29,13 @@
    page's head row (`data-titlebar`) in the bar's place — the bar's own height (--bar-h, 52, as macOS
    27's toolbar; never lower than the system's bar), the window dragged by it (not by its buttons,
    fields, links), clear of the window's buttons at the right (Windows; a Mac's — and the browser's ⌃
-   by them — sit in the sidebar's top, as tall); a page with none: its content under the system bar's
+   by them — sit in the sidebar's top, only as tall as the system's bar: its rows start right under
+   them); a page with none: its content under the system bar's
    height. (Plain CSS: app-region and the display mode.) */
 @media (display-mode: window-controls-overlay) {
   /* (:root twice: over desktop.css's own 52, which loads after this file) */
   :root:root {
     --bar-h: max(env(titlebar-area-height, 0px), 3.25rem);
-  }
-  ui-sidebar {
-    padding-top: var(--bar-h) !important;
-  }
-  ui-sidebar > [data-drag] {
-    height: var(--bar-h) !important;
   }
   [data-titlebar] {
     padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem) !important;

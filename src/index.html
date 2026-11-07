@@ -50,18 +50,21 @@
       document.addEventListener('visibilitychange', reloadIfSwitched);
       window.addEventListener('pageshow', reloadIfSwitched);
 
-      // Desktops (an installed app's window, e.g. on Windows): its title bar — and, with it hidden,
-      // the window's buttons' strip — the page's own color, not the system's gray; phones: none, as
+      // Desktops (an installed app's window): its title bar — and, with it hidden, the strip under
+      // the window's buttons — in the color of what the buttons sit over, not the system's gray: on a
+      // Mac they're at the left, over the sidebar (--title-bar, its gray); elsewhere (Windows, Linux)
+      // at the right, over the page's head (--app-bg, the page's white / dark gray). Phones: none, as
       // above. In from the start (a tag put in only at load, the window's buttons kept the system's
-      // color): the desktops' --app-bg (styles/desktop.css, base.css), then the computed one at load.
+      // color), then the computed one at load (styles/desktop.css).
       if (!mobile) {
+        var mac = /Mac/.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '');
         var meta = document.createElement('meta');
         meta.name = 'theme-color';
-        meta.content = started ? '#262627' : '#f9f9fa';
+        meta.content = mac ? (started ? '#262627' : '#f1f1f4') : (started ? '#1e1e1e' : '#ffffff');
         document.head.appendChild(meta);
         window.addEventListener('load', function () {
           var style = getComputedStyle(root);
-          meta.content = (style.getPropertyValue('--title-bar') || style.getPropertyValue('--app-bg')).trim() || meta.content;
+          meta.content = (style.getPropertyValue(mac ? '--title-bar' : '--app-bg')).trim() || meta.content;
         });
       }
 
