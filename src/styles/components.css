@@ -47,7 +47,7 @@
     -webkit-app-region: no-drag;
   }
   main:not(:has([data-titlebar])) {
-    padding-top: env(titlebar-area-height, 0px);
+    border-top: env(titlebar-area-height, 0px) solid var(--side-bg);
   }
 }
 
