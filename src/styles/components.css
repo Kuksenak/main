@@ -65,6 +65,16 @@
   ui-sidebar [data-bar-search] {
     margin-left: max(0px, calc(env(titlebar-area-x, 0px) - 0.75rem));
   }
+  /* A Mac: its Search under the window's buttons (their strip the system's gray), not in their row */
+  html[data-mac] ui-sidebar {
+    padding-top: env(titlebar-area-height, 0px) !important;
+  }
+  html[data-mac] ui-sidebar > nav {
+    padding-top: 0.5rem !important;
+  }
+  html[data-mac] ui-sidebar [data-bar-search] {
+    margin-left: 0;
+  }
   ui-sidebar :is(button, a, input) {
     app-region: no-drag;
     -webkit-app-region: no-drag;

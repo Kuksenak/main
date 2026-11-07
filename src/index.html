@@ -59,14 +59,29 @@
       // start (a tag put in only at load, the window's buttons kept the system's color), then the
       // computed one at load and at each switch.
       if (!mobile) {
-        var mac = /Mac/.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '');
+        var wco = navigator.windowControlsOverlay;
+        // (a Mac: by its name, or by the window's buttons at the left — the bar's area starting past 0)
+        var isMac = function () {
+          return /Mac/.test((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent || '') ||
+            !!(wco && wco.visible && wco.getTitlebarAreaRect().x > 0);
+        };
+        var mac = isMac();
         var overlay = window.matchMedia('(display-mode: window-controls-overlay)');
         var meta = document.createElement('meta');
         meta.name = 'theme-color';
+        var setMac = function () {
+          mac = isMac();
+          if (mac) root.dataset.mac = ''; else delete root.dataset.mac;
+        };
+        setMac();
         var page = function () { return overlay.matches && !mac; };
         meta.content = page() ? (started ? '#1e1e1e' : '#ffffff') : (started ? '#262627' : '#f1f1f4');
         document.head.appendChild(meta);
         var paint = function () {
+          setMac();
+          // (a Mac's hidden bar: the strip under its buttons is the system's own gray, no tag)
+          if (mac && overlay.matches) { meta.remove(); return; }
+          if (!meta.isConnected) document.head.appendChild(meta);
           var style = getComputedStyle(root);
           meta.content = style.getPropertyValue(page() ? '--app-bg' : '--title-bar').trim() || meta.content;
         };
