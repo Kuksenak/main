@@ -79,9 +79,6 @@
         document.head.appendChild(meta);
         var paint = function () {
           setMac();
-          // (a Mac's hidden bar: the strip under its buttons is the system's own gray, no tag)
-          if (mac && overlay.matches) { meta.remove(); return; }
-          if (!meta.isConnected) document.head.appendChild(meta);
           var style = getComputedStyle(root);
           meta.content = style.getPropertyValue(page() ? '--app-bg' : '--title-bar').trim() || meta.content;
         };

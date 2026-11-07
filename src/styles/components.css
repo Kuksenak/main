@@ -65,7 +65,7 @@
   ui-sidebar [data-bar-search] {
     margin-left: max(0px, calc(env(titlebar-area-x, 0px) - 0.75rem));
   }
-  /* A Mac: its Search under the window's buttons (their strip the system's gray), not in their row */
+  /* A Mac: its Search under the window's buttons not in their row */
   html[data-mac] ui-sidebar {
     padding-top: env(titlebar-area-height, 0px) !important;
   }
@@ -74,6 +74,13 @@
   }
   html[data-mac] ui-sidebar [data-bar-search] {
     margin-left: 0;
+  }
+  /* (and the strip across the window one gray — the sidebar's top and the pages' heads — as the theme-color
+     paints the window's buttons both sides, the left's and the ⌃ / ⋮ at the right) */
+  html[data-mac] main [data-titlebar] {
+    background-color: var(--title-bar) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
   }
   ui-sidebar :is(button, a, input) {
     app-region: no-drag;
