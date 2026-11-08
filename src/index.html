@@ -51,13 +51,12 @@
       window.addEventListener('pageshow', reloadIfSwitched);
 
       // Desktops (an installed app's window): its title bar's color (theme-color), not the system's
-      // gray. With the bar hidden (Window Controls Overlay) only the strip under the window's buttons
-      // is painted: the color of what they sit over — a Mac's at the left, over the sidebar (its gray,
-      // --title-bar); Windows' (and Linux's) at the right, over the page's head (the page's, --app-bg).
-      // With the bar shown (its ⌃ / menu: the display mode switches) it's one strip across the window:
-      // the sidebar's gray, the page round under it (desktop.css). Phones: none, as above. In from the
-      // start (a tag put in only at load, the window's buttons kept the system's color), then the
-      // computed one at load and at each switch.
+      // gray — the window's own (--title-bar): the window is one color all over, the sidebar a panel
+      // floating in it (desktop.css), so it matches with the bar shown (one strip across) or hidden
+      // (the strips under the window's buttons; a Mac's buttons over the window above the panel:
+      // html[data-mac], components.css). Phones: none, as above. In from the start (a tag put in only
+      // at load, the window's buttons kept the system's color), then the computed one at load and at
+      // each switch of the bar.
       if (!mobile) {
         var wco = navigator.windowControlsOverlay;
         // (a Mac: by its name, or by the window's buttons at the left — the bar's area starting past 0)
@@ -74,13 +73,12 @@
           if (mac) root.dataset.mac = ''; else delete root.dataset.mac;
         };
         setMac();
-        var page = function () { return overlay.matches && !mac; };
-        meta.content = page() ? (started ? '#1e1e1e' : '#ffffff') : (started ? '#262627' : '#f1f1f4');
+        meta.content = started ? '#1e1e1e' : '#ffffff';
         document.head.appendChild(meta);
         var paint = function () {
           setMac();
           var style = getComputedStyle(root);
-          meta.content = style.getPropertyValue(page() ? '--app-bg' : '--title-bar').trim() || meta.content;
+          meta.content = style.getPropertyValue('--title-bar').trim() || meta.content;
         };
         window.addEventListener('load', paint);
         overlay.addEventListener('change', paint);

@@ -77,20 +77,15 @@ html.dark[data-device='desktop'] {
   --highlight: rgb(255 255 255 / 0.1);
 }
 
-/* The window as macOS 27's, clear (option A): the sidebar to the window's edge, full height, and one bar
-   across the top (the sidebar's top and the pages' heads in one color) — both nearly clear glass: the
-   page scrolls under the heads, blurred; a hairline between the sidebar and the page, under the heads;
-   the current row a soft gray, the heads' + blue; the page white. The installed app's title bar the
-   bar's color (index.html: --title-bar). */
+/* The window as macOS 26's: one color all over — the page, its heads, the window round the sidebar —
+   and the sidebar a light gray panel floating in it (8 in from the window's edges, round, a hairline,
+   a soft shadow); no lines. The installed app's title bar the window's color (index.html:
+   theme-color), so it matches anywhere — shown or hidden, a Mac's buttons or Windows'. */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
-  /* (the sidebar a gray of its own — no line between it and the page — solid: the installed app's
-     title bar its color when shown (one strip across the window), and with it hidden the strip under
-     a Mac's window buttons, over the sidebar (index.html's theme-color; a clear sidebar's mix came out
-     a shade off). Windows' buttons, at the right over the page's head: the page's white, --app-bg) */
-  --side-bg: #f1f1f4;
-  --title-bar: #f1f1f4;
-  --side-shadow: none;
+  --title-bar: #ffffff;
+  --side-bg: #f2f2f5;
+  --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.09), 0 6px 22px rgb(0 0 0 / 0.07);
   --side-text: #1c1c1e;
   --text: #000000;
   --text-secondary: #6e6e73;
@@ -109,9 +104,9 @@ html[data-device='desktop'] {
 }
 html.dark[data-device='desktop'] {
   --app-bg: #1e1e1e;
-  --side-bg: #262627;
-  --title-bar: #262627;
-  --side-shadow: none;
+  --title-bar: #1e1e1e;
+  --side-bg: #2a2a2c;
+  --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.09), 0 6px 22px rgb(0 0 0 / 0.4);
   --side-text: #e5e5ea;
   --dialog-bg: #2a2a2c;
   --text: #f5f5f5;
@@ -126,18 +121,9 @@ html.dark[data-device='desktop'] {
   --bar-button-hover: rgb(255 255 255 / 0.16);
   --bar-button-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.12);
 }
-/* (the pages' heads: the page's own color, as clear glass — the page blurred under it; no hairline under,
-   as macOS 27's: the sidebar and the page told apart by their colors alone) */
+/* (the pages' heads: the page's own color, as clear glass — the page blurred under it; no hairline) */
 html[data-device='desktop'] main [data-toolbar] {
   background-color: color-mix(in srgb, var(--app-bg) 82%, transparent);
   -webkit-backdrop-filter: blur(22px) saturate(180%);
   backdrop-filter: blur(22px) saturate(180%);
-}
-/* (an installed app with its own title bar shown — one gray strip across the window, theme-color: the
-   page — white, its head too — its top left corner round under it, the sidebar's gray round it; no
-   more gray than that. With the bar hidden the page meets the window's top: square) */
-@media (display-mode: standalone) {
-  html[data-device='desktop'] app-desktop-layout main {
-    border-top-left-radius: 0.75rem;
-  }
 }

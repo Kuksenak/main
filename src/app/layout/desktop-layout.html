@@ -1,10 +1,11 @@
-<!-- The window as macOS 27's: the sidebar at its left edge, full height, gray; the page white beside it
-     (its head too) — under an installed app's own title bar its top left corner round, the gray round
-     it (desktop.css); with the title bar hidden (an installed app), a Mac's window buttons inside
-     the panel's top (UiSidebar); the page's head row in the bar's place (`data-titlebar`: components.css) -->
-<div class="flex h-full bg-side text-fg">
-<div class="flex w-nav shrink-0 flex-col">
-  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
+<!-- The window as macOS 26's: one color all over (the page, its heads, round the panel), the sidebar a
+     light gray panel floating at its left, 8 in from its edges — round corners, a hairline, a soft
+     shadow (desktop.css); with the title bar hidden (an installed app) a Mac's window buttons over the
+     window's color above the panel (components.css); the page's head row in the bar's place
+     (`data-titlebar`: components.css) -->
+<div class="flex h-full bg-app text-fg">
+<div data-side-wrap class="flex w-[calc(var(--nav-w)+0.5rem)] shrink-0 flex-col py-2 pl-2">
+  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1 rounded-[1.125rem] shadow-side">
     <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — as the heads' buttons (white, a hairline),
          the loupe, its word gray, the keys as quiet gray text at its right (as macOS menus show
          shortcuts: keycaps there looked busy); a click: the search window -->
@@ -152,7 +153,7 @@
     </button>
   </ui-sidebar>
 </div>
-  <main class="min-h-0 min-w-0 flex-1 overflow-y-auto bg-app">
+  <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
     <router-outlet />
   </main>
 </div>
