@@ -46,7 +46,7 @@ export class UiTip implements OnDestroy {
     if (!this.el.isConnected) return;
     const tip = document.createElement('div');
     tip.className =
-      'pointer-events-none fixed z-[3000] max-w-60 animate-menu-in rounded-button bg-toast px-2 py-1 text-center text-tip leading-snug font-medium text-toast-text shadow-toast';
+      'pointer-events-none fixed z-[3000] max-w-60 animate-menu-in rounded-button bg-toast px-2 py-1 text-center text-tip leading-snug font-normal text-toast-text shadow-toast';
     tip.setAttribute('role', 'tooltip');
     // (one color; a line break: a new line)
     text.split('\n').forEach((line) => {

@@ -1,5 +1,5 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { Location, NgTemplateOutlet } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
@@ -19,7 +19,7 @@ import { TagsStore } from '../library/tags.store';
 import { PAGE_DRAG, SidebarTags } from '../library/sidebar-tags';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
 import { visiblePlaces } from './places';
-import { keptFolds } from '../core/utils/storage';
+import { keep, kept, keptFolds } from '../core/utils/storage';
 import { sameDay } from '../core/utils/date';
 import { EventsStore, Occurrence } from '../schedule/events.store';
 import { DesktopSearch } from './desktop-search';
@@ -33,6 +33,9 @@ import { Search } from './search';
  * — and ▾; its menu: the email, Users (the admins only), the language, Log out, Log out of all
  * devices); the open page beside it. (Phones have their own, MobileLayout: neither downloads the other's.)
  */
+// (the sidebar hidden, on this device)
+const SIDEBAR_HIDDEN = 'layout.sidebarHidden';
+
 @Component({
   selector: 'app-desktop-layout',
   imports: [
@@ -140,6 +143,27 @@ export class DesktopLayout {
 
   // The account's menu: open at its button
   protected readonly menuAt = signal<HTMLElement | null>(null);
+  // The title bar's ☰ (an installed app with its own title bar): the app's menu open at its button, and
+  // which of its submenus is open (at its row)
+  protected readonly appMenuAt = signal<HTMLElement | null>(null);
+  protected readonly sub = signal<'go' | 'lang' | 'account' | null>(null);
+  protected readonly subAt = signal<HTMLElement | null>(null);
+  protected openSub(which: 'go' | 'lang' | 'account', at: HTMLElement): void {
+    this.sub.set(which);
+    this.subAt.set(at);
+  }
+  protected closeAppMenu(): void {
+    this.appMenuAt.set(null);
+    this.sub.set(null);
+  }
+
+  // The sidebar hidden (the title bar's button; kept on this device); back and forward (its ‹ ›)
+  protected readonly sidebarHidden = signal(kept(SIDEBAR_HIDDEN) === '1');
+  protected toggleSidebar(): void {
+    this.sidebarHidden.set(!this.sidebarHidden());
+    keep(SIDEBAR_HIDDEN, this.sidebarHidden() ? '1' : '');
+  }
+  protected readonly location = inject(Location);
   // The account button: the user's name, else the email
   protected readonly userName = computed(() => this.auth.name() ?? this.auth.email() ?? '');
 

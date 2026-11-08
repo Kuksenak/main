@@ -24,10 +24,18 @@ export class UiMenu {
   readonly origin = input.required<HTMLElement>();
   /** (short rows: 12rem wide at least, not the menus' 17rem) */
   readonly narrow = input(false, { transform: booleanAttribute });
+  /** A submenu (as File › in Claude's): at its row's right (else its left), its top at the row's; no
+   * backdrop of its own — its menu's rows stay under the pointer (another one opens its own) */
+  readonly side = input(false, { transform: booleanAttribute });
   readonly closed = output<void>();
 
   private readonly overlay = viewChild.required(CdkConnectedOverlay);
   private done = false;
+
+  protected readonly sidePositions: ConnectedPosition[] = [
+    { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top', offsetX: 4, offsetY: -6 },
+    { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top', offsetX: -4, offsetY: -6 },
+  ];
 
   protected readonly positions: ConnectedPosition[] = [
     { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 4 },
@@ -42,9 +50,10 @@ export class UiMenu {
     this.closed.emit();
   }
 
-  // (a row picked: the menu goes; the row's own click has run by now)
+  // (a row picked: the menu goes — not one opening a submenu; the row's own click has run by now)
   protected picked(e: MouseEvent): void {
-    if ((e.target as HTMLElement).closest(ROWS)) this.close();
+    const row = (e.target as HTMLElement).closest(ROWS);
+    if (row && !row.hasAttribute('aria-haspopup')) this.close();
   }
 
   protected key(e: KeyboardEvent): void {

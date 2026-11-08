@@ -4,7 +4,8 @@
      name selected) -->
 @if (desktop && page(); as p) {
   <!-- (the bar's height, 52 — as the sections' heads and the sidebar's top: one bar across the window) -->
-  <div data-titlebar data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app pr-6 pl-8">
+  <!-- (an installed app with its own title bar: this row up on it, at its right — components.css) -->
+  <div data-page-head data-titlebar data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app pr-6 pl-8">
     <!-- Its tag, the row's first: a button as the others — # and Tag; a tag on it: the button the
          tag's own whole (its pastel, its name); ▾ either way (a choice) — a click: the picker -->
     @if (tags.of(p.tagIds)[0]; as tag) {
@@ -46,18 +47,19 @@
     @if (p.shareToken) {
       <!-- (Published and its link: one capsule, as macOS's grouped toolbar items) -->
       <span data-group>
-        <button uiButton type="button" icon="lock" (click)="unshare($event)" [uiTip]="'library.unpublish' | t">{{ 'library.shared' | t }}</button>
+        <button uiButton type="button" icon="lock" outline (click)="unshare($event)" [uiTip]="'library.unpublish' | t" [attr.aria-label]="'library.shared' | t">{{ 'library.shared' | t }}</button>
         <button
           uiButton
           type="button"
           icon="link"
+          outline
           (click)="copyLink()"
           [uiTip]="'library.copyLinkTip' | t"
           [attr.aria-label]="'library.copyLink' | t"
         ></button>
       </span>
     } @else {
-      <button uiButton type="button" icon="lock" (click)="share(true)" [uiTip]="'library.shareNote' | t">{{ 'library.share' | t }}</button>
+      <button uiButton type="button" icon="lock" outline (click)="share(true)" [uiTip]="'library.shareNote' | t" [attr.aria-label]="'library.share' | t">{{ 'library.share' | t }}</button>
     }
     <!-- 🔖 (in the favorites — the sidebar's — or not) and ⋯: one capsule -->
     <span data-group>
@@ -76,6 +78,7 @@
       #more
       type="button"
       icon="dots"
+      outline
       (click)="menuOpen.set(!menuOpen())"
       [attr.aria-expanded]="menuOpen()"
       [attr.aria-label]="'library.more' | t"

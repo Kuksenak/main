@@ -51,12 +51,10 @@
       window.addEventListener('pageshow', reloadIfSwitched);
 
       // Desktops (an installed app's window): its title bar's color (theme-color), not the system's
-      // gray — the window's own (--title-bar): the window is one color all over, the sidebar a panel
-      // floating in it (desktop.css), so it matches with the bar shown (one strip across) or hidden
-      // (the strips under the window's buttons; a Mac's buttons over the window above the panel:
-      // html[data-mac], components.css). Phones: none, as above. In from the start (a tag put in only
-      // at load, the window's buttons kept the system's color), then the computed one at load and at
-      // each switch of the bar.
+      // gray — the window's one color (--title-bar): the system's bar when shown, our own (as Claude's)
+      // when hidden — the window's buttons on it, either way one color with it (desktop.css,
+      // components.css). Phones: none, as above. In from the start (a tag put in only at load, the
+      // window's buttons kept the system's color), then the computed one at load and at each switch.
       if (!mobile) {
         var wco = navigator.windowControlsOverlay;
         // (a Mac: by its name, or by the window's buttons at the left — the bar's area starting past 0)
@@ -73,7 +71,7 @@
           if (mac) root.dataset.mac = ''; else delete root.dataset.mac;
         };
         setMac();
-        meta.content = started ? '#1e1e1e' : '#ffffff';
+        meta.content = started ? '#191919' : '#ffffff';
         document.head.appendChild(meta);
         var paint = function () {
           setMac();

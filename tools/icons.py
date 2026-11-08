@@ -208,6 +208,13 @@ ICONS = {
     'logout-all': line('M9.6 46.8C9.7 35 9.5 22 9.8 8.8 16 8.6 22.4 8.9 28.6 8.7')
         + line('M36.1 24.6C36.2 21.8 36.1 19.4 36.2 16.6 29.6 16.3 23.6 16.4 17.4 16.2 17.6 29 17.5 41.6 17.7 54.5 23.8 54.3 30 54.4 36.1 54.1 36 51.2 36.2 48.6 36 45.6')
         + line('M27.6 35.6C35 35.2 43 35.4 52.8 35.2M45.2 27.2C48 30 50.6 32.6 53.4 35.3 50.6 38.1 47.8 40.6 45 43.4'),
+    # the app's menu (the title bar's, as Claude's ☰): three strokes, a little uneven — lines only
+    'menu': line('M13.8 19.6C25.6 19.2 38 19.8 50.2 19.4')
+        + line('M13.6 32.2C25.4 31.9 37.8 32.4 50.4 32')
+        + line('M13.8 44.8C25.8 44.4 38.2 44.9 50.2 44.5'),
+    # the sidebar shown / hidden (the title bar's, as Claude's): a window, a pane at its left — lines only
+    'sidebar': line('M12.6 16.4C12.4 26.4 12.7 37.8 12.8 47.6 25.6 48 38.6 47.7 51.4 47.6 51.6 37.4 51.3 26.6 51.5 16.6 38.8 16.1 25.4 16.4 14.4 16.3')
+        + line('M25.8 17C25.5 27.2 25.9 37.2 25.6 47.2'),
 }
 
 HEAD = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="' + MARKER + '" '

@@ -1,23 +1,52 @@
-<!-- The window as macOS 26's: one color all over (the page, its heads, round the panel), the sidebar a
-     light gray panel floating at its left, 8 in from its edges — round corners, a hairline, a soft
-     shadow (desktop.css); with the title bar hidden (an installed app) a Mac's window buttons over the
-     window's color above the panel (components.css); the page's head row in the bar's place
-     (`data-titlebar`: components.css) -->
-<div class="flex h-full bg-app text-fg">
-<div data-side-wrap class="flex w-[calc(var(--nav-w)+0.5rem)] shrink-0 flex-col py-2 pl-2">
-  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1 rounded-[1.125rem] shadow-side">
-    <!-- Search (Ctrl K / ⌘K too), as macOS 26's sidebars: a round field at the top — as the heads' buttons (white, a hairline),
-         the loupe, its word gray, the keys as quiet gray text at its right (as macOS menus show
-         shortcuts: keycaps there looked busy); a click: the search window -->
-    <button
-      data-bar-search
-      type="button"
-      (click)="search.open.set(true)"
-      class="mb-2 flex h-8 shrink-0 items-center gap-2 rounded-full bg-(--bar-button) pr-3 pl-2.5 text-left text-ui text-fg-secondary shadow-(--bar-button-shadow) outline-none hover:bg-(--bar-button-hover) focus-visible:bg-(--bar-button-hover)"
-    >
-      <app-icon name="search" class="size-4.5 shrink-0 text-icon" />
-      <span class="min-w-0 flex-1 truncate">{{ 'search.title' | t }}</span>
-      <span class="shrink-0 text-caption tracking-wide text-fg-secondary/70">{{ shortcut }}</span>
+<!-- The window as Claude's / Notion's: flat, one color all over — the sidebar at its left edge, full
+     height, the page beside it, a hairline between (desktop.css). An installed app with its title bar hidden (as VS
+     Code's): its own title bar across the top, the window's color, a hairline under it — the window
+     dragged by it; at its left (after a Mac's window buttons) icon buttons, as Claude's: ☰ the app's
+     menu (Go to ›, the trash, Language ›, the account ›), the sidebar shown / hidden, ‹ › back and
+     forward; Windows' buttons at its right (components.css). Else it's not there: the trash and the account at the sidebar's bottom. Search: always the sidebar's first row, as
+     Claude's. Hairlines between the bar, the sidebar and the page. -->
+<div data-window class="flex h-full flex-col bg-app text-fg">
+<header data-app-titlebar class="hidden shrink-0 items-center gap-0.5 border-b-[0.5px] border-separator bg-side">
+  <!-- (as Claude's title bar: icon buttons as large and dark as the browser's own at the bar's right —
+       ☰ the app's menu, the sidebar shown / hidden, ‹ › back and forward; gray under the pointer and
+       while open, their names as hints) -->
+  <button
+    #appMenuBtn
+    type="button"
+    (click)="appMenuAt.set(appMenuAt() ? null : appMenuBtn)"
+    aria-haspopup="menu"
+    [attr.aria-expanded]="!!appMenuAt()"
+    [uiTip]="'nav.appMenu' | t"
+    [attr.aria-label]="'nav.appMenu' | t"
+    class="grid size-8 place-items-center rounded-md text-fg hover:bg-tint aria-expanded:bg-tint-strong"
+  >
+    <app-icon name="menu" class="size-6" />
+  </button>
+  <button
+    type="button"
+    (click)="toggleSidebar()"
+    [attr.aria-pressed]="!sidebarHidden()"
+    [uiTip]="(sidebarHidden() ? 'nav.showSidebar' : 'nav.hideSidebar') | t"
+    [attr.aria-label]="(sidebarHidden() ? 'nav.showSidebar' : 'nav.hideSidebar') | t"
+    class="grid size-8 place-items-center rounded-md text-fg hover:bg-tint"
+  >
+    <app-icon name="sidebar" class="size-6" />
+  </button>
+  <button type="button" (click)="location.back()" [uiTip]="'nav.back' | t" [attr.aria-label]="'nav.back' | t" class="grid size-8 place-items-center rounded-md text-fg hover:bg-tint">
+    <app-icon name="chevron-left" class="size-5" />
+  </button>
+  <button type="button" (click)="location.forward()" [uiTip]="'nav.forward' | t" [attr.aria-label]="'nav.forward' | t" class="grid size-8 place-items-center rounded-md text-fg hover:bg-tint">
+    <app-icon name="chevron-right" class="size-5" />
+  </button>
+</header>
+<div class="flex min-h-0 flex-1">
+<div class="flex w-nav shrink-0 flex-col" [class.hidden]="sidebarHidden()">
+  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1 border-r-[0.5px] border-separator">
+    <!-- Search (Ctrl K / ⌘K too), as Claude's: a row as the places' — its loupe, its word, the keys
+         quiet at its right; a click: the search window -->
+    <button uiSidebarItem icon="search" (click)="search.open.set(true)" class="shrink-0">
+      {{ 'search.title' | t }}
+      <span itemEnd class="shrink-0 text-caption tracking-wide text-fg-secondary/70">{{ shortcut }}</span>
     </button>
     @for (place of places(); track place.path) {
       @if (place.path === '/library') {
@@ -111,7 +140,7 @@
     <span class="flex-1"></span>
     <!-- Recycle bin: the last row (its window as the search's) -->
     @if (library()) {
-      <button uiSidebarItem icon="trash" (click)="trashOpen.set(!trashOpen())" [attr.aria-expanded]="trashOpen()" class="shrink-0">{{ 'trash.title' | t }}</button>
+      <button data-side-trash uiSidebarItem icon="trash" (click)="trashOpen.set(!trashOpen())" [attr.aria-expanded]="trashOpen()" class="shrink-0">{{ 'trash.title' | t }}</button>
     }
     <!-- (a list's head: open — data-open, not aria-expanded: that one's look is a row whose window is open) -->
     <ng-template #listHead let-list>
@@ -139,6 +168,7 @@
     <button
       #account
       sidebarFoot
+      data-side-account
       uiSidebarRow
       type="button"
       (click)="menuAt.set(menuAt() ? null : account)"
@@ -156,6 +186,7 @@
   <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
     <router-outlet />
   </main>
+</div>
 </div>
 
 @if (menuAt(); as at) {
@@ -175,6 +206,55 @@
     }
     <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
     <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
+  </ui-menu>
+}
+
+<!-- The title bar's ☰: the app's menu, as Claude's (File ›, Edit ›, …) — Go to ›, the trash, Language ›,
+     the account › (its email over its rows); a row with › opens its submenu at its right (under the
+     pointer or at a click); a row picked closes both -->
+@if (appMenuAt(); as at) {
+  <ui-menu narrow [origin]="at" (closed)="closeAppMenu()">
+    <button type="button" uiMenuItem icon="arrow-up-right" aria-haspopup="menu" [attr.aria-expanded]="sub() === 'go'" (mouseenter)="openSub('go', $any($event.currentTarget))" (click)="openSub('go', $any($event.currentTarget))">
+      <span class="flex flex-1 items-center">{{ 'nav.goTo' | t }}<app-icon name="chevron-right" class="ml-auto size-4 opacity-60" /></span>
+    </button>
+    @if (library()) {
+      <button type="button" uiMenuItem icon="trash" (mouseenter)="sub.set(null)" (click)="trashOpen.set(true)">{{ 'trash.title' | t }}</button>
+    }
+    <ui-menu-separator />
+    <button type="button" uiMenuItem icon="globe" aria-haspopup="menu" [attr.aria-expanded]="sub() === 'lang'" (mouseenter)="openSub('lang', $any($event.currentTarget))" (click)="openSub('lang', $any($event.currentTarget))">
+      <span class="flex flex-1 items-center">{{ 'account.language' | t }}<app-icon name="chevron-right" class="ml-auto size-4 opacity-60" /></span>
+    </button>
+    <button type="button" uiMenuItem icon="person" aria-haspopup="menu" [attr.aria-expanded]="sub() === 'account'" (mouseenter)="openSub('account', $any($event.currentTarget))" (click)="openSub('account', $any($event.currentTarget))">
+      <span class="flex flex-1 items-center">{{ 'account.title' | t }}<app-icon name="chevron-right" class="ml-auto size-4 opacity-60" /></span>
+    </button>
+  </ui-menu>
+}
+@if (appMenuAt() && sub() && subAt(); as at) {
+  <ui-menu narrow side [origin]="at" (closed)="closeAppMenu()">
+    @switch (sub()) {
+      @case ('go') {
+        @for (place of places(); track place.path) {
+          <button type="button" uiMenuItem [icon]="place.icon" (click)="router.navigateByUrl(place.path)">{{ place.label | t }}</button>
+        }
+        @if (auth.isAdmin()) {
+          <button type="button" uiMenuItem icon="lock" (click)="router.navigateByUrl('/users')">{{ 'users.title' | t }}</button>
+        }
+      }
+      @case ('lang') {
+        @for (language of i18n.languages; track language.code) {
+          <button type="button" uiMenuItem [checked]="language.code === i18n.lang()" (click)="i18n.setLang(language.code)">{{ language.label }}</button>
+        }
+      }
+      @case ('account') {
+        <ui-menu-label>{{ auth.email() }}</ui-menu-label>
+        <ui-menu-separator />
+        @if (updates.ready()) {
+          <button type="button" uiMenuItem icon="update" (click)="updates.apply()"><span class="text-accent">{{ 'account.update' | t }}</span></button>
+        }
+        <button type="button" uiMenuItem icon="logout" danger (click)="auth.logout()">{{ 'account.logout' | t }}</button>
+        <button type="button" uiMenuItem icon="logout-all" danger (click)="auth.logoutEverywhere()">{{ 'account.logoutEverywhere' | t }}</button>
+      }
+    }
   </ui-menu>
 }
 

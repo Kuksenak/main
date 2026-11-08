@@ -2,10 +2,10 @@
   cdkConnectedOverlay
   [cdkConnectedOverlayOrigin]="origin()"
   [cdkConnectedOverlayOpen]="true"
-  [cdkConnectedOverlayPositions]="positions"
+  [cdkConnectedOverlayPositions]="side() ? sidePositions : positions"
   [cdkConnectedOverlayPush]="true"
   [cdkConnectedOverlayViewportMargin]="8"
-  [cdkConnectedOverlayHasBackdrop]="true"
+  [cdkConnectedOverlayHasBackdrop]="!side()"
   cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
   (backdropClick)="close()"
   (overlayKeydown)="key($event)"

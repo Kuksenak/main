@@ -43,6 +43,8 @@ export const ICONS = [
   'chevron-down',
   'chevrons-up-down',
   'lock',
+  'menu',
+  'sidebar',
 ] as const;
 export type IconName = (typeof ICONS)[number];
 

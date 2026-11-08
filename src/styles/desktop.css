@@ -77,46 +77,47 @@ html.dark[data-device='desktop'] {
   --highlight: rgb(255 255 255 / 0.1);
 }
 
-/* The window as macOS 26's: one color all over — the page, its heads, the window round the sidebar —
-   and the sidebar a light gray panel floating in it (8 in from the window's edges, round, a hairline,
-   a soft shadow); no lines. The installed app's title bar the window's color (index.html:
-   theme-color), so it matches anywhere — shown or hidden, a Mac's buttons or Windows'. */
+/* The window as Claude's / Notion's, one color all over: the sidebar, the page, the title bar (the
+   system's or our own, as Claude's: components.css) and the menus all white — hairlines between the
+   bar, the sidebar and the page; the menus off the page by their edge and shadows. The installed app's
+   title bar that color too (index.html: theme-color). */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
   --title-bar: #ffffff;
-  --side-bg: #f2f2f5;
-  --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.09), 0 6px 22px rgb(0 0 0 / 0.07);
+  --side-bg: #ffffff;
+  --side-shadow: none;
   --side-text: #1c1c1e;
   --text: #000000;
   --text-secondary: #6e6e73;
-  --separator: rgb(0 0 0 / 0.12);
+  --separator: rgb(0 0 0 / 0.06); /* (the hairlines: faint — one color all over, they only hint at the parts) */
   --side-hover: rgb(0 0 0 / 0.05);
   --side-on: rgb(0 0 0 / 0.07);
   --side-on-text: #000000;
   --round-side-row: 0.5rem;
-  /* (menus and windows: Liquid Glass — white frosted, a bright rim, a clear edge) */
-  --menu-bg: rgb(255 255 255 / 0.78);
-  --menu-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.9), 0 0 0 0.5px rgb(0 0 0 / 0.14), 0 12px 32px rgb(0 0 0 / 0.16);
+  /* (menus and windows, as Notion's: solid white — glass on the white page melted into it — a clear
+     edge and two shadows, a near one and a far one: they stand off the page) */
+  --menu-bg: #ffffff;
+  --menu-shadow: 0 0 0 1px rgb(15 15 15 / 0.07), 0 3px 6px rgb(15 15 15 / 0.08), 0 9px 24px rgb(15 15 15 / 0.16);
   /* (the heads' buttons: capsules, white, a hairline, a soft shadow) */
   --bar-button: #ffffff;
   --bar-button-hover: #f5f5f7;
   --bar-button-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.12), 0 1px 3px rgb(0 0 0 / 0.07);
 }
 html.dark[data-device='desktop'] {
-  --app-bg: #1e1e1e;
-  --title-bar: #1e1e1e;
-  --side-bg: #2a2a2c;
-  --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.09), 0 6px 22px rgb(0 0 0 / 0.4);
+  --app-bg: #191919;
+  --title-bar: #191919;
+  --side-bg: #191919;
+  --side-shadow: none;
   --side-text: #e5e5ea;
   --dialog-bg: #2a2a2c;
   --text: #f5f5f5;
   --text-secondary: #98989f;
-  --separator: rgb(255 255 255 / 0.1);
+  --separator: rgb(255 255 255 / 0.06);
   --side-hover: rgb(255 255 255 / 0.06);
   --side-on: rgb(255 255 255 / 0.12);
   --side-on-text: #ffffff;
-  --menu-bg: rgb(48 48 52 / 0.72);
-  --menu-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.16), 0 12px 32px rgb(0 0 0 / 0.5);
+  --menu-bg: #191919;
+  --menu-shadow: 0 0 0 1px rgb(255 255 255 / 0.09), 0 3px 6px rgb(0 0 0 / 0.3), 0 9px 24px rgb(0 0 0 / 0.5);
   --bar-button: rgb(255 255 255 / 0.1);
   --bar-button-hover: rgb(255 255 255 / 0.16);
   --bar-button-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.12);
