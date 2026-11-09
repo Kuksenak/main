@@ -38,7 +38,7 @@
    square gray panel at the window's edges — the markup's own. Only an installed app with the window's
    title bar shown — and not its own — the other way round: the window gray (as the title bar), the
    sidebar flat on it, the page a white panel at its right — 8 off the right edge (and the left, the
-   sidebar hidden), square, down to the bottom, a soft shadow.) */
+   sidebar hidden), round at the top, down to the bottom, a soft shadow.) */
 /* (not a Safari web app: Safari draws its title bar in its own gray, not ours — it stays flat, as a tab) */
 @media (display-mode: standalone) {
   /* (the page itself gray too: Safari's web apps (Add to Dock) color their title bar by the page's top,
@@ -50,6 +50,7 @@
   }
   html:not([data-safari-app]) [data-page-panel] {
     margin-right: 0.5rem;
+    border-radius: var(--round-side) var(--round-side) 0 0;
     box-shadow: var(--side-shadow);
   }
   html:not([data-safari-app]) [data-page-panel][data-side-hidden] {
@@ -147,26 +148,5 @@
 @media (display-mode: standalone), (display-mode: window-controls-overlay) {
   html:not([data-safari-app]) [data-side-wrap] > ui-sidebar > nav {
     padding-top: 0;
-  }
-}
-
-/* (a Mac's own title bar, the sidebar shown: Chrome paints its ⌄ ⋮ on a sharp square of the sidebar's
-   gray (the theme color) over the white page — a pocket of that gray under it, 8 wider and 6 lower, round
-   by 10 at its inner corner: the square's corner inside it, one soft shape) */
-[data-controls-pocket] {
-  display: none;
-}
-@media (display-mode: window-controls-overlay) {
-  html[data-mac]:not([data-side-hidden]) [data-controls-pocket] {
-    display: block;
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 40;
-    width: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem);
-    height: calc(env(titlebar-area-height, 2.25rem) + 0.375rem);
-    border-bottom-left-radius: 0.625rem;
-    background-color: var(--side-bg);
-    pointer-events: none;
   }
 }

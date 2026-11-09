@@ -88,7 +88,9 @@
           // (a Mac's own bar with the sidebar hidden — data-side-hidden, DesktopLayout: no gray under the
           // lights any more, the page's white there too)
           var white = overlay.matches && (!mac || 'sideHidden' in root.dataset);
-          meta.content = style.getPropertyValue(white ? '--title-bar' : '--side-bg').trim() || meta.content;
+          // (a Safari web app: a darker one — Safari draws it lighter, desktop.css)
+          var name = 'safariApp' in root.dataset ? '--safari-bar' : white ? '--title-bar' : '--side-bg';
+          meta.content = style.getPropertyValue(name).trim() || meta.content;
         };
         window.addEventListener('load', paint);
         // (the sidebar shown / hidden: DesktopLayout asks again)
