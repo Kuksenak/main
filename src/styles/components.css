@@ -34,17 +34,26 @@
 [data-app-titlebar] {
   display: none !important;
 }
-/* (the app's own title bar, or a browser's tab: the window white, the page flat on it, the sidebar a
-   square gray panel at the window's edges. The window's own title bar — an installed app's, shown —
-   the other way round: the window gray, the page a white panel on it, desktop-layout.html.) */
-@media (display-mode: window-controls-overlay), (display-mode: browser) {
+/* (a browser's tab, or the app's own title bar: the window white, the page flat on it, the sidebar a
+   square gray panel at the window's edges — the markup's own. Only an installed app with the window's
+   title bar shown — and not its own — the other way round: the window gray (as the title bar), the
+   sidebar flat on it, the page a white panel at its right — 8 off the right edge (and the left, the
+   sidebar hidden), round at the top, down to the bottom, a soft shadow.) */
+@media (display-mode: standalone) {
+  /* (the page itself gray too: Safari's web apps (Add to Dock) color their title bar by the page's top,
+     not always by theme-color) */
+  html[data-device='desktop'],
+  html[data-device='desktop'] body,
   [data-app-root] {
-    background-color: var(--app-bg) !important;
+    background-color: var(--side-bg);
   }
   [data-page-panel] {
-    margin: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
+    margin-right: 0.5rem;
+    border-radius: var(--round-side) var(--round-side) 0 0;
+    box-shadow: var(--side-shadow);
+  }
+  [data-page-panel][data-side-hidden] {
+    margin-left: 0.5rem;
   }
 }
 @media (display-mode: window-controls-overlay) {
@@ -60,28 +69,20 @@
     app-region: no-drag;
     -webkit-app-region: no-drag;
   }
-  /* (Windows: the sidebar's panel up to the window's top too — at its edge, as at the others; the
-     bar over it clear, its buttons on its gray. A Mac's: under the bar — its window buttons painted in
-     the bar's one color, a white patch they'd make on the gray.) */
-  /* (a Mac's: its window buttons and Chrome's painted in one color — the bar gray as the sidebar, the
-     window gray, the sidebar flat under the bar, the page white beside it, square: one gray frame, no
-     white strip over the sidebar) */
-  html[data-mac] [data-app-root] {
-    background-color: var(--side-bg) !important;
-  }
-  html[data-mac] [data-app-titlebar] {
-    background-color: transparent !important;
-  }
-  html:not([data-mac]) [data-app-titlebar] {
+  /* (the sidebar's gray up to the window's top — at its edge, as at the others; the bar over it clear,
+     its buttons on the gray, the page's white beside it up to the top too. A Mac's: its window buttons
+     and Chrome's painted in one color — the sidebar's gray (index.html): the lights on the gray, Chrome's
+     ⌄ ⋮ a small gray box at the right) */
+  [data-app-titlebar] {
     position: relative;
     z-index: 30;
     background-color: transparent !important;
   }
-  html:not([data-mac]) [data-side-wrap] {
+  [data-side-wrap] {
     margin-top: calc(-1 * env(titlebar-area-height, 2.25rem));
   }
   /* (its rows — the search first — from under the bar: only the gray goes up) */
-  html:not([data-mac]) [data-side-wrap] > ui-sidebar {
+  [data-side-wrap] > ui-sidebar {
     padding-top: env(titlebar-area-height, 2.25rem);
   }
   [data-side-trash],
@@ -137,14 +138,14 @@
   background-color: var(--bar-button-hover);
 }
 
-/* (the sidebar's first row — the search — from the very top, where the page's white starts beside it;
-   with the app's own title bar, right under it) */
+/* (the sidebar's first row — the search: a browser's tab, no title bar over it — a little room above
+   it; an installed app — right at the top, where the page's white starts beside it, or right under the
+   app's own title bar) */
 [data-side-wrap] > ui-sidebar > nav {
-  padding-top: 0;
+  padding-top: 0.5rem;
 }
-/* (a browser's tab: no title bar over it — a little room above the search) */
-@media (display-mode: browser) {
+@media (display-mode: standalone), (display-mode: window-controls-overlay) {
   [data-side-wrap] > ui-sidebar > nav {
-    padding-top: 0.5rem;
+    padding-top: 0;
   }
 }

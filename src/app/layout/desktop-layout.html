@@ -5,7 +5,7 @@
      menu (Go to ›, the trash, Language ›, the account ›), the sidebar shown / hidden, ‹ › back and
      forward; Windows' buttons at its right (components.css). Else it's not there: the trash and the account at the sidebar's bottom. Search: always the sidebar's first row, as
      Claude's. -->
-<div data-app-root class="flex h-full flex-col bg-side text-fg">
+<div data-app-root class="flex h-full flex-col bg-app text-fg">
 <header data-app-titlebar class="hidden shrink-0 items-center gap-0.5 bg-app">
   <!-- (as Claude's title bar: icon buttons as large and dark as the browser's own at the bar's right —
        ☰ the app's menu, the sidebar shown / hidden, ‹ › back and forward; gray under the pointer and
@@ -188,8 +188,7 @@
     </button>
   </ui-sidebar>
 </div>
-  <main data-page-panel class="m-2 my-0 min-h-0 min-w-0 flex-1 overflow-y-auto rounded-t-side bg-app shadow-side"
-        [class.ml-0]="!sidebarHidden()">
+  <main data-page-panel class="min-h-0 min-w-0 flex-1 overflow-y-auto bg-app" [attr.data-side-hidden]="sidebarHidden() ? '' : null">
     <router-outlet />
   </main>
 </div>
