@@ -20,6 +20,7 @@
   --color-icon: var(--icon);
   --color-danger: var(--danger);
   --color-accent: var(--accent);
+  --color-brand: var(--brand);
   --color-success: var(--success);
   --color-strong: var(--strong-bg);
   --color-on-strong: var(--strong-fg);
@@ -152,7 +153,7 @@
    Claude's: a solid panel, round by 10, 4 in, a hairline and a shadow; its rows 30 tall, 14px regular,
    round by 6, a soft gray under the pointer or the keys (`aria-selected`, focus). */
 @utility menu-panel {
-  @apply flex animate-menu-in flex-col rounded-menu bg-menu p-1 text-fg shadow-menu;
+  @apply flex animate-menu-in flex-col rounded-menu bg-menu/80 p-1 text-fg shadow-menu backdrop-blur-[6px] backdrop-saturate-[180%];
 }
 @utility menu-row {
   @apply flex min-h-menu-row w-full items-center gap-2 rounded-menu-row px-menu-row-x py-0.5 text-left text-ui leading-tight font-normal text-fg outline-none not-disabled:hover:bg-tint focus-visible:bg-tint aria-selected:bg-tint disabled:opacity-40;

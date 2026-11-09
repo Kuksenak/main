@@ -1,5 +1,6 @@
 import { booleanAttribute, Component, computed, input } from '@angular/core';
 import { ICON_DATA } from './icon-data';
+import { ICON_LINES } from './icon-lines';
 
 /** Every icon there is (e.g. to show them all). */
 export const ICONS = [
@@ -77,7 +78,7 @@ export type IconName = (typeof ICONS)[number];
         }
       </svg>
     } @else {
-      @if (colored()) {
+      @if (colored() && !lines()) {
         <!-- (small, coloured in: the pastel under, the lines over it in the text's color) -->
         <span class="relative block size-full">
           @if (tint(); as tint) {
@@ -97,7 +98,7 @@ export type IconName = (typeof ICONS)[number];
             [style.-webkit-mask-image]="linesUrl()"
           ></span>
         </span>
-      } @else if (filled()) {
+      } @else if (filled() && !lines()) {
         <img [src]="filledUrl()" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
       } @else {
         <!-- (the outline as a mask over the text's color: it takes the color it's in — gray, red on
@@ -121,7 +122,10 @@ export class Icon {
   // (the brands' marks: drawn here; the rest: their files)
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
   // (from the app's own code, not a file each: no request each — ICON_DATA, tools/icons.py)
-  protected readonly url = computed(() => `url("${ICON_DATA[this.name()]?.[0]}")`);
+  // (plain even lines — Lucide's, icon-lines.ts — wherever there's one, on every device: no pastel, no
+  // marker; else the drawn outline)
+  protected readonly lines = computed(() => ICON_LINES[this.name()] ?? null);
+  protected readonly url = computed(() => this.lines() ?? `url("${ICON_DATA[this.name()]?.[0]}")`);
   protected readonly filledUrl = computed(() => ICON_DATA[this.name()]?.[1] ?? '');
   protected readonly fillsUrl = computed(() => ICON_DATA[this.name()]?.[2] ?? '');
   protected readonly linesUrl = computed(() => `url("${ICON_DATA[this.name()]?.[3]}")`);

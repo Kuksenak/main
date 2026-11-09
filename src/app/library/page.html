@@ -5,7 +5,7 @@
 @if (desktop && page(); as p) {
   <!-- (the bar's height, 52 — as the sections' heads and the sidebar's top: one bar across the window) -->
   <!-- (an installed app with its own title bar: this row up on it, at its right — components.css) -->
-  <div data-page-head data-titlebar data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app pr-6 pl-8">
+  <div data-page-head data-titlebar data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-4">
     <!-- Its tag, the row's first: a button as the others — # and Tag; a tag on it: the button the
          tag's own whole (its pastel, its name); ▾ either way (a choice) — a click: the picker -->
     @if (tags.of(p.tagIds)[0]; as tag) {
@@ -100,7 +100,7 @@
 }
 
 <!-- (desktops: the blocks nearly the window's whole width, their left edge under the top row's name's) -->
-<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-8 desktop:pt-6">
+<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-5 desktop:pt-6">
 
   @if (page(); as p) {
     @if (desktop) {

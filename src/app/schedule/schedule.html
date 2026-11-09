@@ -3,13 +3,13 @@
      the left and the picked day's events at its right. Phones: the calendar edge to edge, the day's
      events under it; Today floating at the bottom left, + at the bottom right. -->
 @if (desktop) {
-  <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-6">
+  <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-4">
     <h1 class="px-2 text-body font-bold tracking-tight desktop:text-ui desktop:font-semibold">{{ title() }}</h1>
     <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
     <app-toolbar-end [addLabel]="'schedule.newEvent'" (add)="create()" />
   </div>
 }
-<div class="flex flex-col gap-4 px-4 pt-2 pb-24 desktop:flex-row desktop:gap-10 desktop:px-8 desktop:pt-4 desktop:pb-12">
+<div class="flex flex-col gap-4 px-4 pt-2 pb-24 desktop:flex-row desktop:gap-10 desktop:px-5 desktop:pt-4 desktop:pb-12">
   <section class="flex w-full shrink-0 flex-col gap-1 desktop:w-68 desktop:px-2">
     <app-calendar [(selected)]="selected" [(month)]="month" [marked]="store.marked()" />
   </section>

@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Icon, IconName } from '../icon/icon';
 import { UiScrollBar } from '../scroll-bar/scroll-bar';
 
-// (a row: its look, its icon and name — the places' and the buttons'. One chosen at a time, darker than
+// (a row: its look, its icon (one color — the chosen one's as its text) and name — the places' and the buttons'. One chosen at a time, darker than
 // one under the pointer, its name a little heavier (450))
 const ROW =
   'group/row flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-left text-ui font-normal text-side-text outline-none ' +
@@ -14,7 +14,7 @@ const ROW =
   'in-data-window:aria-[current=page]:not-data-on:bg-transparent in-data-window:aria-[current=page]:not-data-on:font-normal ' +
   'in-data-window:aria-[current=page]:not-data-on:text-side-text in-data-window:aria-[current=page]:not-data-on:hover:bg-side-hover';
 const TEMPLATE = `
-  <app-icon [name]="icon()" colored [tint]="tint()" class="size-icon-side text-icon" />
+  <app-icon [name]="icon()" class="size-icon-side text-icon" />
   <span class="min-w-0 flex-1 truncate"><ng-content /></span>
   <ng-content select="[itemEnd]" />
 `;

@@ -100,6 +100,9 @@
             <button uiSidebarItem icon="calendar" (click)="openEvent(event)" class="pl-3.5! [&>app-icon]:hidden">
               <span class="text-fg-secondary tabular-nums">{{ when(event) }}</span> {{ event.title }}
             </button>
+          } @empty {
+            <!-- (none coming: a gray line where they'd be) -->
+            <div class="flex h-side-row shrink-0 items-center pl-3.5 text-ui text-fg-secondary">{{ 'sidebar.noEvents' | t }}</div>
           }
           @if (events.upcoming().length > upcoming().length) {
             <button uiSidebarItem icon="dots" (click)="router.navigateByUrl('/schedule')" class="pl-3.5! text-fg-secondary! [&>app-icon]:scale-75 [&>app-icon]:opacity-40">{{ 'sidebar.viewAll' | t }}</button>

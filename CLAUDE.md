@@ -56,13 +56,14 @@ The account sheet's lists set the size for everything on phones:
 New phone screens use these tokens (`styles/mobile.css`), not sizes of their own.
 
 ## Icons
-- The app's icons are drawn in one style, "marker doodle + pastel fill" (docs/icons.md): one SVG file
-  each, in `public/icons/`, shown by `<app-icon name="…">`.
-- `python tools/icons.py` also writes `core/ui/icon/icon-data.ts`: the icons as data: URLs, which
-  `<app-icon>` uses — no request per icon (a file each showed late on phones). Never hand-edit it.
-- A new icon: drawn in `tools/icons.py` (then `python tools/icons.py`) and added to `ICONS`
-  (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS` (outlined and coloured in), so each new
-  one is there to judge.
+- The app's icons are plain even lines, as Notion's / Claude's: Lucide's (lucide.dev, ISC licence —
+  its notice kept in the file), on every device, in `core/ui/icon/icon-lines.ts` (24×24, stroke 1.5,
+  as data: URLs — no request each), shown by `<app-icon name="…">` in the text's color. No pastel, no
+  marker.
+- A new icon: its Lucide paths copied into `icon-lines.ts` under our name, the name added to `ICONS`
+  (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS`.
+- (The old marker-drawn set — `tools/icons.py`, `public/icons/`, `icon-data.ts` — is only a fallback for
+  a name with no line icon; never hand-edit `icon-data.ts`.)
 
 ## Toasts
 - Errors (a call that failed) and short notices ("Deleted · Undo") are toasts: `inject(Toasts)`

@@ -1,7 +1,7 @@
 <!-- A published page, for anyone with its link: its title and its blocks (as on the page — cards),
      read only; no sign-in, no sidebar -->
 <div class="min-h-full bg-app text-fg">
-  <div class="mx-auto flex max-w-3xl flex-col gap-2.5 px-4 pt-6 pb-16 desktop:px-10 desktop:pt-16">
+  <div class="mx-auto flex max-w-3xl flex-col gap-2.5 px-4 pt-6 pb-16 desktop:px-6 desktop:pt-16">
     @if (page(); as p) {
       <h1 class="mb-2 text-title leading-tight font-semibold desktop:font-bold">{{ p.title }}</h1>
       @for (block of p.blocks; track $index) {

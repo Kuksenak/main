@@ -139,14 +139,8 @@
   background-color: var(--bar-button-hover);
 }
 
-/* (the sidebar's first row — the search: a browser's tab, no title bar over it — a little room above
-   it; an installed app — right at the top, where the page's white starts beside it, or right under the
-   app's own title bar) */
+/* (the sidebar's first row — the search — level with the page's head beside it: centered on its 52, the
+   same top for both, in every mode) */
 [data-side-wrap] > ui-sidebar > nav {
-  padding-top: 0.5rem;
-}
-@media (display-mode: standalone), (display-mode: window-controls-overlay) {
-  html:not([data-safari-app]) [data-side-wrap] > ui-sidebar > nav {
-    padding-top: 0;
-  }
+  padding-top: calc((var(--bar-h) - var(--side-row-h)) / 2);
 }

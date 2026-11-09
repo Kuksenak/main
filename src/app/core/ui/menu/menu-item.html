@@ -1,6 +1,6 @@
 @if (icon(); as name) {
   <!-- (one color: gray; a danger one's red) -->
-  <app-icon [name]="name" class="size-icon-menu text-icon group-data-danger:text-current" />
+  <app-icon [name]="name" class="size-icon-menu text-icon group-data-danger:group-hover:text-current group-data-danger:group-focus-visible:text-current" />
 }
 <span class="min-w-0 flex-1 truncate"><ng-content /></span>
 @if (checked()) {

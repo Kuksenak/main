@@ -3,7 +3,7 @@
        as the pages scroll under it — left to right, nothing pushed to the far end: the section's name
        (bold), the views as pills (the one shown gray), the tag's filter, + New page (ToolbarEnd), the
        picked ones' actions; its buttons as macOS's toolbar's (data-toolbar); then the pages -->
-  <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-1 bg-app px-6">
+  <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-1 bg-app px-4">
     <h1 class="mr-2 px-2 text-body font-bold tracking-tight desktop:text-ui desktop:font-semibold">{{ 'nav.library' | t }}</h1>
       <!-- (the views as pills: gray under the pointer, the one shown gray and its name darker) -->
       <span class="flex items-center gap-0.5">
@@ -79,7 +79,7 @@
       }
   </div>
 
-  <div class="flex flex-col px-8 pt-4 pb-12">
+  <div class="flex flex-col px-5 pt-4 pb-12">
     @if (store.items(); as items) {
       @if (!items.length) {
         <!-- Nothing yet: a big page, a word, New page -->
