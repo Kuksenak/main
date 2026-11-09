@@ -139,10 +139,10 @@ html[data-device='desktop'] main [data-toolbar] {
 }
 
 /* A Safari web app (Add to Dock, index.html: data-safari-app): Safari's title bar is the system's own gray
-   (theme-color not taken) — the window's gray, the sidebar's, matched to it (judged off a photo: tune
-   here) */
+   (theme-color not taken) — the window's gray, the sidebar's, matched to it (light: measured off a
+   screenshot; dark: judged off a photo — tune here) */
 html[data-device='desktop'][data-safari-app] {
-  --side-bg: #ececec;
+  --side-bg: #f6f6f6; /* (Safari's title bar, measured off a screenshot) */
 }
 html.dark[data-device='desktop'][data-safari-app] {
   --side-bg: #383838;
