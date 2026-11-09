@@ -11,7 +11,7 @@ import { Icon, IconName } from '../icon/icon';
   host: {
     type: 'button',
     class:
-      'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full bg-accent pr-3.5 pl-2.5 text-ui font-medium text-on-accent shadow-accent hover:brightness-105 disabled:opacity-50',
+      'inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full desktop:rounded-button bg-accent pr-3.5 pl-2.5 text-ui font-medium text-on-accent shadow-accent hover:brightness-105 disabled:opacity-50',
   },
   template: `
     @if (icon(); as name) {

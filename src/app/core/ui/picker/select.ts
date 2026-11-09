@@ -28,7 +28,7 @@ export interface UiOption {
         (click)="toggle()"
         [attr.aria-expanded]="open()"
         [attr.aria-label]="label() || null"
-        class="inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-ui text-fg hover:bg-tint-strong"
+        class="inline-flex h-button items-center gap-1.5 rounded-full desktop:rounded-button bg-tint pr-2 pl-3.5 text-ui text-fg hover:bg-tint-strong"
         [class.pl-2.5]="!!chosenIcon()"
       >
         @if (chosenIcon(); as icon) {
@@ -39,14 +39,14 @@ export interface UiOption {
       </button>
       @if (open()) {
         <div class="fixed inset-0 z-40" (click)="open.set(false)"></div>
-        <div role="listbox" [attr.data-end]="end() ? '' : null" class="absolute top-full left-0 z-50 data-end:right-0 data-end:left-auto mt-1.5 flex w-max min-w-[200%] animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover">
+        <div role="listbox" [attr.data-end]="end() ? '' : null" class="menu-panel absolute top-full left-0 z-50 data-end:right-0 data-end:left-auto mt-1.5 w-max min-w-[200%]">
           @for (option of options(); track option.value) {
             <button
               type="button"
               role="option"
               [attr.aria-selected]="option.value === value()"
               (click)="value.set(option.value); open.set(false)"
-              class="flex min-h-menu-row w-full items-center gap-2 rounded-button px-menu-row-x py-1 text-left text-ui hover:bg-tint-strong"
+              class="menu-row"
             >
               @if (option.icon) {
                 <app-icon [name]="option.icon" colored class="size-icon-menu text-icon" />
@@ -61,7 +61,7 @@ export interface UiOption {
       }
     } @else {
       <span
-        class="pointer-events-none inline-flex h-button items-center gap-1.5 rounded-full bg-tint pr-2 pl-3.5 text-body text-fg data-wide:w-full data-wide:gap-3 data-wide:pr-3.5 data-wide:pl-4
+        class="pointer-events-none inline-flex h-button items-center gap-1.5 rounded-full desktop:rounded-button bg-tint pr-2 pl-3.5 text-body desktop:text-ui text-fg data-wide:w-full data-wide:gap-3 data-wide:pr-3.5 data-wide:pl-4
                data-glass:h-round data-glass:glass data-plain:gap-1 data-plain:bg-transparent data-plain:px-0 data-plain:text-fg-secondary"
         [class.pl-2.5]="!!chosenIcon() && !wide()"
         [attr.data-wide]="wide() ? '' : null"

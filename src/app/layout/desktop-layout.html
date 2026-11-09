@@ -45,10 +45,10 @@
      (components.css) the other way round: the window white, the sidebar a square gray panel at
      its edges, the page flat.) -->
 <div data-side-wrap class="flex w-nav shrink-0 flex-col" [class.hidden]="sidebarHidden()">
-  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
+  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1" [attr.data-window]="windowOpen() ? '' : null">
     <!-- Search (Ctrl K / ⌘K too), as Claude's: a row as the places' — its loupe, its word, the keys
          quiet at its right; a click: the search window -->
-    <button uiSidebarItem icon="search" (click)="search.open.set(true)" class="shrink-0">
+    <button uiSidebarItem icon="search" (click)="search.open.set(true)" [attr.data-on]="search.open() ? '' : null" class="shrink-0">
       {{ 'search.title' | t }}
       <span itemEnd class="shrink-0 text-caption tracking-wide text-fg-secondary/70">{{ shortcut }}</span>
     </button>
@@ -66,7 +66,7 @@
           (keydown.enter)="folds.toggle('recents')"
           [attr.data-open]="folds.has('recents') ? null : ''"
           [attr.data-on]="onLibrary() ? '' : null"
-          class="group/fold cursor-pointer data-on:bg-side-on data-on:text-side-on-text data-on:[&>app-icon]:text-current"
+          class="group/fold cursor-pointer"
         >
           <ui-fold-name>{{ place.label | t }}</ui-fold-name>
           <span itemEnd class="flex items-center gap-0.5">
@@ -86,7 +86,7 @@
           (keydown.enter)="folds.toggle('events')"
           [attr.data-open]="folds.has('events') ? null : ''"
           [attr.data-on]="onSchedule() ? '' : null"
-          class="group/fold cursor-pointer data-on:bg-side-on data-on:text-side-on-text data-on:[&>app-icon]:text-current"
+          class="group/fold cursor-pointer"
         >
           <ui-fold-name>{{ place.label | t }}</ui-fold-name>
           <span itemEnd class="flex items-center gap-0.5">
@@ -108,7 +108,8 @@
       } @else {
         <a uiSidebarItem [icon]="place.icon" [routerLink]="place.path" [routerLinkActiveOptions]="{ exact: place.path === '/' }">{{ place.label | t }}</a>
       }
-      <!-- (under Library: its 5 last changed pages; more than those: View all — the library — the last row) -->
+      <!-- (under Library: 5 of its pages — the last opened first (one opened: at the top at once), then the
+           last changed — all of them shown (no scrolling of their own); more than those: View all — the library — the last row) -->
       @if (place.path === '/library' && !folds.has('recents')) {
         @for (list of lists(); track list.id) {
           @if (list.id === 'recents') {
@@ -144,7 +145,7 @@
     <span class="flex-1"></span>
     <!-- Recycle bin: the last row (its window as the search's) -->
     @if (library()) {
-      <button data-side-trash uiSidebarItem icon="trash" (click)="trashOpen.set(!trashOpen())" [attr.aria-expanded]="trashOpen()" class="shrink-0">{{ 'trash.title' | t }}</button>
+      <button data-side-trash uiSidebarItem icon="trash" (click)="trashOpen.set(!trashOpen())" [attr.data-on]="trashOpen() ? '' : null" class="shrink-0">{{ 'trash.title' | t }}</button>
     }
     <!-- (a list's head: open — data-open, not aria-expanded: that one's look is a row whose window is open) -->
     <ng-template #listHead let-list>
@@ -182,7 +183,7 @@
       class="w-full gap-2!"
     >
       <!-- (a new version ready: a green dot on it) -->
-      <ui-avatar [name]="userName()" [dot]="updates.ready()" class="size-5.5! rounded-full! text-[0.625rem]!" />
+      <ui-avatar [name]="userName()" [dot]="updates.ready()" class="size-5.5! rounded-full! text-caption!" />
       <span class="min-w-0 flex-1 truncate text-fg">{{ userName() }}</span>
     </button>
   </ui-sidebar>

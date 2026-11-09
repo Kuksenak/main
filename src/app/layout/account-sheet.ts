@@ -8,22 +8,20 @@ import { UpdateService } from '../core/services/update.service';
 import { Icon, UiList, UiFloatingButton, UiListItem, UiOption, UiSelect, UiSheet } from '../core/ui';
 import { UserCard } from '../users/user-card';
 import { UsersList } from '../users/users-list';
-import { TrashList } from '../library/trash-list';
 import { ShortcutKey } from './shortcut-key';
-import { LibraryStore } from '../library/library.store';
 import type { User } from '../users/users.store';
 
-type Page = 'users' | 'user' | 'trash' | 'shortcut';
+type Page = 'users' | 'user' | 'shortcut';
 
 /**
  * Phones: the account (as the Claude app's) — a sheet from the bottom, a fixed height: the email;
- * Users (the admins only), Shortcut (the iPhone shortcut's key) and Trash (those who can read the library); the language (the system's own select); at the bottom Update available
+ * Users (the admins only), Shortcut (the iPhone shortcut's key: those who can read the library); the language (the system's own select); at the bottom Update available
  * (when a new version is ready), Log out and Log out of all devices. A row with › opens its page
- * right in the sheet, sliding in (‹ back): the users — and a user tapped, their card; the trash's pages.
+ * right in the sheet, sliding in (‹ back): the users — and a user tapped, their card.
  */
 @Component({
   selector: 'app-account-sheet',
-  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSelect, UiSheet, ShortcutKey, TrashList, UserCard, UsersList],
+  imports: [Icon, TranslatePipe, UiList, UiFloatingButton, UiListItem, UiSelect, UiSheet, ShortcutKey, UserCard, UsersList],
   templateUrl: './account-sheet.html',
 })
 export class AccountSheet {
@@ -38,8 +36,6 @@ export class AccountSheet {
   protected readonly page = computed(() => this.pages().at(-1) ?? null);
   // (one opened slides in from the right; back, the one under it from the left)
   private readonly slide = inject(Slide);
-  // (the trash's: its pages, Empty trash at the head)
-  protected readonly library = inject(LibraryStore);
   // The user whose card is open, and their name over it (the card reads them from UsersStore itself:
   // the users' code is downloaded only when Users is opened — @defer)
   protected readonly userId = signal<string | null>(null);
@@ -79,8 +75,6 @@ export class AccountSheet {
         return this.i18n.t('users.title');
       case 'user':
         return this.userName();
-      case 'trash':
-        return this.i18n.t('trash.title');
       case 'shortcut':
         return this.i18n.t('shortcut.title');
       default:

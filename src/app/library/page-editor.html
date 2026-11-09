@@ -161,7 +161,7 @@
     @if (caretMenu()) {
     <div
       role="listbox"
-      class="absolute top-full left-2 z-30 mt-1 flex w-72 animate-menu-in flex-col rounded-menu bg-dialog p-1 text-fg shadow-popover"
+      class="menu-panel absolute top-full left-2 z-30 mt-1 w-72"
       (mousedown)="$event.preventDefault()"
     >
       @for (command of caretCommands(); track command.id; let k = $index) {
@@ -171,7 +171,7 @@
           [attr.aria-selected]="k === caretActive()"
           (click)="runAtCaret(command)"
           (mouseenter)="caretActive.set(k)"
-          class="flex min-h-menu-row w-full items-center gap-2.5 rounded-button px-menu-row-x py-1 text-left text-ui aria-selected:bg-tint-strong"
+          class="menu-row"
         >
           <app-icon [name]="command.icon" colored class="size-icon-menu text-icon" />
           <span class="flex-1">{{ command.label | t }}</span>

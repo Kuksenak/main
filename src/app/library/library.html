@@ -4,7 +4,7 @@
        (bold), the views as pills (the one shown gray), the tag's filter, + New page (ToolbarEnd), the
        picked ones' actions; its buttons as macOS's toolbar's (data-toolbar); then the pages -->
   <div data-toolbar data-titlebar class="sticky top-0 z-20 flex h-bar items-center gap-1 bg-app px-6">
-    <h1 class="mr-2 px-2 text-body font-bold tracking-tight">{{ 'nav.library' | t }}</h1>
+    <h1 class="mr-2 px-2 text-body font-bold tracking-tight desktop:text-ui desktop:font-semibold">{{ 'nav.library' | t }}</h1>
       <!-- (the views as pills: gray under the pointer, the one shown gray and its name darker) -->
       <span class="flex items-center gap-0.5">
         @for (v of views; track v.id) {
@@ -12,7 +12,7 @@
             type="button"
             (click)="view.set(v.id); unpick()"
             [attr.aria-pressed]="view() === v.id"
-            class="flex h-7 items-center rounded-full px-3 text-ui text-fg-secondary hover:bg-tint hover:text-fg aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
+            class="flex h-7 items-center rounded-button px-3 text-ui text-fg-secondary hover:bg-tint hover:text-fg aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
           >
             {{ v.label | t }}
           </button>

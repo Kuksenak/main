@@ -40,6 +40,11 @@ export const routes: Routes = [
         canActivate: [areaGuard('library')],
       },
       {
+        path: 'trash',
+        loadComponent: () => import('./library/recently-deleted').then((m) => m.RecentlyDeleted),
+        canActivate: [areaGuard('library')],
+      },
+      {
         path: 'favorites',
         loadComponent: () => import('./favorites/favorites').then((m) => m.Favorites),
         canActivate: [areaGuard('library')],

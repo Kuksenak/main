@@ -16,19 +16,6 @@
       <span class="max-w-[calc(100%-7rem)] truncate text-body font-semibold" data-vt="sheet-title">
         {{ title() }}
       </span>
-      <!-- (the trash: Empty trash at the right, level with ‹ — asked first) -->
-      @if (page() === 'trash' && library.trash()?.length) {
-        <button
-          type="button"
-          uiFloatingButton
-          round
-          (click)="library.askDeleteForever(null, $any($event.currentTarget))"
-          [attr.aria-label]="'trash.emptyAll' | t"
-          class="absolute right-0 text-danger"
-        >
-          <app-icon name="trash" class="size-6" />
-        </button>
-      }
     </div>
   }
   @if (page(); as open) {
@@ -38,13 +25,6 @@
         @case ('users') {
           @defer (on immediate) {
             <app-users-list (picked)="openUser($event)" />
-          }
-        }
-        <!-- (the trash's code: downloaded only now, as the users') -->
-        @case ('trash') {
-          @defer (on immediate) {
-            <!-- (a page restored: opened — the sheet gone) -->
-            <app-trash-list (restored)="sheet.close()" />
           }
         }
         @case ('shortcut') {
@@ -73,7 +53,7 @@
       </ui-list>
 
       <!-- Users (the admins only: their list slides in, a user tapped: their card); the language (the
-           current one in gray, ›: its list slides in); Trash last (its pages slide in) -->
+           current one in gray, ›: its list slides in) -->
       <ui-list>
         @if (auth.isAdmin()) {
           <button type="button" uiListItem icon="lock" chevron (click)="open('users')">{{ 'users.title' | t }}</button>
@@ -86,7 +66,6 @@
         @if (auth.can('library')) {
           <!-- (the iPhone shortcut's key: pages added from Apple's Shortcuts) -->
           <button type="button" uiListItem icon="link" chevron (click)="open('shortcut')">{{ 'shortcut.title' | t }}</button>
-          <button type="button" uiListItem icon="trash" chevron (click)="open('trash')">{{ 'trash.title' | t }}</button>
         }
       </ui-list>
 

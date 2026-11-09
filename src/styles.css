@@ -87,6 +87,8 @@
   --radius-side: var(--round-side);
   --radius-side-row: var(--round-side-row);
   --radius-menu: var(--round-menu);
+  --radius-window: var(--round-window);
+  --radius-menu-row: var(--round-menu-row);
 
   --shadow-popover: var(--popover-shadow);
   --shadow-toast: var(--toast-shadow);
@@ -99,7 +101,8 @@
 
 /* The same on every device */
 @theme {
-  --text-footnote: 0.8125rem; /* 13px */
+  --text-footnote: var(--font-footnote);
+  --text-title: var(--font-title);
   --text-tip: 0.75rem; /* 12px: a hover hint (core/ui/tip) */
   --text-caption: 0.6875rem; /* 11px: the smallest — e.g. a menu's foot (when edited, made) */
 
@@ -143,6 +146,16 @@
    question's panel, a menu. */
 @utility glass {
   @apply bg-glass shadow-glass backdrop-blur-(--glass-blur) backdrop-saturate-[180%];
+}
+
+/* The menus — one look everywhere (ui-menu, a select's list, the editor's / commands), as Notion's /
+   Claude's: a solid panel, round by 10, 4 in, a hairline and a shadow; its rows 30 tall, 14px regular,
+   round by 6, a soft gray under the pointer or the keys (`aria-selected`, focus). */
+@utility menu-panel {
+  @apply flex animate-menu-in flex-col rounded-menu bg-menu p-1 text-fg shadow-menu;
+}
+@utility menu-row {
+  @apply flex min-h-menu-row w-full items-center gap-2 rounded-menu-row px-menu-row-x py-0.5 text-left text-ui leading-tight font-normal text-fg outline-none not-disabled:hover:bg-tint focus-visible:bg-tint aria-selected:bg-tint disabled:opacity-40;
 }
 
 /* base (colors, the page, scrollbars, press feedback) → components (the few shared pieces) */

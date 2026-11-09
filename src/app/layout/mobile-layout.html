@@ -34,12 +34,13 @@
         <span class="w-round shrink-0"></span>
       }
     } @else {
-      <!-- The start (Hub): its name, big, at the left (as iOS's Settings), the logo before it — a circle as
-           large as the round buttons; 🔍 and the account at the right -->
+      <!-- A section: its name, big, at the left (as iOS's Settings); the start (Hub): none — just 🔍 and the
+           account at the right -->
       @if (atStart()) {
-        <img src="logo.svg" alt="" class="size-round shrink-0 select-none" width="44" height="44" draggable="false" />
+        <span class="flex-1"></span>
+      } @else {
+        <span class="min-w-0 flex-1 truncate pl-1 text-[1.75rem] font-bold tracking-tight">{{ title() }}</span>
       }
-      <span class="min-w-0 flex-1 truncate pl-1 text-[1.75rem] font-bold tracking-tight">{{ title() }}</span>
     }
     <!-- (not inside a page opened from a list: there, only ‹ and its title) -->
     @if (!back()) {

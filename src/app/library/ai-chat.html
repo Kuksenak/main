@@ -30,7 +30,7 @@
             type="button"
             (click)="put(turn)"
             [disabled]="turn.added"
-            class="flex h-9 items-center gap-1.5 self-start rounded-full bg-accent px-4 text-ui font-medium text-on-accent disabled:bg-tint disabled:text-fg-secondary"
+            class="flex h-9 items-center gap-1.5 self-start rounded-full desktop:rounded-button bg-accent px-4 text-ui font-medium text-on-accent disabled:bg-tint disabled:text-fg-secondary"
           >
             <app-icon [name]="turn.added ? 'check' : 'plus'" class="size-4.5" />
             {{ (turn.added ? 'ai.added' : 'ai.add') | t }}
@@ -56,7 +56,7 @@
 <!-- The field, as Claude's: one box with a hairline, no fill of its own — the photos to go with it on
      top (× takes one off), the text (2 lines to begin with, growing with what's typed), under it +
      (photos; phones: the camera too) and ↵ (Enter sends), plain icons -->
-<form class="flex shrink-0 flex-col gap-1 rounded-[1.125rem] border-[0.5px] border-separator p-2" (submit)="$event.preventDefault(); send()">
+<form class="flex shrink-0 flex-col gap-1 rounded-[1.125rem] desktop:rounded-menu border-[0.5px] border-separator p-2" (submit)="$event.preventDefault(); send()">
   @if (photos().length) {
     <div class="flex flex-wrap gap-2 px-1 pt-1">
       @for (photo of photos(); track photo.url; let i = $index) {

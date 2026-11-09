@@ -1,11 +1,11 @@
 @if (desktop) {
-  <button type="button" (click)="toggle()" [attr.aria-expanded]="open()" class="inline-flex h-button items-center rounded-full bg-tint px-3.5 text-ui text-fg hover:bg-tint-strong">
+  <button type="button" (click)="toggle()" [attr.aria-expanded]="open()" class="inline-flex h-button items-center rounded-full desktop:rounded-button bg-tint px-3.5 text-ui text-fg hover:bg-tint-strong">
     {{ label() }}
   </button>
   @if (open()) {
     <div class="fixed inset-0 z-40" (click)="open.set(false)"></div>
     <!-- The calendar under the chip -->
-    <div [attr.data-end]="end() ? '' : null" class="absolute top-full left-0 z-50 data-end:right-0 data-end:left-auto mt-1.5 w-62 animate-menu-in rounded-menu bg-dialog p-2 text-fg shadow-popover">
+    <div [attr.data-end]="end() ? '' : null" class="absolute top-full left-0 z-50 data-end:right-0 data-end:left-auto mt-1.5 w-62 animate-menu-in rounded-menu bg-menu p-2 text-fg shadow-menu">
       <div class="mb-1 flex items-center gap-0.5 pl-1.5">
         <span class="flex-1 text-ui font-medium">{{ monthLabel() }}</span>
         <button type="button" (click)="step(-1)" class="grid size-7 place-items-center rounded-md text-icon hover:bg-tint-strong">
@@ -40,6 +40,6 @@
   }
 } @else {
   <!-- Phones: the chip, the system's own date picker over it, unseen (a tap opens it) -->
-  <span class="pointer-events-none inline-flex h-8.5 items-center rounded-full bg-tint px-3.5 text-body whitespace-nowrap text-fg">{{ label() }}</span>
+  <span class="pointer-events-none inline-flex h-8.5 items-center rounded-full desktop:rounded-button bg-tint px-3.5 text-body desktop:text-ui whitespace-nowrap text-fg">{{ label() }}</span>
   <input #field type="date" class="absolute inset-0 opacity-0" [value]="value() ?? ''" (change)="typed(field.value)" />
 }

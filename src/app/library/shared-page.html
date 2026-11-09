@@ -3,7 +3,7 @@
 <div class="min-h-full bg-app text-fg">
   <div class="mx-auto flex max-w-3xl flex-col gap-2.5 px-4 pt-6 pb-16 desktop:px-10 desktop:pt-16">
     @if (page(); as p) {
-      <h1 class="mb-2 text-[1.75rem] leading-tight font-semibold desktop:text-[2rem] desktop:font-bold">{{ p.title }}</h1>
+      <h1 class="mb-2 text-title leading-tight font-semibold desktop:font-bold">{{ p.title }}</h1>
       @for (block of p.blocks; track $index) {
         <app-read-block [text]="block.text" />
       }

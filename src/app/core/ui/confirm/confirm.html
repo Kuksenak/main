@@ -5,7 +5,7 @@
   role="alertdialog"
   class="fixed flex w-72 max-w-[calc(100vw-1rem)] animate-menu-in flex-col gap-1.5 text-fg
          mobile:rounded-[1.75rem] mobile:glass mobile:p-2
-         desktop:rounded-[1.25rem] desktop:border-[0.5px] desktop:border-separator desktop:bg-dialog desktop:p-1.5 desktop:shadow-popover"
+         desktop:rounded-menu desktop:bg-menu desktop:p-1.5 desktop:shadow-menu"
   [style.top.px]="place().top"
   [style.bottom.px]="place().bottom"
   [style.left.px]="place().left"
@@ -16,7 +16,7 @@
     <button
       type="button"
       class="rounded-full bg-tint px-4 text-center font-medium leading-tight hover:bg-tint-strong active:bg-tint-strong
-             mobile:min-h-11 mobile:py-2 mobile:text-body desktop:min-h-8 desktop:py-1.5 desktop:text-ui"
+             mobile:min-h-11 mobile:py-2 mobile:text-body desktop:min-h-8 desktop:rounded-menu-row desktop:py-1.5 desktop:text-ui"
       [class.text-danger]="c.danger"
       (click)="answer(c.value)"
     >

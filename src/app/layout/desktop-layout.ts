@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
 import { Location, NgTemplateOutlet } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -93,8 +93,15 @@ export class DesktopLayout {
   protected readonly lists = computed(() => {
     const items = this.store.items() ?? [];
     const lists: { id: List; label: TranslationKey; icon: IconName; pages: PageItem[] }[] = [];
-    if (this.library()) lists.push({ id: 'recents', label: 'library.recents', icon: 'clock', pages: items.slice(0, RECENTS) });
-    if (this.favorites().length) lists.push({ id: 'favorites', label: 'library.favorites', icon: 'bookmark', pages: this.favorites() });
+    if (this.library()) {
+      // (the last opened first — one opened goes to the top at once — then the last changed: 5 in all)
+      const byId = new Map(items.map((x) => [x.id, x]));
+      const opened = this.opened().map((id) => byId.get(id)).filter((x): x is PageItem => !!x);
+      const pages = [...opened, ...items.filter((x) => !opened.includes(x))].slice(0, RECENTS);
+      lists.push({ id: 'recents', label: 'library.recents', icon: 'clock', pages });
+    }
+    // (Favorites: off the sidebar for now)
+    // if (this.favorites().length) lists.push({ id: 'favorites', label: 'library.favorites', icon: 'bookmark', pages: this.favorites() });
     return lists;
   });
   // (folded away — kept on this device)
@@ -103,8 +110,25 @@ export class DesktopLayout {
   private readonly url = toSignal(this.router.events.pipe(filter((e) => e instanceof NavigationEnd), map(() => this.router.url)), {
     initialValue: this.router.url,
   });
-  protected readonly onLibrary = computed(() => /^\/library(\/|\?|$)/.test(this.url()));
-  protected readonly onSchedule = computed(() => /^\/schedule(\/|\?|$)/.test(this.url()));
+  // (the library's list itself — not a page of it, nor a tag: those rows are the chosen ones then; none
+  // while a window is open: its row is)
+  // (the library's page open: its id)
+  protected readonly openPage = computed(() => /^\/library\/([^/?#]+)/.exec(this.url())?.[1] ?? null);
+  // (the pages opened, the last first — kept on this device)
+  protected readonly opened = signal<string[]>((kept(OPENED) ?? '').split(',').filter(Boolean));
+  private readonly keepOpened = effect(() => {
+    const id = this.openPage();
+    if (!id) return;
+    const ids = untracked(this.opened);
+    if (ids[0] === id) return;
+    const next = [id, ...ids.filter((x) => x !== id)].slice(0, 50);
+    this.opened.set(next);
+    keep(OPENED, next.join(','));
+  });
+  protected readonly onLibrary = computed(() => !this.windowOpen() && /^\/library$/.test(this.url().split('#')[0]));
+  protected readonly onSchedule = computed(() => !this.windowOpen() && /^\/schedule(\/|\?|$)/.test(this.url()));
+  // (a window open over the page — the search, Recently deleted: its row the chosen one)
+  protected readonly windowOpen = computed(() => this.search.open() || this.trashOpen());
 
   // Schedule's next events (the 5 soonest), under it; one clicked (none: a new one) — opened in the schedule
   protected readonly events = inject(EventsStore);
@@ -193,5 +217,7 @@ export class DesktopLayout {
 type List = 'favorites' | 'recents' | 'events';
 // (how many of the last changed pages Recents shows)
 const RECENTS = 5;
+// (the pages last opened, kept on this device: the sidebar's first)
+const OPENED = 'sidebar.opened';
 // (the lists folded away: kept on this device — storage may be off, then it just isn't kept)
 const FOLDED = 'sidebar.folded';

@@ -1,13 +1,18 @@
-import { Component, Directive, ElementRef, inject, input, signal } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, Directive, ElementRef, inject, input, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Icon, IconName } from '../icon/icon';
 import { UiScrollBar } from '../scroll-bar/scroll-bar';
 
-// (a row: its look, its icon and name — the places' and the buttons')
+// (a row: its look, its icon and name — the places' and the buttons'. One chosen at a time, darker than
+// one under the pointer, its name a little heavier (450))
 const ROW =
-  'group/row flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-left text-ui text-side-text outline-none ' +
-  'hover:bg-side-hover focus-visible:bg-side-hover aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-side-on-text aria-[current=page]:[&>app-icon]:text-current ' +
-  'aria-expanded:bg-tint-strong';
+  'group/row flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-left text-ui font-normal text-side-text outline-none ' +
+  'hover:bg-side-hover focus-visible:bg-side-hover aria-expanded:bg-side-hover ' +
+  'aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-side-on-text aria-[current=page]:[&>app-icon]:text-current ' +
+  'data-on:bg-side-on data-on:font-[450] data-on:text-side-on-text data-on:[&>app-icon]:text-current ' +
+  // (a window open — the search, Recently deleted: its row the only chosen one, the page's not)
+  'in-data-window:aria-[current=page]:not-data-on:bg-transparent in-data-window:aria-[current=page]:not-data-on:font-normal ' +
+  'in-data-window:aria-[current=page]:not-data-on:text-side-text in-data-window:aria-[current=page]:not-data-on:hover:bg-side-hover';
 const TEMPLATE = `
   <app-icon [name]="icon()" colored [tint]="tint()" class="size-icon-side text-icon" />
   <span class="min-w-0 flex-1 truncate"><ng-content /></span>
@@ -100,8 +105,8 @@ export class UiSidebarField {}
 
 /**
  * A section's rows that scroll on their own (Favorites' pages, the tags): as tall as they are, at
- * most what's left; fading out at the bottom; scrolled — a hairline over them, their top fading
- * under it too; the scroll bar over them (the system's took room from the rows).
+ * most what's left; as the backup's (Claude's): nothing over or under them at their top — scrolled
+ * down, a hairline over them and their top fading under it; their bottom cut plainly (no fading); the scroll bar over them (the system's took room from the rows).
  *   <div uiSidebarScroll>…rows…</div>
  */
 @Directive({
@@ -110,13 +115,30 @@ export class UiSidebarField {}
   host: {
     class:
       '-mx-1.5 flex min-h-0 flex-initial flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-1.5 pt-px pb-2 ' +
-      '[mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] data-scrolled:border-separator ' +
-      'data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-1.5rem),transparent)]',
+      'transition-[border-color] duration-150 data-scrolled:border-separator ' +
+      'data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem)]',
     '[attr.data-scrolled]': "scrolled() ? '' : null",
-    '(scroll)': 'scrolled.set(el.scrollTop > 0)',
+    '(scroll)': 'measure()',
   },
 })
 export class UiSidebarScroll {
   protected readonly scrolled = signal(false);
   protected readonly el: HTMLElement = inject(ElementRef).nativeElement;
+
+  constructor() {
+    // (and as its rows come and go, or the window's height changes)
+    afterNextRender(() => {
+      const ro = new ResizeObserver(() => this.measure());
+      ro.observe(this.el);
+      const mo = new MutationObserver(() => this.measure());
+      mo.observe(this.el, { childList: true, subtree: true });
+      this.destroy.onDestroy(() => (ro.disconnect(), mo.disconnect()));
+    });
+  }
+  private readonly destroy = inject(DestroyRef);
+
+  protected measure(): void {
+    const el = this.el;
+    this.scrolled.set(el.scrollTop > 0);
+  }
 }

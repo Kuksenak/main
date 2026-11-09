@@ -11,7 +11,7 @@ import { UiKbd } from '../kbd/kbd';
 @Component({
   selector: 'ui-window-head',
   imports: [Icon],
-  host: { class: 'flex h-12 shrink-0 items-center gap-3 px-4.5 text-base text-fg' },
+  host: { class: 'flex h-12 shrink-0 items-center gap-3 px-4.5 text-body text-fg' },
   template: `
     @if (colored()) {
       <app-icon [name]="icon()" colored class="size-5 shrink-0 text-icon" />
@@ -32,7 +32,7 @@ export class UiWindowHead {
   host: {
     type: 'text',
     autocomplete: 'off',
-    class: 'min-w-0 flex-1 bg-transparent text-base text-fg outline-none placeholder:text-fg-secondary',
+    class: 'min-w-0 flex-1 bg-transparent text-body text-fg outline-none placeholder:text-fg-secondary',
   },
 })
 export class UiWindowField {

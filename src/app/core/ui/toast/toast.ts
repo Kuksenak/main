@@ -81,7 +81,7 @@ export class Toasts {
         }
         <span class="min-w-0 flex-1 break-words">{{ toast.text }}</span>
         @if (toast.action; as action) {
-          <button type="button" class="shrink-0 rounded-full px-2.5 py-1 font-semibold text-toast-action hover:bg-toast-text/10" (click)="action.run()">
+          <button type="button" class="shrink-0 rounded-full desktop:rounded-button px-2.5 py-1 font-semibold text-toast-action hover:bg-toast-text/10" (click)="action.run()">
             {{ action.label }}
           </button>
         }

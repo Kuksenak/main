@@ -31,6 +31,14 @@ import { visiblePlaces } from './places';
           </button>
         }
       </ui-list>
+      <!-- (Recently deleted: a row of its own under them — the library's readers) -->
+      @if (auth.can('library')) {
+        <ui-list>
+          <button type="button" uiListItem icon="trash" chevron (click)="router.navigateByUrl('/trash')">
+            {{ 'trash.title' | t }}
+          </button>
+        </ui-list>
+      }
       @if (today().length) {
         <div class="flex flex-col gap-2">
           <ui-list-title>{{ 'schedule.today' | t }}</ui-list-title>
@@ -50,7 +58,7 @@ import { visiblePlaces } from './places';
 export class Hub {
   protected readonly router = inject(Router);
   protected readonly i18n = inject(I18nService);
-  private readonly auth = inject(AuthStore);
+  protected readonly auth = inject(AuthStore);
   private readonly library = inject(LibraryStore);
   private readonly events = inject(EventsStore);
 

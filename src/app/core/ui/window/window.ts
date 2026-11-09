@@ -16,7 +16,7 @@ import { booleanAttribute, Component, DestroyRef, inject, input, output } from '
       <div
         role="dialog"
         aria-modal="true"
-        class="flex h-[76vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-[1.375rem] bg-menu text-fg shadow-menu
+        class="flex h-[76vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-window bg-menu text-fg shadow-menu
                backdrop-blur-2xl backdrop-saturate-[180%]"
                 (mousedown)="$event.stopPropagation()"
       >

@@ -60,56 +60,6 @@
     app-region: no-drag;
     -webkit-app-region: no-drag;
   }
-  /* (a page's actions — its tag, Publish, 🔖, ⋯ — up on the title bar, the row going on from its left
-     after ☰ ▢ ‹ › (their 4 × 32 and the bar's 8 in; 12 more between): no head row of their own under
-     it; flat — no capsules, gray under the pointer, as the bar's own buttons) */
-  [data-page-head] {
-    position: fixed !important;
-    top: 0;
-    left: calc(env(titlebar-area-x, 0px) + 0.375rem + 4 * 2rem + 3 * 0.125rem + 0.75rem) !important;
-    right: auto !important;
-    z-index: 40 !important;
-    height: env(titlebar-area-height, 2.25rem) !important;
-    padding: 0 !important;
-    gap: 0.125rem !important;
-    background: none !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-  }
-  [data-page-head] :is(button, a, input, form) {
-    app-region: no-drag;
-    -webkit-app-region: no-drag;
-  }
-  [data-device='desktop'] [data-page-head] [data-group],
-  [data-device='desktop'] [data-page-head] :is(button, a)[uibutton] {
-    background-color: transparent !important;
-    box-shadow: none !important;
-  }
-  /* (as the bar's own: 32 squares, round by 6, a 24px icon in the text's color, no words — they're the
-     hints — no ▾; a picked tag a chip as tall as they are) */
-  [data-device='desktop'] [data-page-head] :is(button, a)[uibutton] {
-    width: 2rem !important;
-    height: 2rem !important;
-    padding: 0 !important;
-    justify-content: center;
-    border-radius: 0.375rem !important;
-  }
-  [data-page-head] [uibutton] > span,
-  [data-page-head] [uibutton] > span ~ app-icon {
-    display: none !important;
-  }
-  [data-page-head] [uibutton] > app-icon {
-    width: 1.5rem !important;
-    height: 1.5rem !important;
-    color: var(--text) !important;
-  }
-  [data-page-head] > button[data-tag] {
-    height: 1.75rem !important;
-  }
-  [data-device='desktop'] [data-page-head] :is(button, a)[uibutton]:not(:disabled):hover,
-  [data-device='desktop'] [data-page-head] :is(button, a)[uibutton][aria-expanded='true'] {
-    background-color: var(--tint) !important;
-  }
   /* (Windows: the sidebar's panel up to the window's top too — at its edge, as at the others; the
      bar over it clear, its buttons on its gray. A Mac's: under the bar — its window buttons painted in
      the bar's one color, a white patch they'd make on the gray.) */
@@ -131,13 +81,13 @@
   }
 }
 
-/* Desktops' toolbar buttons, as macOS 26's: on a head (`data-toolbar`) its buttons (uiButton) are capsules
-   of their own — the page's white (dark: a gray), a hairline and a soft shadow, as tall as the kit's buttons; just an
+/* Desktops' toolbar buttons: on a head (`data-toolbar`) its buttons (uiButton) are boxes (round by 6, as
+   Notion's — no pills) — the page's white (dark: a gray), a hairline and a soft shadow, as tall as the kit's buttons; just an
    icon: a circle. (Plain CSS: every head's buttons at once, the kit's uiButton elsewhere as it is.) */
 [data-device='desktop'] [data-toolbar] :is(button, a)[uibutton] {
   height: var(--button-h);
   padding-inline: 0.75rem;
-  border-radius: 9999px;
+  border-radius: var(--round-button);
   background-color: var(--bar-button);
   box-shadow: var(--bar-button-shadow);
 }
@@ -155,7 +105,7 @@
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
-  border-radius: 9999px;
+  border-radius: var(--round-button);
   background-color: var(--bar-button);
   box-shadow: var(--bar-button-shadow);
 }
@@ -165,10 +115,10 @@
   box-shadow: none;
 }
 [data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton]:first-child {
-  border-radius: 9999px 0 0 9999px;
+  border-radius: var(--round-button) 0 0 var(--round-button);
 }
 [data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton]:last-child {
-  border-radius: 0 9999px 9999px 0;
+  border-radius: 0 var(--round-button) var(--round-button) 0;
 }
 [data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton] + :is(button, a)[uibutton] {
   box-shadow: inset 0.5px 0 0 var(--separator);
