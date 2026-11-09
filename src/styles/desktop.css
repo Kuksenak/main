@@ -144,7 +144,7 @@ html[data-device='desktop'] main [data-toolbar] {
    tune here.) */
 html[data-device='desktop'][data-safari-app] {
   --side-bg: #ececec;
-  --safari-bar: #dfdfdf;
+  --safari-bar: #e0e0e0; /* (comes out #ececec: measured #dfdfdf → #ebebeb) */
 }
 html.dark[data-device='desktop'][data-safari-app] {
   --side-bg: #2c2c2e;
