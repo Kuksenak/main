@@ -84,6 +84,7 @@
   --radius-capsule: var(--round-capsule);
   --radius-card: var(--round-card);
   --radius-button: var(--round-button);
+  --radius-side: var(--round-side);
   --radius-side-row: var(--round-side-row);
   --radius-menu: var(--round-menu);
 

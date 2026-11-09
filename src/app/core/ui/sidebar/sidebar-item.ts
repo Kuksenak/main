@@ -109,7 +109,7 @@ export class UiSidebarField {}
   hostDirectives: [UiScrollBar],
   host: {
     class:
-      '-mx-3 flex min-h-0 flex-initial flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-3 pt-px pb-2 ' +
+      '-mx-1.5 flex min-h-0 flex-initial flex-col gap-px overflow-y-auto border-t-[0.5px] border-transparent px-1.5 pt-px pb-2 ' +
       '[mask-image:linear-gradient(to_bottom,black_calc(100%-1.5rem),transparent)] data-scrolled:border-separator ' +
       'data-scrolled:[mask-image:linear-gradient(to_bottom,transparent,black_0.875rem,black_calc(100%-1.5rem),transparent)]',
     '[attr.data-scrolled]': "scrolled() ? '' : null",

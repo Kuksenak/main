@@ -18,6 +18,9 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "loader": {
+              ".webmanifest": "text"
+            },
             "polyfills": [
               "zone.js"
             ],

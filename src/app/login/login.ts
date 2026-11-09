@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui';
+import { APP_NAME } from '../core/app-name';
 
 @Component({
   selector: 'app-login',
@@ -11,6 +12,7 @@ import { Icon } from '../core/ui';
 })
 export class Login {
   protected readonly auth = inject(AuthStore);
+  protected readonly appName = APP_NAME;
   // Back without a sign-in, the API says why: ?error=denied — cancelled on the provider's screen;
   // ?error=unverified — an email the provider hasn't checked (not let in)
   private readonly error = inject(ActivatedRoute).snapshot.queryParamMap.get('error');

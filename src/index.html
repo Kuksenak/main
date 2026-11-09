@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="utf-8">
-  <title>App</title>
+  <title></title>
   <base href="/">
   <meta name="viewport"
     content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=overlays-content">
@@ -71,12 +71,14 @@
           if (mac) root.dataset.mac = ''; else delete root.dataset.mac;
         };
         setMac();
-        meta.content = started ? '#191919' : '#ffffff';
+        // (the window's title bar shown: in the window's gray — the sidebar's, the page a white panel on it;
+        // the app's own: in the page's white)
+        meta.content = overlay.matches ? (started ? '#191919' : '#ffffff') : (started ? '#262628' : '#e9e9ec');
         document.head.appendChild(meta);
         var paint = function () {
           setMac();
           var style = getComputedStyle(root);
-          meta.content = style.getPropertyValue('--title-bar').trim() || meta.content;
+          meta.content = style.getPropertyValue(overlay.matches ? '--title-bar' : '--side-bg').trim() || meta.content;
         };
         window.addEventListener('load', paint);
         overlay.addEventListener('change', paint);

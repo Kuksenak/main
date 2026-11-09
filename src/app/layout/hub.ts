@@ -1,4 +1,5 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { APP_NAME } from '../core/app-name';
 import { Router } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -57,7 +58,7 @@ export class Hub {
   protected readonly today = computed(() => this.events.ofDay(new Date()));
 
   constructor() {
-    inject(PageTitle).show(computed(() => this.i18n.t('app.name')));
+    inject(PageTitle).show(signal(APP_NAME));
     this.events.show(new Date());
     if (this.auth.can('library')) this.library.load();
   }

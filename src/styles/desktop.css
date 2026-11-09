@@ -40,6 +40,7 @@
   --menu-label-px: 0.75rem;
   --icon-menu: 1.25rem;
   --round-menu: 0.625rem;
+  --round-side: 0.5rem; /* (the floating page panel) */
   /* Round buttons as tall as the others; list rows 44 */
   --round-h: var(--control-h);
   --row-h: 2.75rem;
@@ -77,15 +78,16 @@ html.dark[data-device='desktop'] {
   --highlight: rgb(255 255 255 / 0.1);
 }
 
-/* The window as Claude's / Notion's, one color all over: the sidebar, the page, the title bar (the
-   system's or our own, as Claude's: components.css) and the menus all white — hairlines between the
-   bar, the sidebar and the page; the menus off the page by their edge and shadows. The installed app's
-   title bar that color too (index.html: theme-color). */
+/* The window: the sidebar a gray of its own, as macOS's, everything else white — the page, the title
+   bar (the system's or our own: components.css), the menus — and no lines: the parts told apart by
+   their colors alone. The title bar white across the window, the sidebar's gray under it: the system
+   paints the strips under the window's buttons one color (theme-color) — a Mac's at both ends — so the
+   bar is that one color end to end (index.html). The menus off the page by their edge and shadows. */
 html[data-device='desktop'] {
   --app-bg: #ffffff;
   --title-bar: #ffffff;
-  --side-bg: #ffffff;
-  --side-shadow: none;
+  --side-bg: #e9e9ec;
+  --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.06), 0 4px 16px rgb(0 0 0 / 0.06);
   --side-text: #1c1c1e;
   --text: #000000;
   --text-secondary: #6e6e73;
@@ -106,8 +108,8 @@ html[data-device='desktop'] {
 html.dark[data-device='desktop'] {
   --app-bg: #191919;
   --title-bar: #191919;
-  --side-bg: #191919;
-  --side-shadow: none;
+  --side-bg: #262628;
+  --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.06), 0 4px 16px rgb(0 0 0 / 0.4);
   --side-text: #e5e5ea;
   --dialog-bg: #2a2a2c;
   --text: #f5f5f5;

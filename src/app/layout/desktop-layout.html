@@ -1,12 +1,12 @@
-<!-- The window as Claude's / Notion's: flat, one color all over — the sidebar at its left edge, full
-     height, the page beside it, a hairline between (desktop.css). An installed app with its title bar hidden (as VS
-     Code's): its own title bar across the top, the window's color, a hairline under it — the window
+<!-- The window: flat — the sidebar a gray of its own at its left edge (as macOS's), everything else
+     white, no lines (desktop.css). An installed app with its title bar hidden (as VS
+     Code's): its own title bar across the top, white end to end (the sidebar's gray under it) — the window
      dragged by it; at its left (after a Mac's window buttons) icon buttons, as Claude's: ☰ the app's
      menu (Go to ›, the trash, Language ›, the account ›), the sidebar shown / hidden, ‹ › back and
      forward; Windows' buttons at its right (components.css). Else it's not there: the trash and the account at the sidebar's bottom. Search: always the sidebar's first row, as
-     Claude's. Hairlines between the bar, the sidebar and the page. -->
-<div data-window class="flex h-full flex-col bg-app text-fg">
-<header data-app-titlebar class="hidden shrink-0 items-center gap-0.5 border-b-[0.5px] border-separator bg-side">
+     Claude's. -->
+<div data-app-root class="flex h-full flex-col bg-side text-fg">
+<header data-app-titlebar class="hidden shrink-0 items-center gap-0.5 bg-app">
   <!-- (as Claude's title bar: icon buttons as large and dark as the browser's own at the bar's right —
        ☰ the app's menu, the sidebar shown / hidden, ‹ › back and forward; gray under the pointer and
        while open, their names as hints) -->
@@ -40,8 +40,12 @@
   </button>
 </header>
 <div class="flex min-h-0 flex-1">
-<div class="flex w-nav shrink-0 flex-col" [class.hidden]="sidebarHidden()">
-  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1 border-r-[0.5px] border-separator">
+<!-- (with the window's title bar: the window gray, the sidebar flat on it, the page a white panel
+     floating at its right — 8px off the edges, round, a soft shadow. With the app's own title bar
+     (components.css) the other way round: the window white, the sidebar a square gray panel at
+     its edges, the page flat.) -->
+<div data-side-wrap class="flex w-nav shrink-0 flex-col" [class.hidden]="sidebarHidden()">
+  <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1">
     <!-- Search (Ctrl K / ⌘K too), as Claude's: a row as the places' — its loupe, its word, the keys
          quiet at its right; a click: the search window -->
     <button uiSidebarItem icon="search" (click)="search.open.set(true)" class="shrink-0">
@@ -183,7 +187,8 @@
     </button>
   </ui-sidebar>
 </div>
-  <main class="min-h-0 min-w-0 flex-1 overflow-y-auto">
+  <main data-page-panel class="m-2 my-0 min-h-0 min-w-0 flex-1 overflow-y-auto rounded-t-side bg-app shadow-side"
+        [class.ml-0]="!sidebarHidden()">
     <router-outlet />
   </main>
 </div>

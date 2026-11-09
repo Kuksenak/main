@@ -4,7 +4,6 @@
  * Add a language: add it to `LANGUAGES` and a dictionary here.
  */
 const en = {
-  'app.name': 'Language Tutor',
   'app.loading': 'Loading…',
   'app.rotate': 'Turn your phone upright',
   'nav.home': 'Home',
@@ -263,7 +262,6 @@ export type TranslationKey = keyof typeof en;
 export type Dictionary = Record<TranslationKey, string>;
 
 const pl: Dictionary = {
-  'app.name': 'Language Tutor',
   'app.loading': 'Ładowanie…',
   'app.rotate': 'Obróć telefon pionowo',
   'nav.home': 'Start',
@@ -519,7 +517,6 @@ const pl: Dictionary = {
 };
 
 const fr: Dictionary = {
-  'app.name': 'Language Tutor',
   'app.loading': 'Chargement…',
   'app.rotate': 'Tournez votre téléphone à la verticale',
   'nav.home': 'Accueil',
