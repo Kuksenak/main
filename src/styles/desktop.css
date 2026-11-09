@@ -93,7 +93,7 @@ html.dark[data-device='desktop'] {
 html[data-device='desktop'] {
   --app-bg: #ffffff;
   --title-bar: #ffffff;
-  --side-bg: #e9e9ec;
+  --side-bg: #ececec; /* (macOS 26's sidebar gray: Messages, measured) */
   --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.06), 0 4px 16px rgb(0 0 0 / 0.06);
   --side-text: #1c1c1e;
   --text: #000000;

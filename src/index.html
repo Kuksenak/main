@@ -80,7 +80,7 @@
         // (the window's title bar shown: in the window's gray — the sidebar's, the page a white panel on it;
         // the app's own: in the page's white)
         // (a Mac's with its own bar: gray too — Chrome paints its window buttons' strip in this one color)
-        meta.content = overlay.matches && !mac ? (started ? '#191919' : '#ffffff') : (started ? '#262628' : '#e9e9ec');
+        meta.content = overlay.matches && !mac ? (started ? '#191919' : '#ffffff') : (started ? '#262628' : '#ececec');
         document.head.appendChild(meta);
         var paint = function () {
           setMac();
