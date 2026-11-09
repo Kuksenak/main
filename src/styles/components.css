@@ -63,6 +63,15 @@
   /* (Windows: the sidebar's panel up to the window's top too — at its edge, as at the others; the
      bar over it clear, its buttons on its gray. A Mac's: under the bar — its window buttons painted in
      the bar's one color, a white patch they'd make on the gray.) */
+  /* (a Mac's: its window buttons and Chrome's painted in one color — the bar gray as the sidebar, the
+     window gray, the sidebar flat under the bar, the page white beside it, square: one gray frame, no
+     white strip over the sidebar) */
+  html[data-mac] [data-app-root] {
+    background-color: var(--side-bg) !important;
+  }
+  html[data-mac] [data-app-titlebar] {
+    background-color: transparent !important;
+  }
   html:not([data-mac]) [data-app-titlebar] {
     position: relative;
     z-index: 30;

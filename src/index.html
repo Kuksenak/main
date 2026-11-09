@@ -74,12 +74,13 @@
         setMac();
         // (the window's title bar shown: in the window's gray — the sidebar's, the page a white panel on it;
         // the app's own: in the page's white)
-        meta.content = overlay.matches ? (started ? '#191919' : '#ffffff') : (started ? '#262628' : '#e9e9ec');
+        // (a Mac's with its own bar: gray too — Chrome paints its window buttons' strip in this one color)
+        meta.content = overlay.matches && !mac ? (started ? '#191919' : '#ffffff') : (started ? '#262628' : '#e9e9ec');
         document.head.appendChild(meta);
         var paint = function () {
           setMac();
           var style = getComputedStyle(root);
-          meta.content = style.getPropertyValue(overlay.matches ? '--title-bar' : '--side-bg').trim() || meta.content;
+          meta.content = style.getPropertyValue(overlay.matches && !mac ? '--title-bar' : '--side-bg').trim() || meta.content;
         };
         window.addEventListener('load', paint);
         overlay.addEventListener('change', paint);
