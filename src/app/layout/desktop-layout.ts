@@ -183,6 +183,13 @@ export class DesktopLayout {
 
   // The sidebar hidden (the title bar's button; kept on this device); back and forward (its ‹ ›)
   protected readonly sidebarHidden = signal(kept(SIDEBAR_HIDDEN) === '1');
+  // (the sidebar hidden, on the page's root too: a Mac's title bar painted white then — index.html)
+  private readonly markSidebar = effect(() => {
+    const root = document.documentElement;
+    if (this.sidebarHidden()) root.dataset['sideHidden'] = '';
+    else delete root.dataset['sideHidden'];
+    window.dispatchEvent(new Event('app-repaint'));
+  });
   protected toggleSidebar(): void {
     this.sidebarHidden.set(!this.sidebarHidden());
     keep(SIDEBAR_HIDDEN, this.sidebarHidden() ? '1' : '');

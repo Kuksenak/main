@@ -188,6 +188,10 @@
     </button>
   </ui-sidebar>
 </div>
+  <!-- (a Mac's own title bar, the sidebar shown: Chrome's ⌄ ⋮ sit on a square of the sidebar's gray — a
+       pocket of that gray under it, a little wider and lower, round at its inner corner: the square's
+       sharp corner hidden in it; components.css) -->
+  <div data-controls-pocket aria-hidden="true"></div>
   <main data-page-panel class="min-h-0 min-w-0 flex-1 overflow-y-auto bg-app" [attr.data-side-hidden]="sidebarHidden() ? '' : null">
     <router-outlet />
   </main>

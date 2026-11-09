@@ -149,3 +149,24 @@
     padding-top: 0;
   }
 }
+
+/* (a Mac's own title bar, the sidebar shown: Chrome paints its ⌄ ⋮ on a sharp square of the sidebar's
+   gray (the theme color) over the white page — a pocket of that gray under it, 8 wider and 6 lower, round
+   by 10 at its inner corner: the square's corner inside it, one soft shape) */
+[data-controls-pocket] {
+  display: none;
+}
+@media (display-mode: window-controls-overlay) {
+  html[data-mac]:not([data-side-hidden]) [data-controls-pocket] {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 40;
+    width: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem);
+    height: calc(env(titlebar-area-height, 2.25rem) + 0.375rem);
+    border-bottom-left-radius: 0.625rem;
+    background-color: var(--side-bg);
+    pointer-events: none;
+  }
+}
