@@ -137,3 +137,13 @@ html[data-device='desktop'] main [data-toolbar] {
   -webkit-backdrop-filter: blur(22px) saturate(180%);
   backdrop-filter: blur(22px) saturate(180%);
 }
+
+/* A Safari web app (Add to Dock, index.html: data-safari-app): Safari's title bar is the system's own gray
+   (theme-color not taken) — the window's gray, the sidebar's, matched to it (judged off a photo: tune
+   here) */
+html[data-device='desktop'][data-safari-app] {
+  --side-bg: #ececec;
+}
+html.dark[data-device='desktop'][data-safari-app] {
+  --side-bg: #383838;
+}

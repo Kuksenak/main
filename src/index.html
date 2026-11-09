@@ -72,6 +72,11 @@
           if (mac) root.dataset.mac = ''; else delete root.dataset.mac;
         };
         setMac();
+        // (a Safari web app — Add to Dock: Safari draws its title bar in the system's own gray, whatever
+        // theme-color says — the window's gray matched to it, desktop.css)
+        if (/Safari/.test(ua) && !/Chrome|Chromium|Edg|Firefox/.test(ua) && window.matchMedia('(display-mode: standalone)').matches) {
+          root.dataset.safariApp = '';
+        }
         // (the window's title bar shown: in the window's gray — the sidebar's, the page a white panel on it;
         // the app's own: in the page's white)
         // (a Mac's with its own bar: gray too — Chrome paints its window buttons' strip in this one color)
