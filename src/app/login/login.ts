@@ -1,9 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { Icon } from '../core/ui';
 import { APP_NAME } from '../core/app-name';
+import { I18nService } from '../core/i18n/i18n.service';
+import { PageTitle } from '../layout/page-title';
 
 @Component({
   selector: 'app-login',
@@ -13,6 +15,12 @@ import { APP_NAME } from '../core/app-name';
 export class Login {
   protected readonly auth = inject(AuthStore);
   protected readonly appName = APP_NAME;
+  private readonly i18n = inject(I18nService);
+
+  constructor() {
+    // (the browser's tab: "Sign in")
+    inject(PageTitle).show(computed(() => this.i18n.t('login.title')));
+  }
   // Back without a sign-in, the API says why: ?error=denied — cancelled on the provider's screen;
   // ?error=unverified — an email the provider hasn't checked (not let in)
   private readonly error = inject(ActivatedRoute).snapshot.queryParamMap.get('error');

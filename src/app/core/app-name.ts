@@ -1,4 +1,4 @@
-import manifest from '../../../public/manifest.webmanifest';
+import manifest from '../../../public/manifest.webmanifest' with { loader: 'text' };
 
 /**
  * The app's name — in one place only: the web manifest's "name" (what an installed app is called), read
