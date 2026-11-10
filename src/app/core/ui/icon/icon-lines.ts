@@ -1,5 +1,5 @@
-// The app's icons, our own, drawn as Notion's menus are: even lines of one weight (1.5 on a 24 grid, as
-// Lucide's), round ends and joins, one color (the text's — gray in rows); no solid shapes but dots (⋯,
+// The app's icons, our own, drawn as Notion's menus are: even lines of one weight (1.5 on a 24 grid),
+// round ends and joins, one color (the text's — gray in rows); no solid shapes but dots (⋯,
 // the drag handle). On every device; used as a mask over the text's color (icon.ts). The brands' marks
 // (Google, Apple) aren't here.
 const S = 'fill="black" stroke="none" fill-rule="evenodd"';
@@ -13,7 +13,8 @@ const PATHS: Record<string, string> = {
   person: '<circle cx="12" cy="8" r="4"/><path d="M4.6 20.4c.6-3.6 3.6-6 7.4-6s6.8 2.4 7.4 6"/>',
   bookmark: '<path d="M7 3.2h10a1.6 1.6 0 0 1 1.6 1.6v15.6L12 16.4l-6.6 4V4.8A1.6 1.6 0 0 1 7 3.2z"/>',
   lock: '<rect x="4.6" y="10.4" width="14.8" height="10.2" rx="2.2"/><path d="M8 10.4V7.6a4 4 0 0 1 8 0v2.8M12 14.6v2"/>',
-  sparkle: '<path d="M10.2 4.6c.3 0 .5.2.6.5l1 3.6c.3 1 1.1 1.8 2.1 2.1l3.6 1c.6.2.6 1 0 1.2l-3.6 1c-1 .3-1.8 1.1-2.1 2.1l-1 3.6c-.2.6-1 .6-1.2 0l-1-3.6c-.3-1-1.1-1.8-2.1-2.1l-3.6-1c-.6-.2-.6-1 0-1.2l3.6-1c1-.3 1.8-1.1 2.1-2.1l1-3.6c.1-.3.3-.5.6-.5z"/><path d="M19 2.8v4M21 4.8h-4M5 17.6v2.8M6.4 19H3.6"/>',
+  // (the assistant: a robot's head — a squarish face, its antenna bent to the left, ears, two eyes)
+  sparkle: '<rect x="4" y="8.2" width="16" height="11.8" rx="2.2"/><path d="M12 8.2V4.2H8.4M2.2 14h1.8M20 14h1.8M9.1 12.9v2.2M14.9 12.9v2.2"/>',
   grid: '<rect x="3.6" y="3.6" width="7" height="7" rx="1.6"/><rect x="13.4" y="3.6" width="7" height="7" rx="1.6"/><rect x="3.6" y="13.4" width="7" height="7" rx="1.6"/><rect x="13.4" y="13.4" width="7" height="7" rx="1.6"/>',
   pencil: '<path d="M11.4 4.6H6.4a2.4 2.4 0 0 0-2.4 2.4v10.6a2.4 2.4 0 0 0 2.4 2.4H17a2.4 2.4 0 0 0 2.4-2.4v-5"/><path d="M17.6 3.6a1.8 1.8 0 0 1 2.6 2.6L12.6 13.8l-3.4.8.8-3.4z"/>',
   eye: '<path d="M2.8 12c1.9-3.9 5.3-6.4 9.2-6.4s7.3 2.5 9.2 6.4c-1.9 3.9-5.3 6.4-9.2 6.4S4.7 15.9 2.8 12z"/><circle cx="12" cy="12" r="3"/>',
@@ -32,7 +33,7 @@ const PATHS: Record<string, string> = {
   filter: '<path d="M4 7h16M7 12h10M10 17h4"/>',
   hash: '<path d="M3.8 5.6a1.8 1.8 0 0 1 1.8-1.8h5.2c.5 0 .9.2 1.3.5l7.6 7.6a1.8 1.8 0 0 1 0 2.6l-5.2 5.2a1.8 1.8 0 0 1-2.6 0l-7.6-7.6a1.8 1.8 0 0 1-.5-1.3z"/><circle cx="8.4" cy="8.4" r="1.3"/>',
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
-  enter: '<path d="m9 10-5 5 5 5"/><path d="M20 4v7a4 4 0 0 1-4 4H4"/>',
+  enter: '<path d="M19.4 4.6v6.2a3.6 3.6 0 0 1-3.6 3.6H5"/><path d="m8.8 10.6-3.8 3.8 3.8 3.8"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   close: '<path d="M17.5 6.5l-11 11M6.5 6.5l11 11"/>',
   check: '<path d="m5 12.6 4.4 4.4L19 7.4"/>',

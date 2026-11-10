@@ -56,8 +56,8 @@ The account sheet's lists set the size for everything on phones:
 New phone screens use these tokens (`styles/mobile.css`), not sizes of their own.
 
 ## Icons
-- The app's icons are our own, drawn as Notion's menus are: even lines of one weight (1.5 on a 24 grid,
-  as Lucide's), round ends, no solid shapes but dots (⋯, the drag handle) — on every device, in
+- The app's icons are our own, drawn as Notion's menus are: even lines of one weight (1.5 on a 24 grid),
+  round ends, no solid shapes but dots (⋯, the drag handle) — on every device, in
   `core/ui/icon/icon-lines.ts` (as data: URLs — no request each), shown by `<app-icon name="…">` in the
   text's color. No pastel, no marker.
 - A new icon: drawn in `icon-lines.ts` in the same style (same grid, same stroke), its name added to

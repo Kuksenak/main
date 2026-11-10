@@ -45,7 +45,6 @@
   --menu-label-px: 0.5rem;
   --icon-menu: 1.25rem;
   --round-menu: 0.625rem;
-  --round-window: 0.75rem; /* (the search's, the trash's, an event's windows) */
   --round-menu-row: 0.375rem;
   --round-side: 0.5rem; /* (the floating page panel) */
   /* Round buttons as tall as the others; list rows 44 */
@@ -105,7 +104,7 @@ html[data-device='desktop'] {
   --round-side-row: 0.5rem;
   /* (menus and windows, as Notion's: solid white — glass on the white page melted into it — a clear
      edge and two shadows, a near one and a far one: they stand off the page) */
-  --menu-bg: #ffffff;
+  --menu-bg: var(--side-bg); /* (the popups — menus, windows, questions, pickers — in the sidebar's gray) */
   --menu-shadow: 0 0 0 1px rgb(15 15 15 / 0.07), 0 3px 6px rgb(15 15 15 / 0.08), 0 9px 24px rgb(15 15 15 / 0.16);
   /* (the heads' buttons: capsules, white, a hairline, a soft shadow) */
   --bar-button: #ffffff;
@@ -118,7 +117,7 @@ html.dark[data-device='desktop'] {
   --side-bg: #262628;
   --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.06), 0 4px 16px rgb(0 0 0 / 0.4);
   --side-text: #e5e5ea;
-  --icon: color-mix(in srgb, var(--text) 92%, transparent); /* (thin lines, light on dark: near the text's own, else lost) */
+  --icon: color-mix(in srgb, var(--text) 60%, transparent); /* (a soft gray, as Notion's dark theme's) */
   --dialog-bg: #2a2a2c;
   --text: #f5f5f5;
   --text-secondary: #98989f;
@@ -126,7 +125,7 @@ html.dark[data-device='desktop'] {
   --side-hover: rgb(255 255 255 / 0.04);
   --side-on: rgb(255 255 255 / 0.085);
   --side-on-text: #ffffff;
-  --menu-bg: #191919;
+  --menu-bg: var(--side-bg);
   --menu-shadow: 0 0 0 1px rgb(255 255 255 / 0.09), 0 3px 6px rgb(0 0 0 / 0.3), 0 9px 24px rgb(0 0 0 / 0.5);
   --bar-button: rgb(255 255 255 / 0.1);
   --bar-button-hover: rgb(255 255 255 / 0.16);

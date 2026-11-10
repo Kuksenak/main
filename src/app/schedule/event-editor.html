@@ -48,7 +48,7 @@
     (document:keydown.enter)="enter($event)"
     (document:mousedown)="outside($event, panel)"
     #panel
-    class="flex max-h-[84vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-window border-[0.5px] border-separator bg-dialog text-fg shadow-popover"
+    class="flex max-h-[84vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-menu popup-glass text-fg shadow-menu"
   >
     <div #head data-toolbar class="flex h-12 shrink-0 items-center gap-3 pr-3 pl-4.5">
       <app-icon name="calendar" colored class="size-5 shrink-0 text-icon" />

@@ -94,7 +94,8 @@ export class DesktopLayout {
     const items = this.store.items() ?? [];
     const lists: { id: List; label: TranslationKey; icon: IconName; pages: PageItem[] }[] = [];
     if (this.library()) {
-      // (the last opened first — one opened goes to the top at once — then the last changed: 5 in all)
+      // (the last opened first — one opened that isn't shown comes in at the top; one shown stays put — then
+      // the last changed: 5 in all)
       const byId = new Map(items.map((x) => [x.id, x]));
       const opened = this.opened().map((id) => byId.get(id)).filter((x): x is PageItem => !!x);
       const pages = [...opened, ...items.filter((x) => !opened.includes(x))].slice(0, RECENTS);
@@ -120,7 +121,9 @@ export class DesktopLayout {
     const id = this.openPage();
     if (!id) return;
     const ids = untracked(this.opened);
-    if (ids[0] === id) return;
+    // (already in the sidebar's list: stays where it is — only one not there comes in, at the top)
+    const shown = untracked(this.lists).find((l) => l.id === 'recents')?.pages ?? [];
+    if (ids[0] === id || shown.some((x) => x.id === id)) return;
     const next = [id, ...ids.filter((x) => x !== id)].slice(0, 50);
     this.opened.set(next);
     keep(OPENED, next.join(','));

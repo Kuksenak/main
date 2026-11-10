@@ -88,7 +88,6 @@
   --radius-side: var(--round-side);
   --radius-side-row: var(--round-side-row);
   --radius-menu: var(--round-menu);
-  --radius-window: var(--round-window);
   --radius-menu-row: var(--round-menu-row);
 
   --shadow-popover: var(--popover-shadow);
@@ -153,7 +152,12 @@
    Claude's: a solid panel, round by 10, 4 in, a hairline and a shadow; its rows 30 tall, 14px regular,
    round by 6, a soft gray under the pointer or the keys (`aria-selected`, focus). */
 @utility menu-panel {
-  @apply flex animate-menu-in flex-col rounded-menu bg-menu/80 p-1 text-fg shadow-menu backdrop-blur-[6px] backdrop-saturate-[180%];
+  @apply flex animate-menu-in flex-col rounded-menu popup-glass p-1 text-fg shadow-menu;
+}
+/* (the popups — windows, the question, the date / time pickers, the editor's bar: exactly as the menus,
+   a little see-through over a blur, the dark theme denser) */
+@utility popup-glass {
+  @apply bg-menu/80 backdrop-blur-[6px] backdrop-saturate-[180%] dark:bg-menu/92;
 }
 @utility menu-row {
   @apply flex min-h-menu-row w-full items-center gap-2 rounded-menu-row px-menu-row-x py-0.5 text-left text-ui leading-tight font-normal text-fg outline-none not-disabled:hover:bg-tint focus-visible:bg-tint aria-selected:bg-tint disabled:opacity-40;

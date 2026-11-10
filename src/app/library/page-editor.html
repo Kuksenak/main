@@ -66,7 +66,7 @@
       <!-- A selection in it — B I U S, Link over the block (what's on: gray) -->
       @if (focused() === i && (selection().a !== selection().b || linking()?.at === i)) {
         <div
-          class="absolute bottom-full left-0 z-30 mb-1 flex animate-menu-in items-center gap-0.5 rounded-menu bg-dialog p-1 text-fg shadow-popover"
+          class="absolute bottom-full left-0 z-30 mb-1 flex animate-menu-in items-center gap-0.5 rounded-menu popup-glass p-1 text-fg shadow-menu"
         >
           @if (linking()) {
             <form
