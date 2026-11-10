@@ -3,7 +3,7 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { Observable, tap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
-import { TAG_COLORS, TagColor, Toasts } from '../core/ui';
+import { TAG_CHOICES, TagColor, Toasts } from '../core/ui';
 import { LibraryStore } from './library.store';
 
 /** A tag of the account's: its name, its color. */
@@ -64,7 +64,7 @@ export class TagsStore {
   }
 
   /** A new tag's color: the next one round. */
-  readonly nextColor = computed<TagColor>(() => TAG_COLORS[this.tags().length % TAG_COLORS.length]);
+  readonly nextColor = computed<TagColor>(() => TAG_CHOICES[this.tags().length % TAG_CHOICES.length]);
 
   create(name: string, color: TagColor = this.nextColor()): Observable<Tag> {
     return this.http.post<Tag>(this.url, { name: name.trim(), color }).pipe(

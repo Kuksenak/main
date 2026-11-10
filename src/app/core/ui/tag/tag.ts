@@ -4,6 +4,8 @@ import { TranslationKey } from '../../i18n/translations';
 /** A tag's colors (as Notion's): the API's names, in the pickers' order. */
 export const TAG_COLORS = ['gray', 'brown', 'orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'red'] as const;
 export type TagColor = (typeof TAG_COLORS)[number];
+/** The colors offered for a tag (gray and brown no more — a tag already so keeps its color). */
+export const TAG_CHOICES: readonly TagColor[] = ['orange', 'yellow', 'green', 'blue', 'purple', 'pink', 'red'];
 
 // A tag's look: data-tag="green" on what wears it sets its pastel and its text (base.css: an unknown
 // color, gray), read by bg-tag / text-tag-text — the same classes whatever the color.
@@ -38,7 +40,7 @@ export class UiTag {
  */
 @Component({
   selector: 'ui-tag-swatch',
-  host: { class: 'block shrink-0 rounded-[30%] bg-tag', '[attr.data-tag]': 'color()' },
+  host: { class: 'block shrink-0 rounded-full bg-tag-dot', '[attr.data-tag]': 'color()' },
   template: '',
 })
 export class UiTagSwatch {

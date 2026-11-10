@@ -17,6 +17,7 @@ export const ICONS = [
   'grip',
   'dots',
   'bookmark',
+  'bookmark-filled',
   'link',
   'eye',
   'popout',
@@ -61,7 +62,7 @@ export type IconName = (typeof ICONS)[number];
  */
 @Component({
   selector: 'app-icon',
-  host: { class: 'inline-flex shrink-0', 'aria-hidden': 'true' },
+  host: { class: 'inline-flex shrink-0', 'aria-hidden': 'true', '[attr.data-tag]': 'tag()' },
   template: `
     @if (brand()) {
       <svg viewBox="0 0 24 24" class="size-full">
@@ -77,6 +78,13 @@ export type IconName = (typeof ICONS)[number];
           }
         }
       </svg>
+    } @else if (tag() && name() === 'hash') {
+      <!-- (a chosen tag's: the tag's shape solid in its color — as a favorite's bookmark) -->
+      <span
+        class="block size-full bg-tag-dot [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+        [style.mask-image]="fillUrl"
+        [style.-webkit-mask-image]="fillUrl"
+      ></span>
     } @else {
       @if (colored() && !lines()) {
         <!-- (small, coloured in: the pastel under, the lines over it in the text's color) -->
@@ -104,7 +112,8 @@ export type IconName = (typeof ICONS)[number];
         <!-- (the outline as a mask over the text's color: it takes the color it's in — gray, red on
              a Log out under the pointer, light in the dark theme) -->
         <span
-          class="block size-full bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+          class="block size-full bg-current data-favorite:bg-favorite [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+          [attr.data-favorite]="name() === 'bookmark-filled' ? '' : null"
           [style.mask-image]="url()"
           [style.-webkit-mask-image]="url()"
         ></span>
@@ -119,6 +128,9 @@ export class Icon {
   readonly colored = input(false, { transform: booleanAttribute });
   // (coloured in with another pastel: a CSS color — a page's tag's, tagTint)
   readonly tint = input<string | null>(null);
+  // (a chosen tag's color — `hash` coloured in with it: its pastel and its ink, base.css's data-tag)
+  readonly tag = input<string | null | undefined>(null);
+  protected readonly fillUrl = ICON_LINES['hash-fill'];
   // (the brands' marks: drawn here; the rest: their files)
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
   // (from the app's own code, not a file each: no request each — ICON_DATA, tools/icons.py)

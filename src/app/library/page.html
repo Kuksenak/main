@@ -5,7 +5,38 @@
 @if (desktop && page(); as p) {
   <!-- (the bar's height, 52 — as the sections' heads and the sidebar's top: one bar across the window) -->
   <!-- (an installed app with its own title bar: this row up on it, at its right — components.css) -->
-  <div data-page-head data-titlebar data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-4">
+  <div data-page-head data-titlebar data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-5">
+    <!-- Its name at the row's left (20px, regular), typed over right there ("Rename" its hint); its words
+         level with the text's under it (the row 20 in as the page, the field 16 in as a block); Enter — on
+         into the text. Right after it, as Claude's, ⌄: the page's menu. The buttons together at the right. -->
+    <form class="flex min-w-0 shrink items-center" (submit)="$event.preventDefault(); titleDone()">
+      <input
+        #titleField
+        type="text"
+        [value]="title()"
+        (input)="typedTitle(titleField.value)"
+        (keydown.escape)="titleField.blur()"
+        [placeholder]="'library.untitled' | t"
+        [attr.aria-label]="'library.rename' | t"
+        maxlength="200"
+        autocomplete="off"
+        [uiTip]="'library.rename' | t"
+        class="h-button min-w-24 max-w-full truncate rounded-button bg-transparent px-4 text-heading font-normal text-fg outline-none [field-sizing:content] placeholder:text-fg-secondary hover:bg-tint focus:bg-tint"
+      />
+    </form>
+    <button
+      uiButton
+      #more
+      type="button"
+      icon="chevron-down"
+      outline
+      (click)="menuOpen.set(!menuOpen())"
+      [attr.aria-expanded]="menuOpen()"
+      [attr.aria-label]="'library.more' | t"
+      [uiTip]="menuOpen() ? null : ('library.more' | t)"
+      class="-ml-1.5"
+    ></button>
+    <div class="ml-auto flex shrink-0 items-center gap-0.5">
     <!-- Its tag, the row's first: a button as the others — # and Tag; a tag on it: the button the
          tag's own whole (its pastel, its name); ▾ either way (a choice) — a click: the picker -->
     @if (tags.of(p.tagIds)[0]; as tag) {
@@ -15,10 +46,9 @@
         (click)="tagsOpen.set(!tagsOpen())"
         [attr.aria-expanded]="tagsOpen()"
         [attr.aria-label]="'tags.title' | t"
-        class="mr-1 inline-flex h-button max-w-56 min-w-0 shrink items-center gap-1 rounded-button bg-tag px-2 text-ui text-tag-text hover:brightness-95"
-        [attr.data-tag]="tag.color"
+        class="inline-flex h-button max-w-56 min-w-0 shrink items-center gap-1.5 rounded-button px-2 text-ui text-fg-secondary hover:bg-tint hover:text-fg aria-expanded:bg-tint aria-expanded:text-fg"
       >
-        <app-icon name="hash" class="size-4 shrink-0" />
+        <app-icon name="hash" [tag]="tag.color" class="size-icon-menu shrink-0" />
         <span class="min-w-0 truncate">{{ tag.name }}</span>
         <app-icon name="chevron-down" class="-ml-0.5 size-4 shrink-0 opacity-50" />
       </button>
@@ -39,56 +69,44 @@
       <app-tag-picker [origin]="tagsAt()!" [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagsOpen.set(false)" />
     }
     @if (saving()) {
-      <span class="mr-1 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
+      <span class="text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
     }
     <!-- Publish, the lock either way: not published — a click publishes it (its public link made and
          copied); published — "Published" (a click: Unpublish, asked first — the link stops working)
          and the link's own button (copied at a click); Preview: in ⋯ -->
+    <!-- published: the link's own button (copied at a click); Publish / Unpublish in ⋯ -->
     @if (p.shareToken) {
-      <!-- (Published and its link: one capsule, as macOS's grouped toolbar items) -->
-      <span data-group>
-        <button uiButton type="button" icon="lock" outline (click)="unshare($event)" [uiTip]="'library.unpublish' | t" [attr.aria-label]="'library.shared' | t">{{ 'library.shared' | t }}</button>
-        <button
-          uiButton
-          type="button"
-          icon="link"
-          outline
-          (click)="copyLink()"
-          [uiTip]="'library.copyLinkTip' | t"
-          [attr.aria-label]="'library.copyLink' | t"
-        ></button>
-      </span>
-    } @else {
-      <button uiButton type="button" icon="lock" outline (click)="share(true)" [uiTip]="'library.shareNote' | t" [attr.aria-label]="'library.share' | t">{{ 'library.share' | t }}</button>
+      <button
+        uiButton
+        type="button"
+        icon="link"
+        outline
+        (click)="copyLink()"
+        [uiTip]="'library.copyLinkTip' | t"
+        [attr.aria-label]="'library.copyLink' | t"
+      ></button>
     }
     <!-- 🔖 (in the favorites — the sidebar's — or not) and ⋯: one capsule -->
-    <span data-group>
     <button
       uiButton
       type="button"
-      [icon]="'bookmark'"
+      [icon]="p.favorite ? 'bookmark-filled' : 'bookmark'"
       [outline]="!p.favorite"
       (click)="favorite()"
       [attr.aria-pressed]="p.favorite"
       [attr.aria-label]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
       [uiTip]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
     ></button>
-    <button
-      uiButton
-      #more
-      type="button"
-      icon="dots"
-      outline
-      (click)="menuOpen.set(!menuOpen())"
-      [attr.aria-expanded]="menuOpen()"
-      [attr.aria-label]="'library.more' | t"
-      [uiTip]="menuOpen() ? null : ('library.more' | t)"
-    ></button>
-    </span>
+    </div>
     @if (menuOpen()) {
       <!-- The assistant, Preview; Duplicate; Move to trash -->
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
         <button type="button" uiMenuItem icon="sparkle" (click)="aiOpen.set(true)">{{ 'editor.ai' | t }}</button>
+        @if (p.shareToken) {
+          <button type="button" uiMenuItem icon="lock" (click)="unshare(more.element)">{{ 'library.unpublish' | t }}</button>
+        } @else {
+          <button type="button" uiMenuItem icon="link" (click)="share(true)">{{ 'library.share' | t }}</button>
+        }
         <button type="button" uiMenuItem icon="popout" (click)="preview()">{{ 'library.preview' | t }}</button>
         <ui-menu-separator />
         <button type="button" uiMenuItem icon="duplicate" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>
@@ -100,25 +118,10 @@
 }
 
 <!-- (desktops: the blocks nearly the window's whole width, their left edge under the top row's name's) -->
-<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-5 desktop:pt-6">
+<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-5 desktop:pt-1">
 
   @if (page(); as p) {
     @if (desktop) {
-      <!-- Its name: a big title over the text, typed over right there; Enter — on into the text -->
-      <form (submit)="$event.preventDefault(); titleDone()">
-        <input
-          #titleField
-          type="text"
-          [value]="title()"
-          (input)="typedTitle(titleField.value)"
-          (keydown.escape)="titleField.blur()"
-          [placeholder]="'library.untitled' | t"
-          [attr.aria-label]="'library.rename' | t"
-          maxlength="200"
-          autocomplete="off"
-          class="w-full bg-transparent text-title leading-tight font-bold tracking-tight text-fg outline-none placeholder:text-fg-secondary/50"
-        />
-      </form>
       <!-- The text: blocks, written right on the page -->
       <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
     } @else {
@@ -188,7 +191,7 @@
           </span>
         </button>
       }
-      <button type="button" uiPopItem icon="bookmark" (click)="actions.close(); favorite()">
+      <button type="button" uiPopItem [icon]="p.favorite ? 'bookmark-filled' : 'bookmark'" (click)="actions.close(); favorite()">
         {{ (p.favorite ? 'library.unfavorite' : 'library.favorite') | t }}
       </button>
       <button type="button" uiPopItem icon="duplicate" (click)="actions.close(); duplicate()">{{ 'library.duplicate' | t }}</button>

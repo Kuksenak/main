@@ -14,7 +14,7 @@ import { LibraryStore, PageItem } from './library.store';
   imports: [TranslatePipe, UiMenu, UiMenuItem, UiMenuSeparator],
   template: `
     <ui-menu narrow [origin]="origin()" (closed)="closed.emit()">
-      <button type="button" uiMenuItem icon="bookmark" (click)="favorite()">
+      <button type="button" uiMenuItem [icon]="page().favorite ? 'bookmark-filled' : 'bookmark'" (click)="favorite()">
         {{ (page().favorite ? 'library.unfavorite' : 'library.favorite') | t }}
       </button>
       <button type="button" uiMenuItem icon="duplicate" (click)="duplicate()">{{ 'library.duplicate' | t }}</button>

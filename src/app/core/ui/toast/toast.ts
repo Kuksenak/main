@@ -53,9 +53,9 @@ export class Toasts {
  * Where the toasts show, dark as iOS's / Telegram's (white words, a soft shadow) — phones: a bar as
  * wide as the screen at the bottom (its side margins the floating buttons'), on their line — over
  * them, a little see-through; the words at its left, wrapped (with the keyboard up: just over it);
- * desktops: a card each in the bottom right
- * corner, as wide as the sidebar, its words wrapped; more than fit in 80% of the screen's height:
- * they scroll.
+ * desktops: a card each in the bottom right corner, as the menus (see-through: 80%, the dark theme 90%; their corners
+ * and shadow — 16 of room round them, else the scrolling box cut the shadow off), as wide as the
+ * sidebar, its words wrapped; more than fit in 80% of the screen's height: they scroll.
  */
 @Component({
   selector: 'ui-toasts',
@@ -63,7 +63,7 @@ export class Toasts {
     class:
       'pointer-events-none fixed z-[70] flex flex-col gap-2 ' +
       'mobile:inset-x-0 mobile:items-center mobile:px-4 ' +
-      'desktop:right-4 desktop:bottom-4 desktop:max-h-[80vh] desktop:w-nav desktop:overflow-y-auto desktop:p-1',
+      'desktop:right-0 desktop:bottom-0 desktop:max-h-[80vh] desktop:w-[calc(var(--nav-w)+2rem)] desktop:overflow-y-auto desktop:p-4',
     '[style.bottom]': 'bottom()',
     'aria-live': 'polite',
   },
@@ -72,16 +72,16 @@ export class Toasts {
       <div
         role="status"
         class="pointer-events-auto flex max-w-full shrink-0 animate-menu-in gap-2.5 bg-toast py-2.5 pr-2 pl-4 text-toast-text shadow-toast backdrop-blur-[20px]
-               mobile:min-h-round mobile:w-full mobile:items-center mobile:rounded-[1.375rem] mobile:bg-toast/85 mobile:text-body desktop:items-start desktop:rounded-menu desktop:text-ui"
+               mobile:min-h-round mobile:w-full mobile:items-center mobile:rounded-[1.375rem] mobile:bg-toast/85 mobile:text-body desktop:items-center desktop:rounded-menu desktop:bg-menu/80 desktop:backdrop-blur-[6px] desktop:backdrop-saturate-[180%] desktop:dark:bg-menu/90 desktop:py-2 desktop:pl-3 desktop:text-ui desktop:text-fg desktop:shadow-menu"
         [class.pr-4]="!toast.action"
         (click)="toasts.dismiss(toast.id)"
       >
         @if (toast.error) {
-          <span class="size-2 shrink-0 rounded-full bg-danger desktop:mt-1.5"></span>
+          <span class="size-2 shrink-0 rounded-full bg-danger"></span>
         }
         <span class="min-w-0 flex-1 break-words">{{ toast.text }}</span>
         @if (toast.action; as action) {
-          <button type="button" class="shrink-0 rounded-full desktop:rounded-button px-2.5 py-1 font-semibold text-toast-action hover:bg-toast-text/10" (click)="action.run()">
+          <button type="button" class="shrink-0 rounded-full desktop:rounded-menu-row px-2.5 py-1 font-semibold text-toast-action hover:bg-toast-text/10 desktop:my-0 desktop:font-normal desktop:text-fg desktop:hover:bg-tint" (click)="action.run()">
             {{ action.label }}
           </button>
         }

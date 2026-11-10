@@ -18,9 +18,9 @@
     [attr.aria-expanded]="!!appMenuAt()"
     [uiTip]="'nav.appMenu' | t"
     [attr.aria-label]="'nav.appMenu' | t"
-    class="grid size-8 place-items-center rounded-md text-fg hover:bg-tint aria-expanded:bg-tint-strong"
+    class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg aria-expanded:bg-tint aria-expanded:text-fg"
   >
-    <app-icon name="menu" class="size-6" />
+    <app-icon name="menu" class="size-icon-menu" />
   </button>
   <button
     type="button"
@@ -28,15 +28,15 @@
     [attr.aria-pressed]="!sidebarHidden()"
     [uiTip]="(sidebarHidden() ? 'nav.showSidebar' : 'nav.hideSidebar') | t"
     [attr.aria-label]="(sidebarHidden() ? 'nav.showSidebar' : 'nav.hideSidebar') | t"
-    class="grid size-8 place-items-center rounded-md text-fg hover:bg-tint"
+    class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg"
   >
-    <app-icon name="sidebar" class="size-6" />
+    <app-icon name="sidebar" class="size-icon-menu" />
   </button>
-  <button type="button" (click)="location.back()" [uiTip]="'nav.back' | t" [attr.aria-label]="'nav.back' | t" class="grid size-8 place-items-center rounded-md text-fg hover:bg-tint">
-    <app-icon name="chevron-left" class="size-5" />
+  <button type="button" (click)="location.back()" [uiTip]="'nav.back' | t" [attr.aria-label]="'nav.back' | t" class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
+    <app-icon name="chevron-left" class="size-icon-menu" />
   </button>
-  <button type="button" (click)="location.forward()" [uiTip]="'nav.forward' | t" [attr.aria-label]="'nav.forward' | t" class="grid size-8 place-items-center rounded-md text-fg hover:bg-tint">
-    <app-icon name="chevron-right" class="size-5" />
+  <button type="button" (click)="location.forward()" [uiTip]="'nav.forward' | t" [attr.aria-label]="'nav.forward' | t" class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
+    <app-icon name="chevron-right" class="size-icon-menu" />
   </button>
 </header>
 <div class="flex min-h-0 flex-1">
@@ -98,7 +98,7 @@
         @if (!folds.has('events')) {
           @for (event of upcoming(); track event.id + event.startsAt) {
             <button uiSidebarItem icon="calendar" (click)="openEvent(event)" class="pl-3.5! [&>app-icon]:hidden">
-              <span class="text-fg-secondary tabular-nums">{{ when(event) }}</span> {{ event.title }}
+              <span class="text-fg/70 tabular-nums">{{ when(event) }}</span> {{ event.title }}
             </button>
           } @empty {
             <!-- (none coming: a gray line where they'd be) -->
@@ -158,8 +158,9 @@
     </ng-template>
     <!-- (a page's row: its icon, its name, ⋯ under the pointer; dragged onto a tag: tagged so) -->
     <ng-template #pageRow let-page>
-      <a uiSidebarItem icon="page" [tint]="tint(page)" [routerLink]="['/library', page.id]" draggable="true" (dragstart)="drag($event, page)" class="pl-3.5!">
-        {{ page.title.trim() || ('library.untitled' | t) }}
+      <!-- (as the events: no icon — its name gray, where the events' times are; the places' names over them dark) -->
+      <a uiSidebarItem icon="page" [routerLink]="['/library', page.id]" draggable="true" (dragstart)="drag($event, page)" class="pl-3.5! [&>app-icon]:hidden">
+        <span class="text-fg/70">{{ page.title.trim() || ('library.untitled' | t) }}</span>
         <button
           itemEnd
           uiSidebarAction

@@ -33,8 +33,10 @@ export class UiMenu {
   private done = false;
 
   protected readonly sidePositions: ConnectedPosition[] = [
-    { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top', offsetX: 4, offsetY: -6 },
-    { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top', offsetX: -4, offsetY: -6 },
+    // (its first row level with the row it opens from — the panel's 4 of padding above it; at the
+    // menu's right, else its left)
+    { originX: 'end', originY: 'top', overlayX: 'start', overlayY: 'top', offsetX: 6, offsetY: -4 },
+    { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'top', offsetX: -6, offsetY: -4 },
   ];
 
   protected readonly positions: ConnectedPosition[] = [

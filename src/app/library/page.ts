@@ -185,9 +185,9 @@ export class PageView {
     });
   }
 
-  // "Published" clicked: Unpublish — asked first (the link stops working)
-  protected async unshare(e: Event): Promise<void> {
-    const yes = await this.confirm.ask(e.currentTarget as HTMLElement, {
+  // Unpublish (⋯'s menu) — asked first, at ⋯ (the link stops working)
+  protected async unshare(at: HTMLElement): Promise<void> {
+    const yes = await this.confirm.ask(at, {
       text: this.i18n.t('library.unshareAsk'),
       yes: this.i18n.t('library.unpublish'),
       danger: true,

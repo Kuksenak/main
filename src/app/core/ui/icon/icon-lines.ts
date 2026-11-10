@@ -12,6 +12,8 @@ const PATHS: Record<string, string> = {
   trash: '<path d="M4.4 6.6h15.2M9.4 6.4V4.8a1 1 0 0 1 1-1h3.2a1 1 0 0 1 1 1v1.6"/><path d="m6.2 6.8.8 12.4a1.9 1.9 0 0 0 1.9 1.8h6.2a1.9 1.9 0 0 0 1.9-1.8l.8-12.4M10.2 10.8v6M13.8 10.8v6"/>',
   person: '<circle cx="12" cy="8" r="4"/><path d="M4.6 20.4c.6-3.6 3.6-6 7.4-6s6.8 2.4 7.4 6"/>',
   bookmark: '<path d="M7 3.2h10a1.6 1.6 0 0 1 1.6 1.6v15.6L12 16.4l-6.6 4V4.8A1.6 1.6 0 0 1 7 3.2z"/>',
+  // (a favorite's: the same, filled in)
+  'bookmark-filled': `<path ${S} d="M7 3.2h10a1.6 1.6 0 0 1 1.6 1.6v15.6L12 16.4l-6.6 4V4.8A1.6 1.6 0 0 1 7 3.2z"/><path d="M7 3.2h10a1.6 1.6 0 0 1 1.6 1.6v15.6L12 16.4l-6.6 4V4.8A1.6 1.6 0 0 1 7 3.2z"/>`,
   lock: '<rect x="4.6" y="10.4" width="14.8" height="10.2" rx="2.2"/><path d="M8 10.4V7.6a4 4 0 0 1 8 0v2.8M12 14.6v2"/>',
   // (the assistant: a robot's head — a squarish face, its antenna bent to the left, ears, two eyes)
   sparkle: '<rect x="4" y="8.2" width="16" height="11.8" rx="2.2"/><path d="M12 8.2V4.2H8.4M2.2 14h1.8M20 14h1.8M9.1 12.9v2.2M14.9 12.9v2.2"/>',
@@ -32,6 +34,8 @@ const PATHS: Record<string, string> = {
   search: '<circle cx="10.6" cy="10.6" r="6.6"/><path d="m15.6 15.6 4.6 4.6"/>',
   filter: '<path d="M4 7h16M7 12h10M10 17h4"/>',
   hash: '<path d="M3.8 5.6a1.8 1.8 0 0 1 1.8-1.8h5.2c.5 0 .9.2 1.3.5l7.6 7.6a1.8 1.8 0 0 1 0 2.6l-5.2 5.2a1.8 1.8 0 0 1-2.6 0l-7.6-7.6a1.8 1.8 0 0 1-.5-1.3z"/><circle cx="8.4" cy="8.4" r="1.3"/>',
+  // (the tag's shape solid, its hole cut: the fill under a chosen tag's lines — icon.ts `tag`)
+  'hash-fill': `<path ${S} d="M3.8 5.6a1.8 1.8 0 0 1 1.8-1.8h5.2c.5 0 .9.2 1.3.5l7.6 7.6a1.8 1.8 0 0 1 0 2.6l-5.2 5.2a1.8 1.8 0 0 1-2.6 0l-7.6-7.6a1.8 1.8 0 0 1-.5-1.3zm4.6 1.5a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6z"/>`,
   menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
   enter: '<path d="M19.4 4.6v6.2a3.6 3.6 0 0 1-3.6 3.6H5"/><path d="m8.8 10.6-3.8 3.8 3.8 3.8"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',

@@ -86,21 +86,46 @@
   [data-side-wrap] > ui-sidebar {
     padding-top: env(titlebar-area-height, 2.25rem);
   }
+  /* (a page's buttons — the tag, Publish, the bookmark, ⋯ — up on the bar at its right, by the window's
+     buttons, when the window is wide enough for them there (narrower: on the page's row at its right, as ever);
+     its name stays on the page's row) */
+  @media (min-width: 56rem) {
+    /* (no blur on the row then — a blur makes the row, not the window, what a fixed piece in it is placed
+       by; and the row over the bar, else the bar (its stacking above the page's) took their clicks) */
+    [data-page-head] {
+      z-index: 50 !important;
+      -webkit-backdrop-filter: none !important;
+      backdrop-filter: none !important;
+    }
+    [data-page-head] > div:last-of-type {
+      position: fixed;
+      top: 0;
+      right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem);
+      z-index: 40;
+      height: env(titlebar-area-height, 2.25rem);
+    }
+    [data-page-head] > div:last-of-type :is(button, a) {
+      app-region: no-drag;
+      -webkit-app-region: no-drag;
+    }
+  }
   [data-side-trash],
   ui-sidebar > div:has(> [data-side-account]) {
     display: none !important;
   }
 }
 
-/* Desktops' toolbar buttons: on a head (`data-toolbar`) its buttons (uiButton) are boxes (round by 6, as
-   Notion's — no pills) — the page's white (dark: a gray), a hairline and a soft shadow, as tall as the kit's buttons; just an
-   icon: a circle. (Plain CSS: every head's buttons at once, the kit's uiButton elsewhere as it is.) */
+/* Desktops' toolbar buttons, as Notion's heads': on a head (`data-toolbar`) its buttons (uiButton) flat —
+   no fill, no line, no shadow; their words a little softer than the text, their icons the menus' (size,
+   gray, weight); a light gray under the pointer and while open; just an icon: a square. (Plain CSS: every
+   head's buttons at once, the kit's uiButton elsewhere as it is.) */
 [data-device='desktop'] [data-toolbar] :is(button, a)[uibutton] {
   height: var(--button-h);
-  padding-inline: 0.75rem;
+  padding-inline: 0.5rem;
   border-radius: var(--round-button);
-  background-color: var(--bar-button);
-  box-shadow: var(--bar-button-shadow);
+  background-color: transparent;
+  box-shadow: none;
+  color: var(--text-secondary);
 }
 [data-device='desktop'] [data-toolbar] :is(button, a)[uibutton]:has(> span:empty) {
   width: var(--button-h);
@@ -108,35 +133,8 @@
 }
 [data-device='desktop'] [data-toolbar] :is(button, a)[uibutton]:not(:disabled):hover,
 [data-device='desktop'] [data-toolbar] :is(button, a)[uibutton][aria-expanded='true'] {
-  background-color: var(--bar-button-hover);
-}
-/* (buttons that belong together — `<span data-group>` on a head — one capsule, as macOS 27's grouped
-   toolbar items: the capsule's look on the group, its buttons plain inside, a hairline between) */
-[data-device='desktop'] [data-toolbar] [data-group] {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  border-radius: var(--round-button);
-  background-color: var(--bar-button);
-  box-shadow: var(--bar-button-shadow);
-}
-[data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton] {
-  border-radius: 0;
-  background-color: transparent;
-  box-shadow: none;
-}
-[data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton]:first-child {
-  border-radius: var(--round-button) 0 0 var(--round-button);
-}
-[data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton]:last-child {
-  border-radius: 0 var(--round-button) var(--round-button) 0;
-}
-[data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton] + :is(button, a)[uibutton] {
-  box-shadow: inset 0.5px 0 0 var(--separator);
-}
-[data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton]:not(:disabled):hover,
-[data-device='desktop'] [data-toolbar] [data-group] > :is(button, a)[uibutton][aria-expanded='true'] {
-  background-color: var(--bar-button-hover);
+  background-color: var(--tint);
+  color: var(--text);
 }
 
 /* (the sidebar's first row — the search — level with the page's head beside it: centered on its 52, the

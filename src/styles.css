@@ -21,6 +21,7 @@
   --color-danger: var(--danger);
   --color-accent: var(--accent);
   --color-brand: var(--brand);
+  --color-favorite: var(--favorite);
   --color-success: var(--success);
   --color-strong: var(--strong-bg);
   --color-on-strong: var(--strong-fg);
@@ -49,6 +50,7 @@
   /* (a tag's: its element's data-tag picks the color, base.css) */
   --color-tag: var(--tag);
   --color-tag-text: var(--tag-text);
+  --color-tag-dot: var(--tag-dot);
   --color-grabber: var(--grabber);
   --color-highlight: var(--highlight);
 
@@ -103,6 +105,7 @@
 @theme {
   --text-footnote: var(--font-footnote);
   --text-title: var(--font-title);
+  --text-heading: var(--font-heading);
   --text-tip: 0.75rem; /* 12px: a hover hint (core/ui/tip) */
   --text-caption: 0.6875rem; /* 11px: the smallest — e.g. a menu's foot (when edited, made) */
 

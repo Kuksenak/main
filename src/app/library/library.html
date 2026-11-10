@@ -36,11 +36,10 @@
           [attr.aria-label]="'tags.title' | t"
           [uiTip]="picked?.name ?? ((tagFilter() === noTag ? 'tags.noTag' : 'tags.all') | t)"
           tipIfCut
-          [attr.data-tag]="picked?.color ?? null"
-          class="max-w-28 text-left [&>span]:max-w-none [&>span]:flex-1 data-tag:bg-tag data-tag:text-tag-text data-tag:aria-expanded:bg-tag data-tag:not-disabled:hover:bg-tag data-tag:hover:brightness-95"
+          class="max-w-28 text-left [&>span]:max-w-none [&>span]:flex-1"
         >
           @if (picked) {
-            <app-icon name="hash" class="mr-1 size-4 align-middle -mt-0.5" />{{ picked.name }}
+            <app-icon name="hash" [tag]="picked.color" class="mr-1.5 size-icon-menu align-middle -mt-0.5" />{{ picked.name }}
           } @else {
             {{ (tagFilter() === noTag ? 'tags.noTag' : 'tags.all') | t }}
           }

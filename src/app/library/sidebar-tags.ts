@@ -4,8 +4,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Confirm, TAG_COLORS, tagColorLabel, UiFoldName, UiTagSwatch } from '../core/ui';
-import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
+import { Confirm, TAG_CHOICES, tagColorLabel, UiFoldName, UiTagSwatch } from '../core/ui';
+import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { UiSidebarAction, UiSidebarField, UiSidebarItem, UiSidebarRow, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { keptFolds } from '../core/utils/storage';
@@ -26,17 +26,16 @@ export const PAGE_DRAG = 'application/x-page';
   selector: 'app-sidebar-tags',
   imports: [
     UiFoldName,
+    UiTagSwatch,
     TranslatePipe,
     UiMenu,
     UiMenuItem,
-    UiMenuLabel,
     UiMenuSeparator,
     UiSidebarAction,
     UiSidebarField,
     UiSidebarItem,
     UiSidebarRow,
     UiSidebarScroll,
-    UiTagSwatch,
     UiTip,
   ],
   host: { class: 'flex min-h-0 flex-initial flex-col gap-px' },
@@ -48,7 +47,7 @@ export class SidebarTags {
   private readonly router = inject(Router);
   private readonly confirm = inject(Confirm);
   private readonly i18n = inject(I18nService);
-  protected readonly colors = TAG_COLORS;
+  protected readonly colors = TAG_CHOICES;
   protected readonly colorLabel = tagColorLabel;
 
   // (folded away — kept on this device)
@@ -71,6 +70,9 @@ export class SidebarTags {
   protected readonly adding = signal(false);
   // ⋯ : its menu at the button; Rename: a field in its row
   protected readonly menuFor = signal<{ tag: Tag; at: HTMLElement } | null>(null);
+  protected closeMenu(): void {
+    this.menuFor.set(null);
+  }
   protected readonly renaming = signal<string | null>(null);
   // A page dragged over a row: that row gray
   protected readonly dropOn = signal<string | null>(null);
