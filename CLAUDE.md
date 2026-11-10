@@ -56,12 +56,12 @@ The account sheet's lists set the size for everything on phones:
 New phone screens use these tokens (`styles/mobile.css`), not sizes of their own.
 
 ## Icons
-- The app's icons are plain even lines, as Notion's / Claude's: Lucide's (lucide.dev, ISC licence —
-  its notice kept in the file), on every device, in `core/ui/icon/icon-lines.ts` (24×24, stroke 1.5,
-  as data: URLs — no request each), shown by `<app-icon name="…">` in the text's color. No pastel, no
-  marker.
-- A new icon: its Lucide paths copied into `icon-lines.ts` under our name, the name added to `ICONS`
-  (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS`.
+- The app's icons are our own, drawn as Notion's menus are: even lines of one weight (1.5 on a 24 grid,
+  as Lucide's), round ends, no solid shapes but dots (⋯, the drag handle) — on every device, in
+  `core/ui/icon/icon-lines.ts` (as data: URLs — no request each), shown by `<app-icon name="…">` in the
+  text's color. No pastel, no marker.
+- A new icon: drawn in `icon-lines.ts` in the same style (same grid, same stroke), its name added to
+  `ICONS` (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS`.
 - (The old marker-drawn set — `tools/icons.py`, `public/icons/`, `icon-data.ts` — is only a fallback for
   a name with no line icon; never hand-edit `icon-data.ts`.)
 

@@ -3,16 +3,17 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Icon, IconName } from '../icon/icon';
 import { UiScrollBar } from '../scroll-bar/scroll-bar';
 
-// (a row: its look, its icon (one color — the chosen one's as its text) and name — the places' and the buttons'. One chosen at a time, darker than
-// one under the pointer, its name a little heavier (450))
+// (a row: its look, its icon (gray) and name — the places' and the buttons'. One chosen at a time, as
+// macOS's: the whole row a gray of its own, its name and icon darker (450); under the pointer a fainter gray)
 const ROW =
   'group/row flex h-side-row shrink-0 items-center gap-2 rounded-side-row px-side-row-x text-left text-ui font-normal text-side-text outline-none ' +
   'hover:bg-side-hover focus-visible:bg-side-hover aria-expanded:bg-side-hover ' +
-  'aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-side-on-text aria-[current=page]:[&>app-icon]:text-current ' +
-  'data-on:bg-side-on data-on:font-[450] data-on:text-side-on-text data-on:[&>app-icon]:text-current ' +
+  'aria-[current=page]:bg-side-on aria-[current=page]:font-[450] aria-[current=page]:text-side-on-text aria-[current=page]:hover:bg-side-on aria-[current=page]:[&>app-icon]:text-current ' +
+  'data-on:bg-side-on data-on:font-[450] data-on:text-side-on-text data-on:hover:bg-side-on data-on:[&>app-icon]:text-current ' +
   // (a window open — the search, Recently deleted: its row the only chosen one, the page's not)
   'in-data-window:aria-[current=page]:not-data-on:bg-transparent in-data-window:aria-[current=page]:not-data-on:font-normal ' +
-  'in-data-window:aria-[current=page]:not-data-on:text-side-text in-data-window:aria-[current=page]:not-data-on:hover:bg-side-hover';
+  'in-data-window:aria-[current=page]:not-data-on:text-side-text in-data-window:aria-[current=page]:not-data-on:[&>app-icon]:text-icon ' +
+  'in-data-window:aria-[current=page]:not-data-on:hover:bg-side-hover';
 const TEMPLATE = `
   <app-icon [name]="icon()" class="size-icon-side text-icon" />
   <span class="min-w-0 flex-1 truncate"><ng-content /></span>
