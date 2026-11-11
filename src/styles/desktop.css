@@ -95,6 +95,7 @@ html[data-device='desktop'] {
   --title-bar: #ffffff;
   --side-bg: #ececec; /* (macOS 26's sidebar gray: Messages, measured) */
   --side-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.06), 0 4px 16px rgb(0 0 0 / 0.06);
+  --capsule-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.1), 0 1px 4px rgb(0 0 0 / 0.08); /* (a Mac's title bar's capsules) */
   --side-text: #1c1c1e;
   --text: #000000;
   --text-secondary: #6e6e73;
@@ -114,6 +115,7 @@ html.dark[data-device='desktop'] {
   --title-bar: #191919;
   --side-bg: #262628;
   --side-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.06), 0 4px 16px rgb(0 0 0 / 0.4);
+  --capsule-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.12), 0 1px 4px rgb(0 0 0 / 0.4);
   --side-text: #e5e5ea;
   --icon: color-mix(in srgb, var(--text) 60%, transparent); /* (a soft gray, as Notion's dark theme's) */
   --dialog-bg: #2a2a2c;
