@@ -50,11 +50,9 @@
      its edges, the page flat.) -->
 <div data-side-wrap class="flex w-nav shrink-0 flex-col" [class.hidden]="sidebarHidden()">
   <ui-sidebar class="h-auto! w-auto! min-h-0 flex-1" [attr.data-window]="windowOpen() ? '' : null">
-    <!-- Search (Ctrl K / ⌘K too), as Claude's: a row as the places' — its loupe, its word, the keys
-         quiet at its right; a click: the search window -->
+    <!-- Search, as Claude's: a row as the places' — its loupe, its word; a click: the search window -->
     <button uiSidebarItem icon="search" (click)="search.open.set(true)" [attr.data-on]="search.open() ? '' : null" class="shrink-0">
       {{ 'search.title' | t }}
-      <span itemEnd class="shrink-0 text-caption tracking-wide text-fg-secondary/70">{{ shortcut }}</span>
     </button>
     @for (place of places(); track place.path) {
       @if (place.path === '/library') {
@@ -297,12 +295,10 @@
       <app-trash-list #trashList [query]="trashQuery()" [(index)]="trashIndex" (restored)="trashOpen.set(false)" />
     </ui-window-list>
     <ui-window-foot>
-      <ui-window-keys [enter]="'trash.restoreKey' | t">
-        <span class="flex-1">{{ 'trash.note' | t }}</span>
-        @if (store.trash()?.length) {
-          <button uiButton type="button" (click)="store.askDeleteForever(null, $any($event.currentTarget))"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
-        }
-      </ui-window-keys>
+      <span class="flex-1">{{ 'trash.note' | t }}</span>
+      @if (store.trash()?.length) {
+        <button uiButton type="button" (click)="store.askDeleteForever(null, $any($event.currentTarget))"><span class="text-danger">{{ 'trash.emptyAll' | t }}</span></button>
+      }
     </ui-window-foot>
   </ui-window>
 }

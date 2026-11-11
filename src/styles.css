@@ -20,7 +20,6 @@
   --color-icon: var(--icon);
   --color-danger: var(--danger);
   --color-accent: var(--accent);
-  --color-brand: var(--brand);
   --color-favorite: var(--favorite);
   --color-success: var(--success);
   --color-strong: var(--strong-bg);
@@ -33,7 +32,6 @@
   --color-side-hover: var(--side-hover);
   --color-side-on: var(--side-on);
   --color-side-text: var(--side-text);
-  --color-side-on-text: var(--side-on-text);
   --color-glass: var(--glass);
   --color-menu: var(--menu-bg);
   --color-on-accent: var(--on-accent);
@@ -87,15 +85,12 @@
   --radius-capsule: var(--round-capsule);
   --radius-card: var(--round-card);
   --radius-button: var(--round-button);
-  --radius-side: var(--round-side);
   --radius-side-row: var(--round-side-row);
   --radius-menu: var(--round-menu);
   --radius-menu-row: var(--round-menu-row);
 
-  --shadow-popover: var(--popover-shadow);
   --shadow-toast: var(--toast-shadow);
   --shadow-glass: var(--glass-shadow);
-  --shadow-side: var(--side-shadow);
   --shadow-menu: var(--menu-shadow);
   --shadow-accent: var(--accent-shadow);
   --shadow-sheet: var(--sheet-shadow);

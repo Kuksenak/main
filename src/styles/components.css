@@ -108,6 +108,23 @@
       app-region: no-drag;
       -webkit-app-region: no-drag;
     }
+    /* (a Mac's: one strip with Chrome's own ⌄ ⋮ — from the page's buttons to the window's edge, under
+       Chrome's square, as tall as the bar, round at its left; in the color Chrome paints its square
+       (the sidebar's gray; the sidebar hidden: the page's white); the buttons round in it) */
+    html[data-mac]:root [data-page-head] > div:last-of-type {
+      right: 0;
+      height: env(titlebar-area-height, 2.25rem);
+      padding-left: 0.25rem;
+      padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
+      border-radius: 9999px 0 0 9999px;
+      background-color: var(--side-bg);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      box-shadow: none;
+    }
+    html[data-mac][data-side-hidden]:root [data-page-head] > div:last-of-type {
+      background-color: var(--app-bg);
+    }
   }
   /* (a Mac's: its buttons in capsules, as macOS 27's toolbars — ☰ ▢ one, ‹ › another, the page's lifted
      ones a third: a pill of the menus' see-through white over a blur, a hairline and a soft shadow; the

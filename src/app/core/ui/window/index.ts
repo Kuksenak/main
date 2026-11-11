@@ -8,8 +8,6 @@ export {
   UiWindowField,
   UiWindowFoot,
   UiWindowHead,
-  UiWindowKey,
-  UiWindowKeys,
   UiWindowList,
   UiWindowSection,
 } from './window-parts';

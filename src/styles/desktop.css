@@ -102,7 +102,6 @@ html[data-device='desktop'] {
   --separator: rgb(0 0 0 / 0.06); /* (the hairlines: faint — one color all over, they only hint at the parts) */
   --side-hover: rgb(0 0 0 / 0.03); /* (under the pointer: faint) */
   --side-on: rgb(0 0 0 / 0.065); /* (the chosen one: a step darker) */
-  --side-on-text: #000000;
   --round-side-row: 0.5rem;
   /* (menus and windows, as Notion's: solid white — glass on the white page melted into it — a clear
      edge and two shadows, a near one and a far one: they stand off the page) */
@@ -124,7 +123,6 @@ html.dark[data-device='desktop'] {
   --separator: rgb(255 255 255 / 0.06);
   --side-hover: rgb(255 255 255 / 0.04);
   --side-on: rgb(255 255 255 / 0.085);
-  --side-on-text: #ffffff;
   --menu-bg: var(--side-bg);
   --menu-shadow: 0 0 0 1px rgb(255 255 255 / 0.09), 0 3px 6px rgb(0 0 0 / 0.3), 0 9px 24px rgb(0 0 0 / 0.5);
 }

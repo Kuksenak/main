@@ -6,7 +6,7 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
-import { Confirm, Icon, UiButton, UiDate, UiFloatingButton, UiKbd, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSwipe, UiTime } from '../core/ui';
+import { Confirm, Icon, UiButton, UiDate, UiFloatingButton, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSwipe, UiTime } from '../core/ui';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { dayKey, EventInput, EventsStore, Occurrence, Repeat, Scope } from './events.store';
 
@@ -33,7 +33,7 @@ const INTERVALS = Array.from({ length: 12 }, (_, i) => i + 1);
  */
 @Component({
   selector: 'app-event-editor',
-  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiFloatingButton, UiKbd, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSelect, UiSwipe, UiTime],
+  imports: [Icon, NgTemplateOutlet, TranslatePipe, UiButton, UiDate, UiFloatingButton, UiList, UiListItem, UiListTitle, UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator, UiSelect, UiSwipe, UiTime],
   templateUrl: './event-editor.html',
 })
 export class EventEditor implements OnInit {

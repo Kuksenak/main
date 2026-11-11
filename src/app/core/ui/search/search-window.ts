@@ -3,7 +3,7 @@ import { UiEmpty } from '../empty/empty';
 import { IconName } from '../icon/icon';
 import { UiRow } from '../row/row';
 import { UiWindow } from '../window/window';
-import { UiListKeys, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList, UiWindowSection } from '../window/window-parts';
+import { UiListKeys, UiWindowField, UiWindowHead, UiWindowList, UiWindowSection } from '../window/window-parts';
 
 /** A result of a `<ui-search-window>`: its icon, its name (a hint after it, gray), the section it's under. */
 export interface UiSearchResult {
@@ -24,7 +24,7 @@ export interface UiSearchResult {
  */
 @Component({
   selector: 'ui-search-window',
-  imports: [UiEmpty, UiListKeys, UiRow, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList, UiWindowSection],
+  imports: [UiEmpty, UiListKeys, UiRow, UiWindow, UiWindowField, UiWindowHead, UiWindowList, UiWindowSection],
   templateUrl: './search-window.html',
 })
 export class UiSearchWindow {

@@ -29,15 +29,3 @@ export class UiFloatingButton {
   /** In a group (`uiFloatingGroup`): no glass, no shadow of its own — the group's. */
   readonly bare = input(false, { transform: booleanAttribute });
 }
-
-/**
- * Phones: floating buttons side by side on one glass capsule (as iOS 27's: [🔍 | +]) — its buttons
- * `uiFloatingButton round bare`.
- *   <div uiFloatingGroup><button uiFloatingButton round bare>…</button>…</div>
- */
-@Component({
-  selector: 'div[uiFloatingGroup]',
-  host: { class: 'inline-flex h-round shrink-0 items-center rounded-full glass *:h-full' },
-  template: `<ng-content />`,
-})
-export class UiFloatingGroup {}

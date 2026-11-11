@@ -1,7 +1,6 @@
 import { afterNextRender, booleanAttribute, Component, Directive, ElementRef, inject, input, model, output } from '@angular/core';
 import { I18nService } from '../../i18n/i18n.service';
 import { Icon, IconName } from '../icon/icon';
-import { UiKbd } from '../kbd/kbd';
 
 /**
  * A window's head, as the search's: its icon at the left (`colored`: coloured in), then what's put
@@ -94,8 +93,7 @@ export class UiWindowList {}
 export class UiWindowSection {}
 
 /**
- * A window's foot, under a hairline: the keys (`<ui-window-key>`), then anything at the right
- * (a note, a button).
+ * A window's foot, under a hairline: a note, a button (the trash's: its note and Empty trash).
  */
 @Component({
   selector: 'ui-window-foot',
@@ -106,45 +104,3 @@ export class UiWindowSection {}
 })
 export class UiWindowFoot {}
 
-/** A key and what it does, in a window's foot: `key` its name ("Esc"), or its icons (`icons`: ↑ ↓, ↵) — a chip each. */
-@Component({
-  selector: 'ui-window-key',
-  imports: [Icon, UiKbd],
-  host: { class: 'flex items-center gap-1.5' },
-  template: `
-    <span class="flex gap-0.5">
-      @if (key()) {
-        <ui-kbd>{{ key() }}</ui-kbd>
-      }
-      @for (name of icons(); track name) {
-        <ui-kbd><app-icon [name]="name" class="size-3.5 my-0.5" /></ui-kbd>
-      }
-    </span>
-    <ng-content />
-  `,
-})
-export class UiWindowKey {
-  readonly key = input('');
-  readonly icons = input<readonly IconName[]>([]);
-}
-
-/**
- * The keys of a window whose list the keys walk (the search's, the trash's), in its foot: Esc (close),
- * ↑ ↓ (move), ↵ — `enter`: what it does there (Open, Restore). What's put in comes after them.
- *   <ui-window-foot><ui-window-keys [enter]="'search.open' | t" /></ui-window-foot>
- */
-@Component({
-  selector: 'ui-window-keys',
-  imports: [UiWindowKey],
-  host: { class: 'contents' },
-  template: `
-    <ui-window-key key="Esc">{{ i18n.t('search.close') }}</ui-window-key>
-    <ui-window-key [icons]="['arrow-up', 'arrow-down']">{{ i18n.t('search.move') }}</ui-window-key>
-    <ui-window-key [icons]="['enter']">{{ enter() }}</ui-window-key>
-    <ng-content />
-  `,
-})
-export class UiWindowKeys {
-  readonly enter = input('');
-  protected readonly i18n = inject(I18nService);
-}

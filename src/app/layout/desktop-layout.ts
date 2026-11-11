@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { Location, NgTemplateOutlet } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -10,7 +10,7 @@ import { UpdateService } from '../core/services/update.service';
 import { Icon, IconName, tagTint, UiAvatar, UiButton, UiFoldName } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarRow, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
-import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowKeys, UiWindowList } from '../core/ui/window';
+import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowList } from '../core/ui/window';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { TranslationKey } from '../core/i18n/translations';
 import { TrashList } from '../library/trash-list';
@@ -27,7 +27,7 @@ import { Search } from './search';
 
 /**
  * Desktop: the frame of every page after sign-in (the router puts the page into it), as macOS 26's —
- * the sidebar a panel floating at the left (the search: at the heads' right, ToolbarEnd; Ctrl K / ⌘K): the app's places (Library: + a new page), the
+ * the sidebar a panel floating at the left (the search: the sidebar's first row): the app's places (Library: + a new page), the
  * library's Recents and Favorites (rows folding their pages; a page's ⋯: its menu); by the account, Trash (its
  * window at it), the account at the bottom (its letter, the name — else the email
  * — and ▾; its menu: the email, Users (the admins only), the language, Log out, Log out of all
@@ -65,7 +65,6 @@ const SIDEBAR_HIDDEN = 'layout.sidebarHidden';
     UiWindowField,
     UiWindowFoot,
     UiWindowHead,
-    UiWindowKeys,
     UiWindowList,
     UiListKeys,
   ],
@@ -201,11 +200,8 @@ export class DesktopLayout {
   // The account button: the user's name, else the email
   protected readonly userName = computed(() => this.auth.name() ?? this.auth.email() ?? '');
 
-  // The search window: open from a head's 🔍 (ToolbarEnd), or Ctrl K (⌘K on a Mac) from anywhere
+  // The search window: open from the sidebar's Search row
   protected readonly search = inject(DesktopSearch);
-  private readonly mac = /mac/i.test(navigator.platform);
-  // (its keys, shown in the field)
-  protected readonly shortcut = this.mac ? '⌘K' : 'Ctrl K';
 
   constructor() {
     this.events.show(new Date());
@@ -213,14 +209,6 @@ export class DesktopLayout {
       this.store.load();
       this.tags.load();
     }
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'k' && (this.mac ? e.metaKey : e.ctrlKey)) {
-        e.preventDefault();
-        this.search.open.set(!this.search.open());
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    inject(DestroyRef).onDestroy(() => document.removeEventListener('keydown', onKey));
   }
 }
 
