@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { keep, kept } from '../utils/storage';
-import { DICTIONARIES, LANGUAGES, LanguageCode, TranslationKey } from './translations';
+import { Dictionary, en, LANGUAGES, LanguageCode, LOADERS, TranslationKey } from './translations';
 
 const STORAGE_KEY = 'lang';
 
@@ -16,8 +16,16 @@ export class I18nService {
     Array.from({ length: 7 }, (_, i) => this.date(new Date(2024, 0, 1 + i), { weekday: 'short' })),
   );
 
+  // (the chosen language's words — English until another's file is in: `load()`, before the app starts)
+  private readonly words = signal<Dictionary>(en);
+
   constructor() {
     document.documentElement.lang = this.lang();
+  }
+
+  /** The chosen language's words downloaded (its own file; English: at once) — the app starts after. */
+  async load(code: LanguageCode = this.lang()): Promise<void> {
+    this.words.set(code === 'en' ? en : await LOADERS[code]());
   }
 
   /** A date in the current locale with the given parts, e.g. { month: 'long', year: 'numeric' }. */
@@ -57,10 +65,11 @@ export class I18nService {
   private readonly formatters = new Map<string, Intl.DateTimeFormat>();
 
   t(key: TranslationKey): string {
-    return DICTIONARIES[this.lang()][key] ?? DICTIONARIES.en[key] ?? key;
+    return this.words()[key] ?? en[key] ?? key;
   }
 
-  setLang(code: LanguageCode): void {
+  async setLang(code: LanguageCode): Promise<void> {
+    await this.load(code);
     this.lang.set(code);
     document.documentElement.lang = code;
     keep(STORAGE_KEY, code);

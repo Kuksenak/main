@@ -89,5 +89,6 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
   sheet (the page showed through it) and laid one view over the other.
 
 ## i18n
-- Every user-facing string goes in `core/i18n/translations.ts`, with each key in en, pl and fr
-  (type-checked). In templates use `{{ 'key' | t }}`.
+- Every user-facing string goes in `core/i18n/`: `translations.ts` (English — the keys, the fallback,
+  in the app from the start), `translations.pl.ts` and `translations.fr.ts` (each key there too,
+  type-checked; downloaded only when that language is the one chosen). In templates use `{{ 'key' | t }}`.
