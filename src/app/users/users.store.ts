@@ -3,7 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { AREAS, Area } from '../auth/permissions';
 import { I18nService } from '../core/i18n/i18n.service';
-import { Toasts } from '../core/ui';
+import { Toasts } from '../core/ui/toast/toast';
 
 export interface User {
   id: string;

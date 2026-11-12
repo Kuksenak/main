@@ -1,7 +1,7 @@
 import { Area } from '../auth/permissions';
 import { TranslationKey } from '../core/i18n/translations';
 import { desktop } from '../core/device';
-import { IconName } from '../core/ui';
+import { IconName } from '../core/ui/icon/icon';
 
 /**
  * A section of the app: its address, name and icon — in the sidebar (desktop) and the top bar's

@@ -6,7 +6,16 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
-import { Confirm, Icon, UiButton, UiDate, UiFloatingButton, UiList, UiListItem, UiListTitle, UiOption, UiSelect, UiSwipe, UiTime } from '../core/ui';
+import { UiButton } from '../core/ui/button/button';
+import { Confirm } from '../core/ui/confirm/confirm';
+import { UiFloatingButton } from '../core/ui/floating-button/floating-button';
+import { Icon } from '../core/ui/icon/icon';
+import { UiList, UiListTitle } from '../core/ui/list/list';
+import { UiListItem } from '../core/ui/list/list-item';
+import { UiDate } from '../core/ui/picker/date';
+import { UiOption, UiSelect } from '../core/ui/picker/select';
+import { UiTime } from '../core/ui/picker/time';
+import { UiSwipe } from '../core/ui/swipe/swipe';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { dayKey, EventInput, EventsStore, Occurrence, Repeat, Scope } from './events.store';
 

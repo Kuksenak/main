@@ -1,10 +1,11 @@
 # Frontend (Angular 21, Tailwind v4)
 
 ## Components
-- Pages are built from the shared UI kit in `src/app/core/ui/` (import from `core/ui`), a folder per
-  piece: `menu/` holds the menu and its rows, `sidebar/` the sidebar and its items, and so on.
-  A new shared piece goes there too, named `Ui*` with a `ui-*` (or attribute) selector, and is
-  exported from `core/ui/index.ts`.
+- Pages are built from the shared UI kit in `src/app/core/ui/`, a folder per piece: `menu/` holds
+  the menu and its rows, `sidebar/` the sidebar and its items, and so on. Import a piece from its
+  own file (`core/ui/tag/tag`, `core/ui/list/list-item`) — there's no index: one pulled the whole
+  kit (the phones' sheets, wheels, swipes too) into every device's first load. A new shared piece
+  goes there too, named `Ui*` with a `ui-*` (or attribute) selector.
 - A section of the app (a page and its own pieces) is one flat folder, e.g. `schedule/` holds
   `schedule.ts` (the page) and `calendar.ts`, with no subfolders.
 - Markup longer than a few lines goes in its own `.html` (`templateUrl`); a one- or two-line template
@@ -13,10 +14,9 @@
 - Where phones and desktops differ a lot, each gets its own component, picked once by the device
   (`core/device.ts`; e.g. app.routes loads `DesktopLayout` or `MobileLayout`). Then neither device
   downloads the other's code.
-- Pieces of one device only stay out of the kit's index (else the other device downloads them
-  too): the desktop's menus (`core/ui/menu`, CDK overlay), sidebar (`core/ui/sidebar`), window
-  (`core/ui/window`: the search's and the assistant's frame) and search window (`core/ui/search`) are
-  imported from their own folders.
+- A piece is downloaded with the first page that uses it: a page of one device only (e.g. the
+  desktop's menus — `core/ui/menu`, CDK overlay —, sidebar, window, search window) never makes the
+  other device download it.
 
 ## Styles
 - Tailwind classes only, in the markup or in `host: { class: … }`. States are variants too:

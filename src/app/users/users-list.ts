@@ -1,6 +1,7 @@
 import { Component, inject, output } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiList, UiListItem } from '../core/ui';
+import { UiList } from '../core/ui/list/list';
+import { UiListItem } from '../core/ui/list/list-item';
 import { User, UsersStore } from './users.store';
 
 /**

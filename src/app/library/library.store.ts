@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { Observable, forkJoin, map, of, switchMap, tap } from 'rxjs';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
-import { Confirm, Toasts } from '../core/ui';
+import { Confirm } from '../core/ui/confirm/confirm';
+import { Toasts } from '../core/ui/toast/toast';
 
 /** A page in the library's list (no content). */
 export interface PageItem {

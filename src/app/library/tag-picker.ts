@@ -1,7 +1,8 @@
 import { afterNextRender, Component, computed, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, UiTag, UiTagSwatch } from '../core/ui';
+import { Icon } from '../core/ui/icon/icon';
+import { UiTag, UiTagSwatch } from '../core/ui/tag/tag';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { TagsStore } from './tags.store';
 

@@ -1,7 +1,11 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, ICONS, UiDate, UiListTitle, UiOption, UiSelect, UiTime } from '../core/ui';
+import { Icon, ICONS } from '../core/ui/icon/icon';
+import { UiListTitle } from '../core/ui/list/list';
+import { UiDate } from '../core/ui/picker/date';
+import { UiOption, UiSelect } from '../core/ui/picker/select';
+import { UiTime } from '../core/ui/picker/time';
 import { PageTitle } from '../layout/page-title';
 
 /**

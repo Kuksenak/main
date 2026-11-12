@@ -3,7 +3,8 @@ import { Router } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiList, UiListItem, UiListTitle } from '../core/ui';
+import { UiList, UiListTitle } from '../core/ui/list/list';
+import { UiListItem } from '../core/ui/list/list-item';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore, PageItem } from '../library/library.store';
 

@@ -1,5 +1,5 @@
 import { booleanAttribute, Component, computed, input } from '@angular/core';
-import { Icon } from '../core/ui';
+import { Icon } from '../core/ui/icon/icon';
 import { marked, shown } from './marks';
 
 /**

@@ -1,7 +1,11 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 import { AREA_LABELS } from '../auth/permissions';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiList, UiListItem, UiListTitle, UiOption, UiToggle, UiWheel } from '../core/ui';
+import { UiList, UiListTitle } from '../core/ui/list/list';
+import { UiListItem } from '../core/ui/list/list-item';
+import { UiOption } from '../core/ui/picker/select';
+import { UiWheel } from '../core/ui/picker/wheel';
+import { UiToggle } from '../core/ui/toggle/toggle';
 import { User, UsersStore } from './users.store';
 
 /**

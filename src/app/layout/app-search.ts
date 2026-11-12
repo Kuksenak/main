@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
-import { IconName } from '../core/ui';
+import { IconName } from '../core/ui/icon/icon';
 import { LibraryStore } from '../library/library.store';
 import { visiblePlaces } from './places';
 

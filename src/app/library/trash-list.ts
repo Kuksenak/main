@@ -4,7 +4,10 @@ import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { desktop } from '../core/device';
 import { keep, kept } from '../core/utils/storage';
-import { UiButton, UiEmpty, UiRow, UiSwipe } from '../core/ui';
+import { UiButton } from '../core/ui/button/button';
+import { UiEmpty } from '../core/ui/empty/empty';
+import { UiRow } from '../core/ui/row/row';
+import { UiSwipe } from '../core/ui/swipe/swipe';
 import { UiTip } from '../core/ui/tip/tip';
 import { LibraryStore } from './library.store';
 

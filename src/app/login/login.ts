@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { AuthStore } from '../auth/auth.store';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon } from '../core/ui';
+import { Icon } from '../core/ui/icon/icon';
 import { APP_NAME } from '../core/app-name';
 import { I18nService } from '../core/i18n/i18n.service';
 import { PageTitle } from '../layout/page-title';

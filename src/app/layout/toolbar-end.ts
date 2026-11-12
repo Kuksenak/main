@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { UiButton } from '../core/ui';
+import { UiButton } from '../core/ui/button/button';
 
 /**
  * Desktops: a section's + (its new one: a page, an event) on its head — a button as the head's

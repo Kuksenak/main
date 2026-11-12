@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
-import { Toasts } from '../core/ui';
+import { Toasts } from '../core/ui/toast/toast';
 
 /** A text the assistant wrote for the page (private: for the teacher only — a task's answers). */
 export interface ChatBlock {

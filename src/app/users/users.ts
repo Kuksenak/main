@@ -3,7 +3,9 @@ import { AREA_LABELS } from '../auth/permissions';
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiList, UiListItem, UiToggle } from '../core/ui';
+import { UiList } from '../core/ui/list/list';
+import { UiListItem } from '../core/ui/list/list-item';
+import { UiToggle } from '../core/ui/toggle/toggle';
 import { PageTitle } from '../layout/page-title';
 import { UsersStore } from './users.store';
 

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
 import { environment } from '@environments/environment';
-import { Toasts } from '../core/ui';
+import { Toasts } from '../core/ui/toast/toast';
 import { addDays, sameDay, startOfMonth } from '../core/utils/date';
 
 export type Repeat = 'Never' | 'Daily' | 'Weekly' | 'Monthly' | 'Yearly';

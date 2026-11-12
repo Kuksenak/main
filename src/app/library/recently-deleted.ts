@@ -1,7 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiList, UiListItem } from '../core/ui';
+import { UiList } from '../core/ui/list/list';
+import { UiListItem } from '../core/ui/list/list-item';
 import { PageTitle } from '../layout/page-title';
 import { LibraryStore } from './library.store';
 import { TrashList } from './trash-list';

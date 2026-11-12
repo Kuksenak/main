@@ -2,7 +2,10 @@ import { Component, computed, DestroyRef, ElementRef, inject, signal, viewChild 
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { refreshThemeColor } from '../core/services/theme-color';
 import { VisibleArea } from '../core/services/visible-area';
-import { Icon, UiFloatingButton, UiList, UiListItem, UiListTitle } from '../core/ui';
+import { UiFloatingButton } from '../core/ui/floating-button/floating-button';
+import { Icon } from '../core/ui/icon/icon';
+import { UiList, UiListTitle } from '../core/ui/list/list';
+import { UiListItem } from '../core/ui/list/list-item';
 import { AuthStore } from '../auth/auth.store';
 import { AppSearch, Found, SearchScope } from './app-search';
 

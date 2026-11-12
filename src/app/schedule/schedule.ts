@@ -3,7 +3,10 @@ import { Component, computed, effect, inject, signal, viewChild } from '@angular
 import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, UiButton, UiFloatingButton, UiListItem } from '../core/ui';
+import { UiButton } from '../core/ui/button/button';
+import { UiFloatingButton } from '../core/ui/floating-button/floating-button';
+import { Icon } from '../core/ui/icon/icon';
+import { UiListItem } from '../core/ui/list/list-item';
 import { startOfDay, startOfMonth } from '../core/utils/date';
 import { PageTitle } from '../layout/page-title';
 import { ToolbarEnd } from '../layout/toolbar-end';

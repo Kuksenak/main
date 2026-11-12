@@ -5,7 +5,7 @@ import { LastSection } from './auth/last-section';
 import { Loading } from './core/services/loading';
 import { TranslatePipe } from './core/i18n/t.pipe';
 import { UpdateService } from './core/services/update.service';
-import { UiToasts } from './core/ui';
+import { UiToasts } from './core/ui/toast/toast';
 
 @Component({
   selector: 'app-root',

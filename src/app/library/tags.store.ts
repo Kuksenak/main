@@ -3,7 +3,8 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { Observable, tap } from 'rxjs';
 import { I18nService } from '../core/i18n/i18n.service';
-import { TAG_CHOICES, TagColor, Toasts } from '../core/ui';
+import { TAG_CHOICES, TagColor } from '../core/ui/tag/tag';
+import { Toasts } from '../core/ui/toast/toast';
 import { LibraryStore } from './library.store';
 
 /** A tag of the account's: its name, its color. */

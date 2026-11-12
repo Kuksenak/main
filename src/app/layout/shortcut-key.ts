@@ -3,7 +3,10 @@ import { Component, inject, signal } from '@angular/core';
 import { environment } from '@environments/environment';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Confirm, Toasts, UiList, UiListItem, UiListTitle } from '../core/ui';
+import { Confirm } from '../core/ui/confirm/confirm';
+import { UiList, UiListTitle } from '../core/ui/list/list';
+import { UiListItem } from '../core/ui/list/list-item';
+import { Toasts } from '../core/ui/toast/toast';
 
 interface Shortcut {
   createdAt: string;

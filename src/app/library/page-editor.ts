@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChild, viewChildren } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon, IconName } from '../core/ui';
+import { Icon, IconName } from '../core/ui/icon/icon';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { LibraryStore, type PageBlock } from './library.store';
 import { UiTip } from '../core/ui/tip/tip';

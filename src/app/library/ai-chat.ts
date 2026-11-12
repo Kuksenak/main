@@ -1,7 +1,7 @@
 import { afterNextRender, Component, computed, DestroyRef, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { desktop } from '../core/device';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { Icon } from '../core/ui';
+import { Icon } from '../core/ui/icon/icon';
 import { AiChatStore, ChatBlock, ChatTurn, MAX_PHOTOS } from './ai-chat.store';
 import { ReadBlock } from './read-block';
 
