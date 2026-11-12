@@ -95,7 +95,7 @@
         </div>
         @if (picking(); as at) {
           <ui-menu #pick [origin]="at" (closed)="closePicker()">
-            <div class="flex h-8 items-center gap-2 px-menu-row-x">
+            <div class="menu-field">
               <app-icon name="search" class="size-icon-menu shrink-0 text-icon" />
               <input
                 #pickField
@@ -115,7 +115,7 @@
                 <span class="truncate">{{ page.title.trim() || ('library.untitled' | t) }}</span>
               </button>
             } @empty {
-              <p class="px-menu-row-x py-2 text-ui text-fg-secondary">{{ 'search.nothing' | t }}</p>
+              <p class="menu-note">{{ 'search.nothing' | t }}</p>
             }
           </ui-menu>
         }

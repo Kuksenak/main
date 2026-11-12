@@ -157,6 +157,13 @@
 @utility popup-glass {
   @apply bg-menu/80 backdrop-blur-[6px] backdrop-saturate-[180%] dark:bg-menu/92;
 }
+/* (a menu's own field row — a ⌕ / # and what's typed — and its note — "nothing found": as its rows) */
+@utility menu-field {
+  @apply flex h-8 items-center gap-2 px-menu-row-x;
+}
+@utility menu-note {
+  @apply px-menu-row-x py-2 text-ui text-fg-secondary;
+}
 @utility menu-row {
   @apply flex min-h-menu-row w-full items-center gap-2 rounded-menu-row px-menu-row-x py-0.5 text-left text-ui leading-tight font-normal text-fg outline-none not-disabled:hover:bg-tint focus-visible:bg-tint aria-selected:bg-tint disabled:opacity-40;
 }
