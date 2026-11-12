@@ -1,13 +1,10 @@
-import { booleanAttribute, Component, computed, input } from '@angular/core';
-import { ICON_DATA } from './icon-data';
+import { Component, computed, input } from '@angular/core';
 import { ICON_LINES } from './icon-lines';
 
 /** Every icon there is (e.g. to show them all). */
 export const ICONS = [
   'google',
   'apple',
-  'google-doodle',
-  'apple-doodle',
   'logout',
   'logout-all',
   'check',
@@ -51,14 +48,10 @@ export const ICONS = [
 export type IconName = (typeof ICONS)[number];
 
 /**
- * The app's icons, as drawn with a marker (docs/icons.md): each its own SVG, 64×64 (in the
- * app's code as data: URLs — icon-data.ts, made by tools/icons.py with the files) —
- * public/icons/{name}.svg the outline only (small ones: menus, rows), drawn in the text's
- * color (currentColor: a mask); and `filled`: public/icons/filled/{name}.svg coloured in with
- * one pastel (big ones, 40px+: the phones' sections) — the dark theme turns those over; `colored`:
- * the same for small ones (menus, rows), a thinner marker — its lines in the text's color (class
- * text-icon: gray; a danger row's: red), the pastel under them. The brands' marks (Google,
- * Apple) are drawn here, in currentColor. Size it from the host: `<app-icon name="home" class="size-7" />`.
+ * The app's icons (icon-lines.ts: our own even lines, as data: URLs — no request each), drawn in the
+ * text's color (a mask over it: gray in rows, red on a danger row under the pointer, light in the dark
+ * theme) — a favorite's bookmark in its amber, a chosen tag's shape (`tag`: its color) solid in it. The
+ * brands' marks (Google, Apple) are drawn here. Size it from the host: `<app-icon name="home" class="size-7" />`.
  */
 @Component({
   selector: 'app-icon',
@@ -78,67 +71,22 @@ export type IconName = (typeof ICONS)[number];
           }
         }
       </svg>
-    } @else if (tag() && name() === 'hash') {
-      <!-- (a chosen tag's: the tag's shape solid in its color — as a favorite's bookmark) -->
-      <span
-        class="block size-full bg-tag-dot [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-        [style.mask-image]="fillUrl"
-        [style.-webkit-mask-image]="fillUrl"
-      ></span>
     } @else {
-      @if (colored() && !lines()) {
-        <!-- (small, coloured in: the pastel under, the lines over it in the text's color) -->
-        <span class="relative block size-full">
-          @if (tint(); as tint) {
-            <!-- (its pastel another's: the fills' shapes painted with it) -->
-            <span
-              class="absolute inset-0 block [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-              [style.background]="tint"
-              [style.mask-image]="'url(&quot;' + fillsUrl() + '&quot;)'"
-              [style.-webkit-mask-image]="'url(&quot;' + fillsUrl() + '&quot;)'"
-            ></span>
-          } @else {
-            <img [src]="fillsUrl()" alt="" draggable="false" class="absolute inset-0 size-full select-none dark:invert dark:hue-rotate-180" />
-          }
-          <span
-            class="absolute inset-0 block bg-current [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-            [style.mask-image]="linesUrl()"
-            [style.-webkit-mask-image]="linesUrl()"
-          ></span>
-        </span>
-      } @else if (filled() && !lines()) {
-        <img [src]="filledUrl()" alt="" draggable="false" class="size-full select-none dark:invert dark:hue-rotate-180" />
-      } @else {
-        <!-- (the outline as a mask over the text's color: it takes the color it's in — gray, red on
-             a Log out under the pointer, light in the dark theme) -->
-        <span
-          class="block size-full bg-current data-favorite:bg-favorite [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
-          [attr.data-favorite]="name() === 'bookmark-filled' ? '' : null"
-          [style.mask-image]="url()"
-          [style.-webkit-mask-image]="url()"
-        ></span>
-      }
+      <span
+        class="block size-full bg-current data-favorite:bg-favorite data-tagged:bg-tag-dot [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]"
+        [attr.data-favorite]="name() === 'bookmark-filled' ? '' : null"
+        [attr.data-tagged]="tagged() ? '' : null"
+        [style.mask-image]="url()"
+        [style.-webkit-mask-image]="url()"
+      ></span>
     }
   `,
 })
 export class Icon {
   readonly name = input.required<IconName>();
-  readonly filled = input(false, { transform: booleanAttribute });
-  // (small and coloured in: menus, rows — the pastel, a thinner marker)
-  readonly colored = input(false, { transform: booleanAttribute });
-  // (coloured in with another pastel: a CSS color — a page's tag's, tagTint)
-  readonly tint = input<string | null>(null);
-  // (a chosen tag's color — `hash` coloured in with it: its pastel and its ink, base.css's data-tag)
+  // (a chosen tag's color: `hash` its shape solid in it — base.css's data-tag)
   readonly tag = input<string | null | undefined>(null);
-  protected readonly fillUrl = ICON_LINES['hash-fill'];
-  // (the brands' marks: drawn here; the rest: their files)
   protected readonly brand = computed(() => this.name() === 'google' || this.name() === 'apple');
-  // (from the app's own code, not a file each: no request each — ICON_DATA, tools/icons.py)
-  // (plain even lines — Lucide's, icon-lines.ts — wherever there's one, on every device: no pastel, no
-  // marker; else the drawn outline)
-  protected readonly lines = computed(() => ICON_LINES[this.name()] ?? null);
-  protected readonly url = computed(() => this.lines() ?? `url("${ICON_DATA[this.name()]?.[0]}")`);
-  protected readonly filledUrl = computed(() => ICON_DATA[this.name()]?.[1] ?? '');
-  protected readonly fillsUrl = computed(() => ICON_DATA[this.name()]?.[2] ?? '');
-  protected readonly linesUrl = computed(() => `url("${ICON_DATA[this.name()]?.[3]}")`);
+  protected readonly tagged = computed(() => !!this.tag() && this.name() === 'hash');
+  protected readonly url = computed(() => (this.tagged() ? ICON_LINES['hash-fill'] : ICON_LINES[this.name()]) ?? null);
 }

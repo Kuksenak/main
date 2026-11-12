@@ -6,7 +6,7 @@ import { desktop } from '../core/device';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
-import { Icon, IconName, tagTint, UiButton, UiFoldName, UiList, UiListItem, UiPrimary, UiTag } from '../core/ui';
+import { Icon, IconName, UiButton, UiFoldName, UiList, UiListItem, UiPrimary, UiTag } from '../core/ui';
 import { PageTitle } from '../layout/page-title';
 import { ToolbarEnd } from '../layout/toolbar-end';
 import { LibraryStore, PageItem } from './library.store';
@@ -55,9 +55,6 @@ export class Library {
   protected readonly tagMenu = signal(false);
   // The tags: after a page's name; its icon in its first tag's pastel
   protected readonly tags = inject(TagsStore);
-  protected tint(item: PageItem): string | null {
-    return tagTint(this.tags.of(item.tagIds)[0]?.color);
-  }
 
   // The date groups folded away (kept on this device)
   protected readonly folds = keptFolds<TranslationKey>(FOLDED);

@@ -38,8 +38,6 @@ const TEMPLATE = `
 })
 export class UiSidebarItem {
   readonly icon = input.required<IconName>();
-  /** (its icon coloured in with another pastel: a page's tag's) */
-  readonly tint = input<string | null>(null);
 
   constructor() {
     // (the current one: marked by aria-current, which its look follows — no class of its own)
@@ -59,8 +57,6 @@ export class UiSidebarItem {
 })
 export class UiSidebarButton {
   readonly icon = input.required<IconName>();
-  /** (its icon coloured in with another pastel: a page's tag's) */
-  readonly tint = input<string | null>(null);
 }
 
 /**

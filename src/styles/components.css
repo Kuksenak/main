@@ -87,64 +87,27 @@
     padding-top: env(titlebar-area-height, 2.25rem);
   }
   /* (a page's buttons — the tag, Publish, the bookmark, ⋯ — up on the bar at its right, by the window's
-     buttons, when the window is wide enough for them there (narrower: on the page's row at its right, as ever);
+     buttons, when the window is wide enough for them there (narrower, or a Mac's: on the page's row at its right, as ever);
      its name stays on the page's row) */
   @media (min-width: 56rem) {
     /* (no blur on the row then — a blur makes the row, not the window, what a fixed piece in it is placed
        by; and the row over the bar, else the bar (its stacking above the page's) took their clicks) */
-    [data-page-head] {
+    html:not([data-mac]) [data-page-head] {
       z-index: 50 !important;
       -webkit-backdrop-filter: none !important;
       backdrop-filter: none !important;
     }
-    [data-page-head] > div:last-of-type {
+    html:not([data-mac]) [data-page-head] > div:last-of-type {
       position: fixed;
       top: 0;
       right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem);
       z-index: 40;
       height: env(titlebar-area-height, 2.25rem);
     }
-    [data-page-head] > div:last-of-type :is(button, a) {
+    html:not([data-mac]) [data-page-head] > div:last-of-type :is(button, a) {
       app-region: no-drag;
       -webkit-app-region: no-drag;
     }
-    /* (a Mac's: one strip with Chrome's own ⌄ ⋮ — from the page's buttons to the window's edge, under
-       Chrome's square, as tall as the bar, round at its left; in the color Chrome paints its square
-       (the sidebar's gray; the sidebar hidden: the page's white); the buttons round in it) */
-    html[data-mac]:root [data-page-head] > div:last-of-type {
-      right: 0;
-      height: env(titlebar-area-height, 2.25rem);
-      padding-left: 0.25rem;
-      padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
-      border-radius: 9999px 0 0 9999px;
-      background-color: var(--side-bg);
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-      box-shadow: none;
-    }
-    html[data-mac][data-side-hidden]:root [data-page-head] > div:last-of-type {
-      background-color: var(--app-bg);
-    }
-  }
-  /* (a Mac's: its buttons in capsules, as macOS 27's toolbars — ☰ ▢ one, ‹ › another, the page's lifted
-     ones a third: a pill of the menus' see-through white over a blur, a hairline and a soft shadow; the
-     buttons round in it, a light gray under the pointer) */
-  html[data-mac] [data-app-titlebar] [data-capsule],
-  html[data-mac] [data-page-head] > div:last-of-type {
-    height: 2rem;
-    padding-inline: 0.125rem;
-    border-radius: 9999px;
-    background-color: color-mix(in srgb, var(--menu-bg) 80%, transparent);
-    -webkit-backdrop-filter: blur(6px) saturate(180%);
-    backdrop-filter: blur(6px) saturate(180%);
-    box-shadow: var(--capsule-shadow);
-  }
-  html[data-mac] [data-app-titlebar] [data-capsule] + [data-capsule] {
-    margin-left: 0.375rem;
-  }
-  html[data-mac] [data-app-titlebar] [data-capsule] > button,
-  html[data-mac] [data-page-head] > div:last-of-type :is(button, a) {
-    border-radius: 9999px !important;
   }
   [data-side-trash],
   ui-sidebar > div:has(> [data-side-account]) {

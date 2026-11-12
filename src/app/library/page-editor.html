@@ -173,7 +173,7 @@
           (mouseenter)="caretActive.set(k)"
           class="menu-row"
         >
-          <app-icon [name]="command.icon" colored class="size-icon-menu text-icon" />
+          <app-icon [name]="command.icon" class="size-icon-menu text-icon" />
           <span class="flex-1">{{ command.label | t }}</span>
           <span class="max-w-36 truncate text-footnote text-fg-secondary">{{ command.hint ? (command.hint | t) : copied() }}</span>
         </button>

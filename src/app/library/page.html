@@ -29,7 +29,6 @@
       #more
       type="button"
       icon="chevron-down"
-      outline
       (click)="menuOpen.set(!menuOpen())"
       [attr.aria-expanded]="menuOpen()"
       [attr.aria-label]="'library.more' | t"
@@ -58,7 +57,6 @@
         uiButton
         type="button"
         icon="hash"
-        outline
         caret
         (click)="tagsOpen.set(!tagsOpen())"
         [attr.aria-expanded]="tagsOpen()"
@@ -80,7 +78,6 @@
         uiButton
         type="button"
         icon="link"
-        outline
         (click)="copyLink()"
         [uiTip]="'library.copyLinkTip' | t"
         [attr.aria-label]="'library.copyLink' | t"
@@ -91,7 +88,6 @@
       uiButton
       type="button"
       [icon]="p.favorite ? 'bookmark-filled' : 'bookmark'"
-      [outline]="!p.favorite"
       (click)="favorite()"
       [attr.aria-pressed]="p.favorite"
       [attr.aria-label]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
@@ -145,7 +141,7 @@
     <!-- Desktops: the shared window (as the search's: near the top, Esc or a click outside closes
          it), as tall as it may be; its head as the search's field row: ✨ and the name -->
     <ui-window tall (closed)="aiOpen.set(false)">
-      <ui-window-head icon="sparkle" colored>{{ 'editor.ai' | t }}</ui-window-head>
+      <ui-window-head icon="sparkle">{{ 'editor.ai' | t }}</ui-window-head>
       <div class="flex min-h-0 flex-1 flex-col px-4.5 pb-4.5">
         <app-ai-chat [pageId]="p.id" [page]="pageText()" (add)="editor()?.insert($event)" />
       </div>

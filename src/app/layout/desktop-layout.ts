@@ -7,7 +7,7 @@ import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
 import { TranslatePipe } from '../core/i18n/t.pipe';
 import { UpdateService } from '../core/services/update.service';
-import { Icon, IconName, tagTint, UiAvatar, UiButton, UiFoldName } from '../core/ui';
+import { Icon, IconName, UiAvatar, UiButton, UiFoldName } from '../core/ui';
 import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarRow, UiSidebarScroll } from '../core/ui/sidebar';
 import { UiTip } from '../core/ui/tip/tip';
 import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowList } from '../core/ui/window';
@@ -147,11 +147,7 @@ export class DesktopLayout {
     return `${day} ${this.i18n.time(at)}`;
   }
 
-  // A page's icon: in its first tag's pastel
   private readonly tags = inject(TagsStore);
-  protected tint(page: PageItem): string | null {
-    return tagTint(this.tags.of(page.tagIds)[0]?.color);
-  }
 
   // A page dragged (onto a tag in the sidebar: tagged so)
   protected drag(e: DragEvent, page: PageItem): void {

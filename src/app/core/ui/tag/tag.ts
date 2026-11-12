@@ -14,9 +14,6 @@ export const TAG_CHOICES: readonly TagColor[] = ['orange', 'yellow', 'green', 'b
 /** A color's name (translations' keys). */
 export const tagColorLabel = (color: TagColor): TranslationKey => `tags.${color}`;
 
-/** A color's pastel, for what's painted by it (a page's icon: `<app-icon colored [tint]>`). */
-export const tagTint = (color: string | null | undefined): string | null =>
-  color && (TAG_COLORS as readonly string[]).includes(color) ? `var(--tag-${color})` : null;
 
 /**
  * A tag: its name on its pastel, small and round (as Notion's). `<ui-tag color="green">A2</ui-tag>`;

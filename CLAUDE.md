@@ -62,8 +62,6 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
   text's color. No pastel, no marker.
 - A new icon: drawn in `icon-lines.ts` in the same style (same grid, same stroke), its name added to
   `ICONS` (`core/ui/icon/icon.ts`). Home shows every icon in `ICONS`.
-- (The old marker-drawn set — `tools/icons.py`, `public/icons/`, `icon-data.ts` — is only a fallback for
-  a name with no line icon; never hand-edit `icon-data.ts`.)
 
 ## Toasts
 - Errors (a call that failed) and short notices ("Deleted · Undo") are toasts: `inject(Toasts)`

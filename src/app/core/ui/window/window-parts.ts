@@ -3,7 +3,7 @@ import { I18nService } from '../../i18n/i18n.service';
 import { Icon, IconName } from '../icon/icon';
 
 /**
- * A window's head, as the search's: its icon at the left (`colored`: coloured in), then what's put
+ * A window's head, as the search's: its icon at the left, then what's put
  * in — a field (`<input uiWindowField>`) or its name.
  *   <ui-window-head icon="search"><input uiWindowField … /></ui-window-head>
  */
@@ -12,17 +12,12 @@ import { Icon, IconName } from '../icon/icon';
   imports: [Icon],
   host: { class: 'flex h-12 shrink-0 items-center gap-3 px-4.5 text-body text-fg' },
   template: `
-    @if (colored()) {
-      <app-icon [name]="icon()" colored class="size-5 shrink-0 text-icon" />
-    } @else {
-      <app-icon [name]="icon()" class="size-5 shrink-0 text-icon" />
-    }
+    <app-icon [name]="icon()" class="size-5 shrink-0 text-icon" />
     <ng-content />
   `,
 })
 export class UiWindowHead {
   readonly icon = input.required<IconName>();
-  readonly colored = input(false, { transform: booleanAttribute });
 }
 
 /** The field in a window's head: the rest of the row, no edge, the base text — the caret in it as the window opens. */

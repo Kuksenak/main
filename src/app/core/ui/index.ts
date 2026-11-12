@@ -24,5 +24,5 @@ export { UiRow } from './row/row';
 export { UiSwipe, type SwipeAction } from './swipe/swipe';
 export { UiPopover, UiPopItem, UiPopSeparator } from './popover/popover';
 export { UiEmpty } from './empty/empty';
-export { UiTag, UiTagSwatch, TAG_CHOICES, TAG_COLORS, tagColorLabel, tagTint, type TagColor } from './tag/tag';
+export { UiTag, UiTagSwatch, TAG_CHOICES, TAG_COLORS, tagColorLabel, type TagColor } from './tag/tag';
 export { UiFoldName } from './fold/fold';

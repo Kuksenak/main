@@ -51,7 +51,7 @@
     class="flex max-h-[84vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-menu popup-glass text-fg shadow-menu"
   >
     <div #head data-toolbar class="flex h-12 shrink-0 items-center gap-3 pr-3 pl-4.5">
-      <app-icon name="calendar" colored class="size-5 shrink-0 text-icon" />
+      <app-icon name="calendar" class="size-5 shrink-0 text-icon" />
       <input
         #titleField
         type="text"
@@ -269,7 +269,7 @@
 <!-- A page it goes with: its icon, its title; × (under the pointer) takes it off -->
 <ng-template #pageRow let-page="page">
   <div class="group flex h-9 items-center gap-2 rounded-md px-1.5 hover:bg-tint">
-    <app-icon name="page" colored class="size-4.5 shrink-0 text-icon" />
+    <app-icon name="page" class="size-4.5 shrink-0 text-icon" />
     <span class="min-w-0 flex-1 truncate text-body desktop:text-ui text-fg">{{ page.title.trim() || ('library.untitled' | t) }}</span>
     <button type="button" (click)="removePage(page.id)" [attr.aria-label]="'schedule.removePage' | t" class="grid size-6 place-items-center rounded-md text-icon opacity-0 group-hover:opacity-100 hover:bg-tint-strong">
       <app-icon name="close" class="size-3.5" />

@@ -32,7 +32,7 @@ export interface UiOption {
         [class.pl-2.5]="!!chosenIcon()"
       >
         @if (chosenIcon(); as icon) {
-          <app-icon [name]="icon" colored class="size-5 text-icon" />
+          <app-icon [name]="icon" class="size-5 text-icon" />
         }
         {{ chosen() }}
         <app-icon name="chevron-down" class="size-4 text-icon" />
@@ -49,7 +49,7 @@ export interface UiOption {
               class="menu-row"
             >
               @if (option.icon) {
-                <app-icon [name]="option.icon" colored class="size-icon-menu text-icon" />
+                <app-icon [name]="option.icon" class="size-icon-menu text-icon" />
               }
               <span class="flex-1">{{ option.label }}</span>
               @if (option.value === value()) {
@@ -69,7 +69,7 @@ export interface UiOption {
         [attr.data-plain]="plain() ? '' : null"
       >
         @if (chosenIcon(); as icon) {
-          <app-icon [name]="icon" colored class="size-6 shrink-0 text-icon data-wide:size-icon-menu" [attr.data-wide]="wide() ? '' : null" />
+          <app-icon [name]="icon" class="size-6 shrink-0 text-icon data-wide:size-icon-menu" [attr.data-wide]="wide() ? '' : null" />
         }
         <span class="min-w-0 truncate data-wide:flex-1" [attr.data-wide]="wide() ? '' : null">{{ chosen() }}</span>
         @if (options().length > 1) {

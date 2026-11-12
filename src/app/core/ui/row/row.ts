@@ -26,7 +26,7 @@ import { Icon, IconName } from '../icon/icon';
   template: `
     <ng-content select="[rowStart]" />
     @if (icon(); as name) {
-      <app-icon [name]="name" colored class="size-5 shrink-0 text-icon mobile:size-icon-menu" />
+      <app-icon [name]="name" class="size-5 shrink-0 text-icon mobile:size-icon-menu" />
     }
     <span class="min-w-0 flex-1 truncate text-ui text-side-text mobile:text-body mobile:text-fg">
       <ng-content />

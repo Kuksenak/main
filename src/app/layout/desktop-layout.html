@@ -10,7 +10,6 @@
   <!-- (as Claude's title bar: icon buttons as large and dark as the browser's own at the bar's right —
        ☰ the app's menu, the sidebar shown / hidden, ‹ › back and forward; gray under the pointer and
        while open, their names as hints) -->
-  <span data-capsule class="flex items-center gap-0.5">
   <button
     #appMenuBtn
     type="button"
@@ -33,15 +32,12 @@
   >
     <app-icon name="sidebar" class="size-icon-menu" />
   </button>
-  </span>
-  <span data-capsule class="flex items-center gap-0.5">
   <button type="button" (click)="location.back()" [uiTip]="'nav.back' | t" [attr.aria-label]="'nav.back' | t" class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
     <app-icon name="chevron-left" class="size-icon-menu" />
   </button>
   <button type="button" (click)="location.forward()" [uiTip]="'nav.forward' | t" [attr.aria-label]="'nav.forward' | t" class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
     <app-icon name="chevron-right" class="size-icon-menu" />
   </button>
-  </span>
 </header>
 <div class="flex min-h-0 flex-1">
 <!-- (with the window's title bar: the window gray, the sidebar flat on it, the page a white panel
