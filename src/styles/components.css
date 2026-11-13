@@ -58,6 +58,10 @@
   html:not([data-safari-app]) [data-page-panel][data-side-hidden] {
     margin-left: 0.5rem;
   }
+  /* (the heads' rows — the tag, 🔖, ⋯; the sections' — up against the panel's top: lower than 52) */
+  html:not([data-safari-app]) [data-page-panel] :is([data-page-head], [data-toolbar]) {
+    height: 2.5rem;
+  }
   /* (no browser's ‹ › there: the app's buttons, as Claude's — ☰, the sidebar, ‹ › — over the sidebar's
      top, close under the window's bar, the search right under them; the page's panel up to the top. The
      sidebar hidden: over the panel's top left, its head's row moved clear of them) */
@@ -111,9 +115,9 @@
     padding-top: env(titlebar-area-height, 2.25rem);
   }
   /* (a page's buttons — the tag, Publish, the bookmark, ⋯ — up on the bar at its right, by the window's
-     buttons, when the window is wide enough for them there (narrower: on the page's row at its right, as ever);
+     buttons, when the window is wide enough for them there (narrower than 640: on the page's row at its right, as ever);
      its name stays on the page's row) */
-  @media (min-width: 56rem) {
+  @media (min-width: 40rem) {
     /* (no blur on the row then — a blur makes the row, not the window, what a fixed piece in it is placed
        by; and the row over the bar, else the bar (its stacking above the page's) took their clicks) */
     [data-page-head] {
@@ -131,6 +135,16 @@
     [data-page-head] > div:last-of-type :is(button, a) {
       app-region: no-drag;
       -webkit-app-region: no-drag;
+    }
+    /* (a page: its panel up under the bar, its head's row — empty now, the window dragged by it — 40
+       tall: the title as far from the white's top as with the window's bar shown (its head 40, above)) */
+    [data-page-panel]:has([data-page-head]) {
+      margin-top: calc(-1 * env(titlebar-area-height, 2.25rem));
+    }
+    [data-page-head] {
+      height: 2.5rem;
+      app-region: drag;
+      -webkit-app-region: drag;
     }
   }
   [data-side-trash],
