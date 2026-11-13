@@ -11,7 +11,7 @@ import { AppSearch, Found, SearchScope } from './app-search';
 /**
  * Phones: the app's search (the top bar's 🔍), as Telegram's — over the whole screen, the field on
  * a capsule where the top bar was and ✕ at its right (both as the top bar's buttons), the tabs
- * under them (All, Pages, Events); under those what's found (AppSearch's, no actions: nothing
+ * under them (All, Pages, Events); under those what's found (AppSearch's: nothing
  * typed, the recent pages), by section, scrolled on its own down to the keyboard — the head
  * stays put. A tap (or
  * Search on the keyboard: the first one) opens it; ✕ or Esc closes it.
@@ -45,7 +45,7 @@ export class SearchBar {
   // What's found, by section, in order
   protected readonly sections = computed(() => {
     const sections: { name: string; items: Found[] }[] = [];
-    for (const found of this.search.find(this.query(), this.scope(), false)) {
+    for (const found of this.search.find(this.query(), this.scope())) {
       const last = sections.at(-1);
       if (last?.name === found.section) last.items.push(found);
       else sections.push({ name: found.section, items: [found] });

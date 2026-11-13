@@ -195,6 +195,10 @@ export class DesktopLayout {
     keep(SIDEBAR_HIDDEN, this.sidebarHidden() ? '1' : '');
   }
   protected readonly location = inject(Location);
+  // ‹ › off when there's nowhere to go that way (the Navigation API's; a browser without it: both on)
+  private readonly nav = (window as { navigation?: { canGoBack: boolean; canGoForward: boolean; addEventListener(t: string, f: () => void): void } }).navigation;
+  protected readonly canBack = signal(this.nav?.canGoBack ?? true);
+  protected readonly canForward = signal(this.nav?.canGoForward ?? true);
   // The account button: the user's name, else the email
   protected readonly userName = computed(() => this.auth.name() ?? this.auth.email() ?? '');
 
@@ -202,6 +206,10 @@ export class DesktopLayout {
   protected readonly search = inject(DesktopSearch);
 
   constructor() {
+    this.nav?.addEventListener('currententrychange', () => {
+      this.canBack.set(this.nav!.canGoBack);
+      this.canForward.set(this.nav!.canGoForward);
+    });
     this.events.show(new Date());
     if (this.library()) {
       this.store.load();

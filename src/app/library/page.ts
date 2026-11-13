@@ -1,4 +1,3 @@
-import { NavButtons } from '../layout/nav-buttons';
 import { Component, computed, DestroyRef, effect, ElementRef, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, switchMap } from 'rxjs';
@@ -41,7 +40,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [NavButtons, AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, UiPopover, UiPopItem, UiPopSeparator],
+  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, UiPopover, UiPopItem, UiPopSeparator],
   templateUrl: './page.html',
 })
 export class PageView {

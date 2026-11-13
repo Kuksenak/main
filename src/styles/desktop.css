@@ -35,6 +35,9 @@
   /* The bar across the window's top (macOS 27's toolbar): the sidebar's top and the pages' heads, 52
      tall — an installed app's too, never lower than the system's own bar (components.css) */
   --bar-h: 3.25rem;
+  /* Windows (ui-window: the search, the trash, the assistant): 70% of the screen, all of them, always (it
+     doesn't jump as results come and go) */
+  --window-h: 70vh;
   --side-row-h: 1.875rem; /* (30) */
   --side-row-px: 0.4375rem;
   --icon-side: 1.375rem; /* (22) */
@@ -65,7 +68,7 @@
 
 /* A Mac's toolbars (a section's top row, the app's own title bar, ‹ ›): their buttons a size up, as
    macOS's own toolbars' are (32, icons 22) */
-html[data-mac] :is([data-toolbar], [data-app-titlebar], [data-nav-buttons]) {
+html[data-mac] :is([data-toolbar], [data-app-titlebar]) {
   --button-h: 2rem;
   --icon-menu: 1.375rem;
 }

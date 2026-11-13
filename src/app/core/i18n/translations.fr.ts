@@ -13,7 +13,6 @@ export const fr: Dictionary = {
   'search.recents': 'Récents',
   'search.pages': 'Pages',
   'search.sections': 'Rubriques',
-  'search.actions': 'Actions',
   'search.all': 'Tout',
   'search.events': 'Événements',
   'search.noEvents': 'Pas encore d’événements',

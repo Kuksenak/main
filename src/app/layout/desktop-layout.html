@@ -3,7 +3,7 @@
      Code's): its own title bar across the top, white end to end (the sidebar's gray under it) — the window
      dragged by it; at its left (after a Mac's window buttons) icon buttons, as Claude's: ☰ the app's
      menu (Go to ›, the trash, Language ›, the account ›), the sidebar shown / hidden, ‹ › back and
-     forward; Windows' buttons at its right (components.css). Else it's not there: the trash and the account at the sidebar's bottom. Search: always the sidebar's first row, as
+     forward; Windows' buttons at its right (components.css). The window's own bar shown: this one under it, ☰ ▯ ‹ › only (components.css). A browser's tab: not there; the trash and the account at the sidebar's bottom. Search: always the sidebar's first row, as
      Claude's. -->
 <div data-app-root class="flex h-full flex-col bg-app text-fg">
 <header data-app-titlebar class="hidden shrink-0 items-center gap-0.5 bg-app">
@@ -32,10 +32,10 @@
   >
     <app-icon name="sidebar" class="size-icon-menu" />
   </button>
-  <button type="button" (click)="location.back()" [uiTip]="'nav.back' | t" [attr.aria-label]="'nav.back' | t" class="grid size-button place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
+  <button type="button" (click)="location.back()" [disabled]="!canBack()" [uiTip]="'nav.back' | t" [attr.aria-label]="'nav.back' | t" class="grid size-button place-items-center rounded-button text-icon not-disabled:hover:bg-tint not-disabled:hover:text-fg disabled:opacity-40">
     <app-icon name="chevron-left" class="size-icon-menu" />
   </button>
-  <button type="button" (click)="location.forward()" [uiTip]="'nav.forward' | t" [attr.aria-label]="'nav.forward' | t" class="grid size-button place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
+  <button type="button" (click)="location.forward()" [disabled]="!canForward()" [uiTip]="'nav.forward' | t" [attr.aria-label]="'nav.forward' | t" class="grid size-button place-items-center rounded-button text-icon not-disabled:hover:bg-tint not-disabled:hover:text-fg disabled:opacity-40">
     <app-icon name="chevron-right" class="size-icon-menu" />
   </button>
 </header>

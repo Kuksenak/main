@@ -21,10 +21,10 @@ export type SearchScope = 'all' | 'pages' | 'events';
 
 /**
  * What the app's search finds — the desktop's search window and the phones' search (SearchBar) alike.
- * Nothing typed: the pages last changed and the actions (New page); something typed: the library's
+ * Nothing typed: the pages last changed; something typed: the library's
  * pages and the app's sections whose names have it (the ones that start with it first). `find` reads
  * signals: call it in a computed. `scope` (the phones' tabs): 'pages' — all the pages, the last
- * changed first (or those that have it); 'events' — none yet. `actions` off (phones): no New page.
+ * changed first (or those that have it); 'events' — none yet.
  */
 @Injectable({ providedIn: 'root' })
 export class AppSearch {
@@ -38,7 +38,7 @@ export class AppSearch {
     if (this.auth.can('library') && !this.library.items()) this.library.load();
   }
 
-  find(query: string, scope: SearchScope = 'all', actions = true): Found[] {
+  find(query: string, scope: SearchScope = 'all'): Found[] {
     const q = this.i18n.lower(query.trim());
     const t = (key: Parameters<I18nService['t']>[0]) => this.i18n.t(key);
     const pages = (this.auth.can('library') ? (this.library.items() ?? []) : []).map(
@@ -50,13 +50,8 @@ export class AppSearch {
       return q ? all.filter((p) => this.i18n.lower(p.label).includes(q)) : all;
     }
 
-    // Nothing typed: the pages last changed, then the actions
-    if (!q) {
-      const extra: Found[] = actions && this.auth.can('library')
-        ? [{ id: 'new-page', section: t('search.actions'), label: t('library.new'), icon: 'plus', open: () => this.newPage() }]
-        : [];
-      return [...pages.slice(0, 8).map((p) => ({ ...p, section: t('search.recents') })), ...extra];
-    }
+    // Nothing typed: the pages last changed
+    if (!q) return pages.slice(0, 8).map((p) => ({ ...p, section: t('search.recents') }));
 
     // Something typed: the names that have it — those starting with it first
     const has = (name: string) => this.i18n.lower(name).includes(q);
@@ -69,9 +64,5 @@ export class AppSearch {
       ...pages.filter((p) => has(p.label)).sort(rank).map((p) => ({ ...p, section: t('search.pages') })),
       ...places.filter((p) => has(p.label)).sort(rank),
     ].slice(0, 50);
-  }
-
-  private newPage(): void {
-    this.library.createAndOpen();
   }
 }

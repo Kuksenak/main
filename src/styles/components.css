@@ -29,7 +29,7 @@
    Code's: its own title bar across the window (`data-app-titlebar`, desktop-layout) in the system's
    bar's place — as tall, the window dragged by it (not by its buttons), clear of the window's buttons
    (a Mac's at the left, Windows' at the right: titlebar-area-x / -width); the trash and the account
-   move onto it, off the sidebar, its buttons from its left. Else (the bar shown, a browser's tab) it isn't there. (Plain CSS:
+   move onto it, off the sidebar, its buttons from its left. The window's bar shown: under it, plain (standalone, below). A browser's tab: not there. (Plain CSS:
    app-region and the display mode.) */
 [data-app-titlebar] {
   display: none !important;
@@ -49,6 +49,8 @@
     background-color: var(--side-bg);
   }
   html:not([data-safari-app]) [data-page-panel] {
+    /* (its top level with the app's buttons' over the sidebar, below) */
+    margin-top: 0.375rem;
     margin-right: 0.5rem;
     border-radius: var(--round-side) var(--round-side) 0 0;
     box-shadow: var(--side-shadow);
@@ -56,9 +58,27 @@
   html:not([data-safari-app]) [data-page-panel][data-side-hidden] {
     margin-left: 0.5rem;
   }
-  /* (no browser's ‹ › there: ours at the left of a section's top row, NavButtons) */
-  [data-nav-buttons] {
+  /* (no browser's ‹ › there: the app's buttons, as Claude's — ☰, the sidebar, ‹ › — over the sidebar's
+     top, close under the window's bar, the search right under them; the page's panel up to the top. The
+     sidebar hidden: over the panel's top left, its head's row moved clear of them) */
+  [data-app-root] {
+    position: relative;
+  }
+  [data-app-titlebar] {
     display: flex !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 30;
+    height: 2.5rem;
+    padding-left: 0.75rem;
+    background-color: transparent !important;
+  }
+  [data-side-wrap] > ui-sidebar {
+    padding-top: 1.75rem;
+  }
+  [data-page-panel][data-side-hidden] :is([data-toolbar], [data-page-head]) {
+    padding-left: 9.5rem;
   }
 }
 @media (display-mode: window-controls-overlay) {
@@ -91,24 +111,24 @@
     padding-top: env(titlebar-area-height, 2.25rem);
   }
   /* (a page's buttons — the tag, Publish, the bookmark, ⋯ — up on the bar at its right, by the window's
-     buttons, when the window is wide enough for them there (narrower, or a Mac's: on the page's row at its right, as ever);
+     buttons, when the window is wide enough for them there (narrower: on the page's row at its right, as ever);
      its name stays on the page's row) */
   @media (min-width: 56rem) {
     /* (no blur on the row then — a blur makes the row, not the window, what a fixed piece in it is placed
        by; and the row over the bar, else the bar (its stacking above the page's) took their clicks) */
-    html:not([data-mac]) [data-page-head] {
+    [data-page-head] {
       z-index: 50 !important;
       -webkit-backdrop-filter: none !important;
       backdrop-filter: none !important;
     }
-    html:not([data-mac]) [data-page-head] > div:last-of-type {
+    [data-page-head] > div:last-of-type {
       position: fixed;
       top: 0;
       right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem);
       z-index: 40;
       height: env(titlebar-area-height, 2.25rem);
     }
-    html:not([data-mac]) [data-page-head] > div:last-of-type :is(button, a) {
+    [data-page-head] > div:last-of-type :is(button, a) {
       app-region: no-drag;
       -webkit-app-region: no-drag;
     }

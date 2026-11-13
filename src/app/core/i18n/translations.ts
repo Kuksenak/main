@@ -15,7 +15,6 @@ const en = {
   'search.recents': 'Recent',
   'search.pages': 'Pages',
   'search.sections': 'Sections',
-  'search.actions': 'Actions',
   'search.all': 'All',
   'search.events': 'Events',
   'search.noEvents': 'No events yet',

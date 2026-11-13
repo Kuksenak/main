@@ -1,11 +1,11 @@
-import { booleanAttribute, Component, DestroyRef, inject, input, output } from '@angular/core';
+import { Component, DestroyRef, inject, output } from '@angular/core';
 
 /**
  * A desktop window, as Notion's search (measured: 600 wide, nothing dims): near the top of the
  * screen, round corners, a hairline edge; what's in it is the page's. Esc or a click outside
- * closes it (`closed`); always as tall as it may be (76% of the screen: it doesn't jump as results
- * come and go), glass as the menus (Liquid Glass). (`tall`: kept, no longer needed.) The search
- * window and the page assistant's are this. Render it with @if.
+ * closes it (`closed`); glass as the menus (Liquid Glass); 70% of the screen tall, always (h-window:
+ * it doesn't jump as results come and go). The search window, the trash and the page assistant's
+ * are this. Render it with @if.
  *   @if (open()) { <ui-window (closed)="open.set(false)">…</ui-window> }
  */
 @Component({
@@ -16,7 +16,7 @@ import { booleanAttribute, Component, DestroyRef, inject, input, output } from '
       <div
         role="dialog"
         aria-modal="true"
-        class="flex h-[76vh] w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-menu popup-glass text-fg shadow-menu"
+        class="flex h-window w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-menu popup-glass text-fg shadow-menu"
                 (mousedown)="$event.stopPropagation()"
       >
         <ng-content />
@@ -25,7 +25,6 @@ import { booleanAttribute, Component, DestroyRef, inject, input, output } from '
   `,
 })
 export class UiWindow {
-  readonly tall = input(false, { transform: booleanAttribute });
   readonly closed = output<void>();
 
   constructor() {
