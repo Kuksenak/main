@@ -159,6 +159,11 @@
 @utility popup-glass {
   @apply bg-menu/80 backdrop-blur-[6px] backdrop-saturate-[180%] dark:bg-menu/92;
 }
+/* (the windows — the search, the trash, the assistant (ui-window): as the menus, a little less
+   see-through — what's under them shows less through the longer lists) */
+@utility window-glass {
+  @apply bg-menu/90 backdrop-blur-[6px] backdrop-saturate-[180%] dark:bg-menu/96;
+}
 /* (a menu's own field row — a ⌕ / # and what's typed — and its note — "nothing found": as its rows) */
 @utility menu-field {
   @apply flex h-8 items-center gap-2 px-menu-row-x;

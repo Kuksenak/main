@@ -3,7 +3,7 @@ import { Component, DestroyRef, inject, output } from '@angular/core';
 /**
  * A desktop window, as Notion's search (measured: 600 wide, nothing dims): near the top of the
  * screen, round corners, a hairline edge; what's in it is the page's. Esc or a click outside
- * closes it (`closed`); glass as the menus (Liquid Glass); 70% of the screen tall, always (h-window:
+ * closes it (`closed`); glass as the menus, a little less see-through (window-glass); 70% of the screen tall, always (h-window:
  * it doesn't jump as results come and go). The search window, the trash and the page assistant's
  * are this. Render it with @if.
  *   @if (open()) { <ui-window (closed)="open.set(false)">…</ui-window> }
@@ -16,7 +16,7 @@ import { Component, DestroyRef, inject, output } from '@angular/core';
       <div
         role="dialog"
         aria-modal="true"
-        class="flex h-window w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-menu popup-glass text-fg shadow-menu"
+        class="flex h-window w-[37.5rem] max-w-[92vw] animate-menu-in flex-col overflow-hidden rounded-menu window-glass text-fg shadow-menu"
                 (mousedown)="$event.stopPropagation()"
       >
         <ng-content />
