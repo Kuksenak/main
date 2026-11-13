@@ -1,6 +1,6 @@
 import { Component, computed, inject, output, signal } from '@angular/core';
 import { I18nService } from '../core/i18n/i18n.service';
-import { UiSearchResult, UiSearchWindow } from '../core/ui/search';
+import { UiSearchResult, UiSearchWindow } from '../core/ui/search/search-window';
 import { AppSearch, Found } from './app-search';
 
 /** Desktop: the app's search (the sidebar's Search), in the search window (what it finds: AppSearch). */

@@ -4,6 +4,7 @@
      events under it; Today floating at the bottom left, + at the bottom right. -->
 @if (desktop) {
   <div data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-4">
+    <app-nav-buttons />
     <h1 class="px-2 text-body font-bold tracking-tight desktop:text-ui desktop:font-semibold">{{ title() }}</h1>
     <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
     <app-toolbar-end [addLabel]="'schedule.newEvent'" (add)="create()" />

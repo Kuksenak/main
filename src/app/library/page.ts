@@ -1,3 +1,4 @@
+import { NavButtons } from '../layout/nav-buttons';
 import { Component, computed, DestroyRef, effect, ElementRef, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, switchMap } from 'rxjs';
@@ -11,9 +12,12 @@ import { UiPopItem, UiPopover, UiPopSeparator } from '../core/ui/popover/popover
 import { UiSheet } from '../core/ui/sheet/sheet';
 import { UiTag, UiTagSwatch } from '../core/ui/tag/tag';
 import { Toasts } from '../core/ui/toast/toast';
-import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
+import { UiMenu } from '../core/ui/menu/menu';
+import { UiMenuItem } from '../core/ui/menu/menu-item';
+import { UiMenuSeparator } from '../core/ui/menu/menu-separator';
 import { UiTip } from '../core/ui/tip/tip';
-import { UiWindow, UiWindowHead } from '../core/ui/window';
+import { UiWindow } from '../core/ui/window/window';
+import { UiWindowHead } from '../core/ui/window/window-parts';
 import { PageTitle } from '../layout/page-title';
 import { AiChat } from './ai-chat';
 import { Page, PageBlock, LibraryStore, shareUrl } from './library.store';
@@ -37,7 +41,7 @@ const SAVE_AFTER_MS = 700;
  */
 @Component({
   selector: 'app-page',
-  imports: [AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, UiPopover, UiPopItem, UiPopSeparator],
+  imports: [NavButtons, AiChat, ReadBlock, Icon, PageEditor, TranslatePipe, UiButton, UiMenu, UiMenuItem, UiMenuSeparator, UiSheet, UiTag, UiTagSwatch, UiTip, UiWindow, UiWindowHead, TagPicker, UiPopover, UiPopItem, UiPopSeparator],
   templateUrl: './page.html',
 })
 export class PageView {
@@ -110,10 +114,12 @@ export class PageView {
     this.store.get(id).subscribe({
       next: (page) => {
         this.page.set(page);
-        this.title.set(page.title);
+        // (never named — saved as "Untitled": the field empty, its gray hint shown)
+        const untitled = ['Untitled', 'Bez tytułu', 'Sans titre', this.i18n.t('library.untitled')];
+        this.title.set(untitled.includes(page.title.trim()) ? '' : page.title);
         this.blocks = page.blocks;
         this.texts = this.blocks;
-        if (fresh && desktop) setTimeout(() => this.titleField()?.nativeElement.select());
+        if (fresh && desktop) setTimeout(() => this.titleField()?.nativeElement.focus());
       },
       error: () => this.toasts.fail('library.pageLoadError'),
     });

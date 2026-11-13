@@ -8,6 +8,8 @@ export const ICONS = [
   'logout',
   'logout-all',
   'check',
+  'image',
+  'todo',
   'globe',
   'calendar',
   'grid',

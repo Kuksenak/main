@@ -41,6 +41,10 @@ const PATHS: Record<string, string> = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   close: '<path d="M17.5 6.5l-11 11M6.5 6.5l11 11"/>',
   check: '<path d="m5 12.6 4.4 4.4L19 7.4"/>',
+  // (an image: a frame, a hill and the sun in it)
+  image: '<rect x="3.4" y="4.6" width="17.2" height="14.8" rx="2.4"/><path d="m3.8 16.6 4.6-4.6a1.6 1.6 0 0 1 2.2 0l4.6 4.6M13.8 15.2l1.6-1.6a1.6 1.6 0 0 1 2.2 0l2.6 2.6"/><circle cx="15.4" cy="9.2" r="1.4"/>',
+  // (a to-do list: a ticked box and a box, a line after each)
+  todo: '<rect x="3.6" y="4.4" width="6" height="6" rx="1.4"/><path d="m4.9 7.4 1.2 1.2 2.2-2.4M13 7.4h7.4"/><rect x="3.6" y="13.6" width="6" height="6" rx="1.4"/><path d="M13 16.6h7.4"/>',
   'chevron-left': '<path d="m14.6 6-6 6 6 6"/>',
   'chevron-right': '<path d="m9.4 6 6 6-6 6"/>',
   'chevron-down': '<path d="m6 9.4 6 6 6-6"/>',

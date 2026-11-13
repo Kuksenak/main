@@ -56,6 +56,10 @@
   html:not([data-safari-app]) [data-page-panel][data-side-hidden] {
     margin-left: 0.5rem;
   }
+  /* (no browser's ‹ › there: ours at the left of a section's top row, NavButtons) */
+  [data-nav-buttons] {
+    display: flex !important;
+  }
 }
 @media (display-mode: window-controls-overlay) {
   [data-app-titlebar] {

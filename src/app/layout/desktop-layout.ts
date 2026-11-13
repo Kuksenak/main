@@ -11,16 +11,21 @@ import { UiAvatar } from '../core/ui/avatar/avatar';
 import { UiButton } from '../core/ui/button/button';
 import { UiFoldName } from '../core/ui/fold/fold';
 import { Icon, IconName } from '../core/ui/icon/icon';
-import { UiSidebar, UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarRow, UiSidebarScroll } from '../core/ui/sidebar';
+import { UiSidebar } from '../core/ui/sidebar/sidebar';
+import { UiSidebarAction, UiSidebarButton, UiSidebarItem, UiSidebarRow } from '../core/ui/sidebar/sidebar-item';
 import { UiTip } from '../core/ui/tip/tip';
-import { UiListKeys, UiWindow, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowList } from '../core/ui/window';
+import { UiWindow } from '../core/ui/window/window';
+import { UiListKeys, UiWindowField, UiWindowFoot, UiWindowHead, UiWindowList } from '../core/ui/window/window-parts';
 import { LibraryStore, PageItem } from '../library/library.store';
 import { TranslationKey } from '../core/i18n/translations';
 import { TrashList } from '../library/trash-list';
 import { PageMenu } from '../library/page-menu';
 import { TagsStore } from '../library/tags.store';
 import { PAGE_DRAG, SidebarTags } from '../library/sidebar-tags';
-import { UiMenu, UiMenuItem, UiMenuLabel, UiMenuSeparator } from '../core/ui/menu';
+import { UiMenu } from '../core/ui/menu/menu';
+import { UiMenuItem } from '../core/ui/menu/menu-item';
+import { UiMenuLabel } from '../core/ui/menu/menu-label';
+import { UiMenuSeparator } from '../core/ui/menu/menu-separator';
 import { visiblePlaces } from './places';
 import { keep, kept, keptFolds } from '../core/utils/storage';
 import { sameDay } from '../core/utils/date';
@@ -61,7 +66,6 @@ const SIDEBAR_HIDDEN = 'layout.sidebarHidden';
     UiSidebarButton,
     UiSidebarItem,
     UiSidebarRow,
-    UiSidebarScroll,
     TrashList,
     UiTip,
     UiWindow,
@@ -81,17 +85,16 @@ export class DesktopLayout {
   // (the sections this user can read)
   protected readonly places = computed(() => visiblePlaces((area) => this.auth.can(area)));
 
-  // The library's: its favorites (the store's list — read here, the sidebar needs it at once), Trash
+  // The library's: its pages (the store's list — read here, the sidebar needs it at once), Trash
   protected readonly library = computed(() => this.auth.can('library'));
   protected readonly store = inject(LibraryStore);
-  protected readonly favorites = computed(() => this.store.items()?.filter((x) => x.favorite) ?? []);
   protected readonly trashOpen = signal(false);
   // (the trash window's field: its pages filtered)
   protected readonly trashQuery = signal('');
   // (and the row its keys picked)
   protected readonly trashIndex = signal<number | null>(0);
 
-  // The sidebar's lists: Recents (the last changed), Favorites (when there are any)
+  // The sidebar's lists: Recents (the last opened, the last changed)
   protected readonly lists = computed(() => {
     const items = this.store.items() ?? [];
     const lists: { id: List; label: TranslationKey; icon: IconName; pages: PageItem[] }[] = [];
@@ -103,8 +106,6 @@ export class DesktopLayout {
       const pages = [...opened, ...items.filter((x) => !opened.includes(x))].slice(0, RECENTS);
       lists.push({ id: 'recents', label: 'library.recents', icon: 'clock', pages });
     }
-    // (Favorites: off the sidebar for now)
-    // if (this.favorites().length) lists.push({ id: 'favorites', label: 'library.favorites', icon: 'bookmark', pages: this.favorites() });
     return lists;
   });
   // (folded away — kept on this device)
@@ -113,8 +114,6 @@ export class DesktopLayout {
   private readonly url = toSignal(this.router.events.pipe(filter((e) => e instanceof NavigationEnd), map(() => this.router.url)), {
     initialValue: this.router.url,
   });
-  // (the library's list itself — not a page of it, nor a tag: those rows are the chosen ones then; none
-  // while a window is open: its row is)
   // (the library's page open: its id)
   protected readonly openPage = computed(() => /^\/library\/([^/?#]+)/.exec(this.url())?.[1] ?? null);
   // (the pages opened, the last first — kept on this device)
@@ -211,7 +210,7 @@ export class DesktopLayout {
   }
 }
 
-type List = 'favorites' | 'recents' | 'events';
+type List = 'recents' | 'events';
 // (how many of the last changed pages Recents shows)
 const RECENTS = 5;
 // (the pages last opened, kept on this device: the sidebar's first)

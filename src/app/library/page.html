@@ -1,103 +1,69 @@
-<!-- Desktops: a row at the very top (the bar's), staying as the page scrolls — its buttons only, left to
-     right: the tag, saving…, Publish, 🔖 and ⋯ (its menu: the assistant…); the page's name under it, a
-     big title at the top of the text (typed over right there; Enter: on into the text; a new page: its
-     name selected) -->
+<!-- Desktops: a row at the very top (the bar's), staying as the page scrolls — at its right saving…,
+     its tag, its link (published), 🔖 and ⋯ (its menu: the assistant, Publish, Preview, Duplicate, Trash) -->
 @if (desktop && page(); as p) {
   <!-- (the bar's height, 52 — as the sections' heads and the sidebar's top: one bar across the window) -->
   <!-- (an installed app with its own title bar: this row up on it, at its right — components.css) -->
   <div data-page-head data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-5">
-    <!-- Its name at the row's left (20px, regular), typed over right there ("Rename" its hint); its words
-         level with the text's under it (the row 20 in as the page, the field 16 in as a block); Enter — on
-         into the text. Right after it, as Claude's, ⌄: the page's menu. The buttons together at the right. -->
-    <form class="flex min-w-0 shrink items-center" (submit)="$event.preventDefault(); titleDone()">
-      <input
-        #titleField
-        type="text"
-        [value]="title()"
-        (input)="typedTitle(titleField.value)"
-        (keydown.escape)="titleField.blur()"
-        [placeholder]="'library.untitled' | t"
-        [attr.aria-label]="'library.rename' | t"
-        maxlength="200"
-        autocomplete="off"
-        [uiTip]="'library.rename' | t"
-        class="h-button min-w-24 max-w-full truncate rounded-button bg-transparent px-4 text-heading font-normal text-fg outline-none [field-sizing:content] placeholder:text-fg-secondary hover:bg-tint focus:bg-tint"
-      />
-    </form>
-    <button
-      uiButton
-      #more
-      type="button"
-      icon="chevron-down"
-      (click)="menuOpen.set(!menuOpen())"
-      [attr.aria-expanded]="menuOpen()"
-      [attr.aria-label]="'library.more' | t"
-      [uiTip]="menuOpen() ? null : ('library.more' | t)"
-      class="-ml-1.5"
-    ></button>
+    <app-nav-buttons />
     <div class="ml-auto flex shrink-0 items-center gap-0.5">
-    <!-- Its tag, the row's first: a button as the others — # and Tag; a tag on it: the button the
-         tag's own whole (its pastel, its name); ▾ either way (a choice) — a click: the picker -->
-    @if (tags.of(p.tagIds)[0]; as tag) {
+      @if (saving()) {
+        <span class="px-2 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
+      }
+      <!-- Its tag, as Notion's: the tag itself — a pill in its color, its name; none: "Tags" in gray —
+           a click: the picker -->
       <button
         #tagsBtn
         type="button"
         (click)="tagsOpen.set(!tagsOpen())"
         [attr.aria-expanded]="tagsOpen()"
         [attr.aria-label]="'tags.title' | t"
-        class="inline-flex h-button max-w-56 min-w-0 shrink items-center gap-1.5 rounded-button px-2 text-ui text-fg-secondary hover:bg-tint hover:text-fg aria-expanded:bg-tint aria-expanded:text-fg"
+        class="inline-flex h-button max-w-56 min-w-0 shrink items-center rounded-button px-1.5 text-ui text-fg-secondary hover:bg-tint aria-expanded:bg-tint"
       >
-        <app-icon name="hash" [tag]="tag.color" class="size-icon-menu shrink-0" />
-        <span class="min-w-0 truncate">{{ tag.name }}</span>
-        <app-icon name="chevron-down" class="-ml-0.5 size-4 shrink-0 opacity-50" />
+        @if (tags.of(p.tagIds)[0]; as tag) {
+          <ui-tag [color]="tag.color" class="h-6! max-w-52! rounded-button! px-2! text-ui!">{{ tag.name }}</ui-tag>
+        } @else {
+          {{ 'tags.title' | t }}
+        }
       </button>
-    } @else {
-      <button
-        #tagsBtn
-        uiButton
-        type="button"
-        icon="hash"
-        caret
-        (click)="tagsOpen.set(!tagsOpen())"
-        [attr.aria-expanded]="tagsOpen()"
-        [attr.aria-label]="'tags.title' | t"
-      >{{ 'tags.add' | t }}</button>
-    }
-    @if (tagsOpen()) {
-      <app-tag-picker [origin]="tagsAt()!" [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagsOpen.set(false)" />
-    }
-    @if (saving()) {
-      <span class="text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
-    }
-    <!-- Publish, the lock either way: not published — a click publishes it (its public link made and
-         copied); published — "Published" (a click: Unpublish, asked first — the link stops working)
-         and the link's own button (copied at a click); Preview: in ⋯ -->
-    <!-- published: the link's own button (copied at a click); Publish / Unpublish in ⋯ -->
-    @if (p.shareToken) {
+      @if (tagsOpen()) {
+        <app-tag-picker [origin]="tagsAt()!" [tagIds]="p.tagIds ?? []" (changed)="setTags($event)" (closed)="tagsOpen.set(false)" />
+      }
+      <!-- published: its link (copied at a click) -->
+      @if (p.shareToken) {
+        <button
+          uiButton
+          type="button"
+          icon="link"
+          (click)="copyLink()"
+          [uiTip]="'library.copyLinkTip' | t"
+          [attr.aria-label]="'library.copyLink' | t"
+        ></button>
+      }
+      <!-- 🔖: in the favorites or not -->
       <button
         uiButton
         type="button"
-        icon="link"
-        (click)="copyLink()"
-        [uiTip]="'library.copyLinkTip' | t"
-        [attr.aria-label]="'library.copyLink' | t"
+        [icon]="p.favorite ? 'bookmark-filled' : 'bookmark'"
+        (click)="favorite()"
+        [attr.aria-pressed]="p.favorite"
+        [attr.aria-label]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
+        [uiTip]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
       ></button>
-    }
-    <!-- 🔖 (in the favorites — the sidebar's — or not) and ⋯: one capsule -->
-    <button
-      uiButton
-      type="button"
-      [icon]="p.favorite ? 'bookmark-filled' : 'bookmark'"
-      (click)="favorite()"
-      [attr.aria-pressed]="p.favorite"
-      [attr.aria-label]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
-      [uiTip]="(p.favorite ? 'library.unfavorite' : 'library.favorite') | t"
-    ></button>
+      <button
+        uiButton
+        #more
+        type="button"
+        icon="dots"
+        (click)="menuOpen.set(!menuOpen())"
+        [attr.aria-expanded]="menuOpen()"
+        [attr.aria-label]="'library.more' | t"
+        [uiTip]="menuOpen() ? null : ('library.more' | t)"
+      ></button>
     </div>
     @if (menuOpen()) {
-      <!-- The assistant, Preview; Duplicate; Move to trash -->
       <ui-menu narrow [origin]="more.element" (closed)="menuOpen.set(false)">
         <button type="button" uiMenuItem icon="sparkle" (click)="aiOpen.set(true)">{{ 'editor.ai' | t }}</button>
+        <ui-menu-separator />
         @if (p.shareToken) {
           <button type="button" uiMenuItem icon="lock" (click)="unshare(more.element)">{{ 'library.unpublish' | t }}</button>
         } @else {
@@ -113,11 +79,28 @@
   </div>
 }
 
-<!-- (desktops: the blocks nearly the window's whole width, their left edge under the top row's name's) -->
-<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:px-5 desktop:pt-1">
+<!-- (desktops: a column as Notion's, at the page's left — the title, then the text, one edge for both;
+     room at the left for the blocks' ⠿) -->
+<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:w-full desktop:max-w-4xl desktop:gap-0 desktop:px-24 desktop:pt-1">
 
   @if (page(); as p) {
     @if (desktop) {
+      <!-- The title (typed over right there; Enter: on into the text; a new page: the caret in it) — not
+           named yet: its gray hint -->
+      <form (submit)="$event.preventDefault(); titleDone()" class="mb-4">
+        <input
+          #titleField
+          type="text"
+          [value]="title()"
+          (input)="typedTitle(titleField.value)"
+          (keydown.escape)="titleField.blur()"
+          [placeholder]="'library.untitled' | t"
+          [attr.aria-label]="'library.rename' | t"
+          maxlength="200"
+          autocomplete="off"
+          class="block w-full truncate bg-transparent text-page-title font-normal text-fg outline-none placeholder:text-fg-secondary/60"
+        />
+      </form>
       <!-- The text: blocks, written right on the page -->
       <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
     } @else {
@@ -206,5 +189,3 @@
     }
   </ui-popover>
 }
-
-

@@ -6,7 +6,7 @@ import { Icon, IconName } from '../core/ui/icon/icon';
 import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
 import { LibraryStore, type PageBlock } from './library.store';
 import { UiTip } from '../core/ui/tip/tip';
-import { linkSelection, Mark, marked, marksAt, toggleMark } from './marks';
+import { imageOf, linkSelection, Mark, marked, marksAt, shown, toggleMark } from './marks';
 
 /** A block being edited (its id: for the list's tracking, as blocks move). */
 interface Item {
@@ -14,23 +14,37 @@ interface Item {
   text: string;
   // (only for the teacher: a lock on it)
   private?: boolean;
+  // (a to-do: its box — the text kept as "- [ ] …" / "- [x] …", the box's part not in the field)
+  todo?: 'open' | 'done';
 }
 
-/** A command at the caret between blocks: a new text, or the assistant. */
+const TODO = /^- \[( |x)\] ?/;
+
+// A block's text as an item (a to-do's box taken off it), and back
+function toItem(text: string, priv?: boolean): Item {
+  const m = TODO.exec(text);
+  return { id: nextId++, text: m ? text.slice(m[0].length) : text, private: priv || undefined, todo: m ? (m[1] === 'x' ? 'done' : 'open') : undefined };
+}
+function fullText(item: Item): string {
+  return item.todo ? `- [${item.todo === 'done' ? 'x' : ' '}] ${item.text}` : item.text;
+}
+
+/** A command at a new line ("/"): an image (by its link), the assistant, Paste. */
 interface Command {
-  id: 'text' | 'ai' | 'paste';
+  id: 'image' | 'ai' | 'todo' | 'paste';
   icon: IconName;
-  label: 'editor.text' | 'editor.ai' | 'editor.paste';
+  label: 'editor.image' | 'editor.ai' | 'editor.todo' | 'editor.paste';
   // (Paste's: what's been copied itself — copied())
-  hint?: 'editor.textHint' | 'editor.aiHint';
+  hint?: 'editor.imageLink' | 'editor.aiHint' | 'editor.todoHint';
 }
 
 // (what's been copied — a block's menu: Copy, the page's: Copy content — put in there)
 const PASTE: Command = { id: 'paste', icon: 'enter', label: 'editor.paste' };
 
 const COMMANDS: Command[] = [
-  { id: 'text', icon: 'page', label: 'editor.text', hint: 'editor.textHint' },
+  { id: 'image', icon: 'image', label: 'editor.image', hint: 'editor.imageLink' },
   { id: 'ai', icon: 'sparkle', label: 'editor.ai', hint: 'editor.aiHint' },
+  { id: 'todo', icon: 'todo', label: 'editor.todo', hint: 'editor.todoHint' },
 ];
 
 const STYLES: { id: Mark; mark: string; look: string; label: 'editor.bold' | 'editor.italic' | 'editor.underline' | 'editor.strike' }[] = [
@@ -45,11 +59,11 @@ let nextId = 1;
 /**
  * Desktop: a page's text, edited right on it (as Notion's): blocks of text — a "/" in one is just
  * text; their marks (**bold**, *italic*, __underline__, ~~strike~~, [links](…)) faded over the
- * text. Enter: a new line (only that); Ctrl+Enter (⌘↵): out of it, the caret's line under it.
+ * text. Enter: a new block (at the end: a new line under it); Shift+Enter: a new line in it.
  * Backspace in an empty one: it goes, the caret up to the one above; ↑ ↓ at the ends: the next one;
- * emptied and left, a text goes. Between two blocks or under the last, a click: the caret there (a
- * line with its hint and the commands: a new text, the assistant, `ai`; what's typed or pasted, a
- * new block there). A selection: B I U S and Link (a menu over the block). Each block's ⠿ (at its
+ * Backspace at the start of one: it joins the one above. Emptied and left, a block goes. Under the
+ * last, a click: a new line there (its hint; after "/", the commands: an image, the assistant, `ai`;
+ * what's typed or pasted, a new block there). A selection: B I U S and Link (a menu over the block). Each block's ⠿ (at its
  * left under the pointer): dragged, it moves (a line where it'd land); clicked, its menu — only for
  * me (a lock on it), copy, duplicate, delete. `blocks`: what it starts with (read once); `changed`:
  * all of them, at each change. (Phones show a page read only: PageView.)
@@ -69,6 +83,8 @@ export class PageEditor {
   private readonly store = inject(LibraryStore);
   protected readonly styles = STYLES;
   protected readonly marked = marked;
+  protected readonly shown = shown;
+  protected readonly imageOf = imageOf;
 
   protected readonly items = signal<Item[]>([]);
   private readonly fields = viewChildren<ElementRef<HTMLTextAreaElement>>('field');
@@ -91,6 +107,8 @@ export class PageEditor {
   protected readonly caretMenu = signal(false);
   protected readonly caretQuery = signal('');
   protected readonly caretActive = signal(0);
+  // (Image picked: the line asks for its link)
+  protected readonly caretImage = signal(false);
   protected readonly caretCommands = computed(() => {
     const query = this.caretQuery().toLocaleLowerCase();
     const all = this.store.clipboard()?.length ? [...COMMANDS, PASTE] : COMMANDS;
@@ -140,7 +158,7 @@ export class PageEditor {
     afterNextRender(() => {
       // (an empty page: no block, the caret's hint instead)
       const blocks = this.blocks();
-      this.items.set(blocks.map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private })));
+      this.items.set(blocks.map((b) => toItem(b.text ?? '', b.private)));
       if (!blocks.length) this.openCaret(0, false, false);
       this.growAll();
     });
@@ -157,7 +175,7 @@ export class PageEditor {
     const at = this.aiAt ?? (this.focused() >= 0 ? this.focused() + 1 : items.length);
     // (the page still empty: its empty block replaced)
     const replace = items.length === 1 && !items[0].text.trim();
-    const added = blocks.map((b) => ({ id: nextId++, text: b.text, private: b.private || undefined }));
+    const added = blocks.map((b) => toItem(b.text, b.private));
     this.items.set(replace ? added : putIn(items, at, added));
     if (this.aiAt !== null) this.aiAt = replace ? added.length : at + added.length; // (the next ones after them)
     this.emit();
@@ -173,19 +191,20 @@ export class PageEditor {
   /** The page as text (for the AI): the blocks, a blank line between. */
   text(): string {
     return this.items()
-      .map((i) => i.text.trim())
+      .map((i) => fullText(i).trim())
       .filter(Boolean)
       .join('\n\n');
   }
 
   private emit(): void {
-    this.changed.emit(this.items().map((i) => ({ kind: 'card' as const, text: i.text, private: i.private || undefined })));
+    this.changed.emit(this.items().map((i) => ({ kind: 'card' as const, text: fullText(i), private: i.private || undefined })));
   }
 
   // A click between two blocks or under the last: the caret there (and the commands)
-  protected openCaret(at: number, menu = true, focus = true): void {
+  protected openCaret(at: number, menu = true, focus = true, image = false): void {
     this.caret.set(at);
-    this.caretMenu.set(menu);
+    this.caretMenu.set(menu && !image);
+    this.caretImage.set(image);
     this.caretQuery.set('');
     this.caretActive.set(0);
     if (focus) setTimeout(() => this.caretField()?.nativeElement.focus());
@@ -198,6 +217,7 @@ export class PageEditor {
 
   protected caretTyped(field: HTMLInputElement): void {
     const v = field.value;
+    if (this.caretImage()) return; // (its link: put in at Enter)
     if (v.startsWith('/') || !v) {
       // ("/" typed where its menu was shut — an empty page, the title's Enter: it opens)
       if (v) this.caretMenu.set(true);
@@ -210,6 +230,7 @@ export class PageEditor {
 
   // Ctrl+V there: a new block with what's pasted (its lines kept)
   protected caretPaste(e: ClipboardEvent): void {
+    if (this.caretImage()) return; // (the link pasted in the field)
     const text = e.clipboardData?.getData('text/plain') ?? '';
     e.preventDefault();
     if (text.trim()) this.blockAtCaret(text);
@@ -230,6 +251,13 @@ export class PageEditor {
     if (e.key === 'Escape') {
       e.preventDefault();
       this.caret.set(null);
+    } else if (this.caretImage() && e.key === 'Enter') {
+      // (Image's link: a block of its own — ![](link))
+      e.preventDefault();
+      const link = (e.target as HTMLInputElement).value.trim();
+      if (!link) return;
+      const full = /^https?:\/\//i.test(link) ? link : `https://${link}`;
+      this.blockAtCaret(`![](${full})`);
     } else if (count && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       e.preventDefault();
       this.caretActive.set((this.caretActive() + (e.key === 'ArrowDown' ? 1 : -1) + count) % count);
@@ -239,15 +267,17 @@ export class PageEditor {
     }
   }
 
-  // A command at the caret: a new text there, or the assistant (its texts to go in there)
+  // A command at the new line: an image there (its link asked for), or the assistant (its texts to go in there)
   protected runAtCaret(command: Command | undefined): void {
     const at = this.caret();
     this.caret.set(null);
     if (at === null || !command) return;
-    if (command.id === 'text') {
-      this.insertAt(at);
+    if (command.id === 'image') {
+      this.openCaret(at, false, true, true);
+    } else if (command.id === 'todo') {
+      this.newBlock(at, { todo: 'open' });
     } else if (command.id === 'paste') {
-      const added = (this.store.clipboard() ?? []).map((b) => ({ id: nextId++, text: b.text ?? '', private: !!b.private }));
+      const added = (this.store.clipboard() ?? []).map((b) => toItem(b.text ?? '', b.private));
       this.items.set(putIn(this.items(), at, added));
       this.emit();
       this.growAll();
@@ -266,10 +296,17 @@ export class PageEditor {
     }, 120);
   }
 
-  // The caret's New text: an empty block there, typed in at once
-  private insertAt(at: number): void {
-    this.items.set(putIn(this.items(), at, [{ id: nextId++, text: '' }]));
-    setTimeout(() => this.focusAt(at, 'start'));
+  // (a new block at `at` — e.g. a to-do — the caret in it)
+  private newBlock(at: number, extra: Partial<Item> = {}): void {
+    this.items.set(putIn(this.items(), at, [{ id: nextId++, text: '', ...extra }]));
+    this.emit();
+    this.growAll(() => this.focusAt(at, 'start'));
+  }
+
+  // A to-do's box: ticked, or not
+  protected toggleTodo(at: number): void {
+    this.items.update((items) => items.map((x, i) => (i === at && x.todo ? { ...x, todo: x.todo === 'done' ? 'open' : 'done' } : x)));
+    this.emit();
   }
 
   private setText(at: number, text: string): void {
@@ -303,10 +340,32 @@ export class PageEditor {
     const a = field.selectionStart;
     const b = field.selectionEnd;
     const text = field.value;
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-      // Ctrl+Enter: out of it, the caret's line under it (a plain Enter: a new line in it, never more)
+    if (e.key === 'Enter' && !e.shiftKey) {
+      // Enter: a new block (Shift+Enter: a new line in this one) — at the end, a new line under it
+      // (its hint, "/" for the commands); inside, what's after the caret goes on into a block of its own
       e.preventDefault();
-      this.openCaret(at + 1, false);
+      const item = this.items()[at];
+      // (a to-do: the next one under it; an empty one — no more to-dos: a plain line instead)
+      if (item.todo && !text) {
+        this.items.set(this.items().filter((_, i) => i !== at));
+        this.emit();
+        this.openCaret(at, false);
+        return;
+      }
+      if (a === text.length && !item.todo) {
+        this.openCaret(at + 1, false);
+        return;
+      }
+      const kept = this.items().map((x, i) => (i === at ? { ...x, text: text.slice(0, a) } : x));
+      this.items.set(putIn(kept, at + 1, [{ id: nextId++, text: text.slice(b), private: item.private, todo: item.todo && 'open' }]));
+      field.value = text.slice(0, a);
+      this.emit();
+      this.growAll(() => this.focusAt(at + 1, 'start'));
+    } else if (e.key === 'Backspace' && a === 0 && b === 0 && this.items()[at]?.todo) {
+      // (at a to-do's start: its box goes, the text stays)
+      e.preventDefault();
+      this.items.update((items) => items.map((x, i) => (i === at ? { ...x, todo: undefined } : x)));
+      this.emit();
     } else if (e.key === 'Backspace' && a === 0 && b === 0 && !text && this.items().length) {
       // Backspace in an empty one: it goes, the caret up (or down, at the top)
       e.preventDefault();
@@ -314,9 +373,14 @@ export class PageEditor {
       this.emit();
       setTimeout(() => (!this.items().length ? this.openCaret(0, false) : at > 0 ? this.focusAt(at - 1, 'end') : this.focusAt(0, 'start')));
     } else if (e.key === 'Backspace' && a === 0 && b === 0 && at > 0) {
-      // (at the start of one: the caret up, to the end of the one above)
+      // (at the start of one: it joins the one above — not an image — the caret where they meet)
       e.preventDefault();
-      this.focusAt(at - 1, 'end');
+      const above = this.items()[at - 1];
+      if (imageOf(above.text)) return;
+      const join = above.text.length;
+      this.items.set(this.items().flatMap((x, i) => (i === at ? [] : i === at - 1 ? [{ ...x, text: x.text + text }] : [x])));
+      this.emit();
+      this.growAll(() => this.focusAt(at - 1, join));
     } else if (e.key === 'ArrowUp' && a === 0 && b === 0 && at > 0) {
       e.preventDefault();
       this.focusAt(at - 1, 'end');
@@ -442,8 +506,8 @@ export class PageEditor {
   // The block's menu: its text copied (with its marks)
   protected copy(at: number): void {
     const item = this.items()[at];
-    this.store.clipboard.set([{ kind: 'card', text: item.text, private: item.private || undefined }]);
-    navigator.clipboard?.writeText(item.text).catch(() => {});
+    this.store.clipboard.set([{ kind: 'card', text: fullText(item), private: item.private || undefined }]);
+    navigator.clipboard?.writeText(fullText(item)).catch(() => {});
   }
 
   protected duplicate(at: number): void {
@@ -460,7 +524,7 @@ export class PageEditor {
   }
 
   // The caret in a block: at its start, its end, or at a place
-  private focusAt(at: number, where: 'start' | 'end' | number): void {
+  protected focusAt(at: number, where: 'start' | 'end' | number): void {
     const field = this.fields()[at]?.nativeElement;
     if (!field) return;
     field.focus({ preventScroll: true });

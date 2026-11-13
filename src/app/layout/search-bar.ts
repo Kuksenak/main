@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { refreshThemeColor } from '../core/services/theme-color';
 import { VisibleArea } from '../core/services/visible-area';
 import { UiFloatingButton } from '../core/ui/floating-button/floating-button';
 import { Icon } from '../core/ui/icon/icon';
@@ -81,7 +80,6 @@ export class SearchBar {
   protected close(): void {
     this.open.set(false);
     this.field().nativeElement.blur();
-    refreshThemeColor();
   }
 
   protected pick(found: Found): void {

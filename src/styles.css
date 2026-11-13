@@ -101,6 +101,7 @@
   --text-footnote: var(--font-footnote);
   --text-title: var(--font-title);
   --text-heading: var(--font-heading);
+  --text-page-title: var(--font-page-title);
   --text-tip: 0.75rem; /* 12px: a hover hint (core/ui/tip) */
   --text-caption: 0.6875rem; /* 11px: the smallest — e.g. a menu's foot (when edited, made) */
 

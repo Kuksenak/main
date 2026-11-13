@@ -18,7 +18,7 @@
     [attr.aria-expanded]="!!appMenuAt()"
     [uiTip]="'nav.appMenu' | t"
     [attr.aria-label]="'nav.appMenu' | t"
-    class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg aria-expanded:bg-tint aria-expanded:text-fg"
+    class="grid size-button place-items-center rounded-button text-icon hover:bg-tint hover:text-fg aria-expanded:bg-tint aria-expanded:text-fg"
   >
     <app-icon name="menu" class="size-icon-menu" />
   </button>
@@ -28,14 +28,14 @@
     [attr.aria-pressed]="!sidebarHidden()"
     [uiTip]="(sidebarHidden() ? 'nav.showSidebar' : 'nav.hideSidebar') | t"
     [attr.aria-label]="(sidebarHidden() ? 'nav.showSidebar' : 'nav.hideSidebar') | t"
-    class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg"
+    class="grid size-button place-items-center rounded-button text-icon hover:bg-tint hover:text-fg"
   >
     <app-icon name="sidebar" class="size-icon-menu" />
   </button>
-  <button type="button" (click)="location.back()" [uiTip]="'nav.back' | t" [attr.aria-label]="'nav.back' | t" class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
+  <button type="button" (click)="location.back()" [uiTip]="'nav.back' | t" [attr.aria-label]="'nav.back' | t" class="grid size-button place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
     <app-icon name="chevron-left" class="size-icon-menu" />
   </button>
-  <button type="button" (click)="location.forward()" [uiTip]="'nav.forward' | t" [attr.aria-label]="'nav.forward' | t" class="grid size-7 place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
+  <button type="button" (click)="location.forward()" [uiTip]="'nav.forward' | t" [attr.aria-label]="'nav.forward' | t" class="grid size-button place-items-center rounded-button text-icon hover:bg-tint hover:text-fg">
     <app-icon name="chevron-right" class="size-icon-menu" />
   </button>
 </header>
@@ -122,20 +122,6 @@
               <button uiSidebarItem icon="dots" (click)="router.navigateByUrl('/library')" class="pl-3.5! text-fg-secondary! [&>app-icon]:scale-75 [&>app-icon]:opacity-40">{{ 'sidebar.viewAll' | t }}</button>
             }
           }
-        }
-      }
-    }
-    <!-- Favorites: their row stays, their pages scroll on their own (as tall as they are, at most what's
-         left), fading out at the bottom; scrolled — a hairline over them, their top fading too -->
-    @for (list of lists(); track list.id) {
-      @if (list.id === 'favorites') {
-        <ng-container [ngTemplateOutlet]="listHead" [ngTemplateOutletContext]="{ $implicit: list }" />
-        @if (!folds.has('favorites')) {
-          <div uiSidebarScroll>
-            @for (page of list.pages; track page.id) {
-              <ng-container [ngTemplateOutlet]="pageRow" [ngTemplateOutletContext]="{ $implicit: page }" />
-            }
-          </div>
         }
       }
     }

@@ -114,3 +114,11 @@ export function shown(text: string): Shown[] {
   plain(text.slice(at));
   return out;
 }
+
+// An image's block: its whole text ![](https://…) — as Markdown writes one
+const IMAGE = /^!\[[^\]\n]*\]\((https?:\/\/[^)\s]+)\)$/;
+
+/** The image's link, when the block is an image (the editor's Image, "/"); else null. */
+export function imageOf(text: string | null | undefined): string | null {
+  return IMAGE.exec((text ?? '').trim())?.[1] ?? null;
+}

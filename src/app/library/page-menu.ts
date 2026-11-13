@@ -1,7 +1,9 @@
 import { Component, inject, input, output } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '../core/i18n/t.pipe';
-import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
+import { UiMenu } from '../core/ui/menu/menu';
+import { UiMenuItem } from '../core/ui/menu/menu-item';
+import { UiMenuSeparator } from '../core/ui/menu/menu-separator';
 import { LibraryStore, PageItem } from './library.store';
 
 /**

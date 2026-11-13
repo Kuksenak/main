@@ -65,7 +65,7 @@ New phone screens use these tokens (`styles/mobile.css`), not sizes of their own
 
 ## Toasts
 - Errors (a call that failed) and short notices ("Deleted · Undo") are toasts: `inject(Toasts)`
-  (`core/ui`) — `.error(text)` (a failed call: `.fail('its.key')`), `.show(text, { label, run })`. No red lines in the page for them.
+  (`core/ui/toast/toast`) — `.error(text)` (a failed call: `.fail('its.key')`), `.show(text, { label, run })`. No red lines in the page for them.
   `<ui-toasts />` in app.html shows them (phones: a bar as wide as the screen at the bottom, over the floating buttons; desktops: the bottom right corner, as wide as the sidebar, scrolling past 80vh).
 
 ## Status bar color (keeps breaking — read before touching it)

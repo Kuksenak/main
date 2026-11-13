@@ -1,6 +1,6 @@
 {
   "name": "main",
-  "version": "0.0.1378",
+  "version": "0.0.1379",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -32,8 +32,7 @@
     "@angular/service-worker": "^21.1.1",
     "@microsoft/signalr": "^10.0.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@angular/build": "^21.1.1",

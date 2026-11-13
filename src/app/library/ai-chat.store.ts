@@ -95,11 +95,6 @@ export class AiChatStore {
     this.turns(pageId).update((turns) => turns.map((t) => (t === turn ? { ...t, added: true } : t)));
   }
 
-  clear(pageId: string): void {
-    const chat = this.turns(pageId);
-    for (const t of chat()) t.photos?.forEach((u) => URL.revokeObjectURL(u));
-    chat.set([]);
-  }
 }
 
 // A photo as the API takes it: a JPEG (its longer side at most PHOTO_SIDE), base64

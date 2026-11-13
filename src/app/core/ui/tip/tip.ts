@@ -1,17 +1,18 @@
-import { booleanAttribute, Directive, ElementRef, OnDestroy, inject, input } from '@angular/core';
+import { booleanAttribute, Directive, effect, ElementRef, OnDestroy, inject, input } from '@angular/core';
 
 /**
  * A hover hint, as Notion's (desktops; not the browser's title): a small dark label by the
  * element — `uiTip="Drag to move"`, all in one color; a line break (\n): a new line. `tipSide`: where it shows (flipped when there's no room). Shown after a short pause on
- * hover; gone on leaving, a press or scrolling. Not on touch screens. `tipIfCut`: only when the
+ * hover; gone on leaving, a press (a click, a drag's start, a key — the capture phase: before the
+ * element's own handlers, even ones that stop it), scrolling, or its text taken away; after a press,
+ * not again till the pointer has left and come back. Not on touch screens. `tipIfCut`: only when the
  * element's text doesn't fit (ends in …) — the hint is then the whole of it.
  */
 @Directive({
   selector: '[uiTip]',
   host: {
     '(mouseenter)': 'show()',
-    '(mouseleave)': 'hide()',
-    '(mousedown)': 'hide()',
+    '(mouseleave)': 'pressed = false; hide()',
     '(focusout)': 'hide()',
   },
 })
@@ -24,10 +25,24 @@ export class UiTip implements OnDestroy {
   private tip: HTMLElement | null = null;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private readonly onScroll = () => this.hide();
+  // (pressed since the pointer came: no hint till it leaves)
+  protected pressed = false;
+  private readonly onPress = () => {
+    this.pressed = true;
+    this.hide();
+  };
+
+  constructor() {
+    for (const type of ['pointerdown', 'mousedown', 'dragstart', 'keydown'] as const) this.el.addEventListener(type, this.onPress, true);
+    // (its text taken away — e.g. its menu opened: the hint gone too)
+    effect(() => {
+      if (!this.uiTip()) this.hide();
+    });
+  }
 
   protected show(): void {
     const text = this.uiTip();
-    if (!text || matchMedia('(hover: none)').matches) return;
+    if (!text || this.pressed || matchMedia('(hover: none)').matches) return;
     // (all of it shown: no need)
     if (this.tipIfCut() && ![this.el, ...this.el.querySelectorAll('*')].some((e) => e.scrollWidth > e.clientWidth)) return;
     clearTimeout(this.timer);
@@ -85,6 +100,7 @@ export class UiTip implements OnDestroy {
   }
 
   ngOnDestroy(): void {
+    for (const type of ['pointerdown', 'mousedown', 'dragstart', 'keydown'] as const) this.el.removeEventListener(type, this.onPress, true);
     this.hide();
   }
 }

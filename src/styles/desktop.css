@@ -11,6 +11,7 @@
      hints), 11 the smallest. */
   --font-title: 2.5rem; /* 40px */
   --font-heading: 1.25rem; /* 20px: a page's name in its head */
+  --font-page-title: 1.5rem; /* 24px: a library page's name over its text */
   --font-body: 1rem; /* 16px */
   --font-footnote: 0.75rem; /* 12px */
 
@@ -60,6 +61,13 @@
   --cal-day: 1.75rem;
   --font-cal-day: 0.875rem;
   --font-cal-weekday: 0.75rem;
+}
+
+/* A Mac's toolbars (a section's top row, the app's own title bar, ‹ ›): their buttons a size up, as
+   macOS's own toolbars' are (32, icons 22) */
+html[data-mac] :is([data-toolbar], [data-app-titlebar], [data-nav-buttons]) {
+  --button-h: 2rem;
+  --icon-menu: 1.375rem;
 }
 
 /* The dark theme on desktops (as Notion's): not black — a dark gray page, the sidebar the same gray

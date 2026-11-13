@@ -1,3 +1,4 @@
+import { NavButtons } from '../layout/nav-buttons';
 import { Component, computed, inject, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -34,7 +35,7 @@ type View = 'recents' | 'favorites' | 'published';
 
 @Component({
   selector: 'app-library',
-  imports: [Icon, NgTemplateOutlet, PageMenu, ToolbarEnd, TranslatePipe, UiButton, UiFoldName, UiList, UiListItem, UiPrimary, UiTag, UiTip, TagPicker],
+  imports: [NavButtons, Icon, NgTemplateOutlet, PageMenu, ToolbarEnd, TranslatePipe, UiButton, UiFoldName, UiList, UiListItem, UiPrimary, UiTag, UiTip, TagPicker],
   templateUrl: './library.html',
 })
 export class Library {

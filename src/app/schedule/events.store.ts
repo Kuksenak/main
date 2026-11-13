@@ -81,7 +81,11 @@ export class EventsStore {
     this.to = to;
     this.http.get<Occurrence[]>(this.url, { params: { from: from.toISOString(), to: to.toISOString() } }).subscribe({
       next: (events) => this.events.set(events),
-      error: () => this.toasts.fail('schedule.loadError'),
+      error: () => {
+        // (not read: these months asked again the next time they're shown)
+        this.from = this.to = null;
+        this.toasts.fail('schedule.loadError');
+      },
     });
   }
 

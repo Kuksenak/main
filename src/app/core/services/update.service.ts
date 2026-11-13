@@ -18,6 +18,12 @@ export class UpdateService {
     this.worker.versionUpdates
       .pipe(filter((e): e is VersionReadyEvent => e.type === 'VERSION_READY'))
       .subscribe(() => this.ready.set(true));
+    // (a section's code fetched only when first opened — ngsw-config's "code": if the server has
+    // only a newer version's by then, this one can't go on: reloaded, what's typed saved first)
+    this.worker.unrecoverable.subscribe(() => {
+      window.dispatchEvent(new Event('app-reload'));
+      setTimeout(() => document.location.reload(), 50);
+    });
     // TODO: back to every minute or so once the app is settled — 10 s is for now, while it's
     // deployed often (each check asks the server for ngsw.json)
     setInterval(() => this.worker.checkForUpdate().catch(() => {}), 10_000);

@@ -10,8 +10,21 @@
           "/favicon.ico",
           "/index.html",
           "/manifest.webmanifest",
-          "/*.css",
-          "/*.js"
+          "/main-*.js",
+          "/styles-*.css",
+          "!/styles-mobile.css",
+          "!/styles-desktop.css"
+        ]
+      }
+    },
+    {
+      "name": "code",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/*.js",
+          "/*.css"
         ]
       }
     },

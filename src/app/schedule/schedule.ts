@@ -1,3 +1,4 @@
+import { NavButtons } from '../layout/nav-buttons';
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { desktop } from '../core/device';
@@ -22,7 +23,7 @@ import { EventsStore, Occurrence } from './events.store';
  */
 @Component({
   selector: 'app-schedule',
-  imports: [Calendar, NgTemplateOutlet, EventEditor, Icon, ToolbarEnd, TranslatePipe, UiButton, UiFloatingButton, UiListItem],
+  imports: [NavButtons, Calendar, NgTemplateOutlet, EventEditor, Icon, ToolbarEnd, TranslatePipe, UiButton, UiFloatingButton, UiListItem],
   templateUrl: './schedule.html',
 })
 export class Schedule {

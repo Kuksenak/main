@@ -3,7 +3,9 @@ import { TranslatePipe } from '../core/i18n/t.pipe';
 import { TranslationKey } from '../core/i18n/translations';
 import { Icon } from '../core/ui/icon/icon';
 import { UiTag, UiTagSwatch } from '../core/ui/tag/tag';
-import { UiMenu, UiMenuItem, UiMenuSeparator } from '../core/ui/menu';
+import { UiMenu } from '../core/ui/menu/menu';
+import { UiMenuItem } from '../core/ui/menu/menu-item';
+import { UiMenuSeparator } from '../core/ui/menu/menu-separator';
 import { TagsStore } from './tags.store';
 
 /**
