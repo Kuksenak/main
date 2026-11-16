@@ -1,4 +1,4 @@
-<div class="grid grid-cols-7 pb-1 mobile:border-b-[0.5px] mobile:border-separator">
+<div class="grid grid-cols-7 pb-1 border-b-[0.5px] border-separator">
   @for (weekday of weekdays(); track $index) {
     <span class="text-center text-cal-weekday font-medium uppercase text-fg-secondary">{{ weekday }}</span>
   }
@@ -11,13 +11,13 @@
   class="h-[calc(var(--cal-row-h)*6)] snap-y snap-proximity overflow-y-auto overscroll-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
 >
   @for (week of weeks; track week[0].getTime()) {
-    <div class="grid h-cal-row snap-start grid-cols-7 mobile:border-b-[0.5px] mobile:border-separator">
+    <div class="grid h-cal-row snap-start grid-cols-7 border-b-[0.5px] border-separator">
       @for (day of week; track day.getTime()) {
         <!-- (picked: aria-pressed — the circle dark; today, not picked: data-today — accent) -->
         <button
           type="button"
           (click)="selected.set(day)"
-          class="group relative flex justify-center pt-1 mobile:items-center mobile:pt-0"
+          class="group relative flex justify-center pt-1 desktop:pt-1.5 mobile:items-center mobile:pt-0"
           [class.opacity-35]="!inMonth(day)"
           [attr.aria-pressed]="isSelected(day)"
           [attr.data-today]="isToday(day) && !isSelected(day) ? '' : null"
@@ -29,7 +29,7 @@
           >{{ day.getDate() }}</span>
           <!-- (its events: a dot under it) -->
           @if (hasEvents(day)) {
-            <span class="absolute bottom-1 left-1/2 size-1 -translate-x-1/2 rounded-full bg-fg-secondary group-aria-pressed:bg-fg"></span>
+            <span class="absolute bottom-1 desktop:bottom-0.75 left-1/2 size-1 -translate-x-1/2 rounded-full bg-fg-secondary group-aria-pressed:bg-fg"></span>
           }
         </button>
       }

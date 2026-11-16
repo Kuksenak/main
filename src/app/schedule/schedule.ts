@@ -7,27 +7,31 @@ import { UiButton } from '../core/ui/button/button';
 import { UiFloatingButton } from '../core/ui/floating-button/floating-button';
 import { Icon } from '../core/ui/icon/icon';
 import { UiListItem } from '../core/ui/list/list-item';
-import { startOfDay, startOfMonth } from '../core/utils/date';
+import { addDays, sameDay, startOfDay, startOfMonth } from '../core/utils/date';
+import { UiTip } from '../core/ui/tip/tip';
 import { PageTitle } from '../layout/page-title';
 import { ToolbarEnd } from '../layout/toolbar-end';
 import { Calendar } from './calendar';
 import { EventEditor } from './event-editor';
 import { EventsStore, Occurrence } from './events.store';
 
+
 /**
- * The schedule: the month in view and Today over the calendar's days (the days with events: a dot),
- * the picked day's events by it (desktops: at its right; phones: under it) — a click opens one (the
+ * The schedule: the month in view over the calendar's days (the days with events: a dot), the picked
+ * day's events by it (desktops: at its right, Up next under the calendar; phones: under it) — a click opens one (the
  * event's window / sheet: EventEditor); New event (desktops: + by Today; phones: + floating at the
  * bottom right) — on the picked day. Phones: the month in the top bar, Today floating at the bottom left.
  */
 @Component({
   selector: 'app-schedule',
-  imports: [Calendar, NgTemplateOutlet, EventEditor, Icon, ToolbarEnd, TranslatePipe, UiButton, UiFloatingButton, UiListItem],
+  imports: [Calendar, NgTemplateOutlet, EventEditor, Icon, ToolbarEnd, TranslatePipe, UiButton, UiFloatingButton, UiListItem, UiTip],
+  host: { class: 'flex flex-col desktop:h-full' },
   templateUrl: './schedule.html',
 })
 export class Schedule {
   private readonly i18n = inject(I18nService);
-  private readonly calendar = viewChild.required(Calendar);
+  // (phones' only: desktops show the month's grid)
+  private readonly calendar = viewChild(Calendar);
   protected readonly store = inject(EventsStore);
   protected readonly desktop = desktop;
 
@@ -46,6 +50,26 @@ export class Schedule {
   );
   protected readonly events = computed(() => this.store.ofDay(this.selected()));
 
+  // Up next: the next events (from now on), at most 8
+  protected readonly upNext = computed(() => this.store.upcoming().slice(0, 8));
+
+  // Up next's: "Today", "Tomorrow", "Thu 19"
+  protected when(e: Occurrence): string {
+    const d = new Date(e.startsAt);
+    const today = startOfDay(new Date());
+    if (sameDay(d, today)) return this.i18n.t('schedule.today');
+    if (sameDay(d, addDays(today, 1))) return this.i18n.t('schedule.tomorrow');
+    return this.i18n.capitalize(this.i18n.date(d, { weekday: 'short', day: 'numeric' }));
+  }
+
+  // Up next's: its day picked (and shown), it opened
+  protected openFromList(e: Occurrence): void {
+    const d = startOfDay(new Date(e.startsAt));
+    this.selected.set(d);
+    this.calendar()?.show(d);
+    this.open(e);
+  }
+
   constructor() {
     // (phones: the month in the top bar)
     inject(PageTitle).show(this.title);
@@ -62,10 +86,22 @@ export class Schedule {
     });
   }
 
+  // Today: gray (a button to press) only while another day is picked
+  protected readonly onToday = computed(() => sameDay(this.selected(), new Date()));
+
   protected today(): void {
     const today = startOfDay(new Date());
     this.selected.set(today);
-    this.calendar().show(today);
+    this.month.set(startOfMonth(today));
+    this.calendar()?.show(today);
+  }
+
+  // Desktops' ‹ ›: the month before / after
+  protected step(n: number): void {
+    const m = this.month();
+    const next = new Date(m.getFullYear(), m.getMonth() + n, 1);
+    this.month.set(next);
+    this.calendar()?.show(next);
   }
 
   protected create(): void {

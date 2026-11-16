@@ -59,8 +59,9 @@
   /* Switches (on / off): small, 36 × 20 (a 16px knob) */
   --toggle-h: 1.25rem;
   --toggle-w: 2.25rem;
-  /* The calendar: 40 tall weeks, the date (14px) in a 28px circle, 12px weekdays */
-  --cal-row-h: 2.5rem;
+  /* The calendar: 44 tall weeks (a hairline under each, as iOS 27's; a day's dot 3 from its circle and the
+     line), the date (14px) in a 28px circle, 12px weekdays */
+  --cal-row-h: 2.75rem;
   --cal-day: 1.75rem;
   --font-cal-day: 0.875rem;
   --font-cal-weekday: 0.75rem;

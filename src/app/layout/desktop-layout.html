@@ -25,10 +25,11 @@
   <button
     type="button"
     (click)="toggleSidebar()"
+    [disabled]="narrow()"
     [attr.aria-pressed]="!sidebarHidden()"
     [uiTip]="(sidebarHidden() ? 'nav.showSidebar' : 'nav.hideSidebar') | t"
     [attr.aria-label]="(sidebarHidden() ? 'nav.showSidebar' : 'nav.hideSidebar') | t"
-    class="grid size-button place-items-center rounded-button text-icon hover:bg-tint hover:text-fg"
+    class="grid size-button place-items-center rounded-button text-icon not-disabled:hover:bg-tint not-disabled:hover:text-fg disabled:opacity-40"
   >
     <app-icon name="sidebar" class="size-icon-menu" />
   </button>

@@ -74,8 +74,8 @@
       <!-- (some picked, Ctrl+click: how many; Select all (the tab's pages), Clear; then what's done to
            them — to the favorites (all of them in already: out of them), to the trash) -->
       <span class="mr-2 px-2 text-ui text-fg-secondary">{{ 'library.picked' | t }}: {{ picked().size }}</span>
-      <button uiButton type="button" (click)="pickAll()">{{ 'library.pickAll' | t }}</button>
-      <button uiButton type="button" (click)="unpick()">{{ 'library.unpick' | t }}</button>
+      <button uiButton type="button" icon="check" (click)="pickAll()">{{ 'library.pickAll' | t }}</button>
+      <button uiButton type="button" icon="close" (click)="unpick()">{{ 'library.unpick' | t }}</button>
       <span class="mx-1.5 h-5 w-px bg-separator"></span>
       <button uiButton type="button" [icon]="allPickedFavorite() ? 'bookmark-filled' : 'bookmark'" (click)="favoritePicked()">
         {{ (allPickedFavorite() ? 'library.unfavorite' : 'library.favorite') | t }}

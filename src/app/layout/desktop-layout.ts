@@ -1,7 +1,7 @@
-import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
 import { Location, NgTemplateOutlet } from '@angular/common';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { AuthStore } from '../auth/auth.store';
 import { I18nService } from '../core/i18n/i18n.service';
@@ -181,8 +181,21 @@ export class DesktopLayout {
     this.sub.set(null);
   }
 
-  // The sidebar hidden (the title bar's button; kept on this device); back and forward (its ‹ ›)
-  protected readonly sidebarHidden = signal(kept(SIDEBAR_HIDDEN) === '1');
+  // The sidebar hidden (the title bar's button; kept on this device); back and forward (its ‹ ›).
+  // A narrow window (an installed app's — where that button is): hidden, the button off, till the window's
+  // wide again (what's kept stays as it was)
+  private readonly sidebarKept = signal(kept(SIDEBAR_HIDDEN) === '1');
+  protected readonly narrow = signal(false);
+  protected readonly sidebarHidden = computed(() => this.narrow() || this.sidebarKept());
+  private readonly watchNarrow = (() => {
+    const qs = ['(max-width: 56rem)', '(display-mode: standalone)', '(display-mode: window-controls-overlay)'].map((q) => matchMedia(q));
+    const set = () => {
+      this.narrow.set(qs[0].matches && (qs[1].matches || qs[2].matches));
+    };
+    set();
+    qs.forEach((q) => q.addEventListener('change', set));
+    inject(DestroyRef).onDestroy(() => qs.forEach((q) => q.removeEventListener('change', set)));
+  })();
   // (the sidebar hidden, on the page's root too: a Mac's title bar painted white then — index.html)
   private readonly markSidebar = effect(() => {
     const root = document.documentElement;
@@ -191,8 +204,9 @@ export class DesktopLayout {
     window.dispatchEvent(new Event('app-repaint'));
   });
   protected toggleSidebar(): void {
-    this.sidebarHidden.set(!this.sidebarHidden());
-    keep(SIDEBAR_HIDDEN, this.sidebarHidden() ? '1' : '');
+    if (this.narrow()) return;
+    this.sidebarKept.set(!this.sidebarKept());
+    keep(SIDEBAR_HIDDEN, this.sidebarKept() ? '1' : '');
   }
   protected readonly location = inject(Location);
   // ‹ › off when there's nowhere to go that way (the Navigation API's; a browser without it: both on)
@@ -215,6 +229,54 @@ export class DesktopLayout {
       this.store.load();
       this.tags.load();
     }
+    this.watchBarFit();
+  }
+
+  /**
+   * An installed app with its title bar hidden: a section's head up on the bar (components.css) only while
+   * it fits there — its name not cut, nothing pushed out of its row; else `data-bar-tight` on <html>: the
+   * head under the bar, as with the window's bar shown. Looked at again as the window widens (past the
+   * width it stopped fitting at), on a new page, as the name's typed.
+   */
+  private watchBarFit(): void {
+    const wco = matchMedia('(display-mode: window-controls-overlay)');
+    const root = document.documentElement;
+    let tightBelow = 0;
+    const check = () => {
+      if (!wco.matches) {
+        delete root.dataset['barTight'];
+        return;
+      }
+      if ('barTight' in root.dataset) {
+        if (innerWidth <= tightBelow) return;
+        delete root.dataset['barTight'];
+      }
+      requestAnimationFrame(() => {
+        const row = document.querySelector<HTMLElement>('[data-page-head] > [data-toolbar]');
+        const name = row?.querySelector<HTMLElement>('h1, input');
+        if (!row) return;
+        const cut = (!!name && name.scrollWidth > name.clientWidth + 1) || row.scrollWidth > row.clientWidth + 1;
+        if (cut) {
+          root.dataset['barTight'] = '';
+          tightBelow = innerWidth;
+        }
+      });
+    };
+    const again = () => {
+      tightBelow = 0;
+      setTimeout(check, 50);
+    };
+    addEventListener('resize', check);
+    wco.addEventListener('change', again);
+    document.addEventListener('input', check);
+    this.router.events.pipe(filter((e) => e instanceof NavigationEnd), takeUntilDestroyed()).subscribe(again);
+    inject(DestroyRef).onDestroy(() => {
+      removeEventListener('resize', check);
+      wco.removeEventListener('change', again);
+      document.removeEventListener('input', check);
+      delete root.dataset['barTight'];
+    });
+    again();
   }
 }
 

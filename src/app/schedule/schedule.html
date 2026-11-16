@@ -1,55 +1,102 @@
 <!-- Desktops, as the library (its head's sizes and edges in every mode — components.css): a row at the top
-     (52 tall), staying as the days scroll under it — the month as a page's title, Today, + New event at
-     the right, the picked day over its events' column; then the calendar (320 wide) at the left and the
-     picked day's events at its right; 12 in at the
-     left, 8 at the right. Phones: the calendar edge to edge, the day's
-     events under it; Today floating at the bottom left, + at the bottom right. -->
+     (52 tall) — over the calendar (as wide) the month as a page's title, Today at its right (its edge by
+     SUN's last letter); over the events the picked day, + New event at the right. Under it: the month's
+     calendar (320 wide), the next events under it (Up next); the picked day's events at the right — a
+     row each: its time, its title, its pages. 12 in at the left, 8 at the right. An installed app with
+     its title bar hidden: the month and ‹ Today › (the month before / after) up on the bar; the day and
+     New event on a row of their own under it. The sidebar hidden (☰ ‹ › by the name): the month at the
+     calendar's right, Today by New event (or on the bar). Phones: the calendar edge to edge, the picked
+     day's events under it; Today floating at the bottom left, + at the bottom right. -->
 @if (desktop) {
   <div data-page-head data-column class="sticky top-0 z-20 bg-app pr-2 pl-3">
-    <div data-toolbar class="flex h-bar items-center gap-10">
-      <!-- (over the calendar: the month, Today; over the events: the picked day — each over its column) -->
-      <span class="flex w-80 shrink-0 items-center gap-2">
-        <h1 class="text-page-title font-normal text-fg">{{ title() }}</h1>
-        <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
+    <div data-toolbar class="flex h-bar items-center">
+      <span data-cal-head class="flex w-[18.8125rem] min-w-0 shrink-0 items-center gap-2">
+        <h1 class="min-w-0 truncate text-page-title font-normal text-fg">{{ title() }}</h1>
+        <button uiButton data-cal-today [attr.data-filled]="onToday() ? null : ''" type="button" class="ml-auto" (click)="today()">{{ 'schedule.today' | t }}</button>
       </span>
-      <h2 class="min-w-0 truncate px-1 text-body font-medium text-fg">{{ dayTitle() }}</h2>
-      <app-toolbar-end class="ml-auto" [addLabel]="'schedule.newEvent'" (add)="create()" />
+      <!-- (over the events: 32 on from the calendar — its name by theirs) -->
+      <span data-day-head class="ml-[3.1875rem] flex min-w-0 flex-1 items-center gap-2">
+        <ng-container [ngTemplateOutlet]="dayHead" />
+      </span>
+      <span data-bar-nav data-head-buttons class="ml-auto shrink-0 items-center gap-0.5">
+        <button uiButton type="button" icon="chevron-left" (click)="step(-1)" [uiTip]="'schedule.prevMonth' | t" [attr.aria-label]="'schedule.prevMonth' | t"></button>
+        <button uiButton [attr.data-filled]="onToday() ? null : ''" type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
+        <button uiButton type="button" icon="chevron-right" (click)="step(1)" [uiTip]="'schedule.nextMonth' | t" [attr.aria-label]="'schedule.nextMonth' | t"></button>
+      </span>
+    </div>
+    <!-- (the title bar hidden: the day and New event here, under it) -->
+    <div data-toolbar data-day-row class="items-center">
+      <span class="w-[18.8125rem] shrink-0"></span>
+      <span class="ml-[3.1875rem] flex min-w-0 flex-1 items-center gap-2">
+        <ng-container [ngTemplateOutlet]="dayHead" />
+      </span>
     </div>
   </div>
-}
-<div data-column class="flex flex-col gap-4 px-4 pt-2 pb-24 desktop:flex-row desktop:gap-10 desktop:pr-2 desktop:pl-3 desktop:pt-4 desktop:pb-12">
-  <section class="flex w-full shrink-0 flex-col gap-1 desktop:w-80">
-    <app-calendar [(selected)]="selected" [(month)]="month" [marked]="store.marked()" />
-  </section>
-
-  <!-- The picked day's events: a row each — its title, ⟲ if it repeats, its pages' count (desktops),
-       its start over its end at the right; past ones gray; a click opens it -->
-  <section class="flex min-w-0 flex-1 flex-col gap-2">
-    <!-- (desktops: the day in the head's row, over this column) -->
-    <h2 class="px-1 text-body font-medium desktop:hidden mobile:font-semibold mobile:text-fg-secondary">{{ dayTitle() }}</h2>
-    @if (desktop) {
-      <div class="flex flex-col gap-0.5">
+  <ng-template #dayHead>
+    <h2 class="min-w-0 truncate px-2 text-body font-medium text-fg">{{ dayTitle() }}</h2>
+    <span data-head-buttons class="ml-auto flex shrink-0 items-center gap-0.5">
+      <button uiButton data-today-at-end [attr.data-filled]="onToday() ? null : ''" type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
+      <app-toolbar-end class="ml-1.5" [addLabel]="'schedule.newEvent'" (add)="create()" />
+    </span>
+  </ng-template>
+  <!-- (the month's calendar, 320 wide — drawn 8 to the left, MON by the month's name —, Up next under it;
+       the picked day's events at the right) -->
+    <div data-column class="flex min-h-0 flex-1 gap-8 pr-2 pl-3 pt-1">
+      <div class="flex w-80 shrink-0 -translate-x-2 flex-col">
+        <app-calendar [(selected)]="selected" [(month)]="month" [marked]="store.marked()" />
+        <h2 class="mt-6 px-2 pb-1 text-footnote font-medium text-fg-secondary">{{ 'schedule.upNext' | t }}</h2>
+        <div class="flex min-h-0 flex-col overflow-y-auto">
+          @for (event of upNext(); track event.id + event.startsAt) {
+            <button
+              type="button"
+              (click)="openFromList(event)"
+              class="flex h-9 shrink-0 items-center gap-3 border-b-[0.5px] border-separator px-2 text-left text-ui hover:bg-tint"
+            >
+              <span class="w-20 shrink-0 truncate text-fg-secondary">{{ when(event) }}</span>
+              <span class="min-w-0 flex-1 truncate text-fg">{{ event.title }}</span>
+              <span class="shrink-0 text-footnote text-fg-secondary tabular-nums">{{ start(event) }}</span>
+            </button>
+          } @empty {
+            <p class="px-2 py-2 text-ui text-fg-secondary">{{ 'sidebar.noEvents' | t }}</p>
+          }
+        </div>
+      </div>
+      <!-- (the picked day's events: a row each, hairlines between — its time, its title, ⟲ if it repeats,
+           its pages' count; past ones paler; a click opens it, a double click on the room under them: a
+           new one on the day) -->
+      <section data-day-events class="flex min-w-0 flex-1 flex-col" (dblclick)="create()">
         @for (event of events(); track event.id + event.startsAt) {
           <button
             type="button"
             (click)="open(event)"
+            (dblclick)="$event.stopPropagation()"
             [class.opacity-50]="past(event)"
-            class="flex h-11 w-full items-center gap-3 rounded-lg px-2 text-left hover:bg-tint"
+            class="flex h-10 w-full shrink-0 items-center gap-4 border-b-[0.5px] border-separator px-2 text-left text-ui hover:bg-tint"
           >
-            <span class="min-w-0 flex-1 truncate text-ui text-fg">{{ event.title }}</span>
+            <span class="shrink-0 whitespace-nowrap text-fg-secondary tabular-nums">{{ start(event) }} – {{ end(event) }}</span>
+            <span class="min-w-0 flex-1 truncate text-fg">{{ event.title }}</span>
             @if (event.repeat !== 'Never') {
               <app-icon name="update" class="size-4 shrink-0 text-icon" />
             }
             @if (event.pageIds.length) {
               <span class="flex shrink-0 items-center gap-1 text-footnote text-fg-secondary"><app-icon name="page" class="size-4 text-icon" />{{ event.pageIds.length }}</span>
             }
-            <ng-container [ngTemplateOutlet]="times" [ngTemplateOutletContext]="{ event }" />
           </button>
         } @empty {
-          <p class="px-1 py-6 text-ui text-fg-secondary">{{ 'schedule.noEvents' | t }}</p>
+          <p class="px-2 py-2 text-ui text-fg-secondary">{{ 'schedule.noEvents' | t }}</p>
         }
-      </div>
-    } @else {
+      </section>
+    </div>
+} @else {
+<div class="flex flex-col gap-4 px-4 pt-2 pb-24">
+  <section class="flex w-full shrink-0 flex-col gap-1">
+    <app-calendar [(selected)]="selected" [(month)]="month" [marked]="store.marked()" />
+  </section>
+
+  <!-- The picked day's events: a row each — its title, ⟲ if it repeats, its start over its end at the
+       right; past ones gray; a click opens it -->
+  <section class="flex min-w-0 flex-1 flex-col gap-2">
+    <h2 class="px-1 text-body font-semibold text-fg-secondary">{{ dayTitle() }}</h2>
       <!-- (plain rows, as iOS's Calendar: no card) -->
       <div class="flex flex-col">
         @for (event of events(); track event.id + event.startsAt) {
@@ -66,9 +113,9 @@
           <div uiListItem><span class="text-fg-secondary">{{ 'schedule.noEvents' | t }}</span></div>
         }
       </div>
-    }
   </section>
 </div>
+}
 
 <!-- Phones: Today floating at the bottom left, + (a new event on the picked day) at the bottom right -->
 <button
