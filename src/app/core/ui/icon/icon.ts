@@ -11,6 +11,7 @@ export const ICONS = [
   'image',
   'todo',
   'globe',
+  'lock-open',
   'calendar',
   'grid',
   'grip',

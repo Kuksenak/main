@@ -1,6 +1,7 @@
-<!-- The blocks: a field each, its marks faded over its text; its ⠿ at its left under the pointer. A
-     line shows where a dragged block would land. -->
-<div #host class="relative flex flex-col" (pointermove)="gripMove($event, host)">
+<!-- The blocks: a field each, its marks faded over its text; its ⠿ at its left under the pointer; one
+     empty line between them, always (a line of the text's: 1lh). A line shows where a dragged block
+     would land. -->
+<div #host class="relative flex flex-col gap-[1lh] text-ui leading-relaxed" (pointermove)="gripMove($event, host)">
   @if (dropLine(); as y) {
     <div
       class="pointer-events-none absolute inset-x-0 z-10 h-0.5 rounded-full bg-accent/35"
@@ -21,13 +22,13 @@
         [uiTip]="blockMenu() !== i && dragging() === null ? ('editor.gripTip' | t) : null"
         [attr.aria-expanded]="blockMenu() === i"
         [attr.data-near]="near() === i ? '' : null"
-        class="absolute top-0.5 -left-5.5 grid h-6 w-4 cursor-grab touch-none place-items-center rounded-md text-icon opacity-0 transition-opacity group-hover:opacity-100 hover:bg-tint-strong active:cursor-grabbing data-near:opacity-100 aria-expanded:opacity-100"
+        class="absolute top-0.5 -left-4.5 grid h-6 w-4.5 cursor-grab touch-none place-items-center rounded-md text-icon opacity-0 transition-opacity group-hover:opacity-100 hover:bg-tint-strong active:cursor-grabbing data-near:opacity-100 aria-expanded:opacity-100"
         (pointerdown)="gripDown($event, i)"
         (pointermove)="gripMove($event, host)"
         (pointerup)="gripUp()"
         (pointercancel)="gripUp()"
       >
-        <app-icon name="grip" class="size-4" />
+        <app-icon name="grip" class="size-icon-ui" />
       </button>
 
       <!-- (plain text, as Notion's — no edge round it; only for the teacher: a lock at its right) -->

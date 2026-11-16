@@ -72,6 +72,11 @@ html[data-mac] :is([data-toolbar], [data-app-titlebar]) {
   --button-h: 2rem;
   --icon-menu: 1.375rem;
 }
+/* (the app's own ☰ ▯ ‹ ›, an installed app's: buttons that size on every system, their icons 21) */
+[data-app-titlebar] {
+  --button-h: 2rem;
+  --icon-menu: 1.3125rem;
+}
 
 /* The dark theme on desktops (as Notion's): not black — a dark gray page, the sidebar the same gray
    (as the light theme: one color with the page and an installed app's title bar, a hairline between —

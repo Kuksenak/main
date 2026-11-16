@@ -1,44 +1,56 @@
 @if (desktop) {
-  <!-- Desktops, as macOS 27's toolbar: one bar at the top (52 tall, the sidebar's top with it), staying
-       as the pages scroll under it — left to right, nothing pushed to the far end: the section's name
-       (bold), the views as pills (the one shown gray), the tag's filter, + New page (ToolbarEnd), the
-       picked ones' actions; its buttons as macOS's toolbar's (data-toolbar); then the pages -->
-  <div data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-1 bg-app px-4">
-    <h1 class="mr-2 px-2 text-body font-bold tracking-tight desktop:text-ui desktop:font-semibold">{{ 'nav.library' | t }}</h1>
-      <!-- (the views as pills: gray under the pointer, the one shown gray and its name darker) -->
-      <span class="flex items-center gap-0.5">
+  <!-- Desktops: staying at the top as the pages scroll under it — the bar (52 tall, the sidebar's top with
+       it, its buttons as macOS's toolbar's: data-toolbar): the section's name (as a page's title); under it
+       the tabs over the list (as the old library's, as Notion's): All, Favorites, Published — each its
+       icon and name, the one shown white —, the tag's filter; + New page at the name's right; some pages
+       picked: in the tabs' place how many, Select all, Clear, to the favorites, to the trash. All as wide
+       as the window, 12 in at the left, 8 at the right, as a page -->
+  <div data-page-head data-column class="sticky top-0 z-20 bg-app pr-2 pl-3">
+  <div data-toolbar class="flex h-bar items-center gap-1">
+    <!-- (the name as a page's title: 24, regular; New page at the right) -->
+    <h1 class="text-page-title font-normal text-fg">{{ 'nav.library' | t }}</h1>
+    <!-- (+ New page at the right, on one line with the name — the window's own bar hidden: at the tabs'
+         right instead, components.css) -->
+    <app-toolbar-end data-new-on-top class="ml-auto" [addLabel]="'library.new'" (add)="create()" />
+  </div>
+  <div data-toolbar class="flex h-10 items-center gap-0.5">
+    @if (!picked().size) {
+      <!-- (the tabs: one strip as tall as a button, as a segmented control — a light gray track, the one shown white on it,
+           raised a little, its name darker; the others darker under the pointer) -->
+      <span class="flex h-button items-center gap-0.5 rounded-button bg-tint p-0.5">
         @for (v of views; track v.id) {
           <button
             type="button"
-            (click)="view.set(v.id); unpick()"
+            (click)="view.set(v.id)"
             [attr.aria-pressed]="view() === v.id"
-            class="flex h-7 items-center rounded-button px-3 text-ui text-fg-secondary hover:bg-tint hover:text-fg aria-pressed:bg-tint aria-pressed:font-medium aria-pressed:text-fg"
+            class="flex h-full items-center gap-1.5 rounded-[0.25rem] pr-2.5 pl-2 text-ui text-fg-secondary hover:text-fg aria-pressed:bg-app aria-pressed:text-fg aria-pressed:shadow-sm"
           >
+            <app-icon [name]="v.icon" class="size-4 shrink-0" />
             {{ v.label | t }}
           </button>
         }
       </span>
-      <!-- (a tag: only its pages — # and All tags; a tag picked: the button the tag's own whole (its
-           pastel, # and its name), as a page's; as wide as what's on it, at most as All tags (a longer
-           name ends in …, the whole of it in the hint — only then); ▾ — its menu: All, No tag, the tags) -->
+      <!-- (a tag: only its pages — # and All tags; a tag picked: # in its color and its name; as wide as
+           what's on it, at most 112 (a longer name ends in …, the whole of it in the hint — only then);
+           ▾ — its menu: All, No tag, the tags) -->
       @if (tags.tags().length) {
-        @let picked = tags.byId().get(tagFilter() ?? '');
+        @let tagPicked = tags.byId().get(tagFilter() ?? '');
         <span class="mx-1 h-5 w-px bg-separator"></span>
         <button
           #tagBtn
           uiButton
           type="button"
-          [icon]="picked ? undefined : 'hash'"
+          [icon]="tagPicked ? undefined : 'hash'"
           caret
           (click)="tagMenu.set(!tagMenu())"
           [attr.aria-expanded]="tagMenu()"
           [attr.aria-label]="'tags.title' | t"
-          [uiTip]="picked?.name ?? ((tagFilter() === noTag ? 'tags.noTag' : 'tags.all') | t)"
+          [uiTip]="tagPicked?.name ?? ((tagFilter() === noTag ? 'tags.noTag' : 'tags.all') | t)"
           tipIfCut
           class="max-w-28 text-left [&>span]:max-w-none [&>span]:flex-1"
         >
-          @if (picked) {
-            <app-icon name="hash" [tag]="picked.color" class="mr-1.5 size-icon-menu align-middle -mt-0.5" />{{ picked.name }}
+          @if (tagPicked) {
+            <app-icon name="hash" [tag]="tagPicked.color" class="mr-1.5 size-icon-menu align-middle -mt-0.5" />{{ tagPicked.name }}
           } @else {
             {{ (tagFilter() === noTag ? 'tags.noTag' : 'tags.all') | t }}
           }
@@ -47,7 +59,7 @@
           <!-- (the page's tag menu, but no new tags here; No tag: the pages with none) -->
           <app-tag-picker
             [origin]="tagBtn.element"
-            [tagIds]="picked ? [picked.id] : []"
+            [tagIds]="tagPicked ? [tagPicked.id] : []"
             [creatable]="false"
             none="tags.all"
             [untagged]="tagFilter() === noTag"
@@ -57,27 +69,24 @@
           />
         }
       }
-      <!-- (+ a new page — none while some are picked) -->
-      <app-toolbar-end [addLabel]="picked().size ? null : 'library.new'" (add)="create()" />
-      @if (picked().size) {
-        <!-- (some picked: how many, Move to trash; ✕ unpicks) -->
-        <span class="mx-1 text-ui text-fg-secondary"
-          >{{ 'library.picked' | t }}: {{ picked().size }}</span
-        >
-        <button uiButton type="button" icon="trash" (click)="trashPicked()">
-          {{ 'library.moveToTrash' | t }}
-        </button>
-        <button
-          uiButton
-          type="button"
-          icon="close"
-          (click)="unpick()"
-          [attr.aria-label]="'library.unpick' | t"
-        ></button>
-      }
+      <app-toolbar-end data-new-in-tabs class="ml-auto hidden" [addLabel]="'library.new'" (add)="create()" />
+    } @else {
+      <!-- (some picked, Ctrl+click: how many; Select all (the tab's pages), Clear; then what's done to
+           them — to the favorites (all of them in already: out of them), to the trash) -->
+      <span class="mr-2 px-2 text-ui text-fg-secondary">{{ 'library.picked' | t }}: {{ picked().size }}</span>
+      <button uiButton type="button" (click)="pickAll()">{{ 'library.pickAll' | t }}</button>
+      <button uiButton type="button" (click)="unpick()">{{ 'library.unpick' | t }}</button>
+      <span class="mx-1.5 h-5 w-px bg-separator"></span>
+      <button uiButton type="button" [icon]="allPickedFavorite() ? 'bookmark-filled' : 'bookmark'" (click)="favoritePicked()">
+        {{ (allPickedFavorite() ? 'library.unfavorite' : 'library.favorite') | t }}
+      </button>
+      <button uiButton type="button" icon="trash" (click)="trashPicked()">{{ 'library.moveToTrash' | t }}</button>
+    }
+  </div>
   </div>
 
-  <div class="flex flex-col px-5 pt-4 pb-12">
+  <!-- (the rows by the same edges: their gray under the pointer from the name's, the tabs' left edge) -->
+  <div data-column class="flex flex-col pr-2 pl-3 pt-1 pb-12">
     @if (store.items(); as items) {
       @if (!items.length) {
         <!-- Nothing yet: a big page, a word, New page -->
@@ -89,24 +98,24 @@
       } @else {
         <!-- The view's pages by when they were changed (Today, the last 7 days, 30, older): each group a
              block of its own — its name small and gray over it, room between them. A row each, as
-             Notion's: its icon, its name, ⋯ (its menu, under the pointer), when (today: the time);
-             gray under the pointer, a picked one tinted. A click opens it; Ctrl+click (⌘ on a Mac)
+             Notion's: its icon, its name, ⋯ (its menu, under the pointer), when (today: the time); a
+             hairline between rows, as a table's; gray under the pointer, a picked one tinted. A click opens it; Ctrl+click (⌘ on a Mac)
              picks it -->
         @for (group of groups(); track group.key) {
           <!-- (the groups one under another, no room between) -->
           <section class="flex flex-col">
             <!-- (its head as the sidebar's Recents / Favorites: a row — its name, ⌄ after it; a click
-                 folds it away / back, kept on this device; its pages under it, a little in) -->
+                 folds it away / back — open each time the library's opened; its pages under it) -->
             <button
               type="button"
-              (click)="folds.toggle(group.key)"
-              [attr.aria-expanded]="!folds.has(group.key)"
+              (click)="fold(group.key)"
+              [attr.aria-expanded]="!folded().has(group.key)"
               class="group/fold flex h-8 w-full shrink-0 items-center gap-2 rounded-md px-2 text-left text-ui text-side-text hover:bg-tint"
             >
               <!-- (as the sidebar's sections, as Notion's: ⌄ right after the name, under the pointer — › folded) -->
               <ui-fold-name>{{ group.key | t }}</ui-fold-name>
             </button>
-            @if (!folds.has(group.key)) {
+            @if (!folded().has(group.key)) {
               @for (item of group.items; track item.id) {
                 <div
                   role="button"
@@ -114,7 +123,7 @@
                   (click)="$event.ctrlKey || $event.metaKey ? pick(item.id) : open(item)"
                   (keydown.enter)="open(item)"
                   [attr.aria-selected]="picked().has(item.id)"
-                  class="group flex h-8 w-full shrink-0 cursor-pointer items-center gap-2.5 rounded-md pr-2 pl-3.5 text-left outline-none hover:bg-tint focus-visible:bg-tint aria-selected:bg-accent/10"
+                  class="group flex h-9 w-full shrink-0 cursor-pointer items-center gap-2.5 border-b-[0.5px] border-separator px-2 text-left outline-none last:border-b-0 hover:bg-tint focus-visible:bg-tint aria-selected:bg-accent/10"
                 >
                   <app-icon name="page" class="size-5 shrink-0 text-icon" />
                   <span
@@ -149,7 +158,7 @@
           </section>
         } @empty {
           <p class="py-16 text-center text-ui text-fg-secondary">
-            {{ (tagFilter() ? 'search.nothing' : view() === 'favorites' ? 'library.noFavorites' : 'library.noPublished') | t }}
+            {{ (tagFilter() || view() === 'all' ? 'search.nothing' : view() === 'favorites' ? 'library.noFavorites' : 'library.noPublished') | t }}
           </p>
         }
       }

@@ -1,10 +1,29 @@
-<!-- Desktops: a row at the very top (the bar's), staying as the page scrolls — at its right saving…,
-     its tag, its link (published), 🔖 and ⋯ (its menu: the assistant, Publish, Preview, Duplicate, Trash) -->
+<!-- Desktops: a row at the top, as the library's (staying as the page scrolls; 22 in at the left (the blocks' ⠿ in that room), 4 at the right (⋯'s dots as far in as the library's New page) —, the bar's height;
+     an installed app's: level with its ☰ ‹ ›, or up on the window's bar with the bar hidden — the title
+     and the buttons on one line, as the library's name and New page): the title at its left — as high as the library's name —, at its right
+     saving…, its tag, its link (published), 🔖 and ⋯ (its menu: the assistant, Publish, Preview,
+     Duplicate, Trash) -->
 @if (desktop && page(); as p) {
-  <!-- (the bar's height, 52 — as the sections' heads and the sidebar's top: one bar across the window) -->
-  <!-- (an installed app with its own title bar: this row up on it, at its right — components.css) -->
-  <div data-page-head data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-5">
-    <div class="ml-auto flex shrink-0 items-center gap-0.5">
+  <!-- (an installed app with its own title bar: the whole row up on it — components.css) -->
+  <div data-page-head data-column class="sticky top-0 z-20 bg-app pr-1 pl-5.5">
+  <div data-toolbar class="flex h-bar items-center gap-2">
+    <!-- The title (typed over right there; Enter: on into the text; a new page: the caret in it) — not
+         named yet: its gray hint -->
+    <form (submit)="$event.preventDefault(); titleDone()" class="min-w-0 flex-1">
+      <input
+        #titleField
+        type="text"
+        [value]="title()"
+        (input)="typedTitle(titleField.value)"
+        (keydown.escape)="titleField.blur()"
+        [placeholder]="'library.untitled' | t"
+        [attr.aria-label]="'library.rename' | t"
+        maxlength="200"
+        autocomplete="off"
+        class="block w-full truncate bg-transparent text-page-title font-normal text-fg outline-none placeholder:text-fg-secondary/60"
+      />
+    </form>
+    <div data-page-buttons class="ml-auto flex shrink-0 items-center gap-0.5">
       @if (saving()) {
         <span class="px-2 text-footnote text-fg-secondary">{{ 'library.saving' | t }}</span>
       }
@@ -66,7 +85,7 @@
         @if (p.shareToken) {
           <button type="button" uiMenuItem icon="lock" (click)="unshare(more.element)">{{ 'library.unpublish' | t }}</button>
         } @else {
-          <button type="button" uiMenuItem icon="link" (click)="share(true)">{{ 'library.share' | t }}</button>
+          <button type="button" uiMenuItem icon="lock-open" (click)="share(true)">{{ 'library.share' | t }}</button>
         }
         <button type="button" uiMenuItem icon="popout" (click)="preview()">{{ 'library.preview' | t }}</button>
         <ui-menu-separator />
@@ -76,30 +95,15 @@
       </ui-menu>
     }
   </div>
+  </div>
 }
 
-<!-- (desktops: a column as Notion's, at the page's left — the title, then the text, one edge for both;
-     room at the left for the blocks' ⠿) -->
-<div class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:w-full desktop:max-w-4xl desktop:gap-0 desktop:px-24 desktop:pt-1">
+<!-- (desktops: the text as wide as the window, 22 in at the left (the ⠿ in that room), 4 at the right, by the title's
+     edge; room at the left for the blocks' ⠿) -->
+<div data-column class="flex flex-col gap-3 px-4 pt-2 pb-10 desktop:w-full desktop:gap-0 desktop:pr-1 desktop:pl-5.5 desktop:pt-4">
 
   @if (page(); as p) {
     @if (desktop) {
-      <!-- The title (typed over right there; Enter: on into the text; a new page: the caret in it) — not
-           named yet: its gray hint -->
-      <form (submit)="$event.preventDefault(); titleDone()" class="mb-4">
-        <input
-          #titleField
-          type="text"
-          [value]="title()"
-          (input)="typedTitle(titleField.value)"
-          (keydown.escape)="titleField.blur()"
-          [placeholder]="'library.untitled' | t"
-          [attr.aria-label]="'library.rename' | t"
-          maxlength="200"
-          autocomplete="off"
-          class="block w-full truncate bg-transparent text-page-title font-normal text-fg outline-none placeholder:text-fg-secondary/60"
-        />
-      </form>
       <!-- The text: blocks, written right on the page -->
       <app-page-editor [blocks]="texts" (changed)="typedBlocks($event)" (ai)="aiOpen.set(true)" />
     } @else {
@@ -181,7 +185,7 @@
         }
         <button type="button" uiPopItem icon="lock" (click)="actions.close(); share(false)">{{ 'library.unpublish' | t }}</button>
       } @else {
-        <button type="button" uiPopItem icon="lock" (click)="actions.close(); share(true)">{{ 'library.publish' | t }}</button>
+        <button type="button" uiPopItem icon="lock-open" (click)="actions.close(); share(true)">{{ 'library.publish' | t }}</button>
       }
       <ui-pop-separator />
       <button type="button" uiPopItem icon="trash" danger (click)="actions.close(); delete()">{{ 'library.moveToTrash' | t }}</button>

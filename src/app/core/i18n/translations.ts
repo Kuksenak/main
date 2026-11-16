@@ -27,6 +27,7 @@ const en = {
   'nav.library': 'Library',
   'nav.favorites': 'Favorites',
   'favorites.empty': 'Nothing here yet. Bookmark a page to see it here.',
+  'library.pickAll': 'Select all',
   'library.unpick': 'Clear selection',
   'library.picked': 'Selected',
   'library.recents': 'Recents',

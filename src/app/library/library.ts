@@ -17,7 +17,6 @@ import { PageTitle } from '../layout/page-title';
 import { ToolbarEnd } from '../layout/toolbar-end';
 import { LibraryStore, PageItem } from './library.store';
 import { PageMenu } from './page-menu';
-import { keptFolds } from '../core/utils/storage';
 import { UiTip } from '../core/ui/tip/tip';
 import { TagPicker } from './tag-picker';
 import { TagsStore } from './tags.store';
@@ -25,12 +24,13 @@ import { TagsStore } from './tags.store';
 /**
  * The library: the account's pages, the last changed first — each its title and when it was last
  * changed; a tap opens it (/library/:id). New page: an empty one ("Untitled"), opened right away.
- * Desktops, as Notion's: the name big, the views as pills (Recents: all; Favorites; Published) and New
- * page, a tag's filter (# — its menu), the view's pages by when they were changed (Today, 7 days, 30 days, older), a row each (Ctrl+click
- * picks it; some picked: to the trash at once), ⋯ its menu (PageMenu). Phones: the pages on a card, no New page
+ * Desktops: the name and New page; under them the tabs over the list (All, Favorites, Published — each
+ * its icon), a tag's filter (# — its menu); the tab's pages by when they were changed (Today, 7 days, 30
+ * days, older), a row each (Ctrl+click picks it; some picked: in the tabs' place Select all, Clear, to
+ * the favorites, to the trash), ⋯ its menu (PageMenu). Phones: the pages on a card, no New page
  * (pages are written on a desktop; Trash: the account's sheet).
  */
-type View = 'recents' | 'favorites' | 'published';
+type View = 'all' | 'favorites' | 'published';
 
 @Component({
   selector: 'app-library',
@@ -44,13 +44,13 @@ export class Library {
 
   protected readonly desktop = desktop;
   protected readonly creating = this.store.creating;
-  // Desktops: the views — all the pages, the favorites, the published ones
+  // Desktops: the tabs — all the pages, the favorites, the published ones
   protected readonly views: { id: View; label: TranslationKey; icon: IconName }[] = [
-    { id: 'recents', label: 'library.recents', icon: 'clock' },
+    { id: 'all', label: 'search.all', icon: 'library' },
     { id: 'favorites', label: 'library.favorites', icon: 'bookmark' },
-    { id: 'published', label: 'library.published', icon: 'lock' },
+    { id: 'published', label: 'library.published', icon: 'lock-open' },
   ];
-  protected readonly view = signal<View>('recents');
+  protected readonly view = signal<View>('all');
   // A tag: only its pages (the views' row: # and its menu); NO_TAG: only the pages with none
   protected readonly tagFilter = signal<string | null>(null);
   // (the address' ?tag= — the sidebar's tags: their pages)
@@ -62,8 +62,16 @@ export class Library {
   // The tags: after a page's name; its icon in its first tag's pastel
   protected readonly tags = inject(TagsStore);
 
-  // The date groups folded away (kept on this device)
-  protected readonly folds = keptFolds<TranslationKey>(FOLDED);
+  // The date groups folded away — none each time the library's opened (not kept)
+  protected readonly folded = signal<Set<TranslationKey>>(new Set());
+
+  protected fold(key: TranslationKey): void {
+    this.folded.update((f) => {
+      const next = new Set(f);
+      if (!next.delete(key)) next.add(key);
+      return next;
+    });
+  }
 
   // A page's ⋯: its menu (as the sidebar's), at the button
   protected readonly menu = signal<{ page: PageItem; at: HTMLElement } | null>(null);
@@ -78,6 +86,25 @@ export class Library {
     });
   }
 
+  // Select all: the tab's pages (its tag's, if one's picked)
+  protected pickAll(): void {
+    this.picked.set(new Set(this.shown().map((i) => i.id)));
+  }
+
+  // All the picked ones in the favorites: the button takes them out, else puts them all in
+  protected readonly allPickedFavorite = computed(() => {
+    const picked = this.picked();
+    return (this.store.items() ?? []).filter((i) => picked.has(i.id)).every((i) => i.favorite);
+  });
+
+  protected favoritePicked(): void {
+    const on = !this.allPickedFavorite();
+    const picked = this.picked();
+    for (const item of this.store.items() ?? []) {
+      if (picked.has(item.id) && item.favorite !== on) this.store.favorite(item.id, on).subscribe();
+    }
+  }
+
   protected unpick(): void {
     this.picked.set(new Set());
   }
@@ -87,15 +114,20 @@ export class Library {
     this.picked.set(new Set());
   }
 
-  // The view's pages by when they were changed: Today, the last 7 days, 30, older (only those with any)
-  protected readonly groups = computed(() => {
+  // The tab's pages (its tag's, if one's picked)
+  private readonly shown = computed(() => {
     const view = this.view();
     const tag = this.tagFilter();
-    const items = (this.store.items() ?? []).filter(
+    return (this.store.items() ?? []).filter(
       (i) =>
-        (view === 'recents' || (view === 'favorites' ? i.favorite : i.published)) &&
+        (view === 'all' || (view === 'favorites' ? i.favorite : i.published)) &&
         (!tag || (tag === NO_TAG ? !i.tagIds?.length : !!i.tagIds?.includes(tag))),
     );
+  });
+
+  // The tab's pages by when they were changed: Today, the last 7 days, 30, older (only those with any)
+  protected readonly groups = computed(() => {
+    const items = this.shown();
     const day = new Date();
     day.setHours(0, 0, 0, 0);
     const today = day.getTime();
@@ -133,7 +165,5 @@ export class Library {
   }
 }
 
-// (the date groups folded away: kept on this device — storage may be off, then it just isn't kept)
-const FOLDED = 'library.folded';
 // (the tag filter's No tag: the pages with none)
 const NO_TAG = '-';

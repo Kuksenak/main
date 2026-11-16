@@ -25,6 +25,7 @@ export const pl: Dictionary = {
   'nav.library': 'Biblioteka',
   'nav.favorites': 'Ulubione',
   'favorites.empty': 'Nic tu jeszcze nie ma. Dodaj stronę do zakładek, aby ją tu zobaczyć.',
+  'library.pickAll': 'Zaznacz wszystkie',
   'library.unpick': 'Odznacz wszystko',
   'library.picked': 'Zaznaczone',
   'library.recents': 'Ostatnie',

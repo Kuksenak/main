@@ -58,9 +58,18 @@
   html:not([data-safari-app]) [data-page-panel][data-side-hidden] {
     margin-left: 0.5rem;
   }
-  /* (the heads' rows — the tag, 🔖, ⋯; the sections' — up against the panel's top: 36, not 52) */
-  html:not([data-safari-app]) [data-page-panel] :is([data-page-head], [data-toolbar]) {
+  /* (the heads' rows — a page's title and its tag, 🔖, ⋯; the sections' — 36, not 52: level with the
+     app's ☰ ▯ ‹ ›) */
+  html:not([data-safari-app]) [data-page-panel] [data-toolbar] {
     height: 2.25rem;
+  }
+  /* (the heads' buttons a little further from the panel's round right edge: 4 more) */
+  [data-page-head] > [data-toolbar]:first-of-type {
+    padding-right: 0.25rem;
+  }
+  /* (a section's New page / New event 2 lower there) */
+  [data-page-head] > [data-toolbar]:first-of-type > app-toolbar-end {
+    translate: 0 2px;
   }
   /* (no browser's ‹ › there: the app's buttons, as Claude's — ☰, the sidebar, ‹ › — over the sidebar's
      top, close under the window's bar, the search right under them; the page's panel up to the top. The
@@ -82,8 +91,17 @@
   [data-side-wrap] > ui-sidebar {
     padding-top: 1.875rem;
   }
-  [data-page-panel][data-side-hidden] :is([data-toolbar], [data-page-head]) {
+  [data-page-panel][data-side-hidden] :is([data-toolbar], [data-page-head]):not([data-column], [data-column] *) {
     padding-left: 9.5rem;
+  }
+  /* (the library's and a page's: only the name's row clear of them — the tabs, the list, the text by
+     the panel's edge as ever) */
+  [data-page-panel][data-side-hidden] [data-page-head] > [data-toolbar]:first-of-type {
+    padding-left: calc(4 * 2rem + 0.125rem);
+  }
+  /* (a page's: as far from them as the library's name — its row 10 further in already) */
+  [data-page-panel][data-side-hidden] [data-page-head]:has([data-page-buttons]) > [data-toolbar]:first-of-type {
+    padding-left: calc(4 * 2rem - 0.5rem);
   }
 }
 @media (display-mode: window-controls-overlay) {
@@ -103,10 +121,24 @@
      its buttons on the gray, the page's white beside it up to the top too. A Mac's: its window buttons
      and Chrome's painted in one color — the sidebar's gray (index.html): the lights on the gray, Chrome's
      ⌄ ⋮ a small gray box at the right) */
+  /* (its buttons as the window's own beside them: square, the bar's whole height — no round corners;
+     a page's flat ones up on it too) */
+  [data-app-titlebar] :is(button, a),
+  [data-page-head] [data-page-buttons] > button[uibutton],
+  [data-page-head] > [data-toolbar]:first-of-type > app-toolbar-end button {
+    border-radius: 0 !important;
+    height: env(titlebar-area-height, 2.25rem) !important;
+  }
+  /* (over the heads' rows that come up on it — the sidebar hidden: its ☰ ▯ ‹ › over the page's — but
+     clicked through where it has no buttons) */
   [data-app-titlebar] {
     position: relative;
-    z-index: 30;
+    z-index: 60;
     background-color: transparent !important;
+    pointer-events: none;
+  }
+  [data-app-titlebar] :is(button, a, input) {
+    pointer-events: auto;
   }
   [data-side-wrap] {
     margin-top: calc(-1 * env(titlebar-area-height, 2.25rem));
@@ -115,37 +147,49 @@
   [data-side-wrap] > ui-sidebar {
     padding-top: env(titlebar-area-height, 2.25rem);
   }
-  /* (a page's buttons — the tag, Publish, the bookmark, ⋯ — up on the bar at its right, by the window's
-     buttons, when the window is wide enough for them there (narrower than 640: on the page's row at its right, as ever);
-     its name stays on the page's row) */
+  /* (the heads' rows — a page's title and its tag, 🔖, ⋯; the library's name and New page — up on the bar,
+     when the window is wide enough (640: narrower, under it, as ever): the panel up under the bar, the
+     row 8 taller than it (a little room over the names), the name at its left and the buttons at its
+     right on one line, clear of the window's buttons; the library's tabs under it level with the
+     sidebar's Search. The row over the page (not the bar: its ☰ ‹ › on top, clicked through elsewhere);
+     what's on the row not a drag handle) */
   @media (min-width: 40rem) {
-    /* (no blur on the row then — a blur makes the row, not the window, what a fixed piece in it is placed
-       by; and the row over the bar, else the bar (its stacking above the page's) took their clicks) */
+    [data-page-panel] {
+      margin-top: calc(-1 * env(titlebar-area-height, 2.25rem));
+    }
+    /* (the window dragged by the bar's own strip under it — not by the row: a drag region of the row's
+       came after the app's ☰ ‹ › and took their clicks) */
     [data-page-head] {
       z-index: 50 !important;
-      -webkit-backdrop-filter: none !important;
-      backdrop-filter: none !important;
     }
-    [data-page-head] > div:last-of-type {
-      position: fixed;
-      top: 0;
-      right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem);
-      z-index: 40;
-      height: env(titlebar-area-height, 2.25rem);
+    [data-page-head] > [data-toolbar]:first-of-type {
+      height: calc(env(titlebar-area-height, 2.25rem) + 0.4375rem);
+      padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw) + 0.5rem);
     }
-    [data-page-head] > div:last-of-type :is(button, a) {
+    /* (its buttons — New page; a page's tag, 🔖, ⋯ — level with the bar's own: the app's ☰ ‹ ›, the
+       window's) */
+    [data-page-head] > [data-toolbar]:first-of-type > :is(app-toolbar-end, [data-page-buttons]) {
+      margin-bottom: 0.375rem;
+    }
+    /* (the library's New page off the bar: at its tabs' right instead) */
+    [data-new-on-top] {
+      display: none !important;
+    }
+    [data-new-in-tabs] {
+      display: flex !important;
+    }
+    [data-page-head] > [data-toolbar] + [data-toolbar] {
+      height: calc(var(--bar-h) - 0.875rem);
+    }
+    [data-page-head] :is(button, a, input, form) {
       app-region: no-drag;
       -webkit-app-region: no-drag;
     }
-    /* (a page: its panel up under the bar, its head's row — empty now, the window dragged by it — 36
-       tall: the title as far from the white's top as with the window's bar shown (its head 36, above)) */
-    [data-page-panel]:has([data-page-head]) {
-      margin-top: calc(-1 * env(titlebar-area-height, 2.25rem));
+    [data-page-panel][data-side-hidden] [data-page-head] > [data-toolbar]:first-of-type {
+      padding-left: calc(env(titlebar-area-x, 0px) + 4 * 2rem + 0.125rem);
     }
-    [data-page-head] {
-      height: 2.25rem;
-      app-region: drag;
-      -webkit-app-region: drag;
+    [data-page-panel][data-side-hidden] [data-page-head]:has([data-page-buttons]) > [data-toolbar]:first-of-type {
+      padding-left: calc(env(titlebar-area-x, 0px) + 4 * 2rem - 0.5rem);
     }
   }
   [data-side-trash],

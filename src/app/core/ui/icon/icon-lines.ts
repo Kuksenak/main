@@ -26,6 +26,8 @@ const PATHS: Record<string, string> = {
   duplicate: '<rect x="8.4" y="8.4" width="12" height="12" rx="2.2"/><path d="M15.6 5.6V5.4a2 2 0 0 0-2-2H5.4a2 2 0 0 0-2 2v8.2a2 2 0 0 0 2 2h.2"/>',
   popout: '<path d="M13.6 4h6.4v6.4M20 4l-8.6 8.6"/><path d="M10.4 5H6.2A2.2 2.2 0 0 0 4 7.2v10.6A2.2 2.2 0 0 0 6.2 20h10.6a2.2 2.2 0 0 0 2.2-2.2v-4.2"/>',
   link: '<path d="M10.2 13.8a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.1 1.1"/><path d="M13.8 10.2a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.1-1.1"/>',
+  // (the lock's own body and keyhole, its shackle up and open at the right: published, open to anyone)
+  'lock-open': '<rect x="4.6" y="10.4" width="14.8" height="10.2" rx="2.2"/><path d="M8 10.4V7.6a4 4 0 0 1 7.8-1.2M12 14.6v2"/>',
   globe: '<circle cx="12" cy="12" r="8.8"/><path d="M12 3.2c-2.4 2.4-3.6 5.4-3.6 8.8s1.2 6.4 3.6 8.8c2.4-2.4 3.6-5.4 3.6-8.8S14.4 5.6 12 3.2zM3.4 12h17.2"/>',
   update: '<path d="M19.4 13a7.6 7.6 0 1 1-2.2-6.3l1.6 1.6"/><path d="M19.2 3.6v4.8h-4.8"/>',
   sidebar: '<rect x="3.2" y="4.2" width="17.6" height="15.6" rx="2.6"/><path d="M9.4 4.4v15.2"/>',

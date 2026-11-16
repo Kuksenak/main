@@ -1,23 +1,32 @@
-<!-- Desktops, as the library: one bar at the top (macOS 27's toolbar, 52 tall), staying as the days scroll
-     under it — left to right: the month (bold), Today, + New event; then the calendar at
-     the left and the picked day's events at its right. Phones: the calendar edge to edge, the day's
+<!-- Desktops, as the library (its head's sizes and edges in every mode — components.css): a row at the top
+     (52 tall), staying as the days scroll under it — the month as a page's title, Today, + New event at
+     the right, the picked day over its events' column; then the calendar (320 wide) at the left and the
+     picked day's events at its right; 12 in at the
+     left, 8 at the right. Phones: the calendar edge to edge, the day's
      events under it; Today floating at the bottom left, + at the bottom right. -->
 @if (desktop) {
-  <div data-toolbar class="sticky top-0 z-20 flex h-bar items-center gap-2 bg-app px-4">
-    <h1 class="px-2 text-body font-bold tracking-tight desktop:text-ui desktop:font-semibold">{{ title() }}</h1>
-    <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
-    <app-toolbar-end [addLabel]="'schedule.newEvent'" (add)="create()" />
+  <div data-page-head data-column class="sticky top-0 z-20 bg-app pr-2 pl-3">
+    <div data-toolbar class="flex h-bar items-center gap-10">
+      <!-- (over the calendar: the month, Today; over the events: the picked day — each over its column) -->
+      <span class="flex w-80 shrink-0 items-center gap-2">
+        <h1 class="text-page-title font-normal text-fg">{{ title() }}</h1>
+        <button uiButton type="button" (click)="today()">{{ 'schedule.today' | t }}</button>
+      </span>
+      <h2 class="min-w-0 truncate px-1 text-body font-medium text-fg">{{ dayTitle() }}</h2>
+      <app-toolbar-end class="ml-auto" [addLabel]="'schedule.newEvent'" (add)="create()" />
+    </div>
   </div>
 }
-<div class="flex flex-col gap-4 px-4 pt-2 pb-24 desktop:flex-row desktop:gap-10 desktop:px-5 desktop:pt-4 desktop:pb-12">
-  <section class="flex w-full shrink-0 flex-col gap-1 desktop:w-68 desktop:px-2">
+<div data-column class="flex flex-col gap-4 px-4 pt-2 pb-24 desktop:flex-row desktop:gap-10 desktop:pr-2 desktop:pl-3 desktop:pt-4 desktop:pb-12">
+  <section class="flex w-full shrink-0 flex-col gap-1 desktop:w-80">
     <app-calendar [(selected)]="selected" [(month)]="month" [marked]="store.marked()" />
   </section>
 
   <!-- The picked day's events: a row each — its title, ⟲ if it repeats, its pages' count (desktops),
        its start over its end at the right; past ones gray; a click opens it -->
   <section class="flex min-w-0 flex-1 flex-col gap-2">
-    <h2 class="px-1 text-body font-medium mobile:font-semibold mobile:text-fg-secondary">{{ dayTitle() }}</h2>
+    <!-- (desktops: the day in the head's row, over this column) -->
+    <h2 class="px-1 text-body font-medium desktop:hidden mobile:font-semibold mobile:text-fg-secondary">{{ dayTitle() }}</h2>
     @if (desktop) {
       <div class="flex flex-col gap-0.5">
         @for (event of events(); track event.id + event.startsAt) {
